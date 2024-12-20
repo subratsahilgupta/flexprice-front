@@ -1,10 +1,12 @@
 import './App.css'
+import { RouterProvider } from 'react-router-dom'
+import { MainRouter } from './core/routes/Routes'
+import { AuthProvider } from './core/auth/AuthProvider'
 
-import { Button } from '@/components/atoms'
 export default function App() {
   return (
-    <div>
-      <Button>Click me</Button>
-    </div>
+    <AuthProvider>
+      <RouterProvider router={MainRouter} />
+    </AuthProvider>
   )
 }
