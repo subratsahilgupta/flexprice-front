@@ -1,1 +1,30 @@
-{"root":["./src/app.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/components/atoms/index.ts","./src/components/atoms/button/button.tsx","./src/components/atoms/button/index.ts","./src/components/atoms/input/input.stories.tsx","./src/components/atoms/input/input.tsx","./src/components/atoms/input/index.ts","./src/components/atoms/spinner/spinner.tsx","./src/components/atoms/spinner/index.ts","./src/components/ui/breadcrumb.tsx","./src/core/auth/authprovider.tsx","./src/core/axios/config.ts","./src/core/axios/types.ts","./src/core/axios/verbs.ts","./src/core/routes/routes.tsx","./src/core/supbase/config.ts","./src/hooks/usercontext.tsx","./src/layouts/mainlayout.tsx","./src/lib/utils.ts","./src/models/modeluser.ts","./src/pages/auth/auth.tsx","./src/pages/customer/customer.tsx","./src/utils/api_requests/userapi.ts"],"version":"5.6.3"}
+{
+    "root": [
+        "./src/app.tsx",
+        "./src/main.tsx",
+        "./src/vite-env.d.ts",
+        "./src/components/atoms/index.ts",
+        "./src/components/atoms/button/button.tsx",
+        "./src/components/atoms/button/index.ts",
+        "./src/components/atoms/input/input.stories.tsx",
+        "./src/components/atoms/input/input.tsx",
+        "./src/components/atoms/input/index.ts",
+        "./src/components/atoms/spinner/spinner.tsx",
+        "./src/components/atoms/spinner/index.ts",
+        "./src/components/ui/breadcrumb.tsx",
+        "./src/core/auth/authprovider.tsx",
+        "./src/core/axios/config.ts",
+        "./src/core/axios/types.ts",
+        "./src/core/axios/verbs.ts",
+        "./src/core/routes/routes.tsx",
+        "./src/core/supbase/config.ts",
+        "./src/hooks/usercontext.tsx",
+        "./src/layouts/mainlayout.tsx",
+        "./src/lib/utils.ts",
+        "./src/models/modeluser.ts",
+        "./src/pages/auth/auth.tsx",
+        "./src/pages/customer/customer.tsx",
+        "./src/utils/api_requests/userapi.ts"
+    ],
+    "version": "5.6.3"
+}
