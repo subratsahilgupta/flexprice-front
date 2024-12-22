@@ -2,7 +2,6 @@ import React, {useState } from 'react';
 import { useUser } from '@/hooks/UserContext';
 import { Button, Input } from "@/components/atoms";
 import toast, { Toaster } from 'react-hot-toast';
-import { fetchMe } from './service/auth_service';
 import { useNavigate } from 'react-router-dom';
 import supabase from '@/core/supbase/config';
 
@@ -19,17 +18,12 @@ const AuthPage: React.FC = () => {
         const email = formData.get('email') as string;
         const password = formData.get('password') as string;
 
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const {data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) {
             toast.error(error.message);
         } else {
-            const userData = await fetchMe();
-            if (userData) {
-                userContext.setUser(userData);
+                userContext.setUser(data);
                 navigate('/'); 
-            } else {
-                toast.error('Failed to fetch user data.');
-            }
         }
         setLoading(false);
     };
