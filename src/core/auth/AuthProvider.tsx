@@ -30,8 +30,8 @@ const AuthMiddleware: React.FC<AuthMiddlewareProps> = ({ children, requiredRole 
 
     useEffect(() => {
         if (user) {
-            userContext.setUser(user);
             console.log(requiredRole);
+            userContext.setUser(user);
         }
     }, [user, userContext]);
 
