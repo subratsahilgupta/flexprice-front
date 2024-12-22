@@ -1,12 +1,11 @@
-import { UserService } from "@/utils/api_requests/UserApi"
-import { useUser } from "@/hooks/UserContext"
+import { UserService, User } from "@/utils/api_requests/UserApi"
 
-const fetchMe = async () => {
-    const userContext = useUser()
+export const fetchMe = async (): Promise<User | undefined> => {
+
     try {
         const data = await UserService.me()
-        userContext.setUser(data)
+        return data
     } catch (err: any) {
-        console.error('Error fetching user data:', err)
+        console.log(err)
     }
 }

@@ -1,41 +1,20 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import supabase from '../../core/supbase/config';
+import React, {useState } from 'react';
 import { useUser } from '@/hooks/UserContext';
-import { UserService } from '@/utils/api_requests/UserApi';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Input } from "@/components/atoms";
 import toast, { Toaster } from 'react-hot-toast';
+import { fetchMe } from './service/auth_service';
+import { useNavigate } from 'react-router-dom';
+import supabase from '@/core/supbase/config';
 
 const AuthPage: React.FC = () => {
+    const navigate = useNavigate();
     const userContext = useUser();
-    const queryClient = useQueryClient();
-    const navigate = useNavigate(); // React Router's navigation hook
-
-    const { data: userData, isLoading, isError, refetch } = useQuery({
-        queryKey: ['fetchUser'],
-        queryFn: () => UserService.me(),
-        enabled: false,
-    });
-
-    useEffect(() => {
-        const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-            if (event === 'SIGNED_IN') {
-                userContext.setUser(session?.user || null);
-                navigate('/'); 
-            } else if (event === 'SIGNED_OUT') {
-                userContext.setUser(null);
-                queryClient.invalidateQueries({ queryKey: ['fetchUser'] });
-            }
-        });
-
-        return () => {
-            authListener.subscription.unsubscribe();
-        };
-    }, [refetch, userContext, queryClient, navigate]);
+    const [loading, setLoading] = useState(false);
 
     const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        setLoading(true);
+
         const formData = new FormData(event.currentTarget);
         const email = formData.get('email') as string;
         const password = formData.get('password') as string;
@@ -44,14 +23,21 @@ const AuthPage: React.FC = () => {
         if (error) {
             toast.error(error.message);
         } else {
-            refetch();
+            const userData = await fetchMe();
+            if (userData) {
+                userContext.setUser(userData);
+                navigate('/'); 
+            } else {
+                toast.error('Failed to fetch user data.');
+            }
         }
+        setLoading(false);
     };
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-50">
             <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
-                <Toaster/>
+                <Toaster />
                 <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">
                     Login to Your Account
                 </h2>
@@ -74,7 +60,7 @@ const AuthPage: React.FC = () => {
                             required
                         />
                     </div>
-                    <Button type="submit" className="w-full" loading={isLoading}>
+                    <Button type="submit" className="w-full" loading={loading}>
                         Login
                     </Button>
                 </form>

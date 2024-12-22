@@ -4,7 +4,6 @@ import { Toaster } from 'react-hot-toast';
 const MainLayout: React.FC = () => {
   const location = useLocation();
 
-  // Extract breadcrumb segments from the URL path
   const pathSegments = location.pathname.split('/').filter((segment) => segment);
 
   return (

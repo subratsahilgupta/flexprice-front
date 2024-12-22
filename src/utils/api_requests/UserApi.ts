@@ -1,6 +1,6 @@
 import { AxiosClient } from "@/core/axios/verbs";
 
-interface User {
+export interface User {
     id: string;
     name: string;
     email: string;
@@ -46,6 +46,6 @@ export class UserService {
     }
 
     public static async me(): Promise<User> {
-        return await AxiosClient.get<User>(`${this.baseUrl}/me`);
+       return await AxiosClient.get<User>(`${this.baseUrl}/me`);
     }
 }
