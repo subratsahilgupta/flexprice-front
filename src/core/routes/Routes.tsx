@@ -2,6 +2,7 @@ import MainLayout from "@/layouts/MainLayout";
 import Auth from "@/pages/auth/Auth";
 import { createBrowserRouter } from "react-router-dom";
 import CustomerPage from "@/pages/customer/Customer";
+import AuthMiddleware from "../auth/AuthProvider";
 
 
 const RouteNames = {
@@ -41,10 +42,15 @@ export const MainRouter = createBrowserRouter([
         path: RouteNames.login.path,
         element: <Auth/>
     },
+
     {
         path: RouteNames.home.path,
-        element: <MainLayout/>,
+        element: <AuthMiddleware requiredRole={['admin']}><MainLayout/></AuthMiddleware>,
         children:[
+            {
+                path: '/',
+                element: <CustomerPage />,
+            },
             {
                 path: RouteNames.plans.path,
                 element: <CustomerPage/>

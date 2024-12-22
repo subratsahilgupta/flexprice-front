@@ -46,6 +46,6 @@ export class UserService {
     }
 
     public static async me(): Promise<User> {
-        return await AxiosClient.get<User>("/me");
+        return await AxiosClient.get<User>(`${this.baseUrl}/me`);
     }
 }

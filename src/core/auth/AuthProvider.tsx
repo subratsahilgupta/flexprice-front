@@ -1,121 +1,60 @@
-import React, { createContext, useEffect, useState, ReactNode } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { ReactNode, useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
 import supabase from '../supbase/config';
+import { useUser } from '@/hooks/UserContext';
+import { useQuery } from '@tanstack/react-query';
+import { Spinner } from '@/components/atoms/Spinner';
 
-interface AuthContextType {
-  user: any;
-  roles: string[] | null;
-  signOut: () => Promise<void>;
-  isLoading: boolean;
+interface AuthMiddlewareProps {
+    children: ReactNode;
+    requiredRole: string[];
 }
 
-export const AuthContext = createContext<AuthContextType | null>(null);
-
-// Define public and private routes
-const PUBLIC_ROUTES = ['/login', '/signup', '/forgot-password'];
-const ROLE_BASED_ROUTES: Record<string, string[]> = {
-  admin: ['/admin', '/plans', '/metering', '/query', '/customer'],
-  user: ['/plans', '/customer'],
-  // Add more role-based routes as needed
+const fetchUser = async () => {
+    const { data, error } = await supabase.auth.getUser();
+    if (error) {
+        throw error;
+    }
+    return data.user;
 };
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<any>(null);
-  const [roles, setRoles] = useState<string[] | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
-  const location = useLocation();
+const AuthMiddleware: React.FC<AuthMiddlewareProps> = ({ children, requiredRole }) => {
+    const userContext = useUser();
 
-  const checkAccess = (userRoles: string[] | null, path: string) => {
-    if (!userRoles || userRoles.length === 0) return false;
-    return userRoles.some(role => ROLE_BASED_ROUTES[role]?.some(route => path.startsWith(route)));
-  };
-
-  const handleNavigation = (user: any, userRoles: string[] | null) => {
-    const currentPath = location.pathname;
-    
-    if (!user) {
-      // If not logged in and trying to access private route, redirect to login
-      if (!PUBLIC_ROUTES.includes(currentPath)) {
-        navigate('/login', { replace: true });
-      }
-      return;
-    }
-
-    // User is logged in but on public route, redirect to default page
-    if (PUBLIC_ROUTES.includes(currentPath)) {
-      navigate('/', { replace: true });
-      return;
-    }
-
-    // Check if user has access to current route
-    if (!checkAccess(userRoles, currentPath)) {
-      // Redirect to first allowed route or fallback to home
-      const firstAllowedRoute = userRoles?.length 
-        ? ROLE_BASED_ROUTES[userRoles[0]]?.[0] 
-        : '/';
-      navigate(firstAllowedRoute || '/', { replace: true });
-    }
-  };
-
-  useEffect(() => {
-    const fetchUserAndRoles = async () => {
-      setIsLoading(true);
-      const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user || null);
-
-      if (session?.user) {
-        const { data: roleData, error } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', session.user.id);
-
-        if (error) {
-          console.error('Error fetching roles:', error);
-          setRoles(null);
-        } else {
-          const userRoles = roleData.map((item: { role: string }) => item.role);
-          setRoles(userRoles);
-          handleNavigation(session.user, userRoles);
-        }
-      } else {
-        setRoles(null);
-        handleNavigation(null, null);
-      }
-      setIsLoading(false);
-    };
-
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user || null);
-      if (session?.user) {
-        fetchUserAndRoles();
-      } else {
-        setRoles(null);
-        handleNavigation(null, null);
-      }
+    const { data: user, isLoading, isError } = useQuery({
+        queryKey: ['fetchUser'],
+        queryFn: fetchUser,
+        retry: 1,
+        staleTime: 1000 * 60 * 5,
     });
 
-    fetchUserAndRoles();
+    useEffect(() => {
+        if (user) {
+            userContext.setUser(user);
+            console.log(requiredRole);
+        }
+    }, [user, userContext]);
 
-    return () => {
-      listener?.subscription.unsubscribe();
-    };
-  }, [location.pathname]);
+    if (isLoading) {
+        return (
+            <div className="fixed inset-0 flex items-center justify-center bg-white/80 z-50">
+                <div className="flex flex-col items-center gap-2">
+                    <Spinner size={50} className="text-primary" />
+                    <p className="text-sm text-gray-500">Loading...</p>
+                </div>
+            </div>
+        );
+    }
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setRoles(null);
-    navigate('/login', { replace: true });
-  };
+    if (isError || !user) {
+        return <Navigate to="/login" />;
+    }
 
-  if (isLoading) {
-    return <div>Loading...</div>; // Or your loading component
-  }
+    // if (requiredRole && !requiredRole.includes(user.role)) {
+    //     return <Navigate to="/not-authorized" />;
+    // }
 
-  return (
-    <AuthContext.Provider value={{ user, roles, signOut, isLoading }}>
-      {children}
-    </AuthContext.Provider>
-  );
+    return <>{children}</>;
 };
+
+export default AuthMiddleware;
