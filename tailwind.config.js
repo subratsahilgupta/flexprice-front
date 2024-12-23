@@ -5,8 +5,12 @@ export default {
 	content: ['./index.html', './src/**/*.{ts,tsx,js,jsx}'],
 	theme: {
 		extend: {
+			fontSize: {
+				xs: '12px',
+			},
 			fontFamily: {
 				inter: ['Inter', 'sans-serif'],
+				'open-sans': ['Open Sans', 'sans-serif'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -63,6 +67,7 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))',
+					'text-accent-foreground': '#18181B',
 				},
 			},
 		},

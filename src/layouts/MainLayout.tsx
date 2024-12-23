@@ -1,7 +1,8 @@
-import { Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import Sidebar from '@/components/molecules/Sidebar';
+import { Sidebar } from '@/components/molecules/Sidebar';
+import { BsChevronRight } from 'react-icons/bs';
 
 const MainLayout: React.FC = () => {
 	const location = useLocation();
@@ -14,7 +15,7 @@ const MainLayout: React.FC = () => {
 			<Sidebar />
 
 			{/* right layout  */}
-			<SidebarInset className='flex flex-col flex-1'>
+			<SidebarInset className='flex flex-col flex-1 bg-white'>
 				<header className='bg-white shadow-sm'>
 					<div className='px-6 py-4'>
 						{/* breadcrumbs */}
@@ -22,13 +23,18 @@ const MainLayout: React.FC = () => {
 							{pathSegments.map((segment, index) => {
 								const path = `/${pathSegments.slice(0, index + 1).join('/')}`;
 								const name = decodeURIComponent(segment);
+								const isCurrentPath = index === pathSegments.length - 1;
 
 								return (
 									<span key={index} className='flex items-center'>
-										<a href={path} className='hover:text-gray-800 capitalize'>
+										<Link to={path} className={`hover:text-gray-800 capitalize ${isCurrentPath ? 'font-semibold text-[#020617]' : ''}`}>
 											{name}
-										</a>
-										{index < pathSegments.length - 1 && <span className='mx-2'>/</span>}
+										</Link>
+										{index < pathSegments.length - 1 && (
+											<span className='mx-2'>
+												<BsChevronRight />
+											</span>
+										)}
 									</span>
 								);
 							})}

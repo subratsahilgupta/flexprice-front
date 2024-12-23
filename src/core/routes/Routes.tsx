@@ -57,6 +57,12 @@ export const MainRouter = createBrowserRouter([
 			{
 				path: RouteNames.plans.path,
 				element: <CustomerPage />,
+				children: [
+					{
+						path: RouteNames.plans.path + 'create',
+						element: <CustomerPage />,
+					},
+				],
 			},
 		],
 	},
