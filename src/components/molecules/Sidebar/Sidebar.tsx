@@ -65,7 +65,14 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 		<Sidebar collapsible='icon' {...props} className='font-open-sans border-none shadow-md max-w-[256px] bg-[#F8FAFC]'>
 			<SidebarHeader>
 				<div className='w-full mt-2 flex items-center justify-between'>
-					<img src='/assets/logo/logo.png' alt='FlexPrice Logo' className={`h-6 ml-5 bg-contain ${!open ? 'hidden' : '/assets/svg/'}`} />
+					<div className={`h-6 flex w-full rounded-md items-center gap-2 bg-contain ${!open ? 'hidden' : ''}`}>
+						<img
+							src={'https://api.dicebear.com/7.x/adventurer-neutral/svg?seed=mail@ashallendesign.co.uk'}
+							className='size-8 bg-contain rounded-md'
+							alt='company logo'
+						/>
+						<p className='font-semibold text-[14px]'>Acme Inc</p>
+					</div>
 
 					<SidebarTrigger />
 				</div>
