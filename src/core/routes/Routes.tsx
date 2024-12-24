@@ -3,6 +3,7 @@ import Auth from '@/pages/auth/Auth';
 import { createBrowserRouter } from 'react-router-dom';
 import CustomerPage from '@/pages/customer/Customer';
 import AuthMiddleware from '../auth/AuthProvider';
+import BillableMetricsPage from '@/pages/usage/BillableMetrics';
 
 const RouteNames = {
 	home: {
@@ -19,6 +20,15 @@ const RouteNames = {
 		edit: {
 			path: '/edit/:id',
 			routing_path: '/edit/',
+		},
+	},
+	usage: {
+		path: '/usage',
+		billableMetric: {
+			path: 'billable-metric',
+		},
+		addMeter: {
+			path: 'add-meter',
 		},
 	},
 	metering: {
@@ -57,11 +67,19 @@ export const MainRouter = createBrowserRouter([
 			{
 				path: RouteNames.plans.path,
 				element: <CustomerPage />,
+			},
+			{
+				path: RouteNames.usage.path,
+				element: <BillableMetricsPage />,
 				children: [
-					{
-						path: RouteNames.plans.path + 'create',
-						element: <CustomerPage />,
-					},
+					// {
+					// 	path: RouteNames.usage.billableMetric.path,
+					// 	element: <BillableMetric />,
+					// },
+					// {
+					// 	path: RouteNames.usage.addMeter.path,
+					// 	element: <AddMeter />,
+					// },
 				],
 			},
 		],

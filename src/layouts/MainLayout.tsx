@@ -16,8 +16,8 @@ const MainLayout: React.FC = () => {
 
 			{/* right layout  */}
 			<SidebarInset className='flex flex-col flex-1 bg-white'>
-				<header className='bg-white shadow-sm'>
-					<div className='px-6 py-4'>
+				<header className='bg-white '>
+					<div className='px-4 py-6'>
 						{/* breadcrumbs */}
 						<nav className='flex items-center space-x-2 text-sm text-gray-500'>
 							{pathSegments.map((segment, index) => {
@@ -43,7 +43,7 @@ const MainLayout: React.FC = () => {
 				</header>
 
 				{/* main layout */}
-				<main className='flex-1 p-6'>
+				<main className='flex-1 px-4 '>
 					<Outlet />
 				</main>
 			</SidebarInset>
