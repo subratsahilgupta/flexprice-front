@@ -7,6 +7,7 @@ export default {
 		extend: {
 			fontSize: {
 				xs: '12px',
+				sm: '14px',
 			},
 			fontFamily: {
 				inter: ['Inter', 'sans-serif'],
@@ -18,6 +19,8 @@ export default {
 				sm: 'calc(var(--radius) - 4px)',
 			},
 			colors: {
+				// zinc: '#09090B',
+
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				card: {
@@ -38,7 +41,7 @@ export default {
 				},
 				muted: {
 					DEFAULT: 'hsl(var(--muted))',
-					foreground: 'hsl(var(--muted-foreground))',
+					foreground: '#64748B',
 				},
 				accent: {
 					DEFAULT: 'hsl(var(--accent))',

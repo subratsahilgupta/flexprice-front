@@ -10,13 +10,13 @@ const MainLayout: React.FC = () => {
 	const pathSegments = location.pathname.split('/').filter((segment) => segment);
 
 	return (
-		<SidebarProvider className='flex h-screen bg-gray-100'>
+		<SidebarProvider className='flex h-screen bg-gray-100 relative'>
 			{/* sidebar */}
 			<Sidebar />
 
 			{/* right layout  */}
-			<SidebarInset className='flex flex-col flex-1 bg-white'>
-				<header className='bg-white '>
+			<SidebarInset className='flex flex-col flex-1 bg-white h-screen relative overflow-y-auto'>
+				<header className='bg-white sticky top-0 z-10 '>
 					<div className='px-6 py-4'>
 						{/* breadcrumbs */}
 						<nav className='flex items-center space-x-2 text-sm text-gray-500'>
@@ -28,7 +28,7 @@ const MainLayout: React.FC = () => {
 								return (
 									<span key={index} className='flex items-center'>
 										<Link to={path} className={`hover:text-gray-800 capitalize ${isCurrentPath ? 'font-normal text-[#020617]' : ''}`}>
-											{name}
+											{name.replace(/-/g, ' ')}
 										</Link>
 										{index < pathSegments.length - 1 && (
 											<span className='mx-2'>

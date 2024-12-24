@@ -4,6 +4,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import CustomerPage from '@/pages/customer/Customer';
 import AuthMiddleware from '../auth/AuthProvider';
 import BillableMetricsPage from '@/pages/usage/BillableMetrics';
+import AddMeterPage from '@/pages/usage/AddMeter';
 
 const RouteNames = {
 	home: {
@@ -22,13 +23,13 @@ const RouteNames = {
 			routing_path: '/edit/',
 		},
 	},
-	usage: {
-		path: '/usage',
+	usageTracking: {
+		path: '/usage-tracking',
 		billableMetric: {
 			path: 'billable-metric',
-		},
-		addMeter: {
-			path: 'add-meter',
+			addMeter: {
+				path: 'add-meter',
+			},
 		},
 	},
 	metering: {
@@ -69,17 +70,16 @@ export const MainRouter = createBrowserRouter([
 				element: <CustomerPage />,
 			},
 			{
-				path: RouteNames.usage.path,
-				element: <BillableMetricsPage />,
+				path: RouteNames.usageTracking.path,
 				children: [
-					// {
-					// 	path: RouteNames.usage.billableMetric.path,
-					// 	element: <BillableMetric />,
-					// },
-					// {
-					// 	path: RouteNames.usage.addMeter.path,
-					// 	element: <AddMeter />,
-					// },
+					{
+						path: RouteNames.usageTracking.billableMetric.path,
+						element: <BillableMetricsPage />,
+					},
+					{
+						path: `${RouteNames.usageTracking.billableMetric.path}/${RouteNames.usageTracking.billableMetric.addMeter.path}`,
+						element: <AddMeterPage />,
+					},
 				],
 			},
 		],
