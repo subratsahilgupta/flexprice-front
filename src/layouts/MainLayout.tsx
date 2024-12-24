@@ -17,7 +17,7 @@ const MainLayout: React.FC = () => {
 			{/* right layout  */}
 			<SidebarInset className='flex flex-col flex-1 bg-white'>
 				<header className='bg-white '>
-					<div className='px-4 py-6'>
+					<div className='px-6 py-4'>
 						{/* breadcrumbs */}
 						<nav className='flex items-center space-x-2 text-sm text-gray-500'>
 							{pathSegments.map((segment, index) => {
@@ -27,7 +27,7 @@ const MainLayout: React.FC = () => {
 
 								return (
 									<span key={index} className='flex items-center'>
-										<Link to={path} className={`hover:text-gray-800 capitalize ${isCurrentPath ? 'font-semibold text-[#020617]' : ''}`}>
+										<Link to={path} className={`hover:text-gray-800 capitalize ${isCurrentPath ? 'font-normal text-[#020617]' : ''}`}>
 											{name}
 										</Link>
 										{index < pathSegments.length - 1 && (
