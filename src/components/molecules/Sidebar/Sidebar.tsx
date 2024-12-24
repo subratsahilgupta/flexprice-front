@@ -8,17 +8,17 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 		'Usage Tracking': [
 			{
 				title: 'Billable Metrics',
-				url: '/usage',
+				url: '/usage-tracking/billable-metric',
 				icon: '/assets/svg/billable_metrics.svg',
 			},
 			{
 				title: 'Query',
-				url: '/customers',
+				url: '/usage-tracking/customers',
 				icon: '/assets/svg/query.svg',
 			},
 			{
 				title: 'Events',
-				url: '/metering',
+				url: '/usage-tracking/metering',
 				icon: '/assets/svg/events.svg',
 				isActive: false,
 				// items: [

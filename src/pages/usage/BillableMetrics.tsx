@@ -4,6 +4,7 @@ import { LiaSlidersHSolid } from 'react-icons/lia';
 import { FiFolderPlus } from 'react-icons/fi';
 import { BillableMetricTable } from '@/components/molecules';
 import { BillableMetric } from '@/components/molecules/BillableMetricTable';
+import { Link } from 'react-router-dom';
 
 const BillableMetricsPage = () => {
 	const dummyData: BillableMetric[] = [
@@ -43,10 +44,12 @@ const BillableMetricsPage = () => {
 					<button className='px-2 py-1'>
 						<LiaSlidersHSolid className='size-5 text-[#09090B] ' />
 					</button>
-					<Button className='w-32 flex gap-2 bg-[#0F172A] '>
-						<FiFolderPlus />
-						<span>Add Meter</span>
-					</Button>
+					<Link to='/usage-tracking/billable-metric/add-meter'>
+						<Button className='w-32 flex gap-2 bg-[#0F172A] '>
+							<FiFolderPlus />
+							<span>Add Meter</span>
+						</Button>
+					</Link>
 				</div>
 			</SectionHeader>
 			<div className=''>
