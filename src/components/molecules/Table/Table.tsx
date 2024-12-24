@@ -12,7 +12,7 @@ export interface ColumnData {
 	suffixIcon?: ReactNode;
 	align?: 'left' | 'center' | 'right' | 'justify';
 	render?: (rowData: any) => ReactNode;
-	children: ReactNode;
+	children?: ReactNode;
 	className?: string;
 }
 
