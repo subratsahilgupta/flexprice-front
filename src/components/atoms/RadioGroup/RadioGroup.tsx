@@ -14,7 +14,7 @@ interface RadioMenuItem {
 	value?: string;
 	label?: string;
 	icon?: FC | IconType;
-	desciption?: string;
+	description?: string;
 }
 
 const RadioGroup: FC<Props> = ({ items, onChange, selected, title, disabled }) => {
@@ -42,7 +42,7 @@ const RadioGroup: FC<Props> = ({ items, onChange, selected, title, disabled }) =
 
 							<div>
 								<p className='font-medium font-inter text-sm'>{item.label}</p>
-								<p className='font-normal font-inter text-sm text-zinc-500 '>{item.desciption}</p>
+								<p className='font-normal font-inter text-sm text-zinc-500 '>{item.description}</p>
 							</div>
 						</div>
 					);

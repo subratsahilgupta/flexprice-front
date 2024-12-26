@@ -5,6 +5,7 @@ import CustomerPage from '@/pages/customer/Customer';
 import AuthMiddleware from '../auth/AuthProvider';
 import BillableMetricsPage from '@/pages/usage/BillableMetrics';
 import AddMeterPage from '@/pages/usage/AddMeter';
+import EditMeterPage from '@/pages/usage/EditMeterPage';
 
 const RouteNames = {
 	home: {
@@ -29,6 +30,9 @@ const RouteNames = {
 			path: 'billable-metric',
 			addMeter: {
 				path: 'add-meter',
+			},
+			editMeter: {
+				path: 'edit-meter',
 			},
 		},
 	},
@@ -79,6 +83,10 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: `${RouteNames.usageTracking.billableMetric.path}/${RouteNames.usageTracking.billableMetric.addMeter.path}`,
 						element: <AddMeterPage />,
+					},
+					{
+						path: `${RouteNames.usageTracking.billableMetric.path}/${RouteNames.usageTracking.billableMetric.editMeter.path}`,
+						element: <EditMeterPage />,
 					},
 				],
 			},

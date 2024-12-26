@@ -6,6 +6,7 @@ import { LuCircleFadingPlus, LuRefreshCw } from 'react-icons/lu';
 import { cn } from '@/lib/utils';
 
 interface MeterFormData {
+	id?: string;
 	eventName: string;
 	displayName: string;
 	eventFilters: EventFilterData[];
@@ -24,12 +25,11 @@ const MeterFormSchema = z.object({
 	eventName: z.string().min(1, { message: 'Event Name is required' }),
 	displayName: z.string().min(1, { message: 'Display Name is required' }),
 	eventFilters: z
-		.array(
-			z.object({
-				key: z.string().min(1, { message: 'Filter key is required' }),
-				value: z.array(z.string().min(1, { message: 'Filter value is required' })),
-			}),
-		)
+		.array(z.any())
+		// z.object({
+		// 	key: z.string().min(1, { message: 'Filter key is required' }).optional(),
+		// 	value: z.array(z.string().min(1, { message: 'Filter value is required' })).optional(),
+		// }),
 		.optional(),
 	aggregationFunction: z.enum(['SUM', 'COUNT'], { errorMap: () => ({ message: 'Invalid aggregation function' }) }),
 	aggregationValue: z.string().min(1, { message: 'Aggregation Value is required' }),
@@ -53,13 +53,13 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 	const radioMenuItemList = [
 		{
 			label: 'Cumulative',
-			desciption: 'Email digest, mentions & all activity.',
+			description: 'Email digest, mentions & all activity.',
 			value: 'cumulative',
 			icon: LuCircleFadingPlus,
 		},
 		{
 			label: 'Period',
-			desciption: 'Only mentions and comments.',
+			description: 'Only mentions and comments.',
 			value: 'period',
 			icon: LuRefreshCw,
 		},
@@ -81,8 +81,30 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 		const validation = MeterFormSchema.safeParse(formData);
 
 		if (validation.success) {
-			// If valid, call the onSubmit callback with mode
-			onSubmit(validation.data as unknown as MeterFormData, isEditMode ? 'edit' : 'add');
+			const formData = {
+				event_name: eventName,
+				name: displayName,
+				aggregation: {
+					type: aggregationFunction,
+					field: aggregationValue,
+				},
+				filters: eventFilters
+					.filter((filter) => filter.key && filter.value.length > 0)
+					.map((filter) => ({
+						key: filter.key,
+						values: filter.value,
+					})),
+			};
+
+			onSubmit(formData as unknown as MeterFormData, isEditMode ? 'edit' : 'add');
+
+			setDisplayName('');
+			setEventName('');
+			setEventFilters([]);
+			setAggregationFunction('SUM');
+			setAggregationValue('');
+			setAggregationType('');
+
 			setErrors({});
 			console.log('Form data:', validation.data);
 		} else {

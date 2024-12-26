@@ -2,30 +2,38 @@ import ActionButton from './ActionButton';
 import { FC } from 'react';
 import { Chip } from '@/components/atoms';
 import FlexpriceTable, { ColumnData } from '../Table';
+import { Meter } from '@/utils/api_requests/MeterApi';
 
-export interface BillableMetric {
-	eventName: string;
-	aggregateType: string;
-	aggregateValue: string;
-	status: string;
-	updatedAt: Date;
-	_id: string;
-}
+const formatDate = (date: string, locale: string = 'en-US'): string => {
+	const parsedDate = new Date(date);
 
-const formatDate = (date: Date): string => {
-	const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-	return new Date(date).toLocaleDateString('en-US', options);
+	if (isNaN(parsedDate.getTime())) {
+		return 'Invalid Date';
+	}
+
+	const options: Intl.DateTimeFormatOptions = {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	};
+
+	return parsedDate.toLocaleDateString(locale, options);
 };
 
 export interface BillableMetricTableProps {
-	data: BillableMetric[];
+	data: Meter[];
 }
 
 const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
+	const mappedData = data.map((meter) => ({
+		...meter,
+		aggregation_type: meter.aggregation.type,
+		aggregation_field: meter.aggregation.field,
+	}));
 	const columns: ColumnData[] = [
-		{ name: 'eventName', title: 'Event Name', width: '400px' },
-		{ name: 'aggregateType', title: 'Aggregate Type', align: 'center' },
-		{ name: 'aggregateValue', title: 'Aggregate Value', align: 'center' },
+		{ name: 'event_name', title: 'Event Name', width: '400px' },
+		{ name: 'aggregation_type', title: 'Aggregate Type', align: 'center' },
+		{ name: 'aggregation_field', title: 'Aggregate Value', align: 'center' },
 		{
 			name: 'status',
 			title: 'Status',
@@ -33,18 +41,20 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 			render: (row) => <Chip isActive={row.status === 'Active'} label={row.status} />,
 		},
 		{
-			name: 'updatedAt',
+			name: 'updated_at',
 			title: 'Updated At',
-			render: (row) => <span className='text-[#09090B] '>{formatDate(row.updatedAt)}</span>,
+			render: (row) => {
+				return <span className='text-[#09090B] '>{formatDate(row.updated_at)}</span>;
+			},
 		},
 		{
 			name: 'actions',
 			title: '',
-			render: () => <ActionButton />,
+			render: (row) => <ActionButton id={row.id} />,
 		},
 	];
 
-	return <FlexpriceTable columns={columns} data={data} />;
+	return <FlexpriceTable columns={columns} data={mappedData} />;
 };
 
 export default BillableMetricTable;
