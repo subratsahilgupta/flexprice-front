@@ -65,12 +65,7 @@ const TableHead = React.forwardRef<
 	<th
 		ref={ref}
 		style={{ textAlign: align, width: width ? (typeof width === 'number' ? `${width}px` : width) : undefined, ...style }}
-		className={cn(
-			'h-12 px-4 text-[14px] font-medium text-[#64748B]',
-			`text-${align}`, // Apply horizontal alignment
-			'align-middle', // Vertically align middle
-			className,
-		)}
+		className={cn('h-12 px-4 text-[14px] font-medium text-[#64748B]', `text-${align}`, 'align-middle', className)}
 		{...props}
 	/>
 ));
@@ -113,7 +108,7 @@ const FlexpriceTable: FC<FlexpriceTableProps> = ({ columns, data }) => {
 						{columns.map(({ name, flex = 1, width, textColor = 'inherit', align = 'left', render }, colIndex) => (
 							<TableCell
 								key={colIndex}
-								className={cn(textColor ? `text-[${textColor}]` : 'text-[#09090B]', 'text-normal', 'max-h-8 px-4 py-3 text-[14px]')}
+								className={cn(textColor ? `text-[${textColor}]` : 'text-[#09090B]', 'font-normal', 'max-h-8 px-4 py-3 text-[14px]')}
 								style={{ flex: width ? undefined : flex }}
 								width={width}
 								align={align}>

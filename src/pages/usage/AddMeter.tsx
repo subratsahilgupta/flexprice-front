@@ -1,12 +1,12 @@
-import { MeterForm, MeterFormData } from '@/components/organisms';
-import { MeterApi } from '@/utils/api_requests/MeterApi';
+import { MeterForm } from '@/components/organisms';
+import { Meter, MeterApi } from '@/utils/api_requests/MeterApi';
 import { useMutation } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 
 const AddMeterPage = () => {
 	const { mutate: createMeter } = useMutation({
 		mutationKey: ['addMeter'],
-		mutationFn: async (data: MeterFormData) => {
+		mutationFn: async (data: Partial<Meter>) => {
 			const res = await MeterApi.createMeter(data);
 			return res;
 		},
@@ -19,7 +19,7 @@ const AddMeterPage = () => {
 		},
 	});
 
-	const handleCreateMeter = (data: MeterFormData) => {
+	const handleCreateMeter = (data: Meter) => {
 		createMeter(data);
 	};
 

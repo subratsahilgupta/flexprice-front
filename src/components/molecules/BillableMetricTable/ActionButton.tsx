@@ -18,17 +18,17 @@ const ActionButton: FC<Props> = ({ id }) => {
 			<DropdownMenuContent>
 				<DropdownMenuItem>
 					<Link to={`/usage-tracking/billable-metric/edit-meter?id=${id}`}>
-						<span className='flex gap-2'>
+						<div className='flex gap-2 items-center w-full'>
 							<MdEdit />
 							<span>Edit</span>
-						</span>
+						</div>
 					</Link>
 				</DropdownMenuItem>
 				<DropdownMenuItem>
-					<span className='flex gap-2'>
+					<div className='flex gap-2 items-center w-full'>
 						<FaRegEyeSlash />
 						<span>Archive</span>
-					</span>
+					</div>
 				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>

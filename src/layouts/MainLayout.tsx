@@ -16,7 +16,7 @@ const MainLayout: React.FC = () => {
 
 			{/* right layout  */}
 			<SidebarInset className='flex flex-col flex-1 bg-white h-screen relative overflow-y-auto'>
-				<header className='bg-white sticky top-0 z-10 '>
+				<header className='bg-white sticky top-0 z-10 shadow-sm'>
 					<div className='px-6 py-4'>
 						{/* breadcrumbs */}
 						<nav className='flex items-center space-x-2 text-sm text-gray-500'>
