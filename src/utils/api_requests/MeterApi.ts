@@ -1,4 +1,3 @@
-import { MeterFormData } from '@/components/organisms';
 import { AxiosClient } from '@/core/axios/verbs';
 
 export interface Meter {
@@ -23,8 +22,8 @@ export interface Meter {
 export class MeterApi {
 	private static baseUrl = '/meters';
 
-	public static async createMeter(data: MeterFormData) {
-		return await AxiosClient.post<Meter, MeterFormData>(this.baseUrl, data);
+	public static async createMeter(data: Partial<Meter>) {
+		return await AxiosClient.post<Meter, Partial<Meter>>(this.baseUrl, data);
 	}
 	public static async getAllMeters() {
 		return await AxiosClient.get<Meter[]>(this.baseUrl);
