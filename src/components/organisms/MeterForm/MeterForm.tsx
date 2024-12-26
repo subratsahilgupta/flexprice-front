@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { z } from 'zod';
 import { Input, RadioGroup, Select } from '@/components/atoms';
-import { EventFilter } from '@/components/molecules';
+import { EventFilter, EventFilterData } from '@/components/molecules';
 import { LuCircleFadingPlus, LuRefreshCw } from 'react-icons/lu';
 import { cn } from '@/lib/utils';
 import { Meter } from '@/utils/api_requests/MeterApi';
@@ -34,9 +34,7 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 
 	const [eventName, setEventName] = useState(data?.event_name || '');
 	const [displayName, setDisplayName] = useState(data?.name || '');
-	const [eventFilters, setEventFilters] = useState<{ key: string; value: string[] }[]>(
-		data?.filters?.map((filter) => ({ key: filter.key, value: filter.values })) || [],
-	);
+	const [eventFilters, setEventFilters] = useState<{ key: string; value: string[] }[]>([]);
 	const [aggregationFunction, setAggregationFunction] = useState(data?.aggregation.type || 'SUM');
 	const [aggregationValue, setAggregationValue] = useState(data?.aggregation.field || '');
 	const [aggregationType, setAggregationType] = useState(data?.aggregation.field || '');
@@ -176,7 +174,12 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 					</div>
 
 					<div className=''>
-						<EventFilter eventFilters={eventFilters} setEventFilters={setEventFilters} error={errors.eventFilters} />
+						<EventFilter
+							eventFilters={eventFilters}
+							setEventFilters={setEventFilters}
+							error={errors.eventFilters}
+							permanentFilters={data?.filters as EventFilterData[] | undefined}
+						/>
 					</div>
 				</div>
 
