@@ -1,23 +1,14 @@
 import React, { useState } from 'react';
 import { z } from 'zod';
 import { Input, RadioGroup, Select } from '@/components/atoms';
-import { EventFilter, EventFilterData } from '@/components/molecules';
+import { EventFilter } from '@/components/molecules';
 import { LuCircleFadingPlus, LuRefreshCw } from 'react-icons/lu';
 import { cn } from '@/lib/utils';
-
-interface MeterFormData {
-	id?: string;
-	eventName: string;
-	displayName: string;
-	eventFilters: EventFilterData[];
-	aggregationFunction: string;
-	aggregationValue: string;
-	aggregationType: string;
-}
+import { Meter } from '@/utils/api_requests/MeterApi';
 
 interface MeterFormProps {
-	data?: MeterFormData;
-	onSubmit: (data: MeterFormData, mode: 'add' | 'edit') => void;
+	data?: Meter;
+	onSubmit: (data: Meter, mode: 'add' | 'edit') => void;
 }
 
 // Zod Schema for Validation
@@ -41,12 +32,14 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 
 	const isEditMode = Boolean(data);
 
-	const [eventName, setEventName] = useState(data?.eventName || '');
-	const [displayName, setDisplayName] = useState(data?.displayName || '');
-	const [eventFilters, setEventFilters] = useState<EventFilterData[]>(data?.eventFilters || []);
-	const [aggregationFunction, setAggregationFunction] = useState(data?.aggregationFunction || 'SUM');
-	const [aggregationValue, setAggregationValue] = useState(data?.aggregationValue || '');
-	const [aggregationType, setAggregationType] = useState(data?.aggregationType || '');
+	const [eventName, setEventName] = useState(data?.event_name || '');
+	const [displayName, setDisplayName] = useState(data?.name || '');
+	const [eventFilters, setEventFilters] = useState<{ key: string; value: string[] }[]>(
+		data?.filters?.map((filter) => ({ key: filter.key, value: filter.values })) || [],
+	);
+	const [aggregationFunction, setAggregationFunction] = useState(data?.aggregation.type || 'SUM');
+	const [aggregationValue, setAggregationValue] = useState(data?.aggregation.field || '');
+	const [aggregationType, setAggregationType] = useState(data?.aggregation.field || '');
 
 	const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -96,7 +89,7 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 					})),
 			};
 
-			onSubmit(formData as unknown as MeterFormData, isEditMode ? 'edit' : 'add');
+			onSubmit(formData as Meter, isEditMode ? 'edit' : 'add');
 
 			setDisplayName('');
 			setEventName('');
@@ -137,7 +130,7 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 				{/* edit meter heading */}
 				{isEditMode && (
 					<div className='w-full flex justify-between items-center'>
-						<p className='font-bold text-zinc-950 text-[20px]'>{data?.displayName}</p>
+						<p className='font-bold text-zinc-950 text-[20px]'>{data?.name}</p>
 						<button onClick={handleSubmit} className='bg-zinc-900 text-white px-4 py-2 rounded-md hover:bg-primary-dark'>
 							{'Save Changes'}
 						</button>
@@ -220,7 +213,7 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 						/>
 					</div>
 
-					<div className='mt-4'>
+					<div className='!mt-6'>
 						<RadioGroup
 							disabled={isEditMode}
 							items={radioMenuItemList}
@@ -243,4 +236,3 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 };
 
 export default MeterForm;
-export type { MeterFormData };

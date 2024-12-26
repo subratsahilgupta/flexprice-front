@@ -4,15 +4,15 @@ import { AxiosClient } from '@/core/axios/verbs';
 export interface Meter {
 	aggregation: {
 		field: string;
-		type: any;
+		type: string;
 	};
 	event_name: string;
 	filters: Array<{
 		key: string;
 		values: string[];
 	}>;
-	id: string;
 	name: string;
+	id: string;
 	reset_usage: string;
 	status: string;
 	tenant_id: string;

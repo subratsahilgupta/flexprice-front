@@ -22,7 +22,7 @@ const EventFilter: FC<Props> = ({ eventFilters, setEventFilters, error }) => {
 
 	return (
 		<div>
-			<div className='flex flex-col gap-2 mb-4 px-6'>
+			<div className='flex flex-col gap-2 mb-4'>
 				{eventFilters.map((eventFilter, index) => {
 					return (
 						<div key={index} className='flex h-full w-full  gap-4'>
@@ -66,15 +66,13 @@ const EventFilter: FC<Props> = ({ eventFilters, setEventFilters, error }) => {
 				{error && <p className='text-sm text-destructive'>{error}</p>}
 			</div>
 
-			<div className='px-6'>
-				<Button
-					variant={'outline'}
-					onClick={() => {
-						setEventFilters([...eventFilters, { key: '', value: [] }]);
-					}}>
-					Add Event Filter
-				</Button>
-			</div>
+			<Button
+				variant={'outline'}
+				onClick={() => {
+					setEventFilters([...eventFilters, { key: '', value: [] }]);
+				}}>
+				Add Event Filter
+			</Button>
 		</div>
 	);
 };
