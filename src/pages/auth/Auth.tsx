@@ -55,7 +55,7 @@ const AuthPage: React.FC = () => {
                         />
                     </div>
                     <Button type="submit" className="w-full" loading={loading}>
-                        Login
+                        Login with email
                     </Button>
                 </form>
                 <p className="mt-4 text-center text-sm text-gray-600">

@@ -10,7 +10,7 @@
     "build-storybook": "storybook build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "dependencies": {
     "@radix-ui/react-collapsible": "^1.1.2",
@@ -75,11 +75,6 @@
     "extends": [
       "plugin:storybook/recommended"
     ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
