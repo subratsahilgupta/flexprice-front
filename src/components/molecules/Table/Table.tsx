@@ -113,7 +113,7 @@ const FlexpriceTable: FC<FlexpriceTableProps> = ({ columns, data }) => {
 						{columns.map(({ name, flex = 1, width, textColor = 'inherit', align = 'left', render }, colIndex) => (
 							<TableCell
 								key={colIndex}
-								className={cn(textColor ? `text-[${textColor}]` : 'text-[#09090B]', 'text-inherit', 'max-h-8 px-4 py-3 text-[14px]')}
+								className={cn(textColor ? `text-[${textColor}]` : 'text-[#09090B]', 'text-normal', 'max-h-8 px-4 py-3 text-[14px]')}
 								style={{ flex: width ? undefined : flex }}
 								width={width}
 								align={align}>

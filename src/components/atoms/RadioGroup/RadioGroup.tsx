@@ -5,7 +5,8 @@ import { IconType } from 'react-icons/lib';
 interface Props {
 	title?: string;
 	items: RadioMenuItem[];
-	selected: RadioMenuItem;
+	selected?: RadioMenuItem;
+	disabled?: boolean;
 	onChange?: (value: RadioMenuItem) => void;
 }
 
@@ -16,22 +17,27 @@ interface RadioMenuItem {
 	desciption?: string;
 }
 
-const RadioGroup: FC<Props> = ({ items, onChange, selected, title }) => {
+const RadioGroup: FC<Props> = ({ items, onChange, selected, title, disabled }) => {
 	return (
 		<div>
 			{title && <p className='font-inter block text-sm font-medium text-zinc mb-2'>{title}</p>}
 			<div className='space-y-1'>
 				{items.map((item) => {
-					const isSelected = selected.value === item.value;
+					const isSelected = selected?.value === item.value;
 
 					return (
 						<div
 							className={cn(
-								'w-full items-center flex gap-4 p-2 hover:bg-zinc-100 cursor-pointer rounded-lg',
+								'w-full items-center flex gap-4 p-2  cursor-pointer rounded-lg',
 								isSelected ? 'bg-zinc-100' : 'bg-white',
+								disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-zinc-100',
 							)}
 							key={item.value}
-							onClick={() => onChange && onChange(item)}>
+							onClick={() => {
+								if (onChange && !disabled) {
+									onChange(item);
+								}
+							}}>
 							{item.icon && <item.icon className={'size-5'} />}
 
 							<div>
