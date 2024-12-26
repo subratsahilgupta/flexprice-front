@@ -10,4 +10,4 @@ export { default as RadioGroup } from './RadioGroup';
 export type { RadioMenuItem } from './RadioGroup';
 
 // multichip input
-export { default as MultiChipInput } from './MultiChipInput';
+export { default as MultiChipInput } from './MultichipInput';
