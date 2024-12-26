@@ -3,36 +3,42 @@ import { IoSearch } from 'react-icons/io5';
 import { LiaSlidersHSolid } from 'react-icons/lia';
 import { FiFolderPlus } from 'react-icons/fi';
 import { BillableMetricTable } from '@/components/molecules';
-import { BillableMetric } from '@/components/molecules/BillableMetricTable';
 import { Link } from 'react-router-dom';
+import { MeterApi } from '@/utils/api_requests/MeterApi';
+import { useQuery } from '@tanstack/react-query';
+import { Spinner } from '@/components/atoms';
+import toast from 'react-hot-toast';
+
+const fetchMeters = async () => {
+	return await MeterApi.getAllMeters();
+};
 
 const BillableMetricsPage = () => {
-	const dummyData: BillableMetric[] = [
-		{
-			eventName: 'Requests per minute',
-			aggregateType: 'Sum',
-			aggregateValue: 'tokens',
-			status: 'Active',
-			updatedAt: new Date(),
-			_id: '1',
-		},
-		{
-			eventName: 'Requests per minute',
-			aggregateType: 'Average',
-			aggregateValue: 'tokens',
-			status: 'Inactive',
-			updatedAt: new Date(),
-			_id: '2',
-		},
-		{
-			eventName: 'Requests per minute',
-			aggregateType: 'Count',
-			aggregateValue: 'tokens',
-			status: 'Active',
-			updatedAt: new Date(),
-			_id: '3',
-		},
-	];
+	const {
+		data: meters,
+		isLoading,
+		isError,
+	} = useQuery({
+		queryKey: ['fetchMeters'],
+		queryFn: fetchMeters,
+		retry: 2,
+		staleTime: 1000 * 60 * 5,
+	});
+
+	if (isLoading) {
+		return (
+			<div className='fixed inset-0 flex items-center justify-center bg-white/80 z-50'>
+				<div className='flex flex-col items-center gap-2'>
+					<Spinner size={50} className='text-primary' />
+					<p className='text-sm text-gray-500'>Loading...</p>
+				</div>
+			</div>
+		);
+	}
+
+	if (isError) {
+		toast.error('Error fetching meters');
+	}
 
 	return (
 		<div className='flex flex-col h-screen'>
@@ -53,7 +59,7 @@ const BillableMetricsPage = () => {
 				</div>
 			</SectionHeader>
 			<div className=''>
-				<BillableMetricTable data={dummyData} />
+				<BillableMetricTable data={meters || []} />
 			</div>
 		</div>
 	);

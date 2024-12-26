@@ -1,10 +1,11 @@
-import { Button, Input } from '@/components/atoms';
-import React, { FC } from 'react';
+import { Button, Input, MultiChipInput } from '@/components/atoms';
+import React, { FC, useEffect } from 'react';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 
 interface Props {
 	eventFilters: EventFilterData[];
 	setEventFilters: React.Dispatch<React.SetStateAction<EventFilterData[]>>;
+	error?: string;
 }
 
 export interface EventFilterData {
@@ -12,7 +13,13 @@ export interface EventFilterData {
 	value: string[];
 }
 
-const EventFilter: FC<Props> = ({ eventFilters, setEventFilters }) => {
+const EventFilter: FC<Props> = ({ eventFilters, setEventFilters, error }) => {
+	useEffect(() => {
+		if (eventFilters.length === 0) {
+			setEventFilters([{ key: '', value: [] }]);
+		}
+	}, []);
+
 	return (
 		<div>
 			<div className='flex flex-col gap-2 mb-4 px-6'>
@@ -30,14 +37,14 @@ const EventFilter: FC<Props> = ({ eventFilters, setEventFilters }) => {
 									setEventFilters(newEventFilters);
 								}}
 							/>
-							<Input
+							<MultiChipInput
 								type='text'
 								label='Values'
 								placeholder='value'
-								value={eventFilter.value.join(',')}
+								value={eventFilter.value}
 								onChange={(e) => {
 									const newEventFilters = [...eventFilters];
-									newEventFilters[index].value = e.split(',');
+									newEventFilters[index].value = e;
 									setEventFilters(newEventFilters);
 								}}
 							/>
@@ -55,7 +62,10 @@ const EventFilter: FC<Props> = ({ eventFilters, setEventFilters }) => {
 						</div>
 					);
 				})}
+				{/* Error Message */}
+				{error && <p className='text-sm text-destructive'>{error}</p>}
 			</div>
+
 			<div className='px-6'>
 				<Button
 					variant={'outline'}
