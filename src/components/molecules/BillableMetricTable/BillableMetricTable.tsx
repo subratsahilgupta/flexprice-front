@@ -4,6 +4,17 @@ import { Chip } from '@/components/atoms';
 import FlexpriceTable, { ColumnData } from '../Table';
 import { Meter } from '@/utils/api_requests/MeterApi';
 
+const formatChips = (data: string): string => {
+	switch (data) {
+		case 'published':
+			return 'active';
+		case 'unpublished':
+			return 'inactive';
+		default:
+			return 'active';
+	}
+};
+
 const formatDate = (date: string, locale: string = 'en-US'): string => {
 	const parsedDate = new Date(date);
 
@@ -38,7 +49,10 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 			name: 'status',
 			title: 'Status',
 			align: 'center',
-			render: (row) => <Chip isActive={row.status === 'Active'} label={row.status} />,
+			render: (row) => {
+				const label = formatChips(row.status);
+				return <Chip isActive={label === 'active'} label={label} />;
+			},
 		},
 		{
 			name: 'updated_at',
@@ -50,11 +64,12 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 		{
 			name: 'actions',
 			title: '',
+			redirect: false,
 			render: (row) => <ActionButton id={row.id} />,
 		},
 	];
 
-	return <FlexpriceTable columns={columns} data={mappedData} />;
+	return <FlexpriceTable redirectUrl='/usage-tracking/billable-metric/edit-meter?id=' columns={columns} data={mappedData} />;
 };
 
 export default BillableMetricTable;

@@ -9,11 +9,12 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
 	placeholder?: string;
 	onChange?: (value: string[]) => void;
 	disabled?: boolean;
+	defaultChips?: string[];
 }
 
 const MultichipField = React.forwardRef<HTMLInputElement, InputProps>(
-	({ className, type, label, description, error, onChange, placeholder, disabled, ...props }, ref) => {
-		const [chips, setchips] = useState<string[]>([]);
+	({ className, type, label, defaultChips = [], description, error, onChange, placeholder, disabled, ...props }, ref) => {
+		const [chips, setchips] = useState<string[]>(defaultChips);
 		const [inputText, setinputText] = useState('');
 
 		return (

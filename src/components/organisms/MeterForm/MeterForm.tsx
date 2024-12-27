@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { z } from 'zod';
-import { Input, RadioGroup, Select } from '@/components/atoms';
+import { Button, Input, RadioGroup, Select } from '@/components/atoms';
 import { EventFilter, EventFilterData } from '@/components/molecules';
 import { LuCircleFadingPlus, LuRefreshCw } from 'react-icons/lu';
 import { cn } from '@/lib/utils';
 import { Meter } from '@/utils/api_requests/MeterApi';
+import { useNavigate } from 'react-router-dom';
 
 interface MeterFormProps {
 	data?: Meter;
@@ -38,6 +39,7 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 	const [aggregationFunction, setAggregationFunction] = useState(data?.aggregation.type || 'SUM');
 	const [aggregationValue, setAggregationValue] = useState(data?.aggregation.field || '');
 	const [aggregationType, setAggregationType] = useState(data?.aggregation.field || '');
+	const navigate = useNavigate();
 
 	const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -55,6 +57,15 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 			icon: LuRefreshCw,
 		},
 	];
+
+	const resetForm = () => {
+		setDisplayName('');
+		setEventName('');
+		setEventFilters([]);
+		setAggregationFunction('SUM');
+		setAggregationValue('');
+		setAggregationType('');
+	};
 
 	// Handle form submission
 	const handleSubmit = () => {
@@ -89,12 +100,10 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 
 			onSubmit(formData as Meter, isEditMode ? 'edit' : 'add');
 
-			setDisplayName('');
-			setEventName('');
-			setEventFilters([]);
-			setAggregationFunction('SUM');
-			setAggregationValue('');
-			setAggregationType('');
+			if (!isEditMode) {
+				resetForm();
+				navigate('/usage-tracking/billable-metric');
+			}
 
 			setErrors({});
 			console.log('Form data:', validation.data);
@@ -129,9 +138,6 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 				{isEditMode && (
 					<div className='w-full flex justify-between items-center'>
 						<p className='font-bold text-zinc-950 text-[20px]'>{data?.name}</p>
-						<button onClick={handleSubmit} className='bg-zinc-900 text-white px-4 py-2 rounded-md hover:bg-primary-dark'>
-							{'Save Changes'}
-						</button>
 					</div>
 				)}
 
@@ -229,10 +235,20 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 
 				{/* Submit Button */}
 				<div className={cn('flex justify-start', isEditMode && 'hidden')}>
-					<button onClick={handleSubmit} className='bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark'>
+					<Button onClick={handleSubmit} className='bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark'>
 						{'Save Meter'}
-					</button>
+					</Button>
 				</div>
+				{isEditMode && (
+					<div className={cn('flex justify-start', isEditMode && 'hidden')}>
+						<Button
+							disabled={eventFilters.length > 0}
+							onClick={handleSubmit}
+							className='bg-zinc-900 text-white px-4 py-2 rounded-md hover:bg-primary-dark'>
+							{'Save Changes'}
+						</Button>
+					</div>
+				)}
 			</div>
 		</div>
 	);
