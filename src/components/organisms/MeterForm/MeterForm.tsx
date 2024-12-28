@@ -145,11 +145,7 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 
 			<div className='px-6 py-4 max-w-3xl flex flex-col gap-7'>
 				{/* edit meter heading */}
-				{isEditMode && (
-					<div className='w-full flex justify-between items-center'>
-						<p className='font-bold text-zinc-950 text-[20px]'>{data?.name}</p>
-					</div>
-				)}
+				{isEditMode && <p className='font-bold text-zinc-950 text-[20px]'>{data?.name}</p>}
 
 				{/* Event Schema */}
 				<div className='p-6 rounded-xl border border-[#E4E4E7]'>

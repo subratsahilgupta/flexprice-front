@@ -14,3 +14,7 @@ export { default as MultiChipInput } from './MultichipInput';
 
 // dialog
 export { default as Dialog } from './Dialog';
+
+export { default as Stepper } from './Stepper';
+
+export { default as FormHeader } from './FormHeader';
