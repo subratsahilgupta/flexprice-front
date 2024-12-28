@@ -4,6 +4,28 @@ import { Chip } from '@/components/atoms';
 import FlexpriceTable, { ColumnData } from '../Table';
 import { Meter } from '@/utils/api_requests/MeterApi';
 
+const formatChips = (data: string): string => {
+	switch (data) {
+		case 'published':
+			return 'Active';
+		case 'unpublished':
+			return 'Inactive';
+		default:
+			return 'Active';
+	}
+};
+
+const formatAggregationType = (data: string): string => {
+	switch (data) {
+		case 'SUM':
+			return 'Sum';
+		case 'COUNT':
+			return 'Count';
+		default:
+			return 'Sum';
+	}
+};
+
 const formatDate = (date: string, locale: string = 'en-US'): string => {
 	const parsedDate = new Date(date);
 
@@ -32,13 +54,23 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 	}));
 	const columns: ColumnData[] = [
 		{ name: 'event_name', title: 'Event Name', width: '400px' },
-		{ name: 'aggregation_type', title: 'Aggregate Type', align: 'center' },
+		{
+			name: 'aggregation_type',
+			title: 'Aggregate Type',
+			align: 'center',
+			render: (row) => {
+				return <span className='text-[#09090B] '>{formatAggregationType(row.aggregation_type)}</span>;
+			},
+		},
 		{ name: 'aggregation_field', title: 'Aggregate Value', align: 'center' },
 		{
 			name: 'status',
 			title: 'Status',
 			align: 'center',
-			render: (row) => <Chip isActive={row.status === 'Active'} label={row.status} />,
+			render: (row) => {
+				const label = formatChips(row.status);
+				return <Chip isActive={label === 'Active'} label={label} />;
+			},
 		},
 		{
 			name: 'updated_at',
@@ -50,11 +82,12 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 		{
 			name: 'actions',
 			title: '',
+			redirect: false,
 			render: (row) => <ActionButton id={row.id} />,
 		},
 	];
 
-	return <FlexpriceTable columns={columns} data={mappedData} />;
+	return <FlexpriceTable redirectUrl='/usage-tracking/billable-metric/edit-meter?id=' columns={columns} data={mappedData} />;
 };
 
 export default BillableMetricTable;

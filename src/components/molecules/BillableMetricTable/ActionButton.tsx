@@ -24,10 +24,16 @@ const ActionButton: FC<Props> = ({ id }) => {
 						</div>
 					</Link>
 				</DropdownMenuItem>
-				<DropdownMenuItem>
+				{/* <DropdownMenuItem>
 					<div className='flex gap-2 items-center w-full'>
 						<FaRegEyeSlash />
 						<span>Archive</span>
+					</div>
+				</DropdownMenuItem> */}
+				<DropdownMenuItem>
+					<div className='flex gap-2 items-center w-full'>
+						<FaRegEyeSlash />
+						<span>Delete</span>
 					</div>
 				</DropdownMenuItem>
 			</DropdownMenuContent>

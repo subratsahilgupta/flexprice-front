@@ -30,7 +30,8 @@ const RadioGroup: FC<Props> = ({ items, onChange, selected, title, disabled }) =
 							className={cn(
 								'w-full items-center flex gap-4 p-2  cursor-pointer rounded-lg',
 								isSelected ? 'bg-zinc-100' : 'bg-white',
-								disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-zinc-100',
+								disabled ? 'opacity-50 cursor-not-allowed border ' : 'hover:bg-zinc-100',
+								disabled && isSelected && 'border-zinc-600 bg-white',
 							)}
 							key={item.value}
 							onClick={() => {

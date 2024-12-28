@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { z } from 'zod';
-import { Input, RadioGroup, Select } from '@/components/atoms';
+import { Button, Input, RadioGroup, Select } from '@/components/atoms';
 import { EventFilter, EventFilterData } from '@/components/molecules';
 import { LuCircleFadingPlus, LuRefreshCw } from 'react-icons/lu';
 import { cn } from '@/lib/utils';
 import { Meter } from '@/utils/api_requests/MeterApi';
+import { useNavigate } from 'react-router-dom';
+import { queryClient } from '@/App';
 
 interface MeterFormProps {
 	data?: Meter;
@@ -24,7 +26,7 @@ const MeterFormSchema = z.object({
 		.optional(),
 	aggregationFunction: z.enum(['SUM', 'COUNT'], { errorMap: () => ({ message: 'Invalid aggregation function' }) }),
 	aggregationValue: z.string().min(1, { message: 'Aggregation Value is required' }),
-	aggregationType: z.string().optional(),
+	resetPeriod: z.string().optional(),
 });
 
 const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
@@ -34,27 +36,42 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 
 	const [eventName, setEventName] = useState(data?.event_name || '');
 	const [displayName, setDisplayName] = useState(data?.name || '');
-	const [eventFilters, setEventFilters] = useState<{ key: string; value: string[] }[]>([]);
+	const [eventFilters, setEventFilters] = useState<{ key: string; values: string[] }[]>([]);
 	const [aggregationFunction, setAggregationFunction] = useState(data?.aggregation.type || 'SUM');
 	const [aggregationValue, setAggregationValue] = useState(data?.aggregation.field || '');
-	const [aggregationType, setAggregationType] = useState(data?.aggregation.field || '');
+	const [resetPeriod, setResetPeriod] = useState(data?.reset_usage || '');
+	const navigate = useNavigate();
 
 	const [errors, setErrors] = useState<Record<string, string>>({});
+
+	useEffect(() => {
+		console.log('evnt filters in meter form', eventFilters);
+		console.log('data in meter form length', eventFilters.length);
+	}, [eventFilters]);
 
 	const radioMenuItemList = [
 		{
 			label: 'Cumulative',
 			description: 'Email digest, mentions & all activity.',
-			value: 'cumulative',
+			value: 'never',
 			icon: LuCircleFadingPlus,
 		},
 		{
 			label: 'Period',
 			description: 'Only mentions and comments.',
-			value: 'period',
+			value: 'RESET_PERIOD',
 			icon: LuRefreshCw,
 		},
 	];
+
+	const resetForm = () => {
+		setDisplayName('');
+		setEventName('');
+		setEventFilters([]);
+		setAggregationFunction('SUM');
+		setAggregationValue('');
+		setResetPeriod('');
+	};
 
 	// Handle form submission
 	const handleSubmit = () => {
@@ -65,7 +82,7 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 			eventFilters,
 			aggregationFunction,
 			aggregationValue,
-			aggregationType,
+			resetPeriod,
 		};
 
 		// Validate using Zod schema
@@ -80,21 +97,23 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 					field: aggregationValue,
 				},
 				filters: eventFilters
-					.filter((filter) => filter.key && filter.value.length > 0)
+					.filter((filter) => filter.key && filter.values.length > 0)
 					.map((filter) => ({
 						key: filter.key,
-						values: filter.value,
+						values: filter.values,
 					})),
+				reset_usage: resetPeriod,
 			};
 
 			onSubmit(formData as Meter, isEditMode ? 'edit' : 'add');
 
-			setDisplayName('');
-			setEventName('');
-			setEventFilters([]);
-			setAggregationFunction('SUM');
-			setAggregationValue('');
-			setAggregationType('');
+			if (!isEditMode) {
+				resetForm();
+				navigate('/usage-tracking/billable-metric');
+				queryClient.invalidateQueries({
+					queryKey: ['fetchMeters'],
+				});
+			}
 
 			setErrors({});
 			console.log('Form data:', validation.data);
@@ -129,9 +148,6 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 				{isEditMode && (
 					<div className='w-full flex justify-between items-center'>
 						<p className='font-bold text-zinc-950 text-[20px]'>{data?.name}</p>
-						<button onClick={handleSubmit} className='bg-zinc-900 text-white px-4 py-2 rounded-md hover:bg-primary-dark'>
-							{'Save Changes'}
-						</button>
 					</div>
 				)}
 
@@ -166,7 +182,7 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 
 				{/* Event Filters */}
 				<div className='p-6 rounded-xl border border-[#E4E4E7]'>
-					<div className='mb-6'>
+					<div className='mb-4'>
 						<p className='font-inter font-semibold text-base'>Event Filters</p>
 						<p className={labelStyle}>
 							Name of the property key in the data object. The groups should only include low cardinality fields.
@@ -175,6 +191,7 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 
 					<div className=''>
 						<EventFilter
+							isEditMode={isEditMode}
 							eventFilters={eventFilters}
 							setEventFilters={setEventFilters}
 							error={errors.eventFilters}
@@ -220,19 +237,29 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 						<RadioGroup
 							disabled={isEditMode}
 							items={radioMenuItemList}
-							selected={radioMenuItemList.find((item) => item.value === aggregationType)}
+							selected={radioMenuItemList.find((item) => item.value === resetPeriod)}
 							title='Aggregation Type'
-							onChange={(value) => setAggregationType(value.value!)}
+							onChange={(value) => setResetPeriod(value.value!)}
 						/>
 					</div>
 				</div>
 
 				{/* Submit Button */}
 				<div className={cn('flex justify-start', isEditMode && 'hidden')}>
-					<button onClick={handleSubmit} className='bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark'>
+					<Button onClick={handleSubmit} className='bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark'>
 						{'Save Meter'}
-					</button>
+					</Button>
 				</div>
+				{isEditMode && (
+					<div className={cn('flex justify-start')}>
+						<Button
+							disabled={eventFilters.length <= 0}
+							onClick={handleSubmit}
+							className='bg-zinc-900 text-white px-4 py-2 rounded-md hover:bg-primary-dark'>
+							{'Save Changes'}
+						</Button>
+					</div>
+				)}
 			</div>
 		</div>
 	);

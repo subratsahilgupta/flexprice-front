@@ -24,12 +24,20 @@ const MainLayout: React.FC = () => {
 								const path = `/${pathSegments.slice(0, index + 1).join('/')}`;
 								const name = decodeURIComponent(segment);
 								const isCurrentPath = index === pathSegments.length - 1;
+								const isFirstPath = index === 0;
 
 								return (
 									<span key={index} className='flex items-center'>
-										<Link to={path} className={`hover:text-gray-800 capitalize ${isCurrentPath ? 'font-normal text-[#020617]' : ''}`}>
-											{name.replace(/-/g, ' ')}
-										</Link>
+										{isFirstPath ? (
+											<span
+												className={`hover:text-gray-800 cursor-default capitalize ${isCurrentPath ? 'font-normal text-[#020617]' : ''}`}>
+												{name.replace(/-/g, ' ')}
+											</span>
+										) : (
+											<Link to={path} className={`hover:text-gray-800 capitalize ${isCurrentPath ? 'font-normal text-[#020617]' : ''}`}>
+												{name.replace(/-/g, ' ')}
+											</Link>
+										)}
 										{index < pathSegments.length - 1 && (
 											<span className='mx-2'>
 												<BsChevronRight />

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { FC, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 export interface ColumnData {
 	name: string;
@@ -14,10 +15,12 @@ export interface ColumnData {
 	render?: (rowData: any) => ReactNode;
 	children?: ReactNode;
 	className?: string;
+	redirect?: boolean;
 }
 
 export interface FlexpriceTableProps {
 	columns: ColumnData[];
+	redirectUrl?: string;
 	data: any[];
 }
 
@@ -85,7 +88,8 @@ const TableCell = React.forwardRef<
 TableCell.displayName = 'TableCell';
 
 // Main FlexpriceTable Component
-const FlexpriceTable: FC<FlexpriceTableProps> = ({ columns, data }) => {
+const FlexpriceTable: FC<FlexpriceTableProps> = ({ columns, data, redirectUrl }) => {
+	const navigate = useNavigate();
 	return (
 		<Table>
 			<TableHeader>
@@ -105,10 +109,20 @@ const FlexpriceTable: FC<FlexpriceTableProps> = ({ columns, data }) => {
 			<TableBody>
 				{data.map((row, rowIndex) => (
 					<TableRow key={rowIndex}>
-						{columns.map(({ name, flex = 1, width, textColor = 'inherit', align = 'left', render }, colIndex) => (
+						{columns.map(({ name, flex = 1, width, textColor = 'inherit', align = 'left', render, redirect = true }, colIndex) => (
 							<TableCell
+								onClick={() => {
+									if (redirect && redirectUrl) {
+										navigate(`${redirectUrl}${row.id}`);
+									}
+								}}
 								key={colIndex}
-								className={cn(textColor ? `text-[${textColor}]` : 'text-[#09090B]', 'font-normal', 'max-h-8 px-4 py-3 text-[14px]')}
+								className={cn(
+									textColor ? `text-[${textColor}]` : 'text-[#09090B] w-full ',
+									'font-normal',
+									'max-h-8 px-4 py-3 text-[14px]',
+									redirect ? 'cursor-pointer' : 'cursor-default',
+								)}
 								style={{ flex: width ? undefined : flex }}
 								width={width}
 								align={align}>
