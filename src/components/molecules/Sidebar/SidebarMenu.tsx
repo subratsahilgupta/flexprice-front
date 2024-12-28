@@ -10,6 +10,7 @@ export type NavItem = {
 	url: string;
 	icon?: string;
 	isActive?: boolean;
+	disabled?: boolean;
 	items?: {
 		title: string;
 		url: string;

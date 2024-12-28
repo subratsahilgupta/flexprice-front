@@ -17,6 +17,11 @@ export class AxiosClient {
 		return response as T;
 	}
 
+	public static async put<T, D = any>(url: string, data?: D): Promise<T> {
+		const response: AxiosResponse<T> = await axiosClient.put(url, data);
+		return response as T;
+	}
+
 	public static async delete<T>(url: string): Promise<T> {
 		const response: AxiosResponse<T> = await axiosClient.delete(url);
 		return response as T;

@@ -6,6 +6,8 @@ import AuthMiddleware from '../auth/AuthProvider';
 import BillableMetricsPage from '@/pages/usage/BillableMetrics';
 import AddMeterPage from '@/pages/usage/AddMeter';
 import EditMeterPage from '@/pages/usage/EditMeterPage';
+import PricingPlans from '@/pages/customer/PricingPlans';
+import CreatePlanPage from '@/pages/customer/CreatePlan';
 
 const RouteNames = {
 	home: {
@@ -42,15 +44,23 @@ const RouteNames = {
 	query: {
 		path: '/query',
 	},
-	customer: {
-		path: '/customer',
+	customerManagement: {
+		path: '/customer-management',
+		pricingPlan: {
+			path: 'pricing-plan',
+			createPlan: {
+				path: 'create-plan',
+			},
+			editPlan: {
+				path: 'edit-plan',
+			},
+		},
 		detail: {
 			path: '/details/:id',
 			routing_path: '/details/',
 		},
 	},
 };
-
 export const MainRouter = createBrowserRouter([
 	{
 		path: RouteNames.login.path,
@@ -87,6 +97,23 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: `${RouteNames.usageTracking.billableMetric.path}/${RouteNames.usageTracking.billableMetric.editMeter.path}`,
 						element: <EditMeterPage />,
+					},
+				],
+			},
+			{
+				path: RouteNames.customerManagement.path,
+				children: [
+					{
+						path: RouteNames.customerManagement.pricingPlan.path,
+						element: <PricingPlans />,
+					},
+					{
+						path: `${RouteNames.customerManagement.pricingPlan.path}/${RouteNames.customerManagement.pricingPlan.createPlan.path}`,
+						element: <CreatePlanPage />,
+					},
+					{
+						path: `${RouteNames.customerManagement.pricingPlan.path}/${RouteNames.customerManagement.pricingPlan.editPlan.path}`,
+						element: <CreatePlanPage />,
 					},
 				],
 			},

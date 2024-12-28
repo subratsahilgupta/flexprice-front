@@ -5,6 +5,7 @@ import { ChevronRight } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Link, useNavigate } from 'react-router-dom';
 import { ReactSVG } from 'react-svg';
+import { cn } from '@/lib/utils';
 
 const SidebarItem: FC<NavItem> = (item) => {
 	const navigate = useNavigate();
@@ -20,15 +21,18 @@ const SidebarItem: FC<NavItem> = (item) => {
 			<SidebarMenuItem>
 				<CollapsibleTrigger asChild>
 					<SidebarMenuButton
+						disabled={item.disabled}
 						onClick={() => {
 							handleNavigation(item.url, !!hasChildren);
 						}}
 						tooltip={item.title}
-						className={`flex items-center gap-2 hover:bg-muted transition-colors ${
-							item.isActive ? 'bg-[#F4F4F5] font-medium text-sidebar-text-accent-foreground' : ''
-						}`}>
+						className={cn(
+							`flex items-center gap-2 hover:bg-muted transition-colors `,
+							item.isActive && 'bg-[#F4F4F5] font-medium text-sidebar-text-accent-foreground',
+							item.disabled && 'cursor-not-allowed',
+						)}>
 						{item.icon && <ReactSVG src={item.icon} className='size-4' />}
-						<span className='text-sm'>{item.title}</span>
+						<span className='text-sm select-none'>{item.title}</span>
 						{hasChildren && (
 							<ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
 						)}

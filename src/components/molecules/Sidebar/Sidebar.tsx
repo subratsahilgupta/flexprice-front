@@ -15,12 +15,14 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				title: 'Query',
 				url: '/usage-tracking/customers',
 				icon: '/assets/svg/query.svg',
+				disabled: true,
 			},
 			{
 				title: 'Events',
 				url: '/usage-tracking/metering',
 				icon: '/assets/svg/events.svg',
 				isActive: false,
+				disabled: true,
 				// items: [
 				// 	{
 				// 		title: 'Billable Metrics',
@@ -42,21 +44,24 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				title: 'Customers',
 				url: '/customers',
 				icon: '/assets/svg/customers.svg',
+				disabled: true,
 			},
 			{
-				title: 'Pricing PLan',
-				url: '/users',
+				title: 'Pricing Plan',
+				url: '/customer-management/pricing-plan',
 				icon: '/assets/svg/pricing_plan.svg',
 			},
 			{
 				title: 'Quotation',
 				url: '/roles',
 				icon: '/assets/svg/quotation.svg',
+				disabled: true,
 			},
 			{
 				title: 'Import - Export',
 				url: '/roles',
 				icon: '/assets/svg/import-export.svg',
+				disabled: true,
 			},
 		],
 	};

@@ -1,23 +1,5 @@
 import { AxiosClient } from '@/core/axios/verbs';
-
-export interface Meter {
-	aggregation: {
-		field: string;
-		type: string;
-	};
-	event_name: string;
-	filters: Array<{
-		key: string;
-		values: string[];
-	}>;
-	name: string;
-	id: string;
-	reset_usage: string;
-	status: string;
-	tenant_id: string;
-	updated_at: string;
-	created_at: string;
-}
+import { Meter } from '@/models/Meter';
 
 export class MeterApi {
 	private static baseUrl = '/meters';
@@ -31,5 +13,13 @@ export class MeterApi {
 
 	public static async getMeterById(id: string) {
 		return await AxiosClient.get<Meter>(`${this.baseUrl}/${id}`);
+	}
+
+	public static async updateMeter(id: string, data: Partial<Meter>) {
+		return await AxiosClient.put<Meter, Partial<Meter>>(`${this.baseUrl}/${id}`, data);
+	}
+
+	public static async deleteMeter(id: string) {
+		return await AxiosClient.delete<Meter>(`${this.baseUrl}/${id}`);
 	}
 }

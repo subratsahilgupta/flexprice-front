@@ -107,7 +107,7 @@ const FlexpriceTable: FC<FlexpriceTableProps> = ({ columns, data, redirectUrl })
 				</TableRow>
 			</TableHeader>
 			<TableBody>
-				{data.map((row, rowIndex) => (
+				{data?.map((row, rowIndex) => (
 					<TableRow key={rowIndex}>
 						{columns.map(({ name, flex = 1, width, textColor = 'inherit', align = 'left', render, redirect = true }, colIndex) => (
 							<TableCell
