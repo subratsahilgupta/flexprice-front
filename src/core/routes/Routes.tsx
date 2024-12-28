@@ -1,6 +1,6 @@
 import MainLayout from '@/layouts/MainLayout';
 import Auth from '@/pages/auth/Auth';
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import CustomerPage from '@/pages/customer/Customer';
 import AuthMiddleware from '../auth/AuthProvider';
 import BillableMetricsPage from '@/pages/usage/BillableMetrics';
@@ -67,7 +67,7 @@ export const MainRouter = createBrowserRouter([
 		children: [
 			{
 				path: '/',
-				element: <CustomerPage />,
+				element: <Navigate to={`${RouteNames.usageTracking.path}/${RouteNames.usageTracking.billableMetric.path}`} />,
 			},
 			{
 				path: RouteNames.plans.path,

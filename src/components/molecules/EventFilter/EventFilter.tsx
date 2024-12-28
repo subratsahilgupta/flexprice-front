@@ -7,23 +7,24 @@ interface Props {
 	permanentFilters?: EventFilterData[];
 	setEventFilters: React.Dispatch<React.SetStateAction<EventFilterData[]>>;
 	error?: string;
+	isEditMode?: boolean;
 }
 
 export interface EventFilterData {
 	key: string;
-	value: string[];
+	values: string[];
 }
 
-const EventFilter: FC<Props> = ({ eventFilters, setEventFilters, error, permanentFilters }) => {
+const EventFilter: FC<Props> = ({ eventFilters, setEventFilters, error, permanentFilters, isEditMode = false }) => {
 	useEffect(() => {
-		if (eventFilters.length === 0) {
-			setEventFilters([{ key: '', value: [] }]);
+		if (eventFilters.length === 0 && !isEditMode) {
+			setEventFilters([{ key: '', values: [] }]);
 		}
 	}, []);
 
 	return (
 		<div>
-			<div className='flex flex-col gap-2 mb-4'>
+			<div className='flex flex-col gap-2 mb-2'>
 				{permanentFilters?.map((eventFilter, index) => {
 					return (
 						<div key={index} className='flex h-full w-full  gap-4'>
@@ -33,6 +34,7 @@ const EventFilter: FC<Props> = ({ eventFilters, setEventFilters, error, permanen
 								disabled
 								placeholder='key'
 								value={eventFilter.key}
+								className='h-full'
 								onChange={(e) => {
 									const newEventFilters = [...eventFilters];
 									newEventFilters[index].key = e;
@@ -44,32 +46,19 @@ const EventFilter: FC<Props> = ({ eventFilters, setEventFilters, error, permanen
 								type='text'
 								label='Values'
 								placeholder='value'
-								value={eventFilter.value}
+								value={eventFilter.values}
 								onChange={(e) => {
 									const newEventFilters = [...eventFilters];
-									newEventFilters[index].value = e;
+									newEventFilters[index].values = e;
 									setEventFilters(newEventFilters);
 								}}
 							/>
 							<div className='flex  items-end  gap-4'>
-								<button
-									className='flex justify-center items-center w-10 h-10 rounded-md border text-zinc'
-									onClick={() => {
-										const newEventFilters = [...eventFilters];
-										newEventFilters.splice(index, 1);
-										setEventFilters(newEventFilters);
-									}}>
-									<RiDeleteBin6Line className='text-zinc' />
-								</button>
+								<div className='flex justify-center items-center size-9 '></div>
 							</div>
 						</div>
 					);
 				})}
-				{/* Error Message */}
-				{error && <p className='text-sm text-destructive'>{error}</p>}
-			</div>
-
-			<div className='flex flex-col gap-2 mb-4'>
 				{eventFilters.map((eventFilter, index) => {
 					return (
 						<div key={index} className='flex h-full w-full  gap-4'>
@@ -88,16 +77,16 @@ const EventFilter: FC<Props> = ({ eventFilters, setEventFilters, error, permanen
 								type='text'
 								label='Values'
 								placeholder='value'
-								value={eventFilter.value}
+								value={eventFilter.values}
 								onChange={(e) => {
 									const newEventFilters = [...eventFilters];
-									newEventFilters[index].value = e;
+									newEventFilters[index].values = e;
 									setEventFilters(newEventFilters);
 								}}
 							/>
 							<div className='flex  items-end  gap-4'>
 								<button
-									className='flex justify-center items-center w-10 h-10 rounded-md border text-zinc'
+									className='flex justify-center items-center size-9 rounded-md border text-zinc'
 									onClick={() => {
 										const newEventFilters = [...eventFilters];
 										newEventFilters.splice(index, 1);
@@ -116,9 +105,10 @@ const EventFilter: FC<Props> = ({ eventFilters, setEventFilters, error, permanen
 			<Button
 				variant={'outline'}
 				onClick={() => {
-					setEventFilters([...eventFilters, { key: '', value: [] }]);
+					setEventFilters([...eventFilters, { key: '', values: [] }]);
+					console.log('eventFilters', eventFilters);
 				}}>
-				Add Event Filter
+				<span className='font-normal'>Add Event Filter</span>
 			</Button>
 		</div>
 	);
