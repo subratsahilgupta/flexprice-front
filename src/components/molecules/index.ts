@@ -5,3 +5,5 @@ export type { ColumnData, FlexpriceTableProps } from './Table';
 export { default as FlexpriceTable } from './Table';
 export { default as EventFilter } from './EventFilter';
 export type { EventFilterData } from './EventFilter';
+
+export { default as PlansTable } from './PlansTable';

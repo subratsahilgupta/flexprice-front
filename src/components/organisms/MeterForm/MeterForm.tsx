@@ -4,9 +4,9 @@ import { Button, Input, RadioGroup, Select } from '@/components/atoms';
 import { EventFilter, EventFilterData } from '@/components/molecules';
 import { LuCircleFadingPlus, LuRefreshCw } from 'react-icons/lu';
 import { cn } from '@/lib/utils';
-import { Meter } from '@/utils/api_requests/MeterApi';
 import { useNavigate } from 'react-router-dom';
 import { queryClient } from '@/App';
+import { Meter } from '@/models/Meter';
 
 interface MeterFormProps {
 	data?: Meter;

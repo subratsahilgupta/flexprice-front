@@ -1,8 +1,8 @@
-import ActionButton from './ActionButton';
 import { FC } from 'react';
 import { Chip } from '@/components/atoms';
 import FlexpriceTable, { ColumnData } from '../Table';
-import { Meter } from '@/models/Meter';
+import ActionButton from './ActionButton';
+import { Plan } from '@/models/Plan';
 
 const formatChips = (data: string): string => {
 	switch (data) {
@@ -12,17 +12,6 @@ const formatChips = (data: string): string => {
 			return 'Inactive';
 		default:
 			return 'Active';
-	}
-};
-
-const formatAggregationType = (data: string): string => {
-	switch (data) {
-		case 'SUM':
-			return 'Sum';
-		case 'COUNT':
-			return 'Count';
-		default:
-			return 'Sum';
 	}
 };
 
@@ -42,27 +31,17 @@ const formatDate = (date: string, locale: string = 'en-US'): string => {
 	return parsedDate.toLocaleDateString(locale, options);
 };
 
-export interface BillableMetricTableProps {
-	data: Meter[];
+export interface PlansTableProps {
+	data: Plan[];
 }
 
-const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
-	const mappedData = data.map((meter) => ({
-		...meter,
-		aggregation_type: meter.aggregation.type,
-		aggregation_field: meter.aggregation.field,
+const PlansTable: FC<PlansTableProps> = ({ data }) => {
+	const mappedData = data.map((plan) => ({
+		...plan,
 	}));
 	const columns: ColumnData[] = [
-		{ name: 'event_name', title: 'Event Name', width: '400px' },
-		{
-			name: 'aggregation_type',
-			title: 'Aggregate Type',
-			align: 'center',
-			render: (row) => {
-				return <span className='text-[#09090B] '>{formatAggregationType(row.aggregation_type)}</span>;
-			},
-		},
-		{ name: 'aggregation_field', title: 'Aggregate Value', align: 'center' },
+		{ name: 'name', title: 'Name', width: '700px' },
+		// { name: 'aggregation_field', title: 'Billing Model', align: 'center' },
 		{
 			name: 'status',
 			title: 'Status',
@@ -87,7 +66,7 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 		},
 	];
 
-	return <FlexpriceTable redirectUrl='/usage-tracking/billable-metric/edit-meter?id=' columns={columns} data={mappedData} />;
+	return <FlexpriceTable redirectUrl='/customer-management/pricing-plan/edit-plan?id=' columns={columns} data={mappedData} />;
 };
 
-export default BillableMetricTable;
+export default PlansTable;
