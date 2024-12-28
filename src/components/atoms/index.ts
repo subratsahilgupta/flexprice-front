@@ -11,3 +11,6 @@ export type { RadioMenuItem } from './RadioGroup';
 
 // multichip input
 export { default as MultiChipInput } from './MultichipInput';
+
+// dialog
+export { default as Dialog } from './Dialog';

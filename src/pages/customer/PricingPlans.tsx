@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Spinner } from '@/components/atoms';
 import toast from 'react-hot-toast';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
-import PlansTable from '@/components/molecules/PlansTable';
+import { PlansTable } from '@/components/molecules';
 
 const fetchPlans = async () => {
 	return await PlanApi.getAllPlans();
