@@ -25,6 +25,7 @@ const FlexPriceSelect: React.FC<Props> = ({
 	placeholder = 'Select an option',
 	label = 'Options',
 	description,
+	onChange,
 	error,
 }) => {
 	return (
@@ -32,7 +33,17 @@ const FlexPriceSelect: React.FC<Props> = ({
 			{/* Label */}
 			{label && <label className='font-inter block text-sm font-medium text-zinc'>{label}</label>}
 
-			<Select defaultValue={selectedValue} disabled={disabled}>
+			<Select
+				defaultValue={selectedValue}
+				onValueChange={(value) => {
+					console.log('new value', value);
+
+					if (onChange) {
+						console.log('new value in if block', value);
+						onChange(value);
+					}
+				}}
+				disabled={disabled}>
 				<SelectTrigger className='w-full '>
 					<SelectValue placeholder={placeholder} />
 				</SelectTrigger>
