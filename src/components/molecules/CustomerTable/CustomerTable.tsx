@@ -3,20 +3,20 @@ import { Chip } from '@/components/atoms';
 import FlexpriceTable, { ColumnData } from '../Table';
 import ActionButton from './ActionButton';
 import { Plan } from '@/models/Plan';
-import formatChips from '@/utils/common/format_chips';
 import formatDate from '@/utils/common/format_date';
+import formatChips from '@/utils/common/format_chips';
 
-export interface PlansTableProps {
+export interface Props {
 	data: Plan[];
 }
 
-const PlansTable: FC<PlansTableProps> = ({ data }) => {
+const CustomerTable: FC<Props> = ({ data }) => {
 	const mappedData = data.map((plan) => ({
 		...plan,
 	}));
 	const columns: ColumnData[] = [
 		{ name: 'name', title: 'Name', width: '700px' },
-		// { name: 'aggregation_field', title: 'Billing Model', align: 'center' },
+		{ name: 'created_by', title: 'Created by' },
 		{
 			name: 'status',
 			title: 'Status',
@@ -44,4 +44,4 @@ const PlansTable: FC<PlansTableProps> = ({ data }) => {
 	return <FlexpriceTable redirectUrl='/customer-management/pricing-plan/edit-plan?id=' columns={columns} data={mappedData} />;
 };
 
-export default PlansTable;
+export default CustomerTable;

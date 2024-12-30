@@ -61,12 +61,12 @@ const RouteNames = {
 		},
 	},
 };
+
 export const MainRouter = createBrowserRouter([
 	{
 		path: RouteNames.login.path,
 		element: <Auth />,
 	},
-
 	{
 		path: RouteNames.home.path,
 		element: (

@@ -3,17 +3,8 @@ import { FC } from 'react';
 import { Chip } from '@/components/atoms';
 import FlexpriceTable, { ColumnData } from '../Table';
 import { Meter } from '@/models/Meter';
-
-const formatChips = (data: string): string => {
-	switch (data) {
-		case 'published':
-			return 'Active';
-		case 'unpublished':
-			return 'Inactive';
-		default:
-			return 'Active';
-	}
-};
+import formatChips from '@/utils/common/format_chips';
+import formatDate from '@/utils/common/format_date';
 
 const formatAggregationType = (data: string): string => {
 	switch (data) {
@@ -24,22 +15,6 @@ const formatAggregationType = (data: string): string => {
 		default:
 			return 'Sum';
 	}
-};
-
-const formatDate = (date: string, locale: string = 'en-US'): string => {
-	const parsedDate = new Date(date);
-
-	if (isNaN(parsedDate.getTime())) {
-		return 'Invalid Date';
-	}
-
-	const options: Intl.DateTimeFormatOptions = {
-		year: 'numeric',
-		month: 'long',
-		day: 'numeric',
-	};
-
-	return parsedDate.toLocaleDateString(locale, options);
 };
 
 export interface BillableMetricTableProps {

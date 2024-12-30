@@ -1,41 +1,40 @@
-import { Button } from '@/components/atoms';
-import supabase from '@/core/supbase/config';
+import { Spinner } from '@/components/atoms';
+import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
 
-export default function CustomerPage() {
-	const navigate = useNavigate();
+const fetchCustomer = async () => {
+	return await CustomerApi.getAllCustomers();
+};
 
-	const signout = async () => {
-		try {
-			const { error } = await supabase.auth.signOut();
-			if (error) throw error;
-
-			toast.success('Logged out successfully');
-			navigate('/login');
-			return true; // Return a value to satisfy React Query
-		} catch (error) {
-			toast.error('Failed to logout');
-			console.error('Logout error:', error);
-			throw error; // Re-throw the error for React Query error handling
-		}
-	};
-
-	const { isLoading: isSignoutLoading, refetch } = useQuery({
-		queryKey: ['logout'],
-		queryFn: signout,
-		enabled: false,
+const CustomerPage = () => {
+	const {
+		data: customers,
+		isLoading,
+		isError,
+	} = useQuery({
+		queryKey: ['fetchCustomer'],
+		queryFn: fetchCustomer,
+		retry: 2,
+		staleTime: 1000 * 60 * 5,
 	});
 
-	return (
-		<div className='p-4'>
-			<div className='flex justify-end'>
-				<Button onClick={() => refetch()} loading={isSignoutLoading} variant='outline'>
-					Logout
-				</Button>
+	if (isLoading) {
+		return (
+			<div className='fixed inset-0 flex items-center justify-center bg-white/80 z-50'>
+				<div className='flex flex-col items-center gap-2'>
+					<Spinner size={50} className='text-primary' />
+					<p className='text-sm text-gray-500'>Loading...</p>
+				</div>
 			</div>
-			<div>CustomerPage</div>
-		</div>
-	);
-}
+		);
+	}
+
+	if (isError) {
+		toast.error('Error fetching meters');
+	}
+
+	return <div className='h-screen'></div>;
+};
+
+export default CustomerPage;

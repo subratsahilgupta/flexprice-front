@@ -3,11 +3,11 @@ import React, { FC } from 'react';
 interface Props {
 	title?: string;
 	subtitle?: string;
-	variant: 'main-header' | 'sub-header' | 'form-title';
+	variant: 'form-component-title' | 'sub-header' | 'form-title';
 }
 
 const FormTitle: FC<Props> = ({ variant, subtitle, title }) => {
-	const labelStyle = 'text-muted-foreground text-sm';
+	const labelStyle = 'text-zinc-500 text-normal text-sm';
 
 	if (variant === 'form-title') {
 		return (
@@ -22,6 +22,15 @@ const FormTitle: FC<Props> = ({ variant, subtitle, title }) => {
 		return (
 			<div className='mb-4'>
 				<p className='font-inter font-semibold text-base'>{title}</p>
+				<p className={labelStyle}>{subtitle}</p>
+			</div>
+		);
+	}
+
+	if (variant === 'form-component-title') {
+		return (
+			<div className='mb-4'>
+				<p className='text-sm text-zinc-950 font-medium font-inter mb-2'>{title}</p>
 				<p className={labelStyle}>{subtitle}</p>
 			</div>
 		);
