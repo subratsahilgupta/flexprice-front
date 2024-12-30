@@ -41,7 +41,7 @@ const CustomerPage = () => {
 
 	return (
 		<div className='flex flex-col h-screen'>
-			<SectionHeader title='Pricing Plan'>
+			<SectionHeader title='Customers'>
 				<div className='flex gap-2 w-full'>
 					<button className='px-2 py-1'>
 						<IoSearch className='size-5 text-[#09090B] ' />
