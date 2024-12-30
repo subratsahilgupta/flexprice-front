@@ -8,7 +8,6 @@ import AddMeterPage from '@/pages/usage/AddMeter';
 import EditMeterPage from '@/pages/usage/EditMeterPage';
 import PricingPlans from '@/pages/customer/PricingPlans';
 import CreatePlanPage from '@/pages/customer/CreatePlan';
-import path from 'path';
 import CreateCustomerPage from '@/pages/customer/CreateCustomer';
 
 const RouteNames = {

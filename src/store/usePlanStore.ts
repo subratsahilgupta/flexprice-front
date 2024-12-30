@@ -1,4 +1,4 @@
 import { create } from 'zustand';
-const usePlanStore = create((set) => ({}));
+const usePlanStore = create(() => ({}));
 
 export default usePlanStore;
