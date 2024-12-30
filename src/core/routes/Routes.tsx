@@ -8,6 +8,8 @@ import AddMeterPage from '@/pages/usage/AddMeter';
 import EditMeterPage from '@/pages/usage/EditMeterPage';
 import PricingPlans from '@/pages/customer/PricingPlans';
 import CreatePlanPage from '@/pages/customer/CreatePlan';
+import path from 'path';
+import CreateCustomerPage from '@/pages/customer/CreateCustomer';
 
 const RouteNames = {
 	home: {
@@ -46,6 +48,12 @@ const RouteNames = {
 	},
 	customerManagement: {
 		path: '/customer-management',
+		customers: {
+			path: 'customers',
+			createCustomer: {
+				path: 'create-customer',
+			},
+		},
 		pricingPlan: {
 			path: 'pricing-plan',
 			createPlan: {
@@ -114,6 +122,14 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: `${RouteNames.customerManagement.pricingPlan.path}/${RouteNames.customerManagement.pricingPlan.editPlan.path}`,
 						element: <CreatePlanPage />,
+					},
+					{
+						path: `${RouteNames.customerManagement.path}/${RouteNames.customerManagement.customers.path}`,
+						element: <CustomerPage />,
+					},
+					{
+						path: `${RouteNames.customerManagement.path}/${RouteNames.customerManagement.customers.path}/${RouteNames.customerManagement.customers.createCustomer.path}`,
+						element: <CreateCustomerPage />,
 					},
 				],
 			},

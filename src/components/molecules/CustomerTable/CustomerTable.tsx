@@ -2,21 +2,21 @@ import { FC } from 'react';
 import { Chip } from '@/components/atoms';
 import FlexpriceTable, { ColumnData } from '../Table';
 import ActionButton from './ActionButton';
-import { Plan } from '@/models/Plan';
 import formatDate from '@/utils/common/format_date';
 import formatChips from '@/utils/common/format_chips';
+import Customer from '@/models/Customer';
 
 export interface Props {
-	data: Plan[];
+	data: Customer[];
 }
 
 const CustomerTable: FC<Props> = ({ data }) => {
-	const mappedData = data.map((plan) => ({
-		...plan,
+	const mappedData = data.map((customer) => ({
+		...customer,
 	}));
 	const columns: ColumnData[] = [
-		{ name: 'name', title: 'Name', width: '700px' },
-		{ name: 'created_by', title: 'Created by' },
+		{ name: 'name', title: 'Name', width: '400px' },
+		{ name: 'external_id', title: 'Slug' },
 		{
 			name: 'status',
 			title: 'Status',
@@ -41,7 +41,7 @@ const CustomerTable: FC<Props> = ({ data }) => {
 		},
 	];
 
-	return <FlexpriceTable redirectUrl='/customer-management/pricing-plan/edit-plan?id=' columns={columns} data={mappedData} />;
+	return <FlexpriceTable columns={columns} data={mappedData} />;
 };
 
 export default CustomerTable;
