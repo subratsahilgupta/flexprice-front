@@ -2,21 +2,21 @@ import { FC } from 'react';
 import { Chip } from '@/components/atoms';
 import FlexpriceTable, { ColumnData } from '../Table';
 import ActionButton from './ActionButton';
-import { Plan } from '@/models/Plan';
-import formatChips from '@/utils/common/format_chips';
 import formatDate from '@/utils/common/format_date';
+import formatChips from '@/utils/common/format_chips';
+import Customer from '@/models/Customer';
 
-export interface PlansTableProps {
-	data: Plan[];
+export interface Props {
+	data: Customer[];
 }
 
-const PlansTable: FC<PlansTableProps> = ({ data }) => {
-	const mappedData = data.map((plan) => ({
-		...plan,
+const CustomerTable: FC<Props> = ({ data }) => {
+	const mappedData = data.map((customer) => ({
+		...customer,
 	}));
 	const columns: ColumnData[] = [
-		{ name: 'name', title: 'Name', width: '700px' },
-		// { name: 'aggregation_field', title: 'Billing Model', align: 'center' },
+		{ name: 'name', title: 'Name', width: '400px' },
+		{ name: 'external_id', title: 'Slug' },
 		{
 			name: 'status',
 			title: 'Status',
@@ -41,7 +41,7 @@ const PlansTable: FC<PlansTableProps> = ({ data }) => {
 		},
 	];
 
-	return <FlexpriceTable redirectUrl='/customer-management/pricing-plan/edit-plan?id=' columns={columns} data={mappedData} />;
+	return <FlexpriceTable columns={columns} data={mappedData} />;
 };
 
-export default PlansTable;
+export default CustomerTable;

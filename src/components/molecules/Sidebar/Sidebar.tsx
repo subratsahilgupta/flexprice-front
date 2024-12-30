@@ -42,9 +42,8 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 		'Customer Management': [
 			{
 				title: 'Customers',
-				url: '/customers',
+				url: '/customer-management/customers',
 				icon: '/assets/svg/customers.svg',
-				disabled: true,
 			},
 			{
 				title: 'Pricing Plan',

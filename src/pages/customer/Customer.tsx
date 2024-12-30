@@ -1,41 +1,67 @@
-import { Button } from '@/components/atoms';
-import supabase from '@/core/supbase/config';
+import { Button, SectionHeader, Spinner } from '@/components/atoms';
+import CustomerTable from '@/components/molecules/CustomerTable/CustomerTable';
+import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
+import { FiFolderPlus } from 'react-icons/fi';
+import { IoSearch } from 'react-icons/io5';
+import { LiaSlidersHSolid } from 'react-icons/lia';
+import { Link } from 'react-router-dom';
 
-export default function CustomerPage() {
-	const navigate = useNavigate();
+const fetchCustomer = async () => {
+	return await CustomerApi.getAllCustomers();
+};
 
-	const signout = async () => {
-		try {
-			const { error } = await supabase.auth.signOut();
-			if (error) throw error;
-
-			toast.success('Logged out successfully');
-			navigate('/login');
-			return true; // Return a value to satisfy React Query
-		} catch (error) {
-			toast.error('Failed to logout');
-			console.error('Logout error:', error);
-			throw error; // Re-throw the error for React Query error handling
-		}
-	};
-
-	const { isLoading: isSignoutLoading, refetch } = useQuery({
-		queryKey: ['logout'],
-		queryFn: signout,
-		enabled: false,
+const CustomerPage = () => {
+	const {
+		data: customers,
+		isLoading,
+		isError,
+	} = useQuery({
+		queryKey: ['fetchCustomer'],
+		queryFn: fetchCustomer,
+		retry: 2,
+		staleTime: 1000 * 60 * 5,
 	});
 
-	return (
-		<div className='p-4'>
-			<div className='flex justify-end'>
-				<Button onClick={() => refetch()} loading={isSignoutLoading} variant='outline'>
-					Logout
-				</Button>
+	if (isLoading) {
+		return (
+			<div className='fixed inset-0 flex items-center justify-center bg-white/80 z-50'>
+				<div className='flex flex-col items-center gap-2'>
+					<Spinner size={50} className='text-primary' />
+					<p className='text-sm text-gray-500'>Loading...</p>
+				</div>
 			</div>
-			<div>CustomerPage</div>
+		);
+	}
+
+	if (isError) {
+		toast.error('Error fetching meters');
+	}
+
+	return (
+		<div className='flex flex-col h-screen'>
+			<SectionHeader title='Pricing Plan'>
+				<div className='flex gap-2 w-full'>
+					<button className='px-2 py-1'>
+						<IoSearch className='size-5 text-[#09090B] ' />
+					</button>
+					<button className='px-2 py-1'>
+						<LiaSlidersHSolid className='size-5 text-[#09090B] ' />
+					</button>
+					<Link to='/customer-management/customers/create-customer'>
+						<Button className=' flex gap-2 bg-[#0F172A] '>
+							<FiFolderPlus />
+							<span>Add Customer</span>
+						</Button>
+					</Link>
+				</div>
+			</SectionHeader>
+			<div className=''>
+				<CustomerTable data={customers?.customers || []} />
+			</div>
 		</div>
 	);
-}
+};
+
+export default CustomerPage;

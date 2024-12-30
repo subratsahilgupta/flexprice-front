@@ -9,14 +9,11 @@ const AuthPage: React.FC = () => {
 	const navigate = useNavigate();
 	const userContext = useUser();
 	const [loading, setLoading] = useState(false);
+	const [email, setemail] = useState('');
+	const [password, setpassword] = useState('');
 
-	const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
+	const handleLogin = async () => {
 		setLoading(true);
-
-		const formData = new FormData(event.currentTarget);
-		const email = formData.get('email') as string;
-		const password = formData.get('password') as string;
 
 		const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 		if (error) {
@@ -35,12 +32,19 @@ const AuthPage: React.FC = () => {
 				<h2 className='text-2xl font-semibold text-center text-gray-800 mb-6'>Login to Your Account</h2>
 				<form onSubmit={handleLogin} className='space-y-5'>
 					<div>
-						<Input id='email' name='email' type='email' placeholder='Enter your email' required />
+						<Input id='email' name='email' type='email' placeholder='Enter your email' required onChange={(s) => setemail(s)} />
 					</div>
 					<div>
-						<Input id='password' name='password' type='password' placeholder='Enter your password' required />
+						<Input
+							id='password'
+							name='password'
+							type='password'
+							placeholder='Enter your password'
+							required
+							onChange={(s) => setpassword(s)}
+						/>
 					</div>
-					<Button type='submit' className='w-full' loading={loading}>
+					<Button onClick={() => handleLogin()} className='w-full' loading={loading}>
 						Login with email
 					</Button>
 				</form>
