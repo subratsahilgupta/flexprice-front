@@ -61,6 +61,6 @@ export class PlanApi {
 	}
 
 	public static async deletePlan(id: string) {
-		return await AxiosClient.delete<Plan>(`${this.baseUrl}/${id}`);
+		return await AxiosClient.delete<void>(`${this.baseUrl}/${id}`);
 	}
 }

@@ -29,8 +29,7 @@ const MainLayout: React.FC = () => {
 								return (
 									<span key={index} className='flex items-center'>
 										{isFirstPath ? (
-											<span
-												className={`hover:text-gray-800 cursor-default capitalize ${isCurrentPath ? 'font-normal text-[#020617]' : ''}`}>
+											<span className={` cursor-default capitalize ${isCurrentPath ? 'font-normal text-[#020617]' : ''}`}>
 												{name.replace(/-/g, ' ')}
 											</span>
 										) : (
@@ -55,7 +54,7 @@ const MainLayout: React.FC = () => {
 					<Outlet />
 				</main>
 			</SidebarInset>
-			<Toaster />
+			<Toaster position='bottom-center' />
 		</SidebarProvider>
 	);
 };

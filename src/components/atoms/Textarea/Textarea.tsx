@@ -15,8 +15,8 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
 	id?: string;
 }
 
-const Input = React.forwardRef<HTMLInputElement, InputProps>(
-	({ className, type, label, description, error, onChange, disabled, placeholder, prefix, suffix, id, value }, ref) => {
+const Textarea = React.forwardRef<HTMLTextAreaElement, InputProps>(
+	({ className, label, description, error, onChange, disabled, placeholder, prefix, suffix, id }, ref) => {
 		return (
 			<div className='space-y-1 w-full flex flex-col '>
 				{/* Label */}
@@ -33,10 +33,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 						className,
 					)}>
 					{prefix && <div className='mr-2'>{prefix}</div>}
-					<input
+					<textarea
 						id={id}
-						type={type}
-						value={value}
 						disabled={disabled}
 						placeholder={placeholder}
 						className={cn('peer flex-1 bg-transparent  outline-none ring-0 focus:outline-none w-full')}
@@ -60,6 +58,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 	},
 );
 
-Input.displayName = 'Input';
+Textarea.displayName = 'Textarea';
 
-export default Input;
+export default Textarea;

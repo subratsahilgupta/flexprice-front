@@ -1,4 +1,5 @@
 import { Button, Input, MultiChipInput } from '@/components/atoms';
+import { cn } from '@/lib/utils';
 import React, { FC, useEffect } from 'react';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 
@@ -8,6 +9,7 @@ interface Props {
 	setEventFilters: React.Dispatch<React.SetStateAction<EventFilterData[]>>;
 	error?: string;
 	isEditMode?: boolean;
+	isArchived?: boolean;
 }
 
 export interface EventFilterData {
@@ -15,12 +17,14 @@ export interface EventFilterData {
 	values: string[];
 }
 
-const EventFilter: FC<Props> = ({ eventFilters, setEventFilters, error, permanentFilters, isEditMode = false }) => {
+const EventFilter: FC<Props> = ({ eventFilters, setEventFilters, error, permanentFilters, isEditMode = false, isArchived }) => {
 	useEffect(() => {
 		if (eventFilters.length === 0 && !isEditMode) {
 			setEventFilters([{ key: '', values: [] }]);
 		}
 	}, []);
+
+	console.log('eventFilters', permanentFilters);
 
 	return (
 		<div>
@@ -103,6 +107,8 @@ const EventFilter: FC<Props> = ({ eventFilters, setEventFilters, error, permanen
 			</div>
 
 			<Button
+				className={cn(isArchived && 'hidden')}
+				disabled={isArchived}
 				variant={'outline'}
 				onClick={() => {
 					setEventFilters([...eventFilters, { key: '', values: [] }]);

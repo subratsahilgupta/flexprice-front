@@ -22,3 +22,7 @@ export { default as FormHeader } from './FormHeader';
 export { default as CheckboxRadioGroup } from './CheckboxRadioGroup';
 
 export { default as Spacer } from './Spacer';
+
+export { default as Textarea } from './Textarea';
+
+export { default as ActionButton } from './ActionButton';
