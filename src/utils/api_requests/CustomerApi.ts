@@ -14,6 +14,10 @@ class CustomerApi {
 	public static async getAllCustomers(): Promise<GetCustomerResponse> {
 		return await AxiosClient.get(this.baseUrl);
 	}
+
+	public static async deleteCustomerById(id: string): Promise<void> {
+		return await AxiosClient.delete(`${this.baseUrl}/${id}`);
+	}
 }
 
 export default CustomerApi;

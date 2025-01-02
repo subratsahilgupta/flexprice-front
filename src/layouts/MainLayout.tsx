@@ -54,7 +54,7 @@ const MainLayout: React.FC = () => {
 					<Outlet />
 				</main>
 			</SidebarInset>
-			<Toaster />
+			<Toaster position='bottom-center' />
 		</SidebarProvider>
 	);
 };

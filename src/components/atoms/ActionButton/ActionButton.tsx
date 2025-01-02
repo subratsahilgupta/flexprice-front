@@ -5,35 +5,31 @@ import { FaRegEyeSlash } from 'react-icons/fa';
 import { FC, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { PlanApi } from '@/utils/api_requests/PlanApi';
 import toast from 'react-hot-toast';
 import { queryClient } from '@/App';
 import { Button, Dialog } from '@/components/atoms';
 
-interface Props {
+interface ActionProps {
 	id: string;
+	editPath: string;
+	deleteMutationFn: (id: string) => Promise<void>;
+	refetchQueryKey: string;
+	entityName: string;
 }
 
-const deletePlanById = async (id: string) => {
-	return await PlanApi.deletePlan(id);
-};
-
-const ActionButton: FC<Props> = ({ id }) => {
+const ActionButton: FC<ActionProps> = ({ id, editPath, deleteMutationFn, refetchQueryKey, entityName }) => {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-	const { mutate: deletePlan } = useMutation({
-		mutationFn: async (id: string) => {
-			deletePlanById(id);
-		},
+	const { mutate: deleteEntity } = useMutation({
+		mutationFn: deleteMutationFn,
 		onSuccess: async () => {
-			toast.success('Plan deleted successfully');
-			await queryClient.refetchQueries({ queryKey: ['fetchPlans'] });
-			queryClient.invalidateQueries({ queryKey: ['fetchPlans'] });
+			toast.success(`${entityName} deleted successfully`);
+			await queryClient.refetchQueries({ queryKey: [refetchQueryKey] });
+			await queryClient.invalidateQueries({ queryKey: [refetchQueryKey] });
 			setIsDialogOpen(false);
 		},
-		onError: async (data) => {
-			toast.error('Failed to delete plan');
-			console.log('onError', data);
+		onError: () => {
+			toast.error(`Failed to delete ${entityName}`);
 			setIsDialogOpen(false);
 		},
 	});
@@ -46,23 +42,14 @@ const ActionButton: FC<Props> = ({ id }) => {
 				</DropdownMenuTrigger>
 				<DropdownMenuContent>
 					<DropdownMenuItem>
-						<Link to={`/customer-management/pricing-plan/edit-plan?id=${id}`}>
+						<Link to={editPath}>
 							<div className='flex gap-2 items-center w-full'>
 								<MdEdit />
 								<span>Edit</span>
 							</div>
 						</Link>
 					</DropdownMenuItem>
-					{/* <DropdownMenuItem>
-					<div className='flex gap-2 items-center w-full'>
-						<FaRegEyeSlash />
-						<span>Archive</span>
-					</div>
-				</DropdownMenuItem> */}
-					<DropdownMenuItem
-						onSelect={() => {
-							setIsDialogOpen(true);
-						}}>
+					<DropdownMenuItem onSelect={() => setIsDialogOpen(true)}>
 						<div className='flex gap-2 items-center w-full'>
 							<FaRegEyeSlash />
 							<span>Delete</span>
@@ -70,13 +57,13 @@ const ActionButton: FC<Props> = ({ id }) => {
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
-			<Dialog title='Are you sure you want to delete this meter?' isOpen={isDialogOpen} onOpenChange={setIsDialogOpen}>
+			<Dialog title={`Are you sure you want to delete this ${entityName}?`} isOpen={isDialogOpen} onOpenChange={setIsDialogOpen}>
 				<div className='flex flex-col mt-4 gap-4 items-end justify-center'>
 					<div className='flex gap-4'>
 						<Button variant={'outline'} onClick={() => setIsDialogOpen(false)}>
 							Cancel
 						</Button>
-						<Button onClick={() => deletePlan(id)}>Delete</Button>
+						<Button onClick={() => deleteEntity(id)}>Delete</Button>
 					</div>
 				</div>
 			</Dialog>

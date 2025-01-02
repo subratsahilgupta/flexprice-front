@@ -1,10 +1,10 @@
-import ActionButton from './ActionButton';
 import { FC } from 'react';
-import { Chip } from '@/components/atoms';
+import { ActionButton, Chip } from '@/components/atoms';
 import FlexpriceTable, { ColumnData } from '../Table';
 import { Meter } from '@/models/Meter';
 import formatChips from '@/utils/common/format_chips';
 import formatDate from '@/utils/common/format_date';
+import { MeterApi } from '@/utils/api_requests/MeterApi';
 
 const formatAggregationType = (data: string): string => {
 	switch (data) {
@@ -58,7 +58,15 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 			name: 'actions',
 			title: '',
 			redirect: false,
-			render: (row) => <ActionButton id={row.id} />,
+			render: (row) => (
+				<ActionButton
+					id={row.id}
+					editPath={`/usage-tracking/billable-metric/edit-meter?id=${row.id}`}
+					deleteMutationFn={(id) => MeterApi.deleteMeter(id)}
+					refetchQueryKey={'fetchMeters'}
+					entityName={'Meter'}
+				/>
+			),
 		},
 	];
 

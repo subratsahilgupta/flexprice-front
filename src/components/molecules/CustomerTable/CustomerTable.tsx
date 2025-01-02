@@ -1,10 +1,10 @@
 import { FC } from 'react';
-import { Chip } from '@/components/atoms';
+import { ActionButton, Chip } from '@/components/atoms';
 import FlexpriceTable, { ColumnData } from '../Table';
-import ActionButton from './ActionButton';
 import formatDate from '@/utils/common/format_date';
 import formatChips from '@/utils/common/format_chips';
 import Customer from '@/models/Customer';
+import CustomerApi from '@/utils/api_requests/CustomerApi';
 
 export interface Props {
 	data: Customer[];
@@ -37,7 +37,15 @@ const CustomerTable: FC<Props> = ({ data }) => {
 			name: 'actions',
 			title: '',
 			redirect: false,
-			render: (row) => <ActionButton id={row.id} />,
+			render: (row) => (
+				<ActionButton
+					entityName='Customer'
+					refetchQueryKey='fetchCustomers'
+					deleteMutationFn={(id) => CustomerApi.deleteCustomerById(id)}
+					editPath={`/customer-management/customers/edit-customer?id=${row.id}`}
+					id={row.id}
+				/>
+			),
 		},
 	];
 

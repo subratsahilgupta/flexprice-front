@@ -33,6 +33,7 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 	const labelStyle = 'text-muted-foreground text-sm';
 
 	const isEditMode = Boolean(data);
+	const isArchived = data?.status === 'archived';
 
 	const [eventName, setEventName] = useState(data?.event_name || '');
 	const [displayName, setDisplayName] = useState(data?.name || '');
@@ -64,14 +65,14 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 		},
 	];
 
-	const resetForm = () => {
-		setDisplayName('');
-		setEventName('');
-		setEventFilters([]);
-		setAggregationFunction('SUM');
-		setAggregationValue('');
-		setResetPeriod('');
-	};
+	// const resetForm = () => {
+	// 	setDisplayName('');
+	// 	setEventName('');
+	// 	setEventFilters([]);
+	// 	setAggregationFunction('SUM');
+	// 	setAggregationValue('');
+	// 	setResetPeriod('');
+	// };
 
 	// Handle form submission
 	const handleSubmit = () => {
@@ -107,13 +108,10 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 
 			onSubmit(formData as Meter, isEditMode ? 'edit' : 'add');
 
-			if (!isEditMode) {
-				resetForm();
-				navigate('/usage-tracking/billable-metric');
-				queryClient.invalidateQueries({
-					queryKey: ['fetchMeters'],
-				});
-			}
+			queryClient.invalidateQueries({
+				queryKey: ['fetchMeters'],
+			});
+			navigate('/usage-tracking/billable-metric');
 
 			setErrors({});
 		} else {
@@ -186,6 +184,7 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 
 					<div className=''>
 						<EventFilter
+							isArchived={isArchived}
 							isEditMode={isEditMode}
 							eventFilters={eventFilters}
 							setEventFilters={setEventFilters}
