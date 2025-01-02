@@ -22,6 +22,8 @@ const EventFilter: FC<Props> = ({ eventFilters, setEventFilters, error, permanen
 		}
 	}, []);
 
+	console.log('eventFilters', permanentFilters);
+
 	return (
 		<div>
 			<div className='flex flex-col gap-2 mb-2'>

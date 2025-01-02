@@ -2,7 +2,7 @@ import { FormHeader, Input, Spacer, Textarea } from '@/components/atoms';
 
 const PlanDetailsSection = () => {
 	return (
-		<div className='p-6 rounded-xl border border-[#E4E4E7]'>
+		<div className='p-6  rounded-xl border border-[#E4E4E7]'>
 			<FormHeader
 				title={'Plan Details'}
 				subtitle={'Assign a name to your event schema to easily identify and track events processed.'}

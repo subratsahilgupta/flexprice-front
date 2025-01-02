@@ -29,10 +29,12 @@ const ActionButton: FC<Props> = ({ id }) => {
 			toast.success('Meter deleted successfully');
 			await queryClient.refetchQueries({ queryKey: ['fetchMeters'] });
 			queryClient.invalidateQueries({ queryKey: ['fetchMeters'] });
+			setIsDialogOpen(false);
 		},
 		onError: async (data) => {
 			toast.error('Failed to delete plan');
 			console.log('onError', data);
+			setIsDialogOpen(false);
 		},
 	});
 

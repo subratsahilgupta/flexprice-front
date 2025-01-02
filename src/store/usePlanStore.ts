@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-interface Price {
+export interface Price {
 	amount: string;
 	billing_cadence: 'RECURRING';
 	billing_model: 'FLAT_FEE';
@@ -26,7 +26,7 @@ interface Price {
 	type: 'USAGE';
 }
 
-interface Plan {
+export interface Plan {
 	description: string;
 	invoice_cadence: 'ARREAR';
 	lookup_key: string;

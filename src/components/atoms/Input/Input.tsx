@@ -16,7 +16,7 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-	({ className, type, label, description, error, onChange, disabled, placeholder, prefix, suffix, id }, ref) => {
+	({ className, type, label, description, error, onChange, disabled, placeholder, prefix, suffix, id, value }, ref) => {
 		return (
 			<div className='space-y-1 w-full flex flex-col '>
 				{/* Label */}
@@ -36,6 +36,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 					<input
 						id={id}
 						type={type}
+						value={value}
 						disabled={disabled}
 						placeholder={placeholder}
 						className={cn('peer flex-1 bg-transparent  outline-none ring-0 focus:outline-none w-full')}

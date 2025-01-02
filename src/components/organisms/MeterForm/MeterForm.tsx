@@ -116,7 +116,6 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 			}
 
 			setErrors({});
-			console.log('Form data:', validation.data);
 		} else {
 			// If invalid, set errors
 			const fieldErrors: Record<string, string> = {};
