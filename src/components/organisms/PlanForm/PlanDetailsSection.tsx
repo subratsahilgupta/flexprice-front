@@ -1,6 +1,9 @@
 import { FormHeader, Input, Spacer, Textarea } from '@/components/atoms';
+import usePlanStore from '@/store/usePlanStore';
 
 const PlanDetailsSection = () => {
+	const { plan, setPlanField, errors } = usePlanStore();
+
 	return (
 		<div className='p-6  rounded-xl border border-[#E4E4E7]'>
 			<FormHeader
@@ -12,9 +15,22 @@ const PlanDetailsSection = () => {
 				placeholder='Enter a name for the plan'
 				description={'A unique identifier for the meter. This is used to refer the meter in the Flexprice APIs.'}
 				label='Plan Name*'
+				value={plan.name}
+				error={errors.name}
+				onChange={(e) => setPlanField('name', e)}
+			/>
+			<Spacer height={'20px'} />
+			<Input
+				onChange={(e) => setPlanField('lookup_key', e)}
+				value={plan.lookup_key}
+				placeholder='Enter a slug for the plan'
+				description={'A slug for the meter.'}
+				label='Plan Slug'
 			/>
 			<Spacer height={'20px'} />
 			<Textarea
+				value={plan.description}
+				onChange={(e) => setPlanField('description', e)}
 				className='min-h-[100px]'
 				placeholder='Enter description'
 				label='Plan Description'

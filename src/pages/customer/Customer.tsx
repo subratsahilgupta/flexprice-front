@@ -18,7 +18,7 @@ const CustomerPage = () => {
 		isLoading,
 		isError,
 	} = useQuery({
-		queryKey: ['fetchCustomers'],
+		queryKey: ['fetchCustomer'],
 		queryFn: fetchCustomer,
 		retry: 2,
 		staleTime: 1000 * 60 * 5,

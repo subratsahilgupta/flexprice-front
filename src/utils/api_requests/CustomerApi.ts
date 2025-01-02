@@ -12,7 +12,7 @@ class CustomerApi {
 	private static baseUrl = '/customers';
 
 	public static async getAllCustomers(): Promise<GetCustomerResponse> {
-		return await AxiosClient.get(this.baseUrl);
+		return await AxiosClient.get(`${this.baseUrl}?status=published`);
 	}
 
 	public static async deleteCustomerById(id: string): Promise<void> {

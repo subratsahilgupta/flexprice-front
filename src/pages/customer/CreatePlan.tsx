@@ -1,13 +1,29 @@
 import { Button, FormHeader, Spacer, Stepper } from '@/components/atoms';
 import { BillingPrefferencesSection, PlanDetailsSection, SetupChargesSection } from '@/components/organisms';
-import { useState } from 'react';
+import usePlanStore from '@/store/usePlanStore';
+import { useEffect, useState } from 'react';
 
 const CreatePlanPage = () => {
 	const [activeStep, setactiveStep] = useState(0);
 	const formSteps = [{ label: 'Plan Details' }, { label: 'Billing Preferences' }, { label: 'Set up Charges' }];
+	const { plan, setError, clearAllErrors, clearPlan } = usePlanStore();
+
+	useEffect(() => {
+		return () => {
+			clearPlan();
+		};
+	}, []);
 
 	const handleNext = () => {
-		if (activeStep === formSteps.length) {
+		if (activeStep === formSteps.length - 1) {
+			if (!validateSteps()) {
+				return;
+			}
+			console.log('Form submitted successfully', plan);
+			// Add form submission logic here
+			return;
+		}
+		if (!validateSteps()) {
 			return;
 		}
 		setactiveStep((prev) => prev + 1);
@@ -18,6 +34,28 @@ const CreatePlanPage = () => {
 			return;
 		}
 		setactiveStep((prev) => prev - 1);
+	};
+
+	const validateSteps = () => {
+		if (activeStep === 0) {
+			clearAllErrors();
+			if (!plan.name) {
+				setError('name', 'Plan name is required');
+				return false;
+			}
+		} else if (activeStep === 1) {
+			if (!plan.invoice_cadence) {
+				setError('invoice_cadence', 'Billing Timing is required');
+				return false;
+			}
+		} else if (activeStep === 2) {
+			if (!plan.prices || plan.prices.length === 0) {
+				setError('prices', 'At least one price tier is required');
+				return false;
+			}
+		}
+
+		return true;
 	};
 
 	return (
@@ -57,6 +95,7 @@ const CreatePlanPage = () => {
 					</Button>
 				</div>
 			</div>
+			<pre className='text-white'>{JSON.stringify(plan, null, 2)}</pre>
 		</div>
 	);
 };

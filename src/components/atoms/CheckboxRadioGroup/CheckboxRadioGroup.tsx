@@ -10,20 +10,28 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 export interface Props {
 	checkboxItems: CheckboxRadioGroupItem[];
-	defaultValue?: CheckboxRadioGroupItem;
-	onChange?: (value: CheckboxRadioGroupItem) => void;
-	value?: CheckboxRadioGroupItem;
+	defaultValue?: string;
+	onChange?: (value: string) => void;
+	value?: string;
 	title?: string;
+	error?: string;
 }
 
-const CheckboxRadioGroup: FC<Props> = ({ checkboxItems, defaultValue, onChange, title, value }) => {
+const CheckboxRadioGroup: FC<Props> = ({ error, checkboxItems, defaultValue, onChange, title, value }) => {
 	return (
 		<div>
 			{title && <p className='text-sm text-zinc-950 font-medium font-inter mb-2'>{title}</p>}
-			<RadioGroup defaultValue={value?.value ?? defaultValue?.value} className=''>
-				{checkboxItems.map((item, index) => (
-					<div key={index} className='flex items-center gap-2'>
-						<RadioGroupItem id={item.value} value={item.value} onChange={() => onChange && onChange(item)} className='peer' />
+			<RadioGroup defaultValue={defaultValue} value={value} className=''>
+				{checkboxItems.map((item) => (
+					<div
+						key={item.value}
+						onClick={() => {
+							if (onChange) {
+								onChange(item.value);
+							}
+						}}
+						className='flex items-center gap-2'>
+						<RadioGroupItem id={item.value} value={item.value} className='peer' />
 
 						<label htmlFor={item.value} className='cursor-pointer font-open-sans'>
 							<p className='font-medium text-sm text-[#18181B] peer-checked:text-black'>{item.label}</p>
@@ -32,6 +40,8 @@ const CheckboxRadioGroup: FC<Props> = ({ checkboxItems, defaultValue, onChange, 
 					</div>
 				))}
 			</RadioGroup>
+			{/* Error Message */}
+			{error && <p className='text-sm text-destructive'>{error}</p>}
 		</div>
 	);
 };

@@ -40,7 +40,7 @@ const CustomerTable: FC<Props> = ({ data }) => {
 			render: (row) => (
 				<ActionButton
 					entityName='Customer'
-					refetchQueryKey='fetchCustomers'
+					refetchQueryKey='fetchCustomer'
 					deleteMutationFn={(id) => CustomerApi.deleteCustomerById(id)}
 					editPath={`/customer-management/customers/edit-customer?id=${row.id}`}
 					id={row.id}
