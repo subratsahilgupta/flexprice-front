@@ -4,8 +4,10 @@ const formatChips = (data: string): string => {
 			return 'Active';
 		case 'archived':
 			return 'Inactive';
+		case 'deleted':
+			return 'Inactive';
 		default:
-			return 'Active';
+			return 'Inactive';
 	}
 };
 

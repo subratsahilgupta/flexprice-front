@@ -1,57 +1,94 @@
 import { create } from 'zustand';
 
 export interface Price {
-	amount: string;
-	billing_cadence: 'RECURRING';
-	billing_model: 'FLAT_FEE';
-	billing_period: 'MONTHLY';
-	billing_period_count: number;
-	currency: string;
-	description: string;
-	filter_values: Record<string, unknown>;
-	lookup_key: string;
-	metadata: Record<string, unknown>;
-	meter_id: string;
-	plan_id: string;
-	tier_mode: 'VOLUME';
-	tiers: {
-		flat_amount: string;
-		unit_amount: string;
-		up_to: number;
+	amount?: string;
+	billing_cadence?: 'RECURRING';
+	billing_model?: 'FLAT_FEE';
+	billing_period?: 'MONTHLY';
+	billing_period_count?: number;
+	currency?: string;
+	description?: string;
+	filter_values?: Record<string, unknown>;
+	lookup_key?: string;
+	metadata?: Record<string, unknown>;
+	meter_id?: string;
+	plan_id?: string;
+	tier_mode?: 'VOLUME';
+	tiers?: {
+		flat_amount?: string;
+		unit_amount?: string;
+		up_to?: number;
 	}[];
-	transform_quantity: {
-		divide_by: number;
-		round: string;
+	transform_quantity?: {
+		divide_by?: number;
+		round?: string;
 	};
-	type: 'USAGE';
+	type?: 'USAGE';
 }
 
 export interface Plan {
-	description: string;
-	invoice_cadence: 'ARREAR';
-	lookup_key: string;
-	name: string;
-	prices: Price[];
-	trial_period: number;
+	description?: string;
+	invoice_cadence?: string;
+	lookup_key?: string;
+	name?: string;
+	prices?: Price[];
+	trial_period?: number;
 }
 
 interface SinglePlanStore {
-	plan: Plan | null;
-	setPlan: (plan: Plan) => void;
-	updatePlan: (updatedFields: Partial<Plan>) => void;
+	plan: Partial<Plan>;
+	setPlan: (plan: Partial<Plan>) => void;
+	setPlanField: <K extends keyof Plan>(field: K, value: Plan[K]) => void;
 	clearPlan: () => void;
+	errors: Partial<Record<keyof Plan, string>>;
+	setError: <K extends keyof Plan>(field: K, errorMessage: string) => void;
+	clearError: <K extends keyof Plan>(field: K) => void;
+	clearAllErrors: () => void;
 }
 
 const usePlanStore = create<SinglePlanStore>((set) => ({
-	plan: null,
+	plan: {
+		name: '',
+		description: '',
+		lookup_key: '',
+		prices: [],
+	},
+	errors: {},
 	setPlan: (plan) => set({ plan }),
 
-	updatePlan: (updatedFields) =>
+	setPlanField: (field, value) => {
+		set((state) => {
+			console.log('field', field);
+			console.log('value', state.plan);
+			return {
+				plan: {
+					...state.plan,
+					[field]: value,
+				},
+			};
+		});
+	},
+
+	setError: (field, errorMessage) =>
 		set((state) => ({
-			plan: state.plan ? { ...state.plan, ...updatedFields } : null,
+			errors: {
+				...state.errors,
+				[field]: errorMessage,
+			},
 		})),
 
-	clearPlan: () => set({ plan: null }),
+	// Clear an error for a specific field
+	clearError: (field) =>
+		set((state) => ({
+			errors: {
+				...state.errors,
+				[field]: undefined,
+			},
+		})),
+
+	clearAllErrors: () => set({ errors: {} }),
+
+	clearPlan: () => set({ plan: {} }),
 }));
 
 export default usePlanStore;

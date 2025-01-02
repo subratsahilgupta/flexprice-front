@@ -1,10 +1,12 @@
 import { CheckboxRadioGroup, FormHeader, Input, Spacer } from '@/components/atoms';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import usePlanStore from '@/store/usePlanStore';
 import { useState } from 'react';
 
 const BillingPrefferencesSection = () => {
 	const [trialPeriod, settrialPeriod] = useState(false);
+	const { setPlanField, plan, errors } = usePlanStore();
 
 	return (
 		<div className='p-6 rounded-xl border border-[#E4E4E7]'>
@@ -17,12 +19,17 @@ const BillingPrefferencesSection = () => {
 			{/* checkbox radio group */}
 			<CheckboxRadioGroup
 				title='Billing timing'
+				value={plan.invoice_cadence}
 				checkboxItems={[
 					{ label: 'Advance', value: 'Advance', description: 'At the end of each billing period' },
 
 					{ label: 'Arrear', value: 'Arrear', description: 'Immediately at the event reception' },
 				]}
-				onChange={(value) => console.log(value)}
+				onChange={(value) => {
+					console.log('value', value);
+					setPlanField('invoice_cadence', value);
+				}}
+				error={errors.invoice_cadence}
 			/>
 			<Spacer height={'16px'} />
 			<div>
@@ -41,7 +48,16 @@ const BillingPrefferencesSection = () => {
 			{trialPeriod && (
 				<div>
 					<Spacer height={'8px'} />
-					<Input placeholder='Enter no. of days in trial period' />
+					<Input
+						value={plan.trial_period}
+						onChange={(value) => {
+							if (isNaN(Number(value))) {
+								return;
+							}
+							setPlanField('trial_period', Number(value));
+						}}
+						placeholder='Enter no. of days in trial period'
+					/>
 				</div>
 			)}
 		</div>
