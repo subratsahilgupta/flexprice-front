@@ -23,6 +23,7 @@ const PlanDetailsSection = () => {
 					setPlanField('lookup_key', 'plan-' + e.replace(/\s/g, '-').toLowerCase());
 				}}
 			/>
+
 			<Spacer height={'20px'} />
 			<Input
 				onChange={(e) => setPlanField('lookup_key', e)}

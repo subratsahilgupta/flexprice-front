@@ -1,10 +1,9 @@
 import { Button, FormHeader, Input, Select, Spacer } from '@/components/atoms';
 import { useState } from 'react';
-import SelectMeter from './SelectMeter';
 import usePlanStore, { Price } from '@/store/usePlanStore';
 
 const RecurringChargesForm = () => {
-	const { setMetaDataField } = usePlanStore();
+	const { setMetaDataField, clearAllErrors } = usePlanStore();
 	const metaData = usePlanStore((state) => state.metaData);
 
 	const recurringPrice = usePlanStore((state) => state.metaData?.recurringPrice);
@@ -26,8 +25,6 @@ const RecurringChargesForm = () => {
 		return selectedCurrency?.currency;
 	};
 
-	const [meterId, setmeterId] = useState(metaData?.recurringPrice?.meter_id);
-
 	const [amount, setamount] = useState<number | undefined>(recurringPrice?.amount);
 	const [billingPeriod, setbillingPeriod] = useState(recurringPrice?.billing_period || billlingPeriodOptions[0].value);
 
@@ -36,13 +33,9 @@ const RecurringChargesForm = () => {
 	const [errors, seterrors] = useState<Partial<Record<keyof Price, any>>>({});
 
 	const handleAddRecurringPrice = () => {
+		clearAllErrors();
 		if (!amount) {
 			seterrors((prev) => ({ ...prev, amount: 'Amount is required' }));
-			return;
-		}
-
-		if (!meterId) {
-			seterrors((prev) => ({ ...prev, meterId: 'Meter is required' }));
 			return;
 		}
 
@@ -65,7 +58,6 @@ const RecurringChargesForm = () => {
 				<div>
 					<FormHeader title='Recurring Fee' variant='form-component-title' />
 
-					<SelectMeter onChange={setmeterId} value={meterId} />
 					<Spacer height={'8px'} />
 					<Select
 						selectedValue={currency}

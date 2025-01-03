@@ -1,12 +1,17 @@
 import { Button, FormHeader, Spacer, Stepper } from '@/components/atoms';
 import { BillingPrefferencesSection, PlanDetailsSection, SetupChargesSection } from '@/components/organisms';
 import usePlanStore from '@/store/usePlanStore';
+import { PlanApi } from '@/utils/api_requests/PlanApi';
+import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 
 const CreatePlanPage = () => {
-	const [activeStep, setactiveStep] = useState(0);
+	const [activeStep, setactiveStep] = useState(2);
 	const formSteps = [{ label: 'Plan Details' }, { label: 'Billing Preferences' }, { label: 'Set up Charges' }];
-	const { plan, setError, clearAllErrors, clearPlan, metaData } = usePlanStore();
+	const { setError, clearAllErrors, clearPlan } = usePlanStore();
+	const plan = usePlanStore((state) => state.plan);
+	const metaData = usePlanStore((state) => state.metaData);
 
 	useEffect(() => {
 		return () => {
@@ -14,13 +19,26 @@ const CreatePlanPage = () => {
 		};
 	}, []);
 
+	const { mutate: submitPlan } = useMutation({
+		mutationFn: async () => {
+			const response = await PlanApi.createPlan({ ...plan, prices: [metaData?.recurringPrice ?? {}, metaData?.usageBasedPrice ?? {}] });
+			return response;
+		},
+		onSuccess() {
+			toast.success('Plan created successfully');
+		},
+		onError() {
+			toast.error('Failed to create plan');
+		},
+	});
+
 	const handleNext = () => {
 		if (activeStep === formSteps.length - 1) {
 			if (!validateSteps()) {
 				return;
 			}
 			console.log('Form submitted successfully', plan);
-			// Add form submission logic here
+			submitPlan();
 			return;
 		}
 		if (!validateSteps()) {
@@ -57,10 +75,10 @@ const CreatePlanPage = () => {
 				return false;
 			}
 		} else if (activeStep === 2) {
-			if (!plan.prices || plan.prices.length === 0) {
-				setError('prices', 'At least one price tier is required');
-				return false;
-			}
+			// if (!plan.prices || plan.prices.length === 0) {
+			// 	setError('prices', 'At least one price tier is required');
+			// 	return false;
+			// }
 		}
 
 		return true;
@@ -99,11 +117,10 @@ const CreatePlanPage = () => {
 						</Button>
 					)}
 					<Button onClick={handleNext} variant='default' className='mr-4'>
-						Next
+						{formSteps.length - 1 === activeStep ? 'Save' : 'Next'}
 					</Button>
 				</div>
 			</div>
-			<pre className='text-white'>{JSON.stringify(plan, null, 2)}</pre>
 		</div>
 	);
 };
