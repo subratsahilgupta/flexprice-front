@@ -1,7 +1,6 @@
-import React from 'react';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-interface Option {
+export interface Option {
 	value: string;
 	label: string;
 	description?: string;

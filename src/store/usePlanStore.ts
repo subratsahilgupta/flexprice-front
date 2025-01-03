@@ -35,6 +35,18 @@ export interface Plan {
 	trial_period?: number;
 }
 
+interface MetaData {
+	isTrialPeriod: boolean;
+	subscriptionType?: string;
+	isRecurringEditMode: boolean;
+	isUsageEditMode: boolean;
+	recurringPrice: Partial<{
+		amount: number;
+		currency: string;
+		billingPeriod: string;
+	}>;
+}
+
 interface SinglePlanStore {
 	plan: Partial<Plan>;
 	setPlan: (plan: Partial<Plan>) => void;
@@ -44,18 +56,37 @@ interface SinglePlanStore {
 	setError: <K extends keyof Plan>(field: K, errorMessage: string) => void;
 	clearError: <K extends keyof Plan>(field: K) => void;
 	clearAllErrors: () => void;
+	metaData?: MetaData;
+	setMetaDataField: <K extends keyof MetaData>(field: K, value: MetaData[K]) => void;
 }
 
 const usePlanStore = create<SinglePlanStore>((set) => ({
 	plan: {
 		name: '',
 		description: '',
-		lookup_key: '',
+		lookup_key: 'plan-',
 		prices: [],
+	},
+	metaData: {
+		isRecurringEditMode: false,
+		isUsageEditMode: false,
+		isTrialPeriod: false,
+		recurringPrice: {},
 	},
 	errors: {},
 	setPlan: (plan) => set({ plan }),
-
+	setMetaDataField: (field, value) => {
+		set((state) => {
+			console.log('field', field);
+			console.log('value', state.metaData);
+			return {
+				metaData: {
+					...state.metaData,
+					[field]: value,
+				} as MetaData,
+			};
+		});
+	},
 	setPlanField: (field, value) => {
 		set((state) => {
 			console.log('field', field);

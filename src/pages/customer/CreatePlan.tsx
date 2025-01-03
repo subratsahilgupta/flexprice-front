@@ -4,9 +4,9 @@ import usePlanStore from '@/store/usePlanStore';
 import { useEffect, useState } from 'react';
 
 const CreatePlanPage = () => {
-	const [activeStep, setactiveStep] = useState(0);
+	const [activeStep, setactiveStep] = useState(2);
 	const formSteps = [{ label: 'Plan Details' }, { label: 'Billing Preferences' }, { label: 'Set up Charges' }];
-	const { plan, setError, clearAllErrors, clearPlan } = usePlanStore();
+	const { plan, setError, clearAllErrors, clearPlan, metaData } = usePlanStore();
 
 	useEffect(() => {
 		return () => {
@@ -37,15 +37,23 @@ const CreatePlanPage = () => {
 	};
 
 	const validateSteps = () => {
+		clearAllErrors();
 		if (activeStep === 0) {
-			clearAllErrors();
 			if (!plan.name) {
 				setError('name', 'Plan name is required');
+				return false;
+			}
+			if (!plan.lookup_key) {
+				setError('lookup_key', 'Plan slug is required');
 				return false;
 			}
 		} else if (activeStep === 1) {
 			if (!plan.invoice_cadence) {
 				setError('invoice_cadence', 'Billing Timing is required');
+				return false;
+			}
+			if (metaData?.isTrialPeriod && !plan.trial_period) {
+				setError('trial_period', 'Trial period is required');
 				return false;
 			}
 		} else if (activeStep === 2) {

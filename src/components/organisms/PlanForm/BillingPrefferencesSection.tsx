@@ -2,11 +2,9 @@ import { CheckboxRadioGroup, FormHeader, Input, Spacer } from '@/components/atom
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import usePlanStore from '@/store/usePlanStore';
-import { useState } from 'react';
 
 const BillingPrefferencesSection = () => {
-	const [trialPeriod, settrialPeriod] = useState(false);
-	const { setPlanField, plan, errors } = usePlanStore();
+	const { setPlanField, plan, errors, metaData, setMetaDataField } = usePlanStore();
 
 	return (
 		<div className='p-6 rounded-xl border border-[#E4E4E7]'>
@@ -35,7 +33,13 @@ const BillingPrefferencesSection = () => {
 			<div>
 				<FormHeader title='Trial Period' variant='form-component-title' />
 				<div className='flex items-center space-x-4 font-open-sans'>
-					<Switch id='airplane-mode' checked={trialPeriod} onCheckedChange={(value) => settrialPeriod(value)} />
+					<Switch
+						id='airplane-mode'
+						checked={metaData?.isTrialPeriod}
+						onCheckedChange={(value) => {
+							setMetaDataField('isTrialPeriod', value);
+						}}
+					/>
 					<Label htmlFor='airplane-mode'>
 						<p className='font-medium text-sm text-[#18181B] peer-checked:text-black'>Start with a free trial</p>
 						<Spacer height={'4px'} />
@@ -45,10 +49,11 @@ const BillingPrefferencesSection = () => {
 					</Label>
 				</div>
 			</div>
-			{trialPeriod && (
+			{metaData?.isTrialPeriod && (
 				<div>
 					<Spacer height={'8px'} />
 					<Input
+						error={errors.trial_period}
 						value={plan.trial_period}
 						onChange={(value) => {
 							if (isNaN(Number(value))) {
