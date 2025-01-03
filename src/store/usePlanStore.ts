@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-
 export interface Price {
 	amount?: number;
 	billing_cadence?: string;

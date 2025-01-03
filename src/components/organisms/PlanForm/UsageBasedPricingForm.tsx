@@ -28,8 +28,9 @@ const UsageBasedPricingForm = () => {
 	const [billingModel, setBillingModel] = useState(metaData?.usageBasedPrice?.billing_model || billingModels[0].value);
 	const [meterId, setMeterId] = useState(metaData?.usageBasedPrice?.meter_id);
 
-	const [tieredPrices, setTieredPrices] = useState([{ flat_amount: 0, up_to: 0, unit_amount: 0 }]);
+	const [tieredPrices, setTieredPrices] = useState([{ from: 0, up_to: Infinity, unit_amount: 0, flat_amount: 0 }]);
 
+	// Mapping currency
 	const mapCurrency = useCallback(
 		(currency: string) => {
 			const selectedCurrency = currencyOptions.find((option) => option.value === currency);
@@ -38,22 +39,52 @@ const UsageBasedPricingForm = () => {
 		[currencyOptions],
 	);
 
+	// Add a new tier
 	const addTieredPrice = () => {
-		setTieredPrices((prev) => [...prev, { flat_amount: 0, up_to: 0, unit_amount: 0 }]);
+		setTieredPrices((prev) => {
+			const lastTier = prev[prev.length - 1];
+			const newFrom = lastTier.up_to + 1;
+			const newTier = { from: newFrom, up_to: Infinity, unit_amount: 0, flat_amount: 0 };
+			return [...prev, newTier];
+		});
 	};
 
+	// Remove a tier
 	const removeTier = (index: number) => {
+		if (index === 0 && tieredPrices.length === 1) {
+			return;
+		}
 		setTieredPrices((prev) => prev.filter((_, i) => i !== index));
 	};
 
+	// Update a tier value
 	const updateTier = (index: number, key: string, value: number) => {
 		setTieredPrices((prev) => {
 			const updatedTiers = [...prev];
 			updatedTiers[index] = { ...updatedTiers[index], [key]: value };
+
+			// Adjust the 'from' and 'up_to' values based on the tier being updated
+			if (key === 'up_to' && index < prev.length - 1) {
+				// If 'up_to' is updated, adjust the 'from' value of the next tier
+				const nextTier = updatedTiers[index + 1];
+				if (value >= nextTier.from) {
+					nextTier.from = value + 1;
+				}
+			}
+
+			if (key === 'from' && index > 0) {
+				// If 'from' is updated, adjust the 'up_to' value of the previous tier
+				const previousTier = updatedTiers[index - 1];
+				if (value <= previousTier.up_to) {
+					previousTier.up_to = value - 1;
+				}
+			}
+
 			return updatedTiers;
 		});
 	};
 
+	// Handle saving of pricing information
 	const handleAddPrice = () => {
 		setMetaDataField('usageBasedPrice', { currency, billing_model: billingModel });
 		setMetaDataField('isUsageEditMode', false);
@@ -128,10 +159,10 @@ const UsageBasedPricingForm = () => {
 												<td className='px-4 py-2'>
 													<Input
 														className='h-9'
-														onChange={(e) => updateTier(index, 'flat_amount', Number(e))}
+														onChange={(e) => updateTier(index, 'from', Number(e))}
 														type='number'
-														value={tier.flat_amount}
-														placeholder='Placeholder'
+														value={tier.from}
+														placeholder='From'
 													/>
 												</td>
 												<td className='px-4 py-2'>
@@ -139,8 +170,8 @@ const UsageBasedPricingForm = () => {
 														className='h-9'
 														onChange={(e) => updateTier(index, 'up_to', Number(e))}
 														type='number'
-														value={tier.up_to}
-														placeholder='Placeholder'
+														value={tier.up_to === Infinity ? '' : tier.up_to}
+														placeholder='To (Infinity)'
 													/>
 												</td>
 												<td className='px-4 py-2'>
@@ -158,7 +189,7 @@ const UsageBasedPricingForm = () => {
 														onChange={(e) => updateTier(index, 'flat_amount', Number(e))}
 														type='number'
 														value={tier.flat_amount}
-														placeholder='Placeholder'
+														placeholder='Flat Fee'
 													/>
 												</td>
 												<td className='px-4 py-2 text-center'>
@@ -180,6 +211,7 @@ const UsageBasedPricingForm = () => {
 							</div>
 						</div>
 					)}
+
 					<Spacer height='16px' />
 					<div className='flex justify-end'>
 						<Button variant='secondary' className='mr-4 text-zinc-900'>

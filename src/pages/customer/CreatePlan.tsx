@@ -4,7 +4,7 @@ import usePlanStore from '@/store/usePlanStore';
 import { useEffect, useState } from 'react';
 
 const CreatePlanPage = () => {
-	const [activeStep, setactiveStep] = useState(2);
+	const [activeStep, setactiveStep] = useState(0);
 	const formSteps = [{ label: 'Plan Details' }, { label: 'Billing Preferences' }, { label: 'Set up Charges' }];
 	const { plan, setError, clearAllErrors, clearPlan, metaData } = usePlanStore();
 

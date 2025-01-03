@@ -2,8 +2,6 @@ import { FormHeader, Spacer } from '@/components/atoms';
 import { IoRepeat } from 'react-icons/io5';
 import { FiDatabase } from 'react-icons/fi';
 import { cn } from '@/lib/utils';
-import { SlPencil } from 'react-icons/sl';
-import { MdOutlineDelete } from 'react-icons/md';
 import usePlanStore from '@/store/usePlanStore';
 import RecurringChargesForm from './RecurringChargesForm';
 import UsageBasedPricingForm from './UsageBasedPricingForm';
