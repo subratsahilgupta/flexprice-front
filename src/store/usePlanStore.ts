@@ -14,15 +14,17 @@ export interface Price {
 	meter_id?: string;
 	plan_id?: string;
 	tier_mode?: 'VOLUME';
-	tiers?: {
-		flat_amount?: string;
-		unit_amount?: string;
-		up_to?: number;
-	}[];
+	tiers?: PriceTier[];
 	transform_quantity?: {
 		divide_by?: number;
 		round?: string;
 	};
+}
+
+export interface PriceTier {
+	flat_amount: number;
+	unit_amount: number;
+	up_to: number;
 }
 
 export interface Plan {

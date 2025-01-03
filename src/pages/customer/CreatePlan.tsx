@@ -4,9 +4,11 @@ import usePlanStore from '@/store/usePlanStore';
 import { useEffect, useState } from 'react';
 
 const CreatePlanPage = () => {
-	const [activeStep, setactiveStep] = useState(0);
+	const [activeStep, setactiveStep] = useState(2);
 	const formSteps = [{ label: 'Plan Details' }, { label: 'Billing Preferences' }, { label: 'Set up Charges' }];
-	const { plan, setError, clearAllErrors, clearPlan, metaData } = usePlanStore();
+	const { setError, clearAllErrors, clearPlan } = usePlanStore();
+	const plan = usePlanStore((state) => state.plan);
+	const metaData = usePlanStore((state) => state.metaData);
 
 	useEffect(() => {
 		return () => {
@@ -103,7 +105,6 @@ const CreatePlanPage = () => {
 					</Button>
 				</div>
 			</div>
-			<pre className='text-white'>{JSON.stringify(plan, null, 2)}</pre>
 		</div>
 	);
 };

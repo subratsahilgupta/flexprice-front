@@ -105,11 +105,12 @@ const SetupChargesSection = () => {
 
 					<div className='w-full flex items-center flex-wrap gap-2'>
 						{/* Dynamic Add Charges Button */}
-						{metaData.subscriptionType === subscriptionTypeOptions[0].value ? (
+
+						{metaData.subscriptionType === subscriptionTypeOptions[1].value && (
 							<AddChargesButton onClick={() => setMetaDataField('isRecurringEditMode', true)} label='Add Recurring Charges' />
-						) : (
-							<AddChargesButton onClick={() => setMetaDataField('isUsageEditMode', true)} label='Add Usage Based Charges' />
 						)}
+
+						<AddChargesButton onClick={() => setMetaDataField('isUsageEditMode', true)} label='Add Usage Based Charges' />
 					</div>
 				</div>
 			)}

@@ -1,42 +1,44 @@
 import { Button, FormHeader, Input, Select, Spacer } from '@/components/atoms';
-import { useState, useCallback, useMemo } from 'react';
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import usePlanStore from '@/store/usePlanStore';
 import SelectMeter from './SelectMeter';
 
+interface PriceTier {
+	from: number;
+	flat_amount: number;
+	unit_amount: number;
+	up_to: number;
+}
+
+const currencyOptions = [
+	{ label: 'USD', value: 'USD', currency: '$' },
+	{ label: 'INR', value: 'INR', currency: '₹' },
+];
+
+const billingModels = [
+	{ value: 'Flat Fee', label: 'Flat Fee' },
+	{ value: 'Package', label: 'Package' },
+	{ value: 'Tiered', label: 'Tiered' },
+];
+
+const mapCurrency = (currency: string) => {
+	const selectedCurrency = currencyOptions.find((option) => option.value === currency);
+	return selectedCurrency?.currency || '';
+};
+
 const UsageBasedPricingForm = () => {
 	const { setMetaDataField } = usePlanStore();
 	const metaData = usePlanStore((state) => state.metaData);
-
-	const currencyOptions = useMemo(
-		() => [
-			{ label: 'USD', value: 'USD', currency: '$' },
-			{ label: 'INR', value: 'INR', currency: '₹' },
-		],
-		[],
-	);
-
-	const billingModels = [
-		{ value: 'Flat Fee', label: 'Flat Fee' },
-		{ value: 'Package', label: 'Package' },
-		{ value: 'Tiered', label: 'Tiered' },
-	];
 
 	const [currency, setCurrency] = useState(metaData?.usageBasedPrice?.currency || currencyOptions[0].value);
 	const [billingModel, setBillingModel] = useState(metaData?.usageBasedPrice?.billing_model || billingModels[0].value);
 	const [meterId, setMeterId] = useState(metaData?.usageBasedPrice?.meter_id);
 
-	const [tieredPrices, setTieredPrices] = useState([{ from: 0, up_to: Infinity, unit_amount: 0, flat_amount: 0 }]);
+	const [tieredPrices, setTieredPrices] = useState<PriceTier[]>([{ from: 0, up_to: Infinity, unit_amount: 0, flat_amount: 0 }]);
 
 	// Mapping currency
-	const mapCurrency = useCallback(
-		(currency: string) => {
-			const selectedCurrency = currencyOptions.find((option) => option.value === currency);
-			return selectedCurrency?.currency || '';
-		},
-		[currencyOptions],
-	);
 
 	// Add a new tier
 	const addTieredPrice = () => {
@@ -66,17 +68,13 @@ const UsageBasedPricingForm = () => {
 			if (key === 'up_to' && index < prev.length - 1) {
 				// If 'up_to' is updated, adjust the 'from' value of the next tier
 				const nextTier = updatedTiers[index + 1];
-				if (value >= nextTier.from) {
-					nextTier.from = value + 1;
-				}
+				nextTier.from = value + 1;
 			}
 
 			if (key === 'from' && index > 0) {
 				// If 'from' is updated, adjust the 'up_to' value of the previous tier
 				const previousTier = updatedTiers[index - 1];
-				if (value <= previousTier.up_to) {
-					previousTier.up_to = value - 1;
-				}
+				previousTier.up_to = value - 1;
 			}
 
 			return updatedTiers;
@@ -85,8 +83,32 @@ const UsageBasedPricingForm = () => {
 
 	// Handle saving of pricing information
 	const handleAddPrice = () => {
-		setMetaDataField('usageBasedPrice', { currency, billing_model: billingModel });
+		if (!validate()) {
+			return;
+		}
+
+		setMetaDataField('usageBasedPrice', { currency, billing_model: billingModel, tiers: tieredPrices, meter_id: meterId });
 		setMetaDataField('isUsageEditMode', false);
+	};
+
+	const validate = () => {
+		if (billingModel === billingModels[2].value) {
+			const invalidTier = tieredPrices.find((tier) => {
+				return tier.from > tier.up_to || tier.unit_amount < 0 || tier.flat_amount < 0;
+			});
+			if (invalidTier) {
+				return false;
+			}
+		}
+
+		if (billingModel === billingModels[1].value) {
+			const invalidTier = tieredPrices.find((tier) => {
+				return tier.unit_amount < 0 || tier.flat_amount < 0;
+			});
+			if (invalidTier) {
+				return false;
+			}
+		}
 	};
 
 	return (
@@ -98,7 +120,7 @@ const UsageBasedPricingForm = () => {
 					<SelectMeter onChange={setMeterId} value={meterId} />
 					<Spacer height='8px' />
 					<Select
-						selectedValue={mapCurrency(currency)}
+						selectedValue={currency}
 						options={currencyOptions}
 						label='Select Currency'
 						onChange={setCurrency}
@@ -120,8 +142,8 @@ const UsageBasedPricingForm = () => {
 							<Input
 								type='number'
 								label='Set Default Price for all plans'
-								inputPrefix={currency}
-								suffix={<span className='text-[#64748B]'>per month</span>}
+								inputPrefix={mapCurrency(currency)}
+								suffix={<span className='text-[#64748B]'>per unit</span>}
 							/>
 						</div>
 					)}
@@ -157,6 +179,7 @@ const UsageBasedPricingForm = () => {
 											<tr key={index}>
 												<td className='px-4 py-2'>
 													<Input
+														disabled
 														className='h-9'
 														onChange={(e) => updateTier(index, 'from', Number(e))}
 														type='number'
@@ -168,8 +191,8 @@ const UsageBasedPricingForm = () => {
 													<Input
 														className='h-9'
 														onChange={(e) => updateTier(index, 'up_to', Number(e))}
-														type='number'
-														value={tier.up_to === Infinity ? '' : tier.up_to}
+														// type='number'
+														value={tier.up_to === Infinity ? '∞' : tier.up_to}
 														placeholder='To (Infinity)'
 													/>
 												</td>
