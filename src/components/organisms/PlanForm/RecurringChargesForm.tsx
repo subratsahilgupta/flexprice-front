@@ -1,8 +1,7 @@
 import { Button, FormHeader, Input, Select, Spacer } from '@/components/atoms';
 import { useState } from 'react';
 import SelectMeter from './SelectMeter';
-import usePlanStore from '@/store/usePlanStore';
-import { subscriptionTypeOptions } from './SetupChargesSection';
+import usePlanStore, { Price } from '@/store/usePlanStore';
 
 const RecurringChargesForm = () => {
 	const { setMetaDataField } = usePlanStore();
@@ -34,7 +33,24 @@ const RecurringChargesForm = () => {
 
 	const [currency, setcurrency] = useState(recurringPrice?.currency || currencyOptions[0].value);
 
+	const [errors, seterrors] = useState<Partial<Record<keyof Price, any>>>({});
+
 	const handleAddRecurringPrice = () => {
+		if (!amount) {
+			seterrors((prev) => ({ ...prev, amount: 'Amount is required' }));
+			return;
+		}
+
+		if (!meterId) {
+			seterrors((prev) => ({ ...prev, meterId: 'Meter is required' }));
+			return;
+		}
+
+		if (!billingPeriod) {
+			seterrors((prev) => ({ ...prev, billingPeriod: 'Billing Period is required' }));
+			return;
+		}
+
 		setMetaDataField('recurringPrice', {
 			amount,
 			currency,
@@ -45,7 +61,7 @@ const RecurringChargesForm = () => {
 
 	return (
 		<>
-			{(metaData?.isRecurringEditMode || metaData?.subscriptionType === subscriptionTypeOptions[0].value) && (
+			{metaData?.isRecurringEditMode && (
 				<div>
 					<FormHeader title='Recurring Fee' variant='form-component-title' />
 
@@ -57,6 +73,7 @@ const RecurringChargesForm = () => {
 						label='Select Currency'
 						onChange={setcurrency}
 						placeholder='Select Currency'
+						error={errors.currency}
 					/>
 					<Spacer height={'8px'} />
 					<Select
@@ -67,6 +84,7 @@ const RecurringChargesForm = () => {
 						}}
 						label='Billing Period'
 						placeholder='Select The Billing Period'
+						error={errors.billing_period}
 					/>
 					<Spacer height={'8px'} />
 					<Input
@@ -76,6 +94,7 @@ const RecurringChargesForm = () => {
 						value={amount}
 						type='number'
 						label='Value'
+						error={errors.amount}
 						inputPrefix={mapCurrency(currency)}
 						suffix={<span className='text-[#64748B]'>per month</span>}
 					/>

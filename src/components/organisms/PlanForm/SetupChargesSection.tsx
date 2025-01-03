@@ -13,18 +13,26 @@ export const subscriptionTypeOptions = [
 	{ value: 'ONETIME', label: 'Usage Based', icon: FiDatabase },
 ];
 
+const AddChargesButton = ({ onClick, label }: { onClick: () => void; label: string }) => (
+	<button onClick={onClick} className='p-4 h-9 cursor-pointer flex gap-2 items-center bg-[#F4F4F5] rounded-md'>
+		<ReactSVG src='/assets/svg/CirclePlus.svg' />
+		<p className='text-[#18181B] text-sm font-medium'>{label}</p>
+	</button>
+);
+
 const SetupChargesSection = () => {
 	const { setMetaDataField } = usePlanStore();
 	const metaData = usePlanStore((state) => state.metaData);
 
+	const handleSubscriptionTypeChange = (type: (typeof subscriptionTypeOptions)[0]) => {
+		setMetaDataField('subscriptionType', type.value);
+		setMetaDataField('isRecurringEditMode', type.value === subscriptionTypeOptions[0].value);
+		setMetaDataField('isUsageEditMode', type.value === subscriptionTypeOptions[1].value);
+	};
+
 	const handleEdit = () => {
-		if (metaData?.subscriptionType === subscriptionTypeOptions[0].value) {
-			// setMetaDataField('recurringPrice', {});
-			setMetaDataField('isRecurringEditMode', true);
-		} else {
-			setMetaDataField('isUsageEditMode', true);
-			// setMetaDataField('usageBasedPrice', {});
-		}
+		setMetaDataField(metaData?.subscriptionType === subscriptionTypeOptions[0].value ? 'isRecurringEditMode' : 'isUsageEditMode', true);
+		setMetaDataField(metaData?.subscriptionType === subscriptionTypeOptions[0].value ? 'isUsageEditMode' : 'isRecurringEditMode', false);
 	};
 
 	const handleDelete = () => {
@@ -33,6 +41,7 @@ const SetupChargesSection = () => {
 		} else {
 			setMetaDataField('usageBasedPrice', undefined);
 		}
+		setMetaDataField('subscriptionType', undefined);
 	};
 
 	const renderSubscriptionTypeButton = (type: (typeof subscriptionTypeOptions)[0]) => {
@@ -40,10 +49,7 @@ const SetupChargesSection = () => {
 		return (
 			<button
 				key={type.value}
-				onClick={() => {
-					console.log('Setting subscription type', type.value);
-					setMetaDataField('subscriptionType', type.value);
-				}}
+				onClick={() => handleSubscriptionTypeChange(type)}
 				className={cn(
 					'p-3 rounded-md border-2 w-full flex flex-col justify-center items-center',
 					isActive ? 'border-[#0F172A]' : 'border-[#E2E8F0]',
@@ -53,14 +59,6 @@ const SetupChargesSection = () => {
 			</button>
 		);
 	};
-
-	// Reusable Add Charges Button
-	const AddChargesButton = ({ onClick, label }: { onClick: () => void; label: string }) => (
-		<button onClick={onClick} className='p-4 h-9 cursor-pointer flex gap-2 items-center bg-[#F4F4F5] rounded-md'>
-			<ReactSVG src='/assets/svg/CirclePlus.svg' />
-			<p className='text-[#18181B] text-sm font-medium'>{label}</p>
-		</button>
-	);
 
 	return (
 		<div className='p-6 rounded-xl border border-[#E4E4E7]'>
@@ -81,7 +79,7 @@ const SetupChargesSection = () => {
 				</div>
 			)}
 
-			{/* Default Charges Section */}
+			{/* Charges Section */}
 			{(metaData?.recurringPrice || metaData?.usageBasedPrice) && (
 				<div>
 					<FormHeader
@@ -89,8 +87,8 @@ const SetupChargesSection = () => {
 						variant='sub-header'
 					/>
 
-					{/* edit delete CTA */}
-					<div className=' gap-2 w-full flex justify-between  group min-h-9 items-center rounded-md border bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground disabled:opacity-50 md:text-sm disabled:cursor-not-allowed'>
+					{/* Edit/Delete CTA */}
+					<div className='gap-2 w-full flex justify-between group min-h-9 items-center rounded-md border bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground disabled:opacity-50 md:text-sm disabled:cursor-not-allowed'>
 						<p>{metaData?.subscriptionType === subscriptionTypeOptions[0].value ? 'Recurring' : 'Usage Based'}</p>
 						<span className='text-[#18181B] flex gap-2 items-center'>
 							<button onClick={handleEdit}>
@@ -106,20 +104,18 @@ const SetupChargesSection = () => {
 					<div className='border-b border-[#F4F4F5] w-full my-3' />
 
 					<div className='w-full flex items-center flex-wrap gap-2'>
-						{metaData.subscriptionType === subscriptionTypeOptions[1].value && (
-							<div className='flex items-center gap-2'>
-								<AddChargesButton onClick={() => setMetaDataField('recurringPrice', {})} label='Add Recurring Charges' />
-							</div>
+						{/* Dynamic Add Charges Button */}
+						{metaData.subscriptionType === subscriptionTypeOptions[0].value ? (
+							<AddChargesButton onClick={() => setMetaDataField('isRecurringEditMode', true)} label='Add Recurring Charges' />
+						) : (
+							<AddChargesButton onClick={() => setMetaDataField('isUsageEditMode', true)} label='Add Usage Based Charges' />
 						)}
-
-						<div className='flex items-center gap-2'>
-							<AddChargesButton onClick={() => setMetaDataField('usageBasedPrice', {})} label='Add Usage Based Charges' />
-						</div>
 					</div>
 				</div>
 			)}
-			<Spacer height='16px' />
+
 			{/* Conditional Forms */}
+			<Spacer height='16px' />
 			{metaData?.subscriptionType && (
 				<>
 					<RecurringChargesForm />
