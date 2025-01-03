@@ -3,7 +3,6 @@ import { useState, useCallback, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import usePlanStore from '@/store/usePlanStore';
-import { subscriptionTypeOptions } from './SetupChargesSection';
 import SelectMeter from './SelectMeter';
 
 const UsageBasedPricingForm = () => {
@@ -92,7 +91,7 @@ const UsageBasedPricingForm = () => {
 
 	return (
 		<div>
-			{(metaData?.isUsageEditMode || metaData?.subscriptionType === subscriptionTypeOptions[1].value) && (
+			{metaData?.isUsageEditMode && (
 				<div>
 					<FormHeader title='Set Usage Based Charge' variant='sub-header' />
 
