@@ -1,4 +1,5 @@
 import { AxiosClient } from '@/core/axios/verbs';
+import { Plan as PlanReq } from '@/store/usePlanStore';
 import { Plan } from '@/models/Plan';
 
 interface GetAllPlansResponse {
@@ -8,44 +9,11 @@ interface GetAllPlansResponse {
 	limit: number;
 }
 
-interface CreatePlanRequestPayload {
-	description?: string;
-	invoice_cadence: string;
-	lookup_key: string;
-	name: string;
-	prices: {
-		amount: string;
-		billing_cadence: string;
-		billing_model: string;
-		billing_period: string;
-		billing_period_count: number;
-		currency: string;
-		description: string;
-		filter_values: Record<string, unknown>;
-		lookup_key: string;
-		metadata: Record<string, unknown>;
-		meter_id: string;
-		plan_id: string;
-		tier_mode: string;
-		tiers: {
-			flat_amount: string;
-			unit_amount: string;
-			up_to: number;
-		}[];
-		transform_quantity: {
-			divide_by: number;
-			round: string;
-		};
-		type: string;
-	}[];
-	trial_period: number;
-}
-
 export class PlanApi {
 	private static baseUrl = '/plans';
 
-	public static async createPlan(data: CreatePlanRequestPayload) {
-		return await AxiosClient.post<Plan, CreatePlanRequestPayload>(this.baseUrl, data);
+	public static async createPlan(data: Partial<PlanReq>) {
+		return await AxiosClient.post<Plan, Partial<PlanReq>>(this.baseUrl, data);
 	}
 
 	public static async getAllPlans() {
