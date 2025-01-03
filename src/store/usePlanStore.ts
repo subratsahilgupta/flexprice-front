@@ -1,15 +1,15 @@
 import { create } from 'zustand';
-
 export interface Price {
-	amount?: string;
-	billing_cadence?: 'RECURRING';
-	billing_model?: 'FLAT_FEE';
-	billing_period?: 'MONTHLY';
+	amount?: number;
+	billing_cadence?: string;
+	billing_model?: string;
+	billing_period?: string;
 	billing_period_count?: number;
 	currency?: string;
+	type?: string;
 	description?: string;
-	filter_values?: Record<string, unknown>;
 	lookup_key?: string;
+	filter_values?: Record<string, unknown>;
 	metadata?: Record<string, unknown>;
 	meter_id?: string;
 	plan_id?: string;
@@ -23,7 +23,6 @@ export interface Price {
 		divide_by?: number;
 		round?: string;
 	};
-	type?: 'USAGE';
 }
 
 export interface Plan {
@@ -35,6 +34,15 @@ export interface Plan {
 	trial_period?: number;
 }
 
+interface MetaData {
+	isTrialPeriod: boolean;
+	subscriptionType?: string;
+	isRecurringEditMode: boolean;
+	isUsageEditMode: boolean;
+	recurringPrice?: Partial<Price>;
+	usageBasedPrice?: Partial<Price>;
+}
+
 interface SinglePlanStore {
 	plan: Partial<Plan>;
 	setPlan: (plan: Partial<Plan>) => void;
@@ -44,18 +52,36 @@ interface SinglePlanStore {
 	setError: <K extends keyof Plan>(field: K, errorMessage: string) => void;
 	clearError: <K extends keyof Plan>(field: K) => void;
 	clearAllErrors: () => void;
+	metaData?: MetaData;
+	setMetaDataField: <K extends keyof MetaData>(field: K, value: MetaData[K]) => void;
 }
 
 const usePlanStore = create<SinglePlanStore>((set) => ({
 	plan: {
 		name: '',
 		description: '',
-		lookup_key: '',
+		lookup_key: 'plan-',
 		prices: [],
+	},
+	metaData: {
+		isRecurringEditMode: false,
+		isUsageEditMode: false,
+		isTrialPeriod: false,
 	},
 	errors: {},
 	setPlan: (plan) => set({ plan }),
-
+	setMetaDataField: (field, value) => {
+		set((state) => {
+			console.log('field', field);
+			console.log('value', state.metaData);
+			return {
+				metaData: {
+					...state.metaData,
+					[field]: value,
+				} as MetaData,
+			};
+		});
+	},
 	setPlanField: (field, value) => {
 		set((state) => {
 			console.log('field', field);

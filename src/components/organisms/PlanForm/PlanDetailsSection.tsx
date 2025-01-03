@@ -3,6 +3,7 @@ import usePlanStore from '@/store/usePlanStore';
 
 const PlanDetailsSection = () => {
 	const { plan, setPlanField, errors } = usePlanStore();
+	console.log('PlanDetailsSection', plan, errors);
 
 	return (
 		<div className='p-6  rounded-xl border border-[#E4E4E7]'>
@@ -17,7 +18,10 @@ const PlanDetailsSection = () => {
 				label='Plan Name*'
 				value={plan.name}
 				error={errors.name}
-				onChange={(e) => setPlanField('name', e)}
+				onChange={(e) => {
+					setPlanField('name', e);
+					setPlanField('lookup_key', 'plan-' + e.replace(/\s/g, '-').toLowerCase());
+				}}
 			/>
 			<Spacer height={'20px'} />
 			<Input

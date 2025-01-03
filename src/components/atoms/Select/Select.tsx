@@ -1,7 +1,6 @@
-import React from 'react';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-interface Option {
+export interface Option {
 	value: string;
 	label: string;
 	description?: string;
@@ -36,10 +35,7 @@ const FlexPriceSelect: React.FC<Props> = ({
 			<Select
 				defaultValue={selectedValue}
 				onValueChange={(value) => {
-					console.log('new value', value);
-
 					if (onChange) {
-						console.log('new value in if block', value);
 						onChange(value);
 					}
 				}}
