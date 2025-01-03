@@ -1,15 +1,16 @@
 import { create } from 'zustand';
 
 export interface Price {
-	amount?: string;
-	billing_cadence?: 'RECURRING';
-	billing_model?: 'FLAT_FEE';
-	billing_period?: 'MONTHLY';
+	amount?: number;
+	billing_cadence?: string;
+	billing_model?: string;
+	billing_period?: string;
 	billing_period_count?: number;
 	currency?: string;
+	type?: string;
 	description?: string;
-	filter_values?: Record<string, unknown>;
 	lookup_key?: string;
+	filter_values?: Record<string, unknown>;
 	metadata?: Record<string, unknown>;
 	meter_id?: string;
 	plan_id?: string;
@@ -23,7 +24,6 @@ export interface Price {
 		divide_by?: number;
 		round?: string;
 	};
-	type?: 'USAGE';
 }
 
 export interface Plan {
@@ -40,11 +40,8 @@ interface MetaData {
 	subscriptionType?: string;
 	isRecurringEditMode: boolean;
 	isUsageEditMode: boolean;
-	recurringPrice: Partial<{
-		amount: number;
-		currency: string;
-		billingPeriod: string;
-	}>;
+	recurringPrice?: Partial<Price>;
+	usageBasedPrice?: Partial<Price>;
 }
 
 interface SinglePlanStore {
@@ -71,7 +68,6 @@ const usePlanStore = create<SinglePlanStore>((set) => ({
 		isRecurringEditMode: false,
 		isUsageEditMode: false,
 		isTrialPeriod: false,
-		recurringPrice: {},
 	},
 	errors: {},
 	setPlan: (plan) => set({ plan }),

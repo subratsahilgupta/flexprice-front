@@ -35,10 +35,7 @@ const FlexPriceSelect: React.FC<Props> = ({
 			<Select
 				defaultValue={selectedValue}
 				onValueChange={(value) => {
-					console.log('new value', value);
-
 					if (onChange) {
-						console.log('new value in if block', value);
 						onChange(value);
 					}
 				}}

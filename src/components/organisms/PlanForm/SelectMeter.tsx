@@ -1,12 +1,18 @@
 import { Option, Select } from '@/components/atoms';
 import { MeterApi } from '@/utils/api_requests/MeterApi';
 import { useQuery } from '@tanstack/react-query';
+import { FC } from 'react';
 
 const fetchMeters = async () => {
 	return await MeterApi.getAllMeters();
 };
 
-const SelectMeter = () => {
+interface Props {
+	onChange: (value: string) => void;
+	value?: string;
+}
+
+const SelectMeter: FC<Props> = ({ onChange, value }) => {
 	const {
 		data: meters,
 		isLoading,
@@ -41,12 +47,7 @@ const SelectMeter = () => {
 
 	return (
 		<div>
-			<Select
-				options={activeMeters}
-				placeholder='Select Meter'
-				// description='Your plan will be created for this specific meter'
-				label='Select Meter'
-			/>
+			<Select selectedValue={value} onChange={(e) => onChange(e)} options={activeMeters} placeholder='Select Meter' label='Select Meter' />
 		</div>
 	);
 };

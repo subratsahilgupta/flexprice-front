@@ -1,103 +1,135 @@
-import { FormHeader, Input, Spacer } from '@/components/atoms';
+import { FormHeader, Spacer } from '@/components/atoms';
 import { IoRepeat } from 'react-icons/io5';
 import { FiDatabase } from 'react-icons/fi';
 import { cn } from '@/lib/utils';
 import { SlPencil } from 'react-icons/sl';
 import { MdOutlineDelete } from 'react-icons/md';
-import { BsPlusCircle } from 'react-icons/bs';
 import usePlanStore from '@/store/usePlanStore';
 import RecurringChargesForm from './RecurringChargesForm';
 import UsageBasedPricingForm from './UsageBasedPricingForm';
+import { ReactSVG } from 'react-svg';
+import { Pencil, Trash2 } from 'lucide-react';
 
-const subscriptionTypeOptions = [
-	{
-		value: 'recurring',
-		label: 'Recurring',
-		icon: IoRepeat,
-	},
-	{
-		value: 'usage_based',
-		label: 'Usage Based',
-		icon: FiDatabase,
-	},
+export const subscriptionTypeOptions = [
+	{ value: 'RECURRING', label: 'Recurring', icon: IoRepeat },
+	{ value: 'ONETIME', label: 'Usage Based', icon: FiDatabase },
 ];
 
 const SetupChargesSection = () => {
-	const metaData = usePlanStore((state) => state.metaData);
 	const { setMetaDataField } = usePlanStore();
+	const metaData = usePlanStore((state) => state.metaData);
+
+	const handleEdit = () => {
+		if (metaData?.subscriptionType === subscriptionTypeOptions[0].value) {
+			// setMetaDataField('recurringPrice', {});
+			setMetaDataField('isRecurringEditMode', true);
+		} else {
+			setMetaDataField('isUsageEditMode', true);
+			// setMetaDataField('usageBasedPrice', {});
+		}
+	};
+
+	const handleDelete = () => {
+		if (metaData?.subscriptionType === subscriptionTypeOptions[0].value) {
+			setMetaDataField('recurringPrice', undefined);
+		} else {
+			setMetaDataField('usageBasedPrice', undefined);
+		}
+	};
+
+	const renderSubscriptionTypeButton = (type: (typeof subscriptionTypeOptions)[0]) => {
+		const isActive = metaData?.subscriptionType === type.value;
+		return (
+			<button
+				key={type.value}
+				onClick={() => {
+					console.log('Setting subscription type', type.value);
+					setMetaDataField('subscriptionType', type.value);
+				}}
+				className={cn(
+					'p-3 rounded-md border-2 w-full flex flex-col justify-center items-center',
+					isActive ? 'border-[#0F172A]' : 'border-[#E2E8F0]',
+				)}>
+				{type.icon && <type.icon size={24} className='text-[#020617]' />}
+				<p className='text-[#18181B] font-medium mt-2'>{type.label}</p>
+			</button>
+		);
+	};
+
+	// Reusable Add Charges Button
+	const AddChargesButton = ({ onClick, label }: { onClick: () => void; label: string }) => (
+		<button onClick={onClick} className='p-4 h-9 cursor-pointer flex gap-2 items-center bg-[#F4F4F5] rounded-md'>
+			<ReactSVG src='/assets/svg/CirclePlus.svg' />
+			<p className='text-[#18181B] text-sm font-medium'>{label}</p>
+		</button>
+	);
 
 	return (
 		<div className='p-6 rounded-xl border border-[#E4E4E7]'>
 			<FormHeader
-				title={'Plan Charges '}
-				subtitle={'Name of the property key in the data object. The groups should only include low cardinality fields.'}
+				title='Plan Charges'
+				subtitle='Name of the property key in the data object. The groups should only include low cardinality fields.'
 				variant='sub-header'
 			/>
-			{
-				<div className=''>
-					<FormHeader title={'Select the Subscription Type'} variant='form-component-title' />
-					<div className='w-full gap-4 grid grid-cols-2'>
-						{subscriptionTypeOptions.map((type) => {
-							const isActive = metaData?.subscriptionType === type.value;
-							return (
-								<button
-									onClick={() => setMetaDataField('subscriptionType', type.value)}
-									className={cn(
-										'p-3 rounded-md border-2  w-full flex flex-col justify-center items-center',
-										isActive ? 'border-[#0F172A]' : 'border-[#E2E8F0]',
-									)}>
-									{type.icon && <type.icon size={24} className='text-[#020617]' />}
-									<p className='text-[#18181B] font-medium mt-2'>{type.label}</p>
-								</button>
-							);
-						})}
-					</div>
-					<Spacer height={'4px'} />
-					<p className=' text-sm text-muted-foreground'>Default subscription means... Subscription means lorem ipsum</p>
 
-					<Spacer height={'16px'} />
-				</div>
-			}
-
-			{metaData?.recurringPrice && (
+			{/* Subscription Type Section */}
+			{!metaData?.recurringPrice && !metaData?.usageBasedPrice && (
 				<div>
-					<FormHeader title={'Usage Fee(s)'} variant='sub-header' />
-					<Input
-						value={'Usage Fee'}
-						disabled
-						suffix={
-							<span className='text-[#18181B] flex gap-2 items-center'>
-								<button>
-									<SlPencil size={16} />
-								</button>
-								<div className='border-r h-[16px]  border-[#E4E4E7]'></div>
-								<button onClick={() => setMetaDataField('recurringPrice', {})}>
-									<MdOutlineDelete size={20} />
-								</button>
-							</span>
-						}
-					/>
-					<Spacer height={'16px'} />
-					<div className='border-b border-[#F4F4F5] w-full' />
-					<Spacer height={'16px'} />
-					<div className='flex items-center gap-2'>
-						<button className='p-4 h-9 cursor-pointer flex gap-2 items-center  bg-[#F4F4F5] rounded-md '>
-							<BsPlusCircle className='size-3  font-semibold' />
-							<p className='text-[#18181B] font-medium '>Add Recurring Based Charges</p>
-						</button>
-						<button onClick={() => {}} className='p-4 h-9 cursor-pointer flex gap-2 items-center  bg-[#F4F4F5] rounded-md '>
-							<BsPlusCircle className='size-3  font-semibold' />
-							<p className='text-[#18181B] font-medium '>Add Usage Based Charges</p>
-						</button>
-					</div>
+					<FormHeader title='Select the Subscription Type' variant='form-component-title' />
+					<div className='w-full gap-4 grid grid-cols-2'>{subscriptionTypeOptions.map(renderSubscriptionTypeButton)}</div>
+					<Spacer height='4px' />
+					<p className='text-sm text-muted-foreground'>Default subscription means... Subscription means lorem ipsum</p>
+					<Spacer height='16px' />
 				</div>
 			)}
 
-			{/* shoq reccuring type form */}
-			{metaData?.subscriptionType === subscriptionTypeOptions[0].value && <RecurringChargesForm />}
+			{/* Default Charges Section */}
+			{(metaData?.recurringPrice || metaData?.usageBasedPrice) && (
+				<div>
+					<FormHeader
+						title={metaData?.subscriptionType === subscriptionTypeOptions[0].value ? 'Recurring Charges' : 'Usage Based Charges'}
+						variant='sub-header'
+					/>
 
-			{metaData?.subscriptionType === subscriptionTypeOptions[1].value && <UsageBasedPricingForm />}
-			<Spacer height={'16px'} />
+					{/* edit delete CTA */}
+					<div className=' gap-2 w-full flex justify-between  group min-h-9 items-center rounded-md border bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground disabled:opacity-50 md:text-sm disabled:cursor-not-allowed'>
+						<p>{metaData?.subscriptionType === subscriptionTypeOptions[0].value ? 'Recurring' : 'Usage Based'}</p>
+						<span className='text-[#18181B] flex gap-2 items-center'>
+							<button onClick={handleEdit}>
+								<Pencil size={16} />
+							</button>
+							<div className='border-r h-[16px] border-[#E4E4E7]' />
+							<button onClick={handleDelete}>
+								<Trash2 size={16} />
+							</button>
+						</span>
+					</div>
+
+					<div className='border-b border-[#F4F4F5] w-full my-3' />
+
+					<div className='w-full flex items-center flex-wrap gap-2'>
+						{metaData.subscriptionType === subscriptionTypeOptions[1].value && (
+							<div className='flex items-center gap-2'>
+								<AddChargesButton onClick={() => setMetaDataField('recurringPrice', {})} label='Add Recurring Charges' />
+							</div>
+						)}
+
+						<div className='flex items-center gap-2'>
+							<AddChargesButton onClick={() => setMetaDataField('usageBasedPrice', {})} label='Add Usage Based Charges' />
+						</div>
+					</div>
+				</div>
+			)}
+			<Spacer height='16px' />
+			{/* Conditional Forms */}
+			{metaData?.subscriptionType && (
+				<>
+					<RecurringChargesForm />
+					<UsageBasedPricingForm />
+				</>
+			)}
+
+			<Spacer height='16px' />
 		</div>
 	);
 };
