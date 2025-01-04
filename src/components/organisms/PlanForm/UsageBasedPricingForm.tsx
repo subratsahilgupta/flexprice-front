@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import usePlanStore, { Price } from '@/store/usePlanStore';
 import SelectMeter from './SelectMeter';
+import { subscriptionTypeOptions } from './SetupChargesSection';
 
 interface PriceTier {
 	from: number;
@@ -18,9 +19,9 @@ const currencyOptions = [
 ];
 
 const billingModels = [
-	{ value: 'Flat Fee', label: 'Flat Fee' },
-	{ value: 'Package', label: 'Package' },
-	{ value: 'Tiered', label: 'Tiered' },
+	{ value: 'FLAT_FEE', label: 'Flat Fee' },
+	{ value: 'PACKAGE', label: 'Package' },
+	{ value: 'TIERED', label: 'Tiered' },
 ];
 
 const billlingPeriodOptions = [
@@ -44,7 +45,10 @@ const UsageBasedPricingForm = () => {
 	const [billingModel, setBillingModel] = useState(metaData?.usageBasedPrice?.billing_model || billingModels[0].value);
 	const [meterId, setMeterId] = useState(metaData?.usageBasedPrice?.meter_id);
 
-	const [tieredPrices, setTieredPrices] = useState<PriceTier[]>([{ from: 0, up_to: null, unit_amount: 0, flat_amount: 0 }]);
+	const [tieredPrices, setTieredPrices] = useState<PriceTier[]>([
+		{ from: 1, up_to: 1, unit_amount: 0, flat_amount: 0 },
+		{ from: 2, up_to: null, unit_amount: 0, flat_amount: 0 },
+	]);
 	const [billingPeriod, setbillingPeriod] = useState(usageBasedPrice?.billing_period || billlingPeriodOptions[0].value);
 	const [flatFee, setflatFee] = useState<string>(usageBasedPrice?.amount || '');
 	const [packagedFee, setpackagedFee] = useState<{ unit: string; price: string }>({ unit: '', price: '' });
@@ -59,7 +63,11 @@ const UsageBasedPricingForm = () => {
 	const addTieredPrice = () => {
 		setTieredPrices((prev) => {
 			const lastTier = prev[prev.length - 1];
-			const newFrom = lastTier.up_to ?? 0 + 1;
+			if (lastTier.up_to === null) {
+				prev[prev.length - 1] = { ...lastTier, up_to: lastTier.from + 1 };
+			}
+			const newFrom = lastTier.up_to ?? lastTier.from + 1;
+
 			const newTier = { from: newFrom, up_to: null, unit_amount: 0, flat_amount: 0 };
 			return [...prev, newTier];
 		});
@@ -109,7 +117,7 @@ const UsageBasedPricingForm = () => {
 			currency,
 			billing_period: billingPeriod,
 			billing_model: billingModel,
-			type: metaData?.subscriptionType,
+			type: subscriptionTypeOptions[1].value,
 		};
 
 		if (billingModel === billingModels[0].value) {
@@ -117,20 +125,19 @@ const UsageBasedPricingForm = () => {
 		}
 
 		if (billingModel === billingModels[1].value) {
-			data.tiers = [
-				{
-					flat_amount: packagedFee.price,
-					unit_amount: packagedFee.unit,
-				},
-			];
+			data.amount = packagedFee.price;
+			data.transform_quantity = {
+				divide_by: Number(packagedFee.unit),
+			};
 		}
 
 		if (billingModel === billingModels[2].value) {
 			data.tiers = tieredPrices.map((tier) => ({
-				up_to: tier.up_to?.toString(),
+				up_to: tier.up_to!,
 				unit_amount: tier.unit_amount.toString(),
 				flat_amount: tier.flat_amount.toString(),
 			}));
+			data.tier_mode = 'VOLUME';
 		}
 
 		console.log('data', data);
@@ -156,15 +163,17 @@ const UsageBasedPricingForm = () => {
 		}
 
 		if (billingModel === billingModels[2].value) {
-			const invalidTier = tieredPrices.find((tier) => {
-				return tier.from > (tier.up_to ?? 0) || tier.unit_amount < 0 || tier.flat_amount < 0;
-			});
-			if (invalidTier) {
-				setinputErrors((prev) => ({ ...prev, tieredModelError: 'Invalid tiered price' }));
-				console.log('validation failed Invalid tiered price');
+			tieredPrices.map((tier, index) => {
+				if (tier.from > (tier.up_to !== null ? tier.up_to : 999999)) {
+					setinputErrors((prev) => ({ ...prev, tieredModelError: `From value cannot be small than upto in row ${index + 1}` }));
+					return true;
+				}
 
-				return false;
-			}
+				if (tier.unit_amount < 0 || tier.flat_amount < 0) {
+					setinputErrors((prev) => ({ ...prev, tieredModelError: `Units and Flat amount cannot be nagative in row ${index + 1}` }));
+					return true;
+				}
+			});
 		}
 
 		if (billingModel === billingModels[1].value) {
@@ -297,8 +306,8 @@ const UsageBasedPricingForm = () => {
 													<Input
 														className='h-9'
 														onChange={(e) => updateTier(index, 'up_to', Number(e))}
-														// type='number'
-														value={tier.up_to === null ? '∞' : tier.up_to}
+														disabled={tier.up_to === null}
+														value={tier.up_to === null ? '∞ Unlimited' : tier.up_to}
 														placeholder='To (Infinity)'
 													/>
 												</td>

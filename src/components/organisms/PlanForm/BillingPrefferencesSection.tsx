@@ -19,9 +19,9 @@ const BillingPrefferencesSection = () => {
 				title='Billing timing'
 				value={plan.invoice_cadence}
 				checkboxItems={[
-					{ label: 'Advance', value: 'Advance', description: 'At the end of each billing period' },
+					{ label: 'Advance', value: 'ADVANCE', description: 'At the end of each billing period' },
 
-					{ label: 'Arrear', value: 'Arrear', description: 'Immediately at the event reception' },
+					{ label: 'Arrear', value: 'ARREAR', description: 'Immediately at the event reception' },
 				]}
 				onChange={(value) => {
 					console.log('value', value);

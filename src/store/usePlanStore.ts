@@ -13,7 +13,7 @@ export interface Price {
 	metadata?: Record<string, unknown>;
 	meter_id?: string;
 	plan_id?: string;
-	tier_mode?: 'VOLUME';
+	tier_mode?: string;
 	tiers?: PriceTier[];
 	transform_quantity?: {
 		divide_by?: number;
@@ -24,7 +24,7 @@ export interface Price {
 export interface PriceTier {
 	flat_amount: string;
 	unit_amount: string;
-	up_to?: string;
+	up_to?: number;
 }
 
 export interface Plan {

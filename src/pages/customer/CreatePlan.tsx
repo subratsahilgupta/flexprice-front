@@ -28,7 +28,6 @@ const CreatePlanPage = () => {
 			if (metaData?.usageBasedPrice) {
 				data.prices?.push({
 					...metaData.usageBasedPrice,
-					type: metaData.subscriptionType,
 					billing_period_count: 1,
 					billing_cadence: 'RECURRING',
 				});
@@ -152,16 +151,6 @@ const CreatePlanPage = () => {
 					</Button>
 				</div>
 			</div>
-			{/* <pre>
-				{JSON.stringify(
-					{
-						plan,
-						metaData,
-					},
-					null,
-					2,
-				)}
-			</pre> */}
 		</div>
 	);
 };

@@ -9,8 +9,8 @@ import { ReactSVG } from 'react-svg';
 import { Pencil, Trash2 } from 'lucide-react';
 
 export const subscriptionTypeOptions = [
-	{ value: 'RECURRING', label: 'Recurring', icon: IoRepeat },
-	{ value: 'ONETIME', label: 'Usage Based', icon: FiDatabase },
+	{ value: 'FIXED', label: 'Recurring', icon: IoRepeat },
+	{ value: 'USAGE', label: 'Usage Based', icon: FiDatabase },
 ];
 
 const AddChargesButton = ({ onClick, label }: { onClick: () => void; label: string }) => (
@@ -21,7 +21,7 @@ const AddChargesButton = ({ onClick, label }: { onClick: () => void; label: stri
 );
 
 const SetupChargesSection = () => {
-	const { setMetaDataField } = usePlanStore();
+	const { setMetaDataField, setPlanField } = usePlanStore();
 	const metaData = usePlanStore((state) => state.metaData);
 
 	const handleSubscriptionTypeChange = (type: (typeof subscriptionTypeOptions)[0]) => {
@@ -39,6 +39,7 @@ const SetupChargesSection = () => {
 		setMetaDataField('recurringPrice', undefined);
 		setMetaDataField('usageBasedPrice', undefined);
 		setMetaDataField('subscriptionType', undefined);
+		setPlanField('prices', []);
 	};
 
 	const renderSubscriptionTypeButton = (type: (typeof subscriptionTypeOptions)[0]) => {
