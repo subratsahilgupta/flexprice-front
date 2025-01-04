@@ -1,3 +1,4 @@
+import { queryClient } from '@/App';
 import { Button, FormHeader, Spacer, Stepper } from '@/components/atoms';
 import { BillingPrefferencesSection, PlanDetailsSection, SetupChargesSection } from '@/components/organisms';
 import usePlanStore from '@/store/usePlanStore';
@@ -5,6 +6,7 @@ import { PlanApi } from '@/utils/api_requests/PlanApi';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 const CreatePlanPage = () => {
 	const [activeStep, setactiveStep] = useState(0);
@@ -12,6 +14,7 @@ const CreatePlanPage = () => {
 	const { setError, clearAllErrors, clearPlan } = usePlanStore();
 	const plan = usePlanStore((state) => state.plan);
 	const metaData = usePlanStore((state) => state.metaData);
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		return () => {
@@ -44,8 +47,15 @@ const CreatePlanPage = () => {
 			const response = await PlanApi.createPlan(data);
 			return response;
 		},
-		onSuccess() {
+		async onSuccess() {
 			toast.success('Plan created successfully');
+			navigate('/customer-management/pricing-plan');
+			await queryClient.invalidateQueries({
+				queryKey: ['fetchPlans'],
+			});
+			await queryClient.refetchQueries({
+				queryKey: ['fetchPlans'],
+			});
 		},
 		onError() {
 			toast.error('Failed to create plan');
