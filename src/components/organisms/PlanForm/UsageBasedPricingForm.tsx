@@ -2,7 +2,7 @@ import { Button, FormHeader, Input, Select, Spacer } from '@/components/atoms';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { RiDeleteBin6Line } from 'react-icons/ri';
-import usePlanStore from '@/store/usePlanStore';
+import usePlanStore, { Price } from '@/store/usePlanStore';
 import SelectMeter from './SelectMeter';
 
 interface PriceTier {
@@ -23,6 +23,13 @@ const billingModels = [
 	{ value: 'Tiered', label: 'Tiered' },
 ];
 
+const billlingPeriodOptions = [
+	{ label: 'Daily', value: 'DAILY' },
+	{ label: 'Weekly', value: 'WEEKLY' },
+	{ label: 'Monthly', value: 'MONTHLY' },
+	{ label: 'Yearly', value: 'ANNUAL' },
+];
+
 const mapCurrency = (currency: string) => {
 	const selectedCurrency = currencyOptions.find((option) => option.value === currency);
 	return selectedCurrency?.currency || '';
@@ -31,12 +38,16 @@ const mapCurrency = (currency: string) => {
 const UsageBasedPricingForm = () => {
 	const { setMetaDataField } = usePlanStore();
 	const metaData = usePlanStore((state) => state.metaData);
+	const usageBasedPrice = usePlanStore((state) => state.metaData?.usageBasedPrice);
 
 	const [currency, setCurrency] = useState(metaData?.usageBasedPrice?.currency || currencyOptions[0].value);
 	const [billingModel, setBillingModel] = useState(metaData?.usageBasedPrice?.billing_model || billingModels[0].value);
 	const [meterId, setMeterId] = useState(metaData?.usageBasedPrice?.meter_id);
 
 	const [tieredPrices, setTieredPrices] = useState<PriceTier[]>([{ from: 0, up_to: Infinity, unit_amount: 0, flat_amount: 0 }]);
+	const [billingPeriod, setbillingPeriod] = useState(usageBasedPrice?.billing_period || billlingPeriodOptions[0].value);
+	// const [errors, seterrors] = useState<Partial<Record<keyof Price, any>>>({});
+	const [errors] = useState<Partial<Record<keyof Price, any>>>({});
 
 	// Mapping currency
 
@@ -127,6 +138,18 @@ const UsageBasedPricingForm = () => {
 						placeholder='Select Currency'
 					/>
 					<Spacer height='8px' />
+					<Select
+						selectedValue={billingPeriod}
+						options={billlingPeriodOptions}
+						onChange={(value) => {
+							setbillingPeriod(value);
+						}}
+						label='Billing Period'
+						placeholder='Select The Billing Period'
+						error={errors.billing_period}
+					/>
+					<Spacer height={'8px'} />
+
 					<Select
 						selectedValue={billingModel}
 						options={billingModels}
