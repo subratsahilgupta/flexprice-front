@@ -141,7 +141,7 @@ const CreatePlanPage = () => {
 					</Button>
 				</div>
 			</div>
-			<pre>
+			{/* <pre>
 				{JSON.stringify(
 					{
 						plan,
@@ -150,7 +150,7 @@ const CreatePlanPage = () => {
 					null,
 					2,
 				)}
-			</pre>
+			</pre> */}
 		</div>
 	);
 };
