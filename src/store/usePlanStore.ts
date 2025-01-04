@@ -22,9 +22,9 @@ export interface Price {
 }
 
 export interface PriceTier {
-	flat_amount: number;
-	unit_amount: number;
-	up_to: number;
+	flat_amount: string;
+	unit_amount: string;
+	up_to?: string;
 }
 
 export interface Plan {
@@ -43,6 +43,7 @@ interface MetaData {
 	isUsageEditMode: boolean;
 	recurringPrice?: Partial<Price>;
 	usageBasedPrice?: Partial<Price>;
+	usagePackagePrice?: { unit: string; price: string };
 }
 
 interface SinglePlanStore {
@@ -55,6 +56,7 @@ interface SinglePlanStore {
 	clearError: <K extends keyof Plan>(field: K) => void;
 	clearAllErrors: () => void;
 	metaData?: MetaData;
+	resetStore: () => void;
 	setMetaDataField: <K extends keyof MetaData>(field: K, value: MetaData[K]) => void;
 }
 
@@ -117,6 +119,29 @@ const usePlanStore = create<SinglePlanStore>((set) => ({
 	clearAllErrors: () => set({ errors: {} }),
 
 	clearPlan: () => set({ plan: {} }),
+	resetStore: () =>
+		set({
+			plan: {
+				name: '',
+				description: '',
+				lookup_key: 'plan-',
+				prices: [],
+				invoice_cadence: undefined,
+				trial_period: undefined,
+			},
+
+			metaData: {
+				usagePackagePrice: undefined,
+				subscriptionType: undefined,
+				isRecurringEditMode: false,
+				isUsageEditMode: false,
+				isTrialPeriod: false,
+				recurringPrice: undefined,
+				usageBasedPrice: undefined,
+			},
+
+			errors: {},
+		}),
 }));
 
 export default usePlanStore;

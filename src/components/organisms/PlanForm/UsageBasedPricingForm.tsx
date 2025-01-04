@@ -9,7 +9,7 @@ interface PriceTier {
 	from: number;
 	flat_amount: number;
 	unit_amount: number;
-	up_to: number;
+	up_to: number | null;
 }
 
 const currencyOptions = [
@@ -44,19 +44,23 @@ const UsageBasedPricingForm = () => {
 	const [billingModel, setBillingModel] = useState(metaData?.usageBasedPrice?.billing_model || billingModels[0].value);
 	const [meterId, setMeterId] = useState(metaData?.usageBasedPrice?.meter_id);
 
-	const [tieredPrices, setTieredPrices] = useState<PriceTier[]>([{ from: 0, up_to: Infinity, unit_amount: 0, flat_amount: 0 }]);
+	const [tieredPrices, setTieredPrices] = useState<PriceTier[]>([{ from: 0, up_to: null, unit_amount: 0, flat_amount: 0 }]);
 	const [billingPeriod, setbillingPeriod] = useState(usageBasedPrice?.billing_period || billlingPeriodOptions[0].value);
-	// const [errors, seterrors] = useState<Partial<Record<keyof Price, any>>>({});
-	const [errors] = useState<Partial<Record<keyof Price, any>>>({});
-
-	// Mapping currency
+	const [flatFee, setflatFee] = useState<string>(usageBasedPrice?.amount || '');
+	const [packagedFee, setpackagedFee] = useState<{ unit: string; price: string }>({ unit: '', price: '' });
+	const [errors, seterrors] = useState<Partial<Record<keyof Price, any>>>({});
+	const [inputErrors, setinputErrors] = useState({
+		flatModelError: '',
+		packagedModelError: '',
+		tieredModelError: '',
+	});
 
 	// Add a new tier
 	const addTieredPrice = () => {
 		setTieredPrices((prev) => {
 			const lastTier = prev[prev.length - 1];
-			const newFrom = lastTier.up_to + 1;
-			const newTier = { from: newFrom, up_to: Infinity, unit_amount: 0, flat_amount: 0 };
+			const newFrom = lastTier.up_to ?? 0 + 1;
+			const newTier = { from: newFrom, up_to: null, unit_amount: 0, flat_amount: 0 };
 			return [...prev, newTier];
 		});
 	};
@@ -95,31 +99,91 @@ const UsageBasedPricingForm = () => {
 	// Handle saving of pricing information
 	const handleAddPrice = () => {
 		if (!validate()) {
+			console.log('Validation failed');
 			return;
 		}
 
-		setMetaDataField('usageBasedPrice', { currency, billing_model: billingModel, tiers: tieredPrices, meter_id: meterId });
+		const data: Price = {
+			// amount: flatFee,
+			meter_id: meterId,
+			currency,
+			billing_period: billingPeriod,
+			billing_model: billingModel,
+			type: metaData?.subscriptionType,
+		};
+
+		if (billingModel === billingModels[0].value) {
+			data.amount = flatFee;
+		}
+
+		if (billingModel === billingModels[1].value) {
+			data.tiers = [
+				{
+					flat_amount: packagedFee.price,
+					unit_amount: packagedFee.unit,
+				},
+			];
+		}
+
+		if (billingModel === billingModels[2].value) {
+			data.tiers = tieredPrices.map((tier) => ({
+				up_to: tier.up_to?.toString(),
+				unit_amount: tier.unit_amount.toString(),
+				flat_amount: tier.flat_amount.toString(),
+			}));
+		}
+
+		console.log('data', data);
+
+		setMetaDataField('usageBasedPrice', data);
 		setMetaDataField('isUsageEditMode', false);
 	};
 
 	const validate = () => {
+		seterrors({});
+		setinputErrors({
+			flatModelError: '',
+			packagedModelError: '',
+			tieredModelError: '',
+		});
+
+		console.log('inside validate function');
+
+		if (!meterId) {
+			seterrors((prev) => ({ ...prev, meter_id: 'Meter is required' }));
+			console.log('validation failed Meter is required');
+			return false;
+		}
+
 		if (billingModel === billingModels[2].value) {
 			const invalidTier = tieredPrices.find((tier) => {
-				return tier.from > tier.up_to || tier.unit_amount < 0 || tier.flat_amount < 0;
+				return tier.from > (tier.up_to ?? 0) || tier.unit_amount < 0 || tier.flat_amount < 0;
 			});
 			if (invalidTier) {
+				setinputErrors((prev) => ({ ...prev, tieredModelError: 'Invalid tiered price' }));
+				console.log('validation failed Invalid tiered price');
+
 				return false;
 			}
 		}
 
 		if (billingModel === billingModels[1].value) {
-			const invalidTier = tieredPrices.find((tier) => {
-				return tier.unit_amount < 0 || tier.flat_amount < 0;
-			});
-			if (invalidTier) {
+			if (packagedFee.price === '' || packagedFee.unit === '') {
+				setinputErrors((prev) => ({ ...prev, packagedModelError: 'Invalid package fee' }));
+				console.log('validation failed Invalid package fee');
 				return false;
 			}
 		}
+
+		if (billingModel === billingModels[0].value) {
+			if (!flatFee || Number(flatFee) < 0) {
+				setinputErrors((prev) => ({ ...prev, flatModelError: 'Invalid flat fee' }));
+				console.log('validation failed Invalid flat fee');
+				return false;
+			}
+		}
+
+		return true;
 	};
 
 	return (
@@ -128,7 +192,7 @@ const UsageBasedPricingForm = () => {
 				<div>
 					<FormHeader title='Set Usage Based Charge' variant='sub-header' />
 
-					<SelectMeter onChange={setMeterId} value={meterId} />
+					<SelectMeter error={errors.meter_id} onChange={setMeterId} value={meterId} />
 					<Spacer height='8px' />
 					<Select
 						selectedValue={currency}
@@ -136,6 +200,7 @@ const UsageBasedPricingForm = () => {
 						label='Select Currency'
 						onChange={setCurrency}
 						placeholder='Select Currency'
+						error={errors.currency}
 					/>
 					<Spacer height='8px' />
 					<Select
@@ -155,7 +220,8 @@ const UsageBasedPricingForm = () => {
 						options={billingModels}
 						onChange={setBillingModel}
 						label='Billing Model'
-						placeholder='Select The Billing Period'
+						error={errors.billing_model}
+						placeholder='Select The Billing Model'
 					/>
 					<Spacer height='8px' />
 
@@ -164,22 +230,39 @@ const UsageBasedPricingForm = () => {
 						<div className='space-y-2'>
 							<Input
 								type='number'
+								error={inputErrors.flatModelError}
 								label='Set Default Price for all plans'
 								inputPrefix={mapCurrency(currency)}
+								onChange={(e) => setflatFee(e)}
 								suffix={<span className='text-[#64748B]'>per unit</span>}
 							/>
 						</div>
 					)}
 
 					{billingModel === billingModels[1].value && (
-						<div className='space-y-4'>
+						<div className='space-y-1'>
 							<div className='flex w-full gap-2 items-end'>
-								<Input type='number' label='Set Default Price for all plans' inputPrefix={currency} />
+								<Input
+									type='number'
+									label='Set Default Price for all plans'
+									inputPrefix={currency}
+									onChange={(e) => setpackagedFee({ ...packagedFee, price: e })}
+								/>
 								<div className='h-[50px] items-center flex gap-2'>
 									<p className='text-[#18181B] font-medium'>per</p>
 								</div>
-								<Input type='number' suffix={<span className='text-[#64748B]'>per month</span>} />
+								<Input
+									type='number'
+									onChange={(e) =>
+										setpackagedFee({
+											...packagedFee,
+											unit: e,
+										})
+									}
+									suffix={<span className='text-[#64748B]'>per month</span>}
+								/>
 							</div>
+							{inputErrors.packagedModelError && <p className='text-red-500 text-sm'>{inputErrors.packagedModelError}</p>}
 						</div>
 					)}
 
@@ -215,7 +298,7 @@ const UsageBasedPricingForm = () => {
 														className='h-9'
 														onChange={(e) => updateTier(index, 'up_to', Number(e))}
 														// type='number'
-														value={tier.up_to === Infinity ? '∞' : tier.up_to}
+														value={tier.up_to === null ? '∞' : tier.up_to}
 														placeholder='To (Infinity)'
 													/>
 												</td>

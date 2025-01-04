@@ -11,14 +11,14 @@ import { useNavigate } from 'react-router-dom';
 const CreatePlanPage = () => {
 	const [activeStep, setactiveStep] = useState(0);
 	const formSteps = [{ label: 'Plan Details' }, { label: 'Billing Preferences' }, { label: 'Set up Charges' }];
-	const { setError, clearAllErrors, clearPlan } = usePlanStore();
+	const { setError, clearAllErrors, resetStore } = usePlanStore();
 	const plan = usePlanStore((state) => state.plan);
 	const metaData = usePlanStore((state) => state.metaData);
 	const navigate = useNavigate();
 
 	useEffect(() => {
 		return () => {
-			clearPlan();
+			resetStore();
 		};
 	}, []);
 
@@ -50,6 +50,7 @@ const CreatePlanPage = () => {
 		async onSuccess() {
 			toast.success('Plan created successfully');
 			navigate('/customer-management/pricing-plan');
+			resetStore();
 			await queryClient.invalidateQueries({
 				queryKey: ['fetchPlans'],
 			});
