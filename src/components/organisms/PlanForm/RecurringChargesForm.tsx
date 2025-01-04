@@ -25,7 +25,7 @@ const RecurringChargesForm = () => {
 		return selectedCurrency?.currency;
 	};
 
-	const [amount, setamount] = useState<number | undefined>(recurringPrice?.amount);
+	const [amount, setamount] = useState<string>(recurringPrice?.amount || '');
 	const [billingPeriod, setbillingPeriod] = useState(recurringPrice?.billing_period || billlingPeriodOptions[0].value);
 
 	const [currency, setcurrency] = useState(recurringPrice?.currency || currencyOptions[0].value);
@@ -81,7 +81,7 @@ const RecurringChargesForm = () => {
 					<Spacer height={'8px'} />
 					<Input
 						onChange={(value) => {
-							setamount(Number(value));
+							setamount(value);
 						}}
 						value={amount}
 						type='number'

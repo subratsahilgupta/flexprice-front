@@ -26,11 +26,9 @@ const ActionButton: FC<ActionProps> = ({ id, editPath, deleteMutationFn, refetch
 			toast.success(`${entityName} deleted successfully`);
 			await queryClient.refetchQueries({ queryKey: [refetchQueryKey] });
 			await queryClient.invalidateQueries({ queryKey: [refetchQueryKey] });
-			setIsDialogOpen(false);
 		},
 		onError: () => {
 			toast.error(`Failed to delete ${entityName}`);
-			setIsDialogOpen(false);
 		},
 	});
 
@@ -63,7 +61,13 @@ const ActionButton: FC<ActionProps> = ({ id, editPath, deleteMutationFn, refetch
 						<Button variant={'outline'} onClick={() => setIsDialogOpen(false)}>
 							Cancel
 						</Button>
-						<Button onClick={() => deleteEntity(id)}>Delete</Button>
+						<Button
+							onClick={() => {
+								setIsDialogOpen(false);
+								deleteEntity(id);
+							}}>
+							Delete
+						</Button>
 					</div>
 				</div>
 			</Dialog>

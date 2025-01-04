@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
 const CreatePlanPage = () => {
-	const [activeStep, setactiveStep] = useState(2);
+	const [activeStep, setactiveStep] = useState(0);
 	const formSteps = [{ label: 'Plan Details' }, { label: 'Billing Preferences' }, { label: 'Set up Charges' }];
 	const { setError, clearAllErrors, clearPlan } = usePlanStore();
 	const plan = usePlanStore((state) => state.plan);
@@ -21,7 +21,27 @@ const CreatePlanPage = () => {
 
 	const { mutate: submitPlan } = useMutation({
 		mutationFn: async () => {
-			const response = await PlanApi.createPlan({ ...plan, prices: [metaData?.recurringPrice ?? {}, metaData?.usageBasedPrice ?? {}] });
+			const data = plan;
+			if (metaData?.usageBasedPrice) {
+				data.prices?.push({
+					...metaData.usageBasedPrice,
+					type: metaData.subscriptionType,
+					billing_period_count: 1,
+					billing_cadence: 'RECURRING',
+				});
+			}
+
+			if (metaData?.recurringPrice) {
+				data.prices?.push({
+					...metaData.recurringPrice,
+					type: metaData.subscriptionType,
+					billing_period_count: 1,
+					billing_cadence: 'RECURRING',
+					billing_model: 'FLAT_FEE',
+				});
+			}
+
+			const response = await PlanApi.createPlan(data);
 			return response;
 		},
 		onSuccess() {
@@ -121,6 +141,16 @@ const CreatePlanPage = () => {
 					</Button>
 				</div>
 			</div>
+			<pre>
+				{JSON.stringify(
+					{
+						plan,
+						metaData,
+					},
+					null,
+					2,
+				)}
+			</pre>
 		</div>
 	);
 };
