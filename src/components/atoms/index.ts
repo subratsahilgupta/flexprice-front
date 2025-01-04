@@ -26,3 +26,5 @@ export { default as Spacer } from './Spacer';
 export { default as Textarea } from './Textarea';
 
 export { default as ActionButton } from './ActionButton';
+
+export { default as DatePicker } from './DatePicker';

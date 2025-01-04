@@ -1,5 +1,6 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import { Plan } from '@/models/Plan';
+import { ExpandedPlan } from '../models/transformed_plan';
 
 interface GetAllPlansResponse {
 	plans: Plan[];
@@ -53,7 +54,7 @@ export class PlanApi {
 	}
 
 	public static async getPlanById(id: string) {
-		return await AxiosClient.get<Plan>(`${this.baseUrl}/${id}`);
+		return await AxiosClient.get<ExpandedPlan>(`${this.baseUrl}/${id}`);
 	}
 
 	public static async updatePlan(id: string, data: Partial<Plan>) {
