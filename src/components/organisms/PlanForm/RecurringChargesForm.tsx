@@ -88,7 +88,7 @@ const RecurringChargesForm = () => {
 						label='Value'
 						error={errors.amount}
 						inputPrefix={mapCurrency(currency)}
-						suffix={<span className='text-[#64748B]'>per month</span>}
+						suffix={<span className='text-[#64748B]'> /{billingPeriod.toLocaleLowerCase()}</span>}
 					/>
 					<Spacer height={'16px'} />
 					<div className='flex justify-end'>
