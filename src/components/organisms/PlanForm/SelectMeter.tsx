@@ -10,9 +10,10 @@ const fetchMeters = async () => {
 interface Props {
 	onChange: (value: string) => void;
 	value?: string;
+	error?: string;
 }
 
-const SelectMeter: FC<Props> = ({ onChange, value }) => {
+const SelectMeter: FC<Props> = ({ onChange, value, error }) => {
 	const {
 		data: meters,
 		isLoading,
@@ -47,7 +48,14 @@ const SelectMeter: FC<Props> = ({ onChange, value }) => {
 
 	return (
 		<div>
-			<Select selectedValue={value} onChange={(e) => onChange(e)} options={activeMeters} placeholder='Select Meter' label='Select Meter' />
+			<Select
+				error={error}
+				selectedValue={value}
+				onChange={(e) => onChange(e)}
+				options={activeMeters}
+				placeholder='Select Meter'
+				label='Select Meter'
+			/>
 		</div>
 	);
 };
