@@ -36,11 +36,8 @@ const SetupChargesSection = () => {
 	};
 
 	const handleDelete = () => {
-		if (metaData?.subscriptionType === subscriptionTypeOptions[0].value) {
-			setMetaDataField('recurringPrice', undefined);
-		} else {
-			setMetaDataField('usageBasedPrice', undefined);
-		}
+		setMetaDataField('recurringPrice', undefined);
+		setMetaDataField('usageBasedPrice', undefined);
 		setMetaDataField('subscriptionType', undefined);
 	};
 

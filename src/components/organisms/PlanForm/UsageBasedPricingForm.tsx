@@ -351,23 +351,6 @@ const UsageBasedPricingForm = () => {
 					</div>
 				</div>
 			)}
-			<pre>
-				{JSON.stringify(
-					{
-						currency,
-						billingModel,
-						meterId,
-						tieredPrices,
-						billingPeriod,
-						flatFee,
-						packagedFee,
-						errors,
-						inputErrors,
-					},
-					null,
-					2,
-				)}
-			</pre>
 		</div>
 	);
 };

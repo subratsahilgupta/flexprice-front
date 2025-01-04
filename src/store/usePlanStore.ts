@@ -56,6 +56,7 @@ interface SinglePlanStore {
 	clearError: <K extends keyof Plan>(field: K) => void;
 	clearAllErrors: () => void;
 	metaData?: MetaData;
+	resetStore: () => void;
 	setMetaDataField: <K extends keyof MetaData>(field: K, value: MetaData[K]) => void;
 }
 
