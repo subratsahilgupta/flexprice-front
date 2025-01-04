@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 export interface Price {
-	amount?: number;
+	amount?: string;
 	billing_cadence?: string;
 	billing_model?: string;
 	billing_period?: string;
