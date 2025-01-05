@@ -351,7 +351,13 @@ const UsageBasedPricingForm = () => {
 
 					<Spacer height='16px' />
 					<div className='flex justify-end'>
-						<Button variant='secondary' className='mr-4 text-zinc-900'>
+						<Button
+							onClick={() => {
+								setMetaDataField('isUsageEditMode', false);
+								setMetaDataField('usageBasedPrice', undefined);
+							}}
+							variant='secondary'
+							className='mr-4 text-zinc-900'>
 							Cancel
 						</Button>
 						<Button onClick={handleAddPrice} variant='default' className='mr-4 font-normal'>
