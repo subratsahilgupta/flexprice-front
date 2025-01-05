@@ -20,8 +20,8 @@ const fetchPlans = async () => {
 const CustomerDetail = () => {
 	const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
 	const [prices, setPrices] = useState<NormalizedPlan | null>(null);
-	const [billingPeriod, setBillingPeriod] = useState<string>('monthly');
-	const [currency, setCurrency] = useState<string>('');
+	const [billingPeriod, setBillingPeriod] = useState<string | null>(null);
+	const [currency, setCurrency] = useState<string>('usd');
 	const [startDate, setStartDate] = useState<Date | undefined>(new Date());
 	const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 
@@ -41,6 +41,9 @@ const CustomerDetail = () => {
 	const fetchNormalizedPlan = async (planId: string) => {
 		const plan = await PlanApi.getPlanById(planId);
 		const normalizedPlan = normalizePlan(plan!);
+		console.log('normalizedPlan', normalizedPlan);
+		const firstBillingPeriod = Object.keys(normalizedPlan.charges)[0];
+		setBillingPeriod(firstBillingPeriod);
 		setPrices(normalizedPlan);
 	};
 
@@ -80,30 +83,38 @@ const CustomerDetail = () => {
 						)}
 
 						{/* Select Billing Period Dropdown */}
-						<Select
-							selectedValue={billingPeriod!}
-							options={[
-								{ label: 'Monthly', value: 'monthly' },
-								{ label: 'Yearly', value: 'yearly' },
-								{ label: 'Daily', value: 'daily' },
-							]}
-							onChange={(value) => setBillingPeriod(value)}
-							label='Select Billing Period'
-							placeholder='Select billing period'
-						/>
+						{!plansLoading && prices && (
+							<Select
+								selectedValue={billingPeriod ?? ''}
+								options={
+									prices.charges
+										? Object.keys(prices.charges).map((billingPeriod) => ({
+												label: billingPeriod,
+												value: billingPeriod,
+											}))
+										: []
+								}
+								onChange={(value) => setBillingPeriod(value)}
+								label='Select Billing Period'
+								placeholder='Select billing period'
+							/>
+						)}
 
 						{/* Select Currency Dropdown */}
-						<Select
-							selectedValue={currency!}
-							options={[
-								{ label: 'USD', value: 'usd' },
-								{ label: 'INR', value: 'inr' },
-							]}
-							onChange={(value) => setCurrency(value)}
-							label='Select Currency'
-							placeholder='Select currency'
-						/>
-						{prices && <ChargeTable data={prices.charges[billingPeriod]} />}
+						{!plansLoading && prices && (
+							<Select
+								selectedValue={currency!}
+								options={[
+									{ label: 'USD', value: 'usd' },
+									{ label: 'INR', value: 'inr' },
+								]}
+								disabled
+								onChange={(value) => setCurrency(value)}
+								label='Select Currency'
+								placeholder='Select currency'
+							/>
+						)}
+						{prices?.charges[billingPeriod!] && <ChargeTable data={prices.charges[billingPeriod!]} />}
 						<div className='flex items-center space-x-4'>
 							<div>
 								<label className='block text-sm font-medium text-gray-700 mb-1'>Subscription Start Date</label>

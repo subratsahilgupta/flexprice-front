@@ -1,8 +1,9 @@
 import { FC } from 'react';
 import { ColumnData, FlexpriceTable } from '@/components/molecules';
-import { NormalizedPlan } from '@/utils/models/transformed_plan';
+import { getPriceTableCharge, NormalizedPlan } from '@/utils/models/transformed_plan';
 
-type ChargesForBillingPeriod = NormalizedPlan['charges'][string];
+export type ChargesForBillingPeriod = NormalizedPlan['charges'][string];
+export type ChargesForBillingPeriodOne = ChargesForBillingPeriod[0];
 
 export interface Props {
 	data: ChargesForBillingPeriod;
@@ -12,10 +13,7 @@ const ChargeTable: FC<Props> = ({ data }) => {
 	const mappedData = (data ?? []).map((charge) => ({
 		charge: charge.meter_name ? `${charge.name}/${charge.meter_name}` : charge.name,
 		quantity: charge.type === 'FIXED' ? '1' : 'pay as you go',
-		price:
-			charge.billing_model === 'PACKAGE'
-				? `${charge.display_amount}/unit/${charge.billing_period}`
-				: `${charge.display_amount}/${charge.billing_period}`,
+		price: getPriceTableCharge(charge),
 	}));
 
 	console.log('Mapped Data', mappedData);

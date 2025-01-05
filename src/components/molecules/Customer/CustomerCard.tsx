@@ -12,7 +12,6 @@ const CustomerCard: React.FC = () => {
 							className='w-full h-full rounded-full object-cover shadow-md'
 						/>
 					</div>
-
 					{/* Customer Details */}
 					<div className='flex flex-col space-y-2'>
 						<div className='text-lg font-semibold text-gray-800'>Hitesh</div>
