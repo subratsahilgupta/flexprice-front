@@ -1,10 +1,9 @@
 import { Button, FormHeader, Input, Select, Spacer } from '@/components/atoms';
 import { useState } from 'react';
-import SelectMeter from './SelectMeter';
 import usePlanStore, { Price } from '@/store/usePlanStore';
 
 const RecurringChargesForm = () => {
-	const { setMetaDataField } = usePlanStore();
+	const { setMetaDataField, clearAllErrors } = usePlanStore();
 	const metaData = usePlanStore((state) => state.metaData);
 
 	const recurringPrice = usePlanStore((state) => state.metaData?.recurringPrice);
@@ -26,9 +25,7 @@ const RecurringChargesForm = () => {
 		return selectedCurrency?.currency;
 	};
 
-	const [meterId, setmeterId] = useState(metaData?.recurringPrice?.meter_id);
-
-	const [amount, setamount] = useState<number | undefined>(recurringPrice?.amount);
+	const [amount, setamount] = useState<string>(recurringPrice?.amount || '');
 	const [billingPeriod, setbillingPeriod] = useState(recurringPrice?.billing_period || billlingPeriodOptions[0].value);
 
 	const [currency, setcurrency] = useState(recurringPrice?.currency || currencyOptions[0].value);
@@ -36,13 +33,9 @@ const RecurringChargesForm = () => {
 	const [errors, seterrors] = useState<Partial<Record<keyof Price, any>>>({});
 
 	const handleAddRecurringPrice = () => {
+		clearAllErrors();
 		if (!amount) {
 			seterrors((prev) => ({ ...prev, amount: 'Amount is required' }));
-			return;
-		}
-
-		if (!meterId) {
-			seterrors((prev) => ({ ...prev, meterId: 'Meter is required' }));
 			return;
 		}
 
@@ -65,7 +58,6 @@ const RecurringChargesForm = () => {
 				<div>
 					<FormHeader title='Recurring Fee' variant='form-component-title' />
 
-					<SelectMeter onChange={setmeterId} value={meterId} />
 					<Spacer height={'8px'} />
 					<Select
 						selectedValue={currency}
@@ -89,18 +81,24 @@ const RecurringChargesForm = () => {
 					<Spacer height={'8px'} />
 					<Input
 						onChange={(value) => {
-							setamount(Number(value));
+							setamount(value);
 						}}
 						value={amount}
 						type='number'
 						label='Value'
 						error={errors.amount}
 						inputPrefix={mapCurrency(currency)}
-						suffix={<span className='text-[#64748B]'>per month</span>}
+						suffix={<span className='text-[#64748B]'> /{billingPeriod.toLocaleLowerCase()}</span>}
 					/>
 					<Spacer height={'16px'} />
 					<div className='flex justify-end'>
-						<Button variant='secondary' className='mr-4 text-zinc-900 '>
+						<Button
+							onClick={() => {
+								setMetaDataField('isRecurringEditMode', false);
+								setMetaDataField('recurringPrice', undefined);
+							}}
+							variant='secondary'
+							className='mr-4 text-zinc-900 '>
 							Cancel
 						</Button>
 						<Button onClick={handleAddRecurringPrice} variant='default' className='mr-4 font-normal'>

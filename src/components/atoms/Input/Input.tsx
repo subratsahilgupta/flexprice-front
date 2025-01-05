@@ -26,9 +26,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 				{/* Input */}
 				<div
 					className={cn(
-						'w-full flex  group min-h-9 items-center rounded-md border bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground disabled:opacity-50 md:text-sm disabled:cursor-not-allowed',
+						'w-full flex h-full  group min-h-9 items-center rounded-md border bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground disabled:opacity-50 md:text-sm disabled:cursor-not-allowed',
 						error ? 'border-destructive' : 'border-input focus-within:ring-ring focus-within:ring-offset-2',
-						'focus-within:border-black', // Black border on focus
+						'focus-within:border-black',
 						className,
 					)}>
 					{inputPrefix && <div className='mr-2'>{inputPrefix}</div>}
@@ -38,7 +38,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 						value={value}
 						disabled={disabled}
 						placeholder={placeholder}
-						className={cn('peer flex-1 bg-transparent outline-none ring-0 focus:outline-none w-full')}
+						className={cn('peer flex-1 bg-transparent outline-none ring-0 focus:outline-none w-full', disabled && 'text-zinc-500')}
 						onChange={(e) => {
 							if (onChange) {
 								onChange(e.target.value);

@@ -1,4 +1,5 @@
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 
 export interface Option {
 	value: string;
@@ -30,7 +31,11 @@ const FlexPriceSelect: React.FC<Props> = ({
 	return (
 		<div className='space-y-1'>
 			{/* Label */}
-			{label && <label className='font-inter block text-sm font-medium text-zinc'>{label}</label>}
+			{label && (
+				<label className={cn('font-inter block text-sm font-medium text-zinc', disabled ? 'text-zinc-500' : 'text-zinc-950')}>
+					{label}
+				</label>
+			)}
 
 			<Select
 				defaultValue={selectedValue}

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 export interface Price {
-	amount?: number;
+	amount?: string;
 	billing_cadence?: string;
 	billing_model?: string;
 	billing_period?: string;
@@ -13,16 +13,18 @@ export interface Price {
 	metadata?: Record<string, unknown>;
 	meter_id?: string;
 	plan_id?: string;
-	tier_mode?: 'VOLUME';
-	tiers?: {
-		flat_amount?: string;
-		unit_amount?: string;
-		up_to?: number;
-	}[];
+	tier_mode?: string;
+	tiers?: PriceTier[];
 	transform_quantity?: {
 		divide_by?: number;
 		round?: string;
 	};
+}
+
+export interface PriceTier {
+	flat_amount: string;
+	unit_amount: string;
+	up_to?: number;
 }
 
 export interface Plan {
@@ -41,6 +43,7 @@ interface MetaData {
 	isUsageEditMode: boolean;
 	recurringPrice?: Partial<Price>;
 	usageBasedPrice?: Partial<Price>;
+	usagePackagePrice?: { unit: string; price: string };
 }
 
 interface SinglePlanStore {
@@ -53,6 +56,7 @@ interface SinglePlanStore {
 	clearError: <K extends keyof Plan>(field: K) => void;
 	clearAllErrors: () => void;
 	metaData?: MetaData;
+	resetStore: () => void;
 	setMetaDataField: <K extends keyof MetaData>(field: K, value: MetaData[K]) => void;
 }
 
@@ -115,6 +119,29 @@ const usePlanStore = create<SinglePlanStore>((set) => ({
 	clearAllErrors: () => set({ errors: {} }),
 
 	clearPlan: () => set({ plan: {} }),
+	resetStore: () =>
+		set({
+			plan: {
+				name: '',
+				description: '',
+				lookup_key: 'plan-',
+				prices: [],
+				invoice_cadence: undefined,
+				trial_period: undefined,
+			},
+
+			metaData: {
+				usagePackagePrice: undefined,
+				subscriptionType: undefined,
+				isRecurringEditMode: false,
+				isUsageEditMode: false,
+				isTrialPeriod: false,
+				recurringPrice: undefined,
+				usageBasedPrice: undefined,
+			},
+
+			errors: {},
+		}),
 }));
 
 export default usePlanStore;

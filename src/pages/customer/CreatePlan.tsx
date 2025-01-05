@@ -1,26 +1,77 @@
+import { queryClient } from '@/App';
 import { Button, FormHeader, Spacer, Stepper } from '@/components/atoms';
 import { BillingPrefferencesSection, PlanDetailsSection, SetupChargesSection } from '@/components/organisms';
 import usePlanStore from '@/store/usePlanStore';
+import { PlanApi } from '@/utils/api_requests/PlanApi';
+import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 const CreatePlanPage = () => {
 	const [activeStep, setactiveStep] = useState(0);
 	const formSteps = [{ label: 'Plan Details' }, { label: 'Billing Preferences' }, { label: 'Set up Charges' }];
-	const { plan, setError, clearAllErrors, clearPlan, metaData } = usePlanStore();
+	const { setError, clearAllErrors, resetStore } = usePlanStore();
+	const plan = usePlanStore((state) => state.plan);
+	const metaData = usePlanStore((state) => state.metaData);
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		return () => {
-			clearPlan();
+			resetStore();
 		};
 	}, []);
 
+	const { mutate: submitPlan, isPending } = useMutation({
+		mutationFn: async () => {
+			const data = plan;
+			if (metaData?.usageBasedPrice) {
+				data.prices?.push({
+					...metaData.usageBasedPrice,
+					billing_period_count: 1,
+					billing_cadence: 'RECURRING',
+				});
+			}
+
+			if (metaData?.recurringPrice) {
+				data.prices?.push({
+					...metaData.recurringPrice,
+					type: metaData.subscriptionType,
+					billing_period_count: 1,
+					billing_cadence: 'RECURRING',
+					billing_model: 'FLAT_FEE',
+				});
+			}
+
+			const response = await PlanApi.createPlan(data);
+			return response;
+		},
+		async onSuccess() {
+			toast.success('Plan created successfully');
+			navigate('/customer-management/pricing-plan');
+			resetStore();
+			await queryClient.invalidateQueries({
+				queryKey: ['fetchPlans'],
+			});
+			await queryClient.refetchQueries({
+				queryKey: ['fetchPlans'],
+			});
+		},
+		onError() {
+			toast.error('Failed to create plan');
+		},
+	});
 	const handleNext = () => {
+		if (isPending) {
+			return;
+		}
+
 		if (activeStep === formSteps.length - 1) {
 			if (!validateSteps()) {
 				return;
 			}
 			console.log('Form submitted successfully', plan);
-			// Add form submission logic here
+			submitPlan();
 			return;
 		}
 		if (!validateSteps()) {
@@ -57,10 +108,10 @@ const CreatePlanPage = () => {
 				return false;
 			}
 		} else if (activeStep === 2) {
-			if (!plan.prices || plan.prices.length === 0) {
-				setError('prices', 'At least one price tier is required');
-				return false;
-			}
+			// if (!plan.prices || plan.prices.length === 0) {
+			// 	setError('prices', 'At least one price tier is required');
+			// 	return false;
+			// }
 		}
 
 		return true;
@@ -99,11 +150,10 @@ const CreatePlanPage = () => {
 						</Button>
 					)}
 					<Button onClick={handleNext} variant='default' className='mr-4'>
-						Next
+						{formSteps.length - 1 === activeStep ? 'Save' : 'Next'}
 					</Button>
 				</div>
 			</div>
-			<pre className='text-white'>{JSON.stringify(plan, null, 2)}</pre>
 		</div>
 	);
 };

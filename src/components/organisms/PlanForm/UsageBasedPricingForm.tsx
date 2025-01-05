@@ -1,49 +1,74 @@
 import { Button, FormHeader, Input, Select, Spacer } from '@/components/atoms';
-import { useState, useCallback, useMemo } from 'react';
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { RiDeleteBin6Line } from 'react-icons/ri';
-import usePlanStore from '@/store/usePlanStore';
+import usePlanStore, { Price } from '@/store/usePlanStore';
 import SelectMeter from './SelectMeter';
+import { subscriptionTypeOptions } from './SetupChargesSection';
+
+interface PriceTier {
+	from: number;
+	flat_amount: number;
+	unit_amount: number;
+	up_to: number | null;
+}
+
+const currencyOptions = [
+	{ label: 'USD', value: 'USD', currency: '$' },
+	{ label: 'INR', value: 'INR', currency: '₹' },
+];
+
+const billingModels = [
+	{ value: 'FLAT_FEE', label: 'Flat Fee' },
+	{ value: 'PACKAGE', label: 'Package' },
+	{ value: 'TIERED', label: 'Tiered' },
+];
+
+const billlingPeriodOptions = [
+	{ label: 'Daily', value: 'DAILY' },
+	{ label: 'Weekly', value: 'WEEKLY' },
+	{ label: 'Monthly', value: 'MONTHLY' },
+	{ label: 'Yearly', value: 'ANNUAL' },
+];
+
+const mapCurrency = (currency: string) => {
+	const selectedCurrency = currencyOptions.find((option) => option.value === currency);
+	return selectedCurrency?.currency || '';
+};
 
 const UsageBasedPricingForm = () => {
 	const { setMetaDataField } = usePlanStore();
 	const metaData = usePlanStore((state) => state.metaData);
-
-	const currencyOptions = useMemo(
-		() => [
-			{ label: 'USD', value: 'USD', currency: '$' },
-			{ label: 'INR', value: 'INR', currency: '₹' },
-		],
-		[],
-	);
-
-	const billingModels = [
-		{ value: 'Flat Fee', label: 'Flat Fee' },
-		{ value: 'Package', label: 'Package' },
-		{ value: 'Tiered', label: 'Tiered' },
-	];
+	const usageBasedPrice = usePlanStore((state) => state.metaData?.usageBasedPrice);
 
 	const [currency, setCurrency] = useState(metaData?.usageBasedPrice?.currency || currencyOptions[0].value);
 	const [billingModel, setBillingModel] = useState(metaData?.usageBasedPrice?.billing_model || billingModels[0].value);
 	const [meterId, setMeterId] = useState(metaData?.usageBasedPrice?.meter_id);
 
-	const [tieredPrices, setTieredPrices] = useState([{ from: 0, up_to: Infinity, unit_amount: 0, flat_amount: 0 }]);
-
-	// Mapping currency
-	const mapCurrency = useCallback(
-		(currency: string) => {
-			const selectedCurrency = currencyOptions.find((option) => option.value === currency);
-			return selectedCurrency?.currency || '';
-		},
-		[currencyOptions],
-	);
+	const [tieredPrices, setTieredPrices] = useState<PriceTier[]>([
+		{ from: 1, up_to: 1, unit_amount: 0, flat_amount: 0 },
+		{ from: 2, up_to: null, unit_amount: 0, flat_amount: 0 },
+	]);
+	const [billingPeriod, setbillingPeriod] = useState(usageBasedPrice?.billing_period || billlingPeriodOptions[0].value);
+	const [flatFee, setflatFee] = useState<string>(usageBasedPrice?.amount || '');
+	const [packagedFee, setpackagedFee] = useState<{ unit: string; price: string }>({ unit: '', price: '' });
+	const [errors, seterrors] = useState<Partial<Record<keyof Price, any>>>({});
+	const [inputErrors, setinputErrors] = useState({
+		flatModelError: '',
+		packagedModelError: '',
+		tieredModelError: '',
+	});
 
 	// Add a new tier
 	const addTieredPrice = () => {
 		setTieredPrices((prev) => {
 			const lastTier = prev[prev.length - 1];
-			const newFrom = lastTier.up_to + 1;
-			const newTier = { from: newFrom, up_to: Infinity, unit_amount: 0, flat_amount: 0 };
+			if (lastTier.up_to === null) {
+				prev[prev.length - 1] = { ...lastTier, up_to: lastTier.from + 1 };
+			}
+			const newFrom = lastTier.up_to ?? lastTier.from + 1;
+
+			const newTier = { from: newFrom, up_to: null, unit_amount: 0, flat_amount: 0 };
 			return [...prev, newTier];
 		});
 	};
@@ -66,17 +91,13 @@ const UsageBasedPricingForm = () => {
 			if (key === 'up_to' && index < prev.length - 1) {
 				// If 'up_to' is updated, adjust the 'from' value of the next tier
 				const nextTier = updatedTiers[index + 1];
-				if (value >= nextTier.from) {
-					nextTier.from = value + 1;
-				}
+				nextTier.from = value + 1;
 			}
 
 			if (key === 'from' && index > 0) {
 				// If 'from' is updated, adjust the 'up_to' value of the previous tier
 				const previousTier = updatedTiers[index - 1];
-				if (value <= previousTier.up_to) {
-					previousTier.up_to = value - 1;
-				}
+				previousTier.up_to = value - 1;
 			}
 
 			return updatedTiers;
@@ -85,8 +106,93 @@ const UsageBasedPricingForm = () => {
 
 	// Handle saving of pricing information
 	const handleAddPrice = () => {
-		setMetaDataField('usageBasedPrice', { currency, billing_model: billingModel });
+		if (!validate()) {
+			console.log('Validation failed');
+			return;
+		}
+
+		const data: Price = {
+			// amount: flatFee,
+			meter_id: meterId,
+			currency,
+			billing_period: billingPeriod,
+			billing_model: billingModel,
+			type: subscriptionTypeOptions[1].value,
+		};
+
+		if (billingModel === billingModels[0].value) {
+			data.amount = flatFee;
+		}
+
+		if (billingModel === billingModels[1].value) {
+			data.amount = packagedFee.price;
+			data.transform_quantity = {
+				divide_by: Number(packagedFee.unit),
+			};
+		}
+
+		if (billingModel === billingModels[2].value) {
+			data.tiers = tieredPrices.map((tier) => ({
+				up_to: tier.up_to!,
+				unit_amount: tier.unit_amount.toString(),
+				flat_amount: tier.flat_amount.toString(),
+			}));
+			data.tier_mode = 'VOLUME';
+		}
+
+		console.log('data', data);
+
+		setMetaDataField('usageBasedPrice', data);
 		setMetaDataField('isUsageEditMode', false);
+	};
+
+	const validate = () => {
+		seterrors({});
+		setinputErrors({
+			flatModelError: '',
+			packagedModelError: '',
+			tieredModelError: '',
+		});
+
+		console.log('inside validate function');
+
+		if (!meterId) {
+			seterrors((prev) => ({ ...prev, meter_id: 'Meter is required' }));
+			console.log('validation failed Meter is required');
+			return false;
+		}
+
+		if (billingModel === billingModels[2].value) {
+			tieredPrices.map((tier, index) => {
+				if (tier.from > (tier.up_to !== null ? tier.up_to : 999999)) {
+					setinputErrors((prev) => ({ ...prev, tieredModelError: `From value cannot be small than upto in row ${index + 1}` }));
+					return true;
+				}
+
+				if (tier.unit_amount < 0 || tier.flat_amount < 0) {
+					setinputErrors((prev) => ({ ...prev, tieredModelError: `Units and Flat amount cannot be nagative in row ${index + 1}` }));
+					return true;
+				}
+			});
+		}
+
+		if (billingModel === billingModels[1].value) {
+			if (packagedFee.price === '' || packagedFee.unit === '') {
+				setinputErrors((prev) => ({ ...prev, packagedModelError: 'Invalid package fee' }));
+				console.log('validation failed Invalid package fee');
+				return false;
+			}
+		}
+
+		if (billingModel === billingModels[0].value) {
+			if (!flatFee || Number(flatFee) < 0) {
+				setinputErrors((prev) => ({ ...prev, flatModelError: 'Invalid flat fee' }));
+				console.log('validation failed Invalid flat fee');
+				return false;
+			}
+		}
+
+		return true;
 	};
 
 	return (
@@ -95,22 +201,36 @@ const UsageBasedPricingForm = () => {
 				<div>
 					<FormHeader title='Set Usage Based Charge' variant='sub-header' />
 
-					<SelectMeter onChange={setMeterId} value={meterId} />
+					<SelectMeter error={errors.meter_id} onChange={setMeterId} value={meterId} />
 					<Spacer height='8px' />
 					<Select
-						selectedValue={mapCurrency(currency)}
+						selectedValue={currency}
 						options={currencyOptions}
 						label='Select Currency'
 						onChange={setCurrency}
 						placeholder='Select Currency'
+						error={errors.currency}
 					/>
 					<Spacer height='8px' />
+					<Select
+						selectedValue={billingPeriod}
+						options={billlingPeriodOptions}
+						onChange={(value) => {
+							setbillingPeriod(value);
+						}}
+						label='Billing Period'
+						placeholder='Select The Billing Period'
+						error={errors.billing_period}
+					/>
+					<Spacer height={'8px'} />
+
 					<Select
 						selectedValue={billingModel}
 						options={billingModels}
 						onChange={setBillingModel}
 						label='Billing Model'
-						placeholder='Select The Billing Period'
+						error={errors.billing_model}
+						placeholder='Select The Billing Model'
 					/>
 					<Spacer height='8px' />
 
@@ -119,22 +239,39 @@ const UsageBasedPricingForm = () => {
 						<div className='space-y-2'>
 							<Input
 								type='number'
+								error={inputErrors.flatModelError}
 								label='Set Default Price for all plans'
-								inputPrefix={currency}
-								suffix={<span className='text-[#64748B]'>per month</span>}
+								inputPrefix={mapCurrency(currency)}
+								onChange={(e) => setflatFee(e)}
+								suffix={<span className='text-[#64748B]'>per unit</span>}
 							/>
 						</div>
 					)}
 
 					{billingModel === billingModels[1].value && (
-						<div className='space-y-4'>
+						<div className='space-y-1'>
 							<div className='flex w-full gap-2 items-end'>
-								<Input type='number' label='Set Default Price for all plans' inputPrefix={currency} />
+								<Input
+									type='number'
+									label='Set Default Price for all plans'
+									inputPrefix={currency}
+									onChange={(e) => setpackagedFee({ ...packagedFee, price: e })}
+								/>
 								<div className='h-[50px] items-center flex gap-2'>
 									<p className='text-[#18181B] font-medium'>per</p>
 								</div>
-								<Input type='number' suffix={<span className='text-[#64748B]'>per month</span>} />
+								<Input
+									type='number'
+									onChange={(e) =>
+										setpackagedFee({
+											...packagedFee,
+											unit: e,
+										})
+									}
+									suffix={<span className='text-[#64748B]'>per month</span>}
+								/>
 							</div>
+							{inputErrors.packagedModelError && <p className='text-red-500 text-sm'>{inputErrors.packagedModelError}</p>}
 						</div>
 					)}
 
@@ -157,6 +294,7 @@ const UsageBasedPricingForm = () => {
 											<tr key={index}>
 												<td className='px-4 py-2'>
 													<Input
+														disabled
 														className='h-9'
 														onChange={(e) => updateTier(index, 'from', Number(e))}
 														type='number'
@@ -168,8 +306,8 @@ const UsageBasedPricingForm = () => {
 													<Input
 														className='h-9'
 														onChange={(e) => updateTier(index, 'up_to', Number(e))}
-														type='number'
-														value={tier.up_to === Infinity ? '' : tier.up_to}
+														disabled={tier.up_to === null}
+														value={tier.up_to === null ? '∞ Unlimited' : tier.up_to}
 														placeholder='To (Infinity)'
 													/>
 												</td>
@@ -213,7 +351,13 @@ const UsageBasedPricingForm = () => {
 
 					<Spacer height='16px' />
 					<div className='flex justify-end'>
-						<Button variant='secondary' className='mr-4 text-zinc-900'>
+						<Button
+							onClick={() => {
+								setMetaDataField('isUsageEditMode', false);
+								setMetaDataField('usageBasedPrice', undefined);
+							}}
+							variant='secondary'
+							className='mr-4 text-zinc-900'>
 							Cancel
 						</Button>
 						<Button onClick={handleAddPrice} variant='default' className='mr-4 font-normal'>

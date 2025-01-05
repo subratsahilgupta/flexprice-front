@@ -56,8 +56,8 @@ const MultichipField = React.forwardRef<HTMLInputElement, InputProps>(
 								aria-label='Add a chip'
 								value={inputText}
 								type={type}
-								placeholder={placeholder}
-								className='peer flex-1 bg-transparent  outline-none ring-0 focus:outline-none w-full'
+								placeholder={chips.length > 0 ? '' : placeholder}
+								className='peer flex-1 h-full bg-transparent  outline-none ring-0 focus:outline-none w-full'
 								onChange={(e) => setinputText(e.target.value)}
 								onKeyDown={(e) => {
 									if (e.key === 'Enter' && inputText.trim()) {

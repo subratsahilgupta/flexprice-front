@@ -1,4 +1,4 @@
-import { Button, SectionHeader } from '@/components/atoms';
+import { Button, SectionHeader, Spacer } from '@/components/atoms';
 import { IoSearch } from 'react-icons/io5';
 import { LiaSlidersHSolid } from 'react-icons/lia';
 import { FiFolderPlus } from 'react-icons/fi';
@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
 import { PlansTable } from '@/components/molecules';
 import { Plan } from '@/models/Plan';
+import { ReactSVG } from 'react-svg';
 
 const fetchPlans = async () => {
 	return await PlanApi.getAllPlans();
@@ -39,6 +40,25 @@ const PricingPlan = () => {
 
 	if (isError) {
 		toast.error('Error fetching meters');
+	}
+
+	if (plans?.plans.length === 0) {
+		return (
+			<div className='h-screen w-full flex justify-center items-center'>
+				<div className='w-full flex flex-col items-center '>
+					<ReactSVG src={'/assets/svg/empty box.svg'} />
+					<p className='font-sans text-2xl font-bold'>Add your first Plan </p>
+					<p className='text-[#71717A] font-normal '>Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellat sit</p>
+					<Spacer height={'16px'} />
+					<Link to='/customer-management/pricing-plan/create-plan'>
+						<Button className='w-32 flex gap-2 bg-[#0F172A] '>
+							<FiFolderPlus />
+							<span>Create Plan</span>
+						</Button>
+					</Link>
+				</div>
+			</div>
+		);
 	}
 
 	return (
