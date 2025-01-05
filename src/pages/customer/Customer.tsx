@@ -1,5 +1,5 @@
 import { Button, SectionHeader, Spinner } from '@/components/atoms';
-import CustomerTable from '@/components/molecules/CustomerTable/CustomerTable';
+import CustomerTable from '@/components/molecules/Customer/CustomerTable';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';

@@ -9,6 +9,8 @@ import EditMeterPage from '@/pages/usage/EditMeterPage';
 import PricingPlans from '@/pages/customer/PricingPlans';
 import CreatePlanPage from '@/pages/customer/CreatePlan';
 import CreateCustomerPage from '@/pages/customer/CreateCustomer';
+import CustomerSubscription from '@/pages/customer/CustomerSubscription';
+import CustomerDetails from '@/pages/customer/CustomerDetails';
 
 const RouteNames = {
 	home: {
@@ -51,6 +53,14 @@ const RouteNames = {
 			path: 'customers',
 			createCustomer: {
 				path: 'create-customer',
+			},
+			detail: {
+				path: 'details/:id',
+				routing_path: '/details/',
+			},
+			subscription: {
+				path: 'subscription/:id',
+				routing_path: '/subscription/',
 			},
 		},
 		pricingPlan: {
@@ -129,6 +139,14 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: `${RouteNames.customerManagement.path}/${RouteNames.customerManagement.customers.path}/${RouteNames.customerManagement.customers.createCustomer.path}`,
 						element: <CreateCustomerPage />,
+					},
+					{
+						path: `${RouteNames.customerManagement.path}/${RouteNames.customerManagement.customers.path}/${RouteNames.customerManagement.customers.subscription.path}`,
+						element: <CustomerSubscription />,
+					},
+					{
+						path: `${RouteNames.customerManagement.path}/${RouteNames.customerManagement.customers.path}/${RouteNames.customerManagement.customers.detail.path}`,
+						element: <CustomerDetails />,
 					},
 				],
 			},
