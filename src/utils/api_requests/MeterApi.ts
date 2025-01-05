@@ -20,6 +20,6 @@ export class MeterApi {
 	}
 
 	public static async deleteMeter(id: string) {
-		return await AxiosClient.delete<Meter>(`${this.baseUrl}/${id}`);
+		return await AxiosClient.delete<void>(`${this.baseUrl}/${id}`);
 	}
 }

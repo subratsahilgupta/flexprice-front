@@ -33,6 +33,7 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 	const labelStyle = 'text-muted-foreground text-sm';
 
 	const isEditMode = Boolean(data);
+	const isArchived = data?.status === 'archived';
 
 	const [eventName, setEventName] = useState(data?.event_name || '');
 	const [displayName, setDisplayName] = useState(data?.name || '');
@@ -64,14 +65,14 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 		},
 	];
 
-	const resetForm = () => {
-		setDisplayName('');
-		setEventName('');
-		setEventFilters([]);
-		setAggregationFunction('SUM');
-		setAggregationValue('');
-		setResetPeriod('');
-	};
+	// const resetForm = () => {
+	// 	setDisplayName('');
+	// 	setEventName('');
+	// 	setEventFilters([]);
+	// 	setAggregationFunction('SUM');
+	// 	setAggregationValue('');
+	// 	setResetPeriod('');
+	// };
 
 	// Handle form submission
 	const handleSubmit = () => {
@@ -107,16 +108,12 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 
 			onSubmit(formData as Meter, isEditMode ? 'edit' : 'add');
 
-			if (!isEditMode) {
-				resetForm();
-				navigate('/usage-tracking/billable-metric');
-				queryClient.invalidateQueries({
-					queryKey: ['fetchMeters'],
-				});
-			}
+			queryClient.invalidateQueries({
+				queryKey: ['fetchMeters'],
+			});
+			navigate('/usage-tracking/billable-metric');
 
 			setErrors({});
-			console.log('Form data:', validation.data);
 		} else {
 			// If invalid, set errors
 			const fieldErrors: Record<string, string> = {};
@@ -145,11 +142,7 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 
 			<div className='px-6 py-4 max-w-3xl flex flex-col gap-7'>
 				{/* edit meter heading */}
-				{isEditMode && (
-					<div className='w-full flex justify-between items-center'>
-						<p className='font-bold text-zinc-950 text-[20px]'>{data?.name}</p>
-					</div>
-				)}
+				{isEditMode && <p className='font-bold text-zinc-950 text-[20px]'>{data?.name}</p>}
 
 				{/* Event Schema */}
 				<div className='p-6 rounded-xl border border-[#E4E4E7]'>
@@ -191,6 +184,7 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 
 					<div className=''>
 						<EventFilter
+							isArchived={isArchived}
 							isEditMode={isEditMode}
 							eventFilters={eventFilters}
 							setEventFilters={setEventFilters}

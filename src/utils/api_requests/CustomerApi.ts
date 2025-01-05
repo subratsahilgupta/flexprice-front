@@ -1,0 +1,56 @@
+import { AxiosClient } from '@/core/axios/verbs';
+import Customer from '@/models/Customer';
+import { Subscription } from '@/models/Subscription';
+
+interface GetCustomerResponse {
+	customers: Customer[];
+	limit: number;
+	offset: number;
+	total: number;
+}
+
+interface GetCustomerSubscriptionsResponse {
+	subscriptions: Subscription[];
+	limit: number;
+	offset: number;
+	total: number;
+}
+
+export interface CreateCustomerSubscriptionPayload {
+	customer_id: string;
+	billing_cadence: 'RECURRING';
+	billing_period: string;
+	billing_period_count: number;
+	currency: string;
+	invoice_cadence: 'ARREAR';
+	plan_id: string;
+	start_date: string;
+	end_date: string | null;
+	lookup_key: string;
+	trial_end: string | null;
+	trial_start: string | null;
+}
+class CustomerApi {
+	private static baseUrl = '/customers';
+
+	public static async getCustomerById(id: string): Promise<Customer> {
+		return await AxiosClient.get(`${this.baseUrl}/${id}`);
+	}
+	public static async getAllCustomers(): Promise<GetCustomerResponse> {
+		return await AxiosClient.get(`${this.baseUrl}?status=published`);
+	}
+
+	public static async deleteCustomerById(id: string): Promise<void> {
+		return await AxiosClient.delete(`${this.baseUrl}/${id}`);
+	}
+
+	public static async createCustomerSubscription(payload: CreateCustomerSubscriptionPayload): Promise<void> {
+		return await AxiosClient.post(`/subscriptions`, payload);
+	}
+
+	public static async getCustomerSubscriptions(id: string): Promise<GetCustomerSubscriptionsResponse> {
+		return await AxiosClient.get(`/subscriptions?customer_id=${id}`);
+	}
+}
+
+export default CustomerApi;

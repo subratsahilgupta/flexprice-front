@@ -1,47 +1,24 @@
 import { FC } from 'react';
-import { Chip } from '@/components/atoms';
+import { ActionButton, Chip } from '@/components/atoms';
 import FlexpriceTable, { ColumnData } from '../Table';
-import ActionButton from './ActionButton';
 import { Plan } from '@/models/Plan';
-
-const formatChips = (data: string): string => {
-	switch (data) {
-		case 'published':
-			return 'Active';
-		case 'unpublished':
-			return 'Inactive';
-		default:
-			return 'Active';
-	}
-};
-
-const formatDate = (date: string, locale: string = 'en-US'): string => {
-	const parsedDate = new Date(date);
-
-	if (isNaN(parsedDate.getTime())) {
-		return 'Invalid Date';
-	}
-
-	const options: Intl.DateTimeFormatOptions = {
-		year: 'numeric',
-		month: 'long',
-		day: 'numeric',
-	};
-
-	return parsedDate.toLocaleDateString(locale, options);
-};
+import formatChips from '@/utils/common/format_chips';
+import formatDate from '@/utils/common/format_date';
+import { PlanApi } from '@/utils/api_requests/PlanApi';
 
 export interface PlansTableProps {
 	data: Plan[];
 }
 
 const PlansTable: FC<PlansTableProps> = ({ data }) => {
+	// Mapping data if additional transformations are required (currently redundant)
 	const mappedData = data.map((plan) => ({
 		...plan,
 	}));
+
+	// Columns definition
 	const columns: ColumnData[] = [
 		{ name: 'name', title: 'Name', width: '700px' },
-		// { name: 'aggregation_field', title: 'Billing Model', align: 'center' },
 		{
 			name: 'status',
 			title: 'Status',
@@ -53,16 +30,24 @@ const PlansTable: FC<PlansTableProps> = ({ data }) => {
 		},
 		{
 			name: 'updated_at',
-			title: 'Updated At',
+			title: 'Updated at',
 			render: (row) => {
-				return <span className='text-[#09090B] '>{formatDate(row.updated_at)}</span>;
+				return <span className='text-[#09090B]'>{formatDate(row.updated_at)}</span>;
 			},
 		},
 		{
 			name: 'actions',
 			title: '',
 			redirect: false,
-			render: (row) => <ActionButton id={row.id} />,
+			render: (row) => (
+				<ActionButton
+					id={row.id}
+					editPath={`/customer-management/pricing-plan/edit-plan?id=${row.id}`}
+					deleteMutationFn={(id) => PlanApi.deletePlan(id)}
+					refetchQueryKey='fetchPlans'
+					entityName='Plan'
+				/>
+			),
 		},
 	];
 

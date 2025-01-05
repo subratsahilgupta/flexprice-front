@@ -121,7 +121,7 @@ const FlexpriceTable: FC<FlexpriceTableProps> = ({ columns, data, redirectUrl })
 									textColor ? `text-[${textColor}]` : 'text-[#09090B] w-full ',
 									'font-normal',
 									'max-h-8 px-4 py-3 text-[14px]',
-									redirect ? 'cursor-pointer' : 'cursor-default',
+									redirect && redirectUrl ? 'cursor-pointer' : 'cursor-default',
 								)}
 								style={{ flex: width ? undefined : flex }}
 								width={width}

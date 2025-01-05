@@ -1,19 +1,10 @@
-import ActionButton from './ActionButton';
 import { FC } from 'react';
-import { Chip } from '@/components/atoms';
+import { ActionButton, Chip } from '@/components/atoms';
 import FlexpriceTable, { ColumnData } from '../Table';
 import { Meter } from '@/models/Meter';
-
-const formatChips = (data: string): string => {
-	switch (data) {
-		case 'published':
-			return 'Active';
-		case 'unpublished':
-			return 'Inactive';
-		default:
-			return 'Active';
-	}
-};
+import formatChips from '@/utils/common/format_chips';
+import formatDate from '@/utils/common/format_date';
+import { MeterApi } from '@/utils/api_requests/MeterApi';
 
 const formatAggregationType = (data: string): string => {
 	switch (data) {
@@ -24,22 +15,6 @@ const formatAggregationType = (data: string): string => {
 		default:
 			return 'Sum';
 	}
-};
-
-const formatDate = (date: string, locale: string = 'en-US'): string => {
-	const parsedDate = new Date(date);
-
-	if (isNaN(parsedDate.getTime())) {
-		return 'Invalid Date';
-	}
-
-	const options: Intl.DateTimeFormatOptions = {
-		year: 'numeric',
-		month: 'long',
-		day: 'numeric',
-	};
-
-	return parsedDate.toLocaleDateString(locale, options);
 };
 
 export interface BillableMetricTableProps {
@@ -83,7 +58,15 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 			name: 'actions',
 			title: '',
 			redirect: false,
-			render: (row) => <ActionButton id={row.id} />,
+			render: (row) => (
+				<ActionButton
+					id={row.id}
+					editPath={`/usage-tracking/billable-metric/edit-meter?id=${row.id}`}
+					deleteMutationFn={(id) => MeterApi.deleteMeter(id)}
+					refetchQueryKey={'fetchMeters'}
+					entityName={'Meter'}
+				/>
+			),
 		},
 	];
 
