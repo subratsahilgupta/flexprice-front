@@ -22,7 +22,7 @@ const CreatePlanPage = () => {
 		};
 	}, []);
 
-	const { mutate: submitPlan } = useMutation({
+	const { mutate: submitPlan, isPending } = useMutation({
 		mutationFn: async () => {
 			const data = plan;
 			if (metaData?.usageBasedPrice) {
@@ -61,8 +61,11 @@ const CreatePlanPage = () => {
 			toast.error('Failed to create plan');
 		},
 	});
-
 	const handleNext = () => {
+		if (isPending) {
+			return;
+		}
+
 		if (activeStep === formSteps.length - 1) {
 			if (!validateSteps()) {
 				return;

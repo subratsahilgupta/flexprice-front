@@ -92,7 +92,13 @@ const RecurringChargesForm = () => {
 					/>
 					<Spacer height={'16px'} />
 					<div className='flex justify-end'>
-						<Button variant='secondary' className='mr-4 text-zinc-900 '>
+						<Button
+							onClick={() => {
+								setMetaDataField('isRecurringEditMode', false);
+								setMetaDataField('recurringPrice', undefined);
+							}}
+							variant='secondary'
+							className='mr-4 text-zinc-900 '>
 							Cancel
 						</Button>
 						<Button onClick={handleAddRecurringPrice} variant='default' className='mr-4 font-normal'>
