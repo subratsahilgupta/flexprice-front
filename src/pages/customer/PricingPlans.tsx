@@ -8,6 +8,7 @@ import { Spinner } from '@/components/atoms';
 import toast from 'react-hot-toast';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
 import { PlansTable } from '@/components/molecules';
+import { Plan } from '@/models/Plan';
 
 const fetchPlans = async () => {
 	return await PlanApi.getAllPlans();
@@ -59,7 +60,7 @@ const PricingPlan = () => {
 				</div>
 			</SectionHeader>
 			<div className=''>
-				<PlansTable data={plans?.plans || []} />
+				<PlansTable data={(plans?.plans || []) as Plan[]} />
 			</div>
 		</div>
 	);
