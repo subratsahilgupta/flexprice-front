@@ -21,7 +21,7 @@ export interface ExpandedPlan {
 	readonly updated_at: Date;
 	readonly created_by: string;
 	readonly updated_by: string;
-	readonly prices: Price[];
+	readonly prices: Price[] | null;
 }
 
 export type NormalizedPlan = {
@@ -49,14 +49,14 @@ export const normalizePlan = (originalData: ExpandedPlan): NormalizedPlan => {
 
 	const charges: NormalizedPlan['charges'] = {};
 
-	for (const price of prices) {
+	for (const price of prices ?? []) {
 		const billingPeriod = price.billing_period.toLowerCase();
 
 		if (!charges[billingPeriod]) {
 			charges[billingPeriod] = [];
 		}
 
-		charges[billingPeriod].push({
+		const currentCharge = {
 			name: name,
 			price_id: price.id,
 			amount: price.amount,
@@ -68,9 +68,10 @@ export const normalizePlan = (originalData: ExpandedPlan): NormalizedPlan => {
 			billing_model: price.billing_model,
 			tiers: price.tiers ?? [],
 			meter_name: price.meter?.name,
-		});
-	}
+		};
 
+		charges[billingPeriod].push(currentCharge);
+	}
 	return {
 		id,
 		name,
@@ -86,4 +87,17 @@ export const getPriceTableCharge = (charge: ChargesForBillingPeriodOne) => {
 	} else {
 		return `${charge.display_amount}/${charge.billing_period}`;
 	}
+};
+
+export const getActualPriceForTotal = (charge: ChargesForBillingPeriodOne) => {
+	let result = 0;
+	if (charge.billing_model === 'PACKAGE') {
+		result = parseFloat(charge.amount);
+	} else if (charge.billing_model === 'TIERED') {
+		result = parseFloat(String(charge.tiers[0].flat_amount));
+	} else {
+		result = parseFloat(charge.amount);
+	}
+
+	return result;
 };

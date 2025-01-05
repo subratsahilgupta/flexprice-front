@@ -3,7 +3,7 @@ import { Plan } from '@/models/Plan';
 import { ExpandedPlan } from '../models/transformed_plan';
 
 interface GetAllPlansResponse {
-	plans: Plan[];
+	plans: Plan[] | ExpandedPlan[];
 	total: number;
 	offset: number;
 	limit: number;
@@ -51,6 +51,11 @@ export class PlanApi {
 
 	public static async getAllPlans() {
 		return await AxiosClient.get<GetAllPlansResponse>(this.baseUrl);
+	}
+
+	public static async getExpandedPlan() {
+		const response = await AxiosClient.get<GetAllPlansResponse>(`${this.baseUrl}?expand=prices%2Cmeters`);
+		return response.plans as ExpandedPlan[];
 	}
 
 	public static async getPlanById(id: string) {

@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { ColumnData, FlexpriceTable } from '@/components/molecules';
 import { getPriceTableCharge, NormalizedPlan } from '@/utils/models/transformed_plan';
 
@@ -16,43 +16,40 @@ const ChargeTable: FC<Props> = ({ data }) => {
 		price: getPriceTableCharge(charge),
 	}));
 
-	console.log('Mapped Data', mappedData);
+	const [showAllRows, setShowAllRows] = useState(false);
+
 	const columns: ColumnData[] = [
 		{
 			name: 'charge',
 			title: 'Charge',
-			width: '400px',
-
-			// render: (row) => {
-			//     return (
-			//         <span className='text-[#09090B] '>{formatDate(row.updated_at)}</span>
-			//     )
-			// }
 		},
 		{
 			name: 'quantity',
 			title: 'Quantity',
-			// render: (row) => {
-			//     return <span className='text-[#09090B] '>{formatDate(row.updated_at)}</span>;
-			// },
 		},
 		{
 			name: 'price',
 			title: 'Price',
-			// render: (row) => {
-			//     return <span className='text-[#09090B] '>{formatDate(row.updated_at)}</span>;
-			// },
 		},
 	];
+
+	const displayedData = showAllRows ? mappedData : mappedData.slice(0, 5);
 
 	return (
 		<div>
 			<div>
-				<p className='font-bold text-zinc text-[20px]'>Charges</p>
+				<p className='font-medium text-zinc text-[14px]'>Charges</p>
 			</div>
-			<div className='rounded-xl border border-gray-300 space-y-6 mt-5'>
-				<FlexpriceTable columns={columns} data={mappedData} redirectUrl={`/customer-management/customers/details/`} />
+			<div className='rounded-xl border border-gray-300 space-y-6 mt-2'>
+				<FlexpriceTable columns={columns} data={displayedData} redirectUrl={`/customer-management/customers/details/`} />
 			</div>
+			{mappedData.length > 5 && (
+				<div className='text-center mt-4'>
+					<button className='text-blue-600 font-semibold hover:underline' onClick={() => setShowAllRows((prev) => !prev)}>
+						{showAllRows ? 'Collapse' : 'Expand'}
+					</button>
+				</div>
+			)}
 		</div>
 	);
 };
