@@ -85,6 +85,7 @@ const CreateCustomerDrawer = () => {
 		<div>
 			<Sheet
 				isOpen={open}
+				onOpenChange={(value) => setopen(value)}
 				title={'Add Customer'}
 				description={`Make changes to your profile here. Click save when you're done.`}
 				trigger={
