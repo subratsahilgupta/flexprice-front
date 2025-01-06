@@ -14,8 +14,8 @@ const PlanDetailsSection = () => {
 			/>
 			<Input
 				placeholder='Enter a name for the plan'
-				description={'A unique identifier for the meter. This is used to refer the meter in the Flexprice APIs.'}
-				label='Plan Name*'
+				description={'Enter the name of the plan that will be visible to your customers.'}
+				label='Plan Name'
 				value={plan.name}
 				error={errors.name}
 				onChange={(e) => {
@@ -26,6 +26,7 @@ const PlanDetailsSection = () => {
 
 			<Spacer height={'20px'} />
 			<Input
+				error={errors.lookup_key}
 				onChange={(e) => setPlanField('lookup_key', e)}
 				value={plan.lookup_key}
 				placeholder='Enter a slug for the plan'

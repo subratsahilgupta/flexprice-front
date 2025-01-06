@@ -144,11 +144,11 @@ const CreatePlanPage = () => {
 						</Button>
 					)}
 
-					{activeStep === 0 && (
+					{/* {activeStep === 0 && (
 						<Button onClick={handleBack} variant='secondary' className='mr-4 text-zinc-900 '>
 							Save Draft
 						</Button>
-					)}
+					)} */}
 					<Button onClick={handleNext} variant='default' className='mr-4'>
 						{formSteps.length - 1 === activeStep ? 'Save' : 'Next'}
 					</Button>
