@@ -72,7 +72,6 @@ const usePlanStore = create<SinglePlanStore>((set) => ({
 		isRecurringEditMode: false,
 		isUsageEditMode: false,
 		isTrialPeriod: false,
-		usagePrices: [],
 	},
 
 	errors: {},

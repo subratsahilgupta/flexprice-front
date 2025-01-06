@@ -53,8 +53,8 @@ const SelectMeter: FC<Props> = ({ onChange, value, error }) => {
 				selectedValue={value}
 				onChange={(e) => onChange(e)}
 				options={activeMeters}
-				placeholder='Select Meter'
-				label='Select Meter'
+				placeholder='Select by meter name'
+				label='Billable Metric'
 			/>
 		</div>
 	);

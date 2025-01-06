@@ -8,8 +8,23 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
+export const mapBillingPeriod = (billingPeriod: string) => {
+	switch (billingPeriod) {
+		case 'DAILY':
+			return 'day';
+		case 'WEEKLY':
+			return 'week';
+		case 'MONTHLY':
+			return 'month';
+		case 'ANNUAL':
+			return 'year';
+		default:
+			return '';
+	}
+};
+
 const CreatePlanPage = () => {
-	const [activeStep, setactiveStep] = useState(2);
+	const [activeStep, setactiveStep] = useState(0);
 	const formSteps = [{ label: 'Plan Details' }, { label: 'Billing Preferences' }, { label: 'Set up Charges' }];
 	const { setError, clearAllErrors, resetStore } = usePlanStore();
 	const plan = usePlanStore((state) => state.plan);
@@ -25,11 +40,13 @@ const CreatePlanPage = () => {
 	const { mutate: submitPlan, isPending } = useMutation({
 		mutationFn: async () => {
 			const data = plan;
-			if (metaData?.usageBasedPrice) {
-				data.prices?.push({
-					...metaData.usageBasedPrice,
-					billing_period_count: 1,
-					billing_cadence: 'RECURRING',
+			if (metaData?.usagePrices) {
+				metaData.usagePrices.forEach((price) => {
+					data.prices?.push({
+						...price,
+						billing_period_count: 1,
+						billing_cadence: 'RECURRING',
+					});
 				});
 			}
 
