@@ -10,6 +10,7 @@ export interface Props {
 }
 
 const ChargeTable: FC<Props> = ({ data }) => {
+	console.log('Charge Data', data);
 	const mappedData = (data ?? []).map((charge) => ({
 		charge: charge.meter_name ? `${charge.name}/${charge.meter_name}` : charge.name,
 		quantity: charge.type === 'FIXED' ? '1' : 'pay as you go',
@@ -41,7 +42,7 @@ const ChargeTable: FC<Props> = ({ data }) => {
 				<p className='font-medium text-zinc text-[14px]'>Charges</p>
 			</div>
 			<div className='rounded-xl border border-gray-300 space-y-6 mt-2'>
-				<FlexpriceTable columns={columns} data={displayedData} redirectUrl={`/customer-management/customers/details/`} />
+				<FlexpriceTable columns={columns} data={displayedData} />
 			</div>
 			{mappedData.length > 5 && (
 				<div className='text-center mt-4'>

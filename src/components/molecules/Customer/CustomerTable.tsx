@@ -49,7 +49,7 @@ const CustomerTable: FC<Props> = ({ data }) => {
 		},
 	];
 
-	return <FlexpriceTable columns={columns} data={mappedData} redirectUrl={`/customer-management/customers/details/`} />;
+	return <FlexpriceTable columns={columns} data={mappedData} redirectUrl={`/customer-management/customers/`} />;
 };
 
 export default CustomerTable;

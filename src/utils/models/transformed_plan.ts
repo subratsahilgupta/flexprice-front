@@ -81,11 +81,11 @@ export const normalizePlan = (originalData: ExpandedPlan): NormalizedPlan => {
 
 export const getPriceTableCharge = (charge: ChargesForBillingPeriodOne) => {
 	if (charge.billing_model === 'PACKAGE') {
-		return `${charge.display_amount}/unit/${charge.billing_period}`;
+		return `${charge.display_amount}/${charge.transform_quantity}/${charge.billing_period}`;
 	} else if (charge.billing_model === 'TIERED') {
-		return `Starts at ${charge.currency}${charge.tiers[0].flat_amount}`;
+		return `Starts at ${charge.currency}${charge.tiers[0].flat_amount}/unit/${charge.billing_period}`;
 	} else {
-		return `${charge.display_amount}/${charge.billing_period}`;
+		return `${charge.display_amount}/unit/${charge.billing_period}`;
 	}
 };
 

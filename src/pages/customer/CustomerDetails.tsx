@@ -1,9 +1,9 @@
 import { useParams } from 'react-router-dom';
-import CustomerCard from '@/components/molecules/Customer/CustomerCard';
 import Tabbar from '@/components/molecules/Tabbar/Tabbar';
 import Overview from './tabs/Overview';
 import Wallet from './tabs/Wallet';
 import Invoice from './tabs/Invoice';
+import CustomerHeader from '@/components/molecules/Customer/CustomerHeader';
 
 const tabs = [
 	{ id: 'overview', label: 'Overview', component: <Overview /> },
@@ -15,7 +15,7 @@ const CustomerDetails = () => {
 	const { id: customerId } = useParams();
 	return (
 		<div className='p-6 space-y-6'>
-			<CustomerCard customerId={customerId!} />
+			<CustomerHeader customerId={customerId!} />
 			<Tabbar tabs={tabs} initialActiveTab='overview' />
 		</div>
 	);
