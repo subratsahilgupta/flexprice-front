@@ -27,7 +27,7 @@ const CreateCustomerDrawer = () => {
 	useEffect(() => {
 		setFormData((prev) => ({
 			...prev,
-			customerSlug: 'customer-' + formData.customerName.toLowerCase().replace(/\s/g, '-'),
+			customerSlug: 'cust-' + formData.customerName.toLowerCase().replace(/\s/g, '-'),
 		}));
 	}, [formData.customerName]);
 
