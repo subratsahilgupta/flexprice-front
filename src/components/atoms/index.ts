@@ -28,3 +28,5 @@ export { default as Textarea } from './Textarea';
 export { default as ActionButton } from './ActionButton';
 
 export { default as DatePicker } from './DatePicker';
+
+export { default as Sheet } from './Sheet';

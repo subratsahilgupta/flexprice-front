@@ -1,12 +1,11 @@
-import { Button, SectionHeader, Spinner } from '@/components/atoms';
+import { SectionHeader, Spinner } from '@/components/atoms';
+import { CreateCustomerDrawer } from '@/components/molecules';
 import CustomerTable from '@/components/molecules/Customer/CustomerTable';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { FiFolderPlus } from 'react-icons/fi';
 import { IoSearch } from 'react-icons/io5';
 import { LiaSlidersHSolid } from 'react-icons/lia';
-import { Link } from 'react-router-dom';
 
 const fetchCustomer = async () => {
 	return await CustomerApi.getAllCustomers();
@@ -49,12 +48,7 @@ const CustomerPage = () => {
 					<button className='px-2 py-1'>
 						<LiaSlidersHSolid className='size-5 text-[#09090B] ' />
 					</button>
-					<Link to='/customer-management/customers/create-customer'>
-						<Button className=' flex gap-2 bg-[#0F172A] '>
-							<FiFolderPlus />
-							<span>Add Customer</span>
-						</Button>
-					</Link>
+					<CreateCustomerDrawer />
 				</div>
 			</SectionHeader>
 			<div className=''>
