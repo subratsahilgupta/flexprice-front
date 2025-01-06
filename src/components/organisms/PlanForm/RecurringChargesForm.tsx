@@ -20,13 +20,28 @@ const RecurringChargesForm = () => {
 		{ label: 'Yearly', value: 'ANNUAL' },
 	];
 
+	const mapBillingPeriod = (billingPeriod: string) => {
+		switch (billingPeriod) {
+			case 'DAILY':
+				return 'per day';
+			case 'WEEKLY':
+				return 'per week';
+			case 'MONTHLY':
+				return 'per month';
+			case 'ANNUAL':
+				return 'per year';
+			default:
+				return '';
+		}
+	};
+
 	const mapCurrency = (currency: string) => {
 		const selectedCurrency = currencyOptions.find((option) => option.value === currency);
 		return selectedCurrency?.currency;
 	};
 
 	const [amount, setamount] = useState<string>(recurringPrice?.amount || '');
-	const [billingPeriod, setbillingPeriod] = useState(recurringPrice?.billing_period || billlingPeriodOptions[0].value);
+	const [billingPeriod, setbillingPeriod] = useState(recurringPrice?.billing_period || billlingPeriodOptions[2].value);
 
 	const [currency, setcurrency] = useState(recurringPrice?.currency || currencyOptions[0].value);
 
@@ -56,7 +71,7 @@ const RecurringChargesForm = () => {
 		<>
 			{metaData?.isRecurringEditMode && (
 				<div>
-					<FormHeader title='Recurring Fee' variant='form-component-title' />
+					<FormHeader title='Setup Recurring Fee' variant='form-component-title' />
 
 					<Spacer height={'8px'} />
 					<Select
@@ -88,7 +103,7 @@ const RecurringChargesForm = () => {
 						label='Value'
 						error={errors.amount}
 						inputPrefix={mapCurrency(currency)}
-						suffix={<span className='text-[#64748B]'> /{billingPeriod.toLocaleLowerCase()}</span>}
+						suffix={<span className='text-[#64748B]'> {mapBillingPeriod(billingPeriod)}</span>}
 					/>
 					<Spacer height={'16px'} />
 					<div className='flex justify-end'>

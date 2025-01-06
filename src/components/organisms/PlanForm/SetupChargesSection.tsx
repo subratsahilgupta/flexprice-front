@@ -60,11 +60,7 @@ const SetupChargesSection = () => {
 
 	return (
 		<div className='p-6 rounded-xl border border-[#E4E4E7]'>
-			<FormHeader
-				title='Plan Charges'
-				subtitle='Name of the property key in the data object. The groups should only include low cardinality fields.'
-				variant='sub-header'
-			/>
+			<FormHeader title='Plan Charges' subtitle='Choose the appropriate subscription model for this pricing plan.' variant='sub-header' />
 
 			{/* Subscription Type Section */}
 			{!metaData?.recurringPrice && !metaData?.usageBasedPrice && (
@@ -72,7 +68,12 @@ const SetupChargesSection = () => {
 					<FormHeader title='Select the Subscription Type' variant='form-component-title' />
 					<div className='w-full gap-4 grid grid-cols-2'>{subscriptionTypeOptions.map(renderSubscriptionTypeButton)}</div>
 					<Spacer height='4px' />
-					<p className='text-sm text-muted-foreground'>Default subscription means... Subscription means lorem ipsum</p>
+					<p className='text-sm text-muted-foreground'>
+						{metaData?.subscriptionType === subscriptionTypeOptions[0].value
+							? 'Customers are charged on a recurring basis (e.g., monthly or yearly).'
+							: 'Customers are charged based on their actual usage (e.g., per API call, compute time).'}
+					</p>
+
 					<Spacer height='16px' />
 				</div>
 			)}
@@ -98,28 +99,27 @@ const SetupChargesSection = () => {
 							</button>
 						</span>
 					</div>
-
-					<div className='border-b border-[#F4F4F5] w-full my-3' />
-
-					<div className='w-full flex items-center flex-wrap gap-2'>
-						{/* Dynamic Add Charges Button */}
-
-						{metaData.subscriptionType === subscriptionTypeOptions[1].value && (
-							<AddChargesButton onClick={() => setMetaDataField('isRecurringEditMode', true)} label='Add Recurring Charges' />
-						)}
-
-						<AddChargesButton onClick={() => setMetaDataField('isUsageEditMode', true)} label='Add Usage Based Charges' />
-					</div>
 				</div>
 			)}
 
 			{/* Conditional Forms */}
-			<Spacer height='16px' />
+			<Spacer height='4px' />
 			{metaData?.subscriptionType && (
 				<>
 					<RecurringChargesForm />
 					<UsageBasedPricingForm />
 				</>
+			)}
+			{(metaData?.recurringPrice || metaData?.usageBasedPrice) && (
+				<div className='w-full flex items-center flex-wrap gap-2'>
+					{/* Dynamic Add Charges Button */}
+
+					{metaData?.subscriptionType === subscriptionTypeOptions[1].value && (
+						<AddChargesButton onClick={() => setMetaDataField('isRecurringEditMode', true)} label='Add Recurring Charges' />
+					)}
+
+					<AddChargesButton onClick={() => setMetaDataField('isUsageEditMode', true)} label='Add Usage Based Charges' />
+				</div>
 			)}
 
 			<Spacer height='16px' />
