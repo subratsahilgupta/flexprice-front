@@ -44,6 +44,7 @@ interface MetaData {
 	recurringPrice?: Partial<Price>;
 	usageBasedPrice?: Partial<Price>;
 	usagePackagePrice?: { unit: string; price: string };
+	usagePrices?: Partial<Price>[];
 }
 
 interface SinglePlanStore {
@@ -72,6 +73,7 @@ const usePlanStore = create<SinglePlanStore>((set) => ({
 		isUsageEditMode: false,
 		isTrialPeriod: false,
 	},
+
 	errors: {},
 	setPlan: (plan) => set({ plan }),
 	setMetaDataField: (field, value) => {

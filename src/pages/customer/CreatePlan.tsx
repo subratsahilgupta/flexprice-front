@@ -8,6 +8,21 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
+export const mapBillingPeriod = (billingPeriod: string) => {
+	switch (billingPeriod) {
+		case 'DAILY':
+			return 'day';
+		case 'WEEKLY':
+			return 'week';
+		case 'MONTHLY':
+			return 'month';
+		case 'ANNUAL':
+			return 'year';
+		default:
+			return '';
+	}
+};
+
 const CreatePlanPage = () => {
 	const [activeStep, setactiveStep] = useState(0);
 	const formSteps = [{ label: 'Plan Details' }, { label: 'Billing Preferences' }, { label: 'Set up Charges' }];
@@ -25,11 +40,13 @@ const CreatePlanPage = () => {
 	const { mutate: submitPlan, isPending } = useMutation({
 		mutationFn: async () => {
 			const data = plan;
-			if (metaData?.usageBasedPrice) {
-				data.prices?.push({
-					...metaData.usageBasedPrice,
-					billing_period_count: 1,
-					billing_cadence: 'RECURRING',
+			if (metaData?.usagePrices) {
+				metaData.usagePrices.forEach((price) => {
+					data.prices?.push({
+						...price,
+						billing_period_count: 1,
+						billing_cadence: 'RECURRING',
+					});
 				});
 			}
 
@@ -119,7 +136,11 @@ const CreatePlanPage = () => {
 
 	return (
 		<div className='p-6'>
-			<FormHeader title={'Plan Details'} subtitle={'Create a new plan by filling in the details below.'} variant='form-title' />
+			<FormHeader
+				title={'Plan Details'}
+				subtitle={'Define pricing plans to manage events, billing, and customer subscriptions seamlessly.'}
+				variant='form-title'
+			/>
 
 			<Spacer height={'16px'} />
 
@@ -144,11 +165,11 @@ const CreatePlanPage = () => {
 						</Button>
 					)}
 
-					{activeStep === 0 && (
+					{/* {activeStep === 0 && (
 						<Button onClick={handleBack} variant='secondary' className='mr-4 text-zinc-900 '>
 							Save Draft
 						</Button>
-					)}
+					)} */}
 					<Button onClick={handleNext} variant='default' className='mr-4'>
 						{formSteps.length - 1 === activeStep ? 'Save' : 'Next'}
 					</Button>

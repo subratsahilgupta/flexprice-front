@@ -9,13 +9,13 @@ const PlanDetailsSection = () => {
 		<div className='p-6  rounded-xl border border-[#E4E4E7]'>
 			<FormHeader
 				title={'Plan Details'}
-				subtitle={'Assign a name to your event schema to easily identify and track events processed.'}
+				subtitle={'Provide details about your pricing plan to help organize and track event data efficiently.'}
 				variant='sub-header'
 			/>
 			<Input
 				placeholder='Enter a name for the plan'
-				description={'A unique identifier for the meter. This is used to refer the meter in the Flexprice APIs.'}
-				label='Plan Name*'
+				description={'A descriptive name to identify this pricing plan.'}
+				label='Plan Name'
 				value={plan.name}
 				error={errors.name}
 				onChange={(e) => {
@@ -26,10 +26,11 @@ const PlanDetailsSection = () => {
 
 			<Spacer height={'20px'} />
 			<Input
+				error={errors.lookup_key}
 				onChange={(e) => setPlanField('lookup_key', e)}
 				value={plan.lookup_key}
 				placeholder='Enter a slug for the plan'
-				description={'A slug for the meter.'}
+				description={'A unique identifier for this plan, used as a reference in API calls and system integrations.'}
 				label='Plan Slug'
 			/>
 			<Spacer height={'20px'} />
@@ -39,7 +40,7 @@ const PlanDetailsSection = () => {
 				className='min-h-[100px]'
 				placeholder='Enter description'
 				label='Plan Description'
-				description='Your message will be copied to the support team.'
+				description='Helps your team to understand the purpose of this plan.'
 			/>
 		</div>
 	);
