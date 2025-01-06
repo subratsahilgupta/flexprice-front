@@ -1,4 +1,5 @@
 import { Option, Select } from '@/components/atoms';
+import { Meter } from '@/models/Meter';
 import { MeterApi } from '@/utils/api_requests/MeterApi';
 import { useQuery } from '@tanstack/react-query';
 import { FC } from 'react';
@@ -8,7 +9,7 @@ const fetchMeters = async () => {
 };
 
 interface Props {
-	onChange: (value: string) => void;
+	onChange: (value: Meter) => void;
 	value?: string;
 	error?: string;
 }
@@ -51,7 +52,7 @@ const SelectMeter: FC<Props> = ({ onChange, value, error }) => {
 			<Select
 				error={error}
 				selectedValue={value}
-				onChange={(e) => onChange(e)}
+				onChange={(e) => onChange(meters.find((meter) => meter.id === e) as Meter)}
 				options={activeMeters}
 				placeholder='Select by meter name'
 				label='Billable Metric'

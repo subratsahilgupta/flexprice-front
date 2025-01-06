@@ -42,6 +42,7 @@ const BillingPrefferencesSection = () => {
 						checked={metaData?.isTrialPeriod}
 						onCheckedChange={(value) => {
 							setMetaDataField('isTrialPeriod', value);
+							setPlanField('trial_period', undefined);
 						}}
 					/>
 					<Label htmlFor='airplane-mode'>

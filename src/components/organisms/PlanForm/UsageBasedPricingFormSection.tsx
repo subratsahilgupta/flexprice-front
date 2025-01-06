@@ -58,8 +58,14 @@ const UsageBasedPricingFormSection = () => {
 	const removePrice = (index: number) => {
 		const updatedPriceList = priceList.filter((_, i) => i !== index);
 		setPriceList(updatedPriceList);
-		setMetaDataField('usagePrices', updatedPriceList);
 		setEditStates((prev) => prev.filter((_, i) => i !== index));
+
+		if (updatedPriceList.length === 0) {
+			setMetaDataField('usagePrices', undefined);
+			return;
+		} else {
+			setMetaDataField('usagePrices', updatedPriceList);
+		}
 	};
 
 	// Update a specific price entry
@@ -77,7 +83,7 @@ const UsageBasedPricingFormSection = () => {
 	return (
 		<div>
 			{/* Render the pricing forms */}
-			{priceList.length > 0 && <FormHeader className='!mb-2' title={'Setup Usage Based Charges'} variant='form-component-title' />}
+			{priceList.length > 0 && <FormHeader className='!mb-2' title={'Usage Based Charges'} variant='form-component-title' />}
 			{priceList.map((price, index) => (
 				<div className='space-y-2'>
 					<UsagePricingForm
@@ -85,9 +91,14 @@ const UsageBasedPricingFormSection = () => {
 						data={price}
 						label={(index + 1).toString()}
 						isEdit={editStates[index]}
+						handleEdit={() => {
+							setEditStates((prev) => prev.map((state, i) => (i === index ? true : state)));
+							console.log('Edit Usage Based Charges5', index);
+						}}
 						addPrice={(updatedPrice) => updatePrice(index, updatedPrice)}
 						handleDelete={() => {
 							console.log('Delete Usage Based Charges5', index);
+
 							removePrice(index);
 						}}
 					/>
@@ -95,30 +106,28 @@ const UsageBasedPricingFormSection = () => {
 			))}
 
 			<Spacer height='16px' />
-			<div className='flex flex-wrap gap-3'>
-				{priceList.length > 0 && (
-					<>
-						<AddChargesButton
-							onClick={() => {
-								addPrice();
-								console.log('Add Usage Based Charges5');
-							}}
-							label='Add Usage Based Charges'
-						/>
-					</>
-				)}
-				{priceList.length > 0 && !metaData?.recurringPrice && (
-					<>
-						<AddChargesButton
-							onClick={() => {
-								setMetaDataField('isRecurringEditMode', true);
-								console.log('Add Recurring Charges');
-							}}
-							label='Add Recurring Charges'
-						/>
-					</>
-				)}
-			</div>
+			{priceList.length > 0 && Object.keys(priceList[priceList.length - 1]).length > 0 && (
+				<div className='flex flex-wrap gap-3'>
+					{!metaData?.recurringPrice && (
+						<>
+							<AddChargesButton
+								onClick={() => {
+									setMetaDataField('isRecurringEditMode', true);
+									console.log('Add Recurring Charges');
+								}}
+								label='Add Recurring Charges'
+							/>
+						</>
+					)}
+					<AddChargesButton
+						onClick={() => {
+							addPrice();
+							console.log('Add Usage Based Charges5');
+						}}
+						label='Add Usage Based Charges'
+					/>
+				</div>
+			)}
 
 			{/* <pre>
 				{JSON.stringify(

@@ -23,6 +23,17 @@ const SetupChargesSection = () => {
 	const { setMetaDataField } = usePlanStore();
 	const metaData = usePlanStore((state) => state.metaData);
 
+	const isSubscriptionBtnVisible = () => {
+		const usagePrices = metaData?.usagePrices;
+		const recurringPrice = metaData?.recurringPrice;
+
+		if (usagePrices?.length ?? 0 > 0) {
+			return Object.keys(usagePrices![0] ?? {}).length === 0;
+		}
+
+		return !usagePrices && !recurringPrice;
+	};
+
 	const handleSubscriptionTypeChange = (type: (typeof subscriptionTypeOptions)[0]) => {
 		setMetaDataField('subscriptionType', type.value);
 		setMetaDataField('isRecurringEditMode', type.value === subscriptionTypeOptions[0].value);
@@ -52,7 +63,7 @@ const SetupChargesSection = () => {
 			<FormHeader title='Plan Charges' subtitle='Choose the appropriate subscription model for this pricing plan.' variant='sub-header' />
 
 			{/* Subscription Type Section */}
-			{!metaData?.recurringPrice && !metaData?.usageBasedPrice && (
+			{isSubscriptionBtnVisible() && (
 				<div>
 					<FormHeader title='Select the Subscription Type' variant='form-component-title' />
 					<div className='w-full gap-4 grid grid-cols-2'>{subscriptionTypeOptions.map(renderSubscriptionTypeButton)}</div>

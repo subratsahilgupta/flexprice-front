@@ -7,6 +7,7 @@ import { RiDeleteBin6Line } from 'react-icons/ri';
 import SelectMeter from './SelectMeter';
 import { Pencil, Trash2 } from 'lucide-react';
 import { mapBillingPeriod } from '@/pages/customer/CreatePlan';
+import { Meter } from '@/models/Meter';
 
 interface Props {
 	data?: Partial<Price>;
@@ -68,6 +69,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 		tieredModelError: '',
 	});
 
+	const [activeMeter, setactiveMeter] = useState<Meter | null>();
 	const addTieredPrice = () => {
 		setTieredPrices((prev) => {
 			const lastTier = prev[prev.length - 1];
@@ -216,7 +218,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 				<div
 					className='gap-2 w-full flex justify-between group min-h-9 items-center rounded-md border bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground disabled:opacity-50 md:text-sm disabled:cursor-not-allowed cursor-pointer'
 					onClick={handleEdit}>
-					<p>{`Usage Based Charge ${label}`}</p>
+					<p>{activeMeter ? `${activeMeter.name}` : `Usage Based Charge ${label}`}</p>
 					<span className='text-[#18181B] flex gap-2 items-center'>
 						<button onClick={handleEdit}>
 							<Pencil size={16} />
@@ -234,7 +236,14 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 	return (
 		<div>
 			<Spacer height={'8px'} />
-			<SelectMeter error={errors.meter_id} onChange={setMeterId} value={meterId} />
+			<SelectMeter
+				error={errors.meter_id}
+				onChange={(meter) => {
+					setMeterId(meter.id);
+					setactiveMeter(meter);
+				}}
+				value={meterId}
+			/>
 			<Spacer height='8px' />
 			<Select
 				selectedValue={currency}

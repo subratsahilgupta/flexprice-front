@@ -74,9 +74,15 @@ const RecurringChargesForm = () => {
 		setisEdit(false);
 	};
 
-	const handleEdit = () => void {};
+	const handleEdit = () => {
+		setMetaDataField('isRecurringEditMode', true);
+		setisActive(true);
+		setisEdit(true);
+	};
 
-	const handleDelete = () => void {};
+	const handleDelete = () => {
+		setMetaDataField('recurringPrice', undefined);
+	};
 
 	if (!isActive && metaData?.subscriptionType === subscriptionTypeOptions[1].value) {
 		return <div></div>;
@@ -91,7 +97,7 @@ const RecurringChargesForm = () => {
 				<div
 					className='gap-2 w-full flex justify-between group min-h-9 items-center rounded-md border bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground disabled:opacity-50 md:text-sm disabled:cursor-not-allowed cursor-pointer'
 					onClick={handleEdit}>
-					<p>{'Recurring'}</p>
+					<p>{'Recurring fee'}</p>
 					<span className='text-[#18181B] flex gap-2 items-center'>
 						<button onClick={handleEdit}>
 							<Pencil size={16} />
@@ -111,7 +117,7 @@ const RecurringChargesForm = () => {
 	} else {
 		return (
 			<div>
-				<FormHeader title='Setup Recurring Fee' variant='form-component-title' />
+				<FormHeader title='Recurring Charges' variant='form-component-title' />
 
 				<Spacer height={'8px'} />
 				<Select
