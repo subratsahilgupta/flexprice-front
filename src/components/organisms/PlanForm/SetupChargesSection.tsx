@@ -103,7 +103,7 @@ const SetupChargesSection = () => {
 			)}
 
 			{/* Conditional Forms */}
-			<Spacer height='4px' />
+			<Spacer height='16px' />
 			{metaData?.subscriptionType && (
 				<>
 					<RecurringChargesForm />
