@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import usePlanStore, { Price } from '@/store/usePlanStore';
 import { Pencil, Trash2 } from 'lucide-react';
 import { AddChargesButton, subscriptionTypeOptions } from './SetupChargesSection';
-import { mapBillingPeriod } from '@/pages/customer/CreatePlan';
+import { mapBillingPeriod } from '@/utils/common/helper_functions';
 
 const RecurringChargesForm = () => {
 	const { setMetaDataField, clearAllErrors } = usePlanStore();

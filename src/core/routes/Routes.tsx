@@ -8,9 +8,9 @@ import AddMeterPage from '@/pages/usage/AddMeter';
 import EditMeterPage from '@/pages/usage/EditMeterPage';
 import PricingPlans from '@/pages/customer/PricingPlans';
 import CreatePlanPage from '@/pages/customer/CreatePlan';
-import CreateCustomerPage from '@/pages/customer/CreateCustomer';
 import CustomerSubscription from '@/pages/customer/CustomerSubscription';
 import CustomerDetails from '@/pages/customer/CustomerDetails';
+import ErrorPage from '@/pages/error/ErrorPage';
 
 const RouteNames = {
 	home: {
@@ -137,10 +137,6 @@ export const MainRouter = createBrowserRouter([
 						element: <CustomerPage />,
 					},
 					{
-						path: `${RouteNames.customerManagement.path}/${RouteNames.customerManagement.customers.path}/${RouteNames.customerManagement.customers.createCustomer.path}`,
-						element: <CreateCustomerPage />,
-					},
-					{
 						path: `${RouteNames.customerManagement.path}/${RouteNames.customerManagement.customers.path}/${RouteNames.customerManagement.customers.subscription.path}`,
 						element: <CustomerSubscription />,
 					},
@@ -151,5 +147,9 @@ export const MainRouter = createBrowserRouter([
 				],
 			},
 		],
+	},
+	{
+		path: '*',
+		element: <ErrorPage />,
 	},
 ]);
