@@ -31,20 +31,6 @@ const CustomerSubscription: React.FC = () => {
 	const [startDate, setStartDate] = useState<Date | undefined>(new Date());
 	const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 
-
-	// Fetch plans
-	const {
-		data: plans,
-		isLoading: plansLoading,
-		isError: plansError,
-	} = useQuery({
-		queryKey: ['fetchPlans'],
-		queryFn: fetchPlans,
-		retry: 2,
-		staleTime: 1000 * 60 * 5,
-	});
-
-
 	const navigate = useNavigate();
 
 	// Sequential fetching
@@ -72,7 +58,7 @@ const CustomerSubscription: React.FC = () => {
 						setBillingPeriod(subscriptionDetails.billing_period.toLowerCase());
 					}
 				}
-			} catch (error) {
+			} catch (e) {
 				setPlansError(true);
 				toast.error('Failed to load plans or subscription details');
 			} finally {
@@ -171,7 +157,6 @@ const CustomerSubscription: React.FC = () => {
 								options={billingPeriodOptions.map((billingPeriod) => ({
 									label: toSentenceCase(billingPeriod),
 									value: billingPeriod,
-
 								}))}
 								onChange={(value) => setBillingPeriod(value)}
 								label='Billing Period*'
