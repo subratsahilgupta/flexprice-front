@@ -27,7 +27,7 @@ const SetupChargesSection = () => {
 		const usagePrices = metaData?.usagePrices;
 		const recurringPrice = metaData?.recurringPrice;
 
-		if (usagePrices?.length ?? 0 > 0) {
+		if ((usagePrices?.length ?? 0) > 0 && !recurringPrice) {
 			return Object.keys(usagePrices![0] ?? {}).length === 0;
 		}
 

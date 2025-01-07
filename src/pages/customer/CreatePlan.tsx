@@ -8,21 +8,6 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
-export const mapBillingPeriod = (billingPeriod: string) => {
-	switch (billingPeriod) {
-		case 'DAILY':
-			return 'day';
-		case 'WEEKLY':
-			return 'week';
-		case 'MONTHLY':
-			return 'month';
-		case 'ANNUAL':
-			return 'year';
-		default:
-			return '';
-	}
-};
-
 const CreatePlanPage = () => {
 	const [activeStep, setactiveStep] = useState(0);
 	const formSteps = [{ label: 'Plan Details' }, { label: 'Billing Preferences' }, { label: 'Set up Charges' }];

@@ -1,11 +1,10 @@
-'use client';
-
 import { Select, DatePicker, Button } from '@/components/atoms';
 import CustomerCard from '@/components/molecules/Customer/CustomerCard';
 import Preview from '@/components/organisms/Subscription/Preview';
 import ChargeTable from '@/components/organisms/Subscription/PriceTable';
 import CustomerApi, { CreateCustomerSubscriptionPayload } from '@/utils/api_requests/CustomerApi';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
+import { toSentenceCase } from '@/utils/common/helper_functions';
 import { NormalizedPlan, normalizePlan } from '@/utils/models/transformed_plan';
 import { useMutation } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
@@ -31,6 +30,20 @@ const CustomerSubscription: React.FC = () => {
 	const [currency, setCurrency] = useState<string>('usd');
 	const [startDate, setStartDate] = useState<Date | undefined>(new Date());
 	const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+
+
+	// Fetch plans
+	const {
+		data: plans,
+		isLoading: plansLoading,
+		isError: plansError,
+	} = useQuery({
+		queryKey: ['fetchPlans'],
+		queryFn: fetchPlans,
+		retry: 2,
+		staleTime: 1000 * 60 * 5,
+	});
+
 
 	const navigate = useNavigate();
 
@@ -144,7 +157,7 @@ const CustomerSubscription: React.FC = () => {
 								setPrices(filteredPlan!);
 								setSelectedPlan(value);
 							}}
-							label='Select Plan*'
+							label='Plan*'
 							placeholder='Select plan'
 							error={plansError ? 'Failed to load plans' : undefined}
 						/>
@@ -155,12 +168,13 @@ const CustomerSubscription: React.FC = () => {
 						<>
 							<Select
 								selectedValue={billingPeriod ?? ''}
-								options={billingPeriodOptions.map((period) => ({
-									label: period,
-									value: period,
+								options={billingPeriodOptions.map((billingPeriod) => ({
+									label: toSentenceCase(billingPeriod),
+									value: billingPeriod,
+
 								}))}
 								onChange={(value) => setBillingPeriod(value)}
-								label='Select Billing Period*'
+								label='Billing Period*'
 								placeholder='Select billing period'
 							/>
 

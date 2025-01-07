@@ -43,11 +43,10 @@ const CreateCustomerDrawer = () => {
 			newErrors.customerSlug = 'Customer Slug is required';
 			valid = false;
 		}
-		if (!formData.customerEmail) {
-			newErrors.customerEmail = 'Customer Email is required';
+		if (formData.customerEmail && !/\S+@\S+\.\S+/.test(formData.customerEmail)) {
+			newErrors.customerEmail = 'Invalid email address';
 			valid = false;
 		}
-
 		setErrors(newErrors);
 
 		if (valid) {
@@ -97,7 +96,7 @@ const CreateCustomerDrawer = () => {
 				<Spacer className='h-4' />
 				<div className='space-y-4'>
 					<Input
-						label='Customer Name*'
+						label='Customer Name'
 						placeholder='Enter Customer Name'
 						name='customerName'
 						value={formData.customerName}
@@ -113,9 +112,10 @@ const CreateCustomerDrawer = () => {
 						error={errors.customerSlug}
 					/>
 					<Input
-						label='Customer Email Address*'
+						label='Customer Email Address'
 						placeholder='e.g. kaavya@gmail.com'
 						name='customerEmail'
+						type='email'
 						value={formData.customerEmail}
 						onChange={(e) => handleChange('customerEmail', e)}
 						error={errors.customerEmail}

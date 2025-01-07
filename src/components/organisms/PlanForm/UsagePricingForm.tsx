@@ -6,8 +6,8 @@ import { cn } from '@/lib/utils';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import SelectMeter from './SelectMeter';
 import { Pencil, Trash2 } from 'lucide-react';
-import { mapBillingPeriod } from '@/pages/customer/CreatePlan';
 import { Meter } from '@/models/Meter';
+import { mapBillingPeriod } from '@/utils/common/helper_functions';
 
 interface Props {
 	data?: Partial<Price>;

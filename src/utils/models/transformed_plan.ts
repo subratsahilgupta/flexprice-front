@@ -1,5 +1,5 @@
 import { Price } from '@/models/Price';
-import { getCurrencySymbol } from '../common/helper_functions';
+import { getCurrencySymbol, mapBillingPeriod } from '../common/helper_functions';
 import { ChargesForBillingPeriodOne } from '@/components/organisms/Subscription/PriceTable';
 
 export type PriceTier = {
@@ -81,11 +81,11 @@ export const normalizePlan = (originalData: ExpandedPlan): NormalizedPlan => {
 
 export const getPriceTableCharge = (charge: ChargesForBillingPeriodOne) => {
 	if (charge.billing_model === 'PACKAGE') {
-		return `${charge.display_amount}/${charge.transform_quantity}/${charge.billing_period}`;
+		return `${charge.display_amount} /unit/${mapBillingPeriod(charge.billing_period)}`;
 	} else if (charge.billing_model === 'TIERED') {
 		return `Starts at ${charge.currency}${charge.tiers[0].flat_amount}/unit/${charge.billing_period}`;
 	} else {
-		return `${charge.display_amount}/unit/${charge.billing_period}`;
+		return `${charge.display_amount} /${mapBillingPeriod(charge.billing_period)}`;
 	}
 };
 
