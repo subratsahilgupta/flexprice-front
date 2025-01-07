@@ -2,8 +2,11 @@ import { Select, DatePicker, Button, Option } from '@/components/atoms';
 import CustomerCard from '@/components/molecules/Customer/CustomerCard';
 import Preview from '@/components/organisms/Subscription/Preview';
 import ChargeTable from '@/components/organisms/Subscription/PriceTable';
+import UsageTable from '@/components/organisms/Subscription/UsageTable';
+import { SubscriptionUsage } from '@/models/Subscription';
 import CustomerApi, { CreateCustomerSubscriptionPayload } from '@/utils/api_requests/CustomerApi';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
+import SubscriptionApi from '@/utils/api_requests/SubscriptionApi';
 import { toSentenceCase } from '@/utils/common/helper_functions';
 import { NormalizedPlan, normalizePlan } from '@/utils/models/transformed_plan';
 import { useMutation } from '@tanstack/react-query';
@@ -33,6 +36,7 @@ const CustomerSubscription: React.FC = () => {
 	const [plansLoading, setPlansLoading] = useState(false);
 	const [plansError, setPlansError] = useState(false);
 
+	const [susbcriptionData, setSubscriptionData] = useState<SubscriptionUsage | null>(null);
 	const [subscriptionState, setSubscriptionState] = useState<SubscriptionState>({
 		selectedPlan: '',
 		prices: null,
@@ -57,6 +61,8 @@ const CustomerSubscription: React.FC = () => {
 				// If subscription_id exists, fetch subscription details
 				if (subscription_id) {
 					const subscriptionDetails = await CustomerApi.getCustomerSubscriptionById(subscription_id);
+					const subscriptionUsage = await SubscriptionApi.getSubscriptionUsage(subscription_id);
+					setSubscriptionData(subscriptionUsage);
 					const planDetails = normalizedPlans.find((plan) => plan.id === subscriptionDetails.plan_id);
 					if (planDetails) {
 						setSubscriptionState({
@@ -191,8 +197,13 @@ const CustomerSubscription: React.FC = () => {
 	return (
 		<div className='flex gap-8 mt-5'>
 			<div className='flex-[6] space-y-6 overflow-y-auto pr-4' style={{ maxHeight: 'calc(100vh - 120px)' }}>
-				<CustomerCard customerId={customerId!} />
+				<CustomerCard customerId={customerId!} subscriptionData={susbcriptionData} />
 
+				{susbcriptionData && (
+					<div>
+						<UsageTable data={susbcriptionData!} />
+					</div>
+				)}
 				<div className='p-6 rounded-xl border border-gray-300 space-y-6'>
 					<h1 className='text-base font-bold mb-1 text-gray-800'>Subscription Details</h1>
 

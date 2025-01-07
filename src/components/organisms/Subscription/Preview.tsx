@@ -3,15 +3,14 @@ import { ChargesForBillingPeriodOne } from './PriceTable';
 import { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'; // Adjust import path if necessary
 import { ChevronDownIcon, ChevronUpIcon, Info } from 'lucide-react';
-import { getTotalPayableText } from '@/utils/common/helper_functions';
-import formatDate from '@/utils/common/format_date';
+import { getTotalPayableInfo, getTotalPayableText } from '@/utils/common/helper_functions';
 
 interface PreviewProps {
 	data: ChargesForBillingPeriodOne[];
 	startDate: Date | undefined;
 }
 
-const Preview = ({ data, startDate }: PreviewProps) => {
+const Preview = ({ data }: PreviewProps) => {
 	// Separate charges into recurring and usage
 	const recurringCharges = data.filter((charge) => charge.type === 'FIXED');
 	const usageCharges = data.filter((charge) => charge.type === 'USAGE');
@@ -27,7 +26,7 @@ const Preview = ({ data, startDate }: PreviewProps) => {
 
 	return (
 		<div>
-			<Card className='max-w-md mx-auto shadow-lg'>
+			<Card className='max-w-md mx-auto shadow-sm'>
 				<CardHeader className='h-16'>
 					<CardTitle className='text-lg font-semibold text-center'>Subscription Preview</CardTitle>
 				</CardHeader>
@@ -108,33 +107,19 @@ const Preview = ({ data, startDate }: PreviewProps) => {
 				</CardContent>
 			</Card>
 
-			<Card className='max-w-md mx-auto mt-4 shadow-lg'>
-				<CardContent className='flex items-start gap-2 p-5'>
-					{/* Icon */}
+			<Card className='max-w-md mx-auto mt-4 shadow-sm'>
+				<CardContent className='flex items-center gap-2 p-5'>
 					<div className='flex-shrink-0'>
-						<Info className='w-5 h-5' />
+						<Info className='w-5 h-5 ' />
 					</div>
 
-					{/* Text Content */}
-					<div className='space-y-1'>
-						{/* Main Information */}
-						<p className='text-gray-800 text-sm font-medium'>
-							{`The customer will be charged ${getTotalPayableText(
-								recurringCharges,
-								usageCharges,
-								recurringTotal,
-							)} for this subscription every month.`}
-						</p>
-
-						{/* Additional Details */}
-						{startDate && (
-							<p className='text-gray-600 text-sm'>
-								{`Starts on ${formatDate(startDate!.toISOString())}. Billing date on ${formatDate(
-									startDate!.toISOString(),
-								)} of every month.`}
-							</p>
-						)}
-					</div>
+					<p className='text-gray-500 text-sm font-normal'>
+						{`The customer will be charged ${getTotalPayableInfo(
+							recurringCharges,
+							usageCharges,
+							recurringTotal,
+						)} for this subscription every month.`}
+					</p>
 				</CardContent>
 			</Card>
 		</div>

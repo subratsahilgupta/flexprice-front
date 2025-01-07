@@ -54,3 +54,25 @@ export const getTotalPayableText = (
 
 	return text;
 };
+
+export const getTotalPayableInfo = (
+	recurringCharges: ChargesForBillingPeriodOne[],
+	usageCharges: ChargesForBillingPeriodOne[],
+	recurringTotal: number,
+) => {
+	let text = '';
+
+	if (recurringCharges.length > 0) {
+		text += `${recurringCharges[0].currency}${recurringTotal}`;
+	}
+
+	if (usageCharges.length > 0) {
+		if (recurringCharges.length > 0) {
+			text += ' + Usage';
+		} else {
+			text += 'depending on usage';
+		}
+	}
+
+	return text;
+};
