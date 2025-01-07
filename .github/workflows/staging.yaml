@@ -1,4 +1,4 @@
-name: Flexprice.io Production Deployment
+name: Flexprice.io Staging Deployment
 
 env:
     VERCEL_ORG_ID: ${{secrets.VERCEL_ORG_ID}}
