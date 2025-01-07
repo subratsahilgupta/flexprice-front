@@ -21,34 +21,38 @@ interface Props {
 	data: Invoice[];
 }
 
-const columnData: ColumnData[] = [
-	{
-		name: 'id',
-		title: 'Invoice Number',
-	},
-	{
-		name: 'id',
-		title: 'Status',
-		render: (row) => <span>{toSentenceCase(row.invoice_status)}</span>,
-	},
-	{
-		name: 'id',
-		title: 'Payment Status',
-		render: (row) => <Chip isActive={row.payment_status === 'SUCCEEDED'} label={formatPaymentStatus(row.payment_status)} />,
-	},
-	{
-		name: 'Amount',
-		title: 'Total Amount',
-		render: (row) => <span>{`${getCurrencySymbol(row.currency)} ${row.amount_paid}`}</span>,
-	},
-	{
-		name: 'id',
-		title: '',
-		render: (row) => <ActionButton id={row.id} editPath={''} deleteMutationFn={async () => {}} refetchQueryKey={''} entityName={''} />,
-	},
-];
-
 const CustomerInvoiceTable: FC<Props> = ({ data }) => {
+	const columnData: ColumnData[] = [
+		...(data.some((invoice) => invoice.invoice_number)
+			? [
+					{
+						name: 'invoice_number',
+						title: 'Invoice Number',
+					},
+				]
+			: []),
+		{
+			name: 'id',
+			title: 'Status',
+			render: (row) => <span>{toSentenceCase(row.invoice_status)}</span>,
+		},
+		{
+			name: 'id',
+			title: 'Payment Status',
+			render: (row) => <Chip isActive={row.payment_status === 'SUCCEEDED'} label={formatPaymentStatus(row.payment_status)} />,
+		},
+		{
+			name: 'Amount',
+			title: 'Total Amount',
+			render: (row) => <span>{`${getCurrencySymbol(row.currency)} ${row.amount_paid}`}</span>,
+		},
+		{
+			name: 'id',
+			title: '',
+			render: (row) => <ActionButton id={row.id} editPath={''} deleteMutationFn={async () => {}} refetchQueryKey={''} entityName={''} />,
+		},
+	];
+
 	return <FlexpriceTable columns={columnData} data={data ?? []} />;
 };
 

@@ -1,6 +1,6 @@
 import { FormHeader, Loader, Spacer } from '@/components/atoms';
 import { CustomerInvoiceTable } from '@/components/molecules';
-import CustomerApi from '@/utils/api_requests/CustomerApi';
+import InvoiceApi from '@/utils/api_requests/InvoiceApi';
 import { useQuery } from '@tanstack/react-query';
 import { IoSearch } from 'react-icons/io5';
 import { LiaSlidersHSolid } from 'react-icons/lia';
@@ -12,7 +12,7 @@ const Invoice = () => {
 	const { data, isLoading } = useQuery({
 		queryKey: ['invoice', customerId],
 		queryFn: async () => {
-			return await CustomerApi.getCustomerInvoices(customerId!);
+			return await InvoiceApi.getCustomerInvoices(customerId!);
 		},
 		enabled: !!customerId,
 	});

@@ -38,6 +38,7 @@ export interface Invoice {
 	line_items: LineItem[];
 	metadata: Record<string, any>;
 	paid_at: string;
+	invoice_number: string;
 	payment_status: string;
 	period_end: string;
 	period_start: string;
