@@ -208,6 +208,7 @@ const CustomerSubscription: React.FC = () => {
 							}
 							onChange={(value) => handlePlanChange(value)}
 							label='Plan*'
+							disabled={subscription_id !== undefined}
 							placeholder='Select plan'
 							error={plansError ? 'Failed to load plans' : undefined}
 						/>
@@ -222,6 +223,7 @@ const CustomerSubscription: React.FC = () => {
 							options={subscriptionState.billingPeriodOptions}
 							onChange={(value) => handleBillingPeriodChange(value)}
 							label='Billing Period*'
+							disabled={subscription_id !== undefined}
 							placeholder='Select billing period'
 						/>
 					)}
@@ -240,6 +242,7 @@ const CustomerSubscription: React.FC = () => {
 								onChange={(value) => handleCurrencyChange(value)}
 								label='Select Currency*'
 								placeholder='Select currency'
+								disabled={subscription_id !== undefined}
 							/>
 						)}
 
@@ -250,21 +253,25 @@ const CustomerSubscription: React.FC = () => {
 
 					{/* Date Pickers */}
 					{subscriptionState.selectedPlan && (
-						<div className='flex items-center space-x-4'>
-							<div>
+						<div className='flex items-center space-x-4 relative'>
+							<div className='relative'>
 								<label className='block text-sm font-medium text-gray-700 mb-1'>Subscription Start Date</label>
 								<DatePicker
 									date={subscriptionState.startDate}
 									setDate={(date) => setSubscriptionState((prev) => ({ ...prev, startDate: date }))}
 								/>
+								{/* Overlay to block clicks */}
+								{subscription_id !== undefined && <div className='absolute inset-0 bg-gray-100 opacity-50 cursor-not-allowed'></div>}
 							</div>
-							<div>
+							<div className='relative'>
 								<label className='block text-sm font-medium text-gray-700 mb-1'>Subscription End Date</label>
 								<DatePicker
 									date={subscriptionState.endDate}
 									setDate={(date) => setSubscriptionState((prev) => ({ ...prev, endDate: date }))}
 									placeholder='Forever'
 								/>
+								{/* Overlay to block clicks */}
+								{subscription_id !== undefined && <div className='absolute inset-0 bg-gray-100 opacity-50 cursor-not-allowed'></div>}
 							</div>
 						</div>
 					)}
@@ -289,7 +296,10 @@ const CustomerSubscription: React.FC = () => {
 			{/* Preview */}
 			<div className='flex-[4]'>
 				{subscriptionState.selectedPlan && (
-					<Preview data={subscriptionState.prices?.charges[subscriptionState.billingPeriod][subscriptionState.currency] ?? []} />
+					<Preview
+						startDate={subscriptionState.startDate}
+						data={subscriptionState.prices?.charges[subscriptionState.billingPeriod][subscriptionState.currency] ?? []}
+					/>
 				)}
 			</div>
 		</div>

@@ -1,6 +1,7 @@
 import { FC, useState } from 'react';
 import { ColumnData, FlexpriceTable } from '@/components/molecules';
 import { getPriceTableCharge, NormalizedPlan } from '@/utils/models/transformed_plan';
+import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 
 export type ChargesForBillingPeriod = NormalizedPlan['charges'][string][string];
 export type ChargesForBillingPeriodOne = ChargesForBillingPeriod[0];
@@ -46,8 +47,18 @@ const ChargeTable: FC<Props> = ({ data }) => {
 			</div>
 			{mappedData.length > 5 && (
 				<div className='text-center mt-4'>
-					<button className='text-blue-600 font-semibold hover:underline' onClick={() => setShowAllRows((prev) => !prev)}>
-						{showAllRows ? 'Collapse' : 'Expand'}
+					<button
+						className='flex items-center gap-1 text-xs text-black font-medium hover:text-white hover:bg-black rounded-full px-2 py-1 border border-black bg-white transition-all'
+						onClick={() => setShowAllRows((prev) => !prev)}>
+						{showAllRows ? (
+							<>
+								Collapse <ChevronUpIcon className='w-4 h-4' />
+							</>
+						) : (
+							<>
+								Expand <ChevronDownIcon className='w-4 h-4' />
+							</>
+						)}
 					</button>
 				</div>
 			)}

@@ -1,3 +1,5 @@
+import { ChargesForBillingPeriodOne } from '@/components/organisms/Subscription/PriceTable';
+
 export function getCurrencySymbol(currency: string): string {
 	switch (currency) {
 		case 'usd':
@@ -29,4 +31,26 @@ export const mapBillingPeriod = (billingPeriod: string) => {
 export const toSentenceCase = (str: string): string => {
 	if (!str) return str;
 	return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+};
+
+export const getTotalPayableText = (
+	recurringCharges: ChargesForBillingPeriodOne[],
+	usageCharges: ChargesForBillingPeriodOne[],
+	recurringTotal: number,
+) => {
+	let text = '';
+
+	if (recurringCharges.length > 0) {
+		text += `${recurringCharges[0].currency}${recurringTotal}`;
+	}
+
+	if (usageCharges.length > 0) {
+		if (recurringCharges.length > 0) {
+			text += ' + Usage';
+		} else {
+			text += 'Depends on usage';
+		}
+	}
+
+	return text;
 };

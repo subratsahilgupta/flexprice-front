@@ -1,48 +1,142 @@
 import { getActualPriceForTotal, getPriceTableCharge } from '@/utils/models/transformed_plan';
 import { ChargesForBillingPeriodOne } from './PriceTable';
 import { useState } from 'react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'; // Adjust import path if necessary
+import { ChevronDownIcon, ChevronUpIcon, Info } from 'lucide-react';
+import { getTotalPayableText } from '@/utils/common/helper_functions';
+import formatDate from '@/utils/common/format_date';
 
 interface PreviewProps {
 	data: ChargesForBillingPeriodOne[];
+	startDate: Date | undefined;
 }
 
-const Preview = ({ data }: PreviewProps) => {
-	const total = data.reduce((acc, charge) => {
-		return acc + getActualPriceForTotal(charge);
-	}, 0);
+const Preview = ({ data, startDate }: PreviewProps) => {
+	// Separate charges into recurring and usage
+	const recurringCharges = data.filter((charge) => charge.type === 'FIXED');
+	const usageCharges = data.filter((charge) => charge.type === 'USAGE');
 
-	const [showAllRows, setShowAllRows] = useState(false);
+	// Calculate totals for both types
+	const recurringTotal = recurringCharges.reduce((acc, charge) => acc + getActualPriceForTotal(charge), 0);
 
-	const displayedData = showAllRows ? data : data.slice(0, 5);
+	const [showAllRecurringRows, setShowAllRecurringRows] = useState(false);
+	const [showAllUsageRows, setShowAllUsageRows] = useState(false);
+
+	const displayedRecurring = showAllRecurringRows ? recurringCharges : recurringCharges.slice(0, 5);
+	const displayedUsage = showAllUsageRows ? usageCharges : usageCharges.slice(0, 5);
 
 	return (
-		<div className='border border-gray-300 rounded-lg bg-gray-50 p-6 max-w-md mx-auto'>
-			<h1 className='text-base font-semibold text-gray-800 mb-4'>Subscription Preview</h1>
-			<p className='text-sm text-gray-600 font-semibold mb-3'>Recurring Charges</p>
-			<div className='space-y-2'>
-				{displayedData.map((charge, index) => (
-					<div key={index} className='flex justify-between items-center border-b border-gray-200 py-2'>
-						<span className='text-gray-700 font-normal text-sm'>
-							{charge.meter_name ? `${charge.name}/${charge.meter_name}` : charge.name}
+		<div>
+			<Card className='max-w-md mx-auto shadow-lg'>
+				<CardHeader className='h-16'>
+					<CardTitle className='text-lg font-semibold text-center'>Subscription Preview</CardTitle>
+				</CardHeader>
+				<CardContent className='bg-gray-50 p-4 space-y-6'>
+					{/* Recurring Charges Section */}
+					{recurringCharges.length > 0 && (
+						<div>
+							<p className='text-sm text-black font-semibold mb-3'>Recurring Charges</p>
+							<div className='space-y-2 border-b border-gray-300 pb-2'>
+								{displayedRecurring.map((charge, index) => (
+									<div key={`recurring-${index}`} className='flex justify-between items-center py-2'>
+										<span className='text-gray-700 font-normal text-sm'>
+											{charge.meter_name ? `${charge.name}/${charge.meter_name}` : charge.name}
+										</span>
+										<span className='text-gray-700 font-normal text-sm'>{getPriceTableCharge(charge)}</span>
+									</div>
+								))}
+								{recurringCharges.length > 5 && (
+									<div className='flex justify-center mt-4'>
+										<button
+											className='flex items-center gap-1 text-blue-600 font-semibold hover:underline rounded-full px-3 py-1 bg-blue-100'
+											onClick={() => setShowAllRecurringRows((prev) => !prev)}>
+											{showAllRecurringRows ? (
+												<>
+													Collapse <ChevronUpIcon className='w-4 h-4' />
+												</>
+											) : (
+												<>
+													Expand <ChevronDownIcon className='w-4 h-4' />
+												</>
+											)}
+										</button>
+									</div>
+								)}
+							</div>
+						</div>
+					)}
+
+					{/* Usage Charges Section */}
+					{usageCharges.length > 0 && (
+						<div>
+							<p className='text-sm text-black font-semibold mb-3 mt-6'>Usage Charges</p>
+							<div className='space-y-2 border-b border-gray-300 pb-2'>
+								{displayedUsage.map((charge, index) => (
+									<div key={`usage-${index}`} className='flex justify-between items-center py-2'>
+										<span className='text-gray-700 font-normal text-sm'>{charge.meter_name ? `${charge.meter_name}` : charge.name}</span>
+										<span className='text-gray-700 font-normal text-sm text-end'>{getPriceTableCharge(charge)}</span>
+									</div>
+								))}
+								{usageCharges.length > 5 && (
+									<div className='flex justify-center mt-4'>
+										<button
+											className='flex items-center gap-1 text-xs text-black font-medium hover:text-white hover:bg-black rounded-full px-2 py-1 border border-black bg-white transition-all'
+											onClick={() => setShowAllUsageRows((prev) => !prev)}>
+											{showAllUsageRows ? (
+												<>
+													Collapse <ChevronUpIcon className='w-4 h-4' />
+												</>
+											) : (
+												<>
+													Expand <ChevronDownIcon className='w-4 h-4' />
+												</>
+											)}
+										</button>
+									</div>
+								)}
+							</div>
+						</div>
+					)}
+
+					{/* Overall Total */}
+					<div className='flex justify-between items-center mt-6'>
+						<span className='text-gray-700 font-semibold text-sm'>Total Payable</span>
+						<span className='text-gray-600 font-semibold text-sm'>
+							{getTotalPayableText(recurringCharges, usageCharges, recurringTotal)}
 						</span>
-						<span className='text-gray-700 font-normal text-sm'>{getPriceTableCharge(charge)}</span>
 					</div>
-				))}
-				{data.length > 5 && (
-					<div className='text-center mt-4'>
-						<button className='text-blue-600 font-semibold hover:underline' onClick={() => setShowAllRows((prev) => !prev)}>
-							{showAllRows ? 'Collapse' : 'Expand'}
-						</button>
+				</CardContent>
+			</Card>
+
+			<Card className='max-w-md mx-auto mt-4 shadow-lg'>
+				<CardContent className='flex items-start gap-2 p-5'>
+					{/* Icon */}
+					<div className='flex-shrink-0'>
+						<Info className='w-5 h-5' />
 					</div>
-				)}
-			</div>
-			<div className='flex justify-between items-center mt-4'>
-				<span className='text-gray-700 font-medium'>Total</span>
-				<span className='text-gray-600 font-medium'>
-					{data[0]?.currency}
-					{total}
-				</span>
-			</div>
+
+					{/* Text Content */}
+					<div className='space-y-1'>
+						{/* Main Information */}
+						<p className='text-gray-800 text-sm font-medium'>
+							{`The customer will be charged ${getTotalPayableText(
+								recurringCharges,
+								usageCharges,
+								recurringTotal,
+							)} for this subscription every month.`}
+						</p>
+
+						{/* Additional Details */}
+						{startDate && (
+							<p className='text-gray-600 text-sm'>
+								{`Starts on ${formatDate(startDate!.toISOString())}. Billing date on ${formatDate(
+									startDate!.toISOString(),
+								)} of every month.`}
+							</p>
+						)}
+					</div>
+				</CardContent>
+			</Card>
 		</div>
 	);
 };
