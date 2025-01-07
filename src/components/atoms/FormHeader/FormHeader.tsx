@@ -6,16 +6,18 @@ interface Props {
 	subtitle?: string;
 	variant: 'form-component-title' | 'sub-header' | 'form-title';
 	className?: string;
+	titleClassName?: string;
+	subtitleClassName?: string;
 }
 
-const FormTitle: FC<Props> = ({ variant, subtitle, title, className }) => {
-	const labelStyle = 'text-zinc-500 text-normal text-sm';
+const FormTitle: FC<Props> = ({ variant, subtitle, title, className, subtitleClassName, titleClassName }) => {
+	const labelStyle = '!text-zinc-500 text-normal text-sm';
 
 	if (variant === 'form-title') {
 		return (
 			<div className={className}>
-				<p className='font-bold text-zinc text-[20px]'>{title}</p>
-				<p className={labelStyle}>{subtitle}</p>
+				<p className={cn('font-bold text-zinc text-[20px]', titleClassName)}>{title}</p>
+				<p className={cn(labelStyle, subtitleClassName)}>{subtitle}</p>
 			</div>
 		);
 	}
@@ -23,8 +25,8 @@ const FormTitle: FC<Props> = ({ variant, subtitle, title, className }) => {
 	if (variant === 'sub-header') {
 		return (
 			<div className={cn('mb-4', className)}>
-				<p className='font-inter font-semibold text-base'>{title}</p>
-				<p className={labelStyle}>{subtitle}</p>
+				<p className={cn('font-inter font-semibold text-base', titleClassName)}>{title}</p>
+				<p className={cn(labelStyle, subtitleClassName)}>{subtitle}</p>
 			</div>
 		);
 	}
@@ -32,8 +34,8 @@ const FormTitle: FC<Props> = ({ variant, subtitle, title, className }) => {
 	if (variant === 'form-component-title') {
 		return (
 			<div className={cn('mb-0', className)}>
-				<p className='text-sm text-zinc-950 font-medium font-inter mb-2'>{title}</p>
-				<p className={labelStyle}>{subtitle}</p>
+				<p className={cn('text-sm text-zinc-950 font-medium font-inter mb-2', titleClassName)}>{title}</p>
+				<p className={cn(labelStyle, subtitleClassName)}>{subtitle}</p>
 			</div>
 		);
 	}

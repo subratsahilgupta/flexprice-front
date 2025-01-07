@@ -1,5 +1,6 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import Customer from '@/models/Customer';
+import { Invoice } from '@/models/Invoice';
 import { Subscription } from '@/models/Subscription';
 
 interface GetCustomerResponse {
@@ -30,6 +31,12 @@ export interface CreateCustomerSubscriptionPayload {
 	trial_end: string | null;
 	trial_start: string | null;
 }
+
+interface GetInvoicesResponse {
+	items: Invoice[];
+	total: number;
+}
+
 class CustomerApi {
 	private static baseUrl = '/customers';
 
@@ -55,8 +62,13 @@ class CustomerApi {
 	public static async getCustomerSubscriptionById(id: string): Promise<Subscription> {
 		return await AxiosClient.get(`/subscriptions/${id}`);
 	}
+
 	public static async createCustomer(customer: { email: string; external_id: string; name?: string }): Promise<Customer> {
 		return await AxiosClient.post(`${this.baseUrl}`, customer);
+	}
+
+	public static async getCustomerInvoices(id: string): Promise<GetInvoicesResponse> {
+		return await AxiosClient.get<GetInvoicesResponse>(`/invoices?customer_id=${id}`);
 	}
 }
 

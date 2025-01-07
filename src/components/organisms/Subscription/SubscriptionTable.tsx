@@ -3,6 +3,7 @@ import { Subscription } from '@/models/Subscription';
 import { ColumnData, FlexpriceTable } from '@/components/molecules';
 import formatChips from '@/utils/common/format_chips';
 import { Chip } from '@/components/atoms';
+import { toSentenceCase } from '@/utils/common/helper_functions';
 
 export interface SubscriptionTableProps {
 	customerId: string;
@@ -27,6 +28,7 @@ const SubscriptionTable: FC<SubscriptionTableProps> = ({ customerId, data }) => 
 		{
 			name: 'billing_period',
 			title: 'Billing Period',
+			render: (row) => <span>{toSentenceCase(row.billing_period)}</span>,
 		},
 		{
 			name: 'status',

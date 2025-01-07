@@ -11,7 +11,7 @@ interface CustomerHeaderProps {
 
 const CustomerHeader: React.FC<CustomerHeaderProps> = ({ customerId }) => {
 	const { data: customer, isLoading } = useQuery({
-		queryKey: ['fetchCustomerCard'],
+		queryKey: ['fetchCustomerCard', customerId],
 		queryFn: () => fetchCustomer(customerId!),
 		retry: 1,
 		staleTime: 1000 * 60 * 5,

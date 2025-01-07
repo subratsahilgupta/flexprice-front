@@ -7,4 +7,4 @@ export { default as EventFilter } from './EventFilter';
 export type { EventFilterData } from './EventFilter';
 
 export { default as PlansTable } from './PlansTable';
-export { CreateCustomerDrawer, CustomerCard, CustomerTable } from './Customer';
+export { CreateCustomerDrawer, CustomerCard, CustomerTable, CustomerInvoiceTable } from './Customer';
