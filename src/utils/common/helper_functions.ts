@@ -3,7 +3,7 @@ export function getCurrencySymbol(currency: string): string {
 		case 'usd':
 			return '$';
 		case 'inr':
-			return '$';
+			return '₹';
 		case 'eur':
 			return '€';
 		default:

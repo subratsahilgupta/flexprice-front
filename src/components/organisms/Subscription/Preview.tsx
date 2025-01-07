@@ -39,7 +39,7 @@ const Preview = ({ data }: PreviewProps) => {
 			<div className='flex justify-between items-center mt-4'>
 				<span className='text-gray-700 font-medium'>Total</span>
 				<span className='text-gray-600 font-medium'>
-					{data[0]?.currency ?? '$'}
+					{data[0]?.currency}
 					{total}
 				</span>
 			</div>

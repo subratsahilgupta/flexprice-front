@@ -2,7 +2,7 @@ import { FC, useState } from 'react';
 import { ColumnData, FlexpriceTable } from '@/components/molecules';
 import { getPriceTableCharge, NormalizedPlan } from '@/utils/models/transformed_plan';
 
-export type ChargesForBillingPeriod = NormalizedPlan['charges'][string];
+export type ChargesForBillingPeriod = NormalizedPlan['charges'][string][string];
 export type ChargesForBillingPeriodOne = ChargesForBillingPeriod[0];
 
 export interface Props {
