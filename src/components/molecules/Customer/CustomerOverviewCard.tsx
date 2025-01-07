@@ -30,13 +30,13 @@ const CustomerOverviewCard: React.FC<CustomerCardProps> = ({ customerId }) => {
 			<h1 className='text-base font-bold mb-4 text-gray-800'>Customer Details</h1>
 			<div className='grid grid-cols-2 gap-4'>
 				<div className='text-sm font-light text-gray-600'>Name</div>
-				<div className='text-sm font-normal text-gray-800'>{customer?.name || 'N/A'}</div>
+				<div className='text-sm font-normal text-gray-800'>{customer?.name || '--'}</div>
 
 				<div className='text-sm font-light text-gray-600'>Email</div>
-				<div className='text-sm font-normal text-gray-800'>{customer?.email || 'N/A'}</div>
+				<div className='text-sm font-normal text-gray-800'>{customer?.email || '--'}</div>
 
 				<div className='text-sm font-light text-gray-600'>Slug</div>
-				<div className='text-sm font-normal text-gray-800'>{customer?.external_id || 'N/A'}</div>
+				<div className='text-sm font-normal text-gray-800'>{customer?.external_id || '--'}</div>
 			</div>
 		</div>
 	);

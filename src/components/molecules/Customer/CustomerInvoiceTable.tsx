@@ -23,14 +23,11 @@ interface Props {
 
 const CustomerInvoiceTable: FC<Props> = ({ data }) => {
 	const columnData: ColumnData[] = [
-		...(data.some((invoice) => invoice.invoice_number)
-			? [
-					{
-						name: 'invoice_number',
-						title: 'Invoice Number',
-					},
-				]
-			: []),
+		{
+			name: 'invoice_number',
+			title: 'Invoice Number',
+			render: (row) => <span>{row.invoice_number || '--'}</span>,
+		},
 		{
 			name: 'id',
 			title: 'Status',
