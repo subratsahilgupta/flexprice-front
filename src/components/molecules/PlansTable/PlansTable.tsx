@@ -11,12 +11,10 @@ export interface PlansTableProps {
 }
 
 const PlansTable: FC<PlansTableProps> = ({ data }) => {
-	// Mapping data if additional transformations are required (currently redundant)
 	const mappedData = data.map((plan) => ({
 		...plan,
 	}));
 
-	// Columns definition
 	const columns: ColumnData[] = [
 		{ name: 'name', title: 'Name', width: '700px' },
 		{

@@ -5,10 +5,11 @@ import formatChips from '@/utils/common/format_chips';
 import { Chip } from '@/components/atoms';
 
 export interface SubscriptionTableProps {
+	customerId: string;
 	data: Subscription[];
 }
 
-const SubscriptionTable: FC<SubscriptionTableProps> = ({ data }) => {
+const SubscriptionTable: FC<SubscriptionTableProps> = ({ customerId, data }) => {
 	const mappedData = (data ?? []).map((subscription) => ({
 		id: subscription.id,
 		plan_name: subscription.plan.name,
@@ -42,7 +43,7 @@ const SubscriptionTable: FC<SubscriptionTableProps> = ({ data }) => {
 		},
 	];
 
-	return <FlexpriceTable columns={columns} data={mappedData} />;
+	return <FlexpriceTable columns={columns} data={mappedData} redirectUrl={`/customer-management/customers/${customerId}/subscription/`} />;
 };
 
 export default SubscriptionTable;

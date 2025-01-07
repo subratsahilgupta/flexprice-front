@@ -5,13 +5,13 @@ const fetchCustomer = async (customerId: string) => {
 	return await CustomerApi.getCustomerById(customerId);
 };
 
-interface CustomerCardProps {
+interface CustomerHeaderProps {
 	customerId: string;
 }
 
-const CustomerCard: React.FC<CustomerCardProps> = ({ customerId }) => {
+const CustomerHeader: React.FC<CustomerHeaderProps> = ({ customerId }) => {
 	const { data: customer, isLoading } = useQuery({
-		queryKey: ['fetchCustomerCard', customerId],
+		queryKey: ['fetchCustomerCard'],
 		queryFn: () => fetchCustomer(customerId!),
 		retry: 1,
 		staleTime: 1000 * 60 * 5,
@@ -37,24 +37,17 @@ const CustomerCard: React.FC<CustomerCardProps> = ({ customerId }) => {
 
 	return (
 		<div className='items-center justify-center'>
-			<div className='py-6 px-4 rounded-xl border border-gray-300'>
-				<h1 className='text-base font-bold mb-2 text-gray-800'>Customer Details</h1>
-				<div className='flex place-items-center space-x-3'>
-					<div className='w-10 h-10'>
-						<img
-							src={'https://picsum.photos/200/300'}
-							alt='Customer Profile'
-							className='w-full h-full rounded-full object-cover shadow-md'
-						/>
-					</div>
-					<div className='flex flex-col'>
-						<div className='text-base font-semibold text-gray-800'>{customer?.name}</div>
-						<div className='text-sm font-normal text-gray-600'>{customer?.email}</div>
-					</div>
+			<div className='flex place-items-center space-x-3'>
+				<div className='w-10 h-10'>
+					<img src={'https://picsum.photos/200/300'} alt='Customer Profile' className='w-full h-full rounded-full object-cover shadow-md' />
+				</div>
+				<div className='flex flex-col'>
+					<div className='text-base font-semibold text-gray-800'>{customer?.name}</div>
+					<div className='text-sm font-normal text-gray-600'>{customer?.email}</div>
 				</div>
 			</div>
 		</div>
 	);
 };
 
-export default CustomerCard;
+export default CustomerHeader;

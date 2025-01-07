@@ -54,13 +54,14 @@ const RouteNames = {
 			createCustomer: {
 				path: 'create-customer',
 			},
-			detail: {
-				path: 'details/:id',
-				routing_path: '/details/',
-			},
 			subscription: {
-				path: 'subscription/:id',
-				routing_path: '/subscription/',
+				path: ':id/subscription',
+			},
+			subscriptionDetails: {
+				path: ':id/subscription/:subscription_id',
+			},
+			detail: {
+				path: ':id',
 			},
 		},
 		pricingPlan: {
@@ -138,6 +139,10 @@ export const MainRouter = createBrowserRouter([
 					},
 					{
 						path: `${RouteNames.customerManagement.path}/${RouteNames.customerManagement.customers.path}/${RouteNames.customerManagement.customers.subscription.path}`,
+						element: <CustomerSubscription />,
+					},
+					{
+						path: `${RouteNames.customerManagement.path}/${RouteNames.customerManagement.customers.path}/${RouteNames.customerManagement.customers.subscriptionDetails.path}`,
 						element: <CustomerSubscription />,
 					},
 					{

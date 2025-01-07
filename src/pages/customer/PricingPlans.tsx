@@ -42,7 +42,7 @@ const PricingPlan = () => {
 		toast.error('Error fetching meters');
 	}
 
-	if (plans?.plans?.length === 0) {
+	if ((plans?.plans ?? []).length === 0) {
 		return (
 			<div className='h-screen w-full flex justify-center items-center'>
 				<div className='w-full flex flex-col items-center '>
