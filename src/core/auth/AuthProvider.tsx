@@ -29,7 +29,8 @@ const AuthMiddleware: React.FC<AuthMiddlewareProps> = ({ children, requiredRole 
 		queryKey: ['fetchUser'],
 		queryFn: fetchUser,
 		retry: 1,
-		staleTime: 1000 * 60 * 5,
+		staleTime: 0,
+		// staleTime: 1000 * 60 * 5,
 	});
 
 	useEffect(() => {
