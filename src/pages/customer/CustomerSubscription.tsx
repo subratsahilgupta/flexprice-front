@@ -200,7 +200,7 @@ const CustomerSubscription: React.FC = () => {
 			<div className='flex-[6] space-y-6 overflow-y-auto pr-4' style={{ maxHeight: 'calc(100vh - 120px)' }}>
 				<CustomerCard customerId={customerId!} subscriptionData={susbcriptionData} />
 
-				{susbcriptionData && (
+				{susbcriptionData && susbcriptionData?.charges?.length > 0 && (
 					<div>
 						<UsageTable data={susbcriptionData!} />
 					</div>

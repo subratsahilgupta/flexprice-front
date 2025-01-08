@@ -31,6 +31,10 @@ const UsageTable: FC<UsageTableProps> = ({ data }) => {
 		},
 	];
 
+	if (mappedData.length === 0) {
+		return <div></div>;
+	}
+
 	return (
 		<div className='rounded-xl border border-gray-300  mt-2 p-4'>
 			<FormHeader title='Current Meter Usage' variant='sub-header' />
