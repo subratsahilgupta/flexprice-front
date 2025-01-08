@@ -51,7 +51,7 @@ const Invoice = () => {
 			</div>
 			<Spacer className='!h-6' />
 
-			<CustomerInvoiceTable data={data?.items ?? []} />
+			<CustomerInvoiceTable customerId={customerId} data={data?.items ?? []} />
 		</div>
 	);
 };

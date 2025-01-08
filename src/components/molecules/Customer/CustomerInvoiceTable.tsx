@@ -19,9 +19,10 @@ const formatPaymentStatus = (status: string) => {
 
 interface Props {
 	data: Invoice[];
+	customerId?: string;
 }
 
-const CustomerInvoiceTable: FC<Props> = ({ data }) => {
+const CustomerInvoiceTable: FC<Props> = ({ data, customerId }) => {
 	const columnData: ColumnData[] = [
 		{
 			name: 'invoice_number',
@@ -37,11 +38,13 @@ const CustomerInvoiceTable: FC<Props> = ({ data }) => {
 			name: 'id',
 			title: 'Payment Status',
 			render: (row) => <Chip isActive={row.payment_status === 'SUCCEEDED'} label={formatPaymentStatus(row.payment_status)} />,
+			align: 'center',
 		},
 		{
 			name: 'Amount',
 			title: 'Total Amount',
-			render: (row) => <span>{`${getCurrencySymbol(row.currency)} ${row.amount_paid}`}</span>,
+			render: (row) => <span>{`${getCurrencySymbol(row.currency)} ${row.amount_due}`}</span>,
+			align: 'center',
 		},
 		{
 			name: 'id',
@@ -50,7 +53,7 @@ const CustomerInvoiceTable: FC<Props> = ({ data }) => {
 		},
 	];
 
-	return <FlexpriceTable columns={columnData} data={data ?? []} />;
+	return <FlexpriceTable columns={columnData} redirectUrl={`/customer-management/customers/${customerId}/invoice/`} data={data ?? []} />;
 };
 
 export default CustomerInvoiceTable;
