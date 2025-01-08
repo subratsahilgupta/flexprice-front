@@ -1,3 +1,4 @@
+import { FormHeader } from '@/components/atoms';
 import { SubscriptionUsage } from '@/models/Subscription';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
 import formatDate from '@/utils/common/format_date';
@@ -43,24 +44,31 @@ const CustomerCard: React.FC<CustomerCardProps> = ({ customerId, subscriptionDat
 	return (
 		<div className='items-center justify-center'>
 			<div className='py-6 px-4 rounded-xl border border-gray-300 bg-white'>
-				<h1 className='text-base font-bold mb-4 text-gray-800'>Customer Details</h1>
+				<FormHeader title='Customer Details' variant='sub-header' />
 				<div className='flex items-center space-x-4'>
-					<div className='w-12 h-12'>
+					{/* <div className='w-12 h-12'>
 						<img src={'https://picsum.photos/200/300'} alt='Customer Profile' className='w-full h-full rounded-full object-cover shadow' />
-					</div>
-					<div className='flex flex-col space-y-1'>
-						<div className='text-base font-semibold text-gray-800'>{customer?.name}</div>
-						<div className='text-sm font-normal text-gray-600'>{customer?.email}</div>
-						{subscriptionData && (
-							<div className='mt-2 space-y-1'>
-								<div className='text-sm font-normal text-gray-600'>
-									<strong>Subscription Amount:</strong> {subscriptionData.display_amount}
-								</div>
-								<div className='text-sm font-normal text-gray-600'>
-									<strong>Subscription Start Date:</strong> {formatDate(subscriptionData.start_time.toString())}
-								</div>
-							</div>
-						)}
+					</div> */}
+					<div className='w-full'>
+						<div className='grid grid-cols-2 gap-4'>
+							<div className='text-sm font-light text-gray-600'>Name</div>
+							<div className='text-sm font-normal text-gray-800'>{customer?.name || '--'}</div>
+
+							<div className='text-sm font-light text-gray-600'>Email</div>
+							<div className='text-sm font-normal text-gray-800'>{customer?.email || '--'}</div>
+							<div className='text-sm font-light text-gray-600'>Slug</div>
+							<div className='text-sm font-normal text-gray-800'>{customer?.external_id || '--'}</div>
+
+							{subscriptionData && (
+								<>
+									<div className='text-sm font-light text-gray-600'>Subscription Amount</div>
+									<div className='text-sm font-normal text-gray-800'>{subscriptionData.display_amount || '--'}</div>
+
+									<div className='text-sm font-light text-gray-600'>Subscription Start Date</div>
+									<div className='text-sm font-normal text-gray-800'>{formatDate(subscriptionData.start_time.toString()) || '--'}</div>
+								</>
+							)}
+						</div>
 					</div>
 				</div>
 			</div>

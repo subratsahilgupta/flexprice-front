@@ -1,8 +1,9 @@
-import { Select, DatePicker, Button, Option } from '@/components/atoms';
+import { Select, DatePicker, Button, Option, FormHeader } from '@/components/atoms';
 import CustomerCard from '@/components/molecules/Customer/CustomerCard';
 import Preview from '@/components/organisms/Subscription/Preview';
 import ChargeTable from '@/components/organisms/Subscription/PriceTable';
 import UsageTable from '@/components/organisms/Subscription/UsageTable';
+import { cn } from '@/lib/utils';
 import { SubscriptionUsage } from '@/models/Subscription';
 import CustomerApi, { CreateCustomerSubscriptionPayload } from '@/utils/api_requests/CustomerApi';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
@@ -195,7 +196,7 @@ const CustomerSubscription: React.FC = () => {
 	};
 
 	return (
-		<div className='flex gap-8 mt-5'>
+		<div className={cn('flex gap-8 mt-5')}>
 			<div className='flex-[6] space-y-6 overflow-y-auto pr-4' style={{ maxHeight: 'calc(100vh - 120px)' }}>
 				<CustomerCard customerId={customerId!} subscriptionData={susbcriptionData} />
 
@@ -205,7 +206,7 @@ const CustomerSubscription: React.FC = () => {
 					</div>
 				)}
 				<div className='p-6 rounded-xl border border-gray-300 space-y-6'>
-					<h1 className='text-base font-bold mb-1 text-gray-800'>Subscription Details</h1>
+					<FormHeader title='Subscription Details' variant='sub-header' />
 
 					{/* Select Plan */}
 					{!plansLoading && (
@@ -268,21 +269,21 @@ const CustomerSubscription: React.FC = () => {
 							<div className='relative'>
 								<label className='block text-sm font-medium text-gray-700 mb-1'>Subscription Start Date</label>
 								<DatePicker
+									disabled={subscription_id !== undefined}
 									date={subscriptionState.startDate}
 									setDate={(date) => setSubscriptionState((prev) => ({ ...prev, startDate: date }))}
 								/>
 								{/* Overlay to block clicks */}
-								{subscription_id !== undefined && <div className='absolute inset-0 bg-gray-100 opacity-50 cursor-not-allowed'></div>}
 							</div>
 							<div className='relative'>
 								<label className='block text-sm font-medium text-gray-700 mb-1'>Subscription End Date</label>
 								<DatePicker
+									disabled={subscription_id !== undefined}
 									date={subscriptionState.endDate}
 									setDate={(date) => setSubscriptionState((prev) => ({ ...prev, endDate: date }))}
 									placeholder='Forever'
 								/>
 								{/* Overlay to block clicks */}
-								{subscription_id !== undefined && <div className='absolute inset-0 bg-gray-100 opacity-50 cursor-not-allowed'></div>}
 							</div>
 						</div>
 					)}
@@ -306,7 +307,7 @@ const CustomerSubscription: React.FC = () => {
 
 			{/* Preview */}
 			<div className='flex-[4]'>
-				{subscriptionState.selectedPlan && (
+				{subscriptionState.selectedPlan && !susbcriptionData && (
 					<Preview
 						startDate={subscriptionState.startDate}
 						data={subscriptionState.prices?.charges[subscriptionState.billingPeriod][subscriptionState.currency] ?? []}
