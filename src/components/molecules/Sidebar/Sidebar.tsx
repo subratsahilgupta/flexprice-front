@@ -19,6 +19,7 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 	const navigate = useNavigate();
 	const handleLogout = async () => {
 		await supabase.auth.signOut();
+		localStorage.clear();
 		navigate('/login');
 	};
 	const navMain: { [key: string]: NavItem[] } = {
