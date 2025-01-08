@@ -30,6 +30,7 @@ export interface CreateCustomerSubscriptionPayload {
 	trial_end: string | null;
 	trial_start: string | null;
 }
+
 class CustomerApi {
 	private static baseUrl = '/customers';
 
@@ -50,6 +51,14 @@ class CustomerApi {
 
 	public static async getCustomerSubscriptions(id: string): Promise<GetCustomerSubscriptionsResponse> {
 		return await AxiosClient.get(`/subscriptions?customer_id=${id}`);
+	}
+
+	public static async getCustomerSubscriptionById(id: string): Promise<Subscription> {
+		return await AxiosClient.get(`/subscriptions/${id}`);
+	}
+
+	public static async createCustomer(customer: { email: string; external_id: string; name?: string }): Promise<Customer> {
+		return await AxiosClient.post(`${this.baseUrl}`, customer);
 	}
 }
 

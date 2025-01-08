@@ -1,8 +1,10 @@
 import { FC, useState } from 'react';
 import { ColumnData, FlexpriceTable } from '@/components/molecules';
 import { getPriceTableCharge, NormalizedPlan } from '@/utils/models/transformed_plan';
+import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
+import { FormHeader } from '@/components/atoms';
 
-export type ChargesForBillingPeriod = NormalizedPlan['charges'][string];
+export type ChargesForBillingPeriod = NormalizedPlan['charges'][string][string];
 export type ChargesForBillingPeriodOne = ChargesForBillingPeriod[0];
 
 export interface Props {
@@ -10,8 +12,9 @@ export interface Props {
 }
 
 const ChargeTable: FC<Props> = ({ data }) => {
+	console.log('Charge Data', data);
 	const mappedData = (data ?? []).map((charge) => ({
-		charge: charge.meter_name ? `${charge.name}/${charge.meter_name}` : charge.name,
+		charge: charge.meter_name ? `${charge.meter_name}` : charge.name,
 		quantity: charge.type === 'FIXED' ? '1' : 'pay as you go',
 		price: getPriceTableCharge(charge),
 	}));
@@ -38,15 +41,25 @@ const ChargeTable: FC<Props> = ({ data }) => {
 	return (
 		<div>
 			<div>
-				<p className='font-medium text-zinc text-[14px]'>Charges</p>
+				<FormHeader title='Charges' variant='sub-header' />
 			</div>
 			<div className='rounded-xl border border-gray-300 space-y-6 mt-2'>
-				<FlexpriceTable columns={columns} data={displayedData} redirectUrl={`/customer-management/customers/details/`} />
+				<FlexpriceTable columns={columns} data={displayedData} />
 			</div>
 			{mappedData.length > 5 && (
 				<div className='text-center mt-4'>
-					<button className='text-blue-600 font-semibold hover:underline' onClick={() => setShowAllRows((prev) => !prev)}>
-						{showAllRows ? 'Collapse' : 'Expand'}
+					<button
+						className='flex items-center gap-1 text-xs text-black font-medium hover:text-white hover:bg-black rounded-full px-2 py-1 border border-black bg-white transition-all'
+						onClick={() => setShowAllRows((prev) => !prev)}>
+						{showAllRows ? (
+							<>
+								Collapse <ChevronUpIcon className='w-4 h-4' />
+							</>
+						) : (
+							<>
+								Expand <ChevronDownIcon className='w-4 h-4' />
+							</>
+						)}
 					</button>
 				</div>
 			)}

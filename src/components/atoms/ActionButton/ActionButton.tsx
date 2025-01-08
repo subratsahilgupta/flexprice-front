@@ -50,12 +50,12 @@ const ActionButton: FC<ActionProps> = ({ id, editPath, deleteMutationFn, refetch
 					<DropdownMenuItem onSelect={() => setIsDialogOpen(true)}>
 						<div className='flex gap-2 items-center w-full'>
 							<FaRegEyeSlash />
-							<span>Delete</span>
+							<span>Archive</span>
 						</div>
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
-			<Dialog title={`Are you sure you want to delete this ${entityName}?`} isOpen={isDialogOpen} onOpenChange={setIsDialogOpen}>
+			<Dialog title={`Are you sure you want to archive this ${entityName}?`} isOpen={isDialogOpen} onOpenChange={setIsDialogOpen}>
 				<div className='flex flex-col mt-4 gap-4 items-end justify-center'>
 					<div className='flex gap-4'>
 						<Button variant={'outline'} onClick={() => setIsDialogOpen(false)}>
@@ -66,7 +66,7 @@ const ActionButton: FC<ActionProps> = ({ id, editPath, deleteMutationFn, refetch
 								setIsDialogOpen(false);
 								deleteEntity(id);
 							}}>
-							Delete
+							Archive
 						</Button>
 					</div>
 				</div>

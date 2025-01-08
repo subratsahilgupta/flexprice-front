@@ -3,12 +3,15 @@ import { Subscription } from '@/models/Subscription';
 import { ColumnData, FlexpriceTable } from '@/components/molecules';
 import formatChips from '@/utils/common/format_chips';
 import { Chip } from '@/components/atoms';
+import { toSentenceCase } from '@/utils/common/helper_functions';
+import formatDate from '@/utils/common/format_date';
 
 export interface SubscriptionTableProps {
+	customerId: string;
 	data: Subscription[];
 }
 
-const SubscriptionTable: FC<SubscriptionTableProps> = ({ data }) => {
+const SubscriptionTable: FC<SubscriptionTableProps> = ({ customerId, data }) => {
 	const mappedData = (data ?? []).map((subscription) => ({
 		id: subscription.id,
 		plan_name: subscription.plan.name,
@@ -26,6 +29,7 @@ const SubscriptionTable: FC<SubscriptionTableProps> = ({ data }) => {
 		{
 			name: 'billing_period',
 			title: 'Billing Period',
+			render: (row) => <span>{toSentenceCase(row.billing_period)}</span>,
 		},
 		{
 			name: 'status',
@@ -39,10 +43,11 @@ const SubscriptionTable: FC<SubscriptionTableProps> = ({ data }) => {
 		{
 			name: 'start_date',
 			title: 'Start Date',
+			render: (row) => <span>{formatDate(row.start_date)}</span>,
 		},
 	];
 
-	return <FlexpriceTable columns={columns} data={mappedData} />;
+	return <FlexpriceTable columns={columns} data={mappedData} redirectUrl={`/customer-management/customers/${customerId}/subscription/`} />;
 };
 
 export default SubscriptionTable;
