@@ -4,13 +4,15 @@ import { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'; // Adjust import path if necessary
 import { ChevronDownIcon, ChevronUpIcon, Info } from 'lucide-react';
 import { getTotalPayableInfo, getTotalPayableText } from '@/utils/common/helper_functions';
+import { cn } from '@/lib/utils';
 
 interface PreviewProps {
 	data: ChargesForBillingPeriodOne[];
 	startDate: Date | undefined;
+	className?: string;
 }
 
-const Preview = ({ data }: PreviewProps) => {
+const Preview = ({ data, className }: PreviewProps) => {
 	// Separate charges into recurring and usage
 	const recurringCharges = data.filter((charge) => charge.type === 'FIXED');
 	const usageCharges = data.filter((charge) => charge.type === 'USAGE');
@@ -26,7 +28,7 @@ const Preview = ({ data }: PreviewProps) => {
 
 	return (
 		<div>
-			<Card className='max-w-md mx-auto shadow-sm'>
+			<Card className={cn('max-w-md mx-auto shadow-sm', className)}>
 				<CardHeader className='h-16'>
 					<CardTitle className='text-lg font-semibold text-center'>Subscription Preview</CardTitle>
 				</CardHeader>

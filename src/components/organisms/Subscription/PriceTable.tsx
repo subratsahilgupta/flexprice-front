@@ -2,6 +2,7 @@ import { FC, useState } from 'react';
 import { ColumnData, FlexpriceTable } from '@/components/molecules';
 import { getPriceTableCharge, NormalizedPlan } from '@/utils/models/transformed_plan';
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
+import { FormHeader } from '@/components/atoms';
 
 export type ChargesForBillingPeriod = NormalizedPlan['charges'][string][string];
 export type ChargesForBillingPeriodOne = ChargesForBillingPeriod[0];
@@ -40,7 +41,7 @@ const ChargeTable: FC<Props> = ({ data }) => {
 	return (
 		<div>
 			<div>
-				<p className='font-medium text-zinc text-[14px]'>Charges</p>
+				<FormHeader title='Charges' variant='sub-header' />
 			</div>
 			<div className='rounded-xl border border-gray-300 space-y-6 mt-2'>
 				<FlexpriceTable columns={columns} data={displayedData} />
