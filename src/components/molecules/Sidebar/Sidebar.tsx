@@ -1,9 +1,26 @@
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
+import {
+	Sidebar,
+	SidebarContent,
+	SidebarFooter,
+	SidebarHeader,
+	SidebarMenuButton,
+	SidebarTrigger,
+	useSidebar,
+} from '@/components/ui/sidebar';
 import React from 'react';
 import SidebarNav, { NavItem } from './SidebarMenu';
+import { cn } from '@/lib/utils';
+import { LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import supabase from '@/core/supbase/config';
 
 const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }) => {
 	const { open } = useSidebar();
+	const navigate = useNavigate();
+	const handleLogout = async () => {
+		await supabase.auth.signOut();
+		navigate('/login');
+	};
 	const navMain: { [key: string]: NavItem[] } = {
 		'Usage Tracking': [
 			{
@@ -86,7 +103,17 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 					<SidebarNav key={key} items={value} title={key} />
 				))}
 			</SidebarContent>
-			<SidebarFooter></SidebarFooter>
+			<SidebarFooter>
+				<SidebarMenuButton
+					onClick={() => {
+						handleLogout();
+					}}
+					tooltip={'Logout'}
+					className={cn(`flex items-center gap-2 hover:bg-muted transition-colors `)}>
+					{<LogOut />}
+					<span className='text-sm select-none'>{'Logout'}</span>
+				</SidebarMenuButton>
+			</SidebarFooter>
 			{/* <SidebarRail /> */}
 		</Sidebar>
 	);
