@@ -1,9 +1,12 @@
-import { Select, DatePicker, Button } from '@/components/atoms';
+import { Select, DatePicker, Button, Option } from '@/components/atoms';
 import CustomerCard from '@/components/molecules/Customer/CustomerCard';
 import Preview from '@/components/organisms/Subscription/Preview';
 import ChargeTable from '@/components/organisms/Subscription/PriceTable';
+import UsageTable from '@/components/organisms/Subscription/UsageTable';
+import { SubscriptionUsage } from '@/models/Subscription';
 import CustomerApi, { CreateCustomerSubscriptionPayload } from '@/utils/api_requests/CustomerApi';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
+import SubscriptionApi from '@/utils/api_requests/SubscriptionApi';
 import { toSentenceCase } from '@/utils/common/helper_functions';
 import { NormalizedPlan, normalizePlan } from '@/utils/models/transformed_plan';
 import { useMutation } from '@tanstack/react-query';
@@ -16,6 +19,16 @@ type Params = {
 	subscription_id?: string;
 };
 
+type SubscriptionState = {
+	selectedPlan: string;
+	prices: NormalizedPlan | null;
+	billingPeriod: string;
+	currency: string;
+	billingPeriodOptions: Option[];
+	startDate: Date | undefined;
+	endDate: Date | undefined;
+};
+
 const CustomerSubscription: React.FC = () => {
 	const { id: customerId, subscription_id } = useParams<Params>();
 
@@ -23,13 +36,16 @@ const CustomerSubscription: React.FC = () => {
 	const [plansLoading, setPlansLoading] = useState(false);
 	const [plansError, setPlansError] = useState(false);
 
-	const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
-	const [prices, setPrices] = useState<NormalizedPlan | null>(null);
-	const [billingPeriodOptions, setBillingPeriodOptions] = useState<string[]>([]);
-	const [billingPeriod, setBillingPeriod] = useState<string | null>(null);
-	const [currency, setCurrency] = useState<string>('usd');
-	const [startDate, setStartDate] = useState<Date | undefined>(new Date());
-	const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+	const [susbcriptionData, setSubscriptionData] = useState<SubscriptionUsage | null>(null);
+	const [subscriptionState, setSubscriptionState] = useState<SubscriptionState>({
+		selectedPlan: '',
+		prices: null,
+		billingPeriod: '',
+		currency: '',
+		billingPeriodOptions: [],
+		startDate: new Date(),
+		endDate: undefined,
+	});
 
 	const navigate = useNavigate();
 
@@ -38,7 +54,6 @@ const CustomerSubscription: React.FC = () => {
 		const fetchData = async () => {
 			try {
 				setPlansLoading(true);
-				// Fetch all plans
 				const plansResponse = await PlanApi.getExpandedPlan();
 				const normalizedPlans = plansResponse.map((plan) => normalizePlan(plan));
 				setPlans(normalizedPlans);
@@ -46,16 +61,22 @@ const CustomerSubscription: React.FC = () => {
 				// If subscription_id exists, fetch subscription details
 				if (subscription_id) {
 					const subscriptionDetails = await CustomerApi.getCustomerSubscriptionById(subscription_id);
-
-					// Populate subscription details
+					const subscriptionUsage = await SubscriptionApi.getSubscriptionUsage(subscription_id);
+					setSubscriptionData(subscriptionUsage);
 					const planDetails = normalizedPlans.find((plan) => plan.id === subscriptionDetails.plan_id);
 					if (planDetails) {
-						setSelectedPlan(subscriptionDetails.plan_id);
-						setStartDate(new Date(subscriptionDetails.start_date));
-						setEndDate(subscriptionDetails.end_date ? new Date(subscriptionDetails.end_date) : undefined);
-						setPrices(planDetails);
-						setBillingPeriodOptions(Object.keys(planDetails.charges));
-						setBillingPeriod(subscriptionDetails.billing_period.toLowerCase());
+						setSubscriptionState({
+							selectedPlan: subscriptionDetails.plan_id,
+							prices: planDetails,
+							billingPeriod: subscriptionDetails.billing_period.toLowerCase(),
+							currency: subscriptionDetails.currency,
+							billingPeriodOptions: Object.keys(planDetails.charges).map((period) => ({
+								label: toSentenceCase(period),
+								value: period,
+							})),
+							startDate: new Date(subscriptionDetails.start_date),
+							endDate: subscriptionDetails.end_date ? new Date(subscriptionDetails.end_date) : undefined,
+						});
 					}
 				}
 			} catch (e) {
@@ -84,7 +105,70 @@ const CustomerSubscription: React.FC = () => {
 		},
 	});
 
+	// Handle plan change
+	const handlePlanChange = (value: string) => {
+		const filteredPlan = plans?.find((plan) => plan.id === value);
+
+		if (!filteredPlan || !filteredPlan.charges || Object.keys(filteredPlan.charges).length === 0) {
+			toast.error('Invalid plan or no charges available.');
+			return;
+		}
+
+		const billingPeriods = Object.keys(filteredPlan.charges);
+		const defaultBillingPeriod = billingPeriods.includes(subscriptionState.billingPeriod)
+			? subscriptionState.billingPeriod
+			: billingPeriods[0];
+
+		const currencies = defaultBillingPeriod ? Object.keys(filteredPlan.charges[defaultBillingPeriod]) : [];
+		const defaultCurrency = currencies.includes(subscriptionState.currency) ? subscriptionState.currency : currencies[0];
+
+		if (!defaultBillingPeriod || !defaultCurrency) {
+			toast.error('Invalid billing period or currency for the selected plan.');
+			return;
+		}
+
+		setSubscriptionState({
+			...subscriptionState,
+			selectedPlan: value,
+			prices: filteredPlan,
+			billingPeriod: defaultBillingPeriod,
+			currency: defaultCurrency,
+			billingPeriodOptions: billingPeriods.map((period) => ({
+				label: toSentenceCase(period),
+				value: period,
+			})),
+		});
+	};
+
+	// Handle billing period change
+	const handleBillingPeriodChange = (value: string) => {
+		const filteredPlan = subscriptionState.prices;
+		if (!filteredPlan || !filteredPlan.charges[value]) {
+			toast.error('Invalid billing period.');
+			return;
+		}
+
+		const currencies = Object.keys(filteredPlan.charges[value]);
+		const defaultCurrency = currencies.includes(subscriptionState.currency) ? subscriptionState.currency : currencies[0];
+
+		setSubscriptionState({
+			...subscriptionState,
+			billingPeriod: value,
+			currency: defaultCurrency,
+		});
+	};
+
+	// Handle currency change
+	const handleCurrencyChange = (value: string) => {
+		setSubscriptionState({
+			...subscriptionState,
+			currency: value,
+		});
+	};
+
 	const handleSubscriptionSubmit = () => {
+		const { billingPeriod, selectedPlan, currency, startDate, endDate } = subscriptionState;
+
 		if (!billingPeriod || !selectedPlan) {
 			toast.error('Please select a plan and billing period.');
 			return;
@@ -94,7 +178,7 @@ const CustomerSubscription: React.FC = () => {
 			billing_cadence: 'RECURRING',
 			billing_period: billingPeriod.toUpperCase(),
 			billing_period_count: 1,
-			currency: currency,
+			currency,
 			customer_id: customerId!,
 			invoice_cadence: 'ARREAR',
 			plan_id: selectedPlan,
@@ -112,90 +196,100 @@ const CustomerSubscription: React.FC = () => {
 
 	return (
 		<div className='flex gap-8 mt-5'>
-			<div
-				className='flex-[6] space-y-6 overflow-y-auto pr-4'
-				style={{
-					maxHeight: 'calc(100vh - 120px)',
-					overflowY: 'auto',
-					scrollbarWidth: 'thin',
-					WebkitOverflowScrolling: 'touch',
-				}}>
-				<CustomerCard customerId={customerId!} />
+			<div className='flex-[6] space-y-6 overflow-y-auto pr-4' style={{ maxHeight: 'calc(100vh - 120px)' }}>
+				<CustomerCard customerId={customerId!} subscriptionData={susbcriptionData} />
 
+				{susbcriptionData && (
+					<div>
+						<UsageTable data={susbcriptionData!} />
+					</div>
+				)}
 				<div className='p-6 rounded-xl border border-gray-300 space-y-6'>
 					<h1 className='text-base font-bold mb-1 text-gray-800'>Subscription Details</h1>
 
 					{/* Select Plan */}
 					{!plansLoading && (
 						<Select
-							selectedValue={selectedPlan ?? ''}
+							selectedValue={subscriptionState.selectedPlan}
 							options={
 								plans?.map((plan) => ({
 									label: plan.name,
 									value: plan.id,
 								})) ?? []
 							}
-							onChange={(value) => {
-								const filteredPlan = plans?.find((plan) => plan.id === value);
-								const defaultBillingPeriod = Object.keys(filteredPlan!.charges)[0];
-								setBillingPeriodOptions(Object.keys(filteredPlan!.charges));
-								setBillingPeriod(defaultBillingPeriod);
-								setPrices(filteredPlan!);
-								setSelectedPlan(value);
-							}}
+							onChange={(value) => handlePlanChange(value)}
 							label='Plan*'
+							disabled={subscription_id !== undefined}
 							placeholder='Select plan'
 							error={plansError ? 'Failed to load plans' : undefined}
 						/>
 					)}
 
-					{/* Billing Period and Currency */}
-					{prices && (
-						<>
-							<Select
-								selectedValue={billingPeriod ?? ''}
-								options={billingPeriodOptions.map((billingPeriod) => ({
-									label: toSentenceCase(billingPeriod),
-									value: billingPeriod,
-								}))}
-								onChange={(value) => setBillingPeriod(value)}
-								label='Billing Period*'
-								placeholder='Select billing period'
-							/>
+					{/* Billing Period */}
+					{/* Billing Period */}
+					{subscriptionState.selectedPlan && subscriptionState.billingPeriodOptions.length > 0 && (
+						<Select
+							key={subscriptionState.billingPeriodOptions.map((opt) => opt.value).join(',')} // Force re-render on options change
+							selectedValue={subscriptionState.billingPeriod}
+							options={subscriptionState.billingPeriodOptions}
+							onChange={(value) => handleBillingPeriodChange(value)}
+							label='Billing Period*'
+							disabled={subscription_id !== undefined}
+							placeholder='Select billing period'
+						/>
+					)}
 
+					{/* Currency */}
+					{subscriptionState.selectedPlan &&
+						subscriptionState.prices &&
+						subscriptionState.prices.charges[subscriptionState.billingPeriod] && (
 							<Select
-								selectedValue={currency!}
-								options={[
-									{ label: 'USD', value: 'usd' },
-									{ label: 'INR', value: 'inr' },
-								]}
-								disabled
-								onChange={(value) => setCurrency(value)}
+								key={Object.keys(subscriptionState.prices.charges[subscriptionState.billingPeriod]).join(',')} // Force re-render on options change
+								selectedValue={subscriptionState.currency}
+								options={Object.keys(subscriptionState.prices.charges[subscriptionState.billingPeriod]).map((currency) => ({
+									label: currency.toUpperCase(),
+									value: currency,
+								}))}
+								onChange={(value) => handleCurrencyChange(value)}
 								label='Select Currency*'
 								placeholder='Select currency'
+								disabled={subscription_id !== undefined}
 							/>
+						)}
 
-							<ChargeTable data={prices.charges[billingPeriod!]} />
-						</>
+					{/* Charge Table */}
+					{subscriptionState.prices && subscriptionState.selectedPlan && (
+						<ChargeTable data={subscriptionState.prices.charges[subscriptionState.billingPeriod][subscriptionState.currency]} />
 					)}
 
 					{/* Date Pickers */}
-					{selectedPlan && (
-						<div className='flex items-center space-x-4'>
-							<div>
+					{subscriptionState.selectedPlan && (
+						<div className='flex items-center space-x-4 relative'>
+							<div className='relative'>
 								<label className='block text-sm font-medium text-gray-700 mb-1'>Subscription Start Date</label>
-								<DatePicker date={startDate} setDate={setStartDate} />
+								<DatePicker
+									date={subscriptionState.startDate}
+									setDate={(date) => setSubscriptionState((prev) => ({ ...prev, startDate: date }))}
+								/>
+								{/* Overlay to block clicks */}
+								{subscription_id !== undefined && <div className='absolute inset-0 bg-gray-100 opacity-50 cursor-not-allowed'></div>}
 							</div>
-
-							<div>
+							<div className='relative'>
 								<label className='block text-sm font-medium text-gray-700 mb-1'>Subscription End Date</label>
-								<DatePicker date={endDate} setDate={setEndDate} placeholder='Forever' />
+								<DatePicker
+									date={subscriptionState.endDate}
+									setDate={(date) => setSubscriptionState((prev) => ({ ...prev, endDate: date }))}
+									placeholder='Forever'
+								/>
+								{/* Overlay to block clicks */}
+								{subscription_id !== undefined && <div className='absolute inset-0 bg-gray-100 opacity-50 cursor-not-allowed'></div>}
 							</div>
 						</div>
 					)}
 				</div>
 
-				{selectedPlan && !subscription_id && (
+				{/* Submit Buttons */}
+				{subscriptionState.selectedPlan && !subscription_id && (
 					<div className='flex items-center justify-start space-x-4'>
 						<Button onClick={navigateBack} className='bg-gray-100 text-black px-4 py-2 rounded-md hover:bg-primary-dark'>
 							Cancel
@@ -211,7 +305,14 @@ const CustomerSubscription: React.FC = () => {
 			</div>
 
 			{/* Preview */}
-			<div className='flex-[4]'>{selectedPlan && <Preview data={prices?.charges[billingPeriod!] ?? []} />}</div>
+			<div className='flex-[4]'>
+				{subscriptionState.selectedPlan && (
+					<Preview
+						startDate={subscriptionState.startDate}
+						data={subscriptionState.prices?.charges[subscriptionState.billingPeriod][subscriptionState.currency] ?? []}
+					/>
+				)}
+			</div>
 		</div>
 	);
 };

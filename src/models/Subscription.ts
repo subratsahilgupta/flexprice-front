@@ -30,3 +30,20 @@ export interface Subscription {
 	readonly updated_by: string;
 	readonly plan: Plan;
 }
+
+export interface SubscriptionUsage {
+	readonly amount: number;
+	readonly currency: string;
+	readonly display_amount: string;
+	readonly start_time: Date;
+	readonly end_time: Date;
+	readonly charges: Charge[];
+}
+
+export interface Charge {
+	readonly amount: number;
+	readonly currency: string;
+	readonly display_amount: string;
+	readonly quantity: number;
+	readonly meter_display_name: string;
+}
