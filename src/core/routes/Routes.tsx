@@ -149,6 +149,10 @@ export const MainRouter = createBrowserRouter([
 						element: <CustomerSubscription />,
 					},
 					{
+						path: `${RouteNames.customerManagement.path}/${RouteNames.customerManagement.customers.path}/${RouteNames.customerManagement.customers.subscriptionDetails.path}`,
+						element: <CustomerSubscription />,
+					},
+					{
 						path: `${RouteNames.customerManagement.path}/${RouteNames.customerManagement.customers.path}/${RouteNames.customerManagement.customers.invoiceDetails.path}`,
 						element: <InvoiceDetailPage />,
 					},
