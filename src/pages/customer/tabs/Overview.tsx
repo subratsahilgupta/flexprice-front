@@ -41,7 +41,8 @@ const Overview = () => {
 		queryKey: ['subscriptions', customerId], // Unique key for caching
 		queryFn: () => fetchAllSubscriptions(customerId!),
 		retry: 1,
-		staleTime: 1000 * 60 * 5, // 5 minutes
+		staleTime: 0,
+		// staleTime: 1000 * 60 * 5, // 5 minutes
 		refetchOnWindowFocus: true, // Automatically refetch when the window regains focus
 		refetchOnMount: 'always', // Refetch when the component is remounted
 	});

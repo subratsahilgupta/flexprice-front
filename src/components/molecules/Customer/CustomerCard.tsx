@@ -18,7 +18,8 @@ const CustomerCard: React.FC<CustomerCardProps> = ({ customerId, subscriptionDat
 		queryKey: ['fetchCustomerCard', customerId],
 		queryFn: () => fetchCustomer(customerId),
 		retry: 1,
-		staleTime: 1000 * 60 * 5,
+		// staleTime: 1000 * 60 * 5,
+		staleTime: 0,
 	});
 
 	// Loading Skeleton
