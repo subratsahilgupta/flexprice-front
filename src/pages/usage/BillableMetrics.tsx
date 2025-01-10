@@ -9,12 +9,18 @@ import { useQuery } from '@tanstack/react-query';
 import { Spinner } from '@/components/atoms';
 import toast from 'react-hot-toast';
 import { ReactSVG } from 'react-svg';
-
-const fetchMeters = async () => {
-	return await MeterApi.getAllMeters();
-};
+import usePagination from '@/hooks/usePagination';
 
 const BillableMetricsPage = () => {
+	const { limit, offset } = usePagination();
+
+	const fetchMeters = async () => {
+		return await MeterApi.getAllMeters({
+			limit,
+			offset,
+		});
+	};
+
 	const {
 		data: meters,
 		isLoading,
@@ -24,7 +30,6 @@ const BillableMetricsPage = () => {
 		queryFn: fetchMeters,
 		retry: 2,
 		staleTime: 0,
-		// staleTime: 1000 * 60 * 5,
 	});
 
 	if (isLoading) {
@@ -83,6 +88,10 @@ const BillableMetricsPage = () => {
 			</SectionHeader>
 			<div className=''>
 				<BillableMetricTable data={meters || []} />
+				<Spacer className='!h-4' />
+				{/* <Pagination
+					totalPages={Math.ceil((plans?.total ?? 1) / limit)}
+				/> */}
 			</div>
 		</div>
 	);

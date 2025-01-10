@@ -7,8 +7,8 @@ export class MeterApi {
 	public static async createMeter(data: Partial<Meter>) {
 		return await AxiosClient.post<Meter, Partial<Meter>>(this.baseUrl, data);
 	}
-	public static async getAllMeters() {
-		return await AxiosClient.get<Meter[]>(this.baseUrl);
+	public static async getAllMeters({ limit, offset }: PaginationType) {
+		return await AxiosClient.get<Meter[]>(`${this.baseUrl}?limit=${limit}&offset=${offset}`);
 	}
 
 	public static async getMeterById(id: string) {
