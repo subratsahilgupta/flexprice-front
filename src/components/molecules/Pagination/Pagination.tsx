@@ -14,6 +14,7 @@ const FLexpricePagination = ({ totalPages }: { totalPages: number }) => {
 	const currentPage = parseInt(searchParams.get('page') || '1', 10);
 
 	const handlePageChange = (page: number) => {
+		if (page < 1 || page > totalPages) return;
 		setSearchParams({ page: page.toString() });
 	};
 

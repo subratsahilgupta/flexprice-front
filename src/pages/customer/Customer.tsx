@@ -1,31 +1,27 @@
-import { SectionHeader, Spinner } from '@/components/atoms';
-import { CreateCustomerDrawer } from '@/components/molecules';
+import { SectionHeader, Spacer, Spinner } from '@/components/atoms';
+import { CreateCustomerDrawer, Pagination } from '@/components/molecules';
 import CustomerTable from '@/components/molecules/Customer/CustomerTable';
+import usePagination from '@/hooks/usePagination';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { IoSearch } from 'react-icons/io5';
 import { LiaSlidersHSolid } from 'react-icons/lia';
-import { useSearchParams } from 'react-router-dom';
-
-const fetchCustomer = async () => {
-	return await CustomerApi.getAllCustomers({});
-};
 
 const CustomerPage = () => {
-	const [searchParams, setSearchParams] = useSearchParams();
-	const page = searchParams.get('page') || '0';
+	const { limit, offset, page } = usePagination();
 
-	if (!searchParams.get('page')) {
-		setSearchParams({ page });
-	}
+	const fetchCustomers = async () => {
+		return await CustomerApi.getAllCustomers({ limit, offset });
+	};
+
 	const {
 		data: customers,
 		isLoading,
 		isError,
 	} = useQuery({
 		queryKey: ['fetchCustomer', page],
-		queryFn: fetchCustomer,
+		queryFn: fetchCustomers,
 		retry: 2,
 		staleTime: 0,
 	});
@@ -42,7 +38,8 @@ const CustomerPage = () => {
 	}
 
 	if (isError) {
-		toast.error('Error fetching meters');
+		toast.error('Error fetching customers');
+		return null;
 	}
 
 	return (
@@ -50,16 +47,18 @@ const CustomerPage = () => {
 			<SectionHeader title='Customers'>
 				<div className='flex gap-2 w-full'>
 					<button className='px-2 py-1'>
-						<IoSearch className='size-5 text-[#09090B] ' />
+						<IoSearch className='size-5 text-[#09090B]' />
 					</button>
 					<button className='px-2 py-1'>
-						<LiaSlidersHSolid className='size-5 text-[#09090B] ' />
+						<LiaSlidersHSolid className='size-5 text-[#09090B]' />
 					</button>
 					<CreateCustomerDrawer />
 				</div>
 			</SectionHeader>
-			<div className=''>
+			<div>
 				<CustomerTable data={customers?.customers || []} />
+				<Spacer className='!h-4' />
+				<Pagination totalPages={Math.ceil((customers?.total ?? 1) / limit)} />
 			</div>
 		</div>
 	);
