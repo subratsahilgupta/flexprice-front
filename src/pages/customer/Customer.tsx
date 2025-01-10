@@ -6,21 +6,28 @@ import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { IoSearch } from 'react-icons/io5';
 import { LiaSlidersHSolid } from 'react-icons/lia';
+import { useSearchParams } from 'react-router-dom';
 
 const fetchCustomer = async () => {
-	return await CustomerApi.getAllCustomers();
+	return await CustomerApi.getAllCustomers({});
 };
 
 const CustomerPage = () => {
+	const [searchParams, setSearchParams] = useSearchParams();
+	const page = searchParams.get('page') || '0';
+
+	if (!searchParams.get('page')) {
+		setSearchParams({ page });
+	}
 	const {
 		data: customers,
 		isLoading,
 		isError,
 	} = useQuery({
-		queryKey: ['fetchCustomer'],
+		queryKey: ['fetchCustomer', page],
 		queryFn: fetchCustomer,
 		retry: 2,
-		staleTime: 1000 * 60 * 5,
+		staleTime: 1000 * 2,
 	});
 
 	if (isLoading) {

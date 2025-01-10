@@ -1,4 +1,3 @@
-import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
 	Pagination,
@@ -8,7 +7,7 @@ import {
 	PaginationPrevious,
 	PaginationNext,
 	PaginationEllipsis,
-} from '@/components/ui/pagination'; // Adjust import path as necessary
+} from '@/components/ui/pagination';
 
 const FLexpricePagination = ({ totalPages }: { totalPages: number }) => {
 	const [searchParams, setSearchParams] = useSearchParams();
