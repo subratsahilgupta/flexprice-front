@@ -14,6 +14,7 @@ const Invoice = () => {
 		queryFn: async () => {
 			return await InvoiceApi.getCustomerInvoices(customerId!);
 		},
+		staleTime: 0,
 		enabled: !!customerId,
 	});
 

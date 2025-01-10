@@ -14,7 +14,8 @@ const CustomerOverviewCard: React.FC<CustomerCardProps> = ({ customerId }) => {
 		queryKey: ['fetchCustomerCard', customerId], // Add customerId to the key for caching
 		queryFn: () => fetchCustomer(customerId),
 		retry: 1,
-		staleTime: 1000 * 60 * 5, // 5 minutes
+		// staleTime: 1000 * 60 * 5, // 5 minutes
+		staleTime: 0,
 	});
 
 	if (isLoading) {
