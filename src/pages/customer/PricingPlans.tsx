@@ -7,21 +7,27 @@ import { useQuery } from '@tanstack/react-query';
 import { Spinner } from '@/components/atoms';
 import toast from 'react-hot-toast';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
-import { PlansTable } from '@/components/molecules';
+import { Pagination, PlansTable } from '@/components/molecules';
 import { Plan } from '@/models/Plan';
 import { ReactSVG } from 'react-svg';
-
-const fetchPlans = async () => {
-	return await PlanApi.getAllPlans();
-};
+import usePagination from '@/hooks/usePagination';
 
 const PricingPlan = () => {
+	const { limit, offset, page } = usePagination();
+
+	const fetchPlans = async () => {
+		return await PlanApi.getAllPlans({
+			limit,
+			offset,
+		});
+	};
+
 	const {
 		data: plans,
 		isLoading,
 		isError,
 	} = useQuery({
-		queryKey: ['fetchPlans'],
+		queryKey: ['fetchPlans', page],
 		queryFn: fetchPlans,
 		retry: 2,
 		staleTime: 0,
@@ -82,6 +88,8 @@ const PricingPlan = () => {
 			</SectionHeader>
 			<div className=''>
 				<PlansTable data={(plans?.plans || []) as Plan[]} />
+				<Spacer className='!h-4' />
+				<Pagination totalPages={Math.ceil((plans?.total ?? 1) / limit)} />
 			</div>
 		</div>
 	);
