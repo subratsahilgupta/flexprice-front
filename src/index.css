@@ -114,3 +114,9 @@
 		@apply bg-background text-foreground;
 	}
 }
+
+@layer utilities {
+	.card {
+		@apply rounded-xl border border-gray-300 p-6;
+	}
+}
