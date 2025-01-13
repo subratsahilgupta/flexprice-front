@@ -1,5 +1,6 @@
 type Wallet = {
 	readonly balance: number;
+	readonly name: string;
 	readonly created_at: string;
 	readonly currency: string;
 	readonly customer_id: string;
