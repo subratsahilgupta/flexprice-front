@@ -1,5 +1,6 @@
 import { Chip, FormHeader, Loader, Spacer } from '@/components/atoms';
-import { WalletTransactionsTable } from '@/components/molecules';
+import { Pagination, WalletTransactionsTable } from '@/components/molecules';
+import usePagination from '@/hooks/usePagination';
 import WalletApi from '@/utils/api_requests/WalletApi';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
@@ -24,6 +25,7 @@ const formatWalletStatus = (status?: string) => {
 const Wallet = () => {
 	const { id: customerId } = useParams();
 	const [activeWallet, setActiveWallet] = useState<Wallet | null>();
+	const { limit, offset } = usePagination();
 
 	const {
 		data: wallets,
@@ -131,6 +133,7 @@ const Wallet = () => {
 				</div>
 				<Spacer className='!h-6' />
 				<WalletTransactionsTable data={transactionsData?.transactions || []} />
+				<Pagination totalPages={Math.ceil((transactionsData?.total ?? 1) / limit)} />
 			</div>
 		</div>
 	);
