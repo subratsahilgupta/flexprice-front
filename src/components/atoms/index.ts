@@ -32,3 +32,5 @@ export { default as DatePicker } from './DatePicker';
 export { default as Sheet } from './Sheet';
 
 export { default as Loader } from './Loader';
+
+export { default as Divider } from './Divider';

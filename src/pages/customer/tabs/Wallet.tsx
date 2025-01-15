@@ -71,9 +71,7 @@ const Wallet = () => {
 	}
 
 	if (wallets?.length === 0) {
-		return <div>
-			no wallets found
-		</div>
+		return <div>no wallets found</div>;
 	}
 
 	return (
