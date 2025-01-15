@@ -1,13 +1,13 @@
 import { useParams } from 'react-router-dom';
 import Tabbar from '@/components/molecules/Tabbar/Tabbar';
 import Overview from './tabs/Overview';
-import Wallet from './tabs/Wallet';
+import WalletTab from './tabs/Wallet';
 import Invoice from './tabs/Invoice';
 import CustomerHeader from '@/components/molecules/Customer/CustomerHeader';
 
 const tabs = [
 	{ id: 'overview', label: 'Overview', component: <Overview /> },
-	{ id: 'wallet', label: 'Wallet', component: <Wallet /> },
+	{ id: 'wallet', label: 'Wallet', component: <WalletTab /> },
 	{ id: 'invoice', label: 'Invoice', component: <Invoice /> },
 ];
 

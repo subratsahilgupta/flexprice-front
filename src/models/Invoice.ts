@@ -17,6 +17,10 @@ export interface LineItem {
 	tenant_id: string;
 	updated_at: string;
 	updated_by: string;
+	meter_display_name: string;
+	plan_display_name: string;
+	display_name: string;
+	price_type: string;
 }
 
 export interface Invoice {
