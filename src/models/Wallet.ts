@@ -1,4 +1,4 @@
-type Wallet = {
+export type Wallet = {
 	readonly balance: number;
 	readonly name: string;
 	readonly created_at: string;
