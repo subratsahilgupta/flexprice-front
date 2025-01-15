@@ -6,7 +6,7 @@ import { FC } from 'react';
 
 const fomatAmount = (type: string, amount: number) => {
 	return (
-		<span className={cn(type === 'credit' ? 'text-green-500' : 'text-red-500')}>
+		<span className={cn(type === 'credit' ? 'text-green-500' : 'text-[#18181B] ')}>
 			{type === 'credit' ? '+' : '-'}
 			{amount}
 			{' credits'}

@@ -1,5 +1,6 @@
 import { Chip, FormHeader, Loader, Spacer } from '@/components/atoms';
-import { WalletTransactionsTable } from '@/components/molecules';
+import { Pagination, WalletTransactionsTable } from '@/components/molecules';
+import usePagination from '@/hooks/usePagination';
 import WalletApi from '@/utils/api_requests/WalletApi';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
@@ -24,6 +25,7 @@ const formatWalletStatus = (status?: string) => {
 const Wallet = () => {
 	const { id: customerId } = useParams();
 	const [activeWallet, setActiveWallet] = useState<Wallet | null>();
+	const { limit, offset } = usePagination();
 
 	const {
 		data: wallets,
@@ -46,6 +48,8 @@ const Wallet = () => {
 		queryFn: async () => {
 			return await WalletApi.getWalletTransactions({
 				walletId: activeWallet ? activeWallet.id : '',
+				limit,
+				offset,
 			});
 		},
 		enabled: !!customerId && !!activeWallet,
@@ -66,6 +70,10 @@ const Wallet = () => {
 		return <p>Something went wrong</p>;
 	}
 
+	if (wallets?.length === 0) {
+		return <div>no wallets found</div>;
+	}
+
 	return (
 		<div className='w-2/3'>
 			<FormHeader
@@ -80,7 +88,7 @@ const Wallet = () => {
 				<FormHeader title='Wallet Details' variant='sub-header' titleClassName='font-semibold' />
 				<div className='w-full flex justify-between items-center'>
 					<p className='text-[#71717A] text-sm'>Wallet Name</p>
-					<p className='text-[#09090B] text-sm'>{activeWallet?.id}</p>
+					<p className='text-[#09090B] text-sm'>{activeWallet?.name || 'Prepaid wallet'}</p>
 				</div>
 				<Spacer className='!my-4' />
 				<div className='w-full flex justify-between items-center'>
@@ -131,6 +139,7 @@ const Wallet = () => {
 				</div>
 				<Spacer className='!h-6' />
 				<WalletTransactionsTable data={transactionsData?.transactions || []} />
+				<Pagination totalPages={Math.ceil((transactionsData?.total ?? 1) / limit)} />
 			</div>
 		</div>
 	);
