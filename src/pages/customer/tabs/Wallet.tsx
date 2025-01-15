@@ -1,6 +1,8 @@
 import { Chip, FormHeader, Loader, Spacer } from '@/components/atoms';
 import { Pagination, WalletTransactionsTable } from '@/components/molecules';
+import { Skeleton } from '@/components/ui/skeleton';
 import usePagination from '@/hooks/usePagination';
+import { Wallet } from '@/models/Wallet';
 import WalletApi from '@/utils/api_requests/WalletApi';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
@@ -22,7 +24,7 @@ const formatWalletStatus = (status?: string) => {
 	}
 };
 
-const Wallet = () => {
+const WalletTab = () => {
 	const { id: customerId } = useParams();
 	const [activeWallet, setActiveWallet] = useState<Wallet | null>();
 	const { limit, offset } = usePagination();
@@ -37,6 +39,14 @@ const Wallet = () => {
 			return await WalletApi.getWallets(customerId!);
 		},
 		enabled: !!customerId,
+	});
+
+	const { data: walletBalance, isLoading: isBalanceLoading } = useQuery({
+		queryKey: ['fetchWalletsTransactions', customerId, activeWallet?.id],
+		queryFn: async () => {
+			return await WalletApi.getWalletBalance(activeWallet ? activeWallet.id : '');
+		},
+		enabled: !!customerId && !!activeWallet,
 	});
 
 	const {
@@ -104,18 +114,22 @@ const Wallet = () => {
 			<Spacer className='!h-4' />
 
 			{/* wallet moneyy */}
-			<div className='w-full grid grid-cols-2 gap-4'>
-				<div className='card w-full'>
-					<p className='text-[#71717A] text-sm'>Current Balance</p>
-					<Spacer className='!my-2' />
-					<p className='text-[#09090B] font-semibold text-3xl '>${activeWallet?.balance}</p>
+			{isBalanceLoading ? (
+				<Skeleton className='w-full h-[200px]' />
+			) : (
+				<div className='w-full grid grid-cols-2 gap-4'>
+					<div className='card w-full'>
+						<p className='text-[#71717A] text-sm'>Current Balance</p>
+						<Spacer className='!my-2' />
+						<p className='text-[#09090B] font-semibold text-3xl '>${walletBalance?.balance}</p>
+					</div>
+					<div className='card w-full'>
+						<p className='text-[#71717A] text-sm'>Ongoing Balance</p>
+						<Spacer className='!my-2' />
+						<p className='text-[#09090B] font-semibold text-3xl '>${walletBalance?.real_time_balance}</p>
+					</div>
 				</div>
-				<div className='card w-full'>
-					<p className='text-[#71717A] text-sm'>Ongoing Balance</p>
-					<Spacer className='!my-2' />
-					<p className='text-[#09090B] font-semibold text-3xl '>${activeWallet?.balance}</p>
-				</div>
-			</div>
+			)}
 			<Spacer className='!h-4' />
 
 			<div className='card'>
@@ -145,4 +159,4 @@ const Wallet = () => {
 	);
 };
 
-export default Wallet;
+export default WalletTab;

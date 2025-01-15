@@ -1,4 +1,6 @@
 import { AxiosClient } from '@/core/axios/verbs';
+import { Wallet } from '@/models/Wallet';
+import { WalletBalance } from '@/models/WalletBalance';
 import { WalletTransaction } from '@/models/WalletTransaction';
 
 interface WalletTransactionPayload extends PaginationType {
@@ -16,6 +18,10 @@ class WalletApi {
 
 	static async getWalletTransactions({ walletId, limit = 10, offset = 0 }: WalletTransactionPayload): Promise<WalletTransactionResponse> {
 		return await AxiosClient.get<WalletTransactionResponse>(`/wallets/${walletId}/transactions?limit=${limit}&offset=${offset}`);
+	}
+
+	static async getWalletBalance(walletId: string): Promise<WalletBalance> {
+		return await AxiosClient.get<WalletBalance>(`/wallets/${walletId}/balance/real-time`);
 	}
 }
 

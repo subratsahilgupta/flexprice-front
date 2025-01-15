@@ -81,7 +81,7 @@ const TableCell = React.forwardRef<
 	<td
 		ref={ref}
 		style={{ textAlign: align, width: width ? (typeof width === 'number' ? `${width}px` : width) : undefined, ...style }}
-		className={cn('p-4 text-[14px] font-medium', `text-${align}`, 'align-middle', className)}
+		className={cn('px-4 py-2 !max-h-9 text-[14px] font-medium', `text-${align}`, 'align-middle', className)}
 		{...props}
 	/>
 ));
@@ -120,7 +120,7 @@ const FlexpriceTable: FC<FlexpriceTableProps> = ({ columns, data, redirectUrl })
 								className={cn(
 									textColor ? `text-[${textColor}]` : 'text-[#09090B] w-full ',
 									'font-normal',
-									'max-h-8 px-4 py-3 text-[14px]',
+									'!max-h-8 px-4 py-2 text-[14px]',
 									redirect && redirectUrl ? 'cursor-pointer' : 'cursor-default',
 								)}
 								style={{ flex: width ? undefined : flex }}
