@@ -2,12 +2,15 @@ import { FormHeader, Loader, Spacer } from '@/components/atoms';
 import { CustomerInvoiceTable } from '@/components/molecules';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { IoSearch } from 'react-icons/io5';
 import { LiaSlidersHSolid } from 'react-icons/lia';
 import { useParams } from 'react-router-dom';
+import InvoiceDetails from '../invoice/InvoiceDetail';
 
 const Invoice = () => {
 	const { id: customerId } = useParams();
+	const [activeInvoice, setactiveInvoice] = useState<string | null>();
 
 	const { data, isLoading } = useQuery({
 		queryKey: ['invoice', customerId],
@@ -17,6 +20,10 @@ const Invoice = () => {
 		staleTime: 0,
 		enabled: !!customerId,
 	});
+
+	const handleShowDetails = (invoice_id: string) => {
+		setactiveInvoice(invoice_id);
+	};
 
 	if (isLoading) {
 		return <Loader />;
@@ -28,6 +35,10 @@ const Invoice = () => {
 				<p className='text-gray-500 text-sm'>No invoices found</p>
 			</div>
 		);
+	}
+
+	if (activeInvoice) {
+		return <InvoiceDetails invoice_id={activeInvoice} />;
 	}
 
 	return (
@@ -52,7 +63,7 @@ const Invoice = () => {
 			</div>
 			<Spacer className='!h-6' />
 
-			<CustomerInvoiceTable customerId={customerId} data={data?.items ?? []} />
+			{!activeInvoice && <CustomerInvoiceTable onRowClick={handleShowDetails} customerId={customerId} data={data?.items ?? []} />}
 		</div>
 	);
 };

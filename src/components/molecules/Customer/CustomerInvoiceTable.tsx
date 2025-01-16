@@ -20,9 +20,10 @@ const formatPaymentStatus = (status: string) => {
 interface Props {
 	data: Invoice[];
 	customerId?: string;
+	onRowClick?: (row: any) => void;
 }
 
-const CustomerInvoiceTable: FC<Props> = ({ data, customerId }) => {
+const CustomerInvoiceTable: FC<Props> = ({ data, onRowClick }) => {
 	const columnData: ColumnData[] = [
 		{
 			name: 'invoice_number',
@@ -53,7 +54,7 @@ const CustomerInvoiceTable: FC<Props> = ({ data, customerId }) => {
 		},
 	];
 
-	return <FlexpriceTable columns={columnData} redirectUrl={`/customer-management/customers/${customerId}/invoice/`} data={data ?? []} />;
+	return <FlexpriceTable onRowClick={onRowClick} columns={columnData} data={data ?? []} />;
 };
 
 export default CustomerInvoiceTable;
