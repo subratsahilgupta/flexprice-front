@@ -5,7 +5,9 @@ import jsPDF from 'jspdf';
  * Captures a React component by ref and generates a downloadable PDF.
  * @param elementRef - A React ref to the DOM element to capture.
  * @param pdfFileName - The name of the generated PDF file.
- */ export const captureToPdf = async (elementRef: React.RefObject<HTMLElement>, pdfFileName: string) => {
+ */
+
+export const captureToPdf = async (elementRef: React.RefObject<HTMLElement>, pdfFileName: string) => {
 	if (!elementRef.current) {
 		console.error('Element not found in ref:', elementRef);
 		return;
@@ -20,19 +22,31 @@ import jsPDF from 'jspdf';
 		const pdf = new jsPDF({
 			orientation: 'portrait',
 			unit: 'px',
-			format: [canvas.width, canvas.height],
+			format: [2100, 2970], // A4 size in pixels at 72 DPI (customizable as needed)
 		});
 
 		const pageHeight = pdf.internal.pageSize.height;
+		const pageWidth = pdf.internal.pageSize.width;
 
-		// If content exceeds the page height, add more pages
+		const contentHeight = canvas.height;
+		const contentWidth = canvas.width;
+
+		// Start with the first page
 		let currentHeight = 0;
-		while (currentHeight < canvas.height) {
-			pdf.addImage(imgData, 'PNG', 0, currentHeight, canvas.width, canvas.height);
-			currentHeight += pageHeight;
 
-			// Add a new page if there's more content to capture
-			if (currentHeight < canvas.height) {
+		// Check if the content height exceeds a single page and split accordingly
+		while (currentHeight < contentHeight) {
+			const remainingHeight = contentHeight - currentHeight;
+
+			// Calculate the section to be added based on the current height
+			const sectionHeight = Math.min(remainingHeight, pageHeight);
+
+			pdf.addImage(imgData, 'PNG', 0, currentHeight, pageWidth, (sectionHeight * pageWidth) / contentWidth);
+
+			currentHeight += sectionHeight;
+
+			// If there is more content, add a new page
+			if (currentHeight < contentHeight) {
 				pdf.addPage();
 			}
 		}

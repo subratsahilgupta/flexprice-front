@@ -5,9 +5,9 @@ import formatDate from '@/utils/common/format_date';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import { useQuery } from '@tanstack/react-query';
 import { Download, Loader } from 'lucide-react';
-import { useRef } from 'react';
+import { FC, useRef } from 'react';
 import toast from 'react-hot-toast';
-import { useParams } from 'react-router-dom';
+// import { useParams } from 'react-router-dom';
 
 const formatToShortDate = (dateString: string): string => {
 	const date = new Date(dateString);
@@ -30,8 +30,12 @@ const formatPriceType = (value: string): string => {
 	}
 };
 
-const InvoiceDetailPage = () => {
-	const { invoice_id } = useParams<{ invoice_id: string }>();
+interface Props {
+	invoice_id: string;
+}
+
+const InvoiceDetails: FC<Props> = ({ invoice_id }) => {
+	// const { invoice_id } = useParams<{ invoice_id: string }>();
 
 	const { data, isLoading, isError } = useQuery({
 		queryKey: ['fetchInvoice', invoice_id],
@@ -164,4 +168,4 @@ const InvoiceDetailPage = () => {
 		</div>
 	);
 };
-export default InvoiceDetailPage;
+export default InvoiceDetails;
