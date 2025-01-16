@@ -22,6 +22,7 @@ export interface FlexpriceTableProps {
 	columns: ColumnData[];
 	redirectUrl?: string;
 	data: any[];
+	onRowClick?: (row: any) => void;
 }
 
 // Table structure components
@@ -88,7 +89,7 @@ const TableCell = React.forwardRef<
 TableCell.displayName = 'TableCell';
 
 // Main FlexpriceTable Component
-const FlexpriceTable: FC<FlexpriceTableProps> = ({ columns, data, redirectUrl }) => {
+const FlexpriceTable: FC<FlexpriceTableProps> = ({ onRowClick, columns, data, redirectUrl }) => {
 	const navigate = useNavigate();
 	return (
 		<Table>
@@ -108,7 +109,13 @@ const FlexpriceTable: FC<FlexpriceTableProps> = ({ columns, data, redirectUrl })
 			</TableHeader>
 			<TableBody>
 				{data?.map((row, rowIndex) => (
-					<TableRow key={rowIndex}>
+					<TableRow
+						onClick={() => {
+							if (onRowClick) {
+								onRowClick(row.id);
+							}
+						}}
+						key={rowIndex}>
 						{columns.map(({ name, flex = 1, width, textColor = 'inherit', align = 'left', render, redirect = true }, colIndex) => (
 							<TableCell
 								onClick={() => {

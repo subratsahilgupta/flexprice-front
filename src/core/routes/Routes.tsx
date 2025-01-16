@@ -11,7 +11,7 @@ import CreatePlanPage from '@/pages/customer/CreatePlan';
 import CustomerSubscription from '@/pages/customer/CustomerSubscription';
 import CustomerDetails from '@/pages/customer/CustomerDetails';
 import ErrorPage from '@/pages/error/ErrorPage';
-import InvoiceDetailPage from '@/pages/customer/invoice/InvoiceDetail';
+// import InvoiceDetails from '@/pages/customer/invoice/InvoiceDetail';
 
 const RouteNames = {
 	home: {
@@ -152,10 +152,10 @@ export const MainRouter = createBrowserRouter([
 						path: `${RouteNames.customerManagement.path}/${RouteNames.customerManagement.customers.path}/${RouteNames.customerManagement.customers.subscriptionDetails.path}`,
 						element: <CustomerSubscription />,
 					},
-					{
-						path: `${RouteNames.customerManagement.path}/${RouteNames.customerManagement.customers.path}/${RouteNames.customerManagement.customers.invoiceDetails.path}`,
-						element: <InvoiceDetailPage />,
-					},
+					// {
+					// 	path: `${RouteNames.customerManagement.path}/${RouteNames.customerManagement.customers.path}/${RouteNames.customerManagement.customers.invoiceDetails.path}`,
+					// 	element: <InvoiceDetails />,
+					// },
 					{
 						path: `${RouteNames.customerManagement.path}/${RouteNames.customerManagement.customers.path}/${RouteNames.customerManagement.customers.detail.path}`,
 						element: <CustomerDetails />,
