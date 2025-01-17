@@ -4,6 +4,7 @@ import usePlanStore, { Price } from '@/store/usePlanStore';
 import { Pencil, Trash2 } from 'lucide-react';
 import { AddChargesButton, subscriptionTypeOptions } from './SetupChargesSection';
 import { mapBillingPeriod } from '@/utils/common/helper_functions';
+import { billlingPeriodOptions, currencyOptions } from '@/core/data/constants';
 
 const RecurringChargesForm = () => {
 	const { setMetaDataField, clearAllErrors } = usePlanStore();
@@ -29,18 +30,6 @@ const RecurringChargesForm = () => {
 			setisEdit(false);
 		}
 	}, [metaData?.subscriptionType, metaData?.isRecurringEditMode]);
-
-	const currencyOptions = [
-		{ label: 'USD', value: 'USD', currency: '$' },
-		{ label: 'INR', value: 'INR', currency: '₹' },
-	];
-
-	const billlingPeriodOptions = [
-		{ label: 'Daily', value: 'DAILY' },
-		{ label: 'Weekly', value: 'WEEKLY' },
-		{ label: 'Monthly', value: 'MONTHLY' },
-		{ label: 'Yearly', value: 'ANNUAL' },
-	];
 
 	const mapCurrency = (currency: string) => {
 		const selectedCurrency = currencyOptions.find((option) => option.value === currency);

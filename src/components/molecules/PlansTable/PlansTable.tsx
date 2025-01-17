@@ -11,7 +11,7 @@ export interface PlansTableProps {
 }
 
 const PlansTable: FC<PlansTableProps> = ({ data }) => {
-	const mappedData = data.map((plan) => ({
+	const mappedData = data?.map((plan) => ({
 		...plan,
 	}));
 

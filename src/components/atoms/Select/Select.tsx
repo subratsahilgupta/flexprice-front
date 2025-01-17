@@ -23,11 +23,13 @@ const FlexPriceSelect: React.FC<Props> = ({
 	options,
 	selectedValue,
 	placeholder = 'Select an option',
-	label = 'Options',
+	label = '',
 	description,
 	onChange,
 	error,
 }) => {
+	console.log(selectedValue);
+
 	return (
 		<div className='space-y-1'>
 			{/* Label */}
@@ -44,6 +46,7 @@ const FlexPriceSelect: React.FC<Props> = ({
 						onChange(value);
 					}
 				}}
+				value={selectedValue}
 				disabled={disabled}>
 				<SelectTrigger className='w-full '>
 					<SelectValue placeholder={placeholder} />
@@ -52,7 +55,7 @@ const FlexPriceSelect: React.FC<Props> = ({
 					<SelectGroup>
 						{options.map((option) => (
 							<SelectItem key={option.value} value={option.value}>
-								<div className='flex flex-col'>
+								<div className='flex flex-col mr-2'>
 									<span>{option.label}</span>
 									{option.description && <span className='text-sm text-gray-500'>{option.description}</span>}
 								</div>

@@ -22,7 +22,7 @@ export interface BillableMetricTableProps {
 }
 
 const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
-	const mappedData = data.map((meter) => ({
+	const mappedData = data?.map((meter) => ({
 		...meter,
 		aggregation_type: meter.aggregation.type,
 		aggregation_field: meter.aggregation.field,
