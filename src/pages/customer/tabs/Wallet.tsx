@@ -1,4 +1,4 @@
-import { Chip, FormHeader, Loader, Spacer } from '@/components/atoms';
+import { Button, Chip, FormHeader, Loader, Select, Spacer } from '@/components/atoms';
 import { Pagination, WalletTransactionsTable } from '@/components/molecules';
 import { Skeleton } from '@/components/ui/skeleton';
 import usePagination from '@/hooks/usePagination';
@@ -10,6 +10,9 @@ import toast from 'react-hot-toast';
 import { IoSearch } from 'react-icons/io5';
 import { LiaSlidersHSolid } from 'react-icons/lia';
 import { useParams } from 'react-router-dom';
+import CreateWallet from '../CreateWallet';
+import { ReactSVG } from 'react-svg';
+import { Wallet as WalletIcon } from 'lucide-react';
 
 const formatWalletStatus = (status?: string) => {
 	switch (status) {
@@ -29,6 +32,8 @@ const WalletTab = () => {
 	const [activeWallet, setActiveWallet] = useState<Wallet | null>();
 	const { limit, offset } = usePagination();
 
+	const [isAdd, setisAdd] = useState(false);
+
 	const {
 		data: wallets,
 		isLoading,
@@ -42,7 +47,7 @@ const WalletTab = () => {
 	});
 
 	const { data: walletBalance, isLoading: isBalanceLoading } = useQuery({
-		queryKey: ['fetchWalletsTransactions', customerId, activeWallet?.id],
+		queryKey: ['fetchWalletBalances', customerId, activeWallet?.id],
 		queryFn: async () => {
 			return await WalletApi.getWalletBalance(activeWallet ? activeWallet.id : '');
 		},
@@ -71,6 +76,12 @@ const WalletTab = () => {
 		}
 	}, [wallets]);
 
+	const walletOptions = wallets?.map((wallet, index) => ({
+		label: wallet.name || `demo name ${index}`,
+		value: wallet.id,
+	}));
+	console.log('wallet options', walletOptions);
+
 	if (isLoading) {
 		return <Loader />;
 	}
@@ -80,8 +91,27 @@ const WalletTab = () => {
 		return <p>Something went wrong</p>;
 	}
 
+	if (isAdd) {
+		return <CreateWallet customerId={customerId!} />;
+	}
+
 	if (wallets?.length === 0) {
-		return <div>no wallets found</div>;
+		return (
+			<div className='h-screen w-full flex justify-center items-center'>
+				<div className='w-full flex flex-col items-center '>
+					<ReactSVG src={'/assets/svg/empty box.svg'} />
+					<p className='font-sans text-2xl font-bold'>Add your first Wallet</p>
+					<p className='text-[#71717A] font-normal '>
+						{'A billable base metric is used to measure usage, and act as a foundation of pricing (e.g., API calls for an API product).'}
+					</p>
+					<Spacer height={'16px'} />
+					<Button onClick={() => setisAdd(true)} className='w-32 flex gap-2 bg-[#0F172A] '>
+						<WalletIcon />
+						<span>Add Wallet</span>
+					</Button>
+				</div>
+			</div>
+		);
 	}
 
 	return (
@@ -92,69 +122,89 @@ const WalletTab = () => {
 				subtitle="Make changes to your account here. Click save when you're done."
 				variant='form-title'
 			/>
-
-			{/* wallet info */}
-			<div className='rounded-xl border border-gray-300 p-6'>
-				<FormHeader title='Wallet Details' variant='sub-header' titleClassName='font-semibold' />
-				<div className='w-full flex justify-between items-center'>
-					<p className='text-[#71717A] text-sm'>Wallet Name</p>
-					<p className='text-[#09090B] text-sm'>{activeWallet?.name || 'Prepaid wallet'}</p>
-				</div>
-				<Spacer className='!my-4' />
-				<div className='w-full flex justify-between items-center'>
-					<p className='text-[#71717A] text-sm'>Status</p>
-					<p className='text-[#09090B] text-sm'>
-						<Chip
-							isActive={formatWalletStatus(activeWallet?.wallet_status) === 'Active'}
-							label={formatWalletStatus(activeWallet?.wallet_status)}
-						/>
-					</p>
+			<div className='w-full flex justify-between items-center mb-3'>
+				<Select
+					options={walletOptions || []}
+					selectedValue={activeWallet?.id}
+					onChange={(value) => {
+						const selectedWallet = wallets?.find((wallet) => wallet.id === value) || null;
+						setActiveWallet(selectedWallet);
+					}}
+				/>
+				<div className='flex items-center space-x-2	'>
+					<Button onClick={() => setisAdd(true)} className='w-32 flex gap-2 bg-[#0F172A] '>
+						<WalletIcon />
+						<span>Add Wallet</span>
+					</Button>
 				</div>
 			</div>
-			<Spacer className='!h-4' />
-
-			{/* wallet moneyy */}
-			{isBalanceLoading ? (
-				<Skeleton className='w-full h-[200px]' />
-			) : (
-				<div className='w-full grid grid-cols-2 gap-4'>
-					<div className='card w-full'>
-						<p className='text-[#71717A] text-sm'>Current Balance</p>
-						<Spacer className='!my-2' />
-						<p className='text-[#09090B] font-semibold text-3xl '>${walletBalance?.balance}</p>
+			{/* when we have wallets or active wallets */}
+			{activeWallet && !isAdd && (
+				<div>
+					{/* wallet info */}
+					<div className='rounded-xl border border-gray-300 p-6'>
+						<FormHeader title='Wallet Details' variant='sub-header' titleClassName='font-semibold' />
+						<div className='w-full flex justify-between items-center'>
+							<p className='text-[#71717A] text-sm'>Wallet Name</p>
+							<p className='text-[#09090B] text-sm'>{activeWallet?.name || 'Prepaid wallet'}</p>
+						</div>
+						<Spacer className='!my-4' />
+						<div className='w-full flex justify-between items-center'>
+							<p className='text-[#71717A] text-sm'>Status</p>
+							<p className='text-[#09090B] text-sm'>
+								<Chip
+									isActive={formatWalletStatus(activeWallet?.wallet_status) === 'Active'}
+									label={formatWalletStatus(activeWallet?.wallet_status)}
+								/>
+							</p>
+						</div>
 					</div>
-					<div className='card w-full'>
-						<p className='text-[#71717A] text-sm'>Ongoing Balance</p>
-						<Spacer className='!my-2' />
-						<p className='text-[#09090B] font-semibold text-3xl '>${walletBalance?.real_time_balance}</p>
+					<Spacer className='!h-4' />
+
+					{/* wallet moneyy */}
+					{isBalanceLoading ? (
+						<Skeleton className='w-full h-[200px]' />
+					) : (
+						<div className='w-full grid grid-cols-2 gap-4'>
+							<div className='card w-full'>
+								<p className='text-[#71717A] text-sm'>Current Balance</p>
+								<Spacer className='!my-2' />
+								<p className='text-[#09090B] font-semibold text-3xl '>${walletBalance?.balance}</p>
+							</div>
+							<div className='card w-full'>
+								<p className='text-[#71717A] text-sm'>Ongoing Balance</p>
+								<Spacer className='!my-2' />
+								<p className='text-[#09090B] font-semibold text-3xl '>${walletBalance?.real_time_balance}</p>
+							</div>
+						</div>
+					)}
+					<Spacer className='!h-4' />
+
+					<div className='card'>
+						<div className='w-full flex justify-between items-center'>
+							<div>
+								<FormHeader
+									title='Transactions'
+									titleClassName='!font-semibold'
+									variant='form-title'
+									subtitle='Assign a name to your event schema '
+								/>
+							</div>
+							<div className='flex items-center space-x-2	'>
+								<button className='px-2 py-1'>
+									<IoSearch className='size-4 text-[#09090B] ' />
+								</button>
+								<button className='px-2 py-1'>
+									<LiaSlidersHSolid className='size-4 text-[#09090B] ' />
+								</button>
+							</div>
+						</div>
+						<Spacer className='!h-6' />
+						<WalletTransactionsTable data={transactionsData?.transactions || []} />
+						<Pagination totalPages={Math.ceil((transactionsData?.total ?? 1) / limit)} />
 					</div>
 				</div>
 			)}
-			<Spacer className='!h-4' />
-
-			<div className='card'>
-				<div className='w-full flex justify-between items-center'>
-					<div>
-						<FormHeader
-							title='Transactions'
-							titleClassName='!font-semibold'
-							variant='form-title'
-							subtitle='Assign a name to your event schema '
-						/>
-					</div>
-					<div className='flex items-center space-x-2	'>
-						<button className='px-2 py-1'>
-							<IoSearch className='size-4 text-[#09090B] ' />
-						</button>
-						<button className='px-2 py-1'>
-							<LiaSlidersHSolid className='size-4 text-[#09090B] ' />
-						</button>
-					</div>
-				</div>
-				<Spacer className='!h-6' />
-				<WalletTransactionsTable data={transactionsData?.transactions || []} />
-				<Pagination totalPages={Math.ceil((transactionsData?.total ?? 1) / limit)} />
-			</div>
 		</div>
 	);
 };

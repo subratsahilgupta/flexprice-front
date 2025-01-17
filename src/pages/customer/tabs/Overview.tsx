@@ -23,7 +23,7 @@ const SkeletonLoader = () => (
 
 const fetchAllSubscriptions = async (customerId: string) => {
 	const subs = await CustomerApi.getCustomerSubscriptions(customerId);
-	return subs.subscriptions;
+	return subs.items;
 };
 const Overview = () => {
 	const navigate = useNavigate();

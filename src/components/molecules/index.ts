@@ -9,4 +9,6 @@ export type { EventFilterData } from './EventFilter';
 export { default as PlansTable } from './PlansTable';
 export { default as Pagination } from './Pagination';
 export { default as WalletTransactionsTable } from './Wallet';
+export { default as TopupCard } from './TopupCard';
+export { default as RectangleRadiogroup } from './RectangleRadiogroup';
 export { CreateCustomerDrawer, CustomerCard, CustomerTable, CustomerInvoiceTable } from './Customer';

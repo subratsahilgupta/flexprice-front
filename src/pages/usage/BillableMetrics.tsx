@@ -22,7 +22,7 @@ const BillableMetricsPage = () => {
 	};
 
 	const {
-		data: meters,
+		data: meterData,
 		isLoading,
 		isError,
 	} = useQuery({
@@ -47,7 +47,7 @@ const BillableMetricsPage = () => {
 		toast.error('Error fetching meters');
 	}
 
-	if (meters?.length === 0) {
+	if (meterData?.items.length === 0) {
 		return (
 			<div className='h-screen w-full flex justify-center items-center'>
 				<div className='w-full flex flex-col items-center '>
@@ -87,7 +87,7 @@ const BillableMetricsPage = () => {
 				</div>
 			</SectionHeader>
 			<div className=''>
-				<BillableMetricTable data={meters || []} />
+				<BillableMetricTable data={meterData?.items || []} />
 				<Spacer className='!h-4' />
 				{/* <Pagination
 					totalPages={Math.ceil((plans?.total ?? 1) / limit)}

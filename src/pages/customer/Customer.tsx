@@ -16,7 +16,7 @@ const CustomerPage = () => {
 	};
 
 	const {
-		data: customers,
+		data: customerData,
 		isLoading,
 		isError,
 	} = useQuery({
@@ -56,9 +56,9 @@ const CustomerPage = () => {
 				</div>
 			</SectionHeader>
 			<div>
-				<CustomerTable data={customers?.customers || []} />
+				<CustomerTable data={customerData?.items || []} />
 				<Spacer className='!h-4' />
-				<Pagination totalPages={Math.ceil((customers?.total ?? 1) / limit)} />
+				<Pagination totalPages={Math.ceil((customerData?.pagination.total ?? 1) / limit)} />
 			</div>
 		</div>
 	);

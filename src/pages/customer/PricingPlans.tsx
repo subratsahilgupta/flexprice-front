@@ -23,7 +23,7 @@ const PricingPlan = () => {
 	};
 
 	const {
-		data: plans,
+		data: plansData,
 		isLoading,
 		isError,
 	} = useQuery({
@@ -49,7 +49,7 @@ const PricingPlan = () => {
 		toast.error('Error fetching meters');
 	}
 
-	if ((plans?.plans ?? []).length === 0) {
+	if ((plansData?.items ?? []).length === 0) {
 		return (
 			<div className='h-screen w-full flex justify-center items-center'>
 				<div className='w-full flex flex-col items-center '>
@@ -87,9 +87,9 @@ const PricingPlan = () => {
 				</div>
 			</SectionHeader>
 			<div className=''>
-				<PlansTable data={(plans?.plans || []) as Plan[]} />
+				<PlansTable data={(plansData?.items || []) as Plan[]} />
 				<Spacer className='!h-4' />
-				<Pagination totalPages={Math.ceil((plans?.total ?? 1) / limit)} />
+				<Pagination totalPages={Math.ceil((plansData?.pagination.total ?? 1) / limit)} />
 			</div>
 		</div>
 	);

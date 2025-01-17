@@ -11,6 +11,17 @@ interface WalletTransactionResponse {
 	transactions: WalletTransaction[];
 }
 
+interface CreateWalletPayload {
+	customerId: string;
+	currency: string;
+	name?: string;
+}
+
+interface TopupWalletPayload {
+	amount?: number;
+	walletId: string;
+}
+
 class WalletApi {
 	static async getWallets(customerId: string): Promise<Wallet[]> {
 		return await AxiosClient.get<Wallet[]>(`/customers/${customerId}/wallets`);
@@ -22,6 +33,18 @@ class WalletApi {
 
 	static async getWalletBalance(walletId: string): Promise<WalletBalance> {
 		return await AxiosClient.get<WalletBalance>(`/wallets/${walletId}/balance/real-time`);
+	}
+	static async createWallet({ currency, customerId }: CreateWalletPayload): Promise<Wallet> {
+		return await AxiosClient.post<Wallet>(`/wallets`, {
+			currency,
+			customer_id: customerId,
+		});
+	}
+
+	static async topupWallet({ walletId, amount }: TopupWalletPayload): Promise<Wallet> {
+		return await AxiosClient.post<Wallet>(`/wallets/${walletId}/top-up`, {
+			amount,
+		});
 	}
 }
 
