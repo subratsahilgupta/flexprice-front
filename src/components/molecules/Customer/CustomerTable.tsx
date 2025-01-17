@@ -11,7 +11,7 @@ export interface Props {
 }
 
 const CustomerTable: FC<Props> = ({ data }) => {
-	const mappedData = data.map((customer) => ({
+	const mappedData = data?.map((customer) => ({
 		...customer,
 	}));
 	const columns: ColumnData[] = [

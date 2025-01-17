@@ -1,6 +1,11 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import { Meter } from '@/models/Meter';
 
+interface getAllMetersResponse {
+	items: Meter[];
+	pagination: PaginationType;
+}
+
 export class MeterApi {
 	private static baseUrl = '/meters';
 
@@ -8,7 +13,7 @@ export class MeterApi {
 		return await AxiosClient.post<Meter, Partial<Meter>>(this.baseUrl, data);
 	}
 	public static async getAllMeters({ limit, offset }: PaginationType) {
-		return await AxiosClient.get<Meter[]>(`${this.baseUrl}?limit=${limit}&offset=${offset}`);
+		return await AxiosClient.get<getAllMetersResponse>(`${this.baseUrl}?limit=${limit}&offset=${offset}`);
 	}
 
 	public static async getMeterById(id: string) {

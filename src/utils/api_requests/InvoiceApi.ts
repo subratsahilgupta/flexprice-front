@@ -3,7 +3,7 @@ import { Invoice } from '@/models/Invoice';
 
 interface GetInvoicesResponse {
 	items: Invoice[];
-	total: number;
+	pagination: PaginationType;
 }
 
 class InvoiceApi {

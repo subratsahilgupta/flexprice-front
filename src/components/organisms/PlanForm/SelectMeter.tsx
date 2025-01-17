@@ -38,7 +38,7 @@ const SelectMeter: FC<Props> = ({ onChange, value, error }) => {
 		return <div>No meters found</div>;
 	}
 
-	const activeMeters: Option[] = meters!
+	const activeMeters: Option[] = meters!.items
 		.filter((meter) => meter.status === 'published')
 		.map((meter) => {
 			return {
@@ -52,7 +52,7 @@ const SelectMeter: FC<Props> = ({ onChange, value, error }) => {
 			<Select
 				error={error}
 				selectedValue={value}
-				onChange={(e) => onChange(meters.find((meter) => meter.id === e) as Meter)}
+				onChange={(e) => onChange(meters.items.find((meter) => meter.id === e) as Meter)}
 				options={activeMeters}
 				placeholder='Select by meter name'
 				label='Billable Metric'

@@ -7,8 +7,19 @@ interface WalletTransactionPayload extends PaginationType {
 	walletId: string;
 }
 interface WalletTransactionResponse {
-	total: number;
-	transactions: WalletTransaction[];
+	items: WalletTransaction[];
+	pagination: PaginationType;
+}
+
+interface CreateWalletPayload {
+	customerId: string;
+	currency: string;
+	name?: string;
+}
+
+interface TopupWalletPayload {
+	amount?: number;
+	walletId: string;
 }
 
 class WalletApi {
@@ -22,6 +33,19 @@ class WalletApi {
 
 	static async getWalletBalance(walletId: string): Promise<WalletBalance> {
 		return await AxiosClient.get<WalletBalance>(`/wallets/${walletId}/balance/real-time`);
+	}
+	static async createWallet({ currency, customerId, name }: CreateWalletPayload): Promise<Wallet> {
+		return await AxiosClient.post<Wallet>(`/wallets`, {
+			currency,
+			customer_id: customerId,
+			name,
+		});
+	}
+
+	static async topupWallet({ walletId, amount }: TopupWalletPayload): Promise<Wallet> {
+		return await AxiosClient.post<Wallet>(`/wallets/${walletId}/top-up`, {
+			amount,
+		});
 	}
 }
 

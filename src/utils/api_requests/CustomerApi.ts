@@ -3,17 +3,13 @@ import Customer from '@/models/Customer';
 import { Subscription } from '@/models/Subscription';
 
 interface GetCustomerResponse {
-	customers: Customer[];
-	limit: number;
-	offset: number;
-	total: number;
+	items: Customer[];
+	pagination: PaginationType;
 }
 
 interface GetCustomerSubscriptionsResponse {
-	subscriptions: Subscription[];
-	limit: number;
-	offset: number;
-	total: number;
+	items: Subscription[];
+	pagination: PaginationType;
 }
 
 export interface CreateCustomerSubscriptionPayload {
