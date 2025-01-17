@@ -5,6 +5,7 @@ import RectangleRadiogroup from '../RectangleRadiogroup';
 import { useMutation } from '@tanstack/react-query';
 import WalletApi from '@/utils/api_requests/WalletApi';
 import toast from 'react-hot-toast';
+import { cn } from '@/lib/utils';
 
 export interface TopupCardPayload {
 	free_credits?: number;
@@ -14,9 +15,11 @@ interface Props {
 	preFunction?: () => void;
 	walletId?: string;
 	isPrefunctionLoading?: boolean;
+	className?: string;
+	onSuccess?: () => void;
 }
 
-const TopupCard: FC<Props> = ({ walletId, preFunction, isPrefunctionLoading = false }) => {
+const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionLoading = false, className }) => {
 	const subscriptionTypeOptions = [
 		{
 			value: 'FIXED',
@@ -52,15 +55,16 @@ const TopupCard: FC<Props> = ({ walletId, preFunction, isPrefunctionLoading = fa
 		onSettled: () => {
 			setfreeCredits(undefined);
 			setsubscriptionType(undefined);
+			if (onSuccess) {
+				onSuccess();
+			}
 		},
 	});
-
 	const handleTopup = async () => {
 		// if (!subscriptionType) {
 		// 	toast.error('Subscription type is required');
 		// 	return;
 		// }
-
 		if (subscriptionType === subscriptionTypeOptions[0].value && !freeCredits) {
 			toast.error('Free credits is required');
 			return;
@@ -76,7 +80,7 @@ const TopupCard: FC<Props> = ({ walletId, preFunction, isPrefunctionLoading = fa
 	};
 
 	return (
-		<div className='card space-y-4'>
+		<div className={cn('card space-y-4', className)}>
 			<FormHeader
 				title='Wallet Top Up'
 				subtitle={`Define credits to purchase and to grant upon wallet creation. Credits for purchase generate invoice, whereas credits for grapnt do not generate invoice`}

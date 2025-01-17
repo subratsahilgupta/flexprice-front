@@ -1,4 +1,5 @@
 import { Dialog as ShadcnDialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { cn } from '@/lib/utils';
 import { FC, ReactNode } from 'react';
 
 interface Props {
@@ -7,12 +8,13 @@ interface Props {
 	title: string;
 	description?: string;
 	children?: ReactNode;
+	className?: string;
 }
 
-const Dialog: FC<Props> = ({ isOpen, onOpenChange, title, description, children }) => {
+const Dialog: FC<Props> = ({ className, isOpen, onOpenChange, title, description, children }) => {
 	return (
 		<ShadcnDialog open={isOpen} onOpenChange={onOpenChange}>
-			<DialogContent className='bg-white'>
+			<DialogContent className={cn('bg-white', className)}>
 				<DialogHeader>
 					<DialogTitle className='font-medium'>{title}</DialogTitle>
 					{description && <DialogDescription>{description}</DialogDescription>}

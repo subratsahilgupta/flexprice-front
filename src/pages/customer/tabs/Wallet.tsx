@@ -1,5 +1,5 @@
-import { Button, Chip, FormHeader, Loader, Select, Spacer } from '@/components/atoms';
-import { Pagination, WalletTransactionsTable } from '@/components/molecules';
+import { Button, Chip, Dialog, FormHeader, Loader, Select, Spacer } from '@/components/atoms';
+import { DropdownMenu, DropdownMenuOption, Pagination, TopupCard, WalletTransactionsTable } from '@/components/molecules';
 import { Skeleton } from '@/components/ui/skeleton';
 import usePagination from '@/hooks/usePagination';
 import { Wallet } from '@/models/Wallet';
@@ -12,7 +12,7 @@ import { LiaSlidersHSolid } from 'react-icons/lia';
 import { useParams } from 'react-router-dom';
 import CreateWallet from '../CreateWallet';
 import { ReactSVG } from 'react-svg';
-import { Wallet as WalletIcon } from 'lucide-react';
+import { CircleFadingPlus, EllipsisVertical, Pencil, Trash2, Wallet as WalletIcon } from 'lucide-react';
 
 const formatWalletStatus = (status?: string) => {
 	switch (status) {
@@ -33,6 +33,24 @@ const WalletTab = () => {
 	const { limit, offset } = usePagination();
 
 	const [isAdd, setisAdd] = useState(false);
+	const [showTopupModal, setshowTopupModal] = useState(false);
+	const dropdownOptions: DropdownMenuOption[] = [
+		{
+			icon: <CircleFadingPlus />,
+			label: 'Topup Wallet',
+			onSelect: () => setshowTopupModal(true),
+		},
+		{
+			icon: <Pencil />,
+			label: 'Edit',
+			disabled: true,
+		},
+		{
+			icon: <Trash2 />,
+			label: 'Delete',
+			disabled: true,
+		},
+	];
 
 	const {
 		data: wallets,
@@ -116,6 +134,11 @@ const WalletTab = () => {
 
 	return (
 		<div className='w-2/3'>
+			{/* topup wallet */}
+			<Dialog className='!w-[700px]' title='' isOpen={showTopupModal} onOpenChange={() => setshowTopupModal(false)}>
+				<TopupCard onSuccess={() => setshowTopupModal(false)} walletId={activeWallet?.id} />
+			</Dialog>
+
 			<FormHeader
 				className='!my-6'
 				title='Wallets'
@@ -136,6 +159,14 @@ const WalletTab = () => {
 						<WalletIcon />
 						<span>Add Wallet</span>
 					</Button>
+
+					<DropdownMenu
+						options={dropdownOptions}
+						trigger={
+							<Button variant={'outline'} className='size-9 '>
+								<EllipsisVertical />
+							</Button>
+						}></DropdownMenu>
 				</div>
 			</div>
 			{/* when we have wallets or active wallets */}

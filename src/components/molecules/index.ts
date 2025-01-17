@@ -11,4 +11,6 @@ export { default as Pagination } from './Pagination';
 export { default as WalletTransactionsTable } from './Wallet';
 export { default as TopupCard } from './TopupCard';
 export { default as RectangleRadiogroup } from './RectangleRadiogroup';
+export { default as DropdownMenu } from './DropdownMenu';
+export type { DropdownMenuOption } from './DropdownMenu';
 export { CreateCustomerDrawer, CustomerCard, CustomerTable, CustomerInvoiceTable } from './Customer';
