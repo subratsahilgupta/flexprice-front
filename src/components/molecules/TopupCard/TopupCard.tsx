@@ -6,13 +6,14 @@ import { useMutation } from '@tanstack/react-query';
 import WalletApi from '@/utils/api_requests/WalletApi';
 import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
+import { queryClient } from '@/App';
 
 export interface TopupCardPayload {
 	free_credits?: number;
 }
 
 interface Props {
-	preFunction?: () => void;
+	preFunction?: () => Promise<string | undefined>;
 	walletId?: string;
 	isPrefunctionLoading?: boolean;
 	className?: string;
@@ -41,16 +42,26 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 
 	const { isPending, mutate: topupWallet } = useMutation({
 		mutationKey: ['topupWallet', walletId],
-		mutationFn: async () => {
+		mutationFn: async (walletId: string) => {
 			return await WalletApi.topupWallet({
-				walletId: walletId!,
+				walletId: walletId,
 				amount: freeCredits!,
 			});
 		},
-		onSuccess: () => {
+		onSuccess: async () => {
 			if (!preFunction) {
 				toast.success('Wallet topped up successfully');
 			}
+			queryClient.invalidateQueries({ queryKey: ['fetcWallets'] });
+			queryClient.invalidateQueries({ queryKey: ['fetchWalletBalances'] });
+			queryClient.invalidateQueries({ queryKey: ['fetchWalletsTransactions'] });
+
+			// Optionally, refetcph queries immediately
+			await Promise.all([
+				queryClient.refetchQueries({ queryKey: ['fetcWallets'] }),
+				queryClient.refetchQueries({ queryKey: ['fetchWalletBalances'] }),
+				queryClient.refetchQueries({ queryKey: ['fetchWalletsTransactions'] }),
+			]);
 		},
 		onSettled: () => {
 			setfreeCredits(undefined);
@@ -71,11 +82,13 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 		}
 
 		if (preFunction) {
-			await preFunction();
+			const id = await preFunction();
+			topupWallet(id!);
 		}
+		console.log('completed with pre function execution', walletId);
 
-		if (walletId) {
-			topupWallet();
+		if (walletId && !preFunction) {
+			topupWallet(walletId);
 		}
 	};
 

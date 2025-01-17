@@ -20,7 +20,7 @@ const CreateWallet: FC<Props> = ({ customerId }) => {
 
 	const {
 		data: walletData,
-		mutate: createWallet,
+		mutateAsync: createWallet,
 		isPending,
 	} = useMutation({
 		mutationKey: ['createWallet', customerId],
@@ -40,7 +40,7 @@ const CreateWallet: FC<Props> = ({ customerId }) => {
 		},
 	});
 
-	const handleCreateWallet = () => {
+	const handleCreateWallet = async () => {
 		if (!walletName) {
 			setErrors((prev) => ({ ...prev, walletName: 'Wallet name is required' }));
 			return;
@@ -50,7 +50,11 @@ const CreateWallet: FC<Props> = ({ customerId }) => {
 			setErrors((prev) => ({ ...prev, currency: 'Currency is required' }));
 			return;
 		}
-		createWallet();
+		console.log('starting create wallet');
+
+		const wallet = await createWallet();
+		console.log('wallet created ');
+		return wallet.id;
 	};
 
 	return (
@@ -75,7 +79,7 @@ const CreateWallet: FC<Props> = ({ customerId }) => {
 				/>
 			</div>
 			<Spacer className='!mt-4' />
-			<TopupCard isPrefunctionLoading={isPending} walletId={walletData?.id} preFunction={() => handleCreateWallet()} />
+			<TopupCard isPrefunctionLoading={isPending} walletId={walletData?.id} preFunction={async () => await handleCreateWallet()} />
 		</div>
 	);
 };

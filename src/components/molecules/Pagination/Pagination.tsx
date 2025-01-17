@@ -8,6 +8,7 @@ import {
 	PaginationNext,
 	PaginationEllipsis,
 } from '@/components/ui/pagination';
+import { Spacer } from '@/components/atoms';
 
 const FLexpricePagination = ({ totalPages }: { totalPages: number }) => {
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -18,39 +19,44 @@ const FLexpricePagination = ({ totalPages }: { totalPages: number }) => {
 		setSearchParams({ page: page.toString() });
 	};
 
+	if (totalPages <= 1) return null;
+
 	return (
-		<Pagination>
-			<PaginationContent>
-				{/* Previous Button */}
-				<PaginationItem>
-					<PaginationPrevious onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
-				</PaginationItem>
-
-				{/* Pagination Items */}
-				{Array.from({ length: totalPages }, (_, index) => {
-					const page = index + 1;
-					return (
-						<PaginationItem key={page}>
-							<PaginationLink isActive={currentPage === page} onClick={() => handlePageChange(page)}>
-								{page}
-							</PaginationLink>
-						</PaginationItem>
-					);
-				})}
-
-				{/* Ellipsis (Optional for large pagination ranges) */}
-				{totalPages > 5 && (
+		<>
+			<Spacer className='!mt-4' />
+			<Pagination>
+				<PaginationContent>
+					{/* Previous Button */}
 					<PaginationItem>
-						<PaginationEllipsis />
+						<PaginationPrevious onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
 					</PaginationItem>
-				)}
 
-				{/* Next Button */}
-				<PaginationItem>
-					<PaginationNext onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />
-				</PaginationItem>
-			</PaginationContent>
-		</Pagination>
+					{/* Pagination Items */}
+					{Array.from({ length: totalPages }, (_, index) => {
+						const page = index + 1;
+						return (
+							<PaginationItem key={page}>
+								<PaginationLink isActive={currentPage === page} onClick={() => handlePageChange(page)}>
+									{page}
+								</PaginationLink>
+							</PaginationItem>
+						);
+					})}
+
+					{/* Ellipsis (Optional for large pagination ranges) */}
+					{totalPages > 5 && (
+						<PaginationItem>
+							<PaginationEllipsis />
+						</PaginationItem>
+					)}
+
+					{/* Next Button */}
+					<PaginationItem>
+						<PaginationNext onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />
+					</PaginationItem>
+				</PaginationContent>
+			</Pagination>
+		</>
 	);
 };
 

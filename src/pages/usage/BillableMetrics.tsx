@@ -2,7 +2,7 @@ import { Button, SectionHeader, Spacer } from '@/components/atoms';
 import { IoSearch } from 'react-icons/io5';
 import { LiaSlidersHSolid } from 'react-icons/lia';
 import { FiFolderPlus } from 'react-icons/fi';
-import { BillableMetricTable } from '@/components/molecules';
+import { BillableMetricTable, Pagination } from '@/components/molecules';
 import { Link } from 'react-router-dom';
 import { MeterApi } from '@/utils/api_requests/MeterApi';
 import { useQuery } from '@tanstack/react-query';
@@ -12,7 +12,7 @@ import { ReactSVG } from 'react-svg';
 import usePagination from '@/hooks/usePagination';
 
 const BillableMetricsPage = () => {
-	const { limit, offset } = usePagination();
+	const { limit, offset, page } = usePagination();
 
 	const fetchMeters = async () => {
 		return await MeterApi.getAllMeters({
@@ -26,7 +26,7 @@ const BillableMetricsPage = () => {
 		isLoading,
 		isError,
 	} = useQuery({
-		queryKey: ['fetchMeters'],
+		queryKey: ['fetchMeters', page],
 		queryFn: fetchMeters,
 		retry: 2,
 		staleTime: 0,
@@ -89,9 +89,7 @@ const BillableMetricsPage = () => {
 			<div className=''>
 				<BillableMetricTable data={meterData?.items || []} />
 				<Spacer className='!h-4' />
-				{/* <Pagination
-					totalPages={Math.ceil((plans?.total ?? 1) / limit)}
-				/> */}
+				<Pagination totalPages={Math.ceil((meterData?.pagination.total ?? 1) / limit)} />
 			</div>
 		</div>
 	);

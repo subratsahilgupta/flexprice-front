@@ -14,7 +14,7 @@ export interface SubscriptionTableProps {
 const SubscriptionTable: FC<SubscriptionTableProps> = ({ customerId, data }) => {
 	const mappedData = (data ?? []).map((subscription) => ({
 		id: subscription.id,
-		plan_name: subscription.plan.name,
+		plan_name: subscription.plan?.name,
 		status: subscription.status,
 		start_date: subscription.start_date,
 		end_date: subscription.end_date,

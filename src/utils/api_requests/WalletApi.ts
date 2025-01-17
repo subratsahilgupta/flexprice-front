@@ -7,8 +7,8 @@ interface WalletTransactionPayload extends PaginationType {
 	walletId: string;
 }
 interface WalletTransactionResponse {
-	total: number;
-	transactions: WalletTransaction[];
+	items: WalletTransaction[];
+	pagination: PaginationType;
 }
 
 interface CreateWalletPayload {
@@ -34,10 +34,11 @@ class WalletApi {
 	static async getWalletBalance(walletId: string): Promise<WalletBalance> {
 		return await AxiosClient.get<WalletBalance>(`/wallets/${walletId}/balance/real-time`);
 	}
-	static async createWallet({ currency, customerId }: CreateWalletPayload): Promise<Wallet> {
+	static async createWallet({ currency, customerId, name }: CreateWalletPayload): Promise<Wallet> {
 		return await AxiosClient.post<Wallet>(`/wallets`, {
 			currency,
 			customer_id: customerId,
+			name,
 		});
 	}
 

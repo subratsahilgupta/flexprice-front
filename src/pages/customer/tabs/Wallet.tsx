@@ -210,30 +210,35 @@ const WalletTab = () => {
 						</div>
 					)}
 					<Spacer className='!h-4' />
-
-					<div className='card'>
-						<div className='w-full flex justify-between items-center'>
-							<div>
-								<FormHeader
-									title='Transactions'
-									titleClassName='!font-semibold'
-									variant='form-title'
-									subtitle='Assign a name to your event schema '
-								/>
-							</div>
-							<div className='flex items-center space-x-2	'>
-								<button className='px-2 py-1'>
-									<IoSearch className='size-4 text-[#09090B] ' />
-								</button>
-								<button className='px-2 py-1'>
-									<LiaSlidersHSolid className='size-4 text-[#09090B] ' />
-								</button>
-							</div>
+					{transactionsData?.items.length === 0 ? (
+						<div className='card'>
+							<FormHeader title='No transactions found' variant='sub-header' subtitle='No recent transactions' />
 						</div>
-						<Spacer className='!h-6' />
-						<WalletTransactionsTable data={transactionsData?.transactions || []} />
-						<Pagination totalPages={Math.ceil((transactionsData?.total ?? 1) / limit)} />
-					</div>
+					) : (
+						<div className='card'>
+							<div className='w-full flex justify-between items-center'>
+								<div>
+									<FormHeader
+										title='Transactions'
+										titleClassName='!font-semibold'
+										variant='form-title'
+										subtitle='Assign a name to your event schema '
+									/>
+								</div>
+								<div className='flex items-center space-x-2	'>
+									<button className='px-2 py-1'>
+										<IoSearch className='size-4 text-[#09090B] ' />
+									</button>
+									<button className='px-2 py-1'>
+										<LiaSlidersHSolid className='size-4 text-[#09090B] ' />
+									</button>
+								</div>
+							</div>
+							<Spacer className='!h-6' />
+							<WalletTransactionsTable data={transactionsData?.items || []} />
+							<Pagination totalPages={Math.ceil((transactionsData?.pagination.total ?? 1) / limit)} />
+						</div>
+					)}
 				</div>
 			)}
 		</div>
