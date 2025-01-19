@@ -12,6 +12,7 @@ import { LiaSlidersHSolid } from 'react-icons/lia';
 import { useParams } from 'react-router-dom';
 import CreateWallet from '../CreateWallet';
 import { CircleFadingPlus, EllipsisVertical, Pencil, Trash2, Wallet as WalletIcon } from 'lucide-react';
+import { getCurrencySymbol } from '@/utils/common/helper_functions';
 
 const formatWalletStatus = (status?: string) => {
 	switch (status) {
@@ -200,12 +201,12 @@ const WalletTab = () => {
 							<div className='card w-full'>
 								<p className='text-[#71717A] text-sm'>Current Balance</p>
 								<Spacer className='!my-2' />
-								<p className='text-[#09090B] font-semibold text-3xl '>${walletBalance?.balance}</p>
+								<p className='text-[#09090B] font-semibold text-3xl '>{getCurrencySymbol(walletBalance?.currency ?? '')}{walletBalance?.balance}</p>
 							</div>
 							<div className='card w-full'>
 								<p className='text-[#71717A] text-sm'>Ongoing Balance</p>
 								<Spacer className='!my-2' />
-								<p className='text-[#09090B] font-semibold text-3xl '>${walletBalance?.real_time_balance}</p>
+								<p className='text-[#09090B] font-semibold text-3xl '>{getCurrencySymbol(walletBalance?.currency ?? '')}{walletBalance?.real_time_balance}</p>
 							</div>
 						</div>
 					)}
