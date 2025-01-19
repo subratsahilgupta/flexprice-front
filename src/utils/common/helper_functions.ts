@@ -1,7 +1,7 @@
 import { ChargesForBillingPeriodOne } from '@/components/organisms/Subscription/PriceTable';
 
 export function getCurrencySymbol(currency: string): string {
-	switch (currency) {
+	switch (currency.toLowerCase()) {
 		case 'usd':
 			return '$';
 		case 'inr':
