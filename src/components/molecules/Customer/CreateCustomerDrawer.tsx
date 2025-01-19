@@ -74,6 +74,9 @@ const CreateCustomerDrawer = () => {
 			await queryClient.invalidateQueries({
 				queryKey: ['fetchCustomer'],
 			});
+			await queryClient.refetchQueries({
+				queryKey: ['fetchCustomer'],
+			});
 		},
 		onError: () => {
 			toast.error('Error adding customer');

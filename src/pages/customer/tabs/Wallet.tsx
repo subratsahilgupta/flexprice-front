@@ -1,4 +1,4 @@
-import { Button, Chip, Dialog, FormHeader, Loader, Select, Spacer } from '@/components/atoms';
+import { Button, Chip, FormHeader, Loader, Modal, Select, Spacer } from '@/components/atoms';
 import { DropdownMenu, DropdownMenuOption, Pagination, TopupCard, WalletTransactionsTable } from '@/components/molecules';
 import { Skeleton } from '@/components/ui/skeleton';
 import usePagination from '@/hooks/usePagination';
@@ -11,7 +11,6 @@ import { IoSearch } from 'react-icons/io5';
 import { LiaSlidersHSolid } from 'react-icons/lia';
 import { useParams } from 'react-router-dom';
 import CreateWallet from '../CreateWallet';
-import { ReactSVG } from 'react-svg';
 import { CircleFadingPlus, EllipsisVertical, Pencil, Trash2, Wallet as WalletIcon } from 'lucide-react';
 
 const formatWalletStatus = (status?: string) => {
@@ -110,24 +109,17 @@ const WalletTab = () => {
 	}
 
 	if (isAdd) {
-		return <CreateWallet customerId={customerId!} />;
+		return <CreateWallet isVisible={isAdd} onClose={(value) => setisAdd(value)} customerId={customerId!} />;
 	}
 
 	if (wallets?.length === 0) {
 		return (
-			<div className='h-screen w-full flex justify-center items-center'>
-				<div className='w-full flex flex-col items-center '>
-					<ReactSVG src={'/assets/svg/empty box.svg'} />
-					<p className='font-sans text-2xl font-bold'>Add your first Wallet</p>
-					<p className='text-[#71717A] font-normal '>
-						{'A billable base metric is used to measure usage, and act as a foundation of pricing (e.g., API calls for an API product).'}
-					</p>
-					<Spacer height={'16px'} />
-					<Button onClick={() => setisAdd(true)} className='w-32 flex gap-2 bg-[#0F172A] '>
-						<WalletIcon />
-						<span>Add Wallet</span>
-					</Button>
-				</div>
+			<div className='card w-full flex justify-between items-center '>
+				<FormHeader className='' title='Wallet' subtitle='No wallet linked to the customer yet.' variant='form-title' />
+				<Button onClick={() => setisAdd(true)} className='w-32 flex gap-2 bg-[#0F172A] '>
+					<WalletIcon />
+					<span>Add Wallet</span>
+				</Button>
 			</div>
 		);
 	}
@@ -135,9 +127,9 @@ const WalletTab = () => {
 	return (
 		<div className='w-2/3'>
 			{/* topup wallet */}
-			<Dialog className='!w-[700px]' title='' isOpen={showTopupModal} onOpenChange={() => setshowTopupModal(false)}>
+			<Modal className='!w-[500px]' isOpen={showTopupModal} onOpenChange={() => setshowTopupModal(false)}>
 				<TopupCard onSuccess={() => setshowTopupModal(false)} walletId={activeWallet?.id} />
-			</Dialog>
+			</Modal>
 
 			<FormHeader
 				className='!my-6'
@@ -146,14 +138,18 @@ const WalletTab = () => {
 				variant='form-title'
 			/>
 			<div className='w-full flex justify-between items-center mb-3'>
-				<Select
-					options={walletOptions || []}
-					selectedValue={activeWallet?.id}
-					onChange={(value) => {
-						const selectedWallet = wallets?.find((wallet) => wallet.id === value) || null;
-						setActiveWallet(selectedWallet);
-					}}
-				/>
+				<div>
+					{(walletOptions?.length ?? 0) > 1 && (
+						<Select
+							options={walletOptions || []}
+							selectedValue={activeWallet?.id}
+							onChange={(value) => {
+								const selectedWallet = wallets?.find((wallet) => wallet.id === value) || null;
+								setActiveWallet(selectedWallet);
+							}}
+						/>
+					)}
+				</div>
 				<div className='flex items-center space-x-2	'>
 					<Button onClick={() => setisAdd(true)} className='w-32 flex gap-2 bg-[#0F172A] '>
 						<WalletIcon />
@@ -184,6 +180,8 @@ const WalletTab = () => {
 							<p className='text-[#71717A] text-sm'>Status</p>
 							<p className='text-[#09090B] text-sm'>
 								<Chip
+									activeTextColor='#377E6A'
+									activeBgColor='#ECFBE4'
 									isActive={formatWalletStatus(activeWallet?.wallet_status) === 'Active'}
 									label={formatWalletStatus(activeWallet?.wallet_status)}
 								/>
