@@ -8,9 +8,11 @@ import toast from 'react-hot-toast';
 
 interface Props {
 	customerId: string;
+	isVisible?: boolean;
+	onClose?: (value: boolean) => void;
 }
 
-const CreateWallet: FC<Props> = ({ customerId }) => {
+const CreateWallet: FC<Props> = ({ customerId, onClose = () => {} }) => {
 	const [walletName, setwalletName] = useState('predefined-wallet-');
 	const [currency, setcurrency] = useState(currencyOptions[0].value);
 	const [errors, setErrors] = useState({
@@ -79,7 +81,12 @@ const CreateWallet: FC<Props> = ({ customerId }) => {
 				/>
 			</div>
 			<Spacer className='!mt-4' />
-			<TopupCard isPrefunctionLoading={isPending} walletId={walletData?.id} preFunction={async () => await handleCreateWallet()} />
+			<TopupCard
+				onSuccess={() => onClose(false)}
+				isPrefunctionLoading={isPending}
+				walletId={walletData?.id}
+				preFunction={async () => await handleCreateWallet()}
+			/>
 		</div>
 	);
 };

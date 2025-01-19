@@ -34,7 +34,7 @@ class CustomerApi {
 		return await AxiosClient.get(`${this.baseUrl}/${id}`);
 	}
 	public static async getAllCustomers({ limit = 10, offset = 0 }: PaginationType): Promise<GetCustomerResponse> {
-		return await AxiosClient.get(`${this.baseUrl}?status=published&limit=${limit}&offset=${offset}`);
+		return await AxiosClient.get(`${this.baseUrl}?limit=${limit}&offset=${offset}`);
 	}
 
 	public static async deleteCustomerById(id: string): Promise<void> {

@@ -1,17 +1,25 @@
 import FlexpriceTable, { ColumnData } from '@/components/molecules/Table';
 import { cn } from '@/lib/utils';
 import { WalletTransaction } from '@/models/WalletTransaction';
-import formatDate from '@/utils/common/format_date';
 import { FC } from 'react';
+
+const formatDateShort = (dateString: string): string => {
+	const date = new Date(dateString);
+	const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' };
+	return date.toLocaleDateString('en-US', options);
+};
 
 const fomatAmount = (type: string, amount: number) => {
 	return (
-		<span className={cn(type === 'credit' ? 'text-green-500' : 'text-[#18181B] ')}>
+		<span className={cn(type === 'credit' ? 'text-[#2A9D90] ' : 'text-[#18181B] ')}>
 			{type === 'credit' ? '+' : '-'}
 			{amount}
 			{' credits'}
 		</span>
 	);
+};
+const fomatTransactionTitle = (type: string) => {
+	return <span className={cn('text-[#18181B] ')}>{type === 'credit' ? 'Credits Invoiced' : 'Credits Offered'}</span>;
 };
 
 interface Props {
@@ -22,11 +30,12 @@ const columnData: ColumnData[] = [
 	{
 		title: 'Transactions',
 		name: 'description',
+		render: (rowData) => fomatTransactionTitle(rowData.type),
 	},
 	{
 		title: 'Date',
 		name: 'created_at',
-		render: (rowData) => <span>{formatDate(rowData.created_at)}</span>,
+		render: (rowData) => <span>{formatDateShort(rowData.created_at)}</span>,
 	},
 
 	{
