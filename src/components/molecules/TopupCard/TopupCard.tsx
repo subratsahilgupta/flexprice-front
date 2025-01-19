@@ -1,7 +1,7 @@
 import { Button, FormHeader, Input, Spacer } from '@/components/atoms';
 import { Gift, Receipt } from 'lucide-react';
 import { FC, useState } from 'react';
-import RectangleRadiogroup from '../RectangleRadiogroup';
+import RectangleRadiogroup, { RectangleRadiogroupOption } from '../RectangleRadiogroup';
 import { useMutation } from '@tanstack/react-query';
 import WalletApi from '@/utils/api_requests/WalletApi';
 import toast from 'react-hot-toast';
@@ -21,7 +21,7 @@ interface Props {
 }
 
 const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionLoading = false, className }) => {
-	const subscriptionTypeOptions = [
+	const subscriptionTypeOptions: RectangleRadiogroupOption[] = [
 		{
 			value: 'FIXED',
 			label: 'Free Credits',
@@ -33,6 +33,7 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 			label: 'Purchase Credits',
 			icon: Gift,
 			disabled: true,
+			comingSoon: true,
 		},
 	];
 
@@ -93,42 +94,47 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 	};
 
 	return (
-		<div className={cn('card space-y-4', className)}>
-			<FormHeader
-				title='Wallet Top Up'
-				subtitle={`Define credits to purchase and to grant upon wallet creation. Credits for purchase generate invoice, whereas credits for grapnt do not generate invoice`}
-				variant='sub-header'
-			/>
-
-			<div className=''>
-				<RectangleRadiogroup
-					options={subscriptionTypeOptions}
-					value={subscriptionType}
-					onChange={(value) => {
-						console.log('subscriptionType', subscriptionType);
-						setsubscriptionType(value);
-					}}
+		<div>
+			<div className={cn('card space-y-4 lg:w-full', className)}>
+				<FormHeader
+					title='Wallet Top Up'
+					subtitle={`Define credits to purchase and to grant upon wallet creation. Credits for purchase generate invoice, whereas credits for grapnt do not generate invoice`}
+					variant='sub-header'
 				/>
+
+				<div className=''>
+					<RectangleRadiogroup
+						options={subscriptionTypeOptions}
+						value={subscriptionType}
+						onChange={(value) => {
+							console.log('subscriptionType', subscriptionType);
+							setsubscriptionType(value);
+						}}
+					/>
+				</div>
+
+				{subscriptionType === subscriptionTypeOptions[0].value && (
+					<Input
+						onChange={(e) => {
+							setfreeCredits(parseInt(e));
+						}}
+						label='Free Credits'
+						placeholder='Enter free credits'
+					/>
+				)}
+				<Spacer className='!mt-4' />
+				{/* toptup amount cta */}
+				{!preFunction && (
+					<Button disabled={isPending || isPrefunctionLoading} onClick={handleTopup}>
+						Add
+					</Button>
+				)}
 			</div>
 
-			{subscriptionType === subscriptionTypeOptions[0].value && (
-				<Input
-					onChange={(e) => {
-						setfreeCredits(parseInt(e));
-					}}
-					label='Free Credits'
-					placeholder='Enter free credits'
-				/>
-			)}
-			<Spacer className='!mt-4' />
+			{/* save meter cta */}
 			{preFunction && (
-				<Button disabled={isPending || isPrefunctionLoading} onClick={handleTopup}>
+				<Button className='!mt-4' disabled={isPending || isPrefunctionLoading} onClick={handleTopup}>
 					Save Wallet
-				</Button>
-			)}
-			{!preFunction && (
-				<Button disabled={isPending || isPrefunctionLoading} onClick={handleTopup}>
-					Add
 				</Button>
 			)}
 		</div>

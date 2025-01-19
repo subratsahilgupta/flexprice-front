@@ -2,11 +2,12 @@ import { FormHeader } from '@/components/atoms';
 import { cn } from '@/lib/utils';
 import { LucideProps } from 'lucide-react';
 import React, { FC } from 'react';
-interface RectangleRadiogroupOption {
+export interface RectangleRadiogroupOption {
 	value: string;
 	label: string;
-	icon: React.ForwardRefExoticComponent<Omit<LucideProps, 'ref'> & React.RefAttributes<SVGSVGElement>>;
-	disabled: boolean;
+	icon?: React.ForwardRefExoticComponent<Omit<LucideProps, 'ref'> & React.RefAttributes<SVGSVGElement>>;
+	disabled?: boolean;
+	comingSoon?: boolean;
 }
 
 interface Props {
@@ -34,15 +35,15 @@ const RectangleRadiogroup: FC<Props> = ({ onChange, options, value, description,
 							className={cn(
 								'relative p-3 py-6 rounded-md border-2 w-full flex flex-col justify-center items-center',
 								option.value === value ? 'border-[#0F172A]' : 'border-[#E2E8F0]',
-								option.disabled ? 'cursor-default text-[#020617]' : 'cursor-pointer',
+								option.disabled ? 'cursor-default text-zinc-500 ' : 'cursor-pointer',
 							)}>
-							{option.icon && <option.icon size={24} className={cn(option.disabled ? ' text-[#020617] ' : 'text-[#020617]')} />}
-							{option.disabled && (
-								<div className='absolute top-2 right-2 bg-[#FEF08A] text-[#D97706] text-xs font-semibold px-2 py-1 rounded-2xl '>
+							{option.icon && <option.icon size={24} className={cn(option.disabled ? '  ' : 'text-[#020617]')} />}
+							{option.comingSoon && (
+								<div className='absolute top-2 right-2 bg-[#FEF08A] text-[#D97706] text-xs font-semibold px-2 py-1 rounded-2xl opacity-55'>
 									Coming Soon
 								</div>
 							)}
-							<p className={cn(option.disabled ? 'text-[#020617]' : 'text-[#18181B] font-medium')}>{option.label}</p>
+							<p className={cn(option.disabled ? '' : 'text-[#18181B] font-medium')}>{option.label}</p>
 						</button>
 					);
 				})}
