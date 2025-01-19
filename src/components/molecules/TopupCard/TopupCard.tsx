@@ -125,9 +125,12 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 				<Spacer className='!mt-4' />
 				{/* toptup amount cta */}
 				{!preFunction && (
-					<Button disabled={isPending || isPrefunctionLoading} onClick={handleTopup}>
-						Add
-					</Button>
+					<div className='w-full justify-end flex'>
+						<Button disabled={isPending || isPrefunctionLoading} onClick={handleTopup}>
+							Add
+						</Button>
+
+					</div>
 				)}
 			</div>
 
@@ -136,6 +139,7 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 				<Button className='!mt-4' disabled={isPending || isPrefunctionLoading} onClick={handleTopup}>
 					Save Wallet
 				</Button>
+
 			)}
 		</div>
 	);

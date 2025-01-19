@@ -127,8 +127,10 @@ const WalletTab = () => {
 	return (
 		<div className='w-2/3'>
 			{/* topup wallet */}
-			<Modal className='!w-[500px]' isOpen={showTopupModal} onOpenChange={() => setshowTopupModal(false)}>
-				<TopupCard onSuccess={() => setshowTopupModal(false)} walletId={activeWallet?.id} />
+			<Modal className='' isOpen={showTopupModal} onOpenChange={() => setshowTopupModal(false)}>
+				<div className='w-[700px] bg-white rounded-xl'>
+					<TopupCard onSuccess={() => setshowTopupModal(false)} walletId={activeWallet?.id} />
+				</div>
 			</Modal>
 
 			<FormHeader

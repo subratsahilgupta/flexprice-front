@@ -13,7 +13,7 @@ const Modal: FC<ModalProps> = ({ isOpen, onOpenChange, children, className }) =>
 
 	return (
 		<div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50' onClick={() => onOpenChange(false)}>
-			<div className={cn('relative bg-white rounded-lg shadow-lg  w-full', className)} onClick={(e) => e.stopPropagation()}>
+			<div className={cn(className)} onClick={(e) => e.stopPropagation()}>
 				{children}
 			</div>
 		</div>
