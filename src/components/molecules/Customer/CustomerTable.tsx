@@ -15,10 +15,10 @@ const CustomerTable: FC<Props> = ({ data }) => {
 		...customer,
 	}));
 	const columns: ColumnData[] = [
-		{ name: 'name', title: 'Name', width: '400px' },
-		{ name: 'external_id', title: 'Slug' },
+		{ fieldName: 'name', title: 'Name', width: '400px' },
+		{ fieldName: 'external_id', title: 'Slug' },
 		{
-			name: 'status',
+			fieldName: 'status',
 			title: 'Status',
 			align: 'center',
 			render: (row) => {
@@ -27,14 +27,14 @@ const CustomerTable: FC<Props> = ({ data }) => {
 			},
 		},
 		{
-			name: 'updated_at',
+			fieldName: 'updated_at',
 			title: 'Updated at',
 			render: (row) => {
 				return <span className='text-[#09090B] '>{formatDate(row.updated_at)}</span>;
 			},
 		},
 		{
-			name: 'actions',
+			fieldName: 'actions',
 			title: '',
 			redirect: false,
 			render: (row) => (

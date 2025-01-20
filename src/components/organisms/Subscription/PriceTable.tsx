@@ -23,15 +23,15 @@ const ChargeTable: FC<Props> = ({ data }) => {
 
 	const columns: ColumnData[] = [
 		{
-			name: 'charge',
+			fieldName: 'charge',
 			title: 'Charge',
 		},
 		{
-			name: 'quantity',
+			fieldName: 'quantity',
 			title: 'Quantity',
 		},
 		{
-			name: 'price',
+			fieldName: 'price',
 			title: 'Price',
 		},
 	];

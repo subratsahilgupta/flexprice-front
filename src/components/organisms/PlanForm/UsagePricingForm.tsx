@@ -7,7 +7,7 @@ import { RiDeleteBin6Line } from 'react-icons/ri';
 import SelectMeter from './SelectMeter';
 import { Pencil, Trash2 } from 'lucide-react';
 import { Meter } from '@/models/Meter';
-import { mapBillingPeriod } from '@/utils/common/helper_functions';
+import { formatBillingPeriod } from '@/utils/common/helper_functions';
 
 interface Props {
 	data?: Partial<Price>;
@@ -285,7 +285,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 						label='Price'
 						inputPrefix={mapCurrency(currency)}
 						onChange={(e) => setflatFee(e)}
-						suffix={<span className='text-[#64748B]'>{`/ unit / ${mapBillingPeriod(billingPeriod)}`}</span>}
+						suffix={<span className='text-[#64748B]'>{`/ unit / ${formatBillingPeriod(billingPeriod)}`}</span>}
 					/>
 				</div>
 			)}
@@ -310,7 +310,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 									unit: e,
 								})
 							}
-							suffix={`/ units / ${mapBillingPeriod(billingPeriod)}`}
+							suffix={`/ units / ${formatBillingPeriod(billingPeriod)}`}
 						/>
 					</div>
 					{inputErrors.packagedModelError && <p className='text-red-500 text-sm'>{inputErrors.packagedModelError}</p>}

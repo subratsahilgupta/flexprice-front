@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 
 export interface ColumnData {
-	name: string;
+	fieldName: string;
 	title: string;
 	flex?: number;
 	width?: number | string;
@@ -116,26 +116,28 @@ const FlexpriceTable: FC<FlexpriceTableProps> = ({ onRowClick, columns, data, re
 							}
 						}}
 						key={rowIndex}>
-						{columns.map(({ name, flex = 1, width, textColor = 'inherit', align = 'left', render, redirect = true }, colIndex) => (
-							<TableCell
-								onClick={() => {
-									if (redirect && redirectUrl) {
-										navigate(`${redirectUrl}${row.id}`);
-									}
-								}}
-								key={colIndex}
-								className={cn(
-									textColor ? `text-[${textColor}]` : 'text-[#09090B] w-full ',
-									'font-normal',
-									'!max-h-8 px-4 py-2 text-[14px]',
-									redirect && redirectUrl ? 'cursor-pointer' : 'cursor-default',
-								)}
-								style={{ flex: width ? undefined : flex }}
-								width={width}
-								align={align}>
-								{render ? render(row) : row[name]}
-							</TableCell>
-						))}
+						{columns.map(
+							({ fieldName: name, flex = 1, width, textColor = 'inherit', align = 'left', render, redirect = true }, colIndex) => (
+								<TableCell
+									onClick={() => {
+										if (redirect && redirectUrl) {
+											navigate(`${redirectUrl}${row.id}`);
+										}
+									}}
+									key={colIndex}
+									className={cn(
+										textColor ? `text-[${textColor}]` : 'text-[#09090B] w-full ',
+										'font-normal',
+										'!max-h-8 px-4 py-2 text-[14px]',
+										redirect && redirectUrl ? 'cursor-pointer' : 'cursor-default',
+									)}
+									style={{ flex: width ? undefined : flex }}
+									width={width}
+									align={align}>
+									{render ? render(row) : row[name]}
+								</TableCell>
+							),
+						)}
 					</TableRow>
 				))}
 			</TableBody>

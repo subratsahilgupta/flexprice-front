@@ -24,16 +24,16 @@ const SubscriptionTable: FC<SubscriptionTableProps> = ({ data, onRowClick }) => 
 
 	const columns: ColumnData[] = [
 		{
-			name: 'plan_name',
+			fieldName: 'plan_name',
 			title: 'Plan Name',
 		},
 		{
-			name: 'billing_period',
+			fieldName: 'billing_period',
 			title: 'Billing Period',
 			render: (row) => <span>{toSentenceCase(row.billing_period)}</span>,
 		},
 		{
-			name: 'status',
+			fieldName: 'status',
 			title: 'Status',
 			align: 'center',
 			render: (row) => {
@@ -42,7 +42,7 @@ const SubscriptionTable: FC<SubscriptionTableProps> = ({ data, onRowClick }) => 
 			},
 		},
 		{
-			name: 'start_date',
+			fieldName: 'start_date',
 			title: 'Start Date',
 			render: (row) => <span>{formatDate(row.start_date)}</span>,
 		},

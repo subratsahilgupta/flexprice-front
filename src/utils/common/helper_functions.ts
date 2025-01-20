@@ -13,7 +13,7 @@ export function getCurrencySymbol(currency: string): string {
 	}
 }
 
-export const mapBillingPeriod = (billingPeriod: string) => {
+export const formatBillingPeriod = (billingPeriod: string) => {
 	switch (billingPeriod.toUpperCase()) {
 		case 'DAILY':
 			return 'day';

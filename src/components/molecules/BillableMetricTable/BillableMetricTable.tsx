@@ -28,18 +28,18 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 		aggregation_field: meter.aggregation.field,
 	}));
 	const columns: ColumnData[] = [
-		{ name: 'event_name', title: 'Event Name', width: '300px' },
+		{ fieldName: 'event_name', title: 'Event Name', width: '300px' },
 		{
-			name: 'aggregation_type',
+			fieldName: 'aggregation_type',
 			title: 'Aggregate Type',
 			align: 'center',
 			render: (row) => {
 				return <span className='text-[#09090B] '>{formatAggregationType(row.aggregation_type)}</span>;
 			},
 		},
-		{ name: 'aggregation_field', title: 'Aggregate Value', align: 'center' },
+		{ fieldName: 'aggregation_field', title: 'Aggregate Value', align: 'center' },
 		{
-			name: 'status',
+			fieldName: 'status',
 			title: 'Status',
 			align: 'center',
 			render: (row) => {
@@ -48,14 +48,14 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 			},
 		},
 		{
-			name: 'updated_at',
+			fieldName: 'updated_at',
 			title: 'Updated At',
 			render: (row) => {
 				return <span className='text-[#09090B] '>{formatDate(row.updated_at)}</span>;
 			},
 		},
 		{
-			name: 'actions',
+			fieldName: 'actions',
 			title: '',
 			redirect: false,
 			render: (row) => (
