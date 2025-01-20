@@ -48,7 +48,7 @@ const RectangleRadiogroup: FC<Props> = ({ onChange, options, value, description,
 					);
 				})}
 			</div>
-			<p className='text-sm text-muted-foreground'>{description}</p>
+			{description && <p className='text-sm text-[#64748B] font-sans '>{description}</p>}
 		</div>
 	);
 };

@@ -104,12 +104,14 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 
 				<div className=''>
 					<RectangleRadiogroup
+						title='Select the Subscription Type'
 						options={subscriptionTypeOptions}
 						value={subscriptionType}
 						onChange={(value) => {
 							console.log('subscriptionType', subscriptionType);
 							setsubscriptionType(value);
 						}}
+						description='Default subscription means... Subscription means lorem ipsum'
 					/>
 				</div>
 
@@ -118,6 +120,7 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 						onChange={(e) => {
 							setfreeCredits(parseInt(e));
 						}}
+						suffix='credits'
 						label='Free Credits'
 						placeholder='Enter free credits'
 					/>
@@ -125,9 +128,11 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 				<Spacer className='!mt-4' />
 				{/* toptup amount cta */}
 				{!preFunction && (
-					<Button disabled={isPending || isPrefunctionLoading} onClick={handleTopup}>
-						Add
-					</Button>
+					<div className='w-full justify-end flex'>
+						<Button disabled={isPending || isPrefunctionLoading} onClick={handleTopup}>
+							Add
+						</Button>
+					</div>
 				)}
 			</div>
 
