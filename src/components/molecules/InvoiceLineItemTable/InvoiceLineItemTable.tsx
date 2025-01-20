@@ -38,7 +38,7 @@ const InvoiceLineItemTable: FC<Props> = ({ data, amount_due, currency, title }) 
 
 	return (
 		<div>
-			<div className='w-full border-t border-gray-200 p-4'>
+			<div className='w-full  p-4'>
 				<FormHeader className='!mb-0' title={title} variant='sub-header' titleClassName='font-semibold' />
 
 				<div className='overflow-x-auto'>
@@ -56,7 +56,7 @@ const InvoiceLineItemTable: FC<Props> = ({ data, amount_due, currency, title }) 
 						<tbody>
 							{data?.map((item, index) => {
 								return (
-									<tr key={index} className='border-b border-gray-100'>
+									<tr key={index} className=''>
 										<td className='py-3 px-2 text-gray-800'>{item.display_name ?? '--'}</td>
 										<td className='py-3 px-2 text-gray-800'>{formatPriceType(item.price_type)}</td>
 										<td className='py-3 px-2 text-center text-gray-800'>{`${formatToShortDate(item.period_start)} - ${formatToShortDate(item.period_end)}`}</td>
