@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { FC } from 'react';
 
 const fetchMeters = async () => {
-	return await MeterApi.getAllMeters({});
+	return await MeterApi.getAllMeters({ limit: 150, offset: 0 });
 };
 
 interface Props {
@@ -16,7 +16,7 @@ interface Props {
 
 const SelectMeter: FC<Props> = ({ onChange, value, error }) => {
 	const {
-		data: meters,
+		data: metersData,
 		isLoading,
 		isError,
 	} = useQuery({
@@ -34,11 +34,11 @@ const SelectMeter: FC<Props> = ({ onChange, value, error }) => {
 		return <div>Error</div>;
 	}
 
-	if (!meters) {
+	if (!metersData) {
 		return <div>No meters found</div>;
 	}
 
-	const activeMeters: Option[] = meters!.items
+	const activeMeters: Option[] = metersData!.items
 		.filter((meter) => meter.status === 'published')
 		.map((meter) => {
 			return {
@@ -52,7 +52,7 @@ const SelectMeter: FC<Props> = ({ onChange, value, error }) => {
 			<Select
 				error={error}
 				selectedValue={value}
-				onChange={(e) => onChange(meters.items.find((meter) => meter.id === e) as Meter)}
+				onChange={(e) => onChange(metersData.items.find((meter) => meter.id === e) as Meter)}
 				options={activeMeters}
 				placeholder='Select by meter name'
 				label='Billable Metric'
