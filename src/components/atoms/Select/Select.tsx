@@ -28,8 +28,6 @@ const FlexPriceSelect: React.FC<Props> = ({
 	onChange,
 	error,
 }) => {
-	console.log(selectedValue);
-
 	return (
 		<div className='space-y-1'>
 			{/* Label */}

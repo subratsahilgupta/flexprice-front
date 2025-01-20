@@ -13,6 +13,7 @@ import { useParams } from 'react-router-dom';
 import CreateWallet from '../CreateWallet';
 import { CircleFadingPlus, EllipsisVertical, Pencil, Trash2, Wallet as WalletIcon } from 'lucide-react';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
+import useQueryParams from '@/hooks/useQueryParams';
 
 const formatWalletStatus = (status?: string) => {
 	switch (status) {
@@ -31,6 +32,10 @@ const WalletTab = () => {
 	const { id: customerId } = useParams();
 	const [activeWallet, setActiveWallet] = useState<Wallet | null>();
 	const { limit, offset } = usePagination();
+	const {
+		queryParams: { activeWalletId },
+		setQueryParam,
+	} = useQueryParams<{ activeWalletId?: string }>({ activeWalletId: '' });
 
 	const [isAdd, setisAdd] = useState(false);
 	const [showTopupModal, setshowTopupModal] = useState(false);
@@ -89,16 +94,28 @@ const WalletTab = () => {
 	});
 
 	useEffect(() => {
-		if (wallets && wallets.length > 0) {
-			setActiveWallet(wallets[0]);
+		if (!wallets || wallets?.length === 0) {
+			return;
 		}
-	}, [wallets]);
+
+		console.log('active wallet id', activeWalletId, wallets);
+
+		if (activeWalletId === '' || !activeWalletId) {
+			setQueryParam('activeWalletId', wallets[0].id);
+			return;
+		}
+
+		const wallet = wallets.find((wallet) => wallet.id === activeWalletId) || wallets[0];
+
+		console.log('active wallet', wallet.id);
+
+		setActiveWallet(wallet);
+	}, [wallets, activeWalletId]);
 
 	const walletOptions = wallets?.map((wallet, index) => ({
 		label: wallet.name || `demo name ${index}`,
 		value: wallet.id,
 	}));
-	console.log('wallet options', walletOptions);
 
 	if (isLoading) {
 		return <Loader />;
@@ -149,6 +166,7 @@ const WalletTab = () => {
 							onChange={(value) => {
 								const selectedWallet = wallets?.find((wallet) => wallet.id === value) || null;
 								setActiveWallet(selectedWallet);
+								setQueryParam('activeWalletId', value);
 							}}
 						/>
 					)}
@@ -201,12 +219,18 @@ const WalletTab = () => {
 							<div className='card w-full'>
 								<p className='text-[#71717A] text-sm'>Current Balance</p>
 								<Spacer className='!my-2' />
-								<p className='text-[#09090B] font-semibold text-3xl '>{getCurrencySymbol(walletBalance?.currency ?? '')}{walletBalance?.balance}</p>
+								<p className='text-[#09090B] font-semibold text-3xl '>
+									{getCurrencySymbol(walletBalance?.currency ?? '')}
+									{walletBalance?.balance}
+								</p>
 							</div>
 							<div className='card w-full'>
 								<p className='text-[#71717A] text-sm'>Ongoing Balance</p>
 								<Spacer className='!my-2' />
-								<p className='text-[#09090B] font-semibold text-3xl '>{getCurrencySymbol(walletBalance?.currency ?? '')}{walletBalance?.real_time_balance}</p>
+								<p className='text-[#09090B] font-semibold text-3xl '>
+									{getCurrencySymbol(walletBalance?.currency ?? '')}
+									{walletBalance?.real_time_balance}
+								</p>
 							</div>
 						</div>
 					)}
