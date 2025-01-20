@@ -1,15 +1,10 @@
 import FlexpriceTable, { ColumnData } from '@/components/molecules/Table';
 import { cn } from '@/lib/utils';
 import { WalletTransaction } from '@/models/WalletTransaction';
+import { formatDateShort } from '@/utils/common/helper_functions';
 import { FC } from 'react';
 
-const formatDateShort = (dateString: string): string => {
-	const date = new Date(dateString);
-	const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' };
-	return date.toLocaleDateString('en-US', options);
-};
-
-const fomatAmount = (type: string, amount: number) => {
+const formatAmount = (type: string, amount: number) => {
 	return (
 		<span className={cn(type === 'credit' ? 'text-[#2A9D90] ' : 'text-[#18181B] ')}>
 			{type === 'credit' ? '+' : '-'}
@@ -41,7 +36,7 @@ const columnData: ColumnData[] = [
 	{
 		title: 'Balance',
 		name: 'balance',
-		render: (rowData) => fomatAmount(rowData.type, rowData.amount),
+		render: (rowData) => formatAmount(rowData.type, rowData.amount),
 	},
 ];
 

@@ -28,7 +28,7 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 		aggregation_field: meter.aggregation.field,
 	}));
 	const columns: ColumnData[] = [
-		{ name: 'event_name', title: 'Event Name', width: '400px' },
+		{ name: 'event_name', title: 'Event Name', width: '300px' },
 		{
 			name: 'aggregation_type',
 			title: 'Aggregate Type',

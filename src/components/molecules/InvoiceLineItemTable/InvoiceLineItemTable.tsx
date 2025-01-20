@@ -32,6 +32,10 @@ const formatPriceType = (value: string): string => {
 };
 
 const InvoiceLineItemTable: FC<Props> = ({ data, amount_due, currency, title }) => {
+	if (data.length === 0) {
+		return <div></div>;
+	}
+
 	return (
 		<div>
 			<div className='w-full border-t border-gray-200 p-4'>
@@ -45,7 +49,7 @@ const InvoiceLineItemTable: FC<Props> = ({ data, amount_due, currency, title }) 
 								<th className='py-2 px-2 text-gray-600'>Description</th>
 								<th className='py-2 px-2 text-center text-gray-600'>Interval</th>
 								<th className='py-2 px-2 text-gray-600 text-center'>Quantity</th>
-								<th className='py-2 px-2 text-gray-600 text-center'>Unit Price</th>
+								{/* <th className='py-2 px-2 text-gray-600 text-center'>Unit Price</th> */}
 								<th className='py-2 px-2 text-gray-600 text-right'>Amount</th>
 							</tr>
 						</thead>
@@ -57,8 +61,8 @@ const InvoiceLineItemTable: FC<Props> = ({ data, amount_due, currency, title }) 
 										<td className='py-3 px-2 text-gray-800'>{formatPriceType(item.price_type)}</td>
 										<td className='py-3 px-2 text-center text-gray-800'>{`${formatToShortDate(item.period_start)} - ${formatToShortDate(item.period_end)}`}</td>
 										<td className='py-3 px-2 text-center text-gray-800'>4</td>
-										<td className='py-3 px-2 text-center text-gray-800'>{formatAmount(item.amount ?? '--', item.currency)}</td>
-										<td className='py-3 px-2 text-right text-gray-800'>{}</td>
+										{/* <td className='py-3 px-2 text-center text-gray-800'>{}</td> */}
+										<td className='py-3 px-2 text-right text-gray-800'>{formatAmount(item.amount ?? '--', item.currency)}</td>
 									</tr>
 								);
 							})}

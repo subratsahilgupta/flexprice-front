@@ -12,7 +12,7 @@ export interface SubscriptionTableProps {
 	onRowClick?: (row: any) => void;
 }
 
-const SubscriptionTable: FC<SubscriptionTableProps> = ({ customerId, data, onRowClick }) => {
+const SubscriptionTable: FC<SubscriptionTableProps> = ({ data, onRowClick }) => {
 	const mappedData = (data ?? []).map((subscription) => ({
 		id: subscription.id,
 		plan_name: subscription.plan?.name,
