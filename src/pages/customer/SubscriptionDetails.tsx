@@ -81,7 +81,9 @@ const SubscriptionDetails: FC<Props> = ({ subscription_id }) => {
 				</div>
 			</div>
 
-			<InvoiceLineItemTable amount_due={data?.amount_due} title='Upcoming Invoices' data={data?.line_items ?? []} />
+			<div className='card'>
+				<InvoiceLineItemTable amount_due={data?.amount_due} title='Upcoming Invoices' data={data?.line_items ?? []} />
+			</div>
 		</div>
 	);
 };
