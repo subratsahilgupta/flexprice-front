@@ -1,4 +1,5 @@
-import React, { FC, useState } from 'react';
+import useQueryParams from '@/hooks/useQueryParams';
+import React, { FC, useEffect, useState } from 'react';
 
 interface Tab {
 	id: string;
@@ -8,16 +9,31 @@ interface Tab {
 
 interface TabbarProps {
 	tabs: Tab[];
-	initialActiveTab?: string; // Optional: Allows setting an initial active tab
+	initialActiveTab?: string;
 }
 
 const Tabbar: FC<TabbarProps> = ({ tabs, initialActiveTab }) => {
-	// State to track the currently active tab
-	const [activeTab, setActiveTab] = useState<string>(initialActiveTab || tabs[0]?.id);
+	const { queryParams, setQueryParam } = useQueryParams<{ activeTab?: string }>({ activeTab: tabs[0]?.id });
+	const initialTabFromQuery = queryParams.activeTab || initialActiveTab || tabs[0]?.id;
+	const [activeTab, setActiveTab] = useState<string>(initialTabFromQuery);
 
-	// Function to handle tab change
+	useEffect(() => {
+		if (queryParams.activeTab && queryParams.activeTab !== activeTab) {
+			setActiveTab(queryParams.activeTab);
+		}
+	}, [queryParams.activeTab]);
+
+	useEffect(() => {
+		// Ensure query parameter matches a valid tab
+		if (queryParams.activeTab && !tabs.some((tab) => tab.id === queryParams.activeTab)) {
+			setQueryParam('activeTab', tabs[0]?.id);
+			setActiveTab(tabs[0]?.id);
+		}
+	}, [queryParams.activeTab, tabs]);
+
 	const onTabChange = (tabId: string) => {
 		setActiveTab(tabId);
+		setQueryParam('activeTab', tabId); // Update query parameter
 	};
 
 	return (
@@ -35,7 +51,9 @@ const Tabbar: FC<TabbarProps> = ({ tabs, initialActiveTab }) => {
 																		? 'text-primary border-b-2 border-primary'
 																		: 'text-muted-foreground hover:text-foreground hover:border-muted'
 																}
-                            `}>
+                            `}
+							role='tab'
+							aria-selected={activeTab === tab.id}>
 							{tab.label}
 							{activeTab === tab.id && <span className='absolute bottom-0 left-0 w-full h-[2px] bg-primary rounded' aria-hidden='true' />}
 						</button>

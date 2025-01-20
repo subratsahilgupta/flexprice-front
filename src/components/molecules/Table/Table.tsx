@@ -112,7 +112,7 @@ const FlexpriceTable: FC<FlexpriceTableProps> = ({ onRowClick, columns, data, re
 					<TableRow
 						onClick={() => {
 							if (onRowClick) {
-								onRowClick(row.id);
+								onRowClick(row);
 							}
 						}}
 						key={rowIndex}>

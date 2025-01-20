@@ -13,7 +13,7 @@ interface Props {
 }
 
 const CreateWallet: FC<Props> = ({ customerId, onClose = () => {} }) => {
-	const [walletName, setwalletName] = useState('predefined-wallet-');
+	const [walletName, setwalletName] = useState('Prepaid Wallet');
 	const [currency, setcurrency] = useState(currencyOptions[0].value);
 	const [errors, setErrors] = useState({
 		currency: '',
