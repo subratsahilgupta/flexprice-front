@@ -18,9 +18,16 @@ export class PlanApi {
 	public static async getAllPlans({ limit, offset }: PaginationType) {
 		return await AxiosClient.get<GetAllPlansResponse>(`${this.baseUrl}?limit=${limit}&offset=${offset}`);
 	}
+	public static async getAllActivePlans() {
+		return await AxiosClient.get<GetAllPlansResponse>(`${this.baseUrl}?status=published`);
+	}
 
 	public static async getExpandedPlan() {
 		const response = await AxiosClient.get<GetAllPlansResponse>(`${this.baseUrl}?expand=prices%2Cmeters`);
+		return response.items as ExpandedPlan[];
+	}
+	public static async getActiveExpandedPlan() {
+		const response = await AxiosClient.get<GetAllPlansResponse>(`${this.baseUrl}?expand=prices%2Cmeters&status=published`);
 		return response.items as ExpandedPlan[];
 	}
 

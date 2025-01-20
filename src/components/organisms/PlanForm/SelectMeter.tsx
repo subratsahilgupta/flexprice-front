@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { FC } from 'react';
 
 const fetchMeters = async () => {
-	return await MeterApi.getAllMeters({ limit: 150, offset: 0 });
+	return await MeterApi.getAllActiveMeters();
 };
 
 interface Props {

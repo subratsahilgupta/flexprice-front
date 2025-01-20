@@ -15,6 +15,9 @@ export class MeterApi {
 	public static async getAllMeters({ limit, offset }: PaginationType) {
 		return await AxiosClient.get<getAllMetersResponse>(`${this.baseUrl}?limit=${limit}&offset=${offset}`);
 	}
+	public static async getAllActiveMeters() {
+		return await AxiosClient.get<getAllMetersResponse>(`${this.baseUrl}?status=published`);
+	}
 
 	public static async getMeterById(id: string) {
 		return await AxiosClient.get<Meter>(`${this.baseUrl}/${id}`);
