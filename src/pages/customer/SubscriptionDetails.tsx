@@ -81,13 +81,11 @@ const SubscriptionDetails: FC<Props> = ({ subscription_id }) => {
 				</div>
 			</div>
 
-			{
-				(data?.line_items?.length ?? 0) > 0 && (
-					<div className='card !mt-4'>
-						<InvoiceLineItemTable amount_due={data?.amount_due} title='Upcoming Invoices' data={data?.line_items ?? []} />
-					</div>
-				)
-			}
+			{(data?.line_items?.length ?? 0) > 0 && (
+				<div className='card !mt-4'>
+					<InvoiceLineItemTable amount_due={data?.amount_due} title='Upcoming Invoices' data={data?.line_items ?? []} />
+				</div>
+			)}
 		</div>
 	);
 };
