@@ -5,6 +5,8 @@ import { useQuery } from '@tanstack/react-query';
 import SubscriptionTable from '@/components/organisms/Subscription/SubscriptionTable';
 import { Subscription } from '@/models/Subscription';
 import CustomerOverviewCard from '@/components/molecules/Customer/CustomerOverviewCard';
+import { useState } from 'react';
+import SubscriptionDetails from '../SubscriptionDetails';
 
 const SkeletonLoader = () => (
 	<div className='rounded-xl border border-gray-300 p-6 space-y-4'>
@@ -33,6 +35,8 @@ const Overview = () => {
 		navigate(`/customer-management/customers/${customerId}/subscription`);
 	};
 
+	const [activeSubscription, setactiveSubscription] = useState<string | undefined>();
+
 	const {
 		data: subscriptions,
 		isLoading: subscriptionsLoading,
@@ -47,11 +51,15 @@ const Overview = () => {
 		refetchOnMount: 'always', // Refetch when the component is remounted
 	});
 
+	if (activeSubscription) {
+		return <SubscriptionDetails subscription_id={activeSubscription} />;
+	}
+
 	return (
-		<div className='space-y-4'>
+		<div className='space-y-4 w-2/3'>
 			<CustomerOverviewCard customerId={customerId!} />
 			<div className='space p-6 rounded-xl border border-gray-300'>
-				<div className='flex justify-between items-center'>
+				<div className='flex mb-4 justify-between items-center'>
 					<h2 className='text-base font-semibold text-gray-800'>Subscriptions</h2>
 					<Button onClick={handleAddSubscription} className='bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark'>
 						Add Subscription
@@ -65,7 +73,15 @@ const Overview = () => {
 				) : (subscriptions ?? []).length === 0 ? (
 					<p className='text-gray-500 text-sm'>No Active Subscriptions Yet</p>
 				) : (
-					<SubscriptionTable data={subscriptions as Subscription[]} customerId={customerId!} />
+					<SubscriptionTable
+						onRowClick={(row) => {
+							console.log('clicked on row', row);
+							setactiveSubscription(row.id);
+							console.log(activeSubscription);
+						}}
+						data={subscriptions as Subscription[]}
+						customerId={customerId!}
+					/>
 				)}
 			</div>
 		</div>

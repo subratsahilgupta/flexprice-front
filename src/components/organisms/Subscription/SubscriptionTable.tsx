@@ -9,9 +9,10 @@ import formatDate from '@/utils/common/format_date';
 export interface SubscriptionTableProps {
 	customerId: string;
 	data: Subscription[];
+	onRowClick?: (row: any) => void;
 }
 
-const SubscriptionTable: FC<SubscriptionTableProps> = ({ customerId, data }) => {
+const SubscriptionTable: FC<SubscriptionTableProps> = ({ customerId, data, onRowClick }) => {
 	const mappedData = (data ?? []).map((subscription) => ({
 		id: subscription.id,
 		plan_name: subscription.plan?.name,
@@ -47,7 +48,7 @@ const SubscriptionTable: FC<SubscriptionTableProps> = ({ customerId, data }) => 
 		},
 	];
 
-	return <FlexpriceTable columns={columns} data={mappedData} redirectUrl={`/customer-management/customers/${customerId}/subscription/`} />;
+	return <FlexpriceTable onRowClick={onRowClick} columns={columns} data={mappedData} />;
 };
 
 export default SubscriptionTable;

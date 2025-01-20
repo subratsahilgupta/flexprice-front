@@ -21,8 +21,8 @@ const Invoice = () => {
 		enabled: !!customerId,
 	});
 
-	const handleShowDetails = (invoice_id: string) => {
-		setactiveInvoice(invoice_id);
+	const handleShowDetails = (invoice: any) => {
+		setactiveInvoice(invoice.id);
 	};
 
 	if (isLoading) {
