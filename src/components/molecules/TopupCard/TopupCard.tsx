@@ -132,7 +132,6 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 						<Button disabled={isPending || isPrefunctionLoading} onClick={handleTopup}>
 							Add
 						</Button>
-
 					</div>
 				)}
 			</div>
@@ -142,7 +141,6 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 				<Button className='!mt-4' disabled={isPending || isPrefunctionLoading} onClick={handleTopup}>
 					Save Wallet
 				</Button>
-
 			)}
 		</div>
 	);
