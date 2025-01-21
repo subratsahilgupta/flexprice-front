@@ -3,7 +3,7 @@ import { ColumnData, FlexpriceTable } from '@/components/molecules';
 import { Price } from '@/models/Price';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
 import formatDate from '@/utils/common/format_date';
-import { toSentenceCase } from '@/utils/common/helper_functions';
+import { formatPriceType, toSentenceCase } from '@/utils/common/helper_functions';
 import { getPriceTableCharge } from '@/utils/models/transformed_plan';
 import { useQuery } from '@tanstack/react-query';
 import { EyeOff, Pencil } from 'lucide-react';
@@ -12,17 +12,6 @@ import { useParams } from 'react-router-dom';
 
 type Params = {
 	planId: string;
-};
-
-const formatSubscriptionType = (type: string): string => {
-	switch (type.toUpperCase()) {
-		case 'RECURRING':
-			return 'Recurring';
-		case 'USAGE':
-			return 'Usage Based';
-		default:
-			return '';
-	}
 };
 
 const formatInvoiceCadence = (cadence: string): string => {
@@ -41,12 +30,15 @@ const columns: ColumnData[] = [
 		title: 'Subscription Type',
 		fieldName: 'billing_cadence',
 		render: (row) => {
-			return <span className='text-[#09090B]'>{formatSubscriptionType(row.billing_cadence)}</span>;
+			return <span className='text-[#09090B]'>{formatPriceType(row.type)}</span>;
 		},
 	},
 	{
 		title: 'Billable Metric',
 		fieldName: 'price',
+		render(rowData) {
+			return <span className='text-[#09090B]'>{rowData.meter?.name ?? '--'}</span>;
+		},
 	},
 	{
 		title: 'Billing Period',
@@ -137,13 +129,13 @@ const PlanViewPage = () => {
 				<Spacer className='!my-4' />
 				<div className='w-full flex justify-between items-center'>
 					<p className='text-[#71717A] text-sm'>Trial Period</p>
-					<p className='text-[#09090B] text-sm'>{planData?.trial_period || '--'}</p>
+					<p className='text-[#09090B] text-sm'>{planData?.trial_period ? `${planData?.trial_period} days` : '--'}</p>
 				</div>
 			</div>
 
 			{(planData?.prices?.length ?? 0) > 0 && (
 				<div className='card mt-4'>
-					<FormHeader title='Charges' subtitle='Assign a name to your event schema ' variant='sub-header' titleClassName='font-semibold' />
+					<FormHeader title='Charges' variant='sub-header' titleClassName='font-semibold' />
 					<FlexpriceTable columns={columns} data={planData?.prices ?? []} />
 				</div>
 			)}

@@ -1,3 +1,5 @@
+import { Meter } from './Meter';
+
 export type Wallet = {
 	readonly balance: number;
 	readonly name: string;
@@ -8,4 +10,5 @@ export type Wallet = {
 	readonly metadata: Record<string, any>;
 	readonly updated_at: string;
 	readonly wallet_status: string;
+	readonly meter: Meter;
 };

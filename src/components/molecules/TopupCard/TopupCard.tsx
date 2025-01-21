@@ -30,7 +30,7 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 		},
 		{
 			value: 'USAGE',
-			label: 'Purchase Credits',
+			label: 'Purchased Credits',
 			icon: Gift,
 			disabled: true,
 			comingSoon: true,
@@ -96,22 +96,18 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 	return (
 		<div>
 			<div className={cn('card space-y-4 lg:w-full', className)}>
-				<FormHeader
-					title='Wallet Top Up'
-					subtitle={`Define credits to purchase and to grant upon wallet creation. Credits for purchase generate invoice, whereas credits for grapnt do not generate invoice`}
-					variant='sub-header'
-				/>
+				<FormHeader title='Add Credits' subtitle={`Define credits to purchase and to grant upon wallet creation`} variant='sub-header' />
 
 				<div className=''>
 					<RectangleRadiogroup
-						title='Select the Subscription Type'
+						title='Select the credit type'
 						options={subscriptionTypeOptions}
 						value={subscriptionType}
 						onChange={(value) => {
 							console.log('subscriptionType', subscriptionType);
 							setsubscriptionType(value);
 						}}
-						description='Default subscription means... Subscription means lorem ipsum'
+						description=''
 					/>
 				</div>
 
@@ -122,6 +118,7 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 						}}
 						suffix='credits'
 						label='Free Credits'
+						prefix={``}
 						placeholder='Enter free credits'
 					/>
 				)}
