@@ -26,3 +26,5 @@ yarn.lock
 package-lock.json
 .env
 .vercel
+tsconfig.tsbuildinfo
+tsconfig.app.tsbuildinfo

@@ -6,94 +6,34 @@ import AuthMiddleware from '../auth/AuthProvider';
 import BillableMetricsPage from '@/pages/usage/BillableMetrics';
 import AddMeterPage from '@/pages/usage/AddMeter';
 import EditMeterPage from '@/pages/usage/EditMeterPage';
-import PricingPlans from '@/pages/customer/PricingPlans';
-import CreatePlanPage from '@/pages/customer/CreatePlan';
+import PricingPlans from '@/pages/customer/pricingPlans/PricingPlans';
+import CreatePlanPage from '@/pages/customer/pricingPlans/CreatePlan';
 import CustomerSubscription from '@/pages/customer/CustomerSubscription';
 import CustomerDetails from '@/pages/customer/CustomerDetails';
 import ErrorPage from '@/pages/error/ErrorPage';
-// import InvoiceDetails from '@/pages/customer/invoice/InvoiceDetail';
+import PlanViewPage from '@/pages/customer/pricingPlans/PlanViewPage';
 
 const RouteNames = {
-	home: {
-		path: '/',
-	},
-	login: {
-		path: '/login',
-	},
-	plans: {
-		path: '/plans',
-		create: {
-			path: '/create',
-		},
-		edit: {
-			path: '/edit/:id',
-			routing_path: '/edit/',
-		},
-	},
-	usageTracking: {
-		path: '/usage-tracking',
-		billableMetric: {
-			path: 'billable-metric',
-			addMeter: {
-				path: 'add-meter',
-			},
-			editMeter: {
-				path: 'edit-meter',
-			},
-		},
-	},
-	metering: {
-		path: '/metering',
-	},
-	query: {
-		path: '/query',
-	},
-	customerManagement: {
-		path: '/customer-management',
-		customers: {
-			path: 'customers',
-			createCustomer: {
-				path: 'create-customer',
-			},
-			subscription: {
-				path: ':id/subscription',
-			},
-			subscriptionDetails: {
-				path: ':id/subscription/:subscription_id',
-			},
-			invoice: {
-				path: ':id/invoice',
-			},
-			invoiceDetails: {
-				path: ':id/invoice/:invoice_id',
-			},
-			detail: {
-				path: ':id',
-			},
-		},
-		pricingPlan: {
-			path: 'pricing-plan',
-			createPlan: {
-				path: 'create-plan',
-			},
-			editPlan: {
-				path: 'edit-plan',
-			},
-		},
-		detail: {
-			path: '/details/:id',
-			routing_path: '/details/',
-		},
-	},
+	home: '/',
+	login: '/login',
+	usageTracking: '/usage-tracking',
+	billableMetric: '/usage-tracking/billable-metric',
+	addMeter: '/usage-tracking/billable-metric/add-meter',
+	editMeter: '/usage-tracking/billable-metric/edit-meter',
+	customerManagement: '/customer-management',
+	customers: '/customer-management/customers',
+	pricingPlan: '/customer-management/pricing-plan',
+	createPlan: '/customer-management/pricing-plan/create-plan',
+	editPlan: '/customer-management/pricing-plan/edit-plan',
 };
 
 export const MainRouter = createBrowserRouter([
 	{
-		path: RouteNames.login.path,
+		path: RouteNames.login,
 		element: <Auth />,
 	},
 	{
-		path: RouteNames.home.path,
+		path: RouteNames.home,
 		element: (
 			<AuthMiddleware requiredRole={['admin']}>
 				<MainLayout />
@@ -102,62 +42,58 @@ export const MainRouter = createBrowserRouter([
 		children: [
 			{
 				path: '/',
-				element: <Navigate to={`${RouteNames.usageTracking.path}/${RouteNames.usageTracking.billableMetric.path}`} />,
+				element: <Navigate to={RouteNames.billableMetric} />,
 			},
 			{
-				path: RouteNames.plans.path,
-				element: <CustomerPage />,
-			},
-			{
-				path: RouteNames.usageTracking.path,
+				path: RouteNames.usageTracking,
 				children: [
 					{
-						path: RouteNames.usageTracking.billableMetric.path,
+						path: RouteNames.billableMetric,
 						element: <BillableMetricsPage />,
 					},
 					{
-						path: `${RouteNames.usageTracking.billableMetric.path}/${RouteNames.usageTracking.billableMetric.addMeter.path}`,
+						path: RouteNames.addMeter,
 						element: <AddMeterPage />,
 					},
 					{
-						path: `${RouteNames.usageTracking.billableMetric.path}/${RouteNames.usageTracking.billableMetric.editMeter.path}`,
+						path: RouteNames.editMeter,
 						element: <EditMeterPage />,
 					},
 				],
 			},
 			{
-				path: RouteNames.customerManagement.path,
+				path: RouteNames.customerManagement,
 				children: [
 					{
-						path: RouteNames.customerManagement.pricingPlan.path,
+						path: RouteNames.pricingPlan,
 						element: <PricingPlans />,
 					},
 					{
-						path: `${RouteNames.customerManagement.pricingPlan.path}/${RouteNames.customerManagement.pricingPlan.createPlan.path}`,
+						path: `${RouteNames.pricingPlan}/:planId`,
+						element: <PlanViewPage />,
+					},
+					{
+						path: RouteNames.createPlan,
 						element: <CreatePlanPage />,
 					},
 					{
-						path: `${RouteNames.customerManagement.pricingPlan.path}/${RouteNames.customerManagement.pricingPlan.editPlan.path}`,
+						path: RouteNames.editPlan,
 						element: <CreatePlanPage />,
 					},
 					{
-						path: `${RouteNames.customerManagement.path}/${RouteNames.customerManagement.customers.path}`,
+						path: `${RouteNames.customers}`,
 						element: <CustomerPage />,
 					},
 					{
-						path: `${RouteNames.customerManagement.path}/${RouteNames.customerManagement.customers.path}/${RouteNames.customerManagement.customers.subscription.path}`,
+						path: `${RouteNames.customers}/:id/subscription`,
 						element: <CustomerSubscription />,
 					},
 					{
-						path: `${RouteNames.customerManagement.path}/${RouteNames.customerManagement.customers.path}/${RouteNames.customerManagement.customers.subscriptionDetails.path}`,
+						path: `${RouteNames.customers}/:id/subscription/:subscription_id`,
 						element: <CustomerSubscription />,
 					},
-					// {
-					// 	path: `${RouteNames.customerManagement.path}/${RouteNames.customerManagement.customers.path}/${RouteNames.customerManagement.customers.invoiceDetails.path}`,
-					// 	element: <InvoiceDetails />,
-					// },
 					{
-						path: `${RouteNames.customerManagement.path}/${RouteNames.customerManagement.customers.path}/${RouteNames.customerManagement.customers.detail.path}`,
+						path: `${RouteNames.customers}/:id`,
 						element: <CustomerDetails />,
 					},
 				],

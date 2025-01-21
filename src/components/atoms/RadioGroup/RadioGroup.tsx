@@ -21,7 +21,7 @@ const RadioGroup: FC<Props> = ({ items, onChange, selected, title, disabled }) =
 	return (
 		<div>
 			{title && <p className='font-inter block text-sm font-medium text-zinc mb-2'>{title}</p>}
-			<div className='space-y-1'>
+			<div className='space-y-2'>
 				{items.map((item) => {
 					const isSelected = selected?.value === item.value;
 
@@ -29,9 +29,9 @@ const RadioGroup: FC<Props> = ({ items, onChange, selected, title, disabled }) =
 						<div
 							className={cn(
 								'w-full items-center flex gap-4 p-2  cursor-pointer rounded-lg',
-								isSelected ? 'bg-zinc-100' : 'bg-white',
-								disabled ? 'opacity-50 cursor-not-allowed  ' : 'hover:bg-zinc-100',
-								disabled && isSelected && 'border-zinc-600 border bg-white',
+								// isSelected ? 'bg-zinc-100' : 'bg-white',
+								disabled ? 'opacity-50 cursor-not-allowed  ' : '',
+								isSelected && 'border-zinc-600 border bg-white',
 							)}
 							key={item.value}
 							onClick={() => {

@@ -55,7 +55,7 @@ const PricingPlan = () => {
 				<div className='w-full flex flex-col items-center '>
 					<ReactSVG src={'/assets/svg/empty box.svg'} />
 					<p className='font-sans text-2xl font-bold'>Add your first Plan </p>
-					<p className='text-[#71717A] font-normal '>Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellat sit</p>
+					<p className='text-[#71717A] font-normal '>Add your first Pricing Plan</p>
 					<Spacer height={'16px'} />
 					<Link to='/customer-management/pricing-plan/create-plan'>
 						<Button className='w-32 flex gap-2 bg-[#0F172A] '>

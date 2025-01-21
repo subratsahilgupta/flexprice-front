@@ -16,9 +16,9 @@ const PlansTable: FC<PlansTableProps> = ({ data }) => {
 	}));
 
 	const columns: ColumnData[] = [
-		{ name: 'name', title: 'Name', width: '700px' },
+		{ fieldName: 'name', title: 'Name', width: '700px' },
 		{
-			name: 'status',
+			fieldName: 'status',
 			title: 'Status',
 			align: 'center',
 			render: (row) => {
@@ -27,19 +27,21 @@ const PlansTable: FC<PlansTableProps> = ({ data }) => {
 			},
 		},
 		{
-			name: 'updated_at',
+			fieldName: 'updated_at',
 			title: 'Updated at',
 			render: (row) => {
 				return <span className='text-[#09090B]'>{formatDate(row.updated_at)}</span>;
 			},
 		},
 		{
-			name: 'actions',
+			fieldName: 'actions',
 			title: '',
 			redirect: false,
 			render: (row) => (
 				<ActionButton
 					id={row.id}
+					isArchiveDisabled={row.status === 'archived'}
+					isEditDisabled={row.status === 'archived'}
 					editPath={`/customer-management/pricing-plan/edit-plan?id=${row.id}`}
 					deleteMutationFn={(id) => PlanApi.deletePlan(id)}
 					refetchQueryKey='fetchPlans'
@@ -49,7 +51,7 @@ const PlansTable: FC<PlansTableProps> = ({ data }) => {
 		},
 	];
 
-	return <FlexpriceTable redirectUrl='/customer-management/pricing-plan/edit-plan?id=' columns={columns} data={mappedData} />;
+	return <FlexpriceTable redirectUrl='/customer-management/pricing-plan/' columns={columns} data={mappedData} />;
 };
 
 export default PlansTable;
