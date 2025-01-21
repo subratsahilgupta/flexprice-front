@@ -23,7 +23,7 @@ const InvoiceDetails: FC<Props> = ({ invoice_id }) => {
 		enabled: !!invoice_id,
 	});
 
-	const customerInfoClass = 'text-sm text-[#71717A] mb-[2px]';
+	// const customerInfoClass = 'text-sm text-[#71717A] mb-[2px]';
 	const invoiceref = useRef<HTMLDivElement>(null);
 
 	const handleDownlaod = () => {
@@ -52,26 +52,22 @@ const InvoiceDetails: FC<Props> = ({ invoice_id }) => {
 					</Button>
 				</div>
 				<Spacer className='!my-6' />
-				<div className='w-full flex gap-4  items-center'>
+				<div className='w-full grid grid-cols-3 gap-4'>
 					<p className='text-[#71717A] text-sm'>Invoice Number</p>
-					<p className='text-[#09090B] text-sm'>{data?.invoice_number}</p>
-				</div>
-				<Spacer className='!my-2' />
-				<div className='w-full flex gap-4  items-center'>
 					<p className='text-[#71717A] text-sm'>Date of Issue</p>
-					<p className='text-[#09090B] text-sm'>{formatDate(data?.created_at ?? '')}</p>
-				</div>
-				<Spacer className='!my-2' />
-				<div className='w-full flex gap-4  items-center'>
 					<p className='text-[#71717A] text-sm'>Date Due</p>
+				</div>
+				<div className='w-full grid grid-cols-3 gap-4'>
+					<p className='text-[#09090B] text-sm'>{data?.invoice_number}</p>
+					<p className='text-[#09090B] text-sm'>{formatDate(data?.created_at ?? '')}</p>
 					<p className='text-[#09090B] text-sm'>{formatDate(data?.due_date ?? '')}</p>
 				</div>
 			</div>
-			<div className='my-3'>
+			<div className='my-3 mx-3'>
 				<Divider />
 			</div>
 
-			<div className='grid grid-cols-2  p-4 border-b border-gray-200'>
+			{/* <div className='grid grid-cols-2  p-4 border-b border-gray-200'>
 				<div>
 					<FormHeader className='' title='Customer Information' variant='sub-header' titleClassName='font-semibold' />
 					<p className={customerInfoClass}>Liam Johnson</p>
@@ -85,7 +81,7 @@ const InvoiceDetails: FC<Props> = ({ invoice_id }) => {
 					<p className={customerInfoClass}>1234 Main St.</p>
 					<p className={customerInfoClass}>Anytown, CA 12345</p>
 				</div>
-			</div>
+			</div> */}
 			<InvoiceLineItemTable title='Order Details' data={data?.line_items ?? []} amount_due={data?.amount_due} currency={data?.currency} />
 		</div>
 	);
