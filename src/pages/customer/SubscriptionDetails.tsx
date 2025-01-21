@@ -8,12 +8,6 @@ import { useQuery } from '@tanstack/react-query';
 import { FC } from 'react';
 import toast from 'react-hot-toast';
 
-const formatDateToMonth = (date: string): string => {
-	const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
-	const formattedDate = new Date(date).toLocaleDateString('en-US', options);
-	return formattedDate;
-};
-
 type Props = {
 	subscription_id: string;
 };
@@ -77,13 +71,18 @@ const SubscriptionDetails: FC<Props> = ({ subscription_id }) => {
 
 				<div className='w-full flex justify-between items-center'>
 					<p className='text-[#71717A] text-sm'>Upcoming Invoice</p>
-					<p className='text-[#09090B] text-sm'>{`${getCurrencySymbol(data?.currency ?? '')} ${data?.amount_due} on ${formatDateToMonth(subscriptionDetails?.current_period_end ?? '')}`}</p>
+					<p className='text-[#09090B] text-sm'>{`${getCurrencySymbol(data?.currency ?? '')}${data?.amount_due} on ${formatDateShort(subscriptionDetails?.current_period_end ?? '')}`}</p>
 				</div>
 			</div>
 
 			{(data?.line_items?.length ?? 0) > 0 && (
 				<div className='card !mt-4'>
-					<InvoiceLineItemTable amount_due={data?.amount_due} title='Upcoming Invoices' data={data?.line_items ?? []} />
+					<InvoiceLineItemTable
+						currency={data?.currency}
+						amount_due={data?.amount_due}
+						title='Upcoming Invoices'
+						data={data?.line_items ?? []}
+					/>
 				</div>
 			)}
 		</div>

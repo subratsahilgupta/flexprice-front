@@ -28,6 +28,17 @@ export const formatBillingPeriod = (billingPeriod: string) => {
 	}
 };
 
+export const formatPriceType = (type: string): string => {
+	switch (type.toUpperCase()) {
+		case 'FIXED':
+			return 'Recurring';
+		case 'USAGE':
+			return 'Usage Based';
+		default:
+			return '';
+	}
+};
+
 export const toSentenceCase = (str: string): string => {
 	if (!str) return str;
 	return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
