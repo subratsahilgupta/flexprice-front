@@ -9,6 +9,14 @@ import { Pencil, Trash2 } from 'lucide-react';
 import { Meter } from '@/models/Meter';
 import { formatBillingPeriod } from '@/utils/common/helper_functions';
 
+const formatAmountWithCommas = (amount: string): string => {
+	return amount.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
+const removeCommasFromAmount = (amount: string): string => {
+	return amount.replace(/,/g, '');
+};
+
 interface Props {
 	data?: Partial<Price>;
 	isEdit?: boolean;
@@ -296,6 +304,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 						<Input
 							type='number'
 							label='Price'
+							value={packagedFee.price}
 							inputPrefix={mapCurrency(currency)}
 							onChange={(e) => setpackagedFee({ ...packagedFee, price: e })}
 						/>
@@ -303,11 +312,12 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 							<p className='text-[#18181B] font-medium'>per</p>
 						</div>
 						<Input
-							type='number'
+							value={formatAmountWithCommas(packagedFee.unit)}
+							type='text'
 							onChange={(e) =>
 								setpackagedFee({
 									...packagedFee,
-									unit: e,
+									unit: removeCommasFromAmount(e),
 								})
 							}
 							suffix={`/ units / ${formatBillingPeriod(billingPeriod)}`}

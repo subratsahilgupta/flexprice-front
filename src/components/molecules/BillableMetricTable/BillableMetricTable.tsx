@@ -60,11 +60,14 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 			redirect: false,
 			render: (row) => (
 				<ActionButton
+					isEditDisabled={row.status === 'archived'}
+					isArchiveDisabled={row.status === 'archived'}
 					id={row.id}
 					editPath={`/usage-tracking/billable-metric/edit-meter?id=${row.id}`}
+					row={row}
 					deleteMutationFn={(id) => MeterApi.deleteMeter(id)}
 					refetchQueryKey={'fetchMeters'}
-					entityName={'Meter'}
+					entityName={row.event_name}
 				/>
 			),
 		},

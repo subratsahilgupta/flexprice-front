@@ -4,6 +4,7 @@ import { Price } from '@/models/Price';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
 import formatDate from '@/utils/common/format_date';
 import { toSentenceCase } from '@/utils/common/helper_functions';
+import { getPriceTableCharge } from '@/utils/models/transformed_plan';
 import { useQuery } from '@tanstack/react-query';
 import { EyeOff, Pencil } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -64,7 +65,8 @@ const columns: ColumnData[] = [
 ];
 
 const ValueCell = ({ data }: { data: Price }) => {
-	return <div>{data.amount}</div>;
+	const price = getPriceTableCharge(data as any);
+	return <div>{price}</div>;
 };
 
 const PlanViewPage = () => {
@@ -92,17 +94,19 @@ const PlanViewPage = () => {
 	return (
 		<div className='w-2/3'>
 			<div className='w-full !my-5 flex justify-between items-center'>
-				<FormHeader title={planData?.name.toUpperCase()} variant='form-title' />
-				<div className='flex gap-2'>
-					<Button variant={'outline'} className='flex gap-2'>
-						<EyeOff />
-						Archive
-					</Button>
-					<Button className='flex gap-2'>
-						<Pencil />
-						Edit
-					</Button>
-				</div>
+				<FormHeader title={planData?.name} variant='form-title' />
+				{planData?.status === 'published' && (
+					<div className='flex gap-2'>
+						<Button variant={'outline'} className='flex gap-2'>
+							<EyeOff />
+							Archive
+						</Button>
+						<Button className='flex gap-2'>
+							<Pencil />
+							Edit
+						</Button>
+					</div>
+				)}
 			</div>
 
 			<div className='card'>

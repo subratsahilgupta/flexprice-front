@@ -53,13 +53,13 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 	const radioMenuItemList = [
 		{
 			label: 'Cumulative',
-			description: 'Email digest, mentions & all activity.',
+			description: 'Track values continuously without resetting, useful for metrics like lifetime usage.',
 			value: 'never',
 			icon: LuCircleFadingPlus,
 		},
 		{
-			label: 'Period',
-			description: 'Only mentions and comments.',
+			label: 'Periodic',
+			description: 'Reset values based on the billing cycle, such as monthly or annual usage',
 			value: 'RESET_PERIOD',
 			icon: LuRefreshCw,
 		},

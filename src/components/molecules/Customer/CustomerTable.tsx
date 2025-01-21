@@ -39,6 +39,8 @@ const CustomerTable: FC<Props> = ({ data }) => {
 			redirect: false,
 			render: (row) => (
 				<ActionButton
+					isArchiveDisabled={row.status === 'archived'}
+					isEditDisabled={row.status === 'archived'}
 					entityName='Customer'
 					refetchQueryKey='fetchCustomer'
 					deleteMutationFn={(id) => CustomerApi.deleteCustomerById(id)}
