@@ -35,7 +35,7 @@ export type NormalizedPlan = {
 				amount: string;
 				display_amount: string;
 				currency: string;
-				transform_quantity: number;
+				transform_quantity: { divide_by: number };
 				type: string;
 				billing_model: string;
 				billing_period: string;
@@ -93,7 +93,7 @@ export const getPriceTableCharge = (charge: ChargesForBillingPeriodOne) => {
 		return `${charge.display_amount}`;
 	} else {
 		if (charge.billing_model === 'PACKAGE') {
-			return `${charge.display_amount} / ${charge.transform_quantity} units`;
+			return `${charge.display_amount} / ${charge.transform_quantity.divide_by} units`;
 		} else if (charge.billing_model === 'FLAT_FEE') {
 			return `${charge.display_amount} / unit`;
 		} else if (charge.billing_model === 'TIERED') {

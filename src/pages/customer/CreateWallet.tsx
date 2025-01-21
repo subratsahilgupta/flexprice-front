@@ -66,7 +66,7 @@ const CreateWallet: FC<Props> = ({ customerId, onClose = () => {} }) => {
 			<div className='card space-y-4'>
 				<FormHeader
 					title='Wallet'
-					subtitle={`Assign a name to your event schema to easily identify and track events processed.`}
+					subtitle={`Create a prepaid wallet to add credits that can be consumed for billing purposes.`}
 					variant='sub-header'
 				/>
 				<Input error={errors.walletName} value={walletName} onChange={setwalletName} label='Wallet Name' placeholder='Enter wallet name' />

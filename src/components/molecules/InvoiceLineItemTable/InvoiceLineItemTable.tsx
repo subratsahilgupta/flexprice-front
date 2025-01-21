@@ -78,7 +78,7 @@ const InvoiceLineItemTable: FC<Props> = ({ data, amount_due, currency, title }) 
 						</div>
 						<div className='flex justify-between'>
 							<span>Tax</span>
-							<span>--</span>
+							<span className=''>-</span>
 						</div>
 						<div className='flex justify-between font-bold text-gray-900 border-t pt-2'>
 							<span>Total Amount</span>

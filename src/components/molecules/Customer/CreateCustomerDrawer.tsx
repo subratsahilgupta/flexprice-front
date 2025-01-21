@@ -89,7 +89,7 @@ const CreateCustomerDrawer = () => {
 				isOpen={open}
 				onOpenChange={(value) => setopen(value)}
 				title={'Add Customer'}
-				description={`Make changes to your profile here. Click save when you're done.`}
+				description={`To create a customer, please fill out this form.`}
 				trigger={
 					<Button onClick={() => setopen(true)} className=' flex gap-2 bg-[#0F172A] '>
 						<FiFolderPlus />
@@ -127,7 +127,8 @@ const CreateCustomerDrawer = () => {
 				<Spacer className='!h-8' />
 				<div className='flex justify-end'>
 					<Button disabled={isPending} className='bg-[#0F172A] text-white inline-flex' onClick={handleSubmit}>
-						Add
+						<FiFolderPlus />
+						Save Customer
 					</Button>
 				</div>
 			</Sheet>

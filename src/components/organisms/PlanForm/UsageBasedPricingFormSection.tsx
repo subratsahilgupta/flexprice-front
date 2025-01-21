@@ -128,17 +128,6 @@ const UsageBasedPricingFormSection = () => {
 					/>
 				</div>
 			)}
-
-			{/* <pre>
-				{JSON.stringify(
-					{
-						priceList,
-						editStates,
-					},
-					null,
-					2,
-				)}
-			</pre> */}
 		</div>
 	);
 };

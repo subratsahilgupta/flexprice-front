@@ -7,6 +7,7 @@ import { Subscription } from '@/models/Subscription';
 import CustomerOverviewCard from '@/components/molecules/Customer/CustomerOverviewCard';
 import { useState } from 'react';
 import SubscriptionDetails from '../SubscriptionDetails';
+import { FiFolderPlus } from 'react-icons/fi';
 
 const SkeletonLoader = () => (
 	<div className='rounded-xl border border-gray-300 p-6 space-y-4'>
@@ -61,7 +62,10 @@ const Overview = () => {
 			<div className='space p-6 rounded-xl border border-gray-300'>
 				<div className='flex mb-4 justify-between items-center'>
 					<h2 className='text-base font-semibold text-gray-800'>Subscriptions</h2>
-					<Button onClick={handleAddSubscription} className='bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark'>
+					<Button
+						onClick={handleAddSubscription}
+						className='bg-primary text-white px-4 inline-flex items-center py-2 rounded-md hover:bg-primary-dark'>
+						<FiFolderPlus />
 						Add Subscription
 					</Button>
 				</div>
