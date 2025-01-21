@@ -1,11 +1,23 @@
+import { sentryVitePlugin } from '@sentry/vite-plugin';
 import path from 'path';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 export default defineConfig({
-	plugins: [react()],
+	plugins: [
+		react(),
+		sentryVitePlugin({
+			org: 'flexprice',
+			project: 'admin-flexprice-io',
+		}),
+	],
+
 	resolve: {
 		alias: {
 			'@': path.resolve(__dirname, './src'),
 		},
+	},
+
+	build: {
+		sourcemap: true,
 	},
 });
