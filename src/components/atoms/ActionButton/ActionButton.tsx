@@ -15,9 +15,20 @@ interface ActionProps {
 	deleteMutationFn: (id: string) => Promise<void>;
 	refetchQueryKey: string;
 	entityName: string;
+	row?: any;
+	isArchiveDisabled?: boolean;
+	isEditDisabled?: boolean;
 }
 
-const ActionButton: FC<ActionProps> = ({ id, editPath, deleteMutationFn, refetchQueryKey, entityName }) => {
+const ActionButton: FC<ActionProps> = ({
+	id,
+	editPath,
+	deleteMutationFn,
+	refetchQueryKey,
+	entityName,
+	isArchiveDisabled,
+	isEditDisabled,
+}) => {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
 	const { mutate: deleteEntity } = useMutation({
@@ -39,7 +50,7 @@ const ActionButton: FC<ActionProps> = ({ id, editPath, deleteMutationFn, refetch
 					<BsThreeDotsVertical className='text-base' />
 				</DropdownMenuTrigger>
 				<DropdownMenuContent>
-					<DropdownMenuItem>
+					<DropdownMenuItem disabled={isEditDisabled}>
 						<Link to={editPath}>
 							<div className='flex gap-2 items-center w-full'>
 								<MdEdit />
@@ -47,7 +58,7 @@ const ActionButton: FC<ActionProps> = ({ id, editPath, deleteMutationFn, refetch
 							</div>
 						</Link>
 					</DropdownMenuItem>
-					<DropdownMenuItem onSelect={() => setIsDialogOpen(true)}>
+					<DropdownMenuItem disabled={isArchiveDisabled} onSelect={() => setIsDialogOpen(true)}>
 						<div className='flex gap-2 items-center w-full'>
 							<FaRegEyeSlash />
 							<span>Archive</span>

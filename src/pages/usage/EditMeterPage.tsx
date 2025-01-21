@@ -16,7 +16,7 @@ const updateMeter = async (id: string, data: Partial<Meter>) => {
 	return await MeterApi.updateMeter(id, data);
 };
 
-const AddMeterPage = () => {
+const EditMeterPage = () => {
 	const [params] = useSearchParams();
 	const navigate = useNavigate();
 
@@ -85,4 +85,4 @@ const AddMeterPage = () => {
 	);
 };
 
-export default AddMeterPage;
+export default EditMeterPage;

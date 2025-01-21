@@ -49,7 +49,7 @@ const SubscriptionDetails: FC<Props> = ({ subscription_id }) => {
 
 	return (
 		<div className='w-2/3'>
-			<div className='rounded-xl border border-gray-300 p-6'>
+			<div className='card'>
 				<FormHeader title='Subscription details' variant='sub-header' titleClassName='font-semibold' />
 				<div className='w-full flex justify-between items-center'>
 					<p className='text-[#71717A] text-sm'>Subscription name</p>

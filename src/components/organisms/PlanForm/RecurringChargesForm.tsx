@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import usePlanStore, { Price } from '@/store/usePlanStore';
 import { Pencil, Trash2 } from 'lucide-react';
 import { AddChargesButton, subscriptionTypeOptions } from './SetupChargesSection';
-import { mapBillingPeriod } from '@/utils/common/helper_functions';
+import { formatBillingPeriod } from '@/utils/common/helper_functions';
 import { billlingPeriodOptions, currencyOptions } from '@/core/data/constants';
 
 const RecurringChargesForm = () => {
@@ -138,7 +138,7 @@ const RecurringChargesForm = () => {
 					label='Price'
 					error={errors.amount}
 					inputPrefix={mapCurrency(currency)}
-					suffix={<span className='text-[#64748B]'> {`per ${mapBillingPeriod(billingPeriod)}`}</span>}
+					suffix={<span className='text-[#64748B]'> {`per ${formatBillingPeriod(billingPeriod)}`}</span>}
 				/>
 				<Spacer height={'16px'} />
 				<div className='flex justify-end'>

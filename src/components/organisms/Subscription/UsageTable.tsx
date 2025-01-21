@@ -16,16 +16,16 @@ const UsageTable: FC<UsageTableProps> = ({ data }) => {
 
 	const columns: ColumnData[] = [
 		{
-			name: 'name',
+			fieldName: 'name',
 			title: 'Meter Name',
 		},
 		{
-			name: 'quantity',
+			fieldName: 'quantity',
 			title: 'Quantity',
 			align: 'center',
 		},
 		{
-			name: 'amount',
+			fieldName: 'amount',
 			title: 'Amount',
 			align: 'center',
 		},

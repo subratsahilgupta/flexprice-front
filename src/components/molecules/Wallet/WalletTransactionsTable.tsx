@@ -24,18 +24,18 @@ interface Props {
 const columnData: ColumnData[] = [
 	{
 		title: 'Transactions',
-		name: 'description',
+		fieldName: 'description',
 		render: (rowData) => fomatTransactionTitle(rowData.type),
 	},
 	{
 		title: 'Date',
-		name: 'created_at',
+		fieldName: 'created_at',
 		render: (rowData) => <span>{formatDateShort(rowData.created_at)}</span>,
 	},
 
 	{
 		title: 'Balance',
-		name: 'balance',
+		fieldName: 'balance',
 		render: (rowData) => formatAmount(rowData.type, rowData.amount),
 	},
 ];

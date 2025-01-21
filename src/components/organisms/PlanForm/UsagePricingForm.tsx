@@ -7,7 +7,15 @@ import { RiDeleteBin6Line } from 'react-icons/ri';
 import SelectMeter from './SelectMeter';
 import { Pencil, Trash2 } from 'lucide-react';
 import { Meter } from '@/models/Meter';
-import { mapBillingPeriod } from '@/utils/common/helper_functions';
+import { formatBillingPeriod } from '@/utils/common/helper_functions';
+
+const formatAmountWithCommas = (amount: string): string => {
+	return amount.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
+const removeCommasFromAmount = (amount: string): string => {
+	return amount.replace(/,/g, '');
+};
 
 interface Props {
 	data?: Partial<Price>;
@@ -285,7 +293,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 						label='Price'
 						inputPrefix={mapCurrency(currency)}
 						onChange={(e) => setflatFee(e)}
-						suffix={<span className='text-[#64748B]'>{`/ unit / ${mapBillingPeriod(billingPeriod)}`}</span>}
+						suffix={<span className='text-[#64748B]'>{`/ unit / ${formatBillingPeriod(billingPeriod)}`}</span>}
 					/>
 				</div>
 			)}
@@ -296,6 +304,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 						<Input
 							type='number'
 							label='Price'
+							value={packagedFee.price}
 							inputPrefix={mapCurrency(currency)}
 							onChange={(e) => setpackagedFee({ ...packagedFee, price: e })}
 						/>
@@ -303,14 +312,15 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 							<p className='text-[#18181B] font-medium'>per</p>
 						</div>
 						<Input
-							type='number'
+							value={formatAmountWithCommas(packagedFee.unit)}
+							type='text'
 							onChange={(e) =>
 								setpackagedFee({
 									...packagedFee,
-									unit: e,
+									unit: removeCommasFromAmount(e),
 								})
 							}
-							suffix={`/ units / ${mapBillingPeriod(billingPeriod)}`}
+							suffix={`/ units / ${formatBillingPeriod(billingPeriod)}`}
 						/>
 					</div>
 					{inputErrors.packagedModelError && <p className='text-red-500 text-sm'>{inputErrors.packagedModelError}</p>}

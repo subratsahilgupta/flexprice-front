@@ -1,4 +1,4 @@
-const formatDate = (date: string, locale: string = 'en-US'): string => {
+const formatDate = (date: string | Date, locale: string = 'en-US'): string => {
 	const parsedDate = new Date(date);
 
 	if (isNaN(parsedDate.getTime())) {
