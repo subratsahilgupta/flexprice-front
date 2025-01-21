@@ -93,7 +93,7 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 							className='size-8 bg-contain rounded-md'
 							alt='company logo'
 						/>
-						<p className='font-semibold text-[14px]'>Acme Inc</p>
+						<p className='font-semibold text-[14px]'>Simplismart</p>
 					</div>
 
 					<SidebarTrigger />
