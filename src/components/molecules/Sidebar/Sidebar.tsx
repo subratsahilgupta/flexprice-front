@@ -31,16 +31,14 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 			},
 			{
 				title: 'Query',
-				url: '/usage-tracking/customers',
+				url: '/usage-tracking/query',
 				icon: '/assets/svg/query.svg',
-				disabled: true,
 			},
 			{
 				title: 'Events',
-				url: '/usage-tracking/metering',
+				url: '/usage-tracking/events',
 				icon: '/assets/svg/events.svg',
 				isActive: false,
-				disabled: true,
 				// items: [
 				// 	{
 				// 		title: 'Billable Metrics',

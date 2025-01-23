@@ -3,15 +3,17 @@ import Auth from '@/pages/auth/Auth';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import CustomerPage from '@/pages/customer/Customer';
 import AuthMiddleware from '../auth/AuthProvider';
-import BillableMetricsPage from '@/pages/usage/BillableMetrics';
-import AddMeterPage from '@/pages/usage/AddMeter';
-import EditMeterPage from '@/pages/usage/EditMeterPage';
+import BillableMetricsPage from '@/pages/usage/meter/BillableMetrics';
+import AddMeterPage from '@/pages/usage/meter/AddMeter';
+import EditMeterPage from '@/pages/usage/meter/EditMeterPage';
 import PricingPlans from '@/pages/customer/pricingPlans/PricingPlans';
 import CreatePlanPage from '@/pages/customer/pricingPlans/CreatePlan';
 import CustomerSubscription from '@/pages/customer/CustomerSubscription';
 import CustomerDetails from '@/pages/customer/CustomerDetails';
 import ErrorPage from '@/pages/error/ErrorPage';
 import PlanViewPage from '@/pages/customer/pricingPlans/PlanViewPage';
+import EventsPage from '@/pages/usage/events/Events';
+import QueryPage from '@/pages/usage/query/Query';
 
 const RouteNames = {
 	home: '/',
@@ -20,6 +22,8 @@ const RouteNames = {
 	billableMetric: '/usage-tracking/billable-metric',
 	addMeter: '/usage-tracking/billable-metric/add-meter',
 	editMeter: '/usage-tracking/billable-metric/edit-meter',
+	eventsPage: '/usage-tracking/events',
+	queryPage: '/usage-tracking/query',
 	customerManagement: '/customer-management',
 	customers: '/customer-management/customers',
 	pricingPlan: '/customer-management/pricing-plan',
@@ -58,6 +62,14 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: RouteNames.editMeter,
 						element: <EditMeterPage />,
+					},
+					{
+						path: RouteNames.eventsPage,
+						element: <EventsPage />,
+					},
+					{
+						path: RouteNames.queryPage,
+						element: <QueryPage />,
 					},
 				],
 			},

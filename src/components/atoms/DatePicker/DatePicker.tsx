@@ -11,7 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 interface DatePickerProps {
 	date: Date | undefined;
 	setDate: (date: Date | undefined) => void;
-	placeholder?: string; // Add a placeholder prop
+	placeholder?: string;
 	disabled?: boolean;
 }
 
