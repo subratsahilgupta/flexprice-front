@@ -10,11 +10,11 @@ const EventsPage: React.FC = () => {
 	const [hasMore, setHasMore] = useState(true);
 	const [loading, setLoading] = useState(false);
 	const [queryData, setqueryData] = useState<{
-		startTime: Date;
-		endTime: Date;
-		externalCustomerId: string;
-		eventName: string;
-	}>();
+		startTime?: string;
+		endTime?: string;
+		externalCustomerId?: string;
+		eventName?: string;
+	}>({});
 
 	const [iterLastKey, setIterLastKey] = useState<string | undefined>(undefined);
 	const observer = useRef<IntersectionObserver | null>(null);
@@ -43,8 +43,8 @@ const EventsPage: React.FC = () => {
 				const response = await EventsApi.getRawEvents({
 					iter_last_key: iterLastKey,
 					page_size: 10,
-					start_time: queryData?.startTime.toISOString(),
-					end_time: queryData?.endTime.toISOString(),
+					start_time: queryData?.startTime,
+					end_time: queryData?.endTime,
 					external_customer_id: queryData?.externalCustomerId,
 					event_name: queryData?.eventName,
 				});
@@ -61,8 +61,8 @@ const EventsPage: React.FC = () => {
 	);
 
 	useEffect(() => {
-		fetchEvents(iterLastKey);
-	}, [queryData]);
+		fetchEvents(undefined);
+	}, [queryData.endTime, queryData.eventName, queryData.externalCustomerId, queryData.startTime]);
 	if (loading && events.length === 0) {
 		return <Loader />;
 	}
@@ -72,17 +72,20 @@ const EventsPage: React.FC = () => {
 			<SectionHeader title='Events' />
 			<div className='w-full flex !gap-4 mb-8 !h-8 items-end'>
 				<DatePicker
-					date={queryData?.startTime}
+					date={queryData.startTime ? new Date(queryData?.startTime) : undefined}
 					title='Start Time'
 					setDate={(date) => {
-						setqueryData((prev) => ({ ...prev, startTime: date }) as typeof queryData);
+						console.log('Setting start time:', date, typeof date);
+
+						setqueryData((prev) => ({ ...prev!, startTime: date?.toISOString() }));
+						console.log('Query data:', queryData);
 					}}
 				/>
 				<DatePicker
-					date={queryData?.endTime}
+					date={queryData.endTime ? new Date(queryData?.endTime) : undefined}
 					title='End Time'
 					setDate={(date) => {
-						setqueryData((prev) => ({ ...prev, endTime: date }) as typeof queryData);
+						setqueryData((prev) => ({ ...prev!, endTime: date?.toISOString() }));
 					}}
 				/>
 				<Input
@@ -91,7 +94,7 @@ const EventsPage: React.FC = () => {
 					label='External Customer ID'
 					value={queryData?.externalCustomerId}
 					onChange={(e) => {
-						setqueryData((prev) => ({ ...prev, externalCustomerId: e }) as typeof queryData);
+						setqueryData((prev) => ({ ...prev!, externalCustomerId: e }) as typeof queryData);
 					}}
 				/>
 				<Input
@@ -100,7 +103,7 @@ const EventsPage: React.FC = () => {
 					label='Event Name'
 					value={queryData?.eventName}
 					onChange={(e) => {
-						setqueryData((prev) => ({ ...prev, eventName: e }) as typeof queryData);
+						setqueryData((prev) => ({ ...prev!, eventName: e }) as typeof queryData);
 					}}
 				/>
 				<Button
