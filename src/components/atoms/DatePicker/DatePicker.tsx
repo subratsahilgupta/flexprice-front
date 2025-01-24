@@ -13,12 +13,14 @@ interface DatePickerProps {
 	setDate: (date: Date | undefined) => void;
 	placeholder?: string;
 	disabled?: boolean;
+	title?: string;
 }
 
-const DatePicker = ({ date, setDate, placeholder = 'Pick a date', disabled }: DatePickerProps) => {
+const DatePicker = ({ date, setDate, placeholder = 'Pick a date', disabled, title }: DatePickerProps) => {
 	return (
 		<Popover>
-			<PopoverTrigger disabled={disabled} asChild>
+			<PopoverTrigger disabled={disabled}>
+				{title && <div className='w-full text-start text-sm text-muted-foreground'>{title}</div>}
 				<Button variant={'outline'} className={cn('w-[240px] justify-start text-left font-normal', !date && 'text-muted-foreground')}>
 					<CalendarIcon className='mr-2 h-4 w-4' />
 					{date ? format(date, 'PPP') : <span>{placeholder}</span>} {/* Use placeholder */}

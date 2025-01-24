@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import FlexpriceTable, { ColumnData } from '../Table';
-import formatDate from '@/utils/common/format_date';
+import { formatDateWithMilliseconds } from '@/utils/common/format_date';
 
 interface Props {
 	data: Event[];
@@ -38,7 +38,7 @@ const EventsTable: FC<Props> = ({ data }) => {
 			title: 'Timestamp',
 			fieldName: 'timestamp',
 			render(rowData) {
-				return <span>{formatDate(rowData.timestamp)}</span>;
+				return <span>{formatDateWithMilliseconds(rowData.timestamp)}</span>;
 			},
 		},
 	];

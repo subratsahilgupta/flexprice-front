@@ -46,12 +46,7 @@ export const DateTimePicker: React.FC<Props> = ({ date, setDate, disabled, place
 	return (
 		<Popover open={isOpen} onOpenChange={setIsOpen}>
 			<PopoverTrigger
-				className={cn(
-					'w-full',
-					date && 'border-primary-foreground',
-					disabled && 'bg-gray-100',
-					!date && 'text-muted-foreground',
-				)}
+				className={cn('w-full', date && 'border-primary-foreground', disabled && 'bg-gray-100', !date && 'text-muted-foreground')}
 				disabled={disabled}>
 				{title && <div className='w-full text-start text-sm text-muted-foreground'>{title}</div>}
 				<Button variant='outline' className={cn('w-full justify-start text-left font-normal', !date && 'text-muted-foreground')}>
