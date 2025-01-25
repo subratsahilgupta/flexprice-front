@@ -14,9 +14,11 @@ interface DatePickerProps {
 	placeholder?: string;
 	disabled?: boolean;
 	title?: string;
+	minDate?: Date;
+	maxDate?: Date;
 }
 
-const DatePicker = ({ date, setDate, placeholder = 'Pick a date', disabled, title }: DatePickerProps) => {
+const DatePicker = ({ date, setDate, placeholder = 'Pick a date', disabled, title, minDate, maxDate }: DatePickerProps) => {
 	return (
 		<Popover>
 			<PopoverTrigger disabled={disabled}>
@@ -27,7 +29,7 @@ const DatePicker = ({ date, setDate, placeholder = 'Pick a date', disabled, titl
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent className='w-auto p-0' align='start'>
-				<Calendar disabled={disabled} mode='single' selected={date} onSelect={setDate} initialFocus />
+				<Calendar disabled={disabled} mode='single' selected={date} onSelect={setDate} initialFocus fromDate={minDate} toDate={maxDate} />
 			</PopoverContent>
 		</Popover>
 	);

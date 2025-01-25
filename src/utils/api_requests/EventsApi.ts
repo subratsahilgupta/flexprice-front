@@ -1,5 +1,5 @@
-// import { AxiosClient } from '@/core/axios/verbs';
-// import { generateQueryParams } from '../common/api_helper';
+import { AxiosClient } from '@/core/axios/verbs';
+import { generateQueryParams } from '../common/api_helper';
 import { Event } from '@/models/Event';
 
 interface GetEventsPayload {
@@ -10,6 +10,7 @@ interface GetEventsPayload {
 	iter_first_key?: string;
 	iter_last_key?: string;
 	page_size?: number;
+	event_id?: string;
 }
 
 interface GetEventsResponse {
@@ -20,12 +21,12 @@ interface GetEventsResponse {
 }
 
 class EventsApi {
-	// private static baseUrl = '/events';
+	private static baseUrl = '/events';
 
 	public static async getRawEvents(payload: GetEventsPayload): Promise<GetEventsResponse> {
-		return await simulateGetEvents(payload);
-		// const url = generateQueryParams(EventsApi.baseUrl, payload);
-		// return await AxiosClient.get<GetEventsResponse>(url);
+		// return await simulateGetEvents(payload);
+		const url = generateQueryParams(EventsApi.baseUrl, payload);
+		return await AxiosClient.get<GetEventsResponse>(url);
 	}
 }
 

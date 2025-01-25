@@ -19,12 +19,12 @@ export interface Event {
 const EventsTable: FC<Props> = ({ data }) => {
 	const columns: ColumnData[] = [
 		{
-			title: 'Name',
-			fieldName: 'event_name',
+			title: 'Event Id',
+			fieldName: 'id',
 		},
 		{
-			title: 'Customer',
-			fieldName: 'customer_id',
+			title: 'Event Type',
+			fieldName: 'event_name',
 		},
 		{
 			title: 'External Customer ID',
@@ -33,6 +33,9 @@ const EventsTable: FC<Props> = ({ data }) => {
 		{
 			title: 'Source',
 			fieldName: 'source',
+			render(rowData) {
+				return <span>{rowData.source || '--'}</span>;
+			},
 		},
 		{
 			title: 'Timestamp',

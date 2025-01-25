@@ -1,10 +1,11 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { Button, DatePicker, Input, Loader, SectionHeader } from '@/components/atoms';
+import { Button, DatePicker, Input, SectionHeader } from '@/components/atoms';
 import { EventsTable } from '@/components/molecules';
 import { Event } from '@/models/Event';
 import EventsApi from '@/utils/api_requests/EventsApi';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RefreshCw } from 'lucide-react';
+
 const EventsPage: React.FC = () => {
 	const [events, setEvents] = useState<Event[]>([]);
 	const [hasMore, setHasMore] = useState(true);
@@ -14,10 +15,12 @@ const EventsPage: React.FC = () => {
 		endTime?: string;
 		externalCustomerId?: string;
 		eventName?: string;
+		eventId?: string;
 	}>({});
 
 	const [iterLastKey, setIterLastKey] = useState<string | undefined>(undefined);
 	const observer = useRef<IntersectionObserver | null>(null);
+
 	const lastElementRef = useCallback(
 		(node: any) => {
 			if (loading) return;
@@ -38,8 +41,6 @@ const EventsPage: React.FC = () => {
 			if (!hasMore || loading) return;
 			setLoading(true);
 			try {
-				console.log('Fetching events with iter_last_key:', iterLastKey, 'and hasMore:', hasMore);
-
 				const response = await EventsApi.getRawEvents({
 					iter_last_key: iterLastKey,
 					page_size: 10,
@@ -47,6 +48,7 @@ const EventsPage: React.FC = () => {
 					end_time: queryData?.endTime,
 					external_customer_id: queryData?.externalCustomerId,
 					event_name: queryData?.eventName,
+					event_id: queryData?.eventId,
 				});
 				setEvents((prev) => [...prev, ...response.events]);
 				setHasMore(response.has_more);
@@ -61,75 +63,77 @@ const EventsPage: React.FC = () => {
 	);
 
 	useEffect(() => {
+		setEvents([]);
+		setIterLastKey(undefined);
+		setHasMore(true);
 		fetchEvents(undefined);
-	}, [queryData.endTime, queryData.eventName, queryData.externalCustomerId, queryData.startTime]);
-	if (loading && events.length === 0) {
-		return <Loader />;
-	}
+	}, [queryData.endTime, queryData.eventName, queryData.externalCustomerId, queryData.startTime, queryData.eventId]);
 
 	return (
-		<div>
+		<div className='p-6 bg-gray-50'>
 			<SectionHeader title='Events' />
-			<div className='w-full flex !gap-4 mb-8 !h-8 items-end'>
-				<DatePicker
-					date={queryData.startTime ? new Date(queryData?.startTime) : undefined}
-					title='Start Time'
-					setDate={(date) => {
-						console.log('Setting start time:', date, typeof date);
-
-						setqueryData((prev) => ({ ...prev!, startTime: date?.toISOString() }));
-						console.log('Query data:', queryData);
-					}}
-				/>
-				<DatePicker
-					date={queryData.endTime ? new Date(queryData?.endTime) : undefined}
-					title='End Time'
-					setDate={(date) => {
-						setqueryData((prev) => ({ ...prev!, endTime: date?.toISOString() }));
-					}}
-				/>
-				<Input
-					labelClassName='text-muted-foreground font-normal'
-					className='h-9 '
-					label='External Customer ID'
-					value={queryData?.externalCustomerId}
-					onChange={(e) => {
-						setqueryData((prev) => ({ ...prev!, externalCustomerId: e }) as typeof queryData);
-					}}
-				/>
-				<Input
-					labelClassName='text-muted-foreground font-normal'
-					className='h-9 '
-					label='Event Name'
-					value={queryData?.eventName}
-					onChange={(e) => {
-						setqueryData((prev) => ({ ...prev!, eventName: e }) as typeof queryData);
-					}}
-				/>
-				<Button
-					className='size-9'
-					variant={'outline'}
-					onClick={() => {
-						setIterLastKey(undefined);
-						setEvents([]);
-						fetchEvents(undefined);
-					}}>
-					<RefreshCw />
-				</Button>
-			</div>
-			<div>
-				<EventsTable data={events} />
-				<div ref={lastElementRef}></div>
-			</div>
-			{loading && (
-				<div className='w-full !mt-4 flex flex-col gap-4'>
-					<Skeleton className='h-8 mb-2 w-full' />
-					<Skeleton className='h-8 mb-2 w-full' />
-					<Skeleton className='h-8 mb-2 w-full' />
-					<Skeleton className='h-8 mb-2 w-full' />
+			<div className='bg-white p-4 rounded-md shadow-md mb-6'>
+				<div className='w-full flex items-end  gap-4'>
+					<DatePicker
+						maxDate={queryData.endTime ? new Date(queryData.endTime) : undefined}
+						date={queryData.startTime ? new Date(queryData.startTime) : undefined}
+						title='Start Time'
+						setDate={(date) => setqueryData((prev) => ({ ...prev, startTime: date?.toISOString() }))}
+					/>
+					<DatePicker
+						minDate={queryData.startTime ? new Date(queryData.startTime) : undefined}
+						date={queryData.endTime ? new Date(queryData.endTime) : undefined}
+						title='End Time'
+						setDate={(date) => setqueryData((prev) => ({ ...prev, endTime: date?.toISOString() }))}
+					/>
+					<Input
+						label='Customer ID'
+						placeholder='Enter Customer ID'
+						className='h-9'
+						labelClassName='text-muted-foreground font-normal'
+						value={queryData?.externalCustomerId ?? ''}
+						onChange={(e) => setqueryData((prev) => ({ ...prev, externalCustomerId: e }))}
+					/>
+					<Input
+						label='Event Id'
+						placeholder='Enter Event Id'
+						className='h-9'
+						labelClassName='text-muted-foreground font-normal'
+						value={queryData?.eventId ?? ''}
+						onChange={(e) => setqueryData((prev) => ({ ...prev, eventId: e }))}
+					/>
+					<Input
+						label='Event Name'
+						placeholder='Enter Event Name'
+						className='h-9'
+						labelClassName='text-muted-foreground font-normal'
+						value={queryData?.eventName}
+						onChange={(e) => setqueryData((prev) => ({ ...prev, eventName: e }))}
+					/>
+					<Button
+						variant='outline'
+						onClick={() => {
+							setIterLastKey(undefined);
+							setEvents([]);
+							fetchEvents(undefined);
+						}}>
+						<RefreshCw />
+					</Button>
 				</div>
-			)}
-			{!hasMore && <p>No more events to load</p>}
+			</div>
+
+			<div className='bg-white p-4 rounded-md shadow-md'>
+				<EventsTable data={events} />
+				<div ref={lastElementRef} />
+				{loading && (
+					<div className='space-y-4 mt-4'>
+						<Skeleton className='h-8 w-full' />
+						<Skeleton className='h-8 w-full' />
+						<Skeleton className='h-8 w-full' />
+					</div>
+				)}
+				{!hasMore && events.length === 0 && <p className='text-center text-gray-500 mt-4'>No events found</p>}
+			</div>
 		</div>
 	);
 };
