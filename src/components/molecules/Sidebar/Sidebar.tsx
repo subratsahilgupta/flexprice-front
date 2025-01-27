@@ -33,6 +33,7 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				title: 'Query',
 				url: '/usage-tracking/query',
 				icon: '/assets/svg/query.svg',
+				disabled: true,
 			},
 			{
 				title: 'Events',

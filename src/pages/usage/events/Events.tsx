@@ -62,11 +62,15 @@ const EventsPage: React.FC = () => {
 		[iterLastKey, hasMore, loading],
 	);
 
-	useEffect(() => {
+	const refetchEvents = () => {
 		setEvents([]);
 		setIterLastKey(undefined);
 		setHasMore(true);
 		fetchEvents(undefined);
+	};
+
+	useEffect(() => {
+		refetchEvents();
 	}, [queryData.endTime, queryData.eventName, queryData.externalCustomerId, queryData.startTime, queryData.eventId]);
 
 	return (
@@ -78,13 +82,19 @@ const EventsPage: React.FC = () => {
 						maxDate={queryData.endTime ? new Date(queryData.endTime) : undefined}
 						date={queryData.startTime ? new Date(queryData.startTime) : undefined}
 						title='Start Time'
-						setDate={(date) => setqueryData((prev) => ({ ...prev, startTime: date?.toISOString() }))}
+						setDate={(date) => {
+							setqueryData((prev) => ({ ...prev, startTime: date?.toISOString() }));
+							refetchEvents();
+						}}
 					/>
 					<DatePicker
 						minDate={queryData.startTime ? new Date(queryData.startTime) : undefined}
 						date={queryData.endTime ? new Date(queryData.endTime) : undefined}
 						title='End Time'
-						setDate={(date) => setqueryData((prev) => ({ ...prev, endTime: date?.toISOString() }))}
+						setDate={(date) => {
+							setqueryData((prev) => ({ ...prev, endTime: date?.toISOString() }));
+							refetchEvents();
+						}}
 					/>
 					<Input
 						label='Customer ID'
@@ -92,7 +102,10 @@ const EventsPage: React.FC = () => {
 						className='h-9'
 						labelClassName='text-muted-foreground font-normal'
 						value={queryData?.externalCustomerId ?? ''}
-						onChange={(e) => setqueryData((prev) => ({ ...prev, externalCustomerId: e }))}
+						onChange={(e) => {
+							setqueryData((prev) => ({ ...prev, externalCustomerId: e }));
+							refetchEvents();
+						}}
 					/>
 					<Input
 						label='Event Id'
@@ -100,7 +113,10 @@ const EventsPage: React.FC = () => {
 						className='h-9'
 						labelClassName='text-muted-foreground font-normal'
 						value={queryData?.eventId ?? ''}
-						onChange={(e) => setqueryData((prev) => ({ ...prev, eventId: e }))}
+						onChange={(e) => {
+							setqueryData((prev) => ({ ...prev, eventId: e }));
+							refetchEvents();
+						}}
 					/>
 					<Input
 						label='Event Name'
@@ -108,7 +124,10 @@ const EventsPage: React.FC = () => {
 						className='h-9'
 						labelClassName='text-muted-foreground font-normal'
 						value={queryData?.eventName}
-						onChange={(e) => setqueryData((prev) => ({ ...prev, eventName: e }))}
+						onChange={(e) => {
+							setqueryData((prev) => ({ ...prev, eventName: e }));
+							refetchEvents();
+						}}
 					/>
 					<Button
 						variant='outline'
