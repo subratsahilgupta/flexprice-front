@@ -27,3 +27,5 @@ export type { DropdownMenuOption } from './DropdownMenu';
 export { CreateCustomerDrawer, CustomerCard, CustomerTable, CustomerInvoiceTable } from './Customer';
 
 export { default as InvoiceLineItemTable } from './InvoiceLineItemTable';
+export { default as EventsTable } from './Events';
+export { default as InfiniteScroll } from './InfiniteScroll';

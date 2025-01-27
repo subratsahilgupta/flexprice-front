@@ -13,15 +13,35 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
 	placeholder?: string;
 	id?: string;
 	inputPrefix?: React.ReactNode;
+	labelClassName?: string;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-	({ className, type, label, description, error, onChange, disabled, placeholder, suffix, id, value, inputPrefix }, ref) => {
+	(
+		{
+			className,
+			type,
+			label,
+			description,
+			error,
+			onChange,
+			disabled,
+			placeholder,
+			suffix,
+			id,
+			value,
+			inputPrefix,
+			labelClassName: titleClassName,
+		},
+		ref,
+	) => {
 		return (
 			<div className='space-y-1 w-full flex flex-col'>
 				{/* Label */}
 				{label && (
-					<label className={cn('font-inter block text-sm font-medium', disabled ? 'text-zinc-500' : 'text-zinc-950')}>{label}</label>
+					<label className={cn('font-inter block text-sm font-medium', disabled ? 'text-zinc-500' : 'text-zinc-950', titleClassName)}>
+						{label}
+					</label>
 				)}
 				{/* Input */}
 				<div
