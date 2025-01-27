@@ -134,6 +134,8 @@ const EventsPage: React.FC = () => {
 						onClick={() => {
 							setIterLastKey(undefined);
 							setEvents([]);
+							setHasMore(true);
+							setqueryData({});
 							fetchEvents(undefined);
 						}}>
 						<RefreshCw />
