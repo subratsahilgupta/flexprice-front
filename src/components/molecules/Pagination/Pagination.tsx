@@ -44,7 +44,7 @@ const FLexpricePagination = ({ totalPages }: { totalPages: number }) => {
 					})}
 
 					{/* Ellipsis (Optional for large pagination ranges) */}
-					{totalPages > 5 && (
+					{totalPages > 15 && (
 						<PaginationItem>
 							<PaginationEllipsis />
 						</PaginationItem>
