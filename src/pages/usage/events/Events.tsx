@@ -62,18 +62,8 @@ const EventsPage: React.FC = () => {
 		[queryData, iterLastKey, hasMore, loading]
 	);
 
-	useEffect(() => {
-		console.log('QueryData changed:', queryData);
 
-		setEvents([]);
-		setIterLastKey(undefined);
-		setHasMore(true);
-		if (Object.keys(queryData).length > 0) {
-			fetchEvents(undefined);
-		}
-	}, [queryData]);
 
-	// Refetch all events
 	const refetchEvents = () => {
 		console.log('Refetching events with updated queryData:', queryData);
 		setEvents([]);
@@ -81,6 +71,20 @@ const EventsPage: React.FC = () => {
 		setHasMore(true);
 		fetchEvents(undefined);
 	};
+
+	useEffect(() => {
+		console.log('QueryData changed:', queryData);
+
+		setEvents([]);
+		setIterLastKey(undefined);
+		setHasMore(true);
+		if (Object.keys(queryData).length > 0) {
+			refetchEvents();
+		}
+	}, [queryData]);
+
+	// Refetch all events
+
 
 	return (
 		<div className="p-6 bg-gray-50">

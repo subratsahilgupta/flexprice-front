@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useState } from 'react';
 
 interface DatePickerProps {
 	date: Date | undefined;
@@ -19,8 +20,10 @@ interface DatePickerProps {
 }
 
 const DatePicker = ({ date, setDate, placeholder = 'Pick a date', disabled, title, minDate, maxDate }: DatePickerProps) => {
+
+	const [open, setopen] = useState(false);
 	return (
-		<Popover>
+		<Popover open={open} onOpenChange={setopen} >
 			<PopoverTrigger disabled={disabled}>
 				{title && <div className='w-full text-start text-sm text-muted-foreground'>{title}</div>}
 				<Button variant={'outline'} className={cn('w-[240px] justify-start text-left font-normal', !date && 'text-muted-foreground')}>
@@ -29,7 +32,10 @@ const DatePicker = ({ date, setDate, placeholder = 'Pick a date', disabled, titl
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent className='w-auto p-0' align='start'>
-				<Calendar disabled={disabled} mode='single' selected={date} onSelect={setDate} initialFocus fromDate={minDate} toDate={maxDate} />
+				<Calendar disabled={disabled} mode='single' selected={date} onSelect={(date) => {
+					setDate(date);
+					setopen(false);
+				}} initialFocus fromDate={minDate} toDate={maxDate} />
 			</PopoverContent>
 		</Popover>
 	);
