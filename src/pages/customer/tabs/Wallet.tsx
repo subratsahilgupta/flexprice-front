@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 import { IoSearch } from 'react-icons/io5';
 import { LiaSlidersHSolid } from 'react-icons/lia';
 import { useParams } from 'react-router-dom';
-import CreateWallet from '../CreateWallet';
+import CreateWallet from '../customers/CreateWallet';
 import { CircleFadingPlus, EllipsisVertical, Pencil, Trash2, Wallet as WalletIcon } from 'lucide-react';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import useQueryParams from '@/hooks/useQueryParams';

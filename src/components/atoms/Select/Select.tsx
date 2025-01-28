@@ -1,14 +1,15 @@
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 
-export interface Option {
+export interface SelectOption {
 	value: string;
 	label: string;
 	description?: string;
+	disabled?: boolean;
 }
 
 interface Props {
-	options: Option[];
+	options: SelectOption[];
 	selectedValue?: string;
 	placeholder?: string;
 	label?: string;
@@ -52,7 +53,11 @@ const FlexPriceSelect: React.FC<Props> = ({
 				<SelectContent>
 					<SelectGroup>
 						{options.map((option) => (
-							<SelectItem key={option.value} value={option.value}>
+							<SelectItem
+								className={cn(option.disabled && 'select-none cursor-not-allowed')}
+								disabled={option.disabled}
+								key={option.value}
+								value={option.value}>
 								<div className='flex flex-col mr-2'>
 									<span>{option.label}</span>
 									{option.description && <span className='text-sm text-gray-500'>{option.description}</span>}

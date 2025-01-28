@@ -33,7 +33,7 @@ const Tabbar: FC<TabbarProps> = ({ tabs, initialActiveTab }) => {
 
 	const onTabChange = (tabId: string) => {
 		setActiveTab(tabId);
-		setQueryParam('activeTab', tabId); // Update query parameter
+		setQueryParam('activeTab', tabId);
 	};
 
 	return (

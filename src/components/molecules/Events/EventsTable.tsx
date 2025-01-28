@@ -23,7 +23,7 @@ const EventsTable: FC<Props> = ({ data }) => {
 			fieldName: 'id',
 		},
 		{
-			title: 'Event Type',
+			title: ' Meter name',
 			fieldName: 'event_name',
 		},
 		{

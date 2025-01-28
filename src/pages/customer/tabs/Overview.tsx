@@ -6,7 +6,7 @@ import SubscriptionTable from '@/components/organisms/Subscription/SubscriptionT
 import { Subscription } from '@/models/Subscription';
 import CustomerOverviewCard from '@/components/molecules/Customer/CustomerOverviewCard';
 import { useState } from 'react';
-import SubscriptionDetails from '../SubscriptionDetails';
+import SubscriptionDetails from '../customers/SubscriptionDetails';
 import { FiFolderPlus } from 'react-icons/fi';
 
 const SkeletonLoader = () => (

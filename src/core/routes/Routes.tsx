@@ -1,34 +1,42 @@
 import MainLayout from '@/layouts/MainLayout';
 import Auth from '@/pages/auth/Auth';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import CustomerPage from '@/pages/customer/Customer';
+import CustomerPage from '@/pages/customer/customers/Customer';
 import AuthMiddleware from '../auth/AuthProvider';
 import BillableMetricsPage from '@/pages/usage/meter/BillableMetrics';
 import AddMeterPage from '@/pages/usage/meter/AddMeter';
 import EditMeterPage from '@/pages/usage/meter/EditMeterPage';
 import PricingPlans from '@/pages/customer/pricingPlans/PricingPlans';
 import CreatePlanPage from '@/pages/customer/pricingPlans/CreatePlan';
-import CustomerSubscription from '@/pages/customer/CustomerSubscription';
-import CustomerDetails from '@/pages/customer/CustomerDetails';
+import CustomerSubscription from '@/pages/customer/customers/CustomerSubscription';
+import CustomerDetails from '@/pages/customer/customers/CustomerDetails';
 import ErrorPage from '@/pages/error/ErrorPage';
 import PlanViewPage from '@/pages/customer/pricingPlans/PlanViewPage';
 import EventsPage from '@/pages/usage/events/Events';
 import QueryPage from '@/pages/usage/query/Query';
+import InvoicePage from '@/pages/customer/invoices/InvoicePage';
+import InvoiceDetailsPage from '@/pages/customer/invoices/InvoiceDetailsPage';
 
 const RouteNames = {
 	home: '/',
 	login: '/login',
+
+	// usage tracking routes
 	usageTracking: '/usage-tracking',
 	billableMetric: '/usage-tracking/billable-metric',
 	addMeter: '/usage-tracking/billable-metric/add-meter',
 	editMeter: '/usage-tracking/billable-metric/edit-meter',
 	eventsPage: '/usage-tracking/events',
 	queryPage: '/usage-tracking/query',
+
+	// customer management routes
 	customerManagement: '/customer-management',
 	customers: '/customer-management/customers',
 	pricingPlan: '/customer-management/pricing-plan',
 	createPlan: '/customer-management/pricing-plan/create-plan',
 	editPlan: '/customer-management/pricing-plan/edit-plan',
+	invoices: '/customer-management/invoices',
+	invoiceDetail: '/customer-management/invoices/:invoiceId',
 };
 
 export const MainRouter = createBrowserRouter([
@@ -107,6 +115,14 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: `${RouteNames.customers}/:id`,
 						element: <CustomerDetails />,
+					},
+					{
+						path: `${RouteNames.invoices}`,
+						element: <InvoicePage />,
+					},
+					{
+						path: `${RouteNames.invoiceDetail}`,
+						element: <InvoiceDetailsPage />,
 					},
 				],
 			},

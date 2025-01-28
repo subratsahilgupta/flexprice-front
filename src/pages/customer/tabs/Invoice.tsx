@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { IoSearch } from 'react-icons/io5';
 import { LiaSlidersHSolid } from 'react-icons/lia';
 import { useParams } from 'react-router-dom';
-import InvoiceDetails from '../invoice/InvoiceDetail';
+import InvoiceDetails from '../customers/invoice/InvoiceDetail';
 
 const Invoice = () => {
 	const { id: customerId } = useParams();

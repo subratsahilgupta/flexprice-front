@@ -118,8 +118,8 @@ const EventsPage: React.FC = () => {
 						onChange={(e) => setQueryData((prev) => ({ ...prev, externalCustomerId: e === '' ? undefined : e }))}
 					/>
 					<Input
-						label='Event Id'
-						placeholder='Enter Event Id'
+						label=' Meter name'
+						placeholder='Enter Meter name'
 						className='h-9'
 						labelClassName='text-muted-foreground font-normal'
 						value={queryData?.eventId ?? ''}

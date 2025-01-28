@@ -1,8 +1,8 @@
 import { useParams } from 'react-router-dom';
 import Tabbar from '@/components/molecules/Tabbar/Tabbar';
-import Overview from './tabs/Overview';
-import WalletTab from './tabs/Wallet';
-import Invoice from './tabs/Invoice';
+import Overview from '../tabs/Overview';
+import WalletTab from '../tabs/Wallet';
+import Invoice from '../tabs/Invoice';
 import CustomerHeader from '@/components/molecules/Customer/CustomerHeader';
 
 const tabs = [

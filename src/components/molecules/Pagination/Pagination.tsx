@@ -23,8 +23,8 @@ const FLexpricePagination = ({ totalPages }: { totalPages: number }) => {
 	if (totalPages <= 1) return null;
 
 	return (
-		<>
-			<Spacer className='!mt-4' />
+		<div className='!mb-6'>
+			<Spacer className='!my-4' />
 			<Pagination>
 				<PaginationContent>
 					{/* Previous Button */}
@@ -67,7 +67,7 @@ const FLexpricePagination = ({ totalPages }: { totalPages: number }) => {
 					</PaginationItem>
 				</PaginationContent>
 			</Pagination>
-		</>
+		</div>
 	);
 };
 

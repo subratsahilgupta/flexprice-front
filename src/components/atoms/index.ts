@@ -4,7 +4,7 @@ export { default as SectionHeader } from './SectionHeader';
 export { default as Chip } from './Chip';
 export { default as Select } from './Select';
 export { default as Spinner } from './Spinner';
-export type { Option } from './Select';
+export type { SelectOption } from './Select';
 // radio group
 export { default as RadioGroup } from './RadioGroup';
 export type { RadioMenuItem } from './RadioGroup';

@@ -1,4 +1,4 @@
-import { Option, Select } from '@/components/atoms';
+import { SelectOption, Select } from '@/components/atoms';
 import { Meter } from '@/models/Meter';
 import { MeterApi } from '@/utils/api_requests/MeterApi';
 import { useQuery } from '@tanstack/react-query';
@@ -38,7 +38,7 @@ const SelectMeter: FC<Props> = ({ onChange, value, error }) => {
 		return <div>No meters found</div>;
 	}
 
-	const activeMeters: Option[] = metersData!.items
+	const activeMeters: SelectOption[] = metersData!.items
 		.filter((meter) => meter.status === 'published')
 		.map((meter) => {
 			return {

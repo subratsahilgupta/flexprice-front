@@ -1,4 +1,4 @@
-import { Select, DatePicker, Button, Option, FormHeader } from '@/components/atoms';
+import { Select, DatePicker, Button, SelectOption, FormHeader } from '@/components/atoms';
 import CustomerCard from '@/components/molecules/Customer/CustomerCard';
 import Preview from '@/components/organisms/Subscription/Preview';
 import ChargeTable from '@/components/organisms/Subscription/PriceTable';
@@ -25,7 +25,7 @@ type SubscriptionState = {
 	prices: NormalizedPlan | null;
 	billingPeriod: string;
 	currency: string;
-	billingPeriodOptions: Option[];
+	billingPeriodOptions: SelectOption[];
 	startDate: Date | undefined;
 	endDate: Date | undefined;
 };

@@ -79,6 +79,11 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				icon: '/assets/svg/import-export.svg',
 				disabled: true,
 			},
+			{
+				title: 'Invoices',
+				url: '/customer-management/invoices',
+				icon: '/assets/svg/receipt.svg',
+			},
 		],
 	};
 

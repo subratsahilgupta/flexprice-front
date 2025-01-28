@@ -88,7 +88,7 @@ const SetupChargesSection = () => {
 			)}
 
 			<Spacer height='16px' />
-			{/* <pre>{JSON.stringify(metaData, null, 2)}</pre> */}
+			{/* {JSON.stringify(metaData, null, 2)}</pre> */}
 		</div>
 	);
 };

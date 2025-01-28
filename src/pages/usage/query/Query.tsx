@@ -106,9 +106,6 @@ const QueryPage = () => {
 					)}
 				</CardContent>
 			</Card>
-
-			<pre>{JSON.stringify(payload, null, 2)}</pre>
-			<pre>{JSON.stringify(data, null, 2)}</pre>
 		</div>
 	);
 };
