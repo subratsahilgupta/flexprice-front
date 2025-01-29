@@ -17,7 +17,7 @@ interface UpdateUserRequest {
 	email?: string;
 }
 
-export class UserService {
+export class UserApi {
 	private static baseUrl = '/users';
 
 	// Fetch all users

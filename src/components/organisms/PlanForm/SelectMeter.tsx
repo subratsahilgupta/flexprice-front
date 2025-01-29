@@ -50,7 +50,7 @@ const SelectMeter: FC<Props> = ({ onChange, value, error, label = 'Billable Metr
 		});
 
 	return (
-		<div>
+		<div className='min-w-[200px]'>
 			<Select
 				error={error}
 				selectedValue={value}

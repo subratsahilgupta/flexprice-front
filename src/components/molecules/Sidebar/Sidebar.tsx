@@ -13,6 +13,8 @@ import { cn } from '@/lib/utils';
 import { LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import supabase from '@/core/supbase/config';
+import useUser from '@/hooks/useUser';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }) => {
 	const { open } = useSidebar();
@@ -22,6 +24,9 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 		localStorage.clear();
 		navigate('/login');
 	};
+
+	const { error, loading, user } = useUser();
+
 	const navMain: { [key: string]: NavItem[] } = {
 		'Usage Tracking': [
 			{
@@ -91,15 +96,17 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 		<Sidebar collapsible='icon' {...props} className='font-open-sans border-none shadow-md max-w-[256px] bg-[#F8FAFC]'>
 			<SidebarHeader>
 				<div className='w-full mt-2 flex items-center justify-between'>
-					<div className={`h-6 flex w-full rounded-md items-center gap-2 bg-contain ${!open ? 'hidden' : ''}`}>
-						<img
-							src={'https://api.dicebear.com/7.x/adventurer-neutral/svg?seed=mail@ashallendesign.co.uk'}
-							className='size-8 bg-contain rounded-md'
-							alt='company logo'
-						/>
-						<p className='font-semibold text-[14px]'>Simplismart</p>
-					</div>
+					{loading ? (
+						<Skeleton className={`h-6 w-full`}></Skeleton>
+					) : (
+						<div className={`h-6 flex w-full rounded-md items-center gap-2 bg-contain ${!open ? 'hidden' : ''}`}>
 
+							<span className='size-8 bg-contain rounded-md'>
+								{user?.name?.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+							</span>
+							<p className='font-semibold text-[14px]'>{user?.name}</p>
+						</div>
+					)}
 					<SidebarTrigger />
 				</div>
 			</SidebarHeader>

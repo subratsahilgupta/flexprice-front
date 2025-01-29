@@ -39,3 +39,5 @@ export { default as Divider } from './Divider';
 export { default as Modal } from './Modal';
 
 export { default as DateTimePicker } from './DateTimePicker';
+
+export { default as DateRangePicker } from './DateRangePicker';
