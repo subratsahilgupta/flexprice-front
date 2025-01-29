@@ -131,9 +131,10 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 							navigate(`/customer-management/customers/${row.customer_id}`);
 						},
 					},
-					// {
-					// 	label: 'View Subscription',
-					// },
+					{
+						disabled: true,
+						label: 'View Subscription',
+					},
 				];
 				return <DropdownMenu options={menuOptions} />;
 			},
