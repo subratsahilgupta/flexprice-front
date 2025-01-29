@@ -99,7 +99,13 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 		if (index === 0 && tieredPrices.length === 1) {
 			return;
 		}
-		setTieredPrices((prev) => prev.filter((_, i) => i !== index));
+		setTieredPrices((prev) => {
+			const updatedTiers = prev.filter((_, i) => i !== index);
+			if (updatedTiers.length > 0 && index === prev.length - 1) {
+				updatedTiers[updatedTiers.length - 1].up_to = null;
+			}
+			return updatedTiers;
+		});
 	};
 
 	// Update a tier value
