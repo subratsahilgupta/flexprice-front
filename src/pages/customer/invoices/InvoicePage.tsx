@@ -1,9 +1,7 @@
-import { Button, SectionHeader, Spacer } from '@/components/atoms';
+import { SectionHeader, Spacer } from '@/components/atoms';
 import { IoSearch } from 'react-icons/io5';
 import { LiaSlidersHSolid } from 'react-icons/lia';
-import { FiFolderPlus } from 'react-icons/fi';
 import { InvoiceTable, Pagination } from '@/components/molecules';
-import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Spinner } from '@/components/atoms';
 import toast from 'react-hot-toast';
@@ -56,13 +54,13 @@ const InvoicesPage = () => {
 					<p className='text-[#71717A] font-normal '>
 						{'A billable base metric is used to measure usage, and act as a foundation of pricing (e.g., API calls for an API product).'}
 					</p>
-					<Spacer height={'16px'} />
-					<Link to='/usage-tracking/billable-metric/add-meter'>
+					{/* <Spacer height={'16px'} /> */}
+					{/* <Link to='/usage-tracking/billable-metric/add-meter'>
 						<Button className='w-32 flex gap-2 bg-[#0F172A] '>
 							<FiFolderPlus />
 							<span>Add Meter</span>
 						</Button>
-					</Link>
+					</Link> */}
 				</div>
 			</div>
 		);
@@ -78,12 +76,12 @@ const InvoicesPage = () => {
 					<button className='px-2 py-1'>
 						<LiaSlidersHSolid className='size-5 text-[#09090B] ' />
 					</button>
-					<Link to='/usage-tracking/billable-metric/add-meter'>
+					{/* <Link to='/usage-tracking/billable-metric/add-meter'>
 						<Button className='w-32 flex gap-2 bg-[#0F172A] '>
 							<FiFolderPlus />
 							<span>Add Meter</span>
 						</Button>
-					</Link>
+					</Link> */}
 				</div>
 			</SectionHeader>
 			<div className=''>

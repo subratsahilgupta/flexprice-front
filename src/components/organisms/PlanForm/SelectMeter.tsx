@@ -12,9 +12,11 @@ interface Props {
 	onChange: (value: Meter) => void;
 	value?: string;
 	error?: string;
+	label?: string;
+	placeholder?: string;
 }
 
-const SelectMeter: FC<Props> = ({ onChange, value, error }) => {
+const SelectMeter: FC<Props> = ({ onChange, value, error, label = 'Billable Metric', placeholder = 'Select by meter name' }) => {
 	const {
 		data: metersData,
 		isLoading,
@@ -54,8 +56,8 @@ const SelectMeter: FC<Props> = ({ onChange, value, error }) => {
 				selectedValue={value}
 				onChange={(e) => onChange(metersData.items.find((meter) => meter.id === e) as Meter)}
 				options={activeMeters}
-				placeholder='Select by meter name'
-				label='Billable Metric'
+				placeholder={placeholder}
+				label={label}
 			/>
 		</div>
 	);

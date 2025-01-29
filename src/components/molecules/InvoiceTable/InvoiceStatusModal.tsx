@@ -1,4 +1,5 @@
-import { Button, FormHeader, Modal, Select, SelectOption, Spacer } from '@/components/atoms';
+import { queryClient } from '@/App';
+import { Button, CheckboxRadioGroup, CheckboxRadioGroupItem, FormHeader, Modal, Spacer } from '@/components/atoms';
 import { Invoice } from '@/models/Invoice';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
 import { useMutation } from '@tanstack/react-query';
@@ -15,41 +16,38 @@ interface InvoiceStatusProps {
  * invoice status
 
 	- for void
-		- invoice_status = draft | finalize
+		- invoice_status = draft | finalize 
 		- payment_status = failed | pending 
 	    
 	- for finalize
 		- invoice_status = draft
 		- payment_status = pending
 
-payment status
-	- from pending -> sucess | failed | pending
-	- from failed -> sucess | failed | pending
-	- from success -> disabled
-
-
+	
  * 
  */
 
 const InvoiceStatusModal: FC<InvoiceStatusProps> = ({ isOpen, onOpenChange, invoice }) => {
-	const statusOptions: SelectOption[] = [
+	const statusOptions: CheckboxRadioGroupItem[] = [
 		{
 			label: 'Void',
 			value: 'VOIDED',
-			disabled:
-				!(invoice?.invoice_status === 'DRAFT' || invoice?.invoice_status === 'FINALIZED') &&
-				(invoice?.payment_status === 'FAILED' || invoice?.payment_status === 'PENDING'),
+			description: 'This action will void the invoice',
+			disabled: !(
+				(invoice?.invoice_status === 'DRAFT' || invoice?.invoice_status === 'FINALIZED') &&
+				(invoice?.payment_status === 'FAILED' || invoice?.payment_status === 'PENDING')
+			),
 		},
 		{
 			label: 'Finalize',
 			value: 'FINALIZED',
-			disabled:
-				!(invoice?.invoice_status === 'DRAFT' || invoice?.invoice_status === 'FINALIZED') &&
-				(invoice?.payment_status === 'FAILED' || invoice?.payment_status === 'PENDING'),
+			description: 'This action will finalize the invoice',
+			disabled: !(invoice?.invoice_status === 'DRAFT' && invoice?.payment_status === 'FAILED'),
 		},
 		{
 			label: 'Draft',
 			value: 'DRAFT',
+			description: 'This action will set the invoice status to draft',
 		},
 	];
 
@@ -59,7 +57,6 @@ const InvoiceStatusModal: FC<InvoiceStatusProps> = ({ isOpen, onOpenChange, invo
 				return await InvoiceApi.voidInvoice(invoice?.id as string);
 			} else if (status === 'FINALIZED') {
 				return await InvoiceApi.finalizeInvoice(invoice?.id as string);
-
 				// update invoice status to draft
 				// update payment status to pending
 			} else if (status === 'DRAFT') {
@@ -69,8 +66,14 @@ const InvoiceStatusModal: FC<InvoiceStatusProps> = ({ isOpen, onOpenChange, invo
 				// update payment status to pending
 			}
 		},
-		onSuccess: () => {
+		onSuccess: async () => {
 			toast.success('Invoice status updated successfully');
+			await queryClient.invalidateQueries({
+				queryKey: ['fetchInvoices'],
+			});
+			await queryClient.refetchQueries({
+				queryKey: ['fetchInvoices'],
+			});
 		},
 		onError: () => {
 			toast.error('Failed to update invoice status');
@@ -90,12 +93,12 @@ const InvoiceStatusModal: FC<InvoiceStatusProps> = ({ isOpen, onOpenChange, invo
 					subtitle='Please note that updating the status of an invoice will not affect the payment status.'
 				/>
 				<Spacer className='!my-6' />
-				<Select
-					label='Invoice Status'
-					selectedValue={status.value}
-					options={statusOptions}
+				<CheckboxRadioGroup
+					value={status.value}
+					checkboxItems={statusOptions}
 					onChange={(e) => setStatus(statusOptions.find((option) => option.value === e) || statusOptions[0])}
 				/>
+
 				<Spacer className='!my-6' />
 				<div className='flex justify-end gap-4'>
 					<Button onClick={() => onOpenChange(false)} variant={'outline'} className='btn btn-primary'>

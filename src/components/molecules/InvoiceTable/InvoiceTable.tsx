@@ -15,7 +15,7 @@ export interface Props {
 const getStatusChip = (status: string) => {
 	switch (status.toUpperCase()) {
 		case 'VOIDED':
-			return <Chip isActive={false} label='Failed' />;
+			return <Chip isActive={true} activeTextColor='#DC2626' activeBgColor='#FEE2E2' label='Failed' />;
 		case 'FINALIZED':
 			return <Chip isActive={true} label='Paid' />;
 		case 'DRAFT':
@@ -32,7 +32,7 @@ const getPaymentStatusChip = (status: string) => {
 		case 'SUCCEEDED':
 			return <Chip isActive={true} label='Successful' />;
 		case 'FAILED':
-			return <Chip isActive={false} label='Failed' />;
+			return <Chip isActive={true} activeTextColor='#DC2626' activeBgColor='#FEE2E2' label='Failed' />;
 		default:
 			return <Chip isActive={false} label='Unknown' />;
 	}
@@ -99,9 +99,9 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 			redirect: false,
 			render: (row: Invoice) => {
 				const menuOptions: DropdownMenuOption[] = [
-					{
-						label: 'Download Invoice',
-					},
+					// {
+					// 	label: 'Download Invoice',
+					// },
 					{
 						label: 'Update Invoice Status',
 						onSelect: () => {
@@ -131,9 +131,9 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 							navigate(`/customer-management/customers/${row.customer_id}`);
 						},
 					},
-					{
-						label: 'View Subscription',
-					},
+					// {
+					// 	label: 'View Subscription',
+					// },
 				];
 				return <DropdownMenu options={menuOptions} />;
 			},

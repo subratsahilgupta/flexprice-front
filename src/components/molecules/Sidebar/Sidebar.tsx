@@ -33,7 +33,7 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				title: 'Query',
 				url: '/usage-tracking/query',
 				icon: '/assets/svg/query.svg',
-				disabled: true,
+				disabled: false,
 			},
 			{
 				title: 'Events',
@@ -68,6 +68,11 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				icon: '/assets/svg/pricing_plan.svg',
 			},
 			{
+				title: 'Invoices',
+				url: '/customer-management/invoices',
+				icon: '/assets/svg/receipt.svg',
+			},
+			{
 				title: 'Quotation',
 				url: '/roles',
 				icon: '/assets/svg/quotation.svg',
@@ -78,11 +83,6 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				url: '/roles',
 				icon: '/assets/svg/import-export.svg',
 				disabled: true,
-			},
-			{
-				title: 'Invoices',
-				url: '/customer-management/invoices',
-				icon: '/assets/svg/receipt.svg',
 			},
 		],
 	};

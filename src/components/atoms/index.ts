@@ -20,6 +20,7 @@ export { default as Stepper } from './Stepper';
 export { default as FormHeader } from './FormHeader';
 
 export { default as CheckboxRadioGroup } from './CheckboxRadioGroup';
+export type { CheckboxRadioGroupItem } from './CheckboxRadioGroup';
 
 export { default as Spacer } from './Spacer';
 

@@ -1,4 +1,4 @@
-import { SectionHeader } from '@/components/atoms';
+import { FormHeader, Input } from '@/components/atoms';
 import SelectMeter from '@/components/organisms/PlanForm/SelectMeter';
 import { Skeleton } from '@/components/ui/skeleton';
 import EventsApi from '@/utils/api_requests/EventsApi';
@@ -8,10 +8,17 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { CartesianGrid, Line, LineChart, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { ChartConfig, ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
+import { cn } from '@/lib/utils';
 
 const QueryPage = () => {
+	const windowSizeOptions = [
+		{ label: 'Min', value: 'MIN' },
+		{ label: 'Hour', value: 'HOUR' },
+		{ label: 'Day', value: 'DAY' },
+	];
+
 	const [payload, setPayload] = useState<{
 		meter_id?: string;
 		customer_id?: string;
@@ -19,7 +26,9 @@ const QueryPage = () => {
 		start_time?: string;
 		external_customer_id?: string;
 		window_size?: string;
-	}>();
+	}>({
+		window_size: windowSizeOptions[0].value,
+	});
 
 	const {
 		data,
@@ -42,7 +51,8 @@ const QueryPage = () => {
 				end_time: payload?.end_time,
 				start_time: payload?.start_time,
 				external_customer_id: payload?.external_customer_id,
-				window_size: 'DAY',
+				window_size: payload?.window_size,
+				// window_size: 'DAY',
 			});
 		},
 		onSuccess: (data) => {
@@ -73,22 +83,50 @@ const QueryPage = () => {
 	} satisfies ChartConfig;
 
 	return (
-		<div className=''>
-			<SectionHeader title='Query' />
+		<div className='p-4'>
+			<FormHeader
+				className=''
+				variant='form-title'
+				title='Query'
+				subtitle="Make changes to your account here. Click save when you're done."
+			/>
+
+			{/* filters */}
+			<div className='w-full flex items-end gap-6 mb-6 mt-6'>
+				<SelectMeter
+					placeholder='Select Billable Metric'
+					onChange={(value) => {
+						setPayload({ ...payload, meter_id: value.id });
+					}}
+				/>
+				<div className='max-w-36'>
+					<Input className='!h-9' label='Customer ID' onChange={(e) => setPayload({ ...payload, customer_id: e })} />
+				</div>
+				<div className=''>
+					<label className={cn('font-inter block text-sm font-medium')}>{'Window Size'}</label>
+					<div className='flex gap-1'>
+						{windowSizeOptions.map((option) => {
+							const isActive = payload?.window_size === option.value;
+							return (
+								<button
+									onClick={() => {
+										setPayload({ ...payload, window_size: option.value });
+									}}
+									key={option.value}
+									className={cn(
+										'flex items-center gap-2 cursor-pointer text-sm font-normal border-2 rounded-sm border-gray-300 py-2 px-3 h-9 ',
+										isActive ? 'bg-gray-100' : 'text-gray-500',
+									)}>
+									{option.label}
+								</button>
+							);
+						})}
+					</div>
+				</div>
+			</div>
 
 			<Card className='mb-6'>
-				<CardHeader>
-					<CardTitle>Usage Statistics</CardTitle>
-					<CardDescription>Analyze meter data over time</CardDescription>
-				</CardHeader>
 				<CardContent>
-					<div className='w-full flex items-end gap-4 mb-6'>
-						<SelectMeter
-							onChange={(value) => {
-								setPayload({ ...payload, meter_id: value.id });
-							}}
-						/>
-					</div>
 					{isPending ? (
 						<Skeleton className='h-48 mb-4' />
 					) : (

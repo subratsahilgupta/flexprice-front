@@ -1,4 +1,5 @@
-import { Button, FormHeader, Modal, Select, Spacer } from '@/components/atoms';
+import { queryClient } from '@/App';
+import { Button, CheckboxRadioGroup, CheckboxRadioGroupItem, FormHeader, Modal, Spacer } from '@/components/atoms';
 import { Invoice } from '@/models/Invoice';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
 import { useMutation } from '@tanstack/react-query';
@@ -32,18 +33,24 @@ payment status
  */
 
 const InvoicePaymentStatusModal: FC<Props> = ({ isOpen, onOpenChange, invoice }) => {
-	const paymentOptions = [
+	const paymentOptions: CheckboxRadioGroupItem[] = [
 		{
 			label: 'Sucessful',
 			value: 'SUCCEEDED',
+			description: 'This action will set the payment status to successful',
+			disabled: invoice?.payment_status === 'SUCCEEDED',
 		},
 		{
 			label: 'Failed',
 			value: 'FAILED',
+			description: 'This action will set the payment status to failed',
+			disabled: invoice?.payment_status === 'SUCCEEDED',
 		},
 		{
 			label: 'Pending',
 			value: 'PENDING',
+			description: 'This action will set the payment status to pending',
+			disabled: invoice?.payment_status === 'SUCCEEDED',
 		},
 	];
 
@@ -53,8 +60,14 @@ const InvoicePaymentStatusModal: FC<Props> = ({ isOpen, onOpenChange, invoice })
 		mutationFn: async ({ invoiceId, status }: { invoiceId: string; status: string }) => {
 			return await InvoiceApi.updateInvoicePaymentStatus(invoiceId, status);
 		},
-		onSuccess() {
+		async onSuccess() {
 			toast.success('Payment status updated successfully');
+			await queryClient.invalidateQueries({
+				queryKey: ['fetchInvoices'],
+			});
+			await queryClient.refetchQueries({
+				queryKey: ['fetchInvoices'],
+			});
 		},
 		onError() {
 			toast.error('Failed to update payment status');
@@ -70,10 +83,9 @@ const InvoicePaymentStatusModal: FC<Props> = ({ isOpen, onOpenChange, invoice })
 					subtitle='Please note that updating the payment status of an invoice will not re-trigger the payment collection process.'
 				/>
 				<Spacer className='!my-6' />
-				<Select
-					label='Payment Status'
-					selectedValue={status.value}
-					options={paymentOptions}
+				<CheckboxRadioGroup
+					value={status.value}
+					checkboxItems={paymentOptions}
 					onChange={(e) => setstatus(paymentOptions.find((option) => option.value === e) || paymentOptions[0])}
 				/>
 
