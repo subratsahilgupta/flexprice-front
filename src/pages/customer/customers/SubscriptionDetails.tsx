@@ -7,23 +7,21 @@ import { formatDateShort, getCurrencySymbol } from '@/utils/common/helper_functi
 import { useQuery } from '@tanstack/react-query';
 import { FC } from 'react';
 import toast from 'react-hot-toast';
+import { useParams } from 'react-router-dom';
 
-type Props = {
-	subscription_id: string;
-};
-
-const SubscriptionDetails: FC<Props> = ({ subscription_id }) => {
+const SubscriptionDetails: FC = () => {
+	const { subscription_id } = useParams();
 	const { data, isLoading, isError } = useQuery({
 		queryKey: ['subscriptionInvoices', subscription_id],
 		queryFn: async () => {
-			return await SubscriptionApi.getSubscriptionInvoicesPreview({ subscription_id });
+			return await SubscriptionApi.getSubscriptionInvoicesPreview({ subscription_id: subscription_id! });
 		},
 	});
 
 	const { data: subscriptionDetails, isLoading: isSubscriptionDetailsLoading } = useQuery({
 		queryKey: ['subscriptionDetails', subscription_id],
 		queryFn: async () => {
-			return await SubscriptionApi.getSubscriptionById(subscription_id);
+			return await SubscriptionApi.getSubscriptionById(subscription_id!);
 		},
 	});
 

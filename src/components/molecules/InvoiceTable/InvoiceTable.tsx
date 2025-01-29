@@ -136,8 +136,11 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 						},
 					},
 					{
-						disabled: true,
 						label: 'View Subscription',
+						onSelect(e) {
+							console.log('View Subscription clicked ', e);
+							navigate(`/customer-management/customers/${row.customer_id}/subscription/${row.subscription_id}`);
+						},
 					},
 				];
 				return <DropdownMenu options={menuOptions} />;

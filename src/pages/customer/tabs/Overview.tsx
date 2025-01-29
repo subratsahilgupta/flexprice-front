@@ -5,8 +5,6 @@ import { useQuery } from '@tanstack/react-query';
 import SubscriptionTable from '@/components/organisms/Subscription/SubscriptionTable';
 import { Subscription } from '@/models/Subscription';
 import CustomerOverviewCard from '@/components/molecules/Customer/CustomerOverviewCard';
-import { useState } from 'react';
-import SubscriptionDetails from '../customers/SubscriptionDetails';
 import { FiFolderPlus } from 'react-icons/fi';
 
 const SkeletonLoader = () => (
@@ -36,8 +34,6 @@ const Overview = () => {
 		navigate(`/customer-management/customers/${customerId}/subscription`);
 	};
 
-	const [activeSubscription, setactiveSubscription] = useState<string | undefined>();
-
 	const {
 		data: subscriptions,
 		isLoading: subscriptionsLoading,
@@ -47,14 +43,9 @@ const Overview = () => {
 		queryFn: () => fetchAllSubscriptions(customerId!),
 		retry: 1,
 		staleTime: 0,
-		// staleTime: 1000 * 60 * 5, // 5 minutes
-		refetchOnWindowFocus: true, // Automatically refetch when the window regains focus
+		refetchOnWindowFocus: true,
 		refetchOnMount: 'always', // Refetch when the component is remounted
 	});
-
-	if (activeSubscription) {
-		return <SubscriptionDetails subscription_id={activeSubscription} />;
-	}
 
 	return (
 		<div className='space-y-4 w-2/3'>
@@ -80,8 +71,7 @@ const Overview = () => {
 					<SubscriptionTable
 						onRowClick={(row) => {
 							console.log('clicked on row', row);
-							setactiveSubscription(row.id);
-							console.log(activeSubscription);
+							navigate(`/customer-management/customers/${customerId}/subscription/${row.id}`);
 						}}
 						data={subscriptions as Subscription[]}
 						customerId={customerId!}

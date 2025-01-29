@@ -42,7 +42,7 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ customerId }) => {
 				<span className='size-9 bg-contain rounded-md bg-gray-400 flex items-center justify-center text-white text-lg'>
 					{customer?.name
 						?.split(' ')
-						.map((n) => n[0].toUpperCase())
+						.map((n) => n[0]?.toUpperCase())
 						.join('')
 						.slice(0, 2)}
 				</span>
