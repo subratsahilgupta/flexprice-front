@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { Outlet, useParams } from 'react-router-dom';
 import Tabbar from '@/components/molecules/Tabbar/Tabbar';
 import Overview from '../tabs/Overview';
 import WalletTab from '../tabs/Wallet';
@@ -17,6 +17,7 @@ const CustomerDetails = () => {
 		<div className='p-6 space-y-6'>
 			<CustomerHeader customerId={customerId!} />
 			<Tabbar tabs={tabs} initialActiveTab='overview' />
+			<Outlet /> {/* This will render the active tab component */}
 		</div>
 	);
 };

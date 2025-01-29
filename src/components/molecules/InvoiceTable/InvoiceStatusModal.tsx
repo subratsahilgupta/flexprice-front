@@ -1,9 +1,9 @@
 import { queryClient } from '@/App';
-import { Button, CheckboxRadioGroup, CheckboxRadioGroupItem, FormHeader, Modal, Spacer } from '@/components/atoms';
+import { Button, CheckboxRadioGroupItem, FormHeader, Modal, Select, Spacer } from '@/components/atoms';
 import { Invoice } from '@/models/Invoice';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
 import { useMutation } from '@tanstack/react-query';
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
 interface InvoiceStatusProps {
@@ -84,6 +84,12 @@ const InvoiceStatusModal: FC<InvoiceStatusProps> = ({ isOpen, onOpenChange, invo
 		invoice ? statusOptions.find((option) => option.value === invoice.invoice_status) || statusOptions[0] : statusOptions[0],
 	);
 
+	useEffect(() => {
+		if (invoice) {
+			setStatus(statusOptions.find((option) => option.value === invoice.invoice_status) || statusOptions[0]);
+		}
+	}, [invoice]);
+
 	return (
 		<Modal isOpen={isOpen} onOpenChange={onOpenChange}>
 			<div className='card bg-white max-w-lg'>
@@ -93,10 +99,11 @@ const InvoiceStatusModal: FC<InvoiceStatusProps> = ({ isOpen, onOpenChange, invo
 					subtitle='Please note that updating the status of an invoice will not affect the payment status.'
 				/>
 				<Spacer className='!my-6' />
-				<CheckboxRadioGroup
+				<Select
 					value={status.value}
-					checkboxItems={statusOptions}
+					options={statusOptions}
 					onChange={(e) => setStatus(statusOptions.find((option) => option.value === e) || statusOptions[0])}
+					isRadio={true}
 				/>
 
 				<Spacer className='!my-6' />

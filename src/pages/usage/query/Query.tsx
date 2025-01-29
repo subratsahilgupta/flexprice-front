@@ -6,7 +6,7 @@ import { formatDateShort } from '@/utils/common/helper_functions';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { CartesianGrid, Line, LineChart, XAxis, YAxis, Tooltip as RechartsTooltip, } from 'recharts';
+import { CartesianGrid, Line, LineChart, XAxis, YAxis, Tooltip as RechartsTooltip } from 'recharts';
 
 import { Card, CardContent } from '@/components/ui/card';
 import { ChartConfig, ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
@@ -64,10 +64,15 @@ const QueryPage = () => {
 		}
 	}, [payload]);
 
-	const formattedData = data?.results?.map((item) => ({
-		date: formatDateShort(item.window_size),
-		value: item.value,
-	}));
+	const formattedData = data?.results?.length
+		? data.results.map((item) => ({
+				date: formatDateShort(item.window_size),
+				value: item.value,
+			}))
+		: [
+				{ date: formatDateShort(new Date().toISOString()), value: 0 },
+				{ date: formatDateShort(new Date().toISOString()), value: 0 },
+			];
 
 	const chartConfig = {
 		value: { label: 'Usage', color: 'hsl(var(--chart-1))' },
@@ -124,7 +129,7 @@ const QueryPage = () => {
 
 			{/* Chart Section */}
 			<Card className='shadow-md'>
-				<CardContent>
+				<CardContent className='mt-6'>
 					{isPending ? (
 						<Skeleton className='h-48 mb-4' />
 					) : (

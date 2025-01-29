@@ -1,5 +1,3 @@
-interface Props {}
-
 const UserProfile = () => {
 	return (
 		<div className={`h-6 flex w-full rounded-md items-center gap-2 bg-contain ${!open ? 'hidden' : ''}`}>
@@ -12,5 +10,4 @@ const UserProfile = () => {
 		</div>
 	);
 };
-
 export default UserProfile;

@@ -1,5 +1,6 @@
 import useQueryParams from '@/hooks/useQueryParams';
 import React, { FC, useEffect, useState } from 'react';
+import { Outlet } from 'react-router-dom';
 
 interface Tab {
 	id: string;
@@ -62,7 +63,8 @@ const Tabbar: FC<TabbarProps> = ({ tabs, initialActiveTab }) => {
 			</div>
 
 			{/* Active Tab Content */}
-			<div className='mt-4'>{tabs.find((tab) => tab.id === activeTab)?.component}</div>
+			{/* <div className='mt-4'>{tabs.find((tab) => tab.id === activeTab)?.component}</div> */}
+			<Outlet />
 		</div>
 	);
 };

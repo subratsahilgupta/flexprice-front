@@ -254,7 +254,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 			/>
 			<Spacer height='8px' />
 			<Select
-				selectedValue={currency}
+				value={currency}
 				options={currencyOptions}
 				label='Currency'
 				onChange={setCurrency}
@@ -263,7 +263,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 			/>
 			<Spacer height='8px' />
 			<Select
-				selectedValue={billingPeriod}
+				value={billingPeriod}
 				options={billlingPeriodOptions}
 				onChange={(value) => {
 					setbillingPeriod(value);
@@ -275,7 +275,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 			<Spacer height={'8px'} />
 
 			<Select
-				selectedValue={billingModel}
+				value={billingModel}
 				options={billingModels}
 				onChange={setBillingModel}
 				label='Billing Model'

@@ -16,6 +16,9 @@ import EventsPage from '@/pages/usage/events/Events';
 import QueryPage from '@/pages/usage/query/Query';
 import InvoicePage from '@/pages/customer/invoices/InvoicePage';
 import InvoiceDetailsPage from '@/pages/customer/invoices/InvoiceDetailsPage';
+import Invoice from '@/pages/customer/tabs/Invoice';
+import Overview from '@/pages/customer/tabs/Overview';
+import WalletTab from '@/pages/customer/tabs/Wallet';
 
 const RouteNames = {
 	home: '/',
@@ -104,6 +107,7 @@ export const MainRouter = createBrowserRouter([
 						path: `${RouteNames.customers}`,
 						element: <CustomerPage />,
 					},
+
 					{
 						path: `${RouteNames.customers}/:id/subscription`,
 						element: <CustomerSubscription />,
@@ -115,6 +119,20 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: `${RouteNames.customers}/:id`,
 						element: <CustomerDetails />,
+						children: [
+							{
+								path: 'overview',
+								element: <Overview />,
+							},
+							{
+								path: 'wallet',
+								element: <WalletTab />,
+							},
+							{
+								path: 'invoice',
+								element: <Invoice />,
+							},
+						],
 					},
 					{
 						path: `${RouteNames.invoices}`,

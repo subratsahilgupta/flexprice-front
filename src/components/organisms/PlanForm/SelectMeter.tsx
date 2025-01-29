@@ -53,7 +53,7 @@ const SelectMeter: FC<Props> = ({ onChange, value, error, label = 'Billable Metr
 		<div className='min-w-[200px]'>
 			<Select
 				error={error}
-				selectedValue={value}
+				value={value}
 				onChange={(e) => onChange(metersData.items.find((meter) => meter.id === e) as Meter)}
 				options={activeMeters}
 				placeholder={placeholder}

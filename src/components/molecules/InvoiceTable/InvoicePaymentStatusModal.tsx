@@ -1,9 +1,9 @@
 import { queryClient } from '@/App';
-import { Button, CheckboxRadioGroup, CheckboxRadioGroupItem, FormHeader, Modal, Spacer } from '@/components/atoms';
+import { Button, CheckboxRadioGroupItem, FormHeader, Modal, Select, Spacer } from '@/components/atoms';
 import { Invoice } from '@/models/Invoice';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
 import { useMutation } from '@tanstack/react-query';
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
 interface Props {
@@ -54,7 +54,13 @@ const InvoicePaymentStatusModal: FC<Props> = ({ isOpen, onOpenChange, invoice })
 		},
 	];
 
-	const [status, setstatus] = useState(paymentOptions[0]);
+	const [status, setstatus] = useState(paymentOptions.find((option) => option.value === invoice?.invoice_status) || paymentOptions[0]);
+
+	useEffect(() => {
+		if (invoice) {
+			setstatus(paymentOptions.find((option) => option.value === invoice?.payment_status) || paymentOptions[0]);
+		}
+	}, [invoice]);
 
 	const { mutate: updatePayment, isPending } = useMutation({
 		mutationFn: async ({ invoiceId, status }: { invoiceId: string; status: string }) => {
@@ -83,9 +89,10 @@ const InvoicePaymentStatusModal: FC<Props> = ({ isOpen, onOpenChange, invoice })
 					subtitle='Please note that updating the payment status of an invoice will not re-trigger the payment collection process.'
 				/>
 				<Spacer className='!my-6' />
-				<CheckboxRadioGroup
+				<Select
 					value={status.value}
-					checkboxItems={paymentOptions}
+					options={paymentOptions}
+					isRadio={true}
 					onChange={(e) => setstatus(paymentOptions.find((option) => option.value === e) || paymentOptions[0])}
 				/>
 

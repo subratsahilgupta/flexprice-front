@@ -208,7 +208,7 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 								{ label: 'SUM', value: 'SUM' },
 								{ label: 'COUNT', value: 'COUNT' },
 							]}
-							selectedValue={aggregationFunction}
+							value={aggregationFunction}
 							onChange={setAggregationFunction}
 							description='The aggregation function to apply to the event values.'
 							label='Aggregation'

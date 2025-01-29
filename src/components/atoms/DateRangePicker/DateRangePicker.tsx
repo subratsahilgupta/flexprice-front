@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { formatDateShort } from '@/utils/common/helper_functions';
-import { isBefore, isAfter } from 'date-fns';
+import { startOfMonth } from 'date-fns';
 
 interface Props {
 	startDate?: Date;
@@ -20,68 +20,66 @@ interface Props {
 
 const DateRangePicker = ({ startDate, endDate, onChange, placeholder = 'Select Range', disabled, title, minDate, maxDate }: Props) => {
 	const [open, setOpen] = useState(false);
+	const [selectedRange, setSelectedRange] = useState<{ from: Date; to: Date } | undefined>({ from: startDate!, to: endDate! });
 
-	const handleSelect = (date: Date | undefined, isStart: boolean) => {
-		if (isStart) {
-			onChange({ startDate: date, endDate });
-		} else {
-			onChange({ startDate, endDate: date });
-		}
+	const currentMonth = startOfMonth(new Date());
 
-		// Close popover only when both dates are selected
-		if (startDate && endDate) {
-			setOpen(false);
-		}
-	};
+	const handleSelect = (date: { from?: Date; to?: Date } | undefined) => {
+		if (!date) return;
+		setSelectedRange({
+			from: date.from!,
+			to: date.to!,
+		});
+		onChange({ startDate: date.from, endDate: date.to });
 
-	// Function to check if a date is within the range
-	const isInRange = (date: Date) => {
-		if (!startDate || !endDate) return false;
-		return isAfter(date, startDate) && isBefore(date, endDate);
+		// if (date.from && date.to) {
+		// 	setOpen(false);
+		// }
 	};
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
-			<PopoverTrigger disabled={disabled} asChild>
-				<div className=''>
+			<PopoverTrigger disabled={disabled}>
+				<div>
 					{title && <span className='text-sm text-muted-foreground mb-1'>{title}</span>}
-					<Button
-						variant='outline'
-						className={cn('w-[240px] justify-start text-left font-normal', !startDate && !endDate && 'text-muted-foreground')}>
-						<CalendarIcon className='mr-2 h-4 w-4' />
-						{startDate && endDate ? `${formatDateShort(startDate.toISOString())} - ${formatDateShort(endDate.toISOString())}` : placeholder}
-					</Button>
+					<div className='relative'>
+						<Button
+							variant='outline'
+							className={cn(
+								' justify-start text-left font-normal',
+								!selectedRange?.from && !selectedRange?.to && 'text-muted-foreground',
+								selectedRange?.from && selectedRange?.to ? 'w-[260px]' : 'w-[240px]',
+								'transition-all duration-300 ease-in-out',
+							)}>
+							<CalendarIcon className='mr-2 h-4 w-4' />
+							{selectedRange?.from && selectedRange?.to
+								? `${formatDateShort(selectedRange?.from.toISOString())} - ${formatDateShort(selectedRange?.to.toISOString())}`
+								: placeholder}
+						</Button>
+						{selectedRange?.from && selectedRange?.to && (
+							<X
+								className='ml-2 h-4 w-4 absolute right-2 top-[9px] cursor-pointer'
+								onClick={(e) => {
+									e.stopPropagation();
+									setSelectedRange(undefined);
+									onChange({ startDate: undefined, endDate: undefined });
+								}}
+							/>
+						)}
+					</div>
 				</div>
 			</PopoverTrigger>
 
 			<PopoverContent className='w-auto flex gap-4 p-2' align='start'>
 				<Calendar
 					disabled={disabled}
-					mode='single'
-					selected={startDate}
-					onSelect={(date) => handleSelect(date, true)}
+					mode='range'
+					selected={selectedRange}
+					onSelect={handleSelect}
 					fromDate={minDate}
 					toDate={maxDate}
-					modifiers={{
-						range: (date) => isInRange(date),
-					}}
-					modifiersClassNames={{
-						range: 'bg-gray-200 ',
-					}}
-				/>
-				<Calendar
-					disabled={disabled}
-					mode='single'
-					selected={endDate}
-					onSelect={(date) => handleSelect(date, false)}
-					fromDate={startDate || minDate}
-					toDate={maxDate}
-					modifiers={{
-						range: (date) => isInRange(date),
-					}}
-					modifiersClassNames={{
-						range: 'bg-gray-200 ',
-					}}
+					defaultMonth={currentMonth}
+					numberOfMonths={2}
 				/>
 			</PopoverContent>
 		</Popover>

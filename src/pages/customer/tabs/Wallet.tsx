@@ -162,7 +162,7 @@ const WalletTab = () => {
 					{(walletOptions?.length ?? 0) > 1 && (
 						<Select
 							options={walletOptions || []}
-							selectedValue={activeWallet?.id}
+							value={activeWallet?.id}
 							onChange={(value) => {
 								const selectedWallet = wallets?.find((wallet) => wallet.id === value) || null;
 								setActiveWallet(selectedWallet);

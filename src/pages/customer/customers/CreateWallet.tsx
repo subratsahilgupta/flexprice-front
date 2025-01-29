@@ -72,7 +72,7 @@ const CreateWallet: FC<Props> = ({ customerId, onClose = () => {} }) => {
 				<Input error={errors.walletName} value={walletName} onChange={setwalletName} label='Wallet Name' placeholder='Enter wallet name' />
 
 				<Select
-					selectedValue={currency}
+					value={currency}
 					options={currencyOptions}
 					label='Select Currency'
 					onChange={setcurrency}
