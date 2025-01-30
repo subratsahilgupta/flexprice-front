@@ -2,7 +2,11 @@ import { AxiosClient } from '@/core/axios/verbs';
 
 export interface User {
 	id: string;
-	name: string;
+	tenant: {
+		id: string;
+		name: string;
+		updated_at: string;
+	};
 	email: string;
 }
 

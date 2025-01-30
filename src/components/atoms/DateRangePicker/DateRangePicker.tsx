@@ -40,8 +40,8 @@ const DateRangePicker = ({ startDate, endDate, onChange, placeholder = 'Select R
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger disabled={disabled}>
-				<div>
-					{title && <span className='text-sm text-muted-foreground mb-1'>{title}</span>}
+				<div className='flex flex-col '>
+					{title && <div className='text-sm text-muted-foreground mb-1 w-full text-start'>{title}</div>}
 					<div className='relative'>
 						<Button
 							variant='outline'

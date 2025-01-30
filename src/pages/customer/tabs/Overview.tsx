@@ -31,7 +31,7 @@ const Overview = () => {
 	const { id: customerId } = useParams();
 
 	const handleAddSubscription = () => {
-		navigate(`/customer-management/customers/${customerId}/subscription`);
+		navigate(`/customer-management/customers/${customerId}/add-subscription`);
 	};
 
 	const {
