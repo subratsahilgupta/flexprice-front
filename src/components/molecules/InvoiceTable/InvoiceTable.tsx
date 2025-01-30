@@ -15,7 +15,7 @@ export interface Props {
 const getStatusChip = (status: string) => {
 	switch (status.toUpperCase()) {
 		case 'VOIDED':
-			return <Chip isActive={true} activeTextColor='#DC2626' activeBgColor='#FEE2E2' label='Void' />;
+			return <Chip isActive={false} label='Void' />;
 		case 'FINALIZED':
 			return <Chip isActive={true} label='Paid' />;
 		case 'DRAFT':
