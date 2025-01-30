@@ -13,6 +13,14 @@ import { ChartConfig, ChartContainer, ChartTooltipContent } from '@/components/u
 import { cn } from '@/lib/utils';
 import { Search } from 'lucide-react';
 
+const getNext24HoursDate = (date: Date): Date => {
+	const nextDate = new Date(date);
+	nextDate.setHours(nextDate.getHours() + 23);
+	nextDate.setMinutes(nextDate.getMinutes() + 59);
+	return nextDate;
+};
+
+
 const QueryPage = () => {
 	const windowSizeOptions = [
 		{ label: 'Min', value: 'MINUTE' },
@@ -66,13 +74,13 @@ const QueryPage = () => {
 
 	const formattedData = data?.results?.length
 		? data.results.map((item) => ({
-				date: formatDateShort(item.window_size),
-				value: item.value,
-			}))
+			date: formatDateShort(item.window_size),
+			value: item.value,
+		}))
 		: [
-				{ date: formatDateShort(new Date().toISOString()), value: 0 },
-				{ date: formatDateShort(new Date().toISOString()), value: 0 },
-			];
+			{ date: formatDateShort(new Date().toISOString()), value: 0 },
+			{ date: formatDateShort(new Date().toISOString()), value: 0 },
+		];
 
 	const chartConfig = {
 		value: { label: 'Usage', color: 'hsl(var(--chart-1))' },
@@ -121,7 +129,7 @@ const QueryPage = () => {
 				{/* Date Range Picker */}
 				<DateRangePicker
 					title='Time Period'
-					onChange={({ endDate, startDate }) => setPayload({ ...payload, start_time: startDate, end_time: endDate })}
+					onChange={({ endDate, startDate }) => setPayload({ ...payload, start_time: startDate, end_time: endDate ? getNext24HoursDate(endDate) : undefined })}
 					startDate={payload.start_time!}
 					endDate={payload.end_time!}
 				/>
