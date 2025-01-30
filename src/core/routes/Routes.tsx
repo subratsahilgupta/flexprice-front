@@ -110,8 +110,12 @@ export const MainRouter = createBrowserRouter([
 					},
 
 					{
-						path: `${RouteNames.customers}/:id/subscription`,
+						path: `${RouteNames.customers}/:id/add-subscription`,
 						element: <CustomerSubscription />,
+					},
+					{
+						path: `${RouteNames.customers}/:id/subscription`,
+						element: <Navigate to={'/customer-management/customers'} />,
 					},
 					// {
 					// 	path: `${RouteNames.customers}/:id/subscription/:subscription_id`,

@@ -12,6 +12,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ChartConfig, ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 import { cn } from '@/lib/utils';
 import { Search } from 'lucide-react';
+import { formatDateTime } from '@/utils/common/format_date';
 
 const getNext24HoursDate = (date: Date): Date => {
 	const nextDate = new Date(date);
@@ -19,7 +20,6 @@ const getNext24HoursDate = (date: Date): Date => {
 	nextDate.setMinutes(nextDate.getMinutes() + 59);
 	return nextDate;
 };
-
 
 const QueryPage = () => {
 	const windowSizeOptions = [
@@ -36,7 +36,7 @@ const QueryPage = () => {
 		external_customer_id?: string;
 		window_size?: string;
 	}>({
-		window_size: windowSizeOptions[1].value,
+		window_size: windowSizeOptions[2].value,
 	});
 
 	const {
@@ -72,16 +72,10 @@ const QueryPage = () => {
 		}
 	}, [payload]);
 
-	const formattedData = data?.results?.length
-		? data.results.map((item) => ({
-			date: formatDateShort(item.window_size),
-			value: item.value,
-		}))
-		: [
-			{ date: formatDateShort(new Date().toISOString()), value: 0 },
-			{ date: formatDateShort(new Date().toISOString()), value: 0 },
-		];
-
+	const formattedData = data?.results?.map((item) => ({
+		date: windowSizeOptions[2].value != payload.window_size ? formatDateTime(item.window_size || '') : formatDateShort(item.window_size),
+		value: item.value,
+	}));
 	const chartConfig = {
 		value: { label: 'Usage', color: 'hsl(var(--chart-1))' },
 	} satisfies ChartConfig;
@@ -129,7 +123,9 @@ const QueryPage = () => {
 				{/* Date Range Picker */}
 				<DateRangePicker
 					title='Time Period'
-					onChange={({ endDate, startDate }) => setPayload({ ...payload, start_time: startDate, end_time: endDate ? getNext24HoursDate(endDate) : undefined })}
+					onChange={({ endDate, startDate }) =>
+						setPayload({ ...payload, start_time: startDate, end_time: endDate ? getNext24HoursDate(endDate) : undefined })
+					}
 					startDate={payload.start_time!}
 					endDate={payload.end_time!}
 				/>
@@ -142,19 +138,43 @@ const QueryPage = () => {
 						<Skeleton className='h-48 mb-4' />
 					) : (
 						<ChartContainer className='!max-h-96 w-full' config={chartConfig}>
-							<LineChart data={formattedData} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
+							<LineChart
+								data={
+									(formattedData ?? []).length > 0
+										? formattedData
+										: [
+												{ date: formatDateShort(new Date().toISOString()), value: 2 },
+												{ date: formatDateShort(new Date().toISOString()), value: 4 },
+												{ date: formatDateShort(new Date().toISOString()), value: 8 },
+												{ date: formatDateShort(new Date().toISOString()), value: 10 },
+											]
+								}
+								margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
 								<CartesianGrid strokeDasharray='3 3' stroke='#e5e7eb' />
 								<XAxis dataKey='date' tickLine={false} axisLine={false} tickMargin={10} className='text-gray-500' />
-								<YAxis tickLine={false} className='text-gray-500' />
-								<RechartsTooltip content={<ChartTooltipContent hideLabel />} cursor={{ stroke: '#ccc' }} />
-								<Line
-									type='monotone'
-									dataKey='value'
-									stroke='#18181B'
-									strokeWidth={1}
-									dot={{ r: 2, fill: '#18181B' }}
-									activeDot={{ r: 3, strokeWidth: 1 }}
-								/>
+								<YAxis tickLine={false} axisLine={false} className='text-gray-500' />
+
+								{(formattedData?.length ?? 0) > 0 ? (
+									<>
+										<RechartsTooltip labelFormatter={(value) => `${value}`} content={<ChartTooltipContent />} cursor={{ stroke: '#ccc' }} />
+										<Line
+											type='monotone'
+											dataKey='value'
+											stroke='#18181B'
+											strokeWidth={1}
+											dot={{ r: 2, fill: '#18181B' }}
+											activeDot={{ r: 3, strokeWidth: 1 }}
+										/>
+									</>
+								) : (
+									<Line
+										type='monotone'
+										dataKey='value'
+										strokeWidth={0}
+										dot={{ r: 0, fill: '#18181B' }}
+										activeDot={{ r: 0, strokeWidth: 0 }}
+									/>
+								)}
 							</LineChart>
 						</ChartContainer>
 					)}

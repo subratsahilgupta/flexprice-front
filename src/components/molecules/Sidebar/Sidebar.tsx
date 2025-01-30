@@ -26,6 +26,7 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 	};
 
 	const { loading, user } = useUser();
+	console.log('user', user);
 
 	const navMain: { [key: string]: NavItem[] } = {
 		'Usage Tracking': [
@@ -100,14 +101,14 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 						<Skeleton className={`h-6 w-full`}></Skeleton>
 					) : (
 						<div className={`h-6 flex w-full rounded-md items-center gap-2 bg-contain ${!open ? 'hidden' : ''}`}>
-							<span className='size-8 bg-contain rounded-md'>
-								{user?.name
+							<span className='size-7 bg-black text-white flex justify-center items-center bg-contain rounded-md'>
+								{user?.tenant.name
 									?.split(' ')
 									.map((n) => n[0])
 									.join('')
 									.slice(0, 2)}
 							</span>
-							<p className='font-semibold text-[14px]'>{user?.name}</p>
+							<p className='font-semibold text-[14px]'>{user?.tenant.name}</p>
 						</div>
 					)}
 					<SidebarTrigger />
