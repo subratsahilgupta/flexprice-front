@@ -26,7 +26,6 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 	};
 
 	const { loading, user } = useUser();
-	console.log('user', user);
 
 	const navMain: { [key: string]: NavItem[] } = {
 		'Usage Tracking': [

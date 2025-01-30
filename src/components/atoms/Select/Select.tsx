@@ -76,8 +76,8 @@ const FlexPriceSelect: React.FC<Props> = ({
 				}}
 				value={value}
 				disabled={disabled}>
-				<SelectTrigger className='w-full shadow-sm'>
-					{<span className=''>{value ? options.find((option) => option.value === value)?.label : placeholder}</span>}
+				<SelectTrigger className='w-full '>
+					{<span>{value ? options.find((option) => option.value === value)?.label : placeholder}</span>}
 				</SelectTrigger>
 				<SelectContent>
 					<SelectGroup>

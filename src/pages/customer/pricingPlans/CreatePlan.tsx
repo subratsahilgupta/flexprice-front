@@ -72,7 +72,6 @@ const CreatePlanPage = () => {
 			if (!validateSteps()) {
 				return;
 			}
-			console.log('Form submitted successfully', plan);
 			submitPlan();
 			return;
 		}

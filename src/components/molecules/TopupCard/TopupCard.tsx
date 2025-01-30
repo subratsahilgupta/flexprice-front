@@ -86,7 +86,6 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 			const id = await preFunction();
 			topupWallet(id!);
 		}
-		console.log('completed with pre function execution', walletId);
 
 		if (walletId && !preFunction) {
 			topupWallet(walletId);
@@ -104,7 +103,6 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 						options={subscriptionTypeOptions}
 						value={subscriptionType}
 						onChange={(value) => {
-							console.log('subscriptionType', subscriptionType);
 							setsubscriptionType(value);
 						}}
 						description=''

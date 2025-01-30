@@ -45,10 +45,7 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 
 	const [errors, setErrors] = useState<Record<string, string>>({});
 
-	useEffect(() => {
-		console.log('evnt filters in meter form', eventFilters);
-		console.log('data in meter form length', eventFilters.length);
-	}, [eventFilters]);
+	useEffect(() => {}, [eventFilters]);
 
 	const radioMenuItemList = [
 		{
@@ -122,7 +119,6 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 					fieldErrors[err.path[0] as string] = err.message;
 				}
 			});
-			console.log('Errors:', fieldErrors);
 
 			setErrors(fieldErrors);
 		}

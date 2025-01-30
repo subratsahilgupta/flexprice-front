@@ -24,8 +24,6 @@ const EventFilter: FC<Props> = ({ eventFilters, setEventFilters, error, permanen
 		}
 	}, []);
 
-	console.log('eventFilters', permanentFilters);
-
 	return (
 		<div>
 			<div className='flex flex-col gap-2 mb-2'>
@@ -112,7 +110,6 @@ const EventFilter: FC<Props> = ({ eventFilters, setEventFilters, error, permanen
 				variant={'outline'}
 				onClick={() => {
 					setEventFilters([...eventFilters, { key: '', values: [] }]);
-					console.log('eventFilters', eventFilters);
 				}}>
 				<span className='font-normal'>Add Event Filter</span>
 			</Button>

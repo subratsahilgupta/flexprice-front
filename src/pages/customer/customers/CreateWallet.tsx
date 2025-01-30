@@ -52,10 +52,8 @@ const CreateWallet: FC<Props> = ({ customerId, onClose = () => {} }) => {
 			setErrors((prev) => ({ ...prev, currency: 'Currency is required' }));
 			return;
 		}
-		console.log('starting create wallet');
 
 		const wallet = await createWallet();
-		console.log('wallet created ');
 		return wallet.id;
 	};
 

@@ -31,15 +31,14 @@ const CustomerDetails = () => {
 
 	useEffect(() => {
 		const currentPath = location.pathname.split('/');
-		console.log(currentPath);
 
 		const tabId = currentPath[4];
 		setActiveTab(getActiveTab(tabId));
 	}, [location.pathname]);
 
 	const onTabChange = (tabId: string) => {
-		setActiveTab(tabId); // Set the active tab locally
-		navigate(`/customer-management/customers/${customerId}/${tabId}`); // Navigate to the new tab in the URL
+		setActiveTab(tabId);
+		navigate(`/customer-management/customers/${customerId}/${tabId}`);
 	};
 
 	return (

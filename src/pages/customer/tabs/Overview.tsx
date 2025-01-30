@@ -70,7 +70,6 @@ const Overview = () => {
 				) : (
 					<SubscriptionTable
 						onRowClick={(row) => {
-							console.log('clicked on row', row);
 							navigate(`/customer-management/customers/${customerId}/subscription/${row.id}`);
 						}}
 						data={subscriptions as Subscription[]}

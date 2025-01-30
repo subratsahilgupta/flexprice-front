@@ -19,7 +19,6 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 			const user = JSON.parse(localStorage.getItem('user')!) as any;
 			setUser(user);
 		} catch (error) {
-			console.log('Error parsing user', error);
 			supabase.auth.signOut();
 			<Navigate to={'/login'} />;
 		}

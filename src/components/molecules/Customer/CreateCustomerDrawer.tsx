@@ -51,7 +51,6 @@ const CreateCustomerDrawer = () => {
 
 		if (valid) {
 			createCustomer();
-			console.log('Form submitted', formData);
 		}
 	};
 

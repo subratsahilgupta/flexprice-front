@@ -74,8 +74,6 @@ const UsageBasedPricingFormSection = () => {
 
 		setPriceList(updatedPriceList);
 		setEditStates((prev) => prev.map((state, i) => (i === index ? false : state)));
-		console.log(`Update Usage Based Charges5 ${index} `);
-		console.log(updatedPriceList);
 
 		setMetaDataField('usagePrices', updatedPriceList);
 	};
@@ -93,12 +91,9 @@ const UsageBasedPricingFormSection = () => {
 						isEdit={editStates[index]}
 						handleEdit={() => {
 							setEditStates((prev) => prev.map((state, i) => (i === index ? true : state)));
-							console.log('Edit Usage Based Charges5', index);
 						}}
 						addPrice={(updatedPrice) => updatePrice(index, updatedPrice)}
 						handleDelete={() => {
-							console.log('Delete Usage Based Charges5', index);
-
 							removePrice(index);
 						}}
 					/>
@@ -113,7 +108,6 @@ const UsageBasedPricingFormSection = () => {
 							<AddChargesButton
 								onClick={() => {
 									setMetaDataField('isRecurringEditMode', true);
-									console.log('Add Recurring Charges');
 								}}
 								label='Add Recurring Charges'
 							/>
@@ -122,7 +116,6 @@ const UsageBasedPricingFormSection = () => {
 					<AddChargesButton
 						onClick={() => {
 							addPrice();
-							console.log('Add Usage Based Charges5');
 						}}
 						label='Add Usage Based Charges'
 					/>

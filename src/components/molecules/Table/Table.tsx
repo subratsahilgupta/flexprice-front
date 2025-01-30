@@ -120,8 +120,6 @@ const FlexpriceTable: FC<FlexpriceTableProps> = ({ onRowClick, columns, data, re
 							({ fieldName: name, flex = 1, width, textColor = 'inherit', align = 'left', render, redirect = true }, colIndex) => (
 								<TableCell
 									onClick={() => {
-										console.log('row clicked', row[name], redirect);
-
 										if (redirect && redirectUrl) {
 											navigate(`${redirectUrl}${row.id}`);
 										}

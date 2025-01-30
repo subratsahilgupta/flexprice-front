@@ -32,7 +32,6 @@ const InvoiceDetails: FC<Props> = ({ invoice_id }) => {
 		{
 			label: 'Update Invoice Status',
 			onSelect: () => {
-				console.log('Update Invoice Status clicked ');
 				setState({
 					...state,
 					isStatusModalOpen: true,
@@ -42,7 +41,6 @@ const InvoiceDetails: FC<Props> = ({ invoice_id }) => {
 		{
 			label: 'Update Payment Status',
 			onSelect: () => {
-				console.log('Update Payment Status clicked ');
 				setState({
 					...state,
 					isPaymentModalOpen: true,
@@ -81,7 +79,6 @@ const InvoiceDetails: FC<Props> = ({ invoice_id }) => {
 				invoice={data}
 				isOpen={state.isStatusModalOpen}
 				onOpenChange={(open) => {
-					console.log('InvoiceStatusModal open change ', open);
 					setState({
 						...state,
 						isStatusModalOpen: open,
@@ -92,7 +89,6 @@ const InvoiceDetails: FC<Props> = ({ invoice_id }) => {
 				invoice={data}
 				isOpen={state.isPaymentModalOpen}
 				onOpenChange={(open) => {
-					console.log('InvoicePaymentStatusModal open change ', open);
 					setState({
 						...state,
 						isPaymentModalOpen: open,

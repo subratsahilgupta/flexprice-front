@@ -105,9 +105,6 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 					{
 						label: 'Update Invoice Status',
 						onSelect: () => {
-							console.log('Update Invoice Status clicked ', row.id);
-							console.log(`updatinf this as activr invoice ${row}`, row);
-
 							setState({
 								...state,
 								isStatusModalOpen: true,
@@ -118,9 +115,6 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 					{
 						label: 'Update Payment Status',
 						onSelect: () => {
-							console.log('Update Payment Status clicked ', row.id);
-							console.log(`updatinf this as activr invoice ${row}`, row);
-
 							setState({
 								...state,
 								isPaymentModalOpen: true,
@@ -131,14 +125,12 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 					{
 						label: 'View Customer',
 						onSelect: () => {
-							console.log('View Customer clicked ', row.customer_id);
 							navigate(`/customer-management/customers/${row.customer_id}`);
 						},
 					},
 					{
 						label: 'View Subscription',
-						onSelect(e) {
-							console.log('View Subscription clicked ', e);
+						onSelect() {
 							navigate(`/customer-management/customers/${row.customer_id}/subscription/${row.subscription_id}`);
 						},
 					},
@@ -164,7 +156,6 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 				invoice={state.activeInvoice}
 				isOpen={state.isPaymentModalOpen}
 				onOpenChange={(open) => {
-					console.log('InvoicePaymentStatusModal open change ', open);
 					setState({
 						...state,
 						isPaymentModalOpen: open,

@@ -98,16 +98,12 @@ const WalletTab = () => {
 			return;
 		}
 
-		console.log('active wallet id', activeWalletId, wallets);
-
 		if (activeWalletId === '' || !activeWalletId) {
 			setQueryParam('activeWalletId', wallets[0].id);
 			return;
 		}
 
 		const wallet = wallets.find((wallet) => wallet.id === activeWalletId) || wallets[0];
-
-		console.log('active wallet', wallet.id);
 
 		setActiveWallet(wallet);
 	}, [wallets, activeWalletId]);

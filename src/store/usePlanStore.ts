@@ -78,8 +78,6 @@ const usePlanStore = create<SinglePlanStore>((set) => ({
 	setPlan: (plan) => set({ plan }),
 	setMetaDataField: (field, value) => {
 		set((state) => {
-			console.log('field', field);
-			console.log('value', state.metaData);
 			return {
 				metaData: {
 					...state.metaData,
@@ -90,8 +88,6 @@ const usePlanStore = create<SinglePlanStore>((set) => ({
 	},
 	setPlanField: (field, value) => {
 		set((state) => {
-			console.log('field', field);
-			console.log('value', state.plan);
 			return {
 				plan: {
 					...state.plan,

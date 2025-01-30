@@ -46,7 +46,6 @@ const EventsPage: React.FC = () => {
 		async (iterLastKey?: string) => {
 			if (!hasMore || loading) return;
 			setLoading(true);
-			console.log('Fetching events with queryData:', queryData, 'iterLastKey:', iterLastKey);
 			try {
 				const response = await EventsApi.getRawEvents({
 					iter_last_key: iterLastKey,
@@ -70,7 +69,6 @@ const EventsPage: React.FC = () => {
 	);
 
 	const refetchEvents = () => {
-		console.log('Refetching events with updated queryData:', queryData);
 		setEvents([]);
 		setIterLastKey(undefined);
 		setHasMore(true);
@@ -78,8 +76,6 @@ const EventsPage: React.FC = () => {
 	};
 
 	useEffect(() => {
-		console.log('QueryData changed:', queryData);
-
 		setEvents([]);
 		setIterLastKey(undefined);
 		setHasMore(true);

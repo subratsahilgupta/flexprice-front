@@ -18,7 +18,7 @@ const fetchUser = async () => {
 	return data.user;
 };
 
-const AuthMiddleware: React.FC<AuthMiddlewareProps> = ({ children, requiredRole }) => {
+const AuthMiddleware: React.FC<AuthMiddlewareProps> = ({ children }) => {
 	const userContext = useUser();
 
 	const {
@@ -36,7 +36,6 @@ const AuthMiddleware: React.FC<AuthMiddlewareProps> = ({ children, requiredRole 
 	useEffect(() => {
 		if (user) {
 			userContext.setUser(user);
-			console.log(requiredRole);
 		}
 	}, [user, userContext]);
 
