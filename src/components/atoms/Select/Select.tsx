@@ -21,6 +21,7 @@ interface Props {
 	onChange?: (value: string) => void;
 	disabled?: boolean;
 	isRadio?: boolean;
+	className?: string;
 }
 
 const RadioSelectItem = React.forwardRef<
@@ -57,9 +58,10 @@ const FlexPriceSelect: React.FC<Props> = ({
 	onChange,
 	error,
 	isRadio,
+	className,
 }) => {
 	return (
-		<div className='space-y-1'>
+		<div className={cn('space-y-1 ')}>
 			{/* Label */}
 			{label && (
 				<label className={cn('font-inter block text-sm font-medium text-zinc', disabled ? 'text-zinc-500' : 'text-zinc-950')}>
@@ -76,7 +78,7 @@ const FlexPriceSelect: React.FC<Props> = ({
 				}}
 				value={value}
 				disabled={disabled}>
-				<SelectTrigger className='w-full '>
+				<SelectTrigger className={cn(disabled && 'cursor-not-allowed', className)}>
 					{<span>{value ? options.find((option) => option.value === value)?.label : placeholder}</span>}
 				</SelectTrigger>
 				<SelectContent>

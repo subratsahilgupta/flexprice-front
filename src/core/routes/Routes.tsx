@@ -20,6 +20,7 @@ import Invoice from '@/pages/customer/tabs/Invoice';
 import Overview from '@/pages/customer/tabs/Overview';
 import WalletTab from '@/pages/customer/tabs/Wallet';
 import SubscriptionDetails from '@/pages/customer/customers/SubscriptionDetails';
+import AddCreditPage from '@/pages/customer/invoices/AddCreditPage';
 
 const RouteNames = {
 	home: '/',
@@ -142,6 +143,14 @@ export const MainRouter = createBrowserRouter([
 							{
 								path: 'invoice',
 								element: <Invoice />,
+							},
+							{
+								path: 'invoice/:invoice_id',
+								element: <Invoice />,
+							},
+							{
+								path: 'invoice/:invoice_id/credit-note',
+								element: <AddCreditPage />,
 							},
 							{
 								path: 'subscription/:subscription_id',

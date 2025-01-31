@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
 
 interface BreadcrumbItem {
 	label: string;
@@ -12,36 +13,35 @@ interface BreadcrumbState {
 	resetBreadcrumbs: () => void;
 }
 
-export const useBreadcrumbStore = create<BreadcrumbState>((set, get) => ({
-	breadcrumbs: [],
-	breadcrumbCache: {},
+export const useBreadcrumbStore = create<BreadcrumbState>()(
+	devtools((set, get) => ({
+		breadcrumbs: [],
+		breadcrumbCache: {},
 
-	setBreadcrumbs: (breadcrumbs, forceChange = false) => {
-		if (typeof window !== 'undefined') {
-			const pathKey = window.location.pathname;
-			const { breadcrumbCache } = get();
+		setBreadcrumbs: (breadcrumbs, forceChange = false) => {
+			if (typeof window !== 'undefined') {
+				const pathKey = window.location.pathname;
+				const { breadcrumbCache } = get();
 
-			// Check if cached breadcrumbs exist for the current path
-			const cachedBreadcrumbs = breadcrumbCache[pathKey];
+				const cachedBreadcrumbs = breadcrumbCache[pathKey];
 
-			// If cached breadcrumbs exist, simply use them
-			if (cachedBreadcrumbs && !forceChange) {
-				set({
-					breadcrumbs: cachedBreadcrumbs,
-				});
-				console.log(`Using cached breadcrumbs for ${pathKey}:`, cachedBreadcrumbs, cachedBreadcrumbs?.length);
-			} else {
-				set({
-					breadcrumbs,
-					breadcrumbCache: {
-						...breadcrumbCache,
-						[pathKey]: breadcrumbs,
-					},
-				});
-				console.log(`Setting new breadcrumbs for ${pathKey}:`, breadcrumbs, cachedBreadcrumbs?.length);
+				// Only update if cache is missing or forced to change
+				if (cachedBreadcrumbs && !forceChange) {
+					console.log(`Using cached breadcrumbs for ${pathKey}:`, cachedBreadcrumbs);
+					set({ breadcrumbs: cachedBreadcrumbs });
+				} else {
+					console.log(`Setting new breadcrumbs for ${pathKey}:`, breadcrumbs);
+					set({
+						breadcrumbs,
+						breadcrumbCache: {
+							...breadcrumbCache,
+							[pathKey]: breadcrumbs,
+						},
+					});
+				}
 			}
-		}
-	},
+		},
 
-	resetBreadcrumbs: () => set({ breadcrumbs: [] }),
-}));
+		resetBreadcrumbs: () => set({ breadcrumbs: [] }),
+	})),
+);

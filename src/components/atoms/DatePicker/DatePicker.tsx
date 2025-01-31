@@ -17,15 +17,18 @@ interface DatePickerProps {
 	title?: string;
 	minDate?: Date;
 	maxDate?: Date;
+	className?: string;
 }
 
-const DatePicker = ({ date, setDate, placeholder = 'Pick a date', disabled, title, minDate, maxDate }: DatePickerProps) => {
+const DatePicker = ({ date, setDate, placeholder = 'Pick a date', disabled, title, minDate, maxDate, className }: DatePickerProps) => {
 	const [open, setopen] = useState(false);
 	return (
 		<Popover open={open} onOpenChange={setopen}>
 			<PopoverTrigger disabled={disabled}>
 				{title && <div className='w-full text-start text-sm text-muted-foreground'>{title}</div>}
-				<Button variant={'outline'} className={cn('w-[240px] justify-start text-left font-normal', !date && 'text-muted-foreground')}>
+				<Button
+					variant={'outline'}
+					className={cn('w-[240px] justify-start text-left font-normal', !date && 'text-muted-foreground', className)}>
 					<CalendarIcon className='mr-2 h-4 w-4' />
 					{date ? format(date, 'PPP') : <span>{placeholder}</span>} {/* Use placeholder */}
 				</Button>

@@ -7,30 +7,50 @@ import { useBreadcrumbStore } from '@/core/store/useBreadcrumbStore';
 import { useEffect } from 'react';
 
 const MainLayout: React.FC = () => {
-	const { breadcrumbs, setBreadcrumbs } = useBreadcrumbStore();
+	const { breadcrumbs, setBreadcrumbs, breadcrumbCache } = useBreadcrumbStore();
 	const location = useLocation();
 
 	useEffect(() => {
-		const pathSegments = location.pathname.split('/').filter(Boolean);
+		const path = location.pathname;
+		const pathSegments = path.split('/').filter(Boolean);
+		console.log('Path segments:', pathSegments);
 
-		// Construct new breadcrumbs while keeping the previous ones at the same index
-		const newBreadcrumbs = pathSegments.map((segment, index, arr) => {
-			const label = decodeURIComponent(segment).replace(/-/g, ' ');
-			const path = `/${arr.slice(0, index + 1).join('/')}`;
+		if (breadcrumbCache[path]) {
+			console.log('Using cached breadcrumbs for', path);
+			setBreadcrumbs(breadcrumbCache[path], true);
+			return;
+		} else {
+			// Construct new breadcrumbs
+			const newBreadcrumbs = pathSegments.map((segment, index, arr) => {
+				const label = decodeURIComponent(segment).replace(/-/g, ' ');
+				const path = `/${arr.slice(0, index + 1).join('/')}`;
 
-			if (breadcrumbs[index]?.path === path) {
-				return breadcrumbs[index];
+				if (breadcrumbs[index]?.path === path) {
+					console.log('Using cached breadcrumb for', path);
+					return breadcrumbs[index];
+				} else {
+					return { label, path };
+				}
+			});
+			console.log('New breadcrumbs:', newBreadcrumbs);
+
+			// Only update breadcrumbs if they're different from the current ones
+			if (!areBreadcrumbsEqual(newBreadcrumbs, breadcrumbs)) {
+				setBreadcrumbs(newBreadcrumbs);
+				console.log('Updating breadcrumbs:', newBreadcrumbs);
 			}
-
-			return { label, path };
-		});
-
-		// Avoid unnecessary re-renders if breadcrumbs remain the same
-		if (JSON.stringify(newBreadcrumbs) !== JSON.stringify(breadcrumbs)) {
-			console.log('Updating breadcrumbs:', newBreadcrumbs);
-			setBreadcrumbs(newBreadcrumbs);
 		}
-	}, [location.pathname, setBreadcrumbs]);
+	}, [location.pathname, breadcrumbs, setBreadcrumbs]);
+
+	const areBreadcrumbsEqual = (newBreadcrumbs: string | any[], currentBreadcrumbs: string | any[]) => {
+		if (newBreadcrumbs.length !== currentBreadcrumbs.length) return false;
+		for (let i = 0; i < newBreadcrumbs.length; i++) {
+			if (newBreadcrumbs[i].path !== currentBreadcrumbs[i].path) {
+				return false;
+			}
+		}
+		return true;
+	};
 
 	return (
 		<SidebarProvider className='flex h-screen bg-gray-100 relative'>

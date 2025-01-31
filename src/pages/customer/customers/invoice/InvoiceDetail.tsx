@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Download, EllipsisVertical, Loader } from 'lucide-react';
 import { FC, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
 	invoice_id: string;
@@ -16,6 +17,7 @@ interface Props {
 
 const InvoiceDetails: FC<Props> = ({ invoice_id }) => {
 	// const { invoice_id } = useParams<{ invoice_id: string }>();
+	const navigate = useNavigate();
 	const [state, setState] = useState({
 		isPaymentModalOpen: false,
 		isStatusModalOpen: false,
@@ -45,6 +47,13 @@ const InvoiceDetails: FC<Props> = ({ invoice_id }) => {
 					...state,
 					isPaymentModalOpen: true,
 				});
+			},
+		},
+		{
+			label: 'Issue a Credit Note',
+			disabled: data?.payment_status === 'PENDING' || data?.payment_status === 'FAILED',
+			onSelect: () => {
+				navigate(`/customer-management/customers/${data?.customer_id}/invoice/${data?.id}/credit-note`);
 			},
 		},
 	];

@@ -123,6 +123,13 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 						},
 					},
 					{
+						label: 'Issue a Credit Note',
+						disabled: row?.payment_status === 'PENDING' || row?.payment_status === 'FAILED',
+						onSelect: () => {
+							navigate(`/customer-management/customers/${row?.customer_id}/invoice/${row?.id}/credit-note`);
+						},
+					},
+					{
 						label: 'View Customer',
 						onSelect: () => {
 							navigate(`/customer-management/customers/${row.customer_id}`);
