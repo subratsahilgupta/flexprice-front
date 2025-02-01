@@ -89,7 +89,11 @@ const QueryPage = () => {
 			{/* Filters Section */}
 			<div className='flex w-full  gap-4 items-end bg-white '>
 				{/* Meter Selection */}
-				<SelectMeter placeholder='Select Billable Metric' onChange={(value) => setPayload({ ...payload, meter_id: value.id })} />
+				<SelectMeter
+					placeholder='Select Billable Metric'
+					onChange={(value) => setPayload({ ...payload, meter_id: value.id })}
+					value={payload.meter_id}
+				/>
 
 				{/* Customer ID Input */}
 				<Input

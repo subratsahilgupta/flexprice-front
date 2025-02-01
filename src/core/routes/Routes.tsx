@@ -21,6 +21,7 @@ import Overview from '@/pages/customer/tabs/Overview';
 import WalletTab from '@/pages/customer/tabs/Wallet';
 import SubscriptionDetails from '@/pages/customer/customers/SubscriptionDetails';
 import AddCreditPage from '@/pages/customer/invoices/AddCreditPage';
+import CreditNote from '@/pages/customer/tabs/CreditNote';
 
 const RouteNames = {
 	home: '/',
@@ -139,6 +140,10 @@ export const MainRouter = createBrowserRouter([
 							{
 								path: 'wallet',
 								element: <WalletTab />,
+							},
+							{
+								path: 'credit-note',
+								element: <CreditNote />,
 							},
 							{
 								path: 'invoice',

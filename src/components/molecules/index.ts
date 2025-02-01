@@ -30,3 +30,5 @@ export { default as InvoiceLineItemTable } from './InvoiceLineItemTable';
 export { default as EventsTable } from './Events';
 export { default as InfiniteScroll } from './InfiniteScroll';
 export { default as InvoiceTable } from './InvoiceTable';
+
+export { default as InvoiceCreditLineItemTable } from './InvoiceCreditLineItemTable';
