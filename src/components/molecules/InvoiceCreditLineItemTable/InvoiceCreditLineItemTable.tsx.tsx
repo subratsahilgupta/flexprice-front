@@ -53,7 +53,7 @@ const InvoiceCreditLineItemTable: FC<Props> = ({ data, total_amount, currency, t
 					</table>
 				</div>
 
-				<div className='flex justify-end px-4 py-4 border-t border-gray-200'>
+				<div className='flex justify-end  py-4 border-t border-gray-200'>
 					<div className='text-sm text-gray-800 space-y-1 w-1/3'>
 						<div className='flex justify-between'>
 							<span>Subtotal</span>

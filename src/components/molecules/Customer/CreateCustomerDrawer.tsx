@@ -1,5 +1,4 @@
 import { Button, Input, Select, SelectOption, Sheet, Spacer } from '@/components/atoms';
-import { FiFolderPlus } from 'react-icons/fi';
 import { FC, useEffect, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
@@ -269,7 +268,7 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 
 					<Spacer className='!h-8' />
 					<Button disabled={isPending} className='bg-[#0F172A] text-white' onClick={handleSubmit}>
-						<FiFolderPlus /> Save Customer
+						Save Customer
 					</Button>
 				</div>
 			</Sheet>
