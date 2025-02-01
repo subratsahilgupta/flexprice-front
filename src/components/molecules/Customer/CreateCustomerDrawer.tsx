@@ -133,11 +133,17 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 		onSuccess: async () => {
 			if (data) {
 				toast.success('Customer updated successfully');
+				await queryClient.invalidateQueries({
+					queryKey: ['fetchCustomerDetails'],
+				});
 				await queryClient.refetchQueries({
 					queryKey: ['fetchCustomerDetails'],
 				});
 			} else {
 				toast.success('Customer added successfully');
+				await queryClient.invalidateQueries({
+					queryKey: ['fetchCustomer'],
+				});
 				await queryClient.refetchQueries({
 					queryKey: ['fetchCustomer'],
 				});

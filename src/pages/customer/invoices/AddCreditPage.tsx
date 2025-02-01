@@ -76,7 +76,7 @@ const AddCreditPage = () => {
 				isOpen={showModal}
 				onOpenChange={(open) => setshowModal(open)}
 				title={'Are you sure?'}
-				description={`${getCurrencySymbol(data?.currency || '')}${data?.amount_paid} will be credited to Stephanie Sharkey’s wallet. Do you want to proceed?`}>
+				description={`${getCurrencySymbol(data?.currency || '')}${data?.amount_paid} will be credited to ${data?.customer?.name} wallet. Do you want to proceed?`}>
 				<div className='w-full flex justify-end gap-4'>
 					<Button
 						onClick={() => {
@@ -123,17 +123,18 @@ const AddCreditPage = () => {
 						<div className='text-sm font-normal text-gray-800'>{data?.customer?.name || '--'}</div>
 					</div>
 					<div className='w-full grid grid-cols-2'>
+						<div className='text-sm font-light text-gray-600'>Invoice Status</div>
+						<div className='text-sm font-normal text-gray-800'>{data?.invoice_status ? getStatusChip(data.invoice_status) : '--'}</div>
+					</div>
+					{/* <div className='w-full grid grid-cols-2'>
 						<div className='text-sm font-light text-gray-600'>Credits Available</div>
 						<div className='text-sm font-normal text-gray-800'>{'--'}</div>
-					</div>
+					</div> */}
 					<div className='w-full grid grid-cols-2'>
 						<div className='text-sm font-light text-gray-600'>Invoice Number</div>
 						<div className='text-sm font-normal text-gray-800'>{data?.invoice_number || '--'}</div>
 					</div>
-					<div className='w-full grid grid-cols-2'>
-						<div className='text-sm font-light text-gray-600'>Invoice Status</div>
-						<div className='text-sm font-normal text-gray-800'>{data?.invoice_status ? getStatusChip(data.invoice_status) : '--'}</div>
-					</div>
+
 					<div className='w-full grid grid-cols-2'>
 						<div className='text-sm font-light text-gray-600'>Issue Date</div>
 						<div className='text-sm font-normal text-gray-800'>{formatDate(data?.created_at || '')}</div>
