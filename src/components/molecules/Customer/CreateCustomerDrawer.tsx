@@ -134,23 +134,20 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 			if (data) {
 				toast.success('Customer updated successfully');
 				await queryClient.invalidateQueries({
-					queryKey: ['fetchCustomerDetails'],
+					queryKey: ['fetchCustomerDetails', formData.id],
 				});
 				await queryClient.refetchQueries({
-					queryKey: ['fetchCustomerDetails'],
+					queryKey: ['fetchCustomerDetails', formData.id],
 				});
 			} else {
 				toast.success('Customer added successfully');
 				await queryClient.invalidateQueries({
-					queryKey: ['fetchCustomer'],
+					queryKey: ['fetchCustomers'],
 				});
-				await queryClient.refetchQueries({
-					queryKey: ['fetchCustomer'],
-				});
+				setFormData({});
 			}
 
 			toggleOpen();
-			setFormData({});
 		},
 		onError: () => toast.error('Error adding customer'),
 	});
