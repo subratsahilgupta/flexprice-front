@@ -8,9 +8,10 @@ import CustomerApi from '@/utils/api_requests/CustomerApi';
 
 export interface Props {
 	data: Customer[];
+	onEdit: (customer: Customer) => void;
 }
 
-const CustomerTable: FC<Props> = ({ data }) => {
+const CustomerTable: FC<Props> = ({ data, onEdit }) => {
 	const mappedData = data?.map((customer) => ({
 		...customer,
 	}));
@@ -45,6 +46,10 @@ const CustomerTable: FC<Props> = ({ data }) => {
 					refetchQueryKey='fetchCustomer'
 					deleteMutationFn={(id) => CustomerApi.deleteCustomerById(id)}
 					editPath={`/customer-management/customers/edit-customer?id=${row.id}`}
+					onEdit={() => {
+						console.log('editing customer', row);
+						onEdit(row);
+					}}
 					id={row.id}
 				/>
 			),

@@ -53,8 +53,11 @@ class CustomerApi {
 		return await AxiosClient.get(`/subscriptions/${id}`);
 	}
 
-	public static async createCustomer(customer: { email: string; external_id: string; name?: string }): Promise<Customer> {
+	public static async createCustomer(customer: Partial<Customer>): Promise<Customer> {
 		return await AxiosClient.post(`${this.baseUrl}`, customer);
+	}
+	public static async updateCustomer(customer: Partial<Customer>, id: string): Promise<Customer> {
+		return await AxiosClient.put(`${this.baseUrl}/${id}`, customer);
 	}
 }
 

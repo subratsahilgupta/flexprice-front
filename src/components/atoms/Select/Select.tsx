@@ -22,6 +22,7 @@ interface Props {
 	disabled?: boolean;
 	isRadio?: boolean;
 	className?: string;
+	noOptionsText?: string;
 }
 
 const RadioSelectItem = React.forwardRef<
@@ -59,6 +60,7 @@ const FlexPriceSelect: React.FC<Props> = ({
 	error,
 	isRadio,
 	className,
+	noOptionsText,
 }) => {
 	return (
 		<div className={cn('space-y-1 ')}>
@@ -83,39 +85,49 @@ const FlexPriceSelect: React.FC<Props> = ({
 				</SelectTrigger>
 				<SelectContent>
 					<SelectGroup>
-						{options.map((option) => {
-							if (isRadio) {
-								return (
-									<RadioSelectItem
-										className={cn(option.disabled && 'select-none cursor-not-allowed')}
-										disabled={option.disabled}
-										key={option.value}
-										value={option.value}>
-										<div className='flex items-center space-x-2'>
-											<div className='flex flex-col mr-2'>
-												<span>{option.label}</span>
-												{option.description && <span className='text-sm text-gray-500'>{option.description}</span>}
+						{options.length > 0 &&
+							options.map((option) => {
+								if (isRadio) {
+									return (
+										<RadioSelectItem
+											className={cn(option.disabled && 'select-none cursor-not-allowed')}
+											disabled={option.disabled}
+											key={option.value}
+											value={option.value}>
+											<div className='flex items-center space-x-2'>
+												<div className='flex flex-col mr-2'>
+													<span>{option.label}</span>
+													{option.description && <span className='text-sm text-gray-500'>{option.description}</span>}
+												</div>
 											</div>
-										</div>
-									</RadioSelectItem>
-								);
-							} else {
-								return (
-									<ShadcnSelect
-										className={cn(option.disabled && 'select-none cursor-not-allowed')}
-										disabled={option.disabled}
-										key={option.value}
-										value={option.value}>
-										<div className='flex items-center space-x-2'>
-											<div className='flex flex-col mr-2'>
-												<span>{option.label}</span>
-												{option.description && <span className='text-sm text-gray-500'>{option.description}</span>}
+										</RadioSelectItem>
+									);
+								} else {
+									return (
+										<ShadcnSelect
+											className={cn(option.disabled && 'select-none cursor-not-allowed')}
+											disabled={option.disabled}
+											key={option.value}
+											value={option.value}>
+											<div className='flex items-center space-x-2'>
+												<div className='flex flex-col mr-2'>
+													<span>{option.label}</span>
+													{option.description && <span className='text-sm text-gray-500'>{option.description}</span>}
+												</div>
 											</div>
-										</div>
-									</ShadcnSelect>
-								);
-							}
-						})}
+										</ShadcnSelect>
+									);
+								}
+							})}
+						{options.length === 0 && noOptionsText && (
+							<ShadcnSelect value='no-items' disabled>
+								<div className='flex items-center space-x-2'>
+									<div className='flex flex-col mr-2'>
+										<span>{noOptionsText}</span>
+									</div>
+								</div>
+							</ShadcnSelect>
+						)}
 					</SelectGroup>
 				</SelectContent>
 			</Select>
