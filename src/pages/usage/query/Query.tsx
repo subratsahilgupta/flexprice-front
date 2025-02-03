@@ -149,11 +149,11 @@ const QueryPage = () => {
 									(formattedData ?? []).length > 0
 										? formattedData
 										: [
-												{ date: formatDateShort(new Date().toISOString()), value: 2 },
-												{ date: formatDateShort(new Date().toISOString()), value: 4 },
-												{ date: formatDateShort(new Date().toISOString()), value: 8 },
-												{ date: formatDateShort(new Date().toISOString()), value: 10 },
-											]
+											{ date: formatDateShort(new Date().toISOString()), value: 2 },
+											{ date: formatDateShort(new Date().toISOString()), value: 4 },
+											{ date: formatDateShort(new Date().toISOString()), value: 8 },
+											{ date: formatDateShort(new Date().toISOString()), value: 10 },
+										]
 								}
 								margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
 								<CartesianGrid strokeDasharray='3 3' stroke='#e5e7eb' />
@@ -168,9 +168,10 @@ const QueryPage = () => {
 											dataKey='value'
 											stroke='#18181B'
 											strokeWidth={1}
-											dot={{ r: 2, fill: '#18181B' }}
-											activeDot={{ r: 3, strokeWidth: 1 }}
+											dot={payload.window_size === 'DAY' ? { r: 2, fill: '#18181B' } : false}
+											activeDot={payload.window_size === 'DAY' ? { r: 3, strokeWidth: 1 } : false}
 										/>
+
 									</>
 								) : (
 									<Line
