@@ -79,7 +79,7 @@ const EventsPage: React.FC = () => {
 		setEvents([]);
 		setIterLastKey(undefined);
 		setHasMore(true);
-		if (Object.keys(queryData).length > 0) {
+		if (!!queryData.startTime && !!queryData.endTime) {
 			refetchEvents();
 		}
 	}, [queryData]);
@@ -98,7 +98,7 @@ const EventsPage: React.FC = () => {
 							setQueryData((prev) => ({
 								...prev,
 								startTime: startDate?.toISOString(),
-								endTime: endDate ? getNext24HoursDate(new Date(endDate)).toISOString() : undefined,
+								endTime: endDate ? getNext24HoursDate(new Date(endDate!)).toISOString() : undefined,
 							}));
 						}}
 					/>
