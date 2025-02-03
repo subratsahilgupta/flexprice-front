@@ -33,6 +33,7 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 		if (data) {
 			setShowBillingDetails(true);
 		}
+		console.log('customer data', data);
 	}, [data]);
 
 	const currentOpen = isControlled ? open : internalOpen;
@@ -49,6 +50,7 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 		label: name,
 		value: isoCode,
 	}));
+
 	const citiesOptions: SelectOption[] =
 		formData.address_country && formData.address_state
 			? City.getCitiesOfState(formData.address_country, formData.address_state).map(({ name }) => ({
@@ -56,6 +58,7 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 					value: name,
 				}))
 			: [];
+
 	const timezoneOptions: SelectOption[] = formData.address_country
 		? Country.getCountryByCode(formData.address_country)?.timezones?.map(({ zoneName, abbreviation }) => ({
 				label: zoneName,
