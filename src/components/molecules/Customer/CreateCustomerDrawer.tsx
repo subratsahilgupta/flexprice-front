@@ -82,6 +82,7 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 		address_state: z.string().optional(),
 		address_city: z.string().optional(),
 		address_line1: z.string().optional(),
+		address_line2: z.string().optional(),
 		phone: z.string().optional(),
 		timezone: z.string().optional(),
 	});
@@ -112,6 +113,7 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 					address_city: formData.address_city || undefined,
 					address_country: formData.address_country || undefined,
 					address_line1: formData.address_line1 || undefined,
+					address_line2: formData.address_line2 || undefined,
 					address_state: formData.address_state || undefined,
 					phone: formData.phone || undefined,
 					timezone: formData.timezone || undefined,
@@ -126,6 +128,7 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 					address_city: formData.address_city!,
 					address_country: formData.address_country!,
 					address_line1: formData.address_line1!,
+					address_line2: formData.address_line2!,
 					address_state: formData.address_state!,
 					phone: formData.phone!,
 					timezone: formData.timezone!,
@@ -139,9 +142,6 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 				await queryClient.invalidateQueries({
 					queryKey: ['fetchCustomerDetails', formData.id],
 				});
-				await queryClient.refetchQueries({
-					queryKey: ['fetchCustomerDetails', formData.id],
-				});
 			} else {
 				toast.success('Customer added successfully');
 				await queryClient.invalidateQueries({
@@ -149,6 +149,10 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 				});
 				setFormData({});
 			}
+			await queryClient.invalidateQueries({
+				queryKey: ['fetchCustomers'],
+				exact: false,
+			});
 
 			toggleOpen();
 		},
@@ -222,13 +226,20 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 									}}
 								/>
 								<Input
-									className='min-h-28'
-									label='Billing Address'
-									placeholder='Enter Billing Address'
+									label='Address Line 1'
+									placeholder='Address Line 1'
 									value={formData.address_line1 || ''}
 									onChange={(e) => handleChange('address_line1', e)}
-									error={errors.name}
+									error={errors.address_line1}
 								/>
+								<Input
+									label='Address Line 2'
+									placeholder='Address Line 2'
+									value={formData.address_line2 || ''}
+									onChange={(e) => handleChange('address_line2', e)}
+									error={errors.address_line2}
+								/>
+
 								<div className='grid grid-cols-2 gap-4'>
 									<Select
 										label='State'

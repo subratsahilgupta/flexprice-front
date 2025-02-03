@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { CalendarIcon, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -37,6 +37,12 @@ const DateRangePicker = ({ startDate, endDate, onChange, placeholder = 'Select R
 		// }
 	};
 
+	useEffect(() => {
+		if (open) {
+			setSelectedRange(undefined);
+		}
+	}, [open]);
+
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger disabled={disabled}>
@@ -51,12 +57,12 @@ const DateRangePicker = ({ startDate, endDate, onChange, placeholder = 'Select R
 								selectedRange?.from && selectedRange?.to ? 'w-[260px]' : 'w-[240px]',
 								'transition-all duration-300 ease-in-out',
 							)}>
-							<CalendarIcon className='mr-2 h-4 w-4' />
+							<CalendarIcon className='mr-0 h-4 w-4' />
 							{selectedRange?.from && selectedRange?.to
 								? `${formatDateShort(selectedRange?.from.toISOString())} - ${formatDateShort(selectedRange?.to.toISOString())}`
 								: placeholder}
 						</Button>
-						{selectedRange?.from && selectedRange?.to && (
+						{/* {selectedRange?.from && selectedRange?.to && (
 							<X
 								className='ml-2 h-4 w-4 absolute right-2 top-[9px] cursor-pointer'
 								onClick={(e) => {
@@ -65,7 +71,7 @@ const DateRangePicker = ({ startDate, endDate, onChange, placeholder = 'Select R
 									onChange({ startDate: undefined, endDate: undefined });
 								}}
 							/>
-						)}
+						)} */}
 					</div>
 				</div>
 			</PopoverTrigger>
