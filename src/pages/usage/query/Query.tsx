@@ -37,8 +37,8 @@ const QueryPage = () => {
 		window_size?: string;
 	}>({
 		window_size: windowSizeOptions[2].value,
-		// start_time : new Date(),
-		// end_time : getNext24HoursDate(new Date()),
+		start_time: new Date(new Date().setDate(new Date().getDate() - 7)),
+		end_time: new Date(),
 	});
 
 	const {
