@@ -1,10 +1,10 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { Button, DatePicker, Input, SectionHeader } from '@/components/atoms';
+import { Button, DateRangePicker, FormHeader, Input } from '@/components/atoms';
 import { EventsTable } from '@/components/molecules';
 import { Event } from '@/models/Event';
 import EventsApi from '@/utils/api_requests/EventsApi';
 import { Skeleton } from '@/components/ui/skeleton';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Search } from 'lucide-react';
 
 const getNext24HoursDate = (date: Date): Date => {
 	const nextDate = new Date(date);
@@ -87,34 +87,34 @@ const EventsPage: React.FC = () => {
 	// Refetch all events
 
 	return (
-		<div className='p-6 bg-gray-50'>
-			<SectionHeader title='Events' />
-			<div className='bg-white p-4 rounded-md shadow-md mb-6'>
+		<div className='page '>
+			<FormHeader variant='form-title' title='Events' subtitle='Analyze meter usage and adjust filters to refine your results.' />
+			<div className='bg-white my-6 rounded-md  mb-6'>
 				<div className='w-full flex items-end gap-4'>
-					<DatePicker
-						maxDate={queryData.endTime ? new Date(queryData.endTime) : undefined}
-						date={queryData.startTime ? new Date(queryData.startTime) : undefined}
-						title='Start Time'
-						setDate={(date) => setQueryData((prev) => ({ ...prev, startTime: date?.toISOString() }))}
+					<DateRangePicker
+						title='Time Period'
+						placeholder='Select Range'
+						onChange={({ endDate, startDate }) => {
+							setQueryData((prev) => ({
+								...prev,
+								startTime: startDate?.toISOString(),
+								endTime: endDate ? getNext24HoursDate(new Date(endDate)).toISOString() : undefined,
+							}));
+						}}
 					/>
-					<DatePicker
-						minDate={queryData.startTime ? new Date(queryData.startTime) : undefined}
-						date={queryData.endTime ? new Date(queryData.endTime) : undefined}
-						title='End Time'
-						setDate={(date) =>
-							setQueryData((prev) => ({ ...prev, endTime: date ? getNext24HoursDate(new Date(date)).toISOString() : undefined }))
-						}
-					/>
+
 					<Input
 						label='Customer ID'
 						placeholder='Enter Customer ID'
 						className='h-9'
+						suffix={<Search className='size-4' />}
 						labelClassName='text-muted-foreground font-normal'
 						value={queryData?.externalCustomerId ?? ''}
 						onChange={(e) => setQueryData((prev) => ({ ...prev, externalCustomerId: e === '' ? undefined : e }))}
 					/>
 					<Input
 						label=' Meter name'
+						suffix={<Search className='size-4' />}
 						placeholder='Enter Meter name'
 						className='h-9'
 						labelClassName='text-muted-foreground font-normal'
@@ -123,6 +123,7 @@ const EventsPage: React.FC = () => {
 					/>
 					<Input
 						label='Event Name'
+						suffix={<Search className='size-4' />}
 						placeholder='Enter Event Name'
 						className='h-9'
 						labelClassName='text-muted-foreground font-normal'
@@ -143,7 +144,7 @@ const EventsPage: React.FC = () => {
 				</div>
 			</div>
 
-			<div className='bg-white p-4 rounded-md shadow-md'>
+			<div className='bg-white p-4 rounded-md '>
 				<EventsTable data={events} />
 				<div ref={lastElementRef} />
 				{loading && (
@@ -153,7 +154,7 @@ const EventsPage: React.FC = () => {
 						<Skeleton className='h-8 w-full' />
 					</div>
 				)}
-				{!hasMore && events.length === 0 && <p className='text-center text-gray-500 mt-4'>No events found</p>}
+				{!hasMore && events.length === 0 && <p className=' text-[#64748B] text-xs font-normal font-sans mt-4'>No events found</p>}
 			</div>
 		</div>
 	);

@@ -1,6 +1,5 @@
 import { SectionHeader, Spacer } from '@/components/atoms';
 import { IoSearch } from 'react-icons/io5';
-import { LiaSlidersHSolid } from 'react-icons/lia';
 import { InvoiceTable, Pagination } from '@/components/molecules';
 import { useQuery } from '@tanstack/react-query';
 import { Spinner } from '@/components/atoms';
@@ -8,6 +7,7 @@ import toast from 'react-hot-toast';
 import { ReactSVG } from 'react-svg';
 import usePagination from '@/hooks/usePagination';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
+import { SlidersHorizontal } from 'lucide-react';
 
 const InvoicesPage = () => {
 	const { limit, offset, page } = usePagination();
@@ -67,14 +67,14 @@ const InvoicesPage = () => {
 	}
 
 	return (
-		<div className='flex flex-col h-screen'>
-			<SectionHeader title='Invoices'>
+		<div className='page'>
+			<SectionHeader className='' title='Invoices'>
 				<div className='flex gap-2 w-full'>
 					<button className='px-2 py-1'>
 						<IoSearch className='size-5 text-[#09090B] ' />
 					</button>
 					<button className='px-2 py-1'>
-						<LiaSlidersHSolid className='size-5 text-[#09090B] ' />
+						<SlidersHorizontal className='size-5 text-[#09090B] ' />
 					</button>
 					{/* <Link to='/usage-tracking/billable-metric/add-meter'>
 						<Button className='w-32 flex gap-2 bg-[#0F172A] '>
@@ -84,7 +84,7 @@ const InvoicesPage = () => {
 					</Link> */}
 				</div>
 			</SectionHeader>
-			<div className=''>
+			<div className='px-0'>
 				<InvoiceTable data={invoiceData?.items || []} />
 				<Spacer className='!h-4' />
 				<Pagination totalPages={Math.ceil((invoiceData?.pagination.total ?? 1) / limit)} />

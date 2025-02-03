@@ -1,13 +1,12 @@
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { MdEdit } from 'react-icons/md';
-import { FaRegEyeSlash } from 'react-icons/fa';
 import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { queryClient } from '@/App';
 import { Button, Dialog } from '@/components/atoms';
+import { EyeOff, Pencil } from 'lucide-react';
 
 interface ActionProps {
 	id: string;
@@ -63,13 +62,13 @@ const ActionButton: FC<ActionProps> = ({
 								}
 							}}
 							className='flex gap-2 items-center w-full'>
-							<MdEdit />
+							<Pencil />
 							<span>Edit</span>
 						</div>
 					</DropdownMenuItem>
 					<DropdownMenuItem disabled={isArchiveDisabled} onSelect={() => setIsDialogOpen(true)}>
 						<div className='flex gap-2 items-center w-full'>
-							<FaRegEyeSlash />
+							<EyeOff />
 							<span>Archive</span>
 						</div>
 					</DropdownMenuItem>

@@ -53,14 +53,16 @@ const DateRangePicker = ({ startDate, endDate, onChange, placeholder = 'Select R
 							variant='outline'
 							className={cn(
 								' justify-start text-left font-normal',
-								!selectedRange?.from && !selectedRange?.to && 'text-muted-foreground',
+								!selectedRange?.from && !selectedRange?.to ? 'text-black' : 'text-muted-foreground ',
 								selectedRange?.from && selectedRange?.to ? 'w-[260px]' : 'w-[240px]',
 								'transition-all duration-300 ease-in-out',
 							)}>
 							<CalendarIcon className='mr-0 h-4 w-4' />
-							{selectedRange?.from && selectedRange?.to
-								? `${formatDateShort(selectedRange?.from.toISOString())} - ${formatDateShort(selectedRange?.to.toISOString())}`
-								: placeholder}
+							<span>
+								{selectedRange?.from && selectedRange?.to
+									? `${formatDateShort(selectedRange?.from.toISOString())} - ${formatDateShort(selectedRange?.to.toISOString())}`
+									: placeholder}
+							</span>
 						</Button>
 						{/* {selectedRange?.from && selectedRange?.to && (
 							<X

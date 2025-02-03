@@ -119,4 +119,7 @@
 	.card {
 		@apply rounded-xl border border-gray-300 p-6;
 	}
+	.page {
+		@apply flex flex-col p-4 h-screen;
+	}
 }

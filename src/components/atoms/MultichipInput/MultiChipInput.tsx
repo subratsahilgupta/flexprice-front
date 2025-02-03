@@ -27,7 +27,7 @@ const MultichipField = React.forwardRef<HTMLInputElement, InputProps>(
 
 				<div
 					className={cn(
-						'group flex flex-col min-h-9   items-center rounded-md border bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+						'group flex flex-col min-h-10  items-center rounded-md border bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
 						error ? 'border-destructive ring-destructive' : 'border-input focus-within:ring-ring focus-within:ring-offset-2',
 						className,
 					)}>

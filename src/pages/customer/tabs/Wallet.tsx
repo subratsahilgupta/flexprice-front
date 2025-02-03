@@ -8,10 +8,9 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { IoSearch } from 'react-icons/io5';
-import { LiaSlidersHSolid } from 'react-icons/lia';
 import { useParams } from 'react-router-dom';
 import CreateWallet from '../customers/CreateWallet';
-import { CircleFadingPlus, EllipsisVertical, Pencil, Trash2, Wallet as WalletIcon } from 'lucide-react';
+import { CircleFadingPlus, EllipsisVertical, Pencil, SlidersHorizontal, Trash2, Wallet as WalletIcon } from 'lucide-react';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import useQueryParams from '@/hooks/useQueryParams';
 
@@ -251,7 +250,7 @@ const WalletTab = () => {
 										<IoSearch className='size-4 text-[#09090B] ' />
 									</button>
 									<button className='px-2 py-1'>
-										<LiaSlidersHSolid className='size-4 text-[#09090B] ' />
+										<SlidersHorizontal className='size-4 text-[#09090B] ' />
 									</button>
 								</div>
 							</div>

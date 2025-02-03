@@ -47,7 +47,7 @@ const EventsTable: FC<Props> = ({ data }) => {
 	];
 	return (
 		<div>
-			<FlexpriceTable columns={columns} data={data} />
+			<FlexpriceTable showEmptyRow columns={columns} data={data} />
 		</div>
 	);
 };

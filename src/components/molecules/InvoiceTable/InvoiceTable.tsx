@@ -1,7 +1,7 @@
 import { Invoice } from '@/models/Invoice';
 import { FC, useState } from 'react';
 import FlexpriceTable, { ColumnData } from '../Table';
-import { formatBillingPeriod, formatDateShort, getCurrencySymbol } from '@/utils/common/helper_functions';
+import { formatDateShort, getCurrencySymbol, toSentenceCase } from '@/utils/common/helper_functions';
 import { Chip } from '@/components/atoms';
 import DropdownMenu, { DropdownMenuOption } from '../DropdownMenu';
 import { useNavigate } from 'react-router-dom';
@@ -66,14 +66,15 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 			render: (row: Invoice) => getStatusChip(row.invoice_status),
 		},
 		{
-			title: 'Customer ID',
+			title: 'Customer Slug',
 			fieldName: 'customer_id',
+			render: (row: Invoice) => <span>{row.customer?.external_id}</span>,
 		},
 		{
 			title: 'Billing Interval',
 			fieldName: '',
 			align: 'center',
-			render: (row: Invoice) => <span>{formatBillingPeriod(row.billing_period || '')}</span>,
+			render: (row: Invoice) => <span>{toSentenceCase(row.billing_period || '')}</span>,
 		},
 		{
 			title: 'Payment Status',

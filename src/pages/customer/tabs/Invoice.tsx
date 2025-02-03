@@ -4,9 +4,9 @@ import InvoiceApi from '@/utils/api_requests/InvoiceApi';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { IoSearch } from 'react-icons/io5';
-import { LiaSlidersHSolid } from 'react-icons/lia';
 import { useParams } from 'react-router-dom';
 import InvoiceDetails from '../customers/invoice/InvoiceDetail';
+import { SlidersHorizontal } from 'lucide-react';
 
 const Invoice = () => {
 	const { id: customerId } = useParams();
@@ -57,7 +57,7 @@ const Invoice = () => {
 						<IoSearch className='size-4 text-[#09090B] ' />
 					</button>
 					<button className='px-2 py-1'>
-						<LiaSlidersHSolid className='size-4 text-[#09090B] ' />
+						<SlidersHorizontal className='size-4 text-[#09090B] ' />
 					</button>
 				</div>
 			</div>

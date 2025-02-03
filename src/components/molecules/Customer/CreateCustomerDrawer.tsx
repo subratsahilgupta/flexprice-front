@@ -170,7 +170,7 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 			<Sheet
 				isOpen={currentOpen}
 				onOpenChange={toggleOpen}
-				title='Add Customer'
+				title={data ? 'Edit Customer' : 'Add Customer'}
 				description='To create a customer, please fill out this form.'
 				trigger={trigger}>
 				<div className='space-y-4'>
