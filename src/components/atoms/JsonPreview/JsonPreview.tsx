@@ -11,11 +11,8 @@ interface Props {
 const JsonPreview: FC<Props> = ({ data }) => {
 
 
-    const [copied, setCopied] = useState(false);
     const copyToClipboard = () => {
         navigator.clipboard.writeText(JSON.stringify(data, null, 2));
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
         toast.success("Copied to clipboard");
     };
 
