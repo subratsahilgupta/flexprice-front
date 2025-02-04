@@ -71,10 +71,10 @@ const InvoicesPage = () => {
 			<SectionHeader className='' title='Invoices'>
 				<div className='flex gap-2 w-full'>
 					<button className='px-2 py-1'>
-						<IoSearch className='size-5 text-[#09090B] ' />
+						<IoSearch className='size-4 text-[#09090B] ' />
 					</button>
 					<button className='px-2 py-1'>
-						<SlidersHorizontal className='size-5 text-[#09090B] ' />
+						<SlidersHorizontal className='size-4 text-[#09090B] ' />
 					</button>
 					{/* <Link to='/usage-tracking/billable-metric/add-meter'>
 						<Button className='w-32 flex gap-2 bg-[#0F172A] '>

@@ -46,7 +46,7 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 
 	const [errors, setErrors] = useState<Record<string, string>>({});
 
-	useEffect(() => { }, [eventFilters]);
+	useEffect(() => {}, [eventFilters]);
 
 	const radioMenuItemList = [
 		{
@@ -89,9 +89,6 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 		reset_usage: resetPeriod,
 	};
 
-
-
-
 	const handleSubmit = () => {
 		// Form data object
 		const formData = {
@@ -107,8 +104,6 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 		const validation = MeterFormSchema.safeParse(formData);
 
 		if (validation.success) {
-
-
 			onSubmit(formData as unknown as Meter, isEditMode ? 'edit' : 'add');
 
 			queryClient.invalidateQueries({
@@ -145,8 +140,6 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 			{isEditMode && <p className='font-bold text-zinc-950 text-[20px] p-6'>{data?.name}</p>}
 
 			<div className='w-full flex gap-0 relative'>
-
-
 				{/* meter form */}
 				<div className='px-6 pb-6 flex-[8] flex flex-col gap-7 '>
 					{/* edit meter heading */}
@@ -263,7 +256,6 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 					)}
 				</div>
 
-
 				{/* preview */}
 				<div className='flex-[3] sticky top-0 left-0 right-0 px-6 py-4'>
 					<FormHeader variant='sub-header' className='mb-0' title='Event Example' />
@@ -289,16 +281,20 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 							}, null, 2)}
 						</pre>
 					</div> */}
-					<JsonPreview data={data ? {
-						event_name: data?.event_name,
-						name: data?.name,
-						aggregation: data?.aggregation,
-						filters: data?.filters,
-						reset_usage: data?.reset_usage,
-
-					} : formData} />
+					<JsonPreview
+						data={
+							data
+								? {
+										event_name: data?.event_name,
+										name: data?.name,
+										aggregation: data?.aggregation,
+										filters: data?.filters,
+										reset_usage: data?.reset_usage,
+									}
+								: formData
+						}
+					/>
 				</div>
-
 			</div>
 		</div>
 	);
