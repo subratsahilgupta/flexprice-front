@@ -1,5 +1,5 @@
 import { Copy } from "lucide-react"; // Assuming Lucide icons
-import { FC, useState } from "react";
+import { FC } from "react";
 import { Highlight, themes } from "prism-react-renderer";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
