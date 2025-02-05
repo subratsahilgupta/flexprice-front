@@ -128,7 +128,7 @@ const WalletTab = () => {
 	if (wallets?.length === 0) {
 		return (
 			<div className='card w-full flex justify-between items-center '>
-				<FormHeader className='' title='Wallet' subtitle='No wallet linked to the customer yet.' variant='form-title' />
+				<FormHeader className='' title='Wallet' subtitle='No wallet linked to the customer yet.' variant='sub-header' />
 				<Button onClick={() => setisAdd(true)} className='w-32 flex gap-2 bg-[#0F172A] '>
 					<WalletIcon />
 					<span>Add Wallet</span>

@@ -54,7 +54,7 @@ const InvoiceCreditLineItemTable: FC<Props> = ({ data, total_amount, currency, t
 				</div>
 
 				<div className='flex justify-end px-[6px]  py-4 border-t border-gray-200'>
-					<div className='text-sm text-gray-800 space-y-1 w-1/3'>
+					<div className='text-sm text-gray-800 space-y-4 w-1/3'>
 						<div className='flex justify-between'>
 							<span>Subtotal</span>
 							<span className='text-[#2A9D90] '>{`${getCurrencySymbol(currency ?? '')}${sub_total}`}</span>
@@ -63,7 +63,8 @@ const InvoiceCreditLineItemTable: FC<Props> = ({ data, total_amount, currency, t
 							<span>Tax</span>
 							<span className=''>{tax || '--'}</span>
 						</div>
-						<div className='flex justify-between font-bold text-gray-900 border-t pt-2'>
+						<div className=' border-t '></div>
+						<div className='flex justify-between font-bold text-gray-900 '>
 							<span>{total_label || 'Credit on Customer Wallet'}</span>
 							<span className=' text-[#2A9D90] '>{formatAmount(total_amount ?? 0, currency ?? '')}</span>
 						</div>

@@ -71,16 +71,17 @@ const InvoiceLineItemTable: FC<Props> = ({ data, amount_due, currency, title }) 
 				</div>
 
 				<div className='flex justify-end px-2 py-4 border-t border-gray-200'>
-					<div className='text-sm text-gray-800 space-y-1 w-1/3'>
-						<div className='flex justify-between py-2 '>
+					<div className='text-sm text-gray-800 space-y-4 w-1/3'>
+						<div className='flex justify-between  '>
 							<span>Subtotal</span>
 							<span>{`${getCurrencySymbol(currency ?? '')}${amount_due}`}</span>
 						</div>
-						<div className='flex justify-between py-2 '>
+						<div className='flex justify-between  '>
 							<span>Tax</span>
 							<span className=''>-</span>
 						</div>
-						<div className='flex justify-between font-bold text-gray-900 border-t py-2 '>
+						<div className=' border-t  '></div>
+						<div className='flex justify-between font-bold   '>
 							<span>Total Amount</span>
 							<span>{formatAmount(amount_due ?? 0, currency ?? '')}</span>
 						</div>

@@ -97,7 +97,24 @@ const MainLayout: React.FC = () => {
 			</SidebarInset>
 
 			{/* Toast Notifications */}
-			<Toaster position='bottom-center' />
+			<Toaster
+				toastOptions={{
+					success: {
+						iconTheme: {
+							primary: '#5CA7A0',
+							secondary: '#fff',
+						},
+					},
+					error: {
+						iconTheme: {
+							primary: '#E76E50',
+							secondary: '#fff',
+						},
+					},
+				}}
+				containerClassName='shadow-md'
+				position='bottom-center'
+			/>
 		</SidebarProvider>
 	);
 };

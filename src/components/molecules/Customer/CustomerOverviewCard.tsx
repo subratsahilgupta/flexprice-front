@@ -1,4 +1,4 @@
-import { Button } from '@/components/atoms';
+import { Button, FormHeader } from '@/components/atoms';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
 import CreateCustomerDrawer from './CreateCustomerDrawer';
@@ -32,10 +32,10 @@ const CustomerOverviewCard: React.FC<CustomerCardProps> = ({ customerId }) => {
 	return (
 		<div className='card border-gray-300'>
 			<div className='flex justify-between items-center mb-4'>
-				<h1 className='text-base font-bold mb-4 text-gray-800'>Customer Details</h1>
+				<FormHeader title='Customer Details' variant='sub-header' />
 				<CreateCustomerDrawer
 					trigger={
-						<Button className='flex gap-2' variant={'outline'}>
+						<Button className='flex gap-2 mx-0 px-2' variant={'outline'}>
 							<Pencil /> Edit
 						</Button>
 					}

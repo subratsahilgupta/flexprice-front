@@ -46,7 +46,6 @@ const BillableMetricsPage = () => {
 	if (isError) {
 		toast.error('Error fetching meters');
 	}
-
 	if (meterData?.items.length === 0) {
 		return (
 			<div className='h-screen w-full flex justify-center items-center'>

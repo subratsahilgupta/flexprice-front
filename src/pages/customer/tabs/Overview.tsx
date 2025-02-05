@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button } from '@/components/atoms';
+import { Button, FormHeader } from '@/components/atoms';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
 import SubscriptionTable from '@/components/organisms/Subscription/SubscriptionTable';
@@ -52,7 +52,7 @@ const Overview = () => {
 			<CustomerOverviewCard customerId={customerId!} />
 			<div className='card border-gray-300'>
 				<div className='flex mb-4 justify-between items-center'>
-					<h2 className='text-base font-semibold text-gray-800'>Subscriptions</h2>
+					<FormHeader title='Subscriptions' variant='sub-header' />
 					<Button
 						onClick={handleAddSubscription}
 						className='bg-primary text-white px-4 inline-flex items-center py-2 rounded-md hover:bg-primary-dark'>
