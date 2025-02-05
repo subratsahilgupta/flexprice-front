@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { z } from 'zod';
-import { Button, FormHeader, Input, RadioGroup, Select } from '@/components/atoms';
+import { Button, CodePreview, FormHeader, Input, RadioGroup, Select } from '@/components/atoms';
 import { EventFilter, EventFilterData } from '@/components/molecules';
 import { LuCircleFadingPlus, LuRefreshCw } from 'react-icons/lu';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { queryClient } from '@/App';
 import { Meter } from '@/models/Meter';
-import JsonPreview from '@/components/atoms/JsonPreview/JsonPreview';
 
-interface MeterFormProps {
+interface Props {
 	data?: Meter;
 	onSubmit: (data: Meter, mode: 'add' | 'edit') => void;
 }
@@ -30,7 +29,7 @@ const MeterFormSchema = z.object({
 	resetPeriod: z.string().optional(),
 });
 
-const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
+const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 	const labelStyle = 'text-muted-foreground text-sm';
 
 	const isEditMode = Boolean(data);
@@ -47,6 +46,19 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 	const [errors, setErrors] = useState<Record<string, string>>({});
 
 	useEffect(() => {}, [eventFilters]);
+	const curlCommand = `curl --request POST \\
+	--url https://api.cloud.flexprice.io/v1/events \\
+	--header 'Content-Type: application/json' \\
+	--header 'x-api-key: <your_api_key>' \\
+	--data '{
+	  "event_id": "${data?.id ?? '__UNIQUE_ID__'}",
+	  "event_name": "${data?.event_name ?? (eventName || '__MUST_BE_DEFINED__')}",
+	  "external_customer_id": "__EXTERNAL_CUSTOMER_ID__",
+	  "properties": {${eventFilters.length > 0 && eventFilters[0].key.length > 0 ? `"\n\t\t${eventFilters[0].key}" : "${eventFilters[0].values[0]}"` : ''}${aggregationValue ? `,"\n\t\t${aggregationValue}":"__${aggregationValue.split(' ').join('_').toUpperCase()}__"` : ''}
+	  },
+	  "source": "api",
+	  "timestamp": "${new Date().toISOString()}"
+	}'`;
 
 	const radioMenuItemList = [
 		{
@@ -73,21 +85,6 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 	// };
 
 	// Handle form submission
-	const formData = {
-		event_name: eventName,
-		name: displayName,
-		aggregation: {
-			type: aggregationFunction,
-			field: aggregationValue,
-		},
-		filters: eventFilters
-			.filter((filter) => filter.key && filter.values.length > 0)
-			.map((filter) => ({
-				key: filter.key,
-				values: filter.values,
-			})),
-		reset_usage: resetPeriod,
-	};
 
 	const handleSubmit = () => {
 		// Form data object
@@ -139,11 +136,9 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 
 			{isEditMode && <p className='font-bold text-zinc-950 text-[20px] p-6'>{data?.name}</p>}
 
-			<div className='w-full flex gap-0 relative'>
+			<div className='w-full flex gap-0 relative h-screen'>
 				{/* meter form */}
-				<div className='px-6 pb-6 flex-[8] flex flex-col gap-7 '>
-					{/* edit meter heading */}
-
+				<div className='px-6 pb-6 flex-[8] flex flex-col gap-7 overflow-y-auto '>
 					{/* Event Schema */}
 					<div className='p-6 rounded-xl border border-[#E4E4E7]'>
 						<div className='mb-4'>
@@ -257,43 +252,11 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 				</div>
 
 				{/* preview */}
-				<div className='flex-[3] sticky top-0 left-0 right-0 px-6 py-4'>
+				<div className='flex-[3] sticky top-0 left-0 right-0 px-6 py-4 max-w-lg'>
 					<FormHeader variant='sub-header' className='mb-0' title='Event Example' />
-					{/* <div className='w-full card relative'>
-						<Button className='text-muted-foreground cursor-pointer absolute top-4 right-4 size-8' variant={'ghost'}>
-							<Copy className='' />
-						</Button>
-						<pre className='font-fira-code '>
-							{JSON.stringify({
-								event_name: eventName,
-								name: displayName,
-								aggregation: {
-									type: aggregationFunction,
-									field: aggregationValue,
-								},
-								filters: eventFilters
-									.filter((filter) => filter.key && filter.values.length > 0)
-									.map((filter) => ({
-										key: filter.key,
-										values: filter.values,
-									})),
-								reset_usage: resetPeriod,
-							}, null, 2)}
-						</pre>
-					</div> */}
-					<JsonPreview
-						data={
-							data
-								? {
-										event_name: data?.event_name,
-										name: data?.name,
-										aggregation: data?.aggregation,
-										filters: data?.filters,
-										reset_usage: data?.reset_usage,
-									}
-								: formData
-						}
-					/>
+					<div className=''>
+						<CodePreview className='' code={curlCommand} language='javascript' />
+					</div>
 				</div>
 			</div>
 		</div>

@@ -68,7 +68,7 @@ const InvoicesPage = () => {
 
 	return (
 		<div className='page'>
-			<SectionHeader className='' title='Invoices'>
+			<SectionHeader title='Invoices'>
 				<div className='flex gap-2 w-full'>
 					<button className='px-2 py-1'>
 						<IoSearch className='size-4 text-[#09090B] ' />

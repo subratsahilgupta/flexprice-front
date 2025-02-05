@@ -37,19 +37,19 @@ const InvoicePaymentStatusModal: FC<Props> = ({ isOpen, onOpenChange, invoice })
 		{
 			label: 'Sucessful',
 			value: 'SUCCEEDED',
-			description: 'This action will set the payment status to successful',
+			description: 'Marks the invoice as successfully paid.',
 			disabled: invoice?.payment_status === 'SUCCEEDED',
 		},
 		{
 			label: 'Failed',
 			value: 'FAILED',
-			description: 'This action will set the payment status to failed',
+			description: 'Indicates that the payment attempt was unsuccessful.',
 			disabled: invoice?.payment_status === 'SUCCEEDED',
 		},
 		{
 			label: 'Pending',
 			value: 'PENDING',
-			description: 'This action will set the payment status to pending',
+			description: 'Keeps the invoice in a pending state while awaiting payment.',
 			disabled: invoice?.payment_status === 'SUCCEEDED',
 		},
 	];
@@ -86,7 +86,7 @@ const InvoicePaymentStatusModal: FC<Props> = ({ isOpen, onOpenChange, invoice })
 				<FormHeader
 					title='Update Payment Status'
 					variant='form-title'
-					subtitle='Please note that updating the payment status of an invoice will not re-trigger the payment collection process.'
+					subtitle='Changing the payment status of this invoice will not initiate a payment collection attempt'
 				/>
 				<Spacer className='!my-6' />
 				<Select

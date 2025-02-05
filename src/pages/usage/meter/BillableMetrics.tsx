@@ -70,7 +70,7 @@ const BillableMetricsPage = () => {
 
 	return (
 		<div className='page'>
-			<SectionHeader className='p-0' title='Billable Metric'>
+			<SectionHeader className='' title='Billable Metric'>
 				<div className='flex gap-2 w-full'>
 					<button className='px-2 py-1'>
 						<IoSearch className='size-4 font-extralight text-[#09090B] ' />

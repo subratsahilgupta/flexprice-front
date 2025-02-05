@@ -30,7 +30,7 @@ const CustomerOverviewCard: React.FC<CustomerCardProps> = ({ customerId }) => {
 	}
 
 	return (
-		<div className='py-6 px-4 rounded-xl border border-gray-300'>
+		<div className='card border-gray-300'>
 			<div className='flex justify-between items-center mb-4'>
 				<h1 className='text-base font-bold mb-4 text-gray-800'>Customer Details</h1>
 				<CreateCustomerDrawer
@@ -42,15 +42,19 @@ const CustomerOverviewCard: React.FC<CustomerCardProps> = ({ customerId }) => {
 					data={customer}
 				/>
 			</div>
-			<div className='grid grid-cols-2 gap-4'>
-				<div className='text-sm font-light text-gray-600'>Name</div>
-				<div className='text-sm font-normal text-gray-800'>{customer?.name || '--'}</div>
-
-				<div className='text-sm font-light text-gray-600'>Email</div>
-				<div className='text-sm font-normal text-gray-800'>{customer?.email || '--'}</div>
-
-				<div className='text-sm font-light text-gray-600'>Slug</div>
-				<div className='text-sm font-normal text-gray-800'>{customer?.external_id || '--'}</div>
+			<div className='flex flex-col  gap-4'>
+				<div className='flex justify-between items-center'>
+					<div className='text-sm font-light text-gray-600'>Name</div>
+					<div className='text-sm font-normal text-gray-800'>{customer?.name || '--'}</div>
+				</div>
+				<div className='flex justify-between items-center'>
+					<div className='text-sm font-light text-gray-600'>Email</div>
+					<div className='text-sm font-normal text-gray-800'>{customer?.email || '--'}</div>
+				</div>
+				<div className='flex justify-between items-center'>
+					<div className='text-sm font-light text-gray-600'>Slug</div>
+					<div className='text-sm font-normal text-gray-800'>{customer?.external_id || '--'}</div>
+				</div>
 			</div>
 		</div>
 	);

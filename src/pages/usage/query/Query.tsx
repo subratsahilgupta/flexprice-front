@@ -84,7 +84,7 @@ const QueryPage = () => {
 
 	return (
 		<div className='page'>
-			<SectionHeader className='!px-0 py-0' title='Query' />
+			<SectionHeader title='Query' />
 
 			{/* Filters Section */}
 			<div className={'space-y-6'}>
@@ -164,9 +164,12 @@ const QueryPage = () => {
 									{(formattedData?.length ?? 0) > 0 ? (
 										<>
 											<RechartsTooltip
+												itemStyle={{ zIndex: 999, backgroundColor: '#fff' }}
 												labelFormatter={(value) => `${value}`}
 												content={<ChartTooltipContent />}
 												cursor={{ stroke: '#ccc' }}
+												contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc', zIndex: 999 }}
+												wrapperStyle={{ backgroundColor: 'white', borderStyle: 'ridge', paddingLeft: '10px', paddingRight: '10px' }}
 											/>
 											<Line
 												type='monotone'

@@ -50,7 +50,7 @@ const Overview = () => {
 	return (
 		<div className='space-y-4 w-2/3'>
 			<CustomerOverviewCard customerId={customerId!} />
-			<div className='space p-6 rounded-xl border border-gray-300'>
+			<div className='card border-gray-300'>
 				<div className='flex mb-4 justify-between items-center'>
 					<h2 className='text-base font-semibold text-gray-800'>Subscriptions</h2>
 					<Button

@@ -6,7 +6,7 @@ const tabs = [
 	{ id: '', label: 'Overview' },
 	{ id: 'wallet', label: 'Wallet' },
 	{ id: 'invoice', label: 'Invoice' },
-	{ id: 'credit-note', label: 'Credit Note' },
+	// { id: 'credit-note', label: 'Credit Note' },
 ];
 
 const getActiveTab = (tabId: string) => {

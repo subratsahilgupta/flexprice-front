@@ -32,7 +32,7 @@ const InvoiceStatusModal: FC<InvoiceStatusProps> = ({ isOpen, onOpenChange, invo
 		{
 			label: 'Void',
 			value: 'VOIDED',
-			description: 'This action will void the invoice',
+			description: 'Cancels the invoice and prevents further changes.',
 			disabled: !(
 				(invoice?.invoice_status === 'DRAFT' || invoice?.invoice_status === 'FINALIZED') &&
 				(invoice?.payment_status === 'FAILED' || invoice?.payment_status === 'PENDING')
@@ -41,13 +41,14 @@ const InvoiceStatusModal: FC<InvoiceStatusProps> = ({ isOpen, onOpenChange, invo
 		{
 			label: 'Finalize',
 			value: 'FINALIZED',
-			description: 'This action will finalize the invoice',
+			description: 'Marks the invoice as final and ready for processing.',
 			disabled: !(invoice?.invoice_status === 'DRAFT' && invoice?.payment_status === 'FAILED'),
 		},
 		{
 			label: 'Draft',
 			value: 'DRAFT',
-			description: 'This action will set the invoice status to draft',
+			description: 'Keeps the invoice in draft mode, allowing further edits.',
+			disabled: true,
 		},
 	];
 
@@ -96,7 +97,7 @@ const InvoiceStatusModal: FC<InvoiceStatusProps> = ({ isOpen, onOpenChange, invo
 				<FormHeader
 					title='Update Invoice Status'
 					variant='form-title'
-					subtitle='Please note that updating the status of an invoice will not affect the payment status.'
+					subtitle='Updating the invoice status will not impact the payment status.'
 				/>
 				<Spacer className='!my-6' />
 				<Select
