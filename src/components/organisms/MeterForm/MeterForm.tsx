@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { queryClient } from '@/App';
 import { Meter } from '@/models/Meter';
+import { v4 as uuidv4 } from 'uuid';
 
 interface Props {
 	data?: Meter;
@@ -46,19 +47,25 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 	const [errors, setErrors] = useState<Record<string, string>>({});
 
 	useEffect(() => {}, [eventFilters]);
+	const getRandomDate = () => {
+		const start = new Date(2020, 0, 1);
+		const end = new Date();
+		return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime())).toISOString();
+	};
+
 	const curlCommand = `curl --request POST \\
-	--url https://api.cloud.flexprice.io/v1/events \\
-	--header 'Content-Type: application/json' \\
-	--header 'x-api-key: <your_api_key>' \\
-	--data '{
-	  "event_id": "${data?.id ?? '__UNIQUE_ID__'}",
-	  "event_name": "${data?.event_name ?? (eventName || '__MUST_BE_DEFINED__')}",
-	  "external_customer_id": "__EXTERNAL_CUSTOMER_ID__",
-	  "properties": {${eventFilters.length > 0 && eventFilters[0].key.length > 0 ? `"\n\t\t${eventFilters[0].key}" : "${eventFilters[0].values[0]}"` : ''}${aggregationValue ? `,"\n\t\t${aggregationValue}":"__${aggregationValue.split(' ').join('_').toUpperCase()}__"` : ''}
-	  },
-	  "source": "api",
-	  "timestamp": "${new Date().toISOString()}"
-	}'`;
+		--url https://api.cloud.flexprice.io/v1/events \\
+		--header 'Content-Type: application/json' \\
+		--header 'x-api-key: <your_api_key>' \\
+		--data '{
+		  "event_id": "${'event_' + uuidv4().replace(/-/g, '').slice(0, 10)}",
+		  "event_name": "${data?.event_name ?? (eventName || '__MUST_BE_DEFINED__')}",
+		  "external_customer_id": "__EXTERNAL_CUSTOMER_ID__",
+		  "properties": {${eventFilters.map((filter) => `\n\t\t\t "${filter.key}" : "${filter.values[0] || 'FILTER_VALUE'}"`).join(',')}${aggregationValue ? `,\n\t\t\t "${aggregationValue}":"__${aggregationValue.split(' ').join('_').toUpperCase()}__"` : ''}
+		  },
+		  "source": "api",
+		"timestamp": "${getRandomDate()}"
+		}'`;
 
 	const radioMenuItemList = [
 		{
@@ -101,6 +108,21 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 		const validation = MeterFormSchema.safeParse(formData);
 
 		if (validation.success) {
+			const formData = {
+				event_name: eventName,
+				name: displayName,
+				aggregation: {
+					type: aggregationFunction,
+					field: aggregationValue,
+				},
+				filters: eventFilters
+					.filter((filter) => filter.key && filter.values.length > 0)
+					.map((filter) => ({
+						key: filter.key,
+						values: filter.values,
+					})),
+				reset_usage: resetPeriod,
+			};
 			onSubmit(formData as unknown as Meter, isEditMode ? 'edit' : 'add');
 
 			queryClient.invalidateQueries({
