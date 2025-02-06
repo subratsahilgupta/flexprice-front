@@ -3,8 +3,8 @@ import { FC, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 
-export interface ColumnData {
-	fieldName: string;
+export interface ColumnData<T = any> {
+	fieldName: keyof T;
 	title: string;
 	flex?: number;
 	width?: number | string;
@@ -12,10 +12,11 @@ export interface ColumnData {
 	textColor?: string;
 	suffixIcon?: ReactNode;
 	align?: 'left' | 'center' | 'right' | 'justify';
-	render?: (rowData: any) => ReactNode;
+	render?: (rowData: T) => ReactNode;
 	children?: ReactNode;
 	className?: string;
 	redirect?: boolean;
+	onCLick?: (row: T) => void;
 }
 
 export interface FlexpriceTableProps {
@@ -119,11 +120,17 @@ const FlexpriceTable: FC<FlexpriceTableProps> = ({ onRowClick, columns, data, re
 							}}
 							key={rowIndex}>
 							{columns.map(
-								({ fieldName: name, flex = 1, width, textColor = 'inherit', align = 'left', render, redirect = true }, colIndex) => (
+								(
+									{ fieldName: name, flex = 1, width, textColor = 'inherit', align = 'left', render, redirect = true, onCLick },
+									colIndex,
+								) => (
 									<TableCell
 										onClick={() => {
 											if (redirect && redirectUrl) {
 												navigate(`${redirectUrl}${row.id}`);
+											}
+											if (onCLick) {
+												onCLick(row);
 											}
 										}}
 										key={colIndex}

@@ -56,7 +56,7 @@ const QueryPage = () => {
 		],
 		mutationFn: async () => {
 			return await EventsApi.getUsageByMeter({
-				meter_id: 'c37aee66-6b25-4a08-8076-891f37e2df26',
+				meter_id: payload.meter_id!,
 				customer_id: payload.customer_id,
 				end_time: payload.end_time?.toISOString(),
 				start_time: payload.start_time?.toISOString(),

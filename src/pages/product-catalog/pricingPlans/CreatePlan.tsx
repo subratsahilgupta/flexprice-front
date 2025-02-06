@@ -50,7 +50,7 @@ const CreatePlanPage = () => {
 		},
 		async onSuccess() {
 			toast.success('Plan created successfully');
-			navigate('/customer-management/pricing-plan');
+			navigate('/product-catalog/pricing-plan');
 			resetStore();
 			await queryClient.invalidateQueries({
 				queryKey: ['fetchPlans'],

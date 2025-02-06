@@ -42,7 +42,7 @@ const PlansTable: FC<PlansTableProps> = ({ data }) => {
 					id={row.id}
 					isArchiveDisabled={row.status === 'archived'}
 					isEditDisabled={row.status === 'archived'}
-					editPath={`/customer-management/pricing-plan/edit-plan?id=${row.id}`}
+					editPath={`/product-catalog/pricing-plan/edit-plan?id=${row.id}`}
 					deleteMutationFn={(id) => PlanApi.deletePlan(id)}
 					refetchQueryKey='fetchPlans'
 					entityName='Plan'
@@ -51,7 +51,7 @@ const PlansTable: FC<PlansTableProps> = ({ data }) => {
 		},
 	];
 
-	return <FlexpriceTable redirectUrl='/customer-management/pricing-plan/' columns={columns} data={mappedData} />;
+	return <FlexpriceTable redirectUrl='/product-catalog/pricing-plan/' columns={columns} data={mappedData} />;
 };
 
 export default PlansTable;

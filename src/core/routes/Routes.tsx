@@ -6,12 +6,12 @@ import AuthMiddleware from '../auth/AuthProvider';
 import BillableMetricsPage from '@/pages/usage/meter/BillableMetrics';
 import AddMeterPage from '@/pages/usage/meter/AddMeter';
 import EditMeterPage from '@/pages/usage/meter/EditMeterPage';
-import PricingPlans from '@/pages/customer/pricingPlans/PricingPlans';
-import CreatePlanPage from '@/pages/customer/pricingPlans/CreatePlan';
+import PricingPlans from '@/pages/product-catalog/pricingPlans/PricingPlans';
+import CreatePlanPage from '@/pages/product-catalog/pricingPlans/CreatePlan';
 import CustomerSubscription from '@/pages/customer/customers/CustomerSubscription';
 import CustomerDetails from '@/pages/customer/customers/CustomerDetails';
 import ErrorPage from '@/pages/error/ErrorPage';
-import PlanViewPage from '@/pages/customer/pricingPlans/PlanViewPage';
+import PlanViewPage from '@/pages/product-catalog/pricingPlans/PlanViewPage';
 import EventsPage from '@/pages/usage/events/Events';
 import QueryPage from '@/pages/usage/query/Query';
 import InvoicePage from '@/pages/customer/invoices/InvoicePage';
@@ -22,8 +22,10 @@ import WalletTab from '@/pages/customer/tabs/Wallet';
 import SubscriptionDetails from '@/pages/customer/customers/SubscriptionDetails';
 import AddCreditPage from '@/pages/customer/invoices/AddCreditPage';
 import CreditNote from '@/pages/customer/tabs/CreditNote';
+import AddFeaturePage from '@/pages/product-catalog/features/AddFeature';
+import FeaturesPage from '@/pages/product-catalog/features/Features';
 
-const RouteNames = {
+export const RouteNames = {
 	home: '/',
 	login: '/login',
 
@@ -38,11 +40,17 @@ const RouteNames = {
 	// customer management routes
 	customerManagement: '/customer-management',
 	customers: '/customer-management/customers',
-	pricingPlan: '/customer-management/pricing-plan',
-	createPlan: '/customer-management/pricing-plan/create-plan',
-	editPlan: '/customer-management/pricing-plan/edit-plan',
 	invoices: '/customer-management/invoices',
 	invoiceDetail: '/customer-management/invoices/:invoiceId',
+
+	// product catalog routes
+	productCatalog: '/product-catalog',
+	createPlan: '/product-catalog/pricing-plan/create-plan',
+	pricingPlan: '/product-catalog/pricing-plan',
+	editPlan: '/product-catalog/pricing-plan/edit-plan',
+
+	features: '/product-catalog/features',
+	createFeature: '/product-catalog/features/create-feature',
 };
 
 export const MainRouter = createBrowserRouter([
@@ -90,22 +98,6 @@ export const MainRouter = createBrowserRouter([
 			{
 				path: RouteNames.customerManagement,
 				children: [
-					{
-						path: RouteNames.pricingPlan,
-						element: <PricingPlans />,
-					},
-					{
-						path: `${RouteNames.pricingPlan}/:planId`,
-						element: <PlanViewPage />,
-					},
-					{
-						path: RouteNames.createPlan,
-						element: <CreatePlanPage />,
-					},
-					{
-						path: RouteNames.editPlan,
-						element: <CreatePlanPage />,
-					},
 					{
 						path: `${RouteNames.customers}`,
 						element: <CustomerPage />,
@@ -170,6 +162,35 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: `${RouteNames.invoiceDetail}`,
 						element: <InvoiceDetailsPage />,
+					},
+				],
+			},
+			{
+				path: RouteNames.productCatalog,
+				children: [
+					{
+						path: RouteNames.pricingPlan,
+						element: <PricingPlans />,
+					},
+					{
+						path: `${RouteNames.pricingPlan}/:planId`,
+						element: <PlanViewPage />,
+					},
+					{
+						path: RouteNames.createPlan,
+						element: <CreatePlanPage />,
+					},
+					{
+						path: RouteNames.editPlan,
+						element: <CreatePlanPage />,
+					},
+					{
+						path: RouteNames.features,
+						element: <FeaturesPage />,
+					},
+					{
+						path: RouteNames.createFeature,
+						element: <AddFeaturePage />,
 					},
 				],
 			},

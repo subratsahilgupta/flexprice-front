@@ -10,7 +10,7 @@ import {
 import React from 'react';
 import SidebarNav, { NavItem } from './SidebarMenu';
 import { cn } from '@/lib/utils';
-import { LogOut } from 'lucide-react';
+import { LogOut, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import supabase from '@/core/supbase/config';
 import useUser from '@/hooks/useUser';
@@ -67,11 +67,7 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				url: '/customer-management/customers',
 				icon: '/assets/svg/customers.svg',
 			},
-			{
-				title: 'Pricing Plan',
-				url: '/customer-management/pricing-plan',
-				icon: '/assets/svg/pricing_plan.svg',
-			},
+
 			{
 				title: 'Invoices',
 				url: '/customer-management/invoices',
@@ -88,6 +84,18 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				url: '/roles',
 				icon: '/assets/svg/import-export.svg',
 				disabled: true,
+			},
+		],
+		'Product Cataglog': [
+			{
+				title: 'Pricing Plan',
+				url: '/product-catalog/pricing-plan',
+				icon: '/assets/svg/pricing_plan.svg',
+			},
+			{
+				title: 'Features',
+				url: '/product-catalog/features',
+				icon: <Star />,
 			},
 		],
 	};
