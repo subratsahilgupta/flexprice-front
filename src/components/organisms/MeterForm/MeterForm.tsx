@@ -48,7 +48,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 
 	const [errors, setErrors] = useState<Record<string, string>>({});
 
-	useEffect(() => {}, [eventFilters]);
+	useEffect(() => { }, [eventFilters]);
 	const getRandomDate = () => {
 		const start = new Date(2020, 0, 1);
 		const end = new Date();
@@ -147,7 +147,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 
 			{isEditMode && <p className='font-bold text-zinc-950 text-[20px] p-6'>{data?.name}</p>}
 
-			<div className='w-full flex gap-0 relative h-screen  '>
+			<div className='w-full flex gap-0 relative   !mb-24'>
 				{/* meter form */}
 
 				{/* add meter heading */}
@@ -266,8 +266,8 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 				</div>
 
 				{/* preview */}
-				<div className={cn('flex-[3] max-w-lg h-screen relative')}>
-					<div className={cn('sticky border-zinc-300 border top-24 bg-[#0000000D] p-6 rounded-lg')}>
+				<div className={cn('flex-[3] max-w-lg  relative')}>
+					<div className={cn('sticky border-zinc-300 border top-24 float-right bg-[#0000000D] p-6 rounded-lg')}>
 						<div className='flex   justify-between items-center w-full'>
 							<p className=' font-semibold text-lg'>Test This Snippet</p>
 							<Button
