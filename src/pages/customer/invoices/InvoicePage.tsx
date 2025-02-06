@@ -50,7 +50,6 @@ const InvoicesPage = () => {
 			<div className='h-screen w-full flex justify-center items-center'>
 				<div className='w-full flex flex-col items-center '>
 					<ReactSVG src={'/assets/svg/empty box.svg'} />
-					<p className='font-sans text-2xl font-bold'>Add your first billable metric</p>
 					<p className='text-[#71717A] font-normal '>
 						{'A billable base metric is used to measure usage, and act as a foundation of pricing (e.g., API calls for an API product).'}
 					</p>
