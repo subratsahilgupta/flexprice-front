@@ -1,5 +1,3 @@
-import { Meter } from './Meter';
-
 interface Feature {
 	id: string;
 	name: string;

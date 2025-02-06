@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { z } from 'zod';
-import { Button, CodePreview, FormHeader, Input, RadioGroup, Select, Spacer } from '@/components/atoms';
+import { Button, Input, RadioGroup, Select, Spacer } from '@/components/atoms';
 import { EventFilter, EventFilterData } from '@/components/molecules';
 import { LuCircleFadingPlus, LuRefreshCw } from 'react-icons/lu';
 import { cn } from '@/lib/utils';
@@ -55,19 +55,6 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 		return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime())).toISOString();
 	};
 
-	const [isScrolled, setIsScrolled] = useState(false);
-
-	useEffect(() => {
-		const handleScroll = () => {
-			setIsScrolled(window.scrollY > 300);
-		};
-
-		window.addEventListener('scroll', handleScroll);
-		return () => {
-			window.removeEventListener('scroll', handleScroll);
-		};
-	}, []);
-
 	const curlCommand = `curl --request POST \\
 		--url https://api.cloud.flexprice.io/v1/events \\
 		--header 'Content-Type: application/json' \\
@@ -96,17 +83,6 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 			icon: LuRefreshCw,
 		},
 	];
-
-	// const resetForm = () => {
-	// 	setDisplayName('');
-	// 	setEventName('');
-	// 	setEventFilters([]);
-	// 	setAggregationFunction('SUM');
-	// 	setAggregationValue('');
-	// 	setResetPeriod('');
-	// };
-
-	// Handle form submission
 
 	const handleSubmit = () => {
 		// Form data object
@@ -160,10 +136,8 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 	};
 
 	return (
-		<div className='h-screen w-full'>
+		<div className='h-screen w-full '>
 			{/* heading */}
-
-			{/* add meter heading */}
 			{!isEditMode && (
 				<div className='p-6'>
 					<p className='font-bold text-zinc text-[20px]'>Add Meter</p>
@@ -173,8 +147,11 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 
 			{isEditMode && <p className='font-bold text-zinc-950 text-[20px] p-6'>{data?.name}</p>}
 
-			<div className='w-full flex gap-0 relative h-screen '>
+			<div className='w-full flex gap-0 relative h-screen  '>
 				{/* meter form */}
+
+				{/* add meter heading */}
+
 				<div className='px-6 pb-6 flex-[8] flex flex-col gap-7  '>
 					{/* Event Schema */}
 					<div className='p-6 rounded-xl border border-[#E4E4E7]'>
@@ -290,7 +267,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 
 				{/* preview */}
 				<div className={cn('flex-[3] max-w-lg h-screen relative')}>
-					<div className={cn('sticky border-zinc-300 border top-0 bg-[#0000000D] p-6 rounded-lg')}>
+					<div className={cn('sticky border-zinc-300 border top-24 bg-[#0000000D] p-6 rounded-lg')}>
 						<div className='flex   justify-between items-center w-full'>
 							<p className=' font-semibold text-lg'>Test This Snippet</p>
 							<Button

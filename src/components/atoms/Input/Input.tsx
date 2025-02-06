@@ -51,6 +51,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 						'focus-within:border-black',
 						className,
 					)}>
+					{inputPrefix && <div className='mr-2'>{inputPrefix}</div>}
 					<input
 						id={id}
 						type={type}
