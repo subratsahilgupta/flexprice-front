@@ -31,7 +31,8 @@ const SidebarItem: FC<NavItem> = (item) => {
 							item.isActive && 'bg-[#F4F4F5] font-medium text-sidebar-text-accent-foreground',
 							item.disabled && 'cursor-not-allowed',
 						)}>
-						{item.icon && <ReactSVG src={item.icon} className='size-4' />}
+						{typeof item.icon === 'string' && <ReactSVG src={item.icon} className='size-4' />}
+						{typeof item.icon === 'object' && item.icon}
 						<span className='text-sm select-none'>{item.title}</span>
 						{hasChildren && (
 							<ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />

@@ -23,7 +23,7 @@ const EventsTable: FC<Props> = ({ data }) => {
 			fieldName: 'id',
 		},
 		{
-			title: 'Event Type',
+			title: ' Meter name',
 			fieldName: 'event_name',
 		},
 		{
@@ -47,7 +47,7 @@ const EventsTable: FC<Props> = ({ data }) => {
 	];
 	return (
 		<div>
-			<FlexpriceTable columns={columns} data={data} />
+			<FlexpriceTable showEmptyRow columns={columns} data={data} />
 		</div>
 	);
 };

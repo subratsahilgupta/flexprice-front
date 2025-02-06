@@ -53,7 +53,6 @@ export const captureToPdf = async (elementRef: React.RefObject<HTMLElement>, pdf
 
 		// Save the generated PDF
 		pdf.save(`${pdfFileName}.pdf`);
-		console.log('PDF generated successfully!');
 	} catch (error) {
 		console.error('Error generating PDF:', error);
 	}

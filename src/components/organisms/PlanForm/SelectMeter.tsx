@@ -1,4 +1,4 @@
-import { Option, Select } from '@/components/atoms';
+import { SelectOption, Select } from '@/components/atoms';
 import { Meter } from '@/models/Meter';
 import { MeterApi } from '@/utils/api_requests/MeterApi';
 import { useQuery } from '@tanstack/react-query';
@@ -12,9 +12,19 @@ interface Props {
 	onChange: (value: Meter) => void;
 	value?: string;
 	error?: string;
+	label?: string;
+	placeholder?: string;
+	description?: string;
 }
 
-const SelectMeter: FC<Props> = ({ onChange, value, error }) => {
+const SelectMeter: FC<Props> = ({
+	onChange,
+	value,
+	error,
+	label = 'Billable Metric',
+	placeholder = 'Select by meter name',
+	description,
+}) => {
 	const {
 		data: metersData,
 		isLoading,
@@ -38,7 +48,7 @@ const SelectMeter: FC<Props> = ({ onChange, value, error }) => {
 		return <div>No meters found</div>;
 	}
 
-	const activeMeters: Option[] = metersData!.items
+	const activeMeters: SelectOption[] = metersData!.items
 		.filter((meter) => meter.status === 'published')
 		.map((meter) => {
 			return {
@@ -48,14 +58,15 @@ const SelectMeter: FC<Props> = ({ onChange, value, error }) => {
 		});
 
 	return (
-		<div>
+		<div className='min-w-[200px]'>
 			<Select
 				error={error}
-				selectedValue={value}
+				value={value}
 				onChange={(e) => onChange(metersData.items.find((meter) => meter.id === e) as Meter)}
 				options={activeMeters}
-				placeholder='Select by meter name'
-				label='Billable Metric'
+				placeholder={placeholder}
+				label={label}
+				description={description}
 			/>
 		</div>
 	);

@@ -3,8 +3,8 @@ import { FC, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 
-export interface ColumnData {
-	fieldName: string;
+export interface ColumnData<T = any> {
+	fieldName: keyof T;
 	title: string;
 	flex?: number;
 	width?: number | string;
@@ -12,10 +12,11 @@ export interface ColumnData {
 	textColor?: string;
 	suffixIcon?: ReactNode;
 	align?: 'left' | 'center' | 'right' | 'justify';
-	render?: (rowData: any) => ReactNode;
+	render?: (rowData: T) => ReactNode;
 	children?: ReactNode;
 	className?: string;
 	redirect?: boolean;
+	onCLick?: (row: T) => void;
 }
 
 export interface FlexpriceTableProps {
@@ -23,6 +24,7 @@ export interface FlexpriceTableProps {
 	redirectUrl?: string;
 	data: any[];
 	onRowClick?: (row: any) => void;
+	showEmptyRow?: boolean;
 }
 
 // Table structure components
@@ -89,7 +91,7 @@ const TableCell = React.forwardRef<
 TableCell.displayName = 'TableCell';
 
 // Main FlexpriceTable Component
-const FlexpriceTable: FC<FlexpriceTableProps> = ({ onRowClick, columns, data, redirectUrl }) => {
+const FlexpriceTable: FC<FlexpriceTableProps> = ({ onRowClick, columns, data, redirectUrl, showEmptyRow }) => {
 	const navigate = useNavigate();
 	return (
 		<Table>
@@ -108,38 +110,62 @@ const FlexpriceTable: FC<FlexpriceTableProps> = ({ onRowClick, columns, data, re
 				</TableRow>
 			</TableHeader>
 			<TableBody>
-				{data?.map((row, rowIndex) => (
-					<TableRow
-						onClick={() => {
-							if (onRowClick) {
-								onRowClick(row);
-							}
-						}}
-						key={rowIndex}>
-						{columns.map(
-							({ fieldName: name, flex = 1, width, textColor = 'inherit', align = 'left', render, redirect = true }, colIndex) => (
-								<TableCell
-									onClick={() => {
-										if (redirect && redirectUrl) {
-											navigate(`${redirectUrl}${row.id}`);
-										}
-									}}
-									key={colIndex}
-									className={cn(
-										textColor ? `text-[${textColor}]` : 'text-[#09090B] w-full ',
-										'font-normal',
-										'!max-h-8 px-4 py-2 text-[14px]',
-										redirect && redirectUrl ? 'cursor-pointer' : 'cursor-default',
-									)}
-									style={{ flex: width ? undefined : flex }}
-									width={width}
-									align={align}>
-									{render ? render(row) : row[name]}
-								</TableCell>
-							),
-						)}
-					</TableRow>
-				))}
+				{data.length > 0 &&
+					data?.map((row, rowIndex) => (
+						<TableRow
+							onClick={() => {
+								if (onRowClick) {
+									onRowClick(row);
+								}
+							}}
+							key={rowIndex}>
+							{columns.map(
+								(
+									{ fieldName: name, flex = 1, width, textColor = 'inherit', align = 'left', render, redirect = true, onCLick },
+									colIndex,
+								) => (
+									<TableCell
+										onClick={() => {
+											if (redirect && redirectUrl) {
+												navigate(`${redirectUrl}${row.id}`);
+											}
+											if (onCLick) {
+												onCLick(row);
+											}
+										}}
+										key={colIndex}
+										className={cn(
+											textColor ? `text-[${textColor}]` : 'text-[#09090B] w-full ',
+											'font-normal',
+											'!max-h-8 px-4 py-2 text-[14px]',
+											redirect && redirectUrl ? 'cursor-pointer' : 'cursor-default',
+										)}
+										style={{ flex: width ? undefined : flex }}
+										width={width}
+										align={align}>
+										{render ? render(row) : row[name]}
+									</TableCell>
+								),
+							)}
+						</TableRow>
+					))}
+				{data.length === 0 &&
+					showEmptyRow &&
+					columns.map(({ flex = 1, width, textColor = 'inherit', align = 'left', redirect = true }, colIndex) => (
+						<TableCell
+							key={colIndex}
+							className={cn(
+								textColor ? `text-[${textColor}]` : 'text-[#09090B] w-full ',
+								'font-normal',
+								'!max-h-8 px-4 py-2 text-[14px]',
+								redirect && redirectUrl ? 'cursor-pointer' : 'cursor-default',
+							)}
+							style={{ flex: width ? undefined : flex }}
+							width={width}
+							align={align}>
+							--
+						</TableCell>
+					))}
 			</TableBody>
 		</Table>
 	);

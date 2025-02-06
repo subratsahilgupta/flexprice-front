@@ -12,6 +12,7 @@ export default {
 			fontFamily: {
 				inter: ['Inter', 'sans-serif'],
 				'open-sans': ['Open Sans', 'sans-serif'],
+				'fira-code': ['Fira Code', 'monospace'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

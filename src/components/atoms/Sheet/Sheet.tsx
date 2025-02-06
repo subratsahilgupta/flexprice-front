@@ -14,12 +14,12 @@ const Sheet: FC<Props> = ({ children, trigger, description, title, isOpen, onOpe
 	return (
 		<ShadcnSheet open={isOpen} onOpenChange={onOpenChange}>
 			<SheetTrigger asChild>{trigger}</SheetTrigger>
-			<SheetContent>
+			<SheetContent className='h-screen overflow-y-auto'>
 				<SheetHeader>
 					<SheetTitle>{title}</SheetTitle>
 					<SheetDescription>{description}</SheetDescription>
-					{children}
 				</SheetHeader>
+				{children}
 			</SheetContent>
 		</ShadcnSheet>
 	);

@@ -3,7 +3,6 @@ import usePlanStore from '@/store/usePlanStore';
 
 const PlanDetailsSection = () => {
 	const { plan, setPlanField, errors } = usePlanStore();
-	console.log('PlanDetailsSection', plan, errors);
 
 	return (
 		<div className='p-6  rounded-xl border border-[#E4E4E7]'>

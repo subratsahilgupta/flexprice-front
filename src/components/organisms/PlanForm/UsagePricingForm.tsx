@@ -81,13 +81,11 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 	const addTieredPrice = () => {
 		setTieredPrices((prev) => {
 			const lastTier = prev[prev.length - 1];
-			console.log('lastTier', lastTier);
 
 			if (lastTier.up_to === null) {
 				prev[prev.length - 1] = { ...lastTier, up_to: lastTier.from + 1 };
 			}
 			const newFrom = lastTier.up_to ?? lastTier.from + 1;
-			console.log('new from ', newFrom);
 
 			const newTier = { from: newFrom + 1, up_to: null, unit_amount: 0, flat_amount: 0 };
 			return [...prev, newTier];
@@ -99,7 +97,13 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 		if (index === 0 && tieredPrices.length === 1) {
 			return;
 		}
-		setTieredPrices((prev) => prev.filter((_, i) => i !== index));
+		setTieredPrices((prev) => {
+			const updatedTiers = prev.filter((_, i) => i !== index);
+			if (updatedTiers.length > 0 && index === prev.length - 1) {
+				updatedTiers[updatedTiers.length - 1].up_to = null;
+			}
+			return updatedTiers;
+		});
 	};
 
 	// Update a tier value
@@ -128,7 +132,6 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 	// Handle saving of pricing information
 	const handleAddPrice = () => {
 		if (!validate()) {
-			console.log('Validation failed');
 			return;
 		}
 
@@ -161,7 +164,6 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 			data.tier_mode = 'VOLUME';
 		}
 
-		console.log('data', data);
 		if (addPrice) {
 			addPrice(data);
 		}
@@ -178,11 +180,8 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 			tieredModelError: '',
 		});
 
-		console.log('inside validate function');
-
 		if (!meterId) {
 			seterrors((prev) => ({ ...prev, meter_id: 'Meter is required' }));
-			console.log('validation failed Meter is required');
 			return false;
 		}
 
@@ -203,7 +202,6 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 		if (billingModel === billingModels[1].value) {
 			if (packagedFee.price === '' || packagedFee.unit === '') {
 				setinputErrors((prev) => ({ ...prev, packagedModelError: 'Invalid package fee' }));
-				console.log('validation failed Invalid package fee');
 				return false;
 			}
 		}
@@ -211,7 +209,6 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 		if (billingModel === billingModels[0].value) {
 			if (!flatFee || Number(flatFee) < 0) {
 				setinputErrors((prev) => ({ ...prev, flatModelError: 'Invalid flat fee' }));
-				console.log('validation failed Invalid flat fee');
 				return false;
 			}
 		}
@@ -254,7 +251,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 			/>
 			<Spacer height='8px' />
 			<Select
-				selectedValue={currency}
+				value={currency}
 				options={currencyOptions}
 				label='Currency'
 				onChange={setCurrency}
@@ -263,7 +260,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 			/>
 			<Spacer height='8px' />
 			<Select
-				selectedValue={billingPeriod}
+				value={billingPeriod}
 				options={billlingPeriodOptions}
 				onChange={(value) => {
 					setbillingPeriod(value);
@@ -275,7 +272,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 			<Spacer height={'8px'} />
 
 			<Select
-				selectedValue={billingModel}
+				value={billingModel}
 				options={billingModels}
 				onChange={setBillingModel}
 				label='Billing Model'

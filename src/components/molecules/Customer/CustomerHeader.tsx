@@ -1,5 +1,7 @@
+import { useBreadcrumbStore } from '@/core/store/useBreadcrumbStore';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
 
 const fetchCustomer = async (customerId: string) => {
 	return await CustomerApi.getCustomerById(customerId);
@@ -11,12 +13,23 @@ interface CustomerHeaderProps {
 
 const CustomerHeader: React.FC<CustomerHeaderProps> = ({ customerId }) => {
 	const { data: customer, isLoading } = useQuery({
-		queryKey: ['fetchCustomerCard', customerId],
+		queryKey: ['fetchCustomerDetails', customerId],
 		queryFn: () => fetchCustomer(customerId!),
 		retry: 1,
 		// staleTime: 1000 * 60 * 5,
 		staleTime: 0,
 	});
+
+	const { setBreadcrumbs, breadcrumbs } = useBreadcrumbStore();
+
+	useEffect(() => {
+		setBreadcrumbs(
+			[...breadcrumbs.slice(0, 2), { label: `${customer?.external_id || ''}`, path: `/customer-management/customers/${customerId}` }],
+			true,
+		);
+
+		return () => setBreadcrumbs([]);
+	}, [setBreadcrumbs, customerId, customer?.name]);
 
 	if (isLoading) {
 		return (
@@ -39,9 +52,13 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ customerId }) => {
 	return (
 		<div className='items-center justify-center'>
 			<div className='flex place-items-center space-x-3'>
-				<div className='w-10 h-10'>
-					<img src={'https://picsum.photos/200/300'} alt='Customer Profile' className='w-full h-full rounded-full object-cover shadow-md' />
-				</div>
+				<span className='size-9 bg-contain rounded-md bg-gray-400 flex items-center justify-center text-white text-lg'>
+					{customer?.name
+						?.split(' ')
+						.map((n) => n[0]?.toUpperCase())
+						.join('')
+						.slice(0, 2)}
+				</span>
 				<div className='flex flex-col'>
 					<div className='text-base font-semibold text-gray-800'>{customer?.name}</div>
 					<div className='text-sm font-normal text-gray-600'>{customer?.email}</div>

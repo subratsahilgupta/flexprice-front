@@ -52,10 +52,8 @@ const CreateWallet: FC<Props> = ({ customerId, onClose = () => {} }) => {
 			setErrors((prev) => ({ ...prev, currency: 'Currency is required' }));
 			return;
 		}
-		console.log('starting create wallet');
 
 		const wallet = await createWallet();
-		console.log('wallet created ');
 		return wallet.id;
 	};
 
@@ -72,7 +70,7 @@ const CreateWallet: FC<Props> = ({ customerId, onClose = () => {} }) => {
 				<Input error={errors.walletName} value={walletName} onChange={setwalletName} label='Wallet Name' placeholder='Enter wallet name' />
 
 				<Select
-					selectedValue={currency}
+					value={currency}
 					options={currencyOptions}
 					label='Select Currency'
 					onChange={setcurrency}

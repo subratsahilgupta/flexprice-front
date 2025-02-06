@@ -6,9 +6,10 @@ import {
 	PaginationItem,
 	PaginationPrevious,
 	PaginationNext,
-	PaginationEllipsis,
+	// PaginationEllipsis,
 } from '@/components/ui/pagination';
 import { Spacer } from '@/components/atoms';
+import { cn } from '@/lib/utils';
 
 const FLexpricePagination = ({ totalPages }: { totalPages: number }) => {
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -22,13 +23,17 @@ const FLexpricePagination = ({ totalPages }: { totalPages: number }) => {
 	if (totalPages <= 1) return null;
 
 	return (
-		<>
-			<Spacer className='!mt-4' />
+		<div className='!mb-6'>
+			<Spacer className='!my-4' />
 			<Pagination>
 				<PaginationContent>
 					{/* Previous Button */}
 					<PaginationItem>
-						<PaginationPrevious onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
+						<PaginationPrevious
+							onClick={() => handlePageChange(currentPage - 1)}
+							className={cn(currentPage === 1 && 'text-zinc-500 select-none cursor-not-allowed hover:bg-white   hover:text-zinc-500')}
+							disabled={currentPage === 1}
+						/>
 					</PaginationItem>
 
 					{/* Pagination Items */}
@@ -44,19 +49,25 @@ const FLexpricePagination = ({ totalPages }: { totalPages: number }) => {
 					})}
 
 					{/* Ellipsis (Optional for large pagination ranges) */}
-					{totalPages > 15 && (
+					{/* {totalPages > 15 && (
 						<PaginationItem>
 							<PaginationEllipsis />
 						</PaginationItem>
-					)}
+					)} */}
 
 					{/* Next Button */}
 					<PaginationItem>
-						<PaginationNext onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />
+						<PaginationNext
+							onClick={() => handlePageChange(currentPage + 1)}
+							className={cn(
+								currentPage === totalPages && 'text-zinc-500 select-none cursor-not-allowed hover:bg-white hover:text-zinc-500',
+							)}
+							disabled={currentPage === totalPages}
+						/>
 					</PaginationItem>
 				</PaginationContent>
 			</Pagination>
-		</>
+		</div>
 	);
 };
 

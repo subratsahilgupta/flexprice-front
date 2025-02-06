@@ -1,9 +1,10 @@
 import { FC } from 'react';
 
-interface CheckboxRadioGroupItem {
+export interface CheckboxRadioGroupItem {
 	label: string;
 	value: string;
 	description?: string;
+	disabled?: boolean;
 }
 
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -26,12 +27,12 @@ const CheckboxRadioGroup: FC<Props> = ({ error, checkboxItems, defaultValue, onC
 					<div
 						key={item.value}
 						onClick={() => {
-							if (onChange) {
+							if (onChange && !item.disabled) {
 								onChange(item.value);
 							}
 						}}
 						className='flex items-center gap-2'>
-						<RadioGroupItem id={item.value} value={item.value} className='peer' />
+						<RadioGroupItem id={item.value} value={item.value} className='peer' disabled={item.disabled} />
 
 						<label htmlFor={item.value} className='cursor-pointer font-open-sans'>
 							<p className='font-medium text-sm text-[#18181B] peer-checked:text-black'>{item.label}</p>

@@ -24,8 +24,6 @@ const EventFilter: FC<Props> = ({ eventFilters, setEventFilters, error, permanen
 		}
 	}, []);
 
-	console.log('eventFilters', permanentFilters);
-
 	return (
 		<div>
 			<div className='flex flex-col gap-2 mb-2'>
@@ -88,9 +86,9 @@ const EventFilter: FC<Props> = ({ eventFilters, setEventFilters, error, permanen
 									setEventFilters(newEventFilters);
 								}}
 							/>
-							<div className='flex  items-end  gap-4'>
+							<div className='flex  items-end  gap-4 mb-[2px]'>
 								<button
-									className='flex justify-center items-center size-9 rounded-md border text-zinc'
+									className='flex justify-center items-center size-10  rounded-md border text-zinc'
 									onClick={() => {
 										const newEventFilters = [...eventFilters];
 										newEventFilters.splice(index, 1);
@@ -112,7 +110,6 @@ const EventFilter: FC<Props> = ({ eventFilters, setEventFilters, error, permanen
 				variant={'outline'}
 				onClick={() => {
 					setEventFilters([...eventFilters, { key: '', values: [] }]);
-					console.log('eventFilters', eventFilters);
 				}}>
 				<span className='font-normal'>Add Event Filter</span>
 			</Button>

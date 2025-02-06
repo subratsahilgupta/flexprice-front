@@ -1,13 +1,12 @@
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { MdEdit } from 'react-icons/md';
-import { FaRegEyeSlash } from 'react-icons/fa';
 import { FC, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { queryClient } from '@/App';
 import { Button, Dialog } from '@/components/atoms';
+import { EyeOff, Pencil } from 'lucide-react';
 
 interface ActionProps {
 	id: string;
@@ -18,11 +17,13 @@ interface ActionProps {
 	row?: any;
 	isArchiveDisabled?: boolean;
 	isEditDisabled?: boolean;
+	onEdit?: () => void;
 }
 
 const ActionButton: FC<ActionProps> = ({
 	id,
 	editPath,
+	onEdit,
 	deleteMutationFn,
 	refetchQueryKey,
 	entityName,
@@ -30,6 +31,7 @@ const ActionButton: FC<ActionProps> = ({
 	isEditDisabled,
 }) => {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
+	const navigate = useNavigate();
 
 	const { mutate: deleteEntity } = useMutation({
 		mutationFn: deleteMutationFn,
@@ -51,16 +53,22 @@ const ActionButton: FC<ActionProps> = ({
 				</DropdownMenuTrigger>
 				<DropdownMenuContent>
 					<DropdownMenuItem disabled={isEditDisabled}>
-						<Link to={editPath}>
-							<div className='flex gap-2 items-center w-full'>
-								<MdEdit />
-								<span>Edit</span>
-							</div>
-						</Link>
+						<div
+							onClick={() => {
+								if (onEdit) {
+									onEdit();
+								} else {
+									navigate(editPath);
+								}
+							}}
+							className='flex gap-2 items-center w-full'>
+							<Pencil />
+							<span>Edit</span>
+						</div>
 					</DropdownMenuItem>
 					<DropdownMenuItem disabled={isArchiveDisabled} onSelect={() => setIsDialogOpen(true)}>
 						<div className='flex gap-2 items-center w-full'>
-							<FaRegEyeSlash />
+							<EyeOff />
 							<span>Archive</span>
 						</div>
 					</DropdownMenuItem>

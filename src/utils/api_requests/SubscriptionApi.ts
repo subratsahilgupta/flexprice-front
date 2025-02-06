@@ -1,36 +1,11 @@
 import { AxiosClient } from '@/core/axios/verbs';
+import { LineItem } from '@/models/Invoice';
 import { SubscriptionUsage } from '@/models/Subscription';
 
 interface GetSubscriptionDetailsPaylaod {
 	subscription_id: string;
 	period_end?: string;
 	period_start?: string;
-}
-
-interface LineItem {
-	amount: number;
-	created_at: string;
-	created_by: string;
-	currency: string;
-	customer_id: string;
-	display_name: string;
-	id: string;
-	invoice_id: string;
-	metadata: Record<string, any>;
-	meter_display_name: string;
-	meter_id: string;
-	period_end: string;
-	period_start: string;
-	plan_display_name: string;
-	plan_id: string;
-	price_id: string;
-	price_type: string;
-	quantity: number;
-	status: string;
-	subscription_id: string;
-	tenant_id: string;
-	updated_at: string;
-	updated_by: string;
 }
 
 interface GetSubscriptionDetailsResponse {

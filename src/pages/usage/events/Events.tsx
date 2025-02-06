@@ -1,10 +1,17 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { Button, DatePicker, Input, SectionHeader } from '@/components/atoms';
+import { Button, DateRangePicker, Input, SectionHeader } from '@/components/atoms';
 import { EventsTable } from '@/components/molecules';
 import { Event } from '@/models/Event';
 import EventsApi from '@/utils/api_requests/EventsApi';
 import { Skeleton } from '@/components/ui/skeleton';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Search } from 'lucide-react';
+
+const getNext24HoursDate = (date: Date): Date => {
+	const nextDate = new Date(date);
+	nextDate.setHours(nextDate.getHours() + 23);
+	nextDate.setMinutes(nextDate.getMinutes() + 59);
+	return nextDate;
+};
 
 const EventsPage: React.FC = () => {
 	const [events, setEvents] = useState<Event[]>([]);
@@ -31,7 +38,7 @@ const EventsPage: React.FC = () => {
 			});
 			if (node) observer.current.observe(node);
 		},
-		[loading, hasMore]
+		[loading, hasMore],
 	);
 
 	// Fetch events from API
@@ -39,7 +46,6 @@ const EventsPage: React.FC = () => {
 		async (iterLastKey?: string) => {
 			if (!hasMore || loading) return;
 			setLoading(true);
-			console.log('Fetching events with queryData:', queryData, 'iterLastKey:', iterLastKey);
 			try {
 				const response = await EventsApi.getRawEvents({
 					iter_last_key: iterLastKey,
@@ -59,13 +65,10 @@ const EventsPage: React.FC = () => {
 				setLoading(false);
 			}
 		},
-		[queryData, iterLastKey, hasMore, loading]
+		[queryData, iterLastKey, hasMore, loading],
 	);
 
-
-
 	const refetchEvents = () => {
-		console.log('Refetching events with updated queryData:', queryData);
 		setEvents([]);
 		setIterLastKey(undefined);
 		setHasMore(true);
@@ -73,94 +76,90 @@ const EventsPage: React.FC = () => {
 	};
 
 	useEffect(() => {
-		console.log('QueryData changed:', queryData);
-
 		setEvents([]);
 		setIterLastKey(undefined);
 		setHasMore(true);
-		if (Object.keys(queryData).length > 0) {
+		if (!!queryData.startTime && !!queryData.endTime) {
 			refetchEvents();
 		}
 	}, [queryData]);
 
 	// Refetch all events
 
-
 	return (
-		<div className="p-6 bg-gray-50">
-			<SectionHeader title="Events" />
-			<div className="bg-white p-4 rounded-md shadow-md mb-6">
-				<div className="w-full flex items-end gap-4">
-					<DatePicker
-						maxDate={queryData.endTime ? new Date(queryData.endTime) : undefined}
-						date={queryData.startTime ? new Date(queryData.startTime) : undefined}
-						title="Start Time"
-						setDate={(date) =>
-							setQueryData((prev) => ({ ...prev, startTime: date?.toISOString() }))
-						}
+		<div className='page'>
+			<SectionHeader title='Events' />
+			<div className='bg-white my-6 rounded-md  mb-6'>
+				<div className='w-full flex items-end gap-4'>
+					<DateRangePicker
+						title='Time Period'
+						placeholder='Select Range'
+						onChange={({ endDate, startDate }) => {
+							if (!startDate && endDate) {
+								startDate = endDate;
+							} else if (startDate && !endDate) {
+								endDate = startDate;
+							}
+							setQueryData((prev) => ({
+								...prev,
+								startTime: startDate?.toISOString(),
+								endTime: endDate ? getNext24HoursDate(new Date(endDate!)).toISOString() : undefined,
+							}));
+						}}
 					/>
-					<DatePicker
-						minDate={queryData.startTime ? new Date(queryData.startTime) : undefined}
-						date={queryData.endTime ? new Date(queryData.endTime) : undefined}
-						title="End Time"
-						setDate={(date) =>
-							setQueryData((prev) => ({ ...prev, endTime: date?.toISOString() }))
-						}
-					/>
+
 					<Input
-						label="Customer ID"
-						placeholder="Enter Customer ID"
-						className="h-9"
-						labelClassName="text-muted-foreground font-normal"
+						label='Customer ID'
+						placeholder='Enter Customer ID'
+						className='h-9'
+						suffix={<Search className='size-4' />}
+						labelClassName='text-muted-foreground font-normal'
 						value={queryData?.externalCustomerId ?? ''}
-						onChange={(e) =>
-							setQueryData((prev) => ({ ...prev, externalCustomerId: e === '' ? undefined : e }))
-						}
+						onChange={(e) => setQueryData((prev) => ({ ...prev, externalCustomerId: e === '' ? undefined : e }))}
 					/>
 					<Input
-						label="Event Id"
-						placeholder="Enter Event Id"
-						className="h-9"
-						labelClassName="text-muted-foreground font-normal"
+						label=' Meter name'
+						suffix={<Search className='size-4' />}
+						placeholder='Enter Meter name'
+						className='h-9'
+						labelClassName='text-muted-foreground font-normal'
 						value={queryData?.eventId ?? ''}
 						onChange={(e) => setQueryData((prev) => ({ ...prev, eventId: e === '' ? undefined : e }))}
 					/>
 					<Input
-						label="Event Name"
-						placeholder="Enter Event Name"
-						className="h-9"
-						labelClassName="text-muted-foreground font-normal"
-						value={queryData?.eventName}
+						label='Event Name'
+						suffix={<Search className='size-4' />}
+						placeholder='Enter Event Name'
+						className='h-9'
+						labelClassName='text-muted-foreground font-normal'
+						value={queryData?.eventName ?? ''}
 						onChange={(e) => setQueryData((prev) => ({ ...prev, eventName: e === '' ? undefined : e }))}
 					/>
 					<Button
-						variant="outline"
+						variant='outline'
 						onClick={() => {
 							setQueryData({});
 							setIterLastKey(undefined);
 							setEvents([]);
 							setHasMore(true);
 							fetchEvents(undefined);
-						}}
-					>
+						}}>
 						<RefreshCw />
 					</Button>
 				</div>
 			</div>
 
-			<div className="bg-white p-4 rounded-md shadow-md">
+			<div className='bg-white p-4 rounded-md '>
 				<EventsTable data={events} />
 				<div ref={lastElementRef} />
 				{loading && (
-					<div className="space-y-4 mt-4">
-						<Skeleton className="h-8 w-full" />
-						<Skeleton className="h-8 w-full" />
-						<Skeleton className="h-8 w-full" />
+					<div className='space-y-4 mt-4'>
+						<Skeleton className='h-8 w-full' />
+						<Skeleton className='h-8 w-full' />
+						<Skeleton className='h-8 w-full' />
 					</div>
 				)}
-				{!hasMore && events.length === 0 && (
-					<p className="text-center text-gray-500 mt-4">No events found</p>
-				)}
+				{!hasMore && events.length === 0 && <p className=' text-[#64748B] text-xs font-normal font-sans mt-4'>No events found</p>}
 			</div>
 		</div>
 	);

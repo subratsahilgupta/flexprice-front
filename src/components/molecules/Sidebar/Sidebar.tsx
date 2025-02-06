@@ -10,9 +10,11 @@ import {
 import React from 'react';
 import SidebarNav, { NavItem } from './SidebarMenu';
 import { cn } from '@/lib/utils';
-import { LogOut } from 'lucide-react';
+import { LogOut, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import supabase from '@/core/supbase/config';
+import useUser from '@/hooks/useUser';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }) => {
 	const { open } = useSidebar();
@@ -22,6 +24,9 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 		localStorage.clear();
 		navigate('/login');
 	};
+
+	const { loading, user } = useUser();
+
 	const navMain: { [key: string]: NavItem[] } = {
 		'Usage Tracking': [
 			{
@@ -33,7 +38,7 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				title: 'Query',
 				url: '/usage-tracking/query',
 				icon: '/assets/svg/query.svg',
-				disabled: true,
+				disabled: false,
 			},
 			{
 				title: 'Events',
@@ -62,10 +67,11 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				url: '/customer-management/customers',
 				icon: '/assets/svg/customers.svg',
 			},
+
 			{
-				title: 'Pricing Plan',
-				url: '/customer-management/pricing-plan',
-				icon: '/assets/svg/pricing_plan.svg',
+				title: 'Invoices',
+				url: '/customer-management/invoices',
+				icon: '/assets/svg/receipt.svg',
 			},
 			{
 				title: 'Quotation',
@@ -80,21 +86,39 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				disabled: true,
 			},
 		],
+		'Product Cataglog': [
+			{
+				title: 'Pricing Plan',
+				url: '/product-catalog/pricing-plan',
+				icon: '/assets/svg/pricing_plan.svg',
+			},
+			{
+				title: 'Features',
+				url: '/product-catalog/features',
+				icon: <Star />,
+				disabled: true,
+			},
+		],
 	};
 
 	return (
 		<Sidebar collapsible='icon' {...props} className='font-open-sans border-none shadow-md max-w-[256px] bg-[#F8FAFC]'>
 			<SidebarHeader>
 				<div className='w-full mt-2 flex items-center justify-between'>
-					<div className={`h-6 flex w-full rounded-md items-center gap-2 bg-contain ${!open ? 'hidden' : ''}`}>
-						<img
-							src={'https://api.dicebear.com/7.x/adventurer-neutral/svg?seed=mail@ashallendesign.co.uk'}
-							className='size-8 bg-contain rounded-md'
-							alt='company logo'
-						/>
-						<p className='font-semibold text-[14px]'>Simplismart</p>
-					</div>
-
+					{loading ? (
+						<Skeleton className={`h-6 w-full`}></Skeleton>
+					) : (
+						<div className={`h-6 flex w-full rounded-md items-center gap-2 bg-contain ${!open ? 'hidden' : ''}`}>
+							<span className='size-7 bg-black text-white flex justify-center items-center bg-contain rounded-md'>
+								{user?.tenant.name
+									?.split(' ')
+									.map((n) => n[0])
+									.join('')
+									.slice(0, 2)}
+							</span>
+							<p className='font-semibold text-[14px]'>{user?.tenant.name}</p>
+						</div>
+					)}
 					<SidebarTrigger />
 				</div>
 			</SidebarHeader>

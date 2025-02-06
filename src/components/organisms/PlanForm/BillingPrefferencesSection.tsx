@@ -28,7 +28,6 @@ const BillingPrefferencesSection = () => {
 					},
 				]}
 				onChange={(value) => {
-					console.log('value', value);
 					setPlanField('invoice_cadence', value);
 				}}
 				error={errors.invoice_cadence}

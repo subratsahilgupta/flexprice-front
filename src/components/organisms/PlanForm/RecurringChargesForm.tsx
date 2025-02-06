@@ -110,7 +110,7 @@ const RecurringChargesForm = () => {
 
 				<Spacer height={'8px'} />
 				<Select
-					selectedValue={currency}
+					value={currency}
 					options={currencyOptions}
 					label='Select Currency'
 					onChange={setcurrency}
@@ -119,7 +119,7 @@ const RecurringChargesForm = () => {
 				/>
 				<Spacer height={'8px'} />
 				<Select
-					selectedValue={billingPeriod}
+					value={billingPeriod}
 					options={billlingPeriodOptions}
 					onChange={(value) => {
 						setbillingPeriod(value);

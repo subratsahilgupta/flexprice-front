@@ -8,10 +8,9 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { IoSearch } from 'react-icons/io5';
-import { LiaSlidersHSolid } from 'react-icons/lia';
 import { useParams } from 'react-router-dom';
-import CreateWallet from '../CreateWallet';
-import { CircleFadingPlus, EllipsisVertical, Pencil, Trash2, Wallet as WalletIcon } from 'lucide-react';
+import CreateWallet from '../customers/CreateWallet';
+import { CircleFadingPlus, EllipsisVertical, Pencil, SlidersHorizontal, Trash2, Wallet as WalletIcon } from 'lucide-react';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import useQueryParams from '@/hooks/useQueryParams';
 
@@ -98,16 +97,12 @@ const WalletTab = () => {
 			return;
 		}
 
-		console.log('active wallet id', activeWalletId, wallets);
-
 		if (activeWalletId === '' || !activeWalletId) {
 			setQueryParam('activeWalletId', wallets[0].id);
 			return;
 		}
 
 		const wallet = wallets.find((wallet) => wallet.id === activeWalletId) || wallets[0];
-
-		console.log('active wallet', wallet.id);
 
 		setActiveWallet(wallet);
 	}, [wallets, activeWalletId]);
@@ -133,7 +128,7 @@ const WalletTab = () => {
 	if (wallets?.length === 0) {
 		return (
 			<div className='card w-full flex justify-between items-center '>
-				<FormHeader className='' title='Wallet' subtitle='No wallet linked to the customer yet.' variant='form-title' />
+				<FormHeader className='' title='Wallet' subtitle='No wallet linked to the customer yet.' variant='sub-header' />
 				<Button onClick={() => setisAdd(true)} className='w-32 flex gap-2 bg-[#0F172A] '>
 					<WalletIcon />
 					<span>Add Wallet</span>
@@ -162,7 +157,7 @@ const WalletTab = () => {
 					{(walletOptions?.length ?? 0) > 1 && (
 						<Select
 							options={walletOptions || []}
-							selectedValue={activeWallet?.id}
+							value={activeWallet?.id}
 							onChange={(value) => {
 								const selectedWallet = wallets?.find((wallet) => wallet.id === value) || null;
 								setActiveWallet(selectedWallet);
@@ -243,19 +238,14 @@ const WalletTab = () => {
 						<div className='card'>
 							<div className='w-full flex justify-between items-center'>
 								<div>
-									<FormHeader
-										title='Transactions'
-										titleClassName='!font-semibold'
-										variant='form-title'
-										subtitle='Assign a name to your event schema '
-									/>
+									<FormHeader title='Transactions' titleClassName='!font-semibold' variant='form-title' />
 								</div>
 								<div className='flex items-center space-x-2	'>
 									<button className='px-2 py-1'>
 										<IoSearch className='size-4 text-[#09090B] ' />
 									</button>
 									<button className='px-2 py-1'>
-										<LiaSlidersHSolid className='size-4 text-[#09090B] ' />
+										<SlidersHorizontal className='size-4 text-[#09090B] ' />
 									</button>
 								</div>
 							</div>

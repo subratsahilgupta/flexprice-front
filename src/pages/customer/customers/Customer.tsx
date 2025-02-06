@@ -1,12 +1,15 @@
-import { SectionHeader, Spacer, Spinner } from '@/components/atoms';
+import { Button, SectionHeader, Spacer, Spinner } from '@/components/atoms';
 import { CreateCustomerDrawer, Pagination } from '@/components/molecules';
 import CustomerTable from '@/components/molecules/Customer/CustomerTable';
 import usePagination from '@/hooks/usePagination';
+import Customer from '@/models/Customer';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
+import { SlidersHorizontal } from 'lucide-react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { FiFolderPlus } from 'react-icons/fi';
 import { IoSearch } from 'react-icons/io5';
-import { LiaSlidersHSolid } from 'react-icons/lia';
 
 const CustomerPage = () => {
 	const { limit, offset, page } = usePagination();
@@ -15,12 +18,15 @@ const CustomerPage = () => {
 		return await CustomerApi.getAllCustomers({ limit, offset });
 	};
 
+	const [activeCustomer, setactiveCustomer] = useState<Customer>();
+	const [customerDrawerOpen, setcustomerDrawerOpen] = useState(false);
+
 	const {
 		data: customerData,
 		isLoading,
 		isError,
 	} = useQuery({
-		queryKey: ['fetchCustomer', page],
+		queryKey: ['fetchCustomers', page],
 		queryFn: fetchCustomers,
 		retry: 2,
 		staleTime: 0,
@@ -43,20 +49,42 @@ const CustomerPage = () => {
 	}
 
 	return (
-		<div className='flex flex-col h-screen'>
+		<div className='page'>
 			<SectionHeader title='Customers'>
 				<div className='flex gap-2 w-full'>
 					<button className='px-2 py-1'>
 						<IoSearch className='size-5 text-[#09090B]' />
 					</button>
 					<button className='px-2 py-1'>
-						<LiaSlidersHSolid className='size-5 text-[#09090B]' />
+						<SlidersHorizontal className='size-5 text-[#09090B]' />
 					</button>
-					<CreateCustomerDrawer />
+					<CreateCustomerDrawer
+						trigger={
+							<Button
+								onClick={() => {
+									setactiveCustomer(undefined);
+									console.log('clicked');
+								}}
+								className='flex gap-2 bg-[#0F172A]'>
+								<FiFolderPlus />
+								<span>Add Customer</span>
+							</Button>
+						}
+						open={customerDrawerOpen}
+						onOpenChange={setcustomerDrawerOpen}
+						data={activeCustomer}
+					/>
 				</div>
 			</SectionHeader>
 			<div>
-				<CustomerTable data={customerData?.items || []} />
+				<CustomerTable
+					onEdit={(data) => {
+						console.log('data', data);
+						setactiveCustomer(data);
+						setcustomerDrawerOpen(true);
+					}}
+					data={customerData?.items || []}
+				/>
 				<Spacer className='!h-4' />
 				<Pagination totalPages={Math.ceil((customerData?.pagination.total ?? 1) / limit)} />
 			</div>

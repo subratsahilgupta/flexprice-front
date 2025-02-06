@@ -1,9 +1,31 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import { Invoice } from '@/models/Invoice';
+import { generateQueryParams } from '../common/api_helper';
 
 interface GetInvoicesResponse {
 	items: Invoice[];
 	pagination: PaginationType;
+}
+
+interface GetAllInvoicesPayload {
+	customer_id?: string;
+	end_time?: string;
+	invoice_status?: string;
+	invoice_type?: string;
+	limit?: number;
+	offset?: number;
+	order?: string;
+	payment_status?: string;
+	start_time?: string;
+	sort?: string;
+	status?: string;
+	subscription_id?: string;
+}
+
+interface UpdateInvoiceStatusPayload {
+	invoiceId: string;
+	payment_status?: string;
+	amount?: number;
 }
 
 class InvoiceApi {
@@ -22,5 +44,23 @@ class InvoiceApi {
 			payment_status: status,
 		});
 	}
+
+	public static async getAllInvoices(query: GetAllInvoicesPayload = {}): Promise<GetInvoicesResponse> {
+		const url = generateQueryParams(this.baseurl, query);
+		return await AxiosClient.get<GetInvoicesResponse>(url);
+	}
+
+	public static async updateInvoiceStatus(payload: UpdateInvoiceStatusPayload): Promise<Invoice> {
+		return await AxiosClient.put<Invoice>(`${this.baseurl}/${payload.invoiceId}/status`, payload);
+	}
+
+	public static async voidInvoice(invoiceId: string) {
+		return await AxiosClient.post(`${this.baseurl}/${invoiceId}/void`);
+	}
+
+	public static async finalizeInvoice(invoiceId: string) {
+		return await AxiosClient.post(`${this.baseurl}/${invoiceId}/finalize`);
+	}
 }
+
 export default InvoiceApi;

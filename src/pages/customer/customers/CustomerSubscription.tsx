@@ -1,4 +1,4 @@
-import { Select, DatePicker, Button, Option, FormHeader } from '@/components/atoms';
+import { Select, DatePicker, Button, SelectOption, FormHeader } from '@/components/atoms';
 import CustomerCard from '@/components/molecules/Customer/CustomerCard';
 import Preview from '@/components/organisms/Subscription/Preview';
 import ChargeTable from '@/components/organisms/Subscription/PriceTable';
@@ -25,7 +25,7 @@ type SubscriptionState = {
 	prices: NormalizedPlan | null;
 	billingPeriod: string;
 	currency: string;
-	billingPeriodOptions: Option[];
+	billingPeriodOptions: SelectOption[];
 	startDate: Date | undefined;
 	endDate: Date | undefined;
 };
@@ -211,7 +211,7 @@ const CustomerSubscription: React.FC = () => {
 					{/* Select Plan */}
 					{!plansLoading && (
 						<Select
-							selectedValue={subscriptionState.selectedPlan}
+							value={subscriptionState.selectedPlan}
 							options={
 								plans?.map((plan) => ({
 									label: plan.name,
@@ -231,7 +231,7 @@ const CustomerSubscription: React.FC = () => {
 					{subscriptionState.selectedPlan && subscriptionState.billingPeriodOptions.length > 0 && (
 						<Select
 							key={subscriptionState.billingPeriodOptions.map((opt) => opt.value).join(',')} // Force re-render on options change
-							selectedValue={subscriptionState.billingPeriod}
+							value={subscriptionState.billingPeriod}
 							options={subscriptionState.billingPeriodOptions}
 							onChange={(value) => handleBillingPeriodChange(value)}
 							label='Billing Period*'
@@ -246,7 +246,7 @@ const CustomerSubscription: React.FC = () => {
 						subscriptionState.prices.charges[subscriptionState.billingPeriod] && (
 							<Select
 								key={Object.keys(subscriptionState.prices.charges[subscriptionState.billingPeriod]).join(',')} // Force re-render on options change
-								selectedValue={subscriptionState.currency}
+								value={subscriptionState.currency}
 								options={Object.keys(subscriptionState.prices.charges[subscriptionState.billingPeriod]).map((currency) => ({
 									label: currency.toUpperCase(),
 									value: currency,

@@ -12,7 +12,6 @@ export interface Props {
 }
 
 const ChargeTable: FC<Props> = ({ data }) => {
-	console.log('Charge Data', data);
 	const mappedData = (data ?? []).map((charge) => ({
 		charge: charge.meter_name ? `${charge.meter_name}` : charge.name,
 		quantity: charge.type === 'FIXED' ? '1' : 'pay as you go',

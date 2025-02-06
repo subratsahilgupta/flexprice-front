@@ -1,6 +1,5 @@
 import { Button, SectionHeader, Spacer } from '@/components/atoms';
 import { IoSearch } from 'react-icons/io5';
-import { LiaSlidersHSolid } from 'react-icons/lia';
 import { FiFolderPlus } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -11,6 +10,7 @@ import { Pagination, PlansTable } from '@/components/molecules';
 import { Plan } from '@/models/Plan';
 import { ReactSVG } from 'react-svg';
 import usePagination from '@/hooks/usePagination';
+import { SlidersHorizontal } from 'lucide-react';
 
 const PricingPlan = () => {
 	const { limit, offset, page } = usePagination();
@@ -57,7 +57,7 @@ const PricingPlan = () => {
 					<p className='font-sans text-2xl font-bold'>Add your first Plan </p>
 					<p className='text-[#71717A] font-normal '>Add your first Pricing Plan</p>
 					<Spacer height={'16px'} />
-					<Link to='/customer-management/pricing-plan/create-plan'>
+					<Link to='/product-catalog/pricing-plan/create-plan'>
 						<Button className='w-32 flex gap-2 bg-[#0F172A] '>
 							<FiFolderPlus />
 							<span>Create Plan</span>
@@ -69,16 +69,16 @@ const PricingPlan = () => {
 	}
 
 	return (
-		<div className='flex flex-col h-screen'>
+		<div className='page'>
 			<SectionHeader title='Pricing Plan'>
 				<div className='flex gap-2 w-full'>
 					<button className='px-2 py-1'>
-						<IoSearch className='size-5 text-[#09090B] ' />
+						<IoSearch className='size-4 text-[#09090B] ' />
 					</button>
 					<button className='px-2 py-1'>
-						<LiaSlidersHSolid className='size-5 text-[#09090B] ' />
+						<SlidersHorizontal className='size-4 text-[#09090B] ' />
 					</button>
-					<Link to='/customer-management/pricing-plan/create-plan'>
+					<Link to='/product-catalog/pricing-plan/create-plan'>
 						<Button className=' flex gap-2 bg-[#0F172A] '>
 							<FiFolderPlus />
 							<span>Add Pricing Plan</span>

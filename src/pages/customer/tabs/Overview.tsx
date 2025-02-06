@@ -1,12 +1,10 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button } from '@/components/atoms';
+import { Button, FormHeader } from '@/components/atoms';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
 import SubscriptionTable from '@/components/organisms/Subscription/SubscriptionTable';
 import { Subscription } from '@/models/Subscription';
 import CustomerOverviewCard from '@/components/molecules/Customer/CustomerOverviewCard';
-import { useState } from 'react';
-import SubscriptionDetails from '../SubscriptionDetails';
 import { FiFolderPlus } from 'react-icons/fi';
 
 const SkeletonLoader = () => (
@@ -33,10 +31,8 @@ const Overview = () => {
 	const { id: customerId } = useParams();
 
 	const handleAddSubscription = () => {
-		navigate(`/customer-management/customers/${customerId}/subscription`);
+		navigate(`/customer-management/customers/${customerId}/add-subscription`);
 	};
-
-	const [activeSubscription, setactiveSubscription] = useState<string | undefined>();
 
 	const {
 		data: subscriptions,
@@ -47,21 +43,16 @@ const Overview = () => {
 		queryFn: () => fetchAllSubscriptions(customerId!),
 		retry: 1,
 		staleTime: 0,
-		// staleTime: 1000 * 60 * 5, // 5 minutes
-		refetchOnWindowFocus: true, // Automatically refetch when the window regains focus
+		refetchOnWindowFocus: true,
 		refetchOnMount: 'always', // Refetch when the component is remounted
 	});
-
-	if (activeSubscription) {
-		return <SubscriptionDetails subscription_id={activeSubscription} />;
-	}
 
 	return (
 		<div className='space-y-4 w-2/3'>
 			<CustomerOverviewCard customerId={customerId!} />
-			<div className='space p-6 rounded-xl border border-gray-300'>
+			<div className='card border-gray-300'>
 				<div className='flex mb-4 justify-between items-center'>
-					<h2 className='text-base font-semibold text-gray-800'>Subscriptions</h2>
+					<FormHeader title='Subscriptions' variant='sub-header' />
 					<Button
 						onClick={handleAddSubscription}
 						className='bg-primary text-white px-4 inline-flex items-center py-2 rounded-md hover:bg-primary-dark'>
@@ -79,9 +70,7 @@ const Overview = () => {
 				) : (
 					<SubscriptionTable
 						onRowClick={(row) => {
-							console.log('clicked on row', row);
-							setactiveSubscription(row.id);
-							console.log(activeSubscription);
+							navigate(`/customer-management/customers/${customerId}/subscription/${row.id}`);
 						}}
 						data={subscriptions as Subscription[]}
 						customerId={customerId!}

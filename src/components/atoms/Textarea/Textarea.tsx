@@ -36,7 +36,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, InputProps>(
 						value={value}
 						disabled={disabled}
 						placeholder={placeholder}
-						className={cn('peer flex-1 bg-transparent outline-none ring-0 focus:outline-none w-full ', 'min-h-20')}
+						className={cn('peer placeholder:m-0 flex-1 bg-transparent outline-none ring-0 focus:outline-none w-full ', 'min-h-20')}
 						onChange={(e) => {
 							if (onChange) {
 								onChange(e.target.value);

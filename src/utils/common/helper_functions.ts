@@ -24,7 +24,7 @@ export const formatBillingPeriod = (billingPeriod: string) => {
 		case 'ANNUAL':
 			return 'year';
 		default:
-			return '';
+			return '--';
 	}
 };
 
@@ -35,7 +35,7 @@ export const formatPriceType = (type: string): string => {
 		case 'USAGE':
 			return 'Usage Based';
 		default:
-			return '';
+			return '--';
 	}
 };
 

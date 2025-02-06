@@ -48,19 +48,17 @@ const Preview = ({ data, className }: PreviewProps) => {
 								))}
 								{recurringCharges.length > 5 && (
 									<div className='flex justify-center mt-4'>
-										<button
-											className='flex items-center gap-1 text-blue-600 font-semibold hover:underline rounded-full px-3 py-1 bg-blue-100'
-											onClick={() => setShowAllRecurringRows((prev) => !prev)}>
+										<span className='flex items-center ' onClick={() => setShowAllRecurringRows((prev) => !prev)}>
 											{showAllRecurringRows ? (
 												<>
-													Collapse <ChevronUpIcon className='w-4 h-4' />
+													<ChevronUpIcon className='w-4 h-4' />
 												</>
 											) : (
 												<>
-													Expand <ChevronDownIcon className='w-4 h-4' />
+													<ChevronDownIcon className='w-4 h-4' />
 												</>
 											)}
-										</button>
+										</span>
 									</div>
 								)}
 							</div>
@@ -80,19 +78,19 @@ const Preview = ({ data, className }: PreviewProps) => {
 								))}
 								{usageCharges.length > 5 && (
 									<div className='flex justify-center mt-4'>
-										<button
-											className='flex items-center gap-1 text-xs text-black font-medium hover:text-white hover:bg-black rounded-full px-2 py-1 border border-black bg-white transition-all'
+										<span
+											className='flex items-center gap-1 text-xs duration-300 transition-all'
 											onClick={() => setShowAllUsageRows((prev) => !prev)}>
 											{showAllUsageRows ? (
 												<>
-													Collapse <ChevronUpIcon className='w-4 h-4' />
+													<ChevronUpIcon className='w-4 h-4' />
 												</>
 											) : (
 												<>
-													Expand <ChevronDownIcon className='w-4 h-4' />
+													<ChevronDownIcon className='w-4 h-4' />
 												</>
 											)}
-										</button>
+										</span>
 									</div>
 								)}
 							</div>

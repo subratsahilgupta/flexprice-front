@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { z } from 'zod';
-import { Button, Input, RadioGroup, Select } from '@/components/atoms';
+import { Button, Input, RadioGroup, Select, Spacer } from '@/components/atoms';
 import { EventFilter, EventFilterData } from '@/components/molecules';
 import { LuCircleFadingPlus, LuRefreshCw } from 'react-icons/lu';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { queryClient } from '@/App';
 import { Meter } from '@/models/Meter';
+import { v4 as uuidv4 } from 'uuid';
+import { Copy } from 'lucide-react';
+import toast from 'react-hot-toast';
 
-interface MeterFormProps {
+interface Props {
 	data?: Meter;
 	onSubmit: (data: Meter, mode: 'add' | 'edit') => void;
 }
@@ -29,7 +32,7 @@ const MeterFormSchema = z.object({
 	resetPeriod: z.string().optional(),
 });
 
-const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
+const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 	const labelStyle = 'text-muted-foreground text-sm';
 
 	const isEditMode = Boolean(data);
@@ -45,10 +48,26 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 
 	const [errors, setErrors] = useState<Record<string, string>>({});
 
-	useEffect(() => {
-		console.log('evnt filters in meter form', eventFilters);
-		console.log('data in meter form length', eventFilters.length);
-	}, [eventFilters]);
+	useEffect(() => { }, [eventFilters]);
+	const getRandomDate = () => {
+		const start = new Date(2020, 0, 1);
+		const end = new Date();
+		return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime())).toISOString();
+	};
+
+	const curlCommand = `curl --request POST \\
+		--url https://api.cloud.flexprice.io/v1/events \\
+		--header 'Content-Type: application/json' \\
+		--header 'x-api-key: <your_api_key>' \\
+		--data '{
+		  "event_id": "${'event_' + uuidv4().replace(/-/g, '').slice(0, 10)}",
+		  "event_name": "${data?.event_name ?? (eventName || '__MUST_BE_DEFINED__')}",
+		  "external_customer_id": "__CUSTOMER_ID__",
+		  "properties": {${eventFilters.map((filter) => `\n\t\t\t "${filter.key}" : "${filter.values[0] || 'FILTER_VALUE'}"`).join(',')}${aggregationValue ? `,\n\t\t\t "${aggregationValue}":"__${aggregationValue.split(' ').join('_').toUpperCase()}__"` : ''}
+		  },
+		  "source": "api",
+		"timestamp": "${getRandomDate()}"
+		}'`;
 
 	const radioMenuItemList = [
 		{
@@ -65,16 +84,6 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 		},
 	];
 
-	// const resetForm = () => {
-	// 	setDisplayName('');
-	// 	setEventName('');
-	// 	setEventFilters([]);
-	// 	setAggregationFunction('SUM');
-	// 	setAggregationValue('');
-	// 	setResetPeriod('');
-	// };
-
-	// Handle form submission
 	const handleSubmit = () => {
 		// Form data object
 		const formData = {
@@ -105,8 +114,7 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 					})),
 				reset_usage: resetPeriod,
 			};
-
-			onSubmit(formData as Meter, isEditMode ? 'edit' : 'add');
+			onSubmit(formData as unknown as Meter, isEditMode ? 'edit' : 'add');
 
 			queryClient.invalidateQueries({
 				queryKey: ['fetchMeters'],
@@ -122,17 +130,14 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 					fieldErrors[err.path[0] as string] = err.message;
 				}
 			});
-			console.log('Errors:', fieldErrors);
 
 			setErrors(fieldErrors);
 		}
 	};
 
 	return (
-		<div className='h-screen w-full'>
+		<div className='h-screen w-full '>
 			{/* heading */}
-
-			{/* add meter heading */}
 			{!isEditMode && (
 				<div className='p-6'>
 					<p className='font-bold text-zinc text-[20px]'>Add Meter</p>
@@ -140,120 +145,148 @@ const MeterForm: React.FC<MeterFormProps> = ({ data, onSubmit }) => {
 				</div>
 			)}
 
-			<div className='px-6 py-4 max-w-3xl flex flex-col gap-7'>
-				{/* edit meter heading */}
-				{isEditMode && <p className='font-bold text-zinc-950 text-[20px]'>{data?.name}</p>}
+			{isEditMode && <p className='font-bold text-zinc-950 text-[20px] p-6'>{data?.name}</p>}
 
-				{/* Event Schema */}
-				<div className='p-6 rounded-xl border border-[#E4E4E7]'>
-					<div className='mb-4'>
-						<p className='font-inter font-semibold text-base'>Event Schema</p>
-						<p className={labelStyle}>Assign a name to your event schema to easily identify and track events processed.</p>
+			<div className='w-full flex gap-0 relative   !mb-24'>
+				{/* meter form */}
+
+				{/* add meter heading */}
+
+				<div className='px-6 pb-6 flex-[8] flex flex-col gap-7  '>
+					{/* Event Schema */}
+					<div className='p-6 rounded-xl border border-[#E4E4E7]'>
+						<div className='mb-4'>
+							<p className='font-inter font-semibold text-base'>Event Schema</p>
+							<p className={labelStyle}>Assign a name to your event schema to easily identify and track events processed.</p>
+						</div>
+
+						<div className='flex flex-col gap-4'>
+							<Input
+								value={eventName}
+								onChange={setEventName}
+								disabled={isEditMode}
+								placeholder='tokens_total'
+								label='Event Name'
+								description='A unique identifier for the meter. This is used to refer to the meter in the Flexprice APIs.'
+								error={errors.eventName}
+							/>
+							<Input
+								value={displayName}
+								disabled={isEditMode}
+								onChange={setDisplayName}
+								label='Display Name'
+								placeholder='Total Token'
+								description='This name will be used in the invoices.'
+								error={errors.displayName}
+							/>
+						</div>
 					</div>
 
-					<div className='flex flex-col gap-4'>
-						<Input
-							value={eventName}
-							onChange={setEventName}
-							disabled={isEditMode}
-							placeholder='tokens_total'
-							label='Event Name'
-							description='A unique identifier for the meter. This is used to refer to the meter in the Flexprice APIs.'
-							error={errors.eventName}
-						/>
-						<Input
-							value={displayName}
-							disabled={isEditMode}
-							onChange={setDisplayName}
-							label='Display Name'
-							placeholder='Total Token'
-							description='This name will be used in the invoices.'
-							error={errors.displayName}
-						/>
-					</div>
-				</div>
+					{/* Event Filters */}
+					<div className='p-6 rounded-xl border border-[#E4E4E7]'>
+						<div className='mb-4'>
+							<p className='font-inter font-semibold text-base'>Event Filters</p>
+							<p className={labelStyle}>
+								Name of the property key in the data object. The groups should only include low cardinality fields.
+							</p>
+						</div>
 
-				{/* Event Filters */}
-				<div className='p-6 rounded-xl border border-[#E4E4E7]'>
-					<div className='mb-4'>
-						<p className='font-inter font-semibold text-base'>Event Filters</p>
-						<p className={labelStyle}>
-							Name of the property key in the data object. The groups should only include low cardinality fields.
-						</p>
+						<div className=''>
+							<EventFilter
+								isArchived={isArchived}
+								isEditMode={isEditMode}
+								eventFilters={eventFilters}
+								setEventFilters={setEventFilters}
+								error={errors.eventFilters}
+								permanentFilters={data?.filters as EventFilterData[] | undefined}
+							/>
+						</div>
 					</div>
 
-					<div className=''>
-						<EventFilter
-							isArchived={isArchived}
-							isEditMode={isEditMode}
-							eventFilters={eventFilters}
-							setEventFilters={setEventFilters}
-							error={errors.eventFilters}
-							permanentFilters={data?.filters as EventFilterData[] | undefined}
-						/>
+					{/* Aggregation */}
+					<div className='p-6 rounded-xl space-y-2 border border-[#E4E4E7]'>
+						<div className='mb-4'>
+							<p className='font-inter font-semibold text-base'>Define Aggregation</p>
+							<p className={labelStyle}>Assign a name to your event schema to easily identify and track events processed.</p>
+						</div>
+
+						<div className='flex flex-col gap-4'>
+							<Select
+								disabled={isEditMode}
+								options={[
+									{ label: 'SUM', value: 'SUM' },
+									{ label: 'COUNT', value: 'COUNT' },
+								]}
+								value={aggregationFunction}
+								onChange={setAggregationFunction}
+								description='The aggregation function to apply to the event values.'
+								label='Aggregation'
+								placeholder='SUM'
+								error={errors.aggregationFunction}
+							/>
+
+							<Input
+								value={aggregationValue}
+								disabled={isEditMode}
+								onChange={(e) => setAggregationValue(e)}
+								label='Aggregation Value'
+								placeholder='tokens'
+								description='Name of the property in the data object holding the value to aggregate over.'
+								error={errors.aggregationValue}
+							/>
+						</div>
+
+						<div className='!mt-6'>
+							<RadioGroup
+								disabled={isEditMode}
+								items={radioMenuItemList}
+								selected={radioMenuItemList.find((item) => item.value === resetPeriod)}
+								title='Aggregation Type'
+								onChange={(value) => setResetPeriod(value.value!)}
+							/>
+						</div>
 					</div>
-				</div>
 
-				{/* Aggregation */}
-				<div className='p-6 rounded-xl space-y-2 border border-[#E4E4E7]'>
-					<div className='mb-4'>
-						<p className='font-inter font-semibold text-base'>Define Aggregation</p>
-						<p className={labelStyle}>Assign a name to your event schema to easily identify and track events processed.</p>
-					</div>
-
-					<div className='flex flex-col gap-4'>
-						<Select
-							disabled={isEditMode}
-							options={[
-								{ label: 'SUM', value: 'SUM' },
-								{ label: 'COUNT', value: 'COUNT' },
-							]}
-							selectedValue={aggregationFunction}
-							onChange={setAggregationFunction}
-							description='The aggregation function to apply to the event values.'
-							label='Aggregation'
-							placeholder='SUM'
-							error={errors.aggregationFunction}
-						/>
-
-						<Input
-							value={aggregationValue}
-							disabled={isEditMode}
-							onChange={(e) => setAggregationValue(e)}
-							label='Aggregation Value'
-							placeholder='tokens'
-							description='Name of the property in the data object holding the value to aggregate over.'
-							error={errors.aggregationValue}
-						/>
-					</div>
-
-					<div className='!mt-6'>
-						<RadioGroup
-							disabled={isEditMode}
-							items={radioMenuItemList}
-							selected={radioMenuItemList.find((item) => item.value === resetPeriod)}
-							title='Aggregation Type'
-							onChange={(value) => setResetPeriod(value.value!)}
-						/>
-					</div>
-				</div>
-
-				{/* Submit Button */}
-				<div className={cn('flex justify-start', isEditMode && 'hidden')}>
-					<Button onClick={handleSubmit} className='bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark'>
-						{'Save Meter'}
-					</Button>
-				</div>
-				{isEditMode && (
-					<div className={cn('flex justify-start')}>
-						<Button
-							disabled={eventFilters.length <= 0}
-							onClick={handleSubmit}
-							className='bg-zinc-900 text-white px-4 py-2 rounded-md hover:bg-primary-dark'>
-							{'Save Changes'}
+					{/* Submit Button */}
+					<div className={cn('flex justify-start', isEditMode && 'hidden')}>
+						<Button onClick={handleSubmit} className='bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark'>
+							{'Save Meter'}
 						</Button>
 					</div>
-				)}
+					{isEditMode && (
+						<div className={cn('flex justify-start')}>
+							<Button
+								disabled={eventFilters.length <= 0}
+								onClick={handleSubmit}
+								className='bg-zinc-900 text-white px-4 py-2 rounded-md hover:bg-primary-dark'>
+								{'Save Changes'}
+							</Button>
+						</div>
+					)}
+				</div>
+
+				{/* preview */}
+				<div className={cn('flex-[3] max-w-lg  relative')}>
+					<div className={cn('sticky border-zinc-300 border top-24 float-right bg-[#0000000D] p-6 rounded-lg')}>
+						<div className='flex   justify-between items-center w-full'>
+							<p className=' font-semibold text-lg'>Test This Snippet</p>
+							<Button
+								onClick={() => {
+									navigator.clipboard.writeText(curlCommand);
+									toast.success('Copied to clipboard');
+								}}
+								className='text-muted-foreground cursor-pointer absolute top-4 right-4 size-8'
+								variant={'ghost'}>
+								<Copy className='' />
+							</Button>
+						</div>
+						<Spacer className='!h-6' />
+						<pre className='text-xs font-fira-code '>
+							{/* <CodePreview className='' code={curlCommand} language='javascript' /> */}
+							{curlCommand}
+						</pre>
+					</div>
+				</div>
 			</div>
 		</div>
 	);

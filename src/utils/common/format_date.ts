@@ -29,13 +29,11 @@ export const formatDateTime = (dateString: string): string => {
 		day: '2-digit',
 		hour: '2-digit',
 		minute: '2-digit',
-		second: '2-digit',
+		// second: '2-digit',
 		hour12: true,
-		timeZone: 'UTC',
-		timeZoneName: 'short',
 	};
 
-	return date.toLocaleString('en-US', options).replace('UTC', 'UTC');
+	return date.toLocaleString('en-US', options);
 };
 
 export const formatDateWithMilliseconds = (dateString: string): string => {

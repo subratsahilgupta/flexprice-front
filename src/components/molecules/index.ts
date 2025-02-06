@@ -29,3 +29,10 @@ export { CreateCustomerDrawer, CustomerCard, CustomerTable, CustomerInvoiceTable
 export { default as InvoiceLineItemTable } from './InvoiceLineItemTable';
 export { default as EventsTable } from './Events';
 export { default as InfiniteScroll } from './InfiniteScroll';
+export { default as InvoiceTable } from './InvoiceTable';
+
+export { default as InvoiceCreditLineItemTable } from './InvoiceCreditLineItemTable';
+
+export { default as BreadCrumbs } from './BreadCrumbs';
+
+export { default as FeatureTable } from './FeatureTable';
