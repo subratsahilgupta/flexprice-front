@@ -57,7 +57,7 @@ const PricingPlan = () => {
 					<p className='font-sans text-2xl font-bold'>Add your first Plan </p>
 					<p className='text-[#71717A] font-normal '>Add your first Pricing Plan</p>
 					<Spacer height={'16px'} />
-					<Link to='/customer-management/pricing-plan/create-plan'>
+					<Link to='/product-catalog/pricing-plan/create-plan'>
 						<Button className='w-32 flex gap-2 bg-[#0F172A] '>
 							<FiFolderPlus />
 							<span>Create Plan</span>
@@ -78,7 +78,7 @@ const PricingPlan = () => {
 					<button className='px-2 py-1'>
 						<SlidersHorizontal className='size-4 text-[#09090B] ' />
 					</button>
-					<Link to='/customer-management/pricing-plan/create-plan'>
+					<Link to='/product-catalog/pricing-plan/create-plan'>
 						<Button className=' flex gap-2 bg-[#0F172A] '>
 							<FiFolderPlus />
 							<span>Add Pricing Plan</span>

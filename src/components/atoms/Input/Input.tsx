@@ -58,7 +58,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 						value={value}
 						disabled={disabled}
 						placeholder={placeholder}
-						className={cn('peer flex-1 bg-transparent outline-none ring-0 focus:outline-none w-full', disabled && 'text-zinc-500')}
+						className={cn(
+							'peer relative flex-1 bg-transparent outline-none ring-0 focus:outline-none w-full placeholder:text-start placeholder:items-start flex flex-col',
+							disabled && 'text-zinc-500',
+						)}
 						onChange={(e) => {
 							if (onChange) {
 								onChange(e.target.value);

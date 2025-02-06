@@ -1,6 +1,6 @@
 'use client';
 
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 import { SidebarGroup, SidebarGroupLabel, SidebarMenu } from '@/components/ui/sidebar';
 import SidebarItem from './SidebarItem';
 import { useLocation } from 'react-router-dom';
@@ -8,7 +8,7 @@ import { useLocation } from 'react-router-dom';
 export type NavItem = {
 	title: string;
 	url: string;
-	icon?: string;
+	icon?: string | ReactNode;
 	isActive?: boolean;
 	disabled?: boolean;
 	items?: {

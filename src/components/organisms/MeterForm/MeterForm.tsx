@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { z } from 'zod';
-import { Button, CodePreview, FormHeader, Input, RadioGroup, Select } from '@/components/atoms';
+import { Button, Input, RadioGroup, Select, Spacer } from '@/components/atoms';
 import { EventFilter, EventFilterData } from '@/components/molecules';
 import { LuCircleFadingPlus, LuRefreshCw } from 'react-icons/lu';
 import { cn } from '@/lib/utils';
@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import { queryClient } from '@/App';
 import { Meter } from '@/models/Meter';
 import { v4 as uuidv4 } from 'uuid';
+import { Copy } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface Props {
 	data?: Meter;
@@ -60,7 +62,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 		--data '{
 		  "event_id": "${'event_' + uuidv4().replace(/-/g, '').slice(0, 10)}",
 		  "event_name": "${data?.event_name ?? (eventName || '__MUST_BE_DEFINED__')}",
-		  "external_customer_id": "__EXTERNAL_CUSTOMER_ID__",
+		  "external_customer_id": "__CUSTOMER_ID__",
 		  "properties": {${eventFilters.map((filter) => `\n\t\t\t "${filter.key}" : "${filter.values[0] || 'FILTER_VALUE'}"`).join(',')}${aggregationValue ? `,\n\t\t\t "${aggregationValue}":"__${aggregationValue.split(' ').join('_').toUpperCase()}__"` : ''}
 		  },
 		  "source": "api",
@@ -81,17 +83,6 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 			icon: LuRefreshCw,
 		},
 	];
-
-	// const resetForm = () => {
-	// 	setDisplayName('');
-	// 	setEventName('');
-	// 	setEventFilters([]);
-	// 	setAggregationFunction('SUM');
-	// 	setAggregationValue('');
-	// 	setResetPeriod('');
-	// };
-
-	// Handle form submission
 
 	const handleSubmit = () => {
 		// Form data object
@@ -145,10 +136,8 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 	};
 
 	return (
-		<div className='h-screen w-full'>
+		<div className='h-screen w-full '>
 			{/* heading */}
-
-			{/* add meter heading */}
 			{!isEditMode && (
 				<div className='p-6'>
 					<p className='font-bold text-zinc text-[20px]'>Add Meter</p>
@@ -158,9 +147,12 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 
 			{isEditMode && <p className='font-bold text-zinc-950 text-[20px] p-6'>{data?.name}</p>}
 
-			<div className='w-full flex gap-0 relative h-screen'>
+			<div className='w-full flex gap-0 relative h-screen  '>
 				{/* meter form */}
-				<div className='px-6 pb-6 flex-[8] flex flex-col gap-7 overflow-y-auto '>
+
+				{/* add meter heading */}
+
+				<div className='px-6 pb-6 flex-[8] flex flex-col gap-7  '>
 					{/* Event Schema */}
 					<div className='p-6 rounded-xl border border-[#E4E4E7]'>
 						<div className='mb-4'>
@@ -274,10 +266,25 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 				</div>
 
 				{/* preview */}
-				<div className='flex-[3] sticky top-0 left-0 right-0 px-6 py-4 max-w-lg'>
-					<FormHeader variant='sub-header' className='mb-0' title='Event Example' />
-					<div className=''>
-						<CodePreview className='' code={curlCommand} language='javascript' />
+				<div className={cn('flex-[3] max-w-lg h-screen relative')}>
+					<div className={cn('sticky border-zinc-300 border top-24 bg-[#0000000D] p-6 rounded-lg')}>
+						<div className='flex   justify-between items-center w-full'>
+							<p className=' font-semibold text-lg'>Test This Snippet</p>
+							<Button
+								onClick={() => {
+									navigator.clipboard.writeText(curlCommand);
+									toast.success('Copied to clipboard');
+								}}
+								className='text-muted-foreground cursor-pointer absolute top-4 right-4 size-8'
+								variant={'ghost'}>
+								<Copy className='' />
+							</Button>
+						</div>
+						<Spacer className='!h-6' />
+						<pre className='text-xs font-fira-code '>
+							{/* <CodePreview className='' code={curlCommand} language='javascript' /> */}
+							{curlCommand}
+						</pre>
 					</div>
 				</div>
 			</div>
