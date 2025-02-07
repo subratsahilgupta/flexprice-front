@@ -52,7 +52,7 @@ const DateRangePicker = ({ startDate, endDate, onChange, placeholder = 'Select R
 						<Button
 							variant='outline'
 							className={cn(
-								' justify-start text-left font-normal',
+								' justify-start text-left font-normal !h-10',
 								!selectedRange?.from || !selectedRange?.to ? 'text-muted-foreground opacity-70 hover:text-muted-foreground' : 'text-black',
 								selectedRange?.from && selectedRange?.to ? 'w-[260px]' : 'w-[240px]',
 								'transition-all duration-300 ease-in-out',

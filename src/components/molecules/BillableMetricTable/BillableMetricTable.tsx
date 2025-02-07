@@ -27,8 +27,14 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 		aggregation_type: meter.aggregation.type,
 		aggregation_field: meter.aggregation.field,
 	}));
-	const columns: ColumnData[] = [
-		{ fieldName: 'event_name', title: 'Event Name', width: '300px' },
+	const columns: ColumnData<
+		Meter & {
+			aggregation_type: string;
+			aggregation_field: string;
+		}
+	>[] = [
+		{ fieldName: 'name', title: 'Meter Name', width: '300px' },
+		// { fieldName: 'event_name', title: 'Event Name', width: '300px' },
 		{
 			fieldName: 'aggregation_type',
 			title: 'Aggregate Type',
@@ -55,7 +61,7 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 			},
 		},
 		{
-			fieldName: 'actions',
+			fieldName: 'aggregation',
 			title: '',
 			redirect: false,
 			render: (row) => (
