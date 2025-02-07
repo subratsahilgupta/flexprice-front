@@ -93,7 +93,11 @@ export const getPriceTableCharge = (charge: ChargesForBillingPeriodOne) => {
 		return `${charge.display_amount}`;
 	} else {
 		if (charge.billing_model === 'PACKAGE') {
-			return `${charge.display_amount} / ${charge.transform_quantity.divide_by} units`;
+			console.log(`${charge.display_amount} / ${charge.transform_quantity.divide_by} units`);
+			console.log(charge);
+
+
+			return `${charge.display_amount} / ${charge.transform_quantity} units`;
 		} else if (charge.billing_model === 'FLAT_FEE') {
 			return `${charge.display_amount} / unit`;
 		} else if (charge.billing_model === 'TIERED') {

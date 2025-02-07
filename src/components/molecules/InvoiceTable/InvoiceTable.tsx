@@ -17,7 +17,7 @@ const getStatusChip = (status: string) => {
 		case 'VOIDED':
 			return <Chip isActive={false} label='Void' />;
 		case 'FINALIZED':
-			return <Chip isActive={true} label='Paid' />;
+			return <Chip isActive={true} label='Finalized' />;
 		case 'DRAFT':
 			return <Chip activeBgColor='#F0F2F5' activeTextColor='#57646E' isActive={false} label='Draft' />;
 		default:
