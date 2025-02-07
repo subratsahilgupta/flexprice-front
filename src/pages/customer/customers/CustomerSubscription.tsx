@@ -196,8 +196,8 @@ const CustomerSubscription: React.FC = () => {
 	};
 
 	return (
-		<div className={cn('flex gap-8 mt-5')}>
-			<div className='flex-[6] space-y-6 overflow-y-auto pr-4' style={{ maxHeight: 'calc(100vh - 120px)' }}>
+		<div className={cn('flex gap-8 mt-5 relative mb-12')}>
+			<div className='flex-[6] space-y-6 mb-12 overflow-y-auto pr-4'>
 				<CustomerCard customerId={customerId!} subscriptionData={susbcriptionData} />
 
 				{susbcriptionData && susbcriptionData?.charges?.length > 0 && (
@@ -306,13 +306,16 @@ const CustomerSubscription: React.FC = () => {
 			</div>
 
 			{/* Preview */}
-			<div className='flex-[4]'>
-				{subscriptionState.selectedPlan && !susbcriptionData && (
-					<Preview
-						startDate={subscriptionState.startDate}
-						data={subscriptionState.prices?.charges[subscriptionState.billingPeriod][subscriptionState.currency] ?? []}
-					/>
-				)}
+			<div className='flex-[4] '>
+				<div className='sticky top-24'>
+					{subscriptionState.selectedPlan && !susbcriptionData && (
+						<Preview
+							startDate={subscriptionState.startDate}
+							data={subscriptionState.prices?.charges[subscriptionState.billingPeriod][subscriptionState.currency] ?? []}
+						/>
+					)}
+				</div>
+
 			</div>
 		</div>
 	);

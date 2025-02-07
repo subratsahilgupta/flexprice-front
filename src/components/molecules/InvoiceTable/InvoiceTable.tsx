@@ -170,7 +170,8 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 					});
 				}}
 			/>
-			<FlexpriceTable redirectUrl='/customer-management/invoices/' columns={columns} data={data} />
+			<FlexpriceTable showEmptyRow={true} redirectUrl='/customer-management/invoices/' columns={columns} data={data} />
+			{data.length === 0 && <p className=' text-[#64748B] text-xs font-normal font-sans mt-4'>No Invoices yet</p>}
 		</div>
 	);
 };

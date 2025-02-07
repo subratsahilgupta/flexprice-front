@@ -45,26 +45,6 @@ const InvoicesPage = () => {
 		toast.error('Error fetching meters');
 	}
 
-	if (invoiceData?.items.length === 0) {
-		return (
-			<div className='h-screen w-full flex justify-center items-center'>
-				<div className='w-full flex flex-col items-center '>
-					<ReactSVG src={'/assets/svg/empty box.svg'} />
-					<p className='text-[#71717A] font-normal '>
-						{'A billable base metric is used to measure usage, and act as a foundation of pricing (e.g., API calls for an API product).'}
-					</p>
-					{/* <Spacer height={'16px'} /> */}
-					{/* <Link to='/usage-tracking/billable-metric/add-meter'>
-						<Button className='w-32 flex gap-2 bg-[#0F172A] '>
-							<FiFolderPlus />
-							<span>Add Meter</span>
-						</Button>
-					</Link> */}
-				</div>
-			</div>
-		);
-	}
-
 	return (
 		<div className='page'>
 			<SectionHeader title='Invoices'>
