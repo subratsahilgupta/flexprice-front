@@ -117,7 +117,7 @@ const EventsPage: React.FC = () => {
 						value={queryData?.externalCustomerId ?? ''}
 						onChange={(e) => setQueryData((prev) => ({ ...prev, externalCustomerId: e === '' ? undefined : e }))}
 					/>
-					<Input
+					{/* <Input
 						label=' Meter name'
 						suffix={<Search className='size-4' />}
 						placeholder='Enter Meter name'
@@ -125,7 +125,7 @@ const EventsPage: React.FC = () => {
 						labelClassName='text-muted-foreground font-normal'
 						value={queryData?.eventId ?? ''}
 						onChange={(e) => setQueryData((prev) => ({ ...prev, eventId: e === '' ? undefined : e }))}
-					/>
+					/> */}
 					<Input
 						label='Event Name'
 						suffix={<Search className='size-4' />}

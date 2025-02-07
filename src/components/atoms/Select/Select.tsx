@@ -81,11 +81,9 @@ const FlexPriceSelect: React.FC<Props> = ({
 				value={value}
 				disabled={disabled}>
 				<SelectTrigger className={cn(disabled && 'cursor-not-allowed', className)}>
-					{
-						<span className={cn(value ? '' : 'text-muted-foreground')}>
-							{value ? options.find((option) => option.value === value)?.label : placeholder}
-						</span>
-					}
+					<span className={cn('truncate', value ? '' : 'text-muted-foreground')}>
+						{value ? options.find((option) => option.value === value)?.label.trim() : placeholder}
+					</span>
 				</SelectTrigger>
 				<SelectContent>
 					<SelectGroup>

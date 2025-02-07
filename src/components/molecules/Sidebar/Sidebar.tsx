@@ -96,7 +96,7 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				title: 'Features',
 				url: '/product-catalog/features',
 				icon: <Star />,
-				disabled: true,
+				// disabled: true,
 			},
 		],
 	};

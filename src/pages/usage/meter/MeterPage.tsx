@@ -11,7 +11,7 @@ import { ReactSVG } from 'react-svg';
 import usePagination from '@/hooks/usePagination';
 import { SlidersHorizontal } from 'lucide-react';
 
-const BillableMetricsPage = () => {
+const MeterPage = () => {
 	const { limit, offset, page } = usePagination();
 
 	const fetchMeters = async () => {
@@ -51,7 +51,7 @@ const BillableMetricsPage = () => {
 			<div className='h-screen w-full flex justify-center items-center'>
 				<div className='w-full flex flex-col items-center '>
 					<ReactSVG src={'/assets/svg/empty box.svg'} />
-					<p className='font-sans text-2xl font-bold'>Add your first billable metric</p>
+					<p className='font-sans text-2xl font-bold'>Add your first Meter</p>
 					<p className='text-[#71717A] font-normal '>
 						{'A billable base metric is used to measure usage, and act as a foundation of pricing (e.g., API calls for an API product).'}
 					</p>
@@ -69,7 +69,7 @@ const BillableMetricsPage = () => {
 
 	return (
 		<div className='page'>
-			<SectionHeader className='' title='Billable Metric'>
+			<SectionHeader className='' title='Meter'>
 				<div className='flex gap-2 w-full'>
 					<button className='px-2 py-1'>
 						<IoSearch className='size-4 font-extralight text-[#09090B] ' />
@@ -94,4 +94,4 @@ const BillableMetricsPage = () => {
 	);
 };
 
-export default BillableMetricsPage;
+export default MeterPage;

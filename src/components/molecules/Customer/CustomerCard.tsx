@@ -1,4 +1,4 @@
-import { FormHeader } from '@/components/atoms';
+import { FormHeader, Spacer } from '@/components/atoms';
 import { SubscriptionUsage } from '@/models/Subscription';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
 import formatDate from '@/utils/common/format_date';
@@ -22,6 +22,50 @@ const CustomerCard: React.FC<CustomerCardProps> = ({ customerId, subscriptionDat
 		staleTime: 0,
 	});
 
+	const details = [
+		{
+			label: 'Name',
+			value: customer?.name || '--',
+		},
+
+		{
+			label: 'Email',
+			value: customer?.email || '--',
+		},
+
+		{
+			label: 'Slug',
+			value: customer?.external_id || '--',
+		},
+	];
+
+	const billingDetails = [
+		{
+			label: 'Phone',
+			value: customer?.phone || '--',
+		},
+		{
+			label: 'Country',
+			value: customer?.address_country || '--',
+		},
+		{
+			label: 'State',
+			value: customer?.address_state || '--',
+		},
+		{
+			label: 'City',
+			value: customer?.address_city || '--',
+		},
+		{
+			label: 'Adress line 1',
+			value: customer?.address_line1 || '--',
+		},
+		{
+			label: 'Adress line 2',
+			value: customer?.address_line2 || '--',
+		},
+	];
+
 	// Loading Skeleton
 	if (isLoading) {
 		return (
@@ -44,32 +88,43 @@ const CustomerCard: React.FC<CustomerCardProps> = ({ customerId, subscriptionDat
 	// Customer Details
 	return (
 		<div className='items-center justify-center'>
-			<div className='py-6 px-4 rounded-xl border border-gray-300 bg-white'>
+			<div className='card bg-white'>
 				<FormHeader title='Customer Details' variant='sub-header' />
 				<div className='flex items-center space-x-4'>
-					{/* <div className='w-12 h-12'>
-						<img src={'https://picsum.photos/200/300'} alt='Customer Profile' className='w-full h-full rounded-full object-cover shadow' />
-					</div> */}
-					<div className='w-full'>
+					<div className='w-full space-y-4'>
+						{details.map((detail, index) => (
+							<div key={index} className='grid grid-cols-2 gap-4'>
+								<div className='text-sm font-light text-gray-600'>{detail.label}</div>
+								<div className='text-sm font-normal text-gray-800 text-right'>{detail.value || '--'}</div>
+							</div>
+						))}
 						<div className='grid grid-cols-2 gap-4'>
-							<div className='text-sm font-light text-gray-600'>Name</div>
-							<div className='text-sm font-normal text-gray-800'>{customer?.name || '--'}</div>
-
-							<div className='text-sm font-light text-gray-600'>Email</div>
-							<div className='text-sm font-normal text-gray-800'>{customer?.email || '--'}</div>
-							<div className='text-sm font-light text-gray-600'>Slug</div>
-							<div className='text-sm font-normal text-gray-800'>{customer?.external_id || '--'}</div>
-
 							{subscriptionData && (
 								<>
 									<div className='text-sm font-light text-gray-600'>Subscription Amount</div>
-									<div className='text-sm font-normal text-gray-800'>{subscriptionData.display_amount || '--'}</div>
+									<div className='text-sm font-normal text-gray-800 text-right'>{subscriptionData.display_amount || '--'}</div>
 
 									<div className='text-sm font-light text-gray-600'>Subscription Start Date</div>
-									<div className='text-sm font-normal text-gray-800'>{formatDate(subscriptionData.start_time.toString()) || '--'}</div>
+									<div className='text-sm font-normal text-gray-800 text-right'>
+										{formatDate(subscriptionData.start_time.toString()) || '--'}
+									</div>
 								</>
 							)}
 						</div>
+					</div>
+				</div>
+			</div>
+			<Spacer className='!h-4' />
+			<div className='card bg-white'>
+				<FormHeader title='Billing Details' variant='sub-header' />
+				<div className='flex items-center space-x-4'>
+					<div className='w-full space-y-4'>
+						{billingDetails.map((detail, index) => (
+							<div key={index} className='grid grid-cols-2 gap-4'>
+								<div className='text-sm font-light text-gray-600'>{detail.label}</div>
+								<div className='text-sm font-normal text-gray-800 text-right'>{detail.value || '--'}</div>
+							</div>
+						))}
 					</div>
 				</div>
 			</div>

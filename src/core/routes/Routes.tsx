@@ -3,7 +3,7 @@ import Auth from '@/pages/auth/Auth';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import CustomerPage from '@/pages/customer/customers/Customer';
 import AuthMiddleware from '../auth/AuthProvider';
-import BillableMetricsPage from '@/pages/usage/meter/BillableMetrics';
+import MeterPage from '@/pages/usage/meter/MeterPage';
 import AddMeterPage from '@/pages/usage/meter/AddMeter';
 import EditMeterPage from '@/pages/usage/meter/EditMeterPage';
 import PricingPlans from '@/pages/product-catalog/pricingPlans/PricingPlans';
@@ -75,7 +75,7 @@ export const MainRouter = createBrowserRouter([
 				children: [
 					{
 						path: RouteNames.billableMetric,
-						element: <BillableMetricsPage />,
+						element: <MeterPage />,
 					},
 					{
 						path: RouteNames.addMeter,

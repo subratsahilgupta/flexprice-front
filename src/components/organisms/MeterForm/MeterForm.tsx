@@ -141,7 +141,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 			{!isEditMode && (
 				<div className='p-6'>
 					<p className='font-bold text-zinc text-[20px]'>Add Meter</p>
-					<p className={labelStyle}>Make changes to your account here. Click save when you're done.</p>
+					<p className={labelStyle}> Define a usage-based metric to track and bill customers accurately.</p>
 				</div>
 			)}
 
@@ -157,19 +157,10 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 					<div className='p-6 rounded-xl border border-[#E4E4E7]'>
 						<div className='mb-4'>
 							<p className='font-inter font-semibold text-base'>Event Schema</p>
-							<p className={labelStyle}>Assign a name to your event schema to easily identify and track events processed.</p>
+							<p className={labelStyle}> Choose how the usage data should be aggregated for billing.</p>
 						</div>
 
 						<div className='flex flex-col gap-4'>
-							<Input
-								value={eventName}
-								onChange={setEventName}
-								disabled={isEditMode}
-								placeholder='tokens_total'
-								label='Event Name'
-								description='A unique identifier for the meter. This is used to refer to the meter in the Flexprice APIs.'
-								error={errors.eventName}
-							/>
 							<Input
 								value={displayName}
 								disabled={isEditMode}
@@ -179,6 +170,15 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 								description='This name will be used in the invoices.'
 								error={errors.displayName}
 							/>
+							<Input
+								value={eventName}
+								onChange={setEventName}
+								disabled={isEditMode}
+								placeholder='tokens_total'
+								label='Event Name'
+								description='A unique identifier for the meter. This is used to refer to the meter in the Flexprice APIs.'
+								error={errors.eventName}
+							/>
 						</div>
 					</div>
 
@@ -186,9 +186,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 					<div className='p-6 rounded-xl border border-[#E4E4E7]'>
 						<div className='mb-4'>
 							<p className='font-inter font-semibold text-base'>Event Filters</p>
-							<p className={labelStyle}>
-								Name of the property key in the data object. The groups should only include low cardinality fields.
-							</p>
+							<p className={labelStyle}>Filter events based on specific properties (e.g., region, user type).</p>
 						</div>
 
 						<div className=''>
@@ -269,7 +267,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 				<div className={cn('flex-[3] max-w-lg  relative')}>
 					<div className={cn('sticky border-zinc-300 border top-24 float-right bg-[#0000000D] p-6 rounded-lg')}>
 						<div className='flex   justify-between items-center w-full'>
-							<p className=' font-semibold text-lg'>Test This Snippet</p>
+							<p className=' font-semibold text-lg'> Event Example</p>
 							<Button
 								onClick={() => {
 									navigator.clipboard.writeText(curlCommand);
