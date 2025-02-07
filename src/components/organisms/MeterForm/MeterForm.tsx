@@ -48,7 +48,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 
 	const [errors, setErrors] = useState<Record<string, string>>({});
 
-	useEffect(() => { }, [eventFilters]);
+	useEffect(() => {}, [eventFilters]);
 	const getRandomDate = () => {
 		const start = new Date(2020, 0, 1);
 		const end = new Date();
