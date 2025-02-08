@@ -4,7 +4,6 @@ import { InvoiceTable, Pagination } from '@/components/molecules';
 import { useQuery } from '@tanstack/react-query';
 import { Spinner } from '@/components/atoms';
 import toast from 'react-hot-toast';
-import { ReactSVG } from 'react-svg';
 import usePagination from '@/hooks/usePagination';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
 import { SlidersHorizontal } from 'lucide-react';
