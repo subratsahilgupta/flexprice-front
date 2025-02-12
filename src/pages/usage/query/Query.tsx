@@ -63,6 +63,7 @@ const QueryPage = () => {
 		if (payload?.meter_id) {
 			fetchUsage();
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [payload]);
 
 	const formattedData = data?.results?.map((item) => ({
@@ -99,7 +100,7 @@ const QueryPage = () => {
 
 					{/* Customer ID Input */}
 					<Input
-						value={payload.external_customer_id}
+						value={payload.external_customer_id ?? ''}
 						suffix={<Search className='size-4' />}
 						className='!h-10'
 						label='External Customer ID'
@@ -135,6 +136,7 @@ const QueryPage = () => {
 								window_size: windowSizeOptions[2].value,
 								start_time: new Date(new Date().setDate(new Date().getDate() - 7)),
 								end_time: new Date(),
+								external_customer_id: undefined,
 							});
 						}}>
 						<RefreshCw />

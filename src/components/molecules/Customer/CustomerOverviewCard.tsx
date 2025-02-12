@@ -3,6 +3,7 @@ import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
 import CreateCustomerDrawer from './CreateCustomerDrawer';
 import { Pencil } from 'lucide-react';
+import { Country, State } from 'country-state-city';
 
 const fetchCustomer = async (customerId: string) => {
 	return await CustomerApi.getCustomerById(customerId);
@@ -28,11 +29,11 @@ const CustomerOverviewCard: React.FC<CustomerCardProps> = ({ customerId }) => {
 		},
 		{
 			label: 'Country',
-			value: customer?.address_country || '--',
+			value: customer?.address_country ? Country.getCountryByCode(customer.address_country)?.name : '--',
 		},
 		{
 			label: 'State',
-			value: customer?.address_state || '--',
+			value: customer?.address_state ? State.getStateByCode(customer.address_state)?.name : '--',
 		},
 		{
 			label: 'City',

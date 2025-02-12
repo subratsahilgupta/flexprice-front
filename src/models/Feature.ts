@@ -12,6 +12,8 @@ interface Feature {
 	updated_at: string;
 	created_by: string;
 	updated_by: string;
+	unit_plural: string;
+	unit_singular: string;
 }
 
 export default Feature;

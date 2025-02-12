@@ -1,5 +1,5 @@
 import { queryClient } from '@/App';
-import { Button, FormHeader, Input, MultiSelect, RadioGroup, RadioMenuItem, Select, Spacer, Textarea, Toggle } from '@/components/atoms';
+import { Button, FormHeader, Input, RadioGroup, RadioMenuItem, Spacer, Textarea, Toggle } from '@/components/atoms';
 import SelectMeter from '@/components/organisms/PlanForm/SelectMeter';
 import { RouteNames } from '@/core/routes/Routes';
 import { cn } from '@/lib/utils';
@@ -18,17 +18,17 @@ const AddFeaturePage = () => {
 	const [data, setdata] = useState<Partial<Feature>>({});
 	const [errors, setErrors] = useState<Partial<Record<keyof Feature, string>>>({});
 	const navigate = useNavigate();
-	const [eventFilters, seteventFilters] = useState<
-		{
-			key: string;
-			values: string[];
-		}[]
-	>([
-		{
-			key: '',
-			values: [],
-		},
-	]);
+	// const [eventFilters, seteventFilters] = useState<
+	// 	{
+	// 		key: string;
+	// 		values: string[];
+	// 	}[]
+	// >([
+	// 	{
+	// 		key: '',
+	// 		values: [],
+	// 	},
+	// ]);
 
 	const featureTypeOptions: RadioMenuItem[] = [
 		{
@@ -77,8 +77,6 @@ const AddFeaturePage = () => {
 		activeMeter: Meter | null;
 		filters: { key: string; values: string[] }[];
 		defineUnits: boolean;
-		singularUnit?: string;
-		pluralUnit?: string;
 	}>({
 		showDescription: false,
 		activeMeter: null,
@@ -210,7 +208,13 @@ const AddFeaturePage = () => {
 							<RadioGroup
 								items={featureTypeOptions}
 								onChange={(e) => {
-									setdata((prev) => ({ ...prev, type: e.value }));
+									setdata((prev) => ({
+										...prev,
+										type: e.value,
+										unit_plural: undefined,
+										unit_singular: undefined,
+									}));
+									setstate((prev) => ({ ...prev, defineUnits: false }));
 								}}
 							/>
 						</>
@@ -263,7 +267,7 @@ const AddFeaturePage = () => {
 									{state.activeMeter && (
 										<div className=''>
 											{/* event filters */}
-											<div>
+											{/* <div>
 												<div className='border border-zinc-200'></div>
 												<Spacer height={'16px'} />
 												<FormHeader variant='form-component-title' title='Event Filters' />
@@ -312,7 +316,7 @@ const AddFeaturePage = () => {
 													}}>
 													Add Filter
 												</Button>
-											</div>
+											</div> */}
 
 											{/* define units */}
 											<div>
@@ -333,16 +337,16 @@ const AddFeaturePage = () => {
 														<div className='gap-4 grid grid-cols-2'>
 															<Input
 																placeholder='singluar'
-																value={state.singularUnit}
+																value={data.unit_singular}
 																onChange={(e) => {
-																	setstate((prev) => ({ ...prev, singularUnit: e }));
+																	setdata((prev) => ({ ...prev, unit_singular: e }));
 																}}
 															/>
 															<Input
 																placeholder='plural'
-																value={state.pluralUnit}
+																value={data.unit_plural}
 																onChange={(e) => {
-																	setstate((prev) => ({ ...prev, pluralUnit: e }));
+																	setdata((prev) => ({ ...prev, unit_plural: e }));
 																}}
 															/>
 														</div>
@@ -390,16 +394,16 @@ const AddFeaturePage = () => {
 										<div className='gap-4 grid grid-cols-2'>
 											<Input
 												placeholder='singluar'
-												value={state.singularUnit}
+												value={data.unit_singular}
 												onChange={(e) => {
-													setstate((prev) => ({ ...prev, singularUnit: e }));
+													setdata((prev) => ({ ...prev, unit_singular: e }));
 												}}
 											/>
 											<Input
 												placeholder='plural'
-												value={state.pluralUnit}
+												value={data.unit_plural}
 												onChange={(e) => {
-													setstate((prev) => ({ ...prev, pluralUnit: e }));
+													setdata((prev) => ({ ...prev, unit_plural: e }));
 												}}
 											/>
 										</div>

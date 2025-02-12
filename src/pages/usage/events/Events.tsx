@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Button, DateRangePicker, Input, SectionHeader } from '@/components/atoms';
 import { EventsTable } from '@/components/molecules';
@@ -31,6 +32,7 @@ const EventsPage: React.FC = () => {
 	const observer = useRef<IntersectionObserver | null>(null);
 
 	const lastElementRef = useCallback(
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		(node: any) => {
 			if (loading) return;
 			if (observer.current) observer.current.disconnect();
