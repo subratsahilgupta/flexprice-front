@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { z } from 'zod';
-import { Button, Input, RadioGroup, Select, Spacer } from '@/components/atoms';
+import { Button, CodePreview, Input, RadioGroup, Select } from '@/components/atoms';
 import { EventFilter, EventFilterData } from '@/components/molecules';
 import { LuCircleFadingPlus, LuRefreshCw } from 'react-icons/lu';
 import { cn } from '@/lib/utils';
@@ -8,8 +8,6 @@ import { useNavigate } from 'react-router-dom';
 import { queryClient } from '@/App';
 import { Meter } from '@/models/Meter';
 import { v4 as uuidv4 } from 'uuid';
-import { Copy } from 'lucide-react';
-import toast from 'react-hot-toast';
 
 interface Props {
 	data?: Meter;
@@ -265,24 +263,8 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 
 				{/* preview */}
 				<div className={cn('flex-F[3] max-w-lg  relative')}>
-					<div className={cn('sticky border-zinc-300 border top-24 float-right bg-[#0000000D] p-6 rounded-lg')}>
-						<div className='flex   justify-between items-center w-full'>
-							<p className=' font-semibold text-lg'> Event Example</p>
-							<Button
-								onClick={() => {
-									navigator.clipboard.writeText(curlCommand);
-									toast.success('Copied to clipboard');
-								}}
-								className='text-muted-foreground cursor-pointer absolute top-4 right-4 size-8'
-								variant={'ghost'}>
-								<Copy className='' />
-							</Button>
-						</div>
-						<Spacer className='!h-6' />
-						<pre className='text-xs font-fira-code '>
-							{/* <CodePreview className='' code={curlCommand} language='javascript' /> */}
-							{curlCommand}
-						</pre>
+					<div className='sticky  top-24 float-right'>
+						<CodePreview title='Event Example' className='sticky top-24' code={curlCommand} language='js' />
 					</div>
 				</div>
 			</div>

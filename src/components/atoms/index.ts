@@ -42,8 +42,6 @@ export { default as DateTimePicker } from './DateTimePicker';
 
 export { default as DateRangePicker } from './DateRangePicker';
 
-export { default as JsonPreview } from './JsonPreview';
-
 export { default as CodePreview } from './CodePreview';
 
 export { default as Toggle } from './Toggle';

@@ -47,7 +47,6 @@ const CustomerOverviewCard: React.FC<CustomerCardProps> = ({ customerId }) => {
 			value: customer?.address_line2 || '--',
 		},
 	];
-
 	if (isLoading) {
 		return (
 			<div className='py-6 px-4 rounded-xl border border-gray-300'>
