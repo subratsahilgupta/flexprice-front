@@ -145,10 +145,14 @@ const EventsPage: React.FC = () => {
 					<Button
 						variant='outline'
 						onClick={() => {
-							setQueryData({});
+							setQueryData({
+								startTime: new Date(new Date().setDate(new Date().getDate() - 7)).toISOString(),
+								endTime: new Date().toISOString(),
+							});
 							setIterLastKey(undefined);
 							setEvents([]);
 							setHasMore(true);
+
 							fetchEvents(undefined);
 						}}>
 						<RefreshCw />

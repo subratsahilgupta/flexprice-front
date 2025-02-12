@@ -38,6 +38,15 @@ const DateRangePicker = ({ startDate, endDate, onChange, placeholder = 'Select R
 	};
 
 	useEffect(() => {
+		// if (startDate === undefined || endDate === undefined) {
+		// 	setSelectedRange(undefined);
+		// } else {
+		// 	setSelectedRange({ from: startDate, to: endDate });
+		// }
+		setSelectedRange({ from: startDate!, to: endDate! });
+	}, [startDate, endDate]);
+
+	useEffect(() => {
 		if (open) {
 			setSelectedRange(undefined);
 		}

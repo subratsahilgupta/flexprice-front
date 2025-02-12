@@ -89,11 +89,11 @@ const PlanViewPage = () => {
 				<FormHeader title={planData?.name} variant='form-title' />
 				{planData?.status === 'published' && (
 					<div className='flex gap-2'>
-						<Button variant={'outline'} className='flex gap-2'>
+						<Button disabled variant={'outline'} className='flex gap-2'>
 							<EyeOff />
 							Archive
 						</Button>
-						<Button className='flex gap-2'>
+						<Button disabled className='flex gap-2'>
 							<Pencil />
 							Edit
 						</Button>

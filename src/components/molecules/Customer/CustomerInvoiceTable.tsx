@@ -50,20 +50,16 @@ const CustomerInvoiceTable: FC<Props> = ({ data, onRowClick }) => {
 		{
 			fieldName: 'id',
 			title: '',
-			render: (row) => <ActionButton id={row.id} editPath={''} deleteMutationFn={async () => { }} refetchQueryKey={''} entityName={''} />,
+			render: (row) => <ActionButton id={row.id} editPath={''} deleteMutationFn={async () => {}} refetchQueryKey={''} entityName={''} />,
 		},
 	];
 
-	return <div>
-		<FlexpriceTable emptyRowText='No Invoices yet' showEmptyRow onRowClick={onRowClick} columns={columnData} data={data ?? []} />
-		{
-			data.length === 0 && (
-				<p className=' text-[#64748B] text-xs font-normal font-sans mt-4'>
-					No Invoices yet
-				</p>
-			)
-		}
-	</div>;
+	return (
+		<div>
+			<FlexpriceTable emptyRowText='No Invoices yet' showEmptyRow onRowClick={onRowClick} columns={columnData} data={data ?? []} />
+			{data.length === 0 && <p className=' text-[#64748B] text-xs font-normal font-sans mt-4'>No Invoices yet</p>}
+		</div>
+	);
 };
 
 export default CustomerInvoiceTable;

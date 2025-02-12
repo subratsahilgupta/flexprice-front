@@ -170,13 +170,8 @@ const FlexpriceTable: FC<FlexpriceTableProps> = ({ onRowClick, columns, data, re
 						))}
 				</TableBody>
 			</Table>
-			{
-				data.length === 0 && !showEmptyRow && (
-					<p className=' text-[#64748B] text-xs font-normal font-sans mt-4'>{emptyRowText}</p>
-				)
-			}
+			{data.length === 0 && !showEmptyRow && <p className=' text-[#64748B] text-xs font-normal font-sans mt-4'>{emptyRowText}</p>}
 		</div>
-
 	);
 };
 

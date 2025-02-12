@@ -38,19 +38,19 @@ const InvoicePaymentStatusModal: FC<Props> = ({ isOpen, onOpenChange, invoice })
 			label: 'Sucessful',
 			value: 'SUCCEEDED',
 			description: 'Marks the invoice as successfully paid.',
-			disabled: invoice?.payment_status === 'SUCCEEDED',
+			disabled: invoice?.payment_status === 'SUCCEEDED' || invoice?.invoice_status === 'VOIDED',
 		},
 		{
 			label: 'Failed',
 			value: 'FAILED',
 			description: 'Indicates that the payment attempt was unsuccessful.',
-			disabled: invoice?.payment_status === 'SUCCEEDED',
+			disabled: invoice?.payment_status === 'SUCCEEDED' || invoice?.invoice_status === 'VOIDED',
 		},
 		{
 			label: 'Pending',
 			value: 'PENDING',
 			description: 'Keeps the invoice in a pending state while awaiting payment.',
-			disabled: invoice?.payment_status === 'SUCCEEDED',
+			disabled: invoice?.payment_status === 'SUCCEEDED' || invoice?.invoice_status === 'VOIDED',
 		},
 	];
 

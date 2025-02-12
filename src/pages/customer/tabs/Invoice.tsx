@@ -29,7 +29,6 @@ const Invoice = () => {
 		return <Loader />;
 	}
 
-
 	if (activeInvoice) {
 		return <InvoiceDetails invoice_id={activeInvoice} />;
 	}
@@ -51,7 +50,7 @@ const Invoice = () => {
 			</div>
 			<Spacer className='!h-6' />
 
-			{!activeInvoice && <CustomerInvoiceTable  onRowClick={handleShowDetails} customerId={customerId} data={data?.items ?? []} />}
+			{!activeInvoice && <CustomerInvoiceTable onRowClick={handleShowDetails} customerId={customerId} data={data?.items ?? []} />}
 		</div>
 	);
 };
