@@ -157,7 +157,7 @@ const AddFeaturePage = () => {
 									'feature-' +
 									e
 										.toLowerCase()
-										.replace(/ /g, '_')
+										.replace(/ /g, '-')
 										.replace(/[^\w-]+/g, ''),
 							}));
 						}}
@@ -359,7 +359,7 @@ const AddFeaturePage = () => {
 						</>
 					)}
 					{data.type && data.type === featureTypeOptions[2].value && (
-						<div className={'border-zinc-200 border bg-white relative'}>
+						<div className={cn('w-full items-start  rounded-lg', 'border-zinc-200 border bg-white relative p-4 ')}>
 							<div className={cn('w-full items-start flex gap-4 p-2  cursor-pointer rounded-lg')}>
 								<Wrench className={'size-5 mt-1'} />
 
@@ -372,21 +372,42 @@ const AddFeaturePage = () => {
 									<p className='font-normal font-inter text-sm text-zinc-500 '>{featureTypeOptions[2].description}</p>
 								</div>
 							</div>
-							<div className='gap-4 p-6 px-9 grid grid-cols-2'>
-								<Input
-									placeholder='singluar'
-									value={state.singularUnit}
+							<div>
+								<Spacer height={'16px'} />
+								<div className=''></div>
+								<Spacer height={'16px'} />
+								<Toggle
+									label='Define Units'
+									checked={state.defineUnits}
 									onChange={(e) => {
-										setstate((prev) => ({ ...prev, singularUnit: e }));
+										setstate((prev) => ({ ...prev, defineUnits: e }));
 									}}
 								/>
-								<Input
-									placeholder='plural'
-									value={state.pluralUnit}
-									onChange={(e) => {
-										setstate((prev) => ({ ...prev, pluralUnit: e }));
-									}}
-								/>
+								{state.defineUnits && (
+									<>
+										<Spacer height={'16px'} />
+										<FormHeader variant='form-component-title' title='Unit Name' />
+										<div className='gap-4 grid grid-cols-2'>
+											<Input
+												placeholder='singluar'
+												value={state.singularUnit}
+												onChange={(e) => {
+													setstate((prev) => ({ ...prev, singularUnit: e }));
+												}}
+											/>
+											<Input
+												placeholder='plural'
+												value={state.pluralUnit}
+												onChange={(e) => {
+													setstate((prev) => ({ ...prev, pluralUnit: e }));
+												}}
+											/>
+										</div>
+										<p className='text-muted-foreground text-sm'>
+											If the unit name changes when the value is plural, please provide the names of the units
+										</p>
+									</>
+								)}
 							</div>
 						</div>
 					)}
