@@ -142,18 +142,18 @@ const InvoiceDetails: FC<Props> = ({ invoice_id }) => {
 				</div>
 
 				<div className='grid grid-cols-2  p-4 border-b border-gray-200'>
-					<div>
-						<FormHeader className='' title='Customer Information' variant='sub-header' titleClassName='font-semibold' />
-						<p className={customerInfoClass}>{data?.customer?.name || '--'}</p>
-						<p className={customerInfoClass}>{data?.customer?.email || '--'}</p>
-						<p className={customerInfoClass}>{data?.customer?.address_line1 || '--'}</p>
-					</div>
-
 					<div className='text-left'>
-						<FormHeader className='' title={user?.tenant.name} variant='sub-header' titleClassName='font-semibold' />
+						<FormHeader className='!mb-2' title={user?.tenant.name} variant='sub-header' titleClassName='font-semibold' />
 						<p className={customerInfoClass}>{user?.tenant.name}</p>
 						<p className={customerInfoClass}>{user?.email}</p>
 						<p className={customerInfoClass}>{'--'}</p>
+					</div>
+
+					<div>
+						<FormHeader className='!mb-2' title='Bill to' variant='sub-header' titleClassName='font-semibold' />
+						<p className={customerInfoClass}>{data?.customer?.name || '--'}</p>
+						<p className={customerInfoClass}>{data?.customer?.address_line1 || '--'}</p>
+						<p className={customerInfoClass}>{data?.customer?.address_line2 || '--'}</p>
 					</div>
 				</div>
 				<InvoiceLineItemTable title='Order Details' data={data?.line_items ?? []} amount_due={data?.amount_due} currency={data?.currency} />

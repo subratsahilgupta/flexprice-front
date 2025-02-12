@@ -1,4 +1,4 @@
-import { FormHeader, Spacer } from '@/components/atoms';
+import { FormHeader } from '@/components/atoms';
 import { SubscriptionUsage } from '@/models/Subscription';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
 import formatDate from '@/utils/common/format_date';
@@ -36,33 +36,6 @@ const CustomerCard: React.FC<CustomerCardProps> = ({ customerId, subscriptionDat
 		{
 			label: 'Slug',
 			value: customer?.external_id || '--',
-		},
-	];
-
-	const billingDetails = [
-		{
-			label: 'Phone',
-			value: customer?.phone || '--',
-		},
-		{
-			label: 'Country',
-			value: customer?.address_country || '--',
-		},
-		{
-			label: 'State',
-			value: customer?.address_state || '--',
-		},
-		{
-			label: 'City',
-			value: customer?.address_city || '--',
-		},
-		{
-			label: 'Adress line 1',
-			value: customer?.address_line1 || '--',
-		},
-		{
-			label: 'Adress line 2',
-			value: customer?.address_line2 || '--',
 		},
 	];
 
@@ -111,20 +84,6 @@ const CustomerCard: React.FC<CustomerCardProps> = ({ customerId, subscriptionDat
 								</>
 							)}
 						</div>
-					</div>
-				</div>
-			</div>
-			<Spacer className='!h-4' />
-			<div className='card bg-white'>
-				<FormHeader title='Billing Details' variant='sub-header' />
-				<div className='flex items-center space-x-4'>
-					<div className='w-full space-y-4'>
-						{billingDetails.map((detail, index) => (
-							<div key={index} className='grid grid-cols-2 gap-4'>
-								<div className='text-sm font-light text-gray-600'>{detail.label}</div>
-								<div className='text-sm font-normal text-gray-800 text-right'>{detail.value || '--'}</div>
-							</div>
-						))}
 					</div>
 				</div>
 			</div>

@@ -119,7 +119,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 			queryClient.invalidateQueries({
 				queryKey: ['fetchMeters'],
 			});
-			navigate('/usage-tracking/billable-metric');
+			navigate('/usage-tracking/meter');
 
 			setErrors({});
 		} else {
@@ -165,7 +165,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 								value={displayName}
 								disabled={isEditMode}
 								onChange={setDisplayName}
-								label='Display Name'
+								label='Meter Name'
 								placeholder='Total Token'
 								description='This name will be used in the invoices.'
 								error={errors.displayName}
@@ -264,7 +264,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 				</div>
 
 				{/* preview */}
-				<div className={cn('flex-[3] max-w-lg  relative')}>
+				<div className={cn('flex-F[3] max-w-lg  relative')}>
 					<div className={cn('sticky border-zinc-300 border top-24 float-right bg-[#0000000D] p-6 rounded-lg')}>
 						<div className='flex   justify-between items-center w-full'>
 							<p className=' font-semibold text-lg'> Event Example</p>

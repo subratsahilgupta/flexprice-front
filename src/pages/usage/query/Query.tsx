@@ -30,7 +30,6 @@ const QueryPage = () => {
 
 	const [payload, setPayload] = useState<{
 		meter_id?: string;
-		customer_id?: string;
 		end_time?: Date;
 		start_time?: Date;
 		external_customer_id?: string;
@@ -46,18 +45,10 @@ const QueryPage = () => {
 		mutate: fetchUsage,
 		isPending,
 	} = useMutation({
-		mutationKey: [
-			'fetchMeters1',
-			payload.customer_id,
-			payload.end_time,
-			payload.start_time,
-			payload.external_customer_id,
-			payload.window_size,
-		],
+		mutationKey: ['fetchMeters1', payload.end_time, payload.start_time, payload.external_customer_id, payload.window_size],
 		mutationFn: async () => {
 			return await EventsApi.getUsageByMeter({
 				meter_id: payload.meter_id!,
-				customer_id: payload.customer_id,
 				end_time: payload.end_time?.toISOString(),
 				start_time: payload.start_time?.toISOString(),
 				external_customer_id: payload.external_customer_id,
@@ -108,12 +99,12 @@ const QueryPage = () => {
 
 					{/* Customer ID Input */}
 					<Input
-						value={payload.customer_id}
+						value={payload.external_customer_id}
 						suffix={<Search className='size-4' />}
 						className='!h-10'
 						label='Customer ID'
 						placeholder='Search by Customer ID'
-						onChange={(e) => setPayload({ ...payload, customer_id: e })}
+						onChange={(e) => setPayload({ ...payload, external_customer_id: e })}
 					/>
 
 					{/* Window Size Selector */}

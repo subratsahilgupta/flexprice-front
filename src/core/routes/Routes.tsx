@@ -31,9 +31,9 @@ export const RouteNames = {
 
 	// usage tracking routes
 	usageTracking: '/usage-tracking',
-	billableMetric: '/usage-tracking/billable-metric',
-	addMeter: '/usage-tracking/billable-metric/add-meter',
-	editMeter: '/usage-tracking/billable-metric/edit-meter',
+	billableMetric: '/usage-tracking/meter',
+	addMeter: '/usage-tracking/meter/add-meter',
+	editMeter: '/usage-tracking/meter/edit-meter',
 	eventsPage: '/usage-tracking/events',
 	queryPage: '/usage-tracking/query',
 

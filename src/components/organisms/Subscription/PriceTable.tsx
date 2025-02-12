@@ -47,19 +47,17 @@ const ChargeTable: FC<Props> = ({ data }) => {
 			</div>
 			{mappedData.length > 5 && (
 				<div className='text-center mt-4'>
-					<button
-						className='flex items-center gap-1 text-xs text-black font-medium hover:text-white hover:bg-black rounded-full px-2 py-1 border border-black bg-white transition-all'
-						onClick={() => setShowAllRows((prev) => !prev)}>
+					<span className='flex items-center gap-1 text-xs duration-300 transition-all' onClick={() => setShowAllRows((prev) => !prev)}>
 						{showAllRows ? (
 							<>
-								Collapse <ChevronUpIcon className='w-4 h-4' />
+								<ChevronUpIcon className='w-4 h-4' />
 							</>
 						) : (
 							<>
-								Expand <ChevronDownIcon className='w-4 h-4' />
+								<ChevronDownIcon className='w-4 h-4' />
 							</>
 						)}
-					</button>
+					</span>
 				</div>
 			)}
 		</div>

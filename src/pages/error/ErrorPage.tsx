@@ -10,7 +10,7 @@ const ErrorPage = () => {
 				<p className='font-sans text-2xl font-bold'>404 Error Page</p>
 				<p className='text-[#71717A] font-normal '>Oops! Looks like you took a wrong turn</p>
 				<Spacer height={'16px'} />
-				<Link to='/usage-tracking/billable-metric/add-meter'>
+				<Link to='/usage-tracking/meter/add-meter'>
 					<Button className='w-32 flex gap-2 bg-[#0F172A] '>
 						<span>Back to Home</span>
 					</Button>

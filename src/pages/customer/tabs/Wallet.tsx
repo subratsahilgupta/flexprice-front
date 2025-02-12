@@ -150,7 +150,7 @@ const WalletTab = () => {
 				className='!my-6'
 				title='Wallets'
 				subtitle="Make changes to your account here. Click save when you're done."
-				variant='form-title'
+				variant='sub-header'
 			/>
 			<div className='w-full flex justify-between items-center mb-3'>
 				<div>

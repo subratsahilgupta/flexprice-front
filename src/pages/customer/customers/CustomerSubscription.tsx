@@ -315,7 +315,6 @@ const CustomerSubscription: React.FC = () => {
 						/>
 					)}
 				</div>
-
 			</div>
 		</div>
 	);

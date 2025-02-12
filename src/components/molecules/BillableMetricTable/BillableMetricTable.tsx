@@ -69,7 +69,7 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 					isEditDisabled={row.status === 'archived'}
 					isArchiveDisabled={row.status === 'archived'}
 					id={row.id}
-					editPath={`/usage-tracking/billable-metric/edit-meter?id=${row.id}`}
+					editPath={`/usage-tracking/meter/edit-meter?id=${row.id}`}
 					row={row}
 					deleteMutationFn={(id) => MeterApi.deleteMeter(id)}
 					refetchQueryKey={'fetchMeters'}
@@ -79,7 +79,7 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 		},
 	];
 
-	return <FlexpriceTable redirectUrl='/usage-tracking/billable-metric/edit-meter?id=' columns={columns} data={mappedData} />;
+	return <FlexpriceTable redirectUrl='/usage-tracking/meter/edit-meter?id=' columns={columns} data={mappedData} />;
 };
 
 export default BillableMetricTable;

@@ -22,7 +22,6 @@ interface GetEventsResponse {
 
 interface GetUsageByMeterPayload {
 	meter_id: string;
-	customer_id?: string;
 	end_time?: string;
 	start_time?: string;
 	external_customer_id?: string;

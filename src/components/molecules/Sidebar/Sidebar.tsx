@@ -30,8 +30,8 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 	const navMain: { [key: string]: NavItem[] } = {
 		'Usage Tracking': [
 			{
-				title: 'Billable Metrics',
-				url: '/usage-tracking/billable-metric',
+				title: 'Meter',
+				url: '/usage-tracking/meter',
 				icon: '/assets/svg/billable_metrics.svg',
 			},
 			{

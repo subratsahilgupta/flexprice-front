@@ -54,7 +54,7 @@ const InvoicesPage = () => {
 					<button className='px-2 py-1'>
 						<SlidersHorizontal className='size-4 text-[#09090B] ' />
 					</button>
-					{/* <Link to='/usage-tracking/billable-metric/add-meter'>
+					{/* <Link to='/usage-tracking/meter/add-meter'>
 						<Button className='w-32 flex gap-2 bg-[#0F172A] '>
 							<FiFolderPlus />
 							<span>Add Meter</span>

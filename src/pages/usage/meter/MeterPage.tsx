@@ -56,7 +56,7 @@ const MeterPage = () => {
 						{'A billable base metric is used to measure usage, and act as a foundation of pricing (e.g., API calls for an API product).'}
 					</p>
 					<Spacer height={'16px'} />
-					<Link to='/usage-tracking/billable-metric/add-meter'>
+					<Link to='/usage-tracking/meter/add-meter'>
 						<Button className='w-32 flex gap-2 bg-[#0F172A] '>
 							<FiFolderPlus />
 							<span>Add Meter</span>
@@ -77,7 +77,7 @@ const MeterPage = () => {
 					<button className='px-2 py-1'>
 						<SlidersHorizontal className='size-4 text-[#09090B] ' />
 					</button>
-					<Link to='/usage-tracking/billable-metric/add-meter'>
+					<Link to='/usage-tracking/meter/add-meter'>
 						<Button className='w-32 flex gap-2 bg-[#0F172A] '>
 							<FiFolderPlus />
 							<span>Add Meter</span>
