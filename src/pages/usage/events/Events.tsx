@@ -23,7 +23,10 @@ const EventsPage: React.FC = () => {
 		externalCustomerId?: string;
 		eventName?: string;
 		eventId?: string;
-	}>({});
+	}>({
+		startTime: new Date(new Date().setDate(new Date().getDate() - 7)).toISOString(),
+		endTime: new Date().toISOString(),
+	});
 	const [iterLastKey, setIterLastKey] = useState<string | undefined>(undefined);
 	const observer = useRef<IntersectionObserver | null>(null);
 
@@ -92,6 +95,8 @@ const EventsPage: React.FC = () => {
 			<div className='bg-white my-6 rounded-md  mb-6'>
 				<div className='w-full flex items-end gap-4'>
 					<DateRangePicker
+						startDate={queryData.startTime ? new Date(queryData.startTime) : undefined}
+						endDate={queryData.endTime ? new Date(queryData.endTime) : undefined}
 						title='Time Period'
 						placeholder='Select Range'
 						onChange={({ endDate, startDate }) => {
@@ -109,8 +114,8 @@ const EventsPage: React.FC = () => {
 					/>
 
 					<Input
-						label='Customer ID'
-						placeholder='Enter Customer ID'
+						label='External Customer ID'
+						placeholder='Enter External Customer ID'
 						className='h-9'
 						suffix={<Search className='size-4' />}
 						labelClassName='text-muted-foreground font-normal'

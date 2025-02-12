@@ -102,8 +102,8 @@ const QueryPage = () => {
 						value={payload.external_customer_id}
 						suffix={<Search className='size-4' />}
 						className='!h-10'
-						label='Customer ID'
-						placeholder='Search by Customer ID'
+						label='External Customer ID'
+						placeholder='Search by External Customer ID'
 						onChange={(e) => setPayload({ ...payload, external_customer_id: e })}
 					/>
 
