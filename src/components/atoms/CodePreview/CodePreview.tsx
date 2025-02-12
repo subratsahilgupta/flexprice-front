@@ -30,12 +30,12 @@ const CodePreview: FC<Props> = ({ code, language, className: styles, title }) =>
 						<Copy className='text-[#52525B]' />
 					</Button>
 				</div>
-				<div className='p-4 bg-[#F4F4F5]'>
+				<div className='p-3 bg-[#F4F4F5]'>
 					<CodeHighlighter
 						theme={{
-							...themes.oneLight,
+							...themes.nightOwlLight,
 							plain: {
-								...themes.oneLight.plain,
+								...themes.nightOwlLight.plain,
 								color: '#18181B',
 								backgroundColor: '#F4F4F5',
 							},
