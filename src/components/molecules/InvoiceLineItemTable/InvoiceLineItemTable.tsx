@@ -56,7 +56,7 @@ const InvoiceLineItemTable: FC<Props> = ({ data, amount_due, currency, title }) 
 						<tbody>
 							{data?.map((item, index) => {
 								return (
-									<tr key={index} className=''>
+									<tr key={index} className='border-b border-gray-200'>
 										<td className='py-3 px-2 text-gray-800'>{item.display_name ?? '--'}</td>
 										<td className='py-3 px-2 text-gray-800'>{formatPriceType(item.price_type)}</td>
 										<td className='py-3 px-2 text-center text-gray-800'>{`${formatToShortDate(item.period_start)} - ${formatToShortDate(item.period_end)}`}</td>
@@ -70,8 +70,8 @@ const InvoiceLineItemTable: FC<Props> = ({ data, amount_due, currency, title }) 
 					</table>
 				</div>
 
-				<div className='flex justify-end px-2 py-4 border-t border-gray-200'>
-					<div className='text-sm text-gray-800 space-y-4 w-1/3'>
+				<div className='flex justify-end '>
+					<div className='text-sm text-gray-800 space-y-4 w-1/3  px-2'>
 						<div className='flex justify-between  '>
 							<span>Subtotal</span>
 							<span>{`${getCurrencySymbol(currency ?? '')}${amount_due}`}</span>
