@@ -29,13 +29,6 @@ const Invoice = () => {
 		return <Loader />;
 	}
 
-	if (data?.items.length === 0) {
-		return (
-			<div className='rounded-xl border border-gray-300 p-6 w-2/3'>
-				<p className='text-gray-500 text-sm'>No invoices found</p>
-			</div>
-		);
-	}
 
 	if (activeInvoice) {
 		return <InvoiceDetails invoice_id={activeInvoice} />;
@@ -58,7 +51,7 @@ const Invoice = () => {
 			</div>
 			<Spacer className='!h-6' />
 
-			{!activeInvoice && <CustomerInvoiceTable onRowClick={handleShowDetails} customerId={customerId} data={data?.items ?? []} />}
+			{!activeInvoice && <CustomerInvoiceTable  onRowClick={handleShowDetails} customerId={customerId} data={data?.items ?? []} />}
 		</div>
 	);
 };
