@@ -35,10 +35,8 @@ const Invoice = () => {
 
 	return (
 		<div className='rounded-xl border border-gray-300 p-6 w-2/3'>
-			<div className='w-full flex justify-between items-center'>
-				<div>
-					<FormHeader title='Invoices' variant='sub-header' />
-				</div>
+			<div className='w-full flex justify-between items-start'>
+				<FormHeader title='Invoices' variant='sub-header' />
 				<div className='flex items-center space-x-2	'>
 					<button className='px-2 py-1'>
 						<IoSearch className='size-4 text-[#09090B] ' />
