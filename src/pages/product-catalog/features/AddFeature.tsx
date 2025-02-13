@@ -44,7 +44,7 @@ const AddFeaturePage = () => {
 			value: 'metered',
 		},
 		{
-			label: 'Configuration',
+			label: 'Static',
 			description: 'Functionality with varying usage however need not be measured based on customer usage.',
 			icon: Wrench,
 			value: 'static',
@@ -253,16 +253,17 @@ const AddFeaturePage = () => {
 								</div>
 								<Spacer height={'16px'} />
 								<div className='ml-8'>
-									<SelectMeter
-										value={data.meter_id}
-										onChange={(meter) => {
-											setdata((prev) => ({ ...prev, meter_id: meter.id }));
-											setstate((prev) => ({ ...prev, activeMeter: meter }));
-										}}
-										description='The feature will be measured according to the billable metric you choose'
-									/>
-
-									<Spacer height={'16px'} />
+									<div>
+										<SelectMeter
+											className='!w-1/3'
+											value={data.meter_id}
+											onChange={(meter) => {
+												setdata((prev) => ({ ...prev, meter_id: meter.id }));
+												setstate((prev) => ({ ...prev, activeMeter: meter }));
+											}}
+											description='The feature will be measured according to the billable metric you choose'
+										/>
+									</div>
 
 									{state.activeMeter && (
 										<div className=''>
@@ -321,7 +322,7 @@ const AddFeaturePage = () => {
 											{/* define units */}
 											<div>
 												<Spacer height={'16px'} />
-												<div className='border border-zinc-200'></div>
+												<div className='h-[1px] bg-zinc-200 '></div>
 												<Spacer height={'16px'} />
 												<Toggle
 													label='Define Units'
@@ -389,6 +390,8 @@ const AddFeaturePage = () => {
 								/>
 								{state.defineUnits && (
 									<>
+										<Spacer height={'16px'} />
+										<div className='h-[1px] bg-zinc-200 '></div>
 										<Spacer height={'16px'} />
 										<FormHeader variant='form-component-title' title='Unit Name' />
 										<div className='gap-4 grid grid-cols-2'>

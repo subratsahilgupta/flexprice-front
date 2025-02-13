@@ -24,7 +24,10 @@ class FeatureApi {
 	private static baseUrl = '/features';
 
 	public static async getAllFeatures(payload: GetFeaturesPayload): Promise<GetFeaturesResponse> {
-		const url = generateQueryParams(this.baseUrl, payload);
+		const url = generateQueryParams(this.baseUrl, {
+			...payload,
+			expand: 'meters',
+		});
 		return await AxiosClient.get<GetFeaturesResponse>(url);
 	}
 

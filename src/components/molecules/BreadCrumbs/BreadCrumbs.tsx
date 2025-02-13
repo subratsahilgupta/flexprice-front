@@ -55,7 +55,7 @@ const BreadCrumbs = () => {
 				{/* Breadcrumbs */}
 				<nav className='flex items-center space-x-2 text-sm text-gray-500'>
 					{breadcrumbs.map((breadcrumb, index) => (
-						<span key={index} className='flex items-center'>
+						<span key={index} className='flex items-center space-x-2'>
 							{index === breadcrumbs.length - 1 || index === 0 ? (
 								<div
 									className={`hover:text-gray-800 capitalize select-none ${
@@ -71,7 +71,7 @@ const BreadCrumbs = () => {
 								</Link>
 							)}
 							{index < breadcrumbs.length - 1 && (
-								<span className='mx-2'>
+								<span className=''>
 									<BsChevronRight />
 								</span>
 							)}

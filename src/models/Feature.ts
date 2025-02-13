@@ -1,3 +1,5 @@
+import { Meter } from './Meter';
+
 interface Feature {
 	id: string;
 	name: string;
@@ -14,6 +16,7 @@ interface Feature {
 	updated_by: string;
 	unit_plural: string;
 	unit_singular: string;
+	meter: Meter;
 }
 
 export default Feature;
