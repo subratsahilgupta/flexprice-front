@@ -32,7 +32,7 @@ export const getFeatureIcon = (featureType: string) => {
 	}
 };
 
-const SelectMeter: FC<Props> = ({
+const SelectFeature: FC<Props> = ({
 	onChange,
 	value,
 	error,
@@ -96,4 +96,4 @@ const SelectMeter: FC<Props> = ({
 	);
 };
 
-export default SelectMeter;
+export default SelectFeature;

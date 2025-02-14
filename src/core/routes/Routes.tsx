@@ -24,6 +24,7 @@ import AddCreditPage from '@/pages/customer/invoices/AddCreditPage';
 import CreditNote from '@/pages/customer/tabs/CreditNote';
 import AddFeaturePage from '@/pages/product-catalog/features/AddFeature';
 import FeaturesPage from '@/pages/product-catalog/features/Features';
+import ImportExport from '@/pages/customer/import-export/ImportExport';
 
 export const RouteNames = {
 	home: '/',
@@ -42,6 +43,9 @@ export const RouteNames = {
 	customers: '/customer-management/customers',
 	invoices: '/customer-management/invoices',
 	invoiceDetail: '/customer-management/invoices/:invoiceId',
+
+	// import export routes
+	importExport: '/customer-management/import-export',
 
 	// product catalog routes
 	productCatalog: '/product-catalog',
@@ -101,6 +105,10 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: `${RouteNames.customers}`,
 						element: <CustomerPage />,
+					},
+					{
+						path: `${RouteNames.importExport}`,
+						element: <ImportExport />,
 					},
 
 					{

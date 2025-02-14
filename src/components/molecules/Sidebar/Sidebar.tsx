@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import supabase from '@/core/supbase/config';
 import useUser from '@/hooks/useUser';
 import { Skeleton } from '@/components/ui/skeleton';
+import { RouteNames } from '@/core/routes/Routes';
 
 const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }) => {
 	const { open } = useSidebar();
@@ -81,9 +82,9 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 			},
 			{
 				title: 'Import - Export',
-				url: '/roles',
+				url: RouteNames.importExport,
 				icon: '/assets/svg/import-export.svg',
-				disabled: true,
+				// disabled: true,
 			},
 		],
 		'Product Cataglog': [
