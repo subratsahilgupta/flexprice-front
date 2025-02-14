@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import usePlanStore, { Price } from '@/store/usePlanStore';
 import { Pencil, Trash2 } from 'lucide-react';
 import { AddChargesButton, subscriptionTypeOptions } from './SetupChargesSection';
-import { formatBillingPeriod } from '@/utils/common/helper_functions';
+import { formatBillingPeriod, getCurrencySymbol } from '@/utils/common/helper_functions';
 import { billlingPeriodOptions, currencyOptions } from '@/core/data/constants';
 
 const RecurringChargesForm = () => {
@@ -30,11 +30,6 @@ const RecurringChargesForm = () => {
 			setisEdit(false);
 		}
 	}, [metaData?.subscriptionType, metaData?.isRecurringEditMode]);
-
-	const mapCurrency = (currency: string) => {
-		const selectedCurrency = currencyOptions.find((option) => option.value === currency);
-		return selectedCurrency?.currency;
-	};
 
 	const [amount, setamount] = useState<string>(charges?.amount || '');
 	const [billingPeriod, setbillingPeriod] = useState(charges?.billing_period || billlingPeriodOptions[2].value);
@@ -137,7 +132,7 @@ const RecurringChargesForm = () => {
 					type='number'
 					label='Price'
 					error={errors.amount}
-					inputPrefix={mapCurrency(currency)}
+					inputPrefix={getCurrencySymbol(currency)}
 					suffix={<span className='text-[#64748B]'> {`per ${formatBillingPeriod(billingPeriod)}`}</span>}
 				/>
 				<Spacer height={'16px'} />

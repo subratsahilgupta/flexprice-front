@@ -7,7 +7,8 @@ import { RiDeleteBin6Line } from 'react-icons/ri';
 import SelectMeter from './SelectMeter';
 import { Pencil, Trash2 } from 'lucide-react';
 import { Meter } from '@/models/Meter';
-import { formatBillingPeriod } from '@/utils/common/helper_functions';
+import { formatBillingPeriod, getCurrencySymbol } from '@/utils/common/helper_functions';
+import { currencyOptions } from '@/core/data/constants';
 
 const formatAmountWithCommas = (amount: string): string => {
 	return amount.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -33,11 +34,6 @@ interface PriceTier {
 	up_to: number | null;
 }
 
-const currencyOptions = [
-	{ label: 'USD', value: 'USD', currency: '$' },
-	{ label: 'INR', value: 'INR', currency: '₹' },
-];
-
 const billingModels = [
 	{ value: 'FLAT_FEE', label: 'Flat Fee' },
 	{ value: 'PACKAGE', label: 'Package' },
@@ -50,11 +46,6 @@ const billlingPeriodOptions = [
 	{ label: 'Monthly', value: 'MONTHLY' },
 	{ label: 'Yearly', value: 'ANNUAL' },
 ];
-
-const mapCurrency = (currency: string) => {
-	const selectedCurrency = currencyOptions.find((option) => option.value === currency);
-	return selectedCurrency?.currency || '';
-};
 
 const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, addPrice, label }) => {
 	const metaData = usePlanStore((state) => state.metaData);
@@ -288,7 +279,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 						type='number'
 						error={inputErrors.flatModelError}
 						label='Price'
-						inputPrefix={mapCurrency(currency)}
+						inputPrefix={getCurrencySymbol(currency)}
 						onChange={(e) => setflatFee(e)}
 						suffix={<span className='text-[#64748B]'>{`/ unit / ${formatBillingPeriod(billingPeriod)}`}</span>}
 					/>
@@ -302,7 +293,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 							type='number'
 							label='Price'
 							value={packagedFee.price}
-							inputPrefix={mapCurrency(currency)}
+							inputPrefix={getCurrencySymbol(currency)}
 							onChange={(e) => setpackagedFee({ ...packagedFee, price: e })}
 						/>
 						<div className='h-[50px] items-center flex gap-2'>
