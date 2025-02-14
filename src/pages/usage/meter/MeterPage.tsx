@@ -1,5 +1,4 @@
 import { Button, SectionHeader, Spacer } from '@/components/atoms';
-import { IoSearch } from 'react-icons/io5';
 import { FiFolderPlus } from 'react-icons/fi';
 import { BillableMetricTable, Pagination } from '@/components/molecules';
 import { Link, useNavigate } from 'react-router-dom';

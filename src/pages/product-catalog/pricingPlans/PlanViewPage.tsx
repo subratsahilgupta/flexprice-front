@@ -89,7 +89,7 @@ const PlanViewPage = () => {
 	return (
 		<div className='page'>
 			{/* create entitlement drawer */}
-			<AddEntitlementDrawer isOpen={drawerOpen} onOpenChange={(value) => setdrawerOpen(value)} />
+			<AddEntitlementDrawer planId={planData?.id} isOpen={drawerOpen} onOpenChange={(value) => setdrawerOpen(value)} />
 
 			<div className='w-2/3 mb-10'>
 				<div className='w-full !my-5 flex justify-between items-center'>

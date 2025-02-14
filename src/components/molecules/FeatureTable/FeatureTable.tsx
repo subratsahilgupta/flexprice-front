@@ -41,7 +41,7 @@ const FeatureTable: FC<Props> = ({ data, emptyRowMessage, showEmptyRow }) => {
 			title: 'Type',
 			align: 'center',
 			render(row) {
-				return getFeatureTypeChips(row.type);
+				return getFeatureTypeChips(row?.type || '');
 			},
 		},
 		{
@@ -49,11 +49,11 @@ const FeatureTable: FC<Props> = ({ data, emptyRowMessage, showEmptyRow }) => {
 			title: 'Linked Billable Metric ',
 			onCLick(row) {
 				if (row.meter_id) {
-					navigate(RouteNames.editMeter + `?id=${row.meter_id}`);
+					navigate(RouteNames.editMeter + `?id=${row?.meter_id}`);
 				}
 			},
 			render(row) {
-				return row.meter ? row.meter.name : '--';
+				return row?.meter ? row.meter.name : '--';
 			},
 		},
 		{
@@ -61,7 +61,7 @@ const FeatureTable: FC<Props> = ({ data, emptyRowMessage, showEmptyRow }) => {
 			title: 'Status',
 			align: 'center',
 			render: (row) => {
-				const label = formatChips(row.status);
+				const label = formatChips(row?.status);
 				return <Chip isActive={label === 'Active'} label={label} />;
 			},
 		},
@@ -76,7 +76,7 @@ const FeatureTable: FC<Props> = ({ data, emptyRowMessage, showEmptyRow }) => {
 			fieldName: 'updated_at',
 			title: 'Updated At',
 			render: (row) => {
-				return formatDate(row.updated_at);
+				return formatDate(row?.updated_at);
 			},
 		},
 		{
@@ -86,14 +86,14 @@ const FeatureTable: FC<Props> = ({ data, emptyRowMessage, showEmptyRow }) => {
 				return (
 					<ActionButton
 						deleteMutationFn={async () => {
-							return await FeatureApi.deleteFeature(row.id);
+							return await FeatureApi.deleteFeature(row?.id);
 						}}
-						id={row.id}
+						id={row?.id}
 						editPath={''}
 						isEditDisabled={true}
-						isArchiveDisabled={row.status === 'archived'}
+						isArchiveDisabled={row?.status === 'archived'}
 						refetchQueryKey={'fetchFeatures'}
-						entityName={row.name}
+						entityName={row?.name}
 					/>
 				);
 			},

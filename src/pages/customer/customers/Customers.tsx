@@ -5,11 +5,9 @@ import usePagination from '@/hooks/usePagination';
 import Customer from '@/models/Customer';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
-import { SlidersHorizontal } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { FiFolderPlus } from 'react-icons/fi';
-import { IoSearch } from 'react-icons/io5';
 
 const CustomerPage = () => {
 	const { limit, offset, page } = usePagination();

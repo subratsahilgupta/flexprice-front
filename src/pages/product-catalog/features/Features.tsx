@@ -4,9 +4,8 @@ import { RouteNames } from '@/core/routes/Routes';
 import usePagination from '@/hooks/usePagination';
 import FeatureApi from '@/utils/api_requests/FeatureApi';
 import { useQuery } from '@tanstack/react-query';
-import { SlidersHorizontal, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { IoSearch } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 import { ReactSVG } from 'react-svg';
 

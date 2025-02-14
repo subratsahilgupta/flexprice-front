@@ -16,7 +16,7 @@ export class PlanApi {
 	}
 
 	public static async getAllPlans({ limit, offset }: PaginationType) {
-		return await AxiosClient.get<GetAllPlansResponse>(`${this.baseUrl}?limit=${limit}&offset=${offset}`);
+		return await AxiosClient.get<GetAllPlansResponse>(`${this.baseUrl}?limit=${limit}&offset=${offset}&expand=entitlements`);
 	}
 	public static async getAllActivePlans() {
 		return await AxiosClient.get<GetAllPlansResponse>(`${this.baseUrl}?status=published`);

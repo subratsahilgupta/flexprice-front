@@ -115,23 +115,23 @@ const FlexPriceSelect: React.FC<Props> = ({
 											className={cn(
 												'cursor-pointer',
 												option.disabled && 'select-none cursor-not-allowed',
-												'flex items-center space-x-2 justify-between w-full'
+												'flex items-center space-x-2 justify-between w-full',
 											)}
 											disabled={option.disabled}
 											key={option.value}
 											value={option.value}>
 											<div
-												className={cn('flex w-full items-center space-x-2 justify-between', option.disabled && 'opacity-50 pointer-events-none')}>
+												className={cn(
+													'flex w-full items-center space-x-2 justify-between',
+													option.disabled && 'opacity-50 pointer-events-none',
+												)}>
 												{option.prefixIcon && option.prefixIcon}
 
 												<div className='flex flex-col mr-2'>
 													<span>{option.label}</span>
 													{option.description && <span className='text-sm text-gray-500'>{option.description}</span>}
 												</div>
-												{option.suffixIcon && <span className='absolute right-2 top-2'>
-													{option.suffixIcon}
-												</span>}
-
+												{option.suffixIcon && <span className='absolute right-2 top-2'>{option.suffixIcon}</span>}
 											</div>
 										</ShadcnSelect>
 									);

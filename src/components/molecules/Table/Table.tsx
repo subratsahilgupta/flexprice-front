@@ -129,7 +129,7 @@ const FlexpriceTable: FC<FlexpriceTableProps> = ({ onRowClick, columns, data, re
 										<TableCell
 											onClick={() => {
 												if (redirect && redirectUrl) {
-													navigate(`${redirectUrl}${row.id}`);
+													navigate(`${redirectUrl}${row?.id}`);
 												}
 												if (onCLick) {
 													onCLick(row);

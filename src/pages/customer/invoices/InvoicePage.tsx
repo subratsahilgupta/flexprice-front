@@ -1,12 +1,10 @@
 import { SectionHeader, Spacer } from '@/components/atoms';
-import { IoSearch } from 'react-icons/io5';
 import { InvoiceTable, Pagination } from '@/components/molecules';
 import { useQuery } from '@tanstack/react-query';
 import { Spinner } from '@/components/atoms';
 import toast from 'react-hot-toast';
 import usePagination from '@/hooks/usePagination';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
-import { SlidersHorizontal } from 'lucide-react';
 
 const InvoicesPage = () => {
 	const { limit, offset, page } = usePagination();
