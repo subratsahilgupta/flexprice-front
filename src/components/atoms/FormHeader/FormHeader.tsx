@@ -4,7 +4,7 @@ import { FC } from 'react';
 interface Props {
 	title?: string;
 	subtitle?: string;
-	variant: 'form-component-title' | 'sub-header' | 'form-title';
+	variant: 'form-component-title' | 'sub-header' | 'form-title' | 'default';
 	className?: string;
 	titleClassName?: string;
 	subtitleClassName?: string;
@@ -17,6 +17,15 @@ const FormTitle: FC<Props> = ({ variant, subtitle, title, className, subtitleCla
 		return (
 			<div className={className}>
 				<p className={cn('font-bold text-zinc text-[20px]', titleClassName)}>{title}</p>
+				<p className={cn(labelStyle, subtitleClassName)}>{subtitle}</p>
+			</div>
+		);
+	}
+
+	if (variant === 'default') {
+		return (
+			<div className={className}>
+				<h1 className='font-inter font-bold text-xl '>{title}</h1>
 				<p className={cn(labelStyle, subtitleClassName)}>{subtitle}</p>
 			</div>
 		);

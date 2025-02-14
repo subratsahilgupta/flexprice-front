@@ -1,7 +1,7 @@
 import MainLayout from '@/layouts/MainLayout';
 import Auth from '@/pages/auth/Auth';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import CustomerPage from '@/pages/customer/customers/Customer';
+import CustomerPage from '@/pages/customer/customers/Customers';
 import AuthMiddleware from '../auth/AuthProvider';
 import MeterPage from '@/pages/usage/meter/MeterPage';
 import AddMeterPage from '@/pages/usage/meter/AddMeter';

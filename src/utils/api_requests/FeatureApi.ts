@@ -23,7 +23,7 @@ interface GetFeaturesResponse {
 class FeatureApi {
 	private static baseUrl = '/features';
 
-	public static async getAllFeatures(payload: GetFeaturesPayload): Promise<GetFeaturesResponse> {
+	public static async getAllFeatures(payload: GetFeaturesPayload = {}): Promise<GetFeaturesResponse> {
 		const url = generateQueryParams(this.baseUrl, {
 			...payload,
 			expand: 'meters',

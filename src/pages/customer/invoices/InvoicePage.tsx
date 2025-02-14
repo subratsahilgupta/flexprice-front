@@ -46,22 +46,7 @@ const InvoicesPage = () => {
 
 	return (
 		<div className='page'>
-			<SectionHeader title='Invoices'>
-				<div className='flex gap-2 w-full'>
-					<button className='px-2 py-1'>
-						<IoSearch className='size-4 text-[#09090B] ' />
-					</button>
-					<button className='px-2 py-1'>
-						<SlidersHorizontal className='size-4 text-[#09090B] ' />
-					</button>
-					{/* <Link to='/usage-tracking/meter/add-meter'>
-						<Button className='w-32 flex gap-2 bg-[#0F172A] '>
-							<FiFolderPlus />
-							<span>Add Meter</span>
-						</Button>
-					</Link> */}
-				</div>
-			</SectionHeader>
+			<SectionHeader showFilter showSearch title='Invoices' />
 			<div className='px-0'>
 				<InvoiceTable data={invoiceData?.items || []} />
 				<Spacer className='!h-4' />

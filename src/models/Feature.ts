@@ -19,4 +19,10 @@ interface Feature {
 	meter: Meter;
 }
 
+export enum FeatureType {
+	metered = 'metered',
+	static = 'static',
+	boolean = 'boolean',
+}
+
 export default Feature;

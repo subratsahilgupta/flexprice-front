@@ -11,6 +11,8 @@ import FeatureApi from '@/utils/api_requests/FeatureApi';
 
 interface Props {
 	data: Feature[];
+	showEmptyRow?: boolean;
+	emptyRowMessage?: string;
 }
 
 const getFeatureTypeChips = (type: string) => {
@@ -26,7 +28,7 @@ const getFeatureTypeChips = (type: string) => {
 	}
 };
 
-const FeatureTable: FC<Props> = ({ data }) => {
+const FeatureTable: FC<Props> = ({ data, emptyRowMessage, showEmptyRow }) => {
 	const navigate = useNavigate();
 
 	const columnData: ColumnData<Feature>[] = [
@@ -100,7 +102,7 @@ const FeatureTable: FC<Props> = ({ data }) => {
 
 	return (
 		<div>
-			<FlexpriceTable data={data} columns={columnData} />
+			<FlexpriceTable data={data} columns={columnData} showEmptyRow={showEmptyRow} emptyRowText={emptyRowMessage} />
 		</div>
 	);
 };

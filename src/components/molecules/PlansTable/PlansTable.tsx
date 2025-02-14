@@ -5,6 +5,7 @@ import { Plan } from '@/models/Plan';
 import formatChips from '@/utils/common/format_chips';
 import formatDate from '@/utils/common/format_date';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
+import { RouteNames } from '@/core/routes/Routes';
 
 export interface PlansTableProps {
 	data: Plan[];
@@ -51,7 +52,7 @@ const PlansTable: FC<PlansTableProps> = ({ data }) => {
 		},
 	];
 
-	return <FlexpriceTable redirectUrl='/product-catalog/pricing-plan/' columns={columns} data={mappedData} />;
+	return <FlexpriceTable redirectUrl={RouteNames.pricingPlan + '/'} columns={columns} data={mappedData} />;
 };
 
 export default PlansTable;

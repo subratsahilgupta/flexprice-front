@@ -50,31 +50,23 @@ const CustomerPage = () => {
 
 	return (
 		<div className='page'>
-			<SectionHeader title='Customers'>
-				<div className='flex gap-2 w-full'>
-					<button className='px-2 py-1'>
-						<IoSearch className='size-5 text-[#09090B]' />
-					</button>
-					<button className='px-2 py-1'>
-						<SlidersHorizontal className='size-5 text-[#09090B]' />
-					</button>
-					<CreateCustomerDrawer
-						trigger={
-							<Button
-								onClick={() => {
-									setactiveCustomer(undefined);
-									console.log('clicked');
-								}}
-								className='flex gap-2 bg-[#0F172A]'>
-								<FiFolderPlus />
-								<span>Add Customer</span>
-							</Button>
-						}
-						open={customerDrawerOpen}
-						onOpenChange={setcustomerDrawerOpen}
-						data={activeCustomer}
-					/>
-				</div>
+			<SectionHeader showFilter showSearch title='Customers'>
+				<CreateCustomerDrawer
+					trigger={
+						<Button
+							onClick={() => {
+								setactiveCustomer(undefined);
+								console.log('clicked');
+							}}
+							className='flex gap-2 bg-[#0F172A]'>
+							<FiFolderPlus />
+							<span>Add Customer</span>
+						</Button>
+					}
+					open={customerDrawerOpen}
+					onOpenChange={setcustomerDrawerOpen}
+					data={activeCustomer}
+				/>
 			</SectionHeader>
 			<div>
 				<CustomerTable

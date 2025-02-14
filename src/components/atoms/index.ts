@@ -47,3 +47,7 @@ export { default as CodePreview } from './CodePreview';
 export { default as Toggle } from './Toggle';
 
 export { default as MultiSelect } from './MultiSelect';
+
+export { default as SelectFeature } from './SelectFeature';
+
+export { default as Checkbox } from './Checkbox';

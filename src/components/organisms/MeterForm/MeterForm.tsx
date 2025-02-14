@@ -71,7 +71,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 		{
 			label: 'Cumulative',
 			description: 'Track values continuously without resetting, useful for metrics like lifetime usage.',
-			value: 'never',
+			value: 'NEVER',
 			icon: LuCircleFadingPlus,
 		},
 		{
