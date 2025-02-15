@@ -10,7 +10,7 @@ import {
 import React from 'react';
 import SidebarNav, { NavItem } from './SidebarMenu';
 import { cn } from '@/lib/utils';
-import { LogOut, Star } from 'lucide-react';
+import { LogOut, Plug2, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import supabase from '@/core/supbase/config';
 import useUser from '@/hooks/useUser';
@@ -98,6 +98,13 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				url: '/product-catalog/features',
 				icon: <Star />,
 				disabled: true,
+			},
+		],
+		'Insights & Tools': [
+			{
+				title: 'Integrations',
+				url: RouteNames.integrations,
+				icon: <Plug2 />,
 			},
 		],
 	};

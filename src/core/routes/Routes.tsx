@@ -25,6 +25,7 @@ import CreditNote from '@/pages/customer/tabs/CreditNote';
 import AddFeaturePage from '@/pages/product-catalog/features/AddFeature';
 import FeaturesPage from '@/pages/product-catalog/features/Features';
 import ImportExport from '@/pages/customer/import-export/ImportExport';
+import Integrations from '@/pages/insights-tools/integrations/Integrations';
 
 export const RouteNames = {
 	home: '/',
@@ -55,6 +56,10 @@ export const RouteNames = {
 
 	features: '/product-catalog/features',
 	createFeature: '/product-catalog/features/create-feature',
+
+	// insights and tools
+	insights: '/insights-&-tools',
+	integrations: '/insights-&-tools/integrations',
 };
 
 export const MainRouter = createBrowserRouter([
@@ -199,6 +204,15 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: RouteNames.createFeature,
 						element: <AddFeaturePage />,
+					},
+				],
+			},
+			{
+				path: RouteNames.insights,
+				children: [
+					{
+						path: RouteNames.integrations,
+						element: <Integrations />,
 					},
 				],
 			},

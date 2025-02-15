@@ -1,9 +1,13 @@
 import { Button, Chip, FormHeader, Select, SelectOption, Sheet } from '@/components/atoms';
-import { FC, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { CSVBoxButton } from '@csvbox/react';
 import { cn } from '@/lib/utils';
-import { CircleAlert, File, RefreshCcw } from 'lucide-react';
+import { File, LoaderCircleIcon, RefreshCcw } from 'lucide-react';
 import formatDate from '@/utils/common/format_date';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import TaskApi from '@/utils/api_requests/TaskApi';
+import { ImportTask } from '@/models/ImportTask';
+import { toSentenceCase } from '@/utils/common/helper_functions';
 
 interface Props {
 	isOpen: boolean;
@@ -50,67 +54,162 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange }) => {
 	const importTypeOptions: SelectOption[] = [
 		{
 			label: 'Events',
-			value: 'events',
+			value: 'EVENTS',
+		},
+		{
+			label: 'Prices',
+			value: 'PRICES',
+			disabled: true,
+		},
+	];
+	const fileTypeOptions: SelectOption[] = [
+		{
+			label: 'Csv',
+			value: 'CSV',
+		},
+		{
+			label: 'Json',
+			value: 'JSON',
 		},
 	];
 
-	const [uploadedFile, setuploadedFile] = useState<ImportMeta>();
+	const taskTypeOptions: SelectOption[] = [
+		{
+			label: 'Import',
+			value: 'IMPORT',
+		},
+		{
+			label: 'Export',
+			value: 'EXPORT',
+		},
+	];
 
-	const [activeImportType, setactiveImportType] = useState<SelectOption>();
+	const [uploadedFile, setUploadedFile] = useState<ImportMeta>();
+
+	const [activeImportType, setActiveImportType] = useState<SelectOption>();
 
 	const csvBoxKey = useMemo(
 		() => `${activeImportType?.value ? getLicenseKey(activeImportType.value) : ''}-${JSON.stringify(activeImportType?.label)}`,
 		[activeImportType],
 	);
 
+	const [errors, seterrors] = useState({
+		file: '',
+		entity_type: '',
+		file_type: '',
+		task_type: '',
+	});
+
+	const {
+		mutate: addTask,
+		data: task,
+		isPending,
+	} = useMutation({
+		mutationFn: async (data?: ImportMeta) => {
+			return await TaskApi.addTask({
+				entity_type: activeImportType?.value || '',
+				file_type: fileTypeOptions[0].value,
+				file_url: (data?.raw_file ?? uploadedFile?.raw_file) || '',
+				task_type: taskTypeOptions[0].value,
+			});
+		},
+		onSuccess: (data) => {
+			console.log(data);
+		},
+		onError: (error) => {
+			console.log(error);
+		},
+	});
+
+	const {
+		data: importTask,
+		isLoading,
+		refetch: refreshTaskStatus,
+	} = useQuery({
+		queryKey: ['task', task?.id],
+		queryFn: async (): Promise<ImportTask> => {
+			return await TaskApi.getTaskById(task?.id || '');
+		},
+		enabled: task?.id ? true : false,
+		staleTime: 0,
+	});
+
 	const importDetails = [
 		{
 			label: 'Type',
-			value: 'events',
+			value: activeImportType?.label,
 		},
-		{
-			label: 'Meter',
-			value: 'Billable Meter',
-		},
+		// {
+		// 	label: 'Meter',
+		// 	value: 'Billable Meter',
+		// },
 		{
 			label: 'Status',
-			value: <Chip label='Completed' isActive />,
+			value: <Chip label={toSentenceCase(importTask?.task_status || '')} isActive={importTask?.task_status === 'COMPLETED'} />,
 		},
 		{
 			label: 'Import Started at',
-			value: formatDate(new Date()),
+			value: importTask?.started_at ? formatDate(new Date(importTask.started_at)) : formatDate(new Date()),
 		},
 		{
 			label: 'Import Completed at',
-			value: formatDate(new Date()),
+			value: importTask?.completed_at ? formatDate(new Date(importTask.completed_at)) : formatDate(new Date()),
 		},
 	];
 
 	const processedRows = [
 		{
 			label: 'Total Rows',
-			value: 100,
+			value: importTask?.total_records || uploadedFile?.row_count,
 		},
 		{
 			label: 'Failed Rows',
-			value: 10,
+			value: importTask?.failed_records,
 		},
 		{
 			label: 'Successful Rows',
-			value: 90,
+			value: importTask?.successful_records,
 		},
 	];
+
+	useEffect(() => {
+		if (!isOpen) {
+			setUploadedFile(undefined);
+			setActiveImportType(undefined);
+			seterrors({
+				file: '',
+				entity_type: '',
+				file_type: '',
+				task_type: '',
+			});
+		}
+	}, [isOpen]);
+
+	const handleImport = () => {
+		seterrors({} as any);
+		if (!uploadedFile) {
+			seterrors((prev) => ({ ...prev, file: 'Please upload a file' }));
+		}
+		if (!activeImportType) {
+			seterrors((prev) => ({ ...prev, entity_type: 'Please select an entity type' }));
+		}
+
+		if (uploadedFile && activeImportType) {
+			addTask(uploadedFile);
+		}
+	};
 
 	return (
 		<div>
 			<Sheet isOpen={isOpen} onOpenChange={onOpenChange} title={'Import File'} description={'kuch toh dalunga'}>
 				<div className='space-y-4 mt-6'>
 					<Select
+						error={errors.entity_type}
 						options={importTypeOptions}
 						value={activeImportType?.value}
 						label='Select Import Type'
 						onChange={(value) => {
-							setactiveImportType(importTypeOptions.find((option) => option.value === value));
+							setActiveImportType(importTypeOptions.find((option) => option.value === value));
 						}}
 						description='Select the type of data you want to import'
 					/>
@@ -121,7 +220,7 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange }) => {
 						onImport={(data: boolean, meta: ImportMeta) => {
 							console.log(data);
 							console.log(meta);
-							setuploadedFile(meta);
+							setUploadedFile(meta);
 						}}
 						licenseKey={getLicenseKey(activeImportType?.value || '')}
 						render={(launch, isLoading) => (
@@ -145,82 +244,103 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange }) => {
 										) : (
 											<>
 												<p className='font-medium'>Choose File</p>
-												<span className=''>No File Chosen</span>
 											</>
 										)}
 									</div>
 									<p className={cn('text-sm', 'text-muted-foreground')}>
 										{uploadedFile ? `${uploadedFile.row_count} Rows uploaded` : 'Max File Size: 5 MB. .csv format accepted.'}
 									</p>
+									{errors.file && <p className='text-sm text-destructive'>{errors.file}</p>}
 								</div>
 							</div>
 						)}
 					/>
 
 					<div>
-						<FormHeader title='Import Details' variant='form-component-title' />
+						{importTask && (
+							<div>
+								<FormHeader title='Import Details' variant='form-component-title' />
 
-						<div className='space-y-4 mt-4'>
-							{importDetails.map((detail, index) => (
-								<div key={index} className='flex justify-between'>
-									<p className='text-sm text-muted-foreground'>{detail.label}</p>
-									<p className='text-sm text-zinc-950'>{detail.value}</p>
+								<div className='space-y-4 mt-4'>
+									{importDetails.map((detail, index) => (
+										<div key={index} className='flex justify-between'>
+											<p className='text-sm text-muted-foreground'>{detail.label}</p>
+											<p className='text-sm text-zinc-950'>{detail.value}</p>
+										</div>
+									))}
 								</div>
-							))}
-						</div>
-						<div className='h-[1px] bg-[#E4E4E7] my-4'></div>
-						<div className='space-y-4 mt-4'>
-							{processedRows.map((detail, index) => (
-								<div key={index} className='flex justify-between'>
-									<p className='text-sm text-muted-foreground'>{detail.label}</p>
-									<p className='text-sm'>{detail.value}</p>
+								<div className='h-[1px] bg-[#E4E4E7] my-4'></div>
+								<div className='space-y-4 mt-4'>
+									{processedRows.map((detail, index) => (
+										<div key={index} className='flex justify-between'>
+											<p className='text-sm text-muted-foreground'>{detail.label}</p>
+											<p className='text-sm'>{detail.value}</p>
+										</div>
+									))}
 								</div>
-							))}
-						</div>
-
-						<div className='border rounded-md border-destructive text-destructive p-4 mt-4 flex gap-3 items-start fonts-sans text-sm'>
+							</div>
+						)}
+						{/* <div className='border rounded-md border-destructive text-destructive p-4 mt-4 flex gap-3 items-start fonts-sans text-sm'>
 							<CircleAlert className='text-destructive w-12' />
 							<div className='flex flex-col '>
 								<p className='font-medium mb-2'>The records are not in correct format</p>
 								<p>20 records found to be in incorrect format. Download the CSV to containing the results of this import action.</p>
 							</div>
-						</div>
+						</div> */}
 					</div>
 
 					<div className='mt-6 !space-y-4'>
-						<Button
-							onClick={() => {
-								onOpenChange(false);
-							}}
-							className=''>
-							Import Data
-						</Button>
-						<Button
-							onClick={() => {
-								onOpenChange(false);
-							}}
-							className='flex gap-2 items-center'>
-							<RefreshCcw />
-							Refresh
-						</Button>
+						{!importTask && (
+							<Button
+								disabled={isPending || isLoading}
+								onClick={() => {
+									handleImport();
+									// onOpenChange(false);
+								}}
+								className=''>
+								{isPending || isLoading ? <LoaderCircleIcon className='size-4 animate-spin' /> : 'Import Data'}
+							</Button>
+						)}
+						{importTask && (
+							<Button
+								disabled={isPending || isLoading}
+								onClick={() => {
+									// onOpenChange(false);
+									refreshTaskStatus();
+								}}
+								className='flex gap-2 items-center'>
+								{isPending || isLoading ? (
+									<LoaderCircleIcon className='size-4 animate-spin' />
+								) : (
+									<>
+										<RefreshCcw />
+										Refresh
+									</>
+								)}
+							</Button>
+						)}
 
-						<div className='flex gap-2 items-center'>
-							<Button
-								onClick={() => {
-									onOpenChange(false);
-								}}
-								variant={'outline'}
-								className='flex gap-2 items-center'>
-								Download CSV
-							</Button>
-							<Button
-								onClick={() => {
-									onOpenChange(false);
-								}}
-								className='flex gap-2 items-center'>
-								Try Again
-							</Button>
-						</div>
+						{importTask && importTask.task_status === 'FAILED' && (
+							<div className='flex gap-2 items-center'>
+								<Button
+									onClick={() => {
+										window.open(uploadedFile?.raw_file, '_blank');
+									}}
+									variant={'outline'}
+									className='flex gap-2 items-center'>
+									Download CSV
+								</Button>
+								<Button
+									onClick={() => {
+										// onOpenChange(false);
+										// refreshTaskStatus();
+										handleImport();
+									}}
+									className='flex gap-2 items-center'>
+									Try Again
+								</Button>
+							</div>
+						)}
 					</div>
 				</div>
 			</Sheet>

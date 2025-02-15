@@ -1,0 +1,23 @@
+export type ImportTask = Readonly<{
+	id: string;
+	task_type: string;
+	entity_type: string;
+	file_url: string;
+	file_type: string;
+	task_status: string;
+	processed_records: number;
+	successful_records: number;
+	failed_records: number;
+	tenant_id: string;
+	status: string;
+	created_at: string;
+	updated_at: string;
+	created_by: string;
+	updated_by: string;
+	completed_at: string;
+	error_summary: string;
+	failed_at: string;
+	metadata: Record<string, unknown>;
+	started_at: string;
+	total_records: number;
+}>;

@@ -25,7 +25,7 @@ const MeterFormSchema = z.object({
 		// 	value: z.array(z.string().min(1, { message: 'Filter value is required' })).optional(),
 		// }),
 		.optional(),
-	aggregationFunction: z.enum(['SUM', 'COUNT'], { errorMap: () => ({ message: 'Invalid aggregation function' }) }),
+	aggregationFunction: z.enum(['SUM', 'COUNT', 'COUNT UNIQUE'], { errorMap: () => ({ message: 'Invalid aggregation function' }) }),
 	aggregationValue: z.string().min(1, { message: 'Aggregation Value is required' }),
 	resetPeriod: z.string().optional(),
 });
