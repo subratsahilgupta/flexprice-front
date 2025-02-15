@@ -1,36 +1,14 @@
 import { FormHeader, SectionHeader } from '@/components/atoms';
-
-type Integration = {
-	name: string;
-	description: string;
-	logo: string;
-	tags: string[];
-	comingSoon?: boolean;
-};
-
-const integrations: Integration[] = [
-	{
-		name: 'Stripe',
-		description: 'Send invoices, calculate tax and collect payment.',
-		logo: 'https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg',
-		tags: ['Payment', 'Calculate Tax', 'Invoice Customer'],
-		comingSoon: true,
-	},
-	{
-		name: 'Razorpay',
-		description:
-			'Razorpay is a payments solution in India that allows businesses to accept, process and disburse payments with its product suite.',
-		logo: 'https://upload.wikimedia.org/wikipedia/commons/7/77/Razorpay_logo.png',
-		tags: [],
-	},
-];
+import { comingSoonIntegration, Integration, integrations } from './integrationsData';
+import { useNavigate } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 
 const Integrations = () => {
 	return (
 		<div className='page'>
 			<SectionHeader title='Integrations' />
 			<div className=''>
-				<FormHeader title='Available Integrations' variant='sub-header' />
+				<FormHeader title='Installed Integrations' variant='sub-header' />
 				<div className='grid grid-cols-2 gap-4 '>
 					{integrations.map((integration, index) => (
 						<IntegrationCard key={index} integration={integration} />
@@ -40,7 +18,7 @@ const Integrations = () => {
 			<div className='mt-6'>
 				<FormHeader title='Available Integrations' variant='sub-header' />
 				<div className='grid grid-cols-2 gap-4 '>
-					{integrations.map((integration, index) => (
+					{comingSoonIntegration.map((integration, index) => (
 						<IntegrationCard key={index} integration={integration} />
 					))}
 				</div>
@@ -50,8 +28,16 @@ const Integrations = () => {
 };
 
 const IntegrationCard = ({ integration }: { integration: Integration }) => {
+	const navigate = useNavigate();
 	return (
-		<div className='border rounded-xl p-4 flex items-center shadow-sm'>
+		<div
+			onClick={() => {
+				if (integration.comingSoon) {
+					return;
+				}
+				navigate(integration.name.toLowerCase());
+			}}
+			className={cn('border rounded-xl p-4 flex items-center shadow-sm', !integration.comingSoon && 'cursor-pointer')}>
 			<div className='w-16 h-16 flex items-center justify-center bg-gray-100 rounded-lg'>
 				<img src={integration.logo} alt={integration.name} className='w-12 h-12 object-contain' />
 			</div>

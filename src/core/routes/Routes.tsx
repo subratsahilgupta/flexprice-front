@@ -26,6 +26,7 @@ import AddFeaturePage from '@/pages/product-catalog/features/AddFeature';
 import FeaturesPage from '@/pages/product-catalog/features/Features';
 import ImportExport from '@/pages/customer/import-export/ImportExport';
 import Integrations from '@/pages/insights-tools/integrations/Integrations';
+import IntegrationDetails from '@/pages/insights-tools/integrations/IntegrationDetails';
 
 export const RouteNames = {
 	home: '/',
@@ -60,6 +61,7 @@ export const RouteNames = {
 	// insights and tools
 	insights: '/insights-&-tools',
 	integrations: '/insights-&-tools/integrations',
+	integrationDetails: '/insights-&-tools/integrations/:id',
 };
 
 export const MainRouter = createBrowserRouter([
@@ -213,6 +215,10 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: RouteNames.integrations,
 						element: <Integrations />,
+					},
+					{
+						path: RouteNames.integrationDetails,
+						element: <IntegrationDetails />,
 					},
 				],
 			},
