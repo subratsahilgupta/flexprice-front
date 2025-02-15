@@ -8,7 +8,7 @@ const Integrations = () => {
 		<div className='page'>
 			<SectionHeader title='Integrations' />
 			<div className=''>
-				<FormHeader title='Installed Integrations' variant='sub-header' />
+				<FormHeader title='Installed' variant='sub-header' />
 				<div className='grid grid-cols-2 gap-4 '>
 					{integrations.map((integration, index) => (
 						<IntegrationCard key={index} integration={integration} />
@@ -16,7 +16,7 @@ const Integrations = () => {
 				</div>
 			</div>
 			<div className='mt-6'>
-				<FormHeader title='Available Integrations' variant='sub-header' />
+				<FormHeader title='Available' variant='sub-header' />
 				<div className='grid grid-cols-2 gap-4 '>
 					{comingSoonIntegration.map((integration, index) => (
 						<IntegrationCard key={index} integration={integration} />
