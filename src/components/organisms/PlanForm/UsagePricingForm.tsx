@@ -100,8 +100,14 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 		}
 
 		if (billingModel === billingModels[2].value) {
+			for (let i = 0; i < tieredPrices.length; i++) {
+				if (!tieredPrices[i].up_to && i !== tieredPrices.length - 1) {
+					tieredPrices[i].up_to = tieredPrices[i + 1].up_to ? tieredPrices[i + 1].up_to! - 1 : null;
+				}
+			}
 			data.tiers = tieredPrices.map((tier) => ({
-				up_to: tier.up_to!,
+				from: tier.from,
+				up_to: tier.up_to,
 				unit_amount: tier.unit_amount || '0',
 				flat_amount: tier.flat_amount || '0',
 			})) as any;
@@ -268,12 +274,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 				</div>
 			)}
 
-			{billingModel === billingModels[2].value && (
-				<VolumeTieredPricingForm
-					setTieredPrices={setTieredPrices}
-					tieredPrices={tieredPrices}
-				/>
-			)}
+			{billingModel === billingModels[2].value && <VolumeTieredPricingForm setTieredPrices={setTieredPrices} tieredPrices={tieredPrices} />}
 
 			<Spacer height='16px' />
 			<div className='flex justify-end'>
