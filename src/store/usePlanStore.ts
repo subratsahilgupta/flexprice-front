@@ -22,9 +22,9 @@ export interface Price {
 }
 
 export interface PriceTier {
-	flat_amount: string;
-	unit_amount: string;
-	up_to?: number;
+	flat_amount?: string;
+	unit_amount?: string;
+	up_to?: string;
 }
 
 export interface Plan {

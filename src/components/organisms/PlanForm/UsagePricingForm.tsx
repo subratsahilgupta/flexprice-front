@@ -2,13 +2,12 @@ import usePlanStore, { Price } from '@/store/usePlanStore';
 import { FC, useState } from 'react';
 import { subscriptionTypeOptions } from './SetupChargesSection';
 import { Button, Input, Select, Spacer } from '@/components/atoms';
-import { cn } from '@/lib/utils';
-import { RiDeleteBin6Line } from 'react-icons/ri';
 import SelectMeter from './SelectMeter';
 import { Pencil, Trash2 } from 'lucide-react';
 import { Meter } from '@/models/Meter';
 import { formatBillingPeriod, getCurrencySymbol } from '@/utils/common/helper_functions';
 import { currencyOptions } from '@/core/data/constants';
+import VolumeTieredPricingForm from './VolumeTieredPricingForm';
 
 const formatAmountWithCommas = (amount: string): string => {
 	return amount.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -27,11 +26,11 @@ interface Props {
 	label?: string;
 }
 
-interface PriceTier {
+export interface PriceTier {
 	from: number;
-	flat_amount: number;
-	unit_amount: number;
 	up_to: number | null;
+	flat_amount?: string;
+	unit_amount?: string;
 }
 
 const billingModels = [
@@ -55,8 +54,8 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 	const [meterId, setMeterId] = useState(metaData?.usageBasedPrice?.meter_id);
 
 	const [tieredPrices, setTieredPrices] = useState<PriceTier[]>([
-		{ from: 1, up_to: 1, unit_amount: 0, flat_amount: 0 },
-		{ from: 2, up_to: null, unit_amount: 0, flat_amount: 0 },
+		{ from: 1, up_to: 1 },
+		{ from: 2, up_to: null },
 	]);
 	const [billingPeriod, setbillingPeriod] = useState(data?.billing_period || billlingPeriodOptions[2].value);
 	const [flatFee, setflatFee] = useState<string>(data?.amount || '');
@@ -69,56 +68,10 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 	});
 
 	const [activeMeter, setactiveMeter] = useState<Meter | null>();
-	const addTieredPrice = () => {
-		setTieredPrices((prev) => {
-			const lastTier = prev[prev.length - 1];
-
-			if (lastTier.up_to === null) {
-				prev[prev.length - 1] = { ...lastTier, up_to: lastTier.from + 1 };
-			}
-			const newFrom = lastTier.up_to ?? lastTier.from + 1;
-
-			const newTier = { from: newFrom + 1, up_to: null, unit_amount: 0, flat_amount: 0 };
-			return [...prev, newTier];
-		});
-	};
 
 	// Remove a tier
-	const removeTier = (index: number) => {
-		if (index === 0 && tieredPrices.length === 1) {
-			return;
-		}
-		setTieredPrices((prev) => {
-			const updatedTiers = prev.filter((_, i) => i !== index);
-			if (updatedTiers.length > 0 && index === prev.length - 1) {
-				updatedTiers[updatedTiers.length - 1].up_to = null;
-			}
-			return updatedTiers;
-		});
-	};
 
 	// Update a tier value
-	const updateTier = (index: number, key: string, value: number) => {
-		setTieredPrices((prev) => {
-			const updatedTiers = [...prev];
-			updatedTiers[index] = { ...updatedTiers[index], [key]: value };
-
-			// Adjust the 'from' and 'up_to' values based on the tier being updated
-			if (key === 'up_to' && index < prev.length - 1) {
-				// If 'up_to' is updated, adjust the 'from' value of the next tier
-				const nextTier = updatedTiers[index + 1];
-				nextTier.from = value + 1;
-			}
-
-			if (key === 'from' && index > 0) {
-				// If 'from' is updated, adjust the 'up_to' value of the previous tier
-				const previousTier = updatedTiers[index - 1];
-				previousTier.up_to = value - 1;
-			}
-
-			return updatedTiers;
-		});
-	};
 
 	// Handle saving of pricing information
 	const handleAddPrice = () => {
@@ -149,9 +102,9 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 		if (billingModel === billingModels[2].value) {
 			data.tiers = tieredPrices.map((tier) => ({
 				up_to: tier.up_to!,
-				unit_amount: tier.unit_amount.toString(),
-				flat_amount: tier.flat_amount.toString(),
-			}));
+				unit_amount: tier.unit_amount || '0',
+				flat_amount: tier.flat_amount || '0',
+			})) as any;
 			data.tier_mode = 'VOLUME';
 		}
 
@@ -183,10 +136,10 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 					return true;
 				}
 
-				if (tier.unit_amount < 0 || tier.flat_amount < 0) {
-					setinputErrors((prev) => ({ ...prev, tieredModelError: `Units and Flat amount cannot be nagative in row ${index + 1}` }));
-					return true;
-				}
+				// if (tier.unit_amount < 0 || tier.flat_amount < 0) {
+				// 	setinputErrors((prev) => ({ ...prev, tieredModelError: `Units and Flat amount cannot be nagative in row ${index + 1}` }));
+				// 	return true;
+				// }
 			});
 		}
 
@@ -316,77 +269,10 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 			)}
 
 			{billingModel === billingModels[2].value && (
-				<div className='space-y-4'>
-					<Spacer height='16px' />
-					<div className={cn('w-full', tieredPrices.length > 0 ? '' : 'hidden')}>
-						<table className='table-auto w-full border-collapse border border-gray-200 overflow-x-auto'>
-							<thead>
-								<tr className='bg-gray-100 text-left border-b'>
-									<th className='px-4 py-2 font-normal bg-white text-nowrap text-[#71717A]'>First unit</th>
-									<th className='px-4 py-2 font-normal bg-white text-nowrap text-[#71717A]'>Last unit</th>
-									<th className='px-4 py-2 font-normal bg-white text-nowrap text-[#71717A]'>{`Per unit price `}</th>
-									<th className='px-4 py-2 font-normal bg-white text-nowrap text-[#71717A]'>Flat fee </th>
-									<th className='px-4 py-2 font-normal bg-white text-nowrap text-[#71717A]'></th>
-								</tr>
-							</thead>
-							<tbody>
-								{tieredPrices.map((tier, index) => (
-									<tr key={index} className='w-full'>
-										<td className='px-4 py-2'>
-											<Input
-												disabled
-												className='h-9'
-												onChange={(e) => updateTier(index, 'from', Number(e))}
-												type='number'
-												value={tier.from}
-												placeholder='From'
-											/>
-										</td>
-										<td className='px-4 py-2'>
-											<Input
-												className='h-9'
-												onChange={(e) => updateTier(index, 'up_to', Number(e))}
-												disabled={tier.up_to === null}
-												value={tier.up_to === null ? '∞' : tier.up_to}
-												placeholder='To (Infinity)'
-											/>
-										</td>
-										<td className='px-4 py-2'>
-											<Input
-												className='h-9'
-												onChange={(e) => updateTier(index, 'unit_amount', Number(e))}
-												type='number'
-												value={tier.unit_amount}
-												placeholder='Rs. 100'
-											/>
-										</td>
-										<td className='px-4 py-2'>
-											<Input
-												className='h-9'
-												onChange={(e) => updateTier(index, 'flat_amount', Number(e))}
-												type='number'
-												value={tier.flat_amount}
-												placeholder='Flat Fee'
-											/>
-										</td>
-										<td className='px-4 py-2 text-center'>
-											<button
-												className='flex justify-center items-center size-9 rounded-md border text-zinc'
-												onClick={() => removeTier(index)}>
-												<RiDeleteBin6Line className='text-zinc' />
-											</button>
-										</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
-					</div>
-					<div className='flex justify-between items-center mt-4'>
-						<Button onClick={addTieredPrice} variant='default' className='flex items-center gap-2'>
-							Add Tier
-						</Button>
-					</div>
-				</div>
+				<VolumeTieredPricingForm
+					setTieredPrices={setTieredPrices}
+					tieredPrices={tieredPrices}
+				/>
 			)}
 
 			<Spacer height='16px' />

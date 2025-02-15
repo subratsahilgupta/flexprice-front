@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
 const CreatePlanPage = () => {
-	const [activeStep, setactiveStep] = useState(0);
+	const [activeStep, setactiveStep] = useState(2);
 	const formSteps = [{ label: 'Plan Details' }, { label: 'Billing Preferences' }, { label: 'Set up Charges' }];
 	const { setError, clearAllErrors, resetStore } = usePlanStore();
 	const plan = usePlanStore((state) => state.plan);
