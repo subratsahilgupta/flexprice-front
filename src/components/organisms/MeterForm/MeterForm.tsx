@@ -212,6 +212,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 								options={[
 									{ label: 'SUM', value: 'SUM' },
 									{ label: 'COUNT', value: 'COUNT' },
+									{ label: 'COUNT UNIQUE', value: 'COUNT UNIQUE' },
 								]}
 								value={aggregationFunction}
 								onChange={setAggregationFunction}
