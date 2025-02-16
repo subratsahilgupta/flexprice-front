@@ -18,7 +18,11 @@ const IntegrationDetails = () => {
 				<div className='ml-4 flex-1'>
 					<div className='flex items-center justify-between w-full'>
 						<h3 className='font-semibold text-lg'>{integration.name}</h3>
-						{integration.comingSoon && <span className='text-xs bg-yellow-200 text-yellow-800 px-2 py-1 rounded-2xl'>Coming Soon</span>}
+						{integration.comingSoon && (
+							<span className='absolute top-2 right-2 bg-[#FEF08A] text-[#D97706] text-xs font-semibold px-2 py-1 rounded-2xl opacity-55'>
+								Coming Soon
+							</span>
+						)}
 					</div>
 					<p className='text-gray-500 text-sm'>{integration.description}</p>
 					<div className='mt-2 flex items-center gap-2'>
@@ -33,11 +37,37 @@ const IntegrationDetails = () => {
 					{/* <Button variant={'outline'} className='flex gap-2 items-center'>
                         View Dashboard
                     </Button> */}
-					<Button onClick={() => {}} className='flex gap-2 items-center'>
-						Install
-					</Button>
+					{integration.type === 'available' && (
+						<Button onClick={() => {}} className='flex gap-2 items-center'>
+							Install
+						</Button>
+					)}
 				</div>
 			</div>
+
+			{/* Display account details when installed */}
+			{integration.type === 'installed' && (
+				<div className='card p-4 mt-6 !space-y-8 text-sm'>
+					<div className=''>
+						<div className='flex gap-6 mb-4  '>
+							<p className='font-medium w-[100px] text-muted-foreground '>Account ID</p>
+							<p className='text-gray-900'>{integration.accountId}</p>
+						</div>
+						<div className='flex gap-6 mb-4  '>
+							<p className='font-medium w-[100px] text-muted-foreground '>Mode</p>
+							<p className='text-gray-900'>{integration.mode}</p>
+						</div>
+						<div className='flex gap-6 mb-4  '>
+							<p className='font-medium w-[100px] text-muted-foreground '>API Key</p>
+							<p className='text-gray-900'>{integration.apiKey}</p>
+						</div>
+						<div className='flex gap-6 mb-4  '>
+							<p className='font-medium w-[100px] text-muted-foreground '>Installed</p>
+							<p className='text-gray-900'>{integration.installedAt}</p>
+						</div>
+					</div>
+				</div>
+			)}
 
 			<Spacer height={32} />
 			{/* details section */}

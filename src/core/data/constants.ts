@@ -6,7 +6,8 @@ export const currencyOptions = Array.from(
 			currency.currency,
 			{
 				// label: `${currency.currency} (${currency.symbol})`,
-				label: `${currency.currency} (${currency.countryName})`,
+				// label: `${currency.currency} (${currency.countryName})`,
+				label: currency.currency,
 				value: currency.currency,
 				symbol: currency.symbol,
 			},

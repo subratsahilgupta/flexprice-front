@@ -1,5 +1,5 @@
 import { FormHeader, SectionHeader } from '@/components/atoms';
-import { comingSoonIntegration, Integration, integrations } from './integrationsData';
+import { availableIntegrations, installedIntegrations, Integration } from './integrationsData';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -10,7 +10,7 @@ const Integrations = () => {
 			<div className=''>
 				<FormHeader title='Installed' variant='sub-header' />
 				<div className='grid grid-cols-2 gap-4 '>
-					{integrations.map((integration, index) => (
+					{installedIntegrations.map((integration, index) => (
 						<IntegrationCard key={index} integration={integration} />
 					))}
 				</div>
@@ -18,7 +18,7 @@ const Integrations = () => {
 			<div className='mt-6'>
 				<FormHeader title='Available' variant='sub-header' />
 				<div className='grid grid-cols-2 gap-4 '>
-					{comingSoonIntegration.map((integration, index) => (
+					{availableIntegrations.map((integration, index) => (
 						<IntegrationCard key={index} integration={integration} />
 					))}
 				</div>
@@ -37,7 +37,7 @@ const IntegrationCard = ({ integration }: { integration: Integration }) => {
 				}
 				navigate(integration.name.toLowerCase());
 			}}
-			className={cn('border rounded-xl p-4 flex items-center shadow-sm', !integration.comingSoon && 'cursor-pointer')}>
+			className={cn('border rounded-xl p-4 flex items-center shadow-sm', !integration.comingSoon && 'cursor-pointer', 'cursor-pointer ')}>
 			<div className='w-16 h-16 flex items-center justify-center bg-gray-100 rounded-lg'>
 				<img src={integration.logo} alt={integration.name} className='w-12 h-12 object-contain' />
 			</div>

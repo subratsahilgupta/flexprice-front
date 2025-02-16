@@ -1,5 +1,5 @@
 import { ChargesForBillingPeriodOne } from '@/components/organisms/Subscription/PriceTable';
-import { getAllISOCodes, getParamByParam } from 'iso-country-currency';
+import { getAllISOCodes, getParamByParam } from '../currency';
 
 export const getCurrencyOptions = () => {
 	return getAllISOCodes();
@@ -7,16 +7,6 @@ export const getCurrencyOptions = () => {
 
 export function getCurrencySymbol(currency: string): string {
 	return getParamByParam('currency', currency.toUpperCase(), 'symbol');
-	// switch (currency.toLowerCase()) {
-	// 	case 'usd':
-	// 		return '$';
-	// 	case 'inr':
-	// 		return '₹';
-	// 	case 'eur':
-	// 		return '€';
-	// 	default:
-	// 		return currency;
-	// }
 }
 
 export const formatBillingPeriod = (billingPeriod: string) => {
