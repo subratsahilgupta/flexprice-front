@@ -2,12 +2,13 @@ import { Button, Chip, FormHeader, Select, SelectOption, Sheet } from '@/compone
 import { FC, useEffect, useMemo, useState } from 'react';
 import { CSVBoxButton } from '@csvbox/react';
 import { cn } from '@/lib/utils';
-import { File, LoaderCircleIcon, RefreshCcw } from 'lucide-react';
+import { LoaderCircleIcon, Plus, RefreshCcw, X } from 'lucide-react';
 import formatDate from '@/utils/common/format_date';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import TaskApi from '@/utils/api_requests/TaskApi';
 import { ImportTask } from '@/models/ImportTask';
 import { toSentenceCase } from '@/utils/common/helper_functions';
+import toast from 'react-hot-toast';
 
 interface Props {
 	isOpen: boolean;
@@ -87,6 +88,7 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange }) => {
 	const [uploadedFile, setUploadedFile] = useState<ImportMeta>();
 
 	const [activeImportType, setActiveImportType] = useState<SelectOption>();
+	const [uploadedTaskDetails, setuploadedTaskDetails] = useState<ImportTask>();
 
 	const csvBoxKey = useMemo(
 		() => `${activeImportType?.value ? getLicenseKey(activeImportType.value) : ''}-${JSON.stringify(activeImportType?.label)}`,
@@ -104,6 +106,7 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange }) => {
 		mutate: addTask,
 		data: task,
 		isPending,
+		// error,
 	} = useMutation({
 		mutationFn: async (data?: ImportMeta) => {
 			return await TaskApi.addTask({
@@ -118,6 +121,7 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange }) => {
 		},
 		onError: (error) => {
 			console.log(error);
+			toast.error('Something went wrong');
 		},
 	});
 
@@ -130,9 +134,15 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange }) => {
 		queryFn: async (): Promise<ImportTask> => {
 			return await TaskApi.getTaskById(task?.id || '');
 		},
-		enabled: task?.id ? true : false,
+		enabled: !!task?.id,
 		staleTime: 0,
 	});
+
+	useEffect(() => {
+		if (importTask) {
+			setuploadedTaskDetails(importTask);
+		}
+	}, [importTask]);
 
 	const importDetails = [
 		{
@@ -145,30 +155,32 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange }) => {
 		// },
 		{
 			label: 'Status',
-			value: <Chip label={toSentenceCase(importTask?.task_status || '')} isActive={importTask?.task_status === 'COMPLETED'} />,
+			value: (
+				<Chip label={toSentenceCase(uploadedTaskDetails?.task_status || '')} isActive={uploadedTaskDetails?.task_status === 'COMPLETED'} />
+			),
 		},
 		{
 			label: 'Import Started at',
-			value: importTask?.started_at ? formatDate(new Date(importTask.started_at)) : formatDate(new Date()),
+			value: uploadedTaskDetails?.started_at ? formatDate(new Date(uploadedTaskDetails.started_at)) : formatDate(new Date()),
 		},
 		{
 			label: 'Import Completed at',
-			value: importTask?.completed_at ? formatDate(new Date(importTask.completed_at)) : formatDate(new Date()),
+			value: uploadedTaskDetails?.completed_at ? formatDate(new Date(uploadedTaskDetails.completed_at)) : formatDate(new Date()),
 		},
 	];
 
 	const processedRows = [
 		{
 			label: 'Total Rows',
-			value: importTask?.total_records || uploadedFile?.row_count,
+			value: uploadedTaskDetails?.total_records || uploadedFile?.row_count,
 		},
 		{
 			label: 'Failed Rows',
-			value: importTask?.failed_records,
+			value: uploadedTaskDetails?.failed_records,
 		},
 		{
 			label: 'Successful Rows',
-			value: importTask?.successful_records,
+			value: uploadedTaskDetails?.successful_records,
 		},
 	];
 
@@ -182,6 +194,8 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange }) => {
 				file_type: '',
 				task_type: '',
 			});
+			refreshTaskStatus();
+			setuploadedTaskDetails(undefined);
 		}
 	}, [isOpen]);
 
@@ -207,57 +221,68 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange }) => {
 						error={errors.entity_type}
 						options={importTypeOptions}
 						value={activeImportType?.value}
-						label='Select Import Type'
+						label='Import Type'
 						onChange={(value) => {
 							setActiveImportType(importTypeOptions.find((option) => option.value === value));
 						}}
 						description='Select the type of data you want to import'
 					/>
 
-					<CSVBoxButton
-						key={csvBoxKey}
-						user='user_id'
-						onImport={(data: boolean, meta: ImportMeta) => {
-							console.log(data);
-							console.log(meta);
-							setUploadedFile(meta);
-						}}
-						licenseKey={getLicenseKey(activeImportType?.value || '')}
-						render={(launch, isLoading) => (
-							<div onClick={launch} className='cursor-pointer'>
-								<div className='space-y-1 w-full flex flex-col'>
-									{/* Label */}
-									<label className={cn('font-inter block text-sm font-medium', 'text-zinc-950')}>Import file</label>
-									{/* Input */}
-									<div
-										aria-disabled={isLoading}
-										className={cn(
-											'w-full flex h-full gap-2 group min-h-9 items-center rounded-md border bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground disabled:opacity-50 md:text-sm disabled:cursor-not-allowed',
-											'focus-within:border-black',
-											isLoading && 'text-zinc-500',
-										)}>
-										{uploadedFile ? (
-											<div className='flex gap-2 items-center'>
-												<File className='size-4' />
-												<p className='font-medium font-sans text-sm'>{uploadedFile.original_filename}</p>
+					{uploadedFile ? (
+						<div
+							className={cn(
+								'w-full flex justify-between items-center gap-2 group min-h-9 rounded-md border-dashed bg-gray-200 bg-background border px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground disabled:opacity-50 md:text-sm disabled:cursor-not-allowed',
+								'focus-within:border-black',
+							)}>
+							{uploadedFile.original_filename}
+							<button
+								onClick={() => {
+									setuploadedTaskDetails(undefined);
+									setUploadedFile(undefined);
+								}}
+								className='size-4'>
+								<X className='size-4 ' />
+							</button>
+						</div>
+					) : (
+						<CSVBoxButton
+							key={csvBoxKey}
+							user='user_id'
+							onImport={(data: boolean, meta: ImportMeta) => {
+								console.log(data);
+								console.log(meta);
+								setUploadedFile(meta);
+							}}
+							licenseKey={getLicenseKey(activeImportType?.value || '')}
+							render={(launch, isLoading) => (
+								<div onClick={launch} className='cursor-pointer'>
+									<div className='space-y-1 w-full flex flex-col'>
+										{/* Label */}
+										{/* <label className={cn('font-inter block text-sm font-medium', 'text-zinc-950')}>Import file</label> */}
+										<div
+											aria-disabled={isLoading}
+											className={cn(
+												'w-full h-32 flex justify-center items-center gap-2 group min-h-9 rounded-md border-dashed bg-gray-200 bg-background border px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground disabled:opacity-50 md:text-sm disabled:cursor-not-allowed',
+												'focus-within:border-black',
+												isLoading && 'text-zinc-500',
+											)}>
+											<div className={'p-2 border rounded-lg py-2 px-4'}>
+												<p className='font-medium flex gap-2 items-center'>
+													<Plus className='size-4' />
+													Choose File
+												</p>
 											</div>
-										) : (
-											<>
-												<p className='font-medium'>Choose File</p>
-											</>
-										)}
+										</div>
+										<p className={cn('text-sm', 'text-muted-foreground')}>Max File Size: 5 MB. .csv format accepted.</p>
+										{errors.file && <p className='text-sm text-destructive'>{errors.file}</p>}
 									</div>
-									<p className={cn('text-sm', 'text-muted-foreground')}>
-										{uploadedFile ? `${uploadedFile.row_count} Rows uploaded` : 'Max File Size: 5 MB. .csv format accepted.'}
-									</p>
-									{errors.file && <p className='text-sm text-destructive'>{errors.file}</p>}
 								</div>
-							</div>
-						)}
-					/>
+							)}
+						/>
+					)}
 
 					<div>
-						{importTask && (
+						{uploadedTaskDetails && (
 							<div>
 								<FormHeader title='Import Details' variant='form-component-title' />
 
@@ -290,18 +315,18 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange }) => {
 					</div>
 
 					<div className='mt-6 !space-y-4'>
-						{!importTask && (
+						{!uploadedTaskDetails && (
 							<Button
-								disabled={isPending || isLoading}
+								disabled={isPending || isLoading || !uploadedFile || !activeImportType}
 								onClick={() => {
 									handleImport();
 									// onOpenChange(false);
 								}}
 								className=''>
-								{isPending || isLoading ? <LoaderCircleIcon className='size-4 animate-spin' /> : 'Import Data'}
+								{isPending ? <LoaderCircleIcon className='size-4 animate-spin' /> : 'Import Data'}
 							</Button>
 						)}
-						{importTask && (
+						{uploadedTaskDetails?.task_status === 'QUEUED' && (
 							<Button
 								disabled={isPending || isLoading}
 								onClick={() => {
@@ -309,7 +334,7 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange }) => {
 									refreshTaskStatus();
 								}}
 								className='flex gap-2 items-center'>
-								{isPending || isLoading ? (
+								{isPending ? (
 									<LoaderCircleIcon className='size-4 animate-spin' />
 								) : (
 									<>
@@ -319,8 +344,18 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange }) => {
 								)}
 							</Button>
 						)}
+						{uploadedTaskDetails?.task_status === 'COMPLETED' && (
+							<Button
+								disabled={isPending || isLoading}
+								onClick={() => {
+									onOpenChange(false);
+								}}
+								className='flex gap-2 items-center'>
+								Done
+							</Button>
+						)}
 
-						{importTask && importTask.task_status === 'FAILED' && (
+						{uploadedTaskDetails && uploadedTaskDetails.task_status === 'FAILED' && (
 							<div className='flex gap-2 items-center'>
 								<Button
 									onClick={() => {

@@ -75,16 +75,16 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				icon: '/assets/svg/receipt.svg',
 			},
 			{
-				title: 'Quotation',
-				url: '/roles',
-				icon: '/assets/svg/quotation.svg',
-				disabled: true,
-			},
-			{
 				title: 'Import - Export',
 				url: RouteNames.importExport,
 				icon: '/assets/svg/import-export.svg',
 				// disabled: true,
+			},
+			{
+				title: 'Quotation',
+				url: '/roles',
+				icon: '/assets/svg/quotation.svg',
+				disabled: true,
 			},
 		],
 		'Product Cataglog': [
