@@ -80,8 +80,11 @@ const SetupChargesSection = () => {
 
 			{/* Conditional Forms */}
 			<Spacer height='4px' />
+
 			{metaData?.subscriptionType && (
 				<>
+					<FormHeader title='Plan Charges' subtitle='Define the charges for this pricing plan.' variant='sub-header' />
+					<Spacer height='4px' />
 					<RecurringChargesForm />
 					<UsageBasedPricingFormSection />
 				</>

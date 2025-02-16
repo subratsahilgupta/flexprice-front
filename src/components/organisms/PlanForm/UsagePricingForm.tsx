@@ -5,7 +5,7 @@ import { Button, Input, Select, Spacer } from '@/components/atoms';
 import SelectMeter from './SelectMeter';
 import { Pencil, Trash2 } from 'lucide-react';
 import { Meter } from '@/models/Meter';
-import { formatBillingPeriod, getCurrencySymbol } from '@/utils/common/helper_functions';
+import { formatBillingPeriod, getCurrencySymbol, toSentenceCase } from '@/utils/common/helper_functions';
 import { currencyOptions } from '@/core/data/constants';
 import VolumeTieredPricingForm from './VolumeTieredPricingForm';
 
@@ -173,7 +173,14 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 				<div
 					className='gap-2 w-full flex justify-between group min-h-9 items-center rounded-md border bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground disabled:opacity-50 md:text-sm disabled:cursor-not-allowed cursor-pointer'
 					onClick={handleEdit}>
-					<p>{activeMeter ? `${activeMeter.name}` : `Usage Based Charge ${label}`}</p>
+					<div>
+						<p>{activeMeter ? `${activeMeter.name}` : `Usage Based Charge ${label}`}</p>
+						<span className='flex gap-2'>
+							<p className='text-zinc-500 text-xs'>
+								{data?.currency}| {toSentenceCase(data?.billing_period || '')}
+							</p>
+						</span>
+					</div>
 					<span className='text-[#18181B] flex gap-2 items-center'>
 						<button onClick={handleEdit}>
 							<Pencil size={16} />
@@ -189,7 +196,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 	}
 
 	return (
-		<div>
+		<div className='card'>
 			<Spacer height={'8px'} />
 			<SelectMeter
 				error={errors.meter_id}
@@ -238,6 +245,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 						type='number'
 						error={inputErrors.flatModelError}
 						label='Price'
+						value={flatFee}
 						inputPrefix={getCurrencySymbol(currency)}
 						onChange={(e) => setflatFee(e)}
 						suffix={<span className='text-[#64748B]'>{`/ unit / ${formatBillingPeriod(billingPeriod)}`}</span>}
@@ -274,7 +282,9 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 				</div>
 			)}
 
-			{billingModel === billingModels[2].value && <VolumeTieredPricingForm setTieredPrices={setTieredPrices} tieredPrices={tieredPrices} />}
+			{billingModel === billingModels[2].value && (
+				<VolumeTieredPricingForm setTieredPrices={setTieredPrices} tieredPrices={tieredPrices} currency={currency} />
+			)}
 
 			<Spacer height='16px' />
 			<div className='flex justify-end'>

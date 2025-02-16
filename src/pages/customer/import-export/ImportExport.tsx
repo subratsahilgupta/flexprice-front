@@ -7,7 +7,7 @@ import formatDate from '@/utils/common/format_date';
 import { toSentenceCase } from '@/utils/common/helper_functions';
 import { useQuery } from '@tanstack/react-query';
 import { Import, RefreshCw } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
 const columns: ColumnData<ImportTask>[] = [
@@ -31,7 +31,14 @@ const columns: ColumnData<ImportTask>[] = [
 		title: 'Status',
 		align: 'center',
 		render(rowData) {
-			return <Chip label={toSentenceCase(rowData?.task_status || '')} isActive={rowData?.task_status === 'COMPLETED'} />;
+			return (
+				<Chip
+					label={toSentenceCase(rowData?.task_status || '')}
+					isActive={rowData?.task_status === 'COMPLETED'}
+					inactiveTextColor='#DC2626'
+					inactiveBgColor='#FEE2E2'
+				/>
+			);
 		},
 	},
 	{
@@ -54,6 +61,14 @@ const columns: ColumnData<ImportTask>[] = [
 const ImportExport = () => {
 	const [drawerOpen, setdrawerOpen] = useState(false);
 	const { limit, offset } = usePagination();
+	const [activeTask, setactiveTask] = useState();
+
+	useEffect(() => {
+		if (!drawerOpen) {
+			setactiveTask(undefined);
+		}
+	}, [drawerOpen]);
+
 	const {
 		data,
 		isLoading,
@@ -81,7 +96,7 @@ const ImportExport = () => {
 	return (
 		<div className='page'>
 			{/* import export drawer */}
-			<ImportFileDrawer isOpen={drawerOpen} onOpenChange={(value) => setdrawerOpen(value)} />
+			<ImportFileDrawer taskId={activeTask} isOpen={drawerOpen} onOpenChange={(value) => setdrawerOpen(value)} />
 
 			<SectionHeader showFilter showSearch title='Bulk Imports'>
 				<Button
@@ -98,7 +113,16 @@ const ImportExport = () => {
 			</SectionHeader>
 
 			<div>
-				<FlexpriceTable data={data?.items ?? []} columns={columns} showEmptyRow emptyRowText='No data found' />
+				<FlexpriceTable
+					onRowClick={(row) => {
+						setactiveTask(row.id);
+						setdrawerOpen(true);
+					}}
+					data={data?.items ?? []}
+					columns={columns}
+					showEmptyRow
+					emptyRowText='No data found'
+				/>
 				<Pagination totalPages={Math.ceil((data?.pagination.total ?? 1) / limit)} />
 			</div>
 		</div>

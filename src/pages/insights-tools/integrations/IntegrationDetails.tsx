@@ -19,9 +19,9 @@ const IntegrationDetails = () => {
 					<div className='flex items-center justify-between w-full'>
 						<h3 className='font-semibold text-lg'>{integration.name}</h3>
 						{integration.comingSoon && (
-							<span className='absolute top-2 right-2 bg-[#FEF08A] text-[#D97706] text-xs font-semibold px-2 py-1 rounded-2xl opacity-55'>
+							<div className='absolute top-2 right-2 bg-[#FEF08A] text-[#D97706] text-xs !font-semibold px-2 py-1 rounded-2xl !opacity-55'>
 								Coming Soon
-							</span>
+							</div>
 						)}
 					</div>
 					<p className='text-gray-500 text-sm'>{integration.description}</p>

@@ -44,7 +44,11 @@ const IntegrationCard = ({ integration }: { integration: Integration }) => {
 			<div className='ml-4 flex-1'>
 				<div className='flex items-center justify-between w-full'>
 					<h3 className='font-semibold text-lg'>{integration.name}</h3>
-					{integration.comingSoon && <span className='text-xs bg-yellow-200 text-yellow-800 px-2 py-1 rounded-2xl'>Coming Soon</span>}
+					{integration.comingSoon && (
+						<div className=' top-2 right-2 bg-[#FEF08A] text-[#D97706] text-xs !font-semibold px-2 py-1 rounded-2xl !opacity-55'>
+							Coming Soon
+						</div>
+					)}
 				</div>
 				<p className='text-gray-500 text-sm'>{integration.description}</p>
 				<div className='mt-2 flex items-center gap-2'>

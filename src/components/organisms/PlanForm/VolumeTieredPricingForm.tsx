@@ -3,10 +3,12 @@ import { cn } from '@/lib/utils';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { Button, Input, Spacer } from '@/components/atoms';
 import { PriceTier } from './UsagePricingForm';
+import { getCurrencySymbol } from '@/utils/common/helper_functions';
 
 interface Props {
 	tieredPrices: PriceTier[];
 	setTieredPrices: React.Dispatch<React.SetStateAction<PriceTier[]>>;
+	currency?: string;
 }
 
 const formatNumber = (value: string): number | null => {
@@ -17,7 +19,7 @@ const formatNumber = (value: string): number | null => {
 	return parseInt(numericString, 10);
 };
 
-const VolumeTieredPricingForm: FC<Props> = ({ setTieredPrices, tieredPrices }) => {
+const VolumeTieredPricingForm: FC<Props> = ({ setTieredPrices, tieredPrices, currency }) => {
 	const addTieredPrice = () => {
 		setTieredPrices((prev) => {
 			const lastTier = prev[prev.length - 1];
@@ -74,7 +76,7 @@ const VolumeTieredPricingForm: FC<Props> = ({ setTieredPrices, tieredPrices }) =
 	};
 
 	const updatePrice = (index: number, key: string, value: string) => {
-		const numericString = value.replace(/[^0-9]/g, '');
+		const numericString = value.replace(/[^0-9.]/g, '');
 		setTieredPrices((prev) => {
 			const updatedTiers = [...prev];
 			// if (newValue !== null) {
@@ -102,13 +104,7 @@ const VolumeTieredPricingForm: FC<Props> = ({ setTieredPrices, tieredPrices }) =
 						{tieredPrices.map((tier, index) => (
 							<tr key={index}>
 								<td className='px-4 py-2'>
-									<Input
-										disabled
-										className='h-9'
-										onChange={(e) => updateTier(index, 'from', e)}
-										value={tier.from.toString()}
-										placeholder='From'
-									/>
+									<Input disabled className='h-9' onChange={(e) => updateTier(index, 'from', e)} value={tier.from.toString()} />
 								</td>
 								<td className='px-4 py-2'>
 									<Input
@@ -116,7 +112,6 @@ const VolumeTieredPricingForm: FC<Props> = ({ setTieredPrices, tieredPrices }) =
 										onChange={(e) => updateTier(index, 'up_to', e)}
 										disabled={tier.up_to === null}
 										value={tier.up_to === null ? '∞' : tier.up_to.toString()}
-										placeholder='To (Infinity)'
 									/>
 								</td>
 								<td className='px-4 py-2'>
@@ -124,7 +119,7 @@ const VolumeTieredPricingForm: FC<Props> = ({ setTieredPrices, tieredPrices }) =
 										className='h-9'
 										onChange={(e) => updatePrice(index, 'unit_amount', e)}
 										value={tier.unit_amount?.toString()}
-										placeholder='Rs. 100'
+										placeholder={currency ? `${getCurrencySymbol(currency)} 0` : undefined}
 									/>
 								</td>
 								<td className='px-4 py-2'>
@@ -132,7 +127,7 @@ const VolumeTieredPricingForm: FC<Props> = ({ setTieredPrices, tieredPrices }) =
 										className='h-9'
 										onChange={(e) => updatePrice(index, 'flat_amount', e)}
 										value={tier.flat_amount?.toString()}
-										placeholder='Flat Fee'
+										placeholder={currency ? `${getCurrencySymbol(currency)} 0` : undefined}
 									/>
 								</td>
 								<td className='px-4 py-2 text-center'>

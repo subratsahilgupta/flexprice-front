@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import usePlanStore, { Price } from '@/store/usePlanStore';
 import { Pencil, Trash2 } from 'lucide-react';
 import { AddChargesButton, subscriptionTypeOptions } from './SetupChargesSection';
-import { formatBillingPeriod, getCurrencySymbol } from '@/utils/common/helper_functions';
+import { formatBillingPeriod, getCurrencySymbol, toSentenceCase } from '@/utils/common/helper_functions';
 import { billlingPeriodOptions, currencyOptions } from '@/core/data/constants';
 
 const RecurringChargesForm = () => {
@@ -81,7 +81,14 @@ const RecurringChargesForm = () => {
 				<div
 					className='gap-2 w-full flex justify-between group min-h-9 items-center rounded-md border bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground disabled:opacity-50 md:text-sm disabled:cursor-not-allowed cursor-pointer'
 					onClick={handleEdit}>
-					<p>{'Recurring fee'}</p>
+					<div>
+						<p>{'Recurring Charge'}</p>
+						<span className='flex gap-2'>
+							<p className='text-zinc-500 text-xs'>
+								{currency}| {toSentenceCase(billingPeriod)}
+							</p>
+						</span>
+					</div>
 					<span className='text-[#18181B] flex gap-2 items-center'>
 						<button onClick={handleEdit}>
 							<Pencil size={16} />
@@ -100,7 +107,7 @@ const RecurringChargesForm = () => {
 		);
 	} else {
 		return (
-			<div>
+			<div className='card'>
 				<FormHeader title='Recurring Charges' variant='form-component-title' />
 
 				<Spacer height={'8px'} />
