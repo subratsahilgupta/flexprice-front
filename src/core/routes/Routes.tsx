@@ -63,7 +63,6 @@ export const RouteNames = {
 	integrationDetails: '/insights-&-tools/integrations/:id',
 	importExport: '/insights-&-tools/bulk-imports',
 };
-
 export const MainRouter = createBrowserRouter([
 	{
 		path: RouteNames.login,
@@ -113,7 +112,6 @@ export const MainRouter = createBrowserRouter([
 						path: `${RouteNames.customers}`,
 						element: <CustomerPage />,
 					},
-
 					{
 						path: `${RouteNames.customers}/:id/add-subscription`,
 						element: <CustomerSubscription />,
