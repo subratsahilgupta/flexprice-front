@@ -20,6 +20,8 @@ export const formatAggregationType = (data: string): string => {
 			return 'Sum';
 		case 'COUNT':
 			return 'Count';
+		case 'COUNT_UNIQUE':
+			return 'Count Unique';
 		default:
 			return 'Sum';
 	}
