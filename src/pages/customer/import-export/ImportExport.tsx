@@ -23,10 +23,10 @@ const mapStatusChips = (status: string) => {
 
 const columns: ColumnData<ImportTask>[] = [
 	{
-		fieldName: 'file_url',
+		fieldName: 'file_name',
 		title: 'File Name',
-		render() {
-			return <div>--</div>;
+		render(rowData) {
+			return <div>{rowData.file_name || '--'}</div>;
 		},
 	},
 	{
@@ -71,7 +71,7 @@ const columns: ColumnData<ImportTask>[] = [
 ];
 const ImportExport = () => {
 	const [drawerOpen, setdrawerOpen] = useState(false);
-	const { limit, offset } = usePagination();
+	const { limit, offset, page } = usePagination();
 	const [activeTask, setactiveTask] = useState();
 
 	useEffect(() => {
@@ -86,7 +86,7 @@ const ImportExport = () => {
 		error,
 		refetch: refetchTasks,
 	} = useQuery({
-		queryKey: ['importTasks'],
+		queryKey: ['importTasks', page],
 		queryFn: async () => {
 			return await TaskApi.getAllTasks({
 				limit,
@@ -107,7 +107,7 @@ const ImportExport = () => {
 	if (data?.items.length === 0) {
 		return (
 			<EmptyPage title='Import Tasks' description='No import tasks found'>
-				<ImportFileDrawer taskId={activeTask} isOpen={drawerOpen} onOpenChange={(value) => setdrawerOpen(value)} />
+				<ImportFileDrawer taskId={activeTask} isOpen={drawerOpen && Boolean(activeTask)} onOpenChange={(value) => setdrawerOpen(value)} />
 				<Button onClick={() => setdrawerOpen(true)} className='flex gap-2 items-center '>
 					<Import />
 					<span>Import File</span>

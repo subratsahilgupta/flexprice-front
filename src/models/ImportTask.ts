@@ -3,6 +3,7 @@ export type ImportTask = Readonly<{
 	task_type: string;
 	entity_type: string;
 	file_url: string;
+	file_name: string;
 	file_type: string;
 	task_status: string;
 	processed_records: number;
