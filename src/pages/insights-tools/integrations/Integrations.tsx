@@ -53,11 +53,6 @@ const IntegrationCard = ({ integration }: { integration: Integration }) => {
 								Coming Soon
 							</div>
 						)}
-						{integration.type === 'available' && !integration.comingSoon && (
-							<Button onClick={() => {}} className='flex gap-2 items-center'>
-								Install
-							</Button>
-						)}
 						{/* {integration.type === 'available' && !integration.comingSoon && (
 							<Button variant={'outline'} onClick={() => { }} className=' flex w-6 h-8 gap-2 items-center'>
 								<Plus className='w-4 h-4' />
@@ -72,6 +67,11 @@ const IntegrationCard = ({ integration }: { integration: Integration }) => {
 							</span>
 						))}
 					</div>
+					{integration.type === 'available' && !integration.comingSoon && (
+						<Button onClick={() => {}} className='flex gap-2 items-center'>
+							Install
+						</Button>
+					)}
 				</div>
 			</div>
 		</div>
