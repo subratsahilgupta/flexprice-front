@@ -250,7 +250,7 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 				isOpen={isOpen}
 				onOpenChange={onOpenChange}
 				title={'Import File'}
-				description={'Select a module to start importing or exporting data'}>
+				description={'Easily upload and manage your bulk data imports.'}>
 				<div className='mt-6'>
 					{!uploadedTaskDetails && (
 						<Select
@@ -348,13 +348,13 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 												variant='form-component-title'
 												className='mb-0'
 												titleClassName='mb-0'
-												subtitle='Download a sample csv file below & compare it to your import file to ensure you have the right format or the import.'
+												subtitle='Max file size: 5 MB. Only .csv format is accepted.'
 											/>
 											<Button
 												className='flex gap-2 !p-0 m-0 underline'
 												variant={'link'}
 												onClick={() => {
-													window.open('https://www.youtube.com/', '_blank');
+													window.open('/assets/csv/sample.csv', '_blank');
 												}}>
 												Sample CSV
 												<Download className='size-4 underline' />

@@ -14,13 +14,14 @@ export type Integration = {
 	apiKey?: string;
 	installedAt?: string;
 };
+
 export const integrations: Integration[] = [
 	{
 		name: 'Stripe',
 		logo: 'https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg',
 		description: 'Send invoices, calculate tax, and collect payments.',
 		tags: ['Payments', 'Invoices'],
-		type: 'installed', // 'available' for uninstalled integrations
+		type: 'installed',
 		accountId: 'acct_1PloOLJiOrSZFKQm',
 		mode: 'Test Mode',
 		apiKey: 'sk_test_***HT1',

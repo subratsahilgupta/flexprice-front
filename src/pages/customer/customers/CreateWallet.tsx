@@ -64,7 +64,7 @@ const CreateWallet: FC<Props> = ({ customerId, onClose = () => {} }) => {
 			<div className='card space-y-4'>
 				<FormHeader
 					title='Wallet'
-					subtitle={`Create a prepaid wallet to add credits that can be consumed for billing purposes.`}
+					subtitle={`Manage credits for usage-based billing that can apply to invoices pre-tax.`}
 					variant='sub-header'
 				/>
 				<Input error={errors.walletName} value={walletName} onChange={setwalletName} label='Wallet Name' placeholder='Enter wallet name' />
@@ -80,6 +80,7 @@ const CreateWallet: FC<Props> = ({ customerId, onClose = () => {} }) => {
 			</div>
 			<Spacer className='!mt-4' />
 			<TopupCard
+				currency={currency}
 				onSuccess={() => onClose(false)}
 				isPrefunctionLoading={isPending}
 				walletId={walletData?.id}

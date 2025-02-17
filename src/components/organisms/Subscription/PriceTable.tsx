@@ -46,7 +46,7 @@ const ChargeTable: FC<Props> = ({ data }) => {
 			<div className='rounded-xl border border-gray-300 space-y-6 mt-2 '>
 				<motion.div
 					initial={{ height: 'auto' }}
-					animate={{ height: showAllRows ? 'auto' : 200 }}
+					// animate={{ height: showAllRows ? 'auto' : 200 }}
 					transition={{ duration: 0.3, ease: 'easeInOut' }}
 					style={{ overflow: 'hidden' }}>
 					<FlexpriceTable columns={columns} data={displayedData} />

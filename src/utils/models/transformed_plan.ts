@@ -53,7 +53,7 @@ export const normalizePlan = (originalData: ExpandedPlan): NormalizedPlan => {
 
 	for (const price of prices ?? []) {
 		const billingPeriod = price.billing_period.toLowerCase();
-		const currency = price.currency.toLowerCase();
+		const currency = price.currency.toUpperCase();
 
 		// Ensure the structure exists for the billing period
 		if (!charges[billingPeriod]) {
@@ -88,7 +88,7 @@ export const normalizePlan = (originalData: ExpandedPlan): NormalizedPlan => {
 	};
 };
 
-export const getPriceTableCharge = (charge: ChargesForBillingPeriodOne) => {
+export const getPriceTableCharge = (charge: ChargesForBillingPeriodOne, normalizedPrice: boolean = true) => {
 	if (charge.type === 'FIXED') {
 		return `${charge.display_amount}`;
 	} else {
@@ -97,7 +97,7 @@ export const getPriceTableCharge = (charge: ChargesForBillingPeriodOne) => {
 		} else if (charge.billing_model === 'FLAT_FEE') {
 			return `${charge.display_amount} / unit`;
 		} else if (charge.billing_model === 'TIERED') {
-			return `Starts at ${getCurrencySymbol(charge.currency)}${charge.tiers[0].unit_amount} / unit`;
+			return `Starts at ${normalizedPrice ? charge.currency : getCurrencySymbol(charge.currency)}${charge.tiers[0].unit_amount} / unit`;
 		} else {
 			return `${charge.display_amount}`;
 		}

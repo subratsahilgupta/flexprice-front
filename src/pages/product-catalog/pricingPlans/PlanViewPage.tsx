@@ -1,4 +1,4 @@
-import { Button, FormHeader, Loader, SectionHeader, Spacer } from '@/components/atoms';
+import { FormHeader, Loader, SectionHeader, Spacer } from '@/components/atoms';
 import { AddEntitlementDrawer, ColumnData, FeatureTable, FlexpriceTable } from '@/components/molecules';
 import { Price } from '@/models/Price';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
@@ -6,7 +6,7 @@ import formatDate from '@/utils/common/format_date';
 import { formatPriceType, toSentenceCase } from '@/utils/common/helper_functions';
 import { getPriceTableCharge } from '@/utils/models/transformed_plan';
 import { useQuery } from '@tanstack/react-query';
-import { EyeOff, Pencil, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useParams } from 'react-router-dom';
@@ -58,7 +58,7 @@ const chargeColumns: ColumnData[] = [
 ];
 
 const ValueCell = ({ data }: { data: Price }) => {
-	const price = getPriceTableCharge(data as any);
+	const price = getPriceTableCharge(data as any, false);
 	return <div>{price}</div>;
 };
 
@@ -92,7 +92,7 @@ const PlanViewPage = () => {
 			<AddEntitlementDrawer planId={planData?.id} isOpen={drawerOpen} onOpenChange={(value) => setdrawerOpen(value)} />
 
 			<div className='w-2/3 mb-10'>
-				<div className='w-full !my-5 flex justify-between items-center'>
+				{/* <div className='w-full !my-5 flex justify-between items-center'>
 					<FormHeader title={planData?.name} variant='form-title' />
 					{planData?.status === 'published' && (
 						<div className='flex gap-2'>
@@ -106,7 +106,7 @@ const PlanViewPage = () => {
 							</Button>
 						</div>
 					)}
-				</div>
+				</div> */}
 
 				<div className='card'>
 					<FormHeader title='Plan details' variant='sub-header' titleClassName='font-semibold' />

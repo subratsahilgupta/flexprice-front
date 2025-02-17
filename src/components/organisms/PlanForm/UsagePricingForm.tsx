@@ -50,16 +50,28 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 	const metaData = usePlanStore((state) => state.metaData);
 
 	const [currency, setCurrency] = useState(metaData?.usageBasedPrice?.currency || currencyOptions[0].value);
-	const [billingModel, setBillingModel] = useState(metaData?.usageBasedPrice?.billing_model || billingModels[0].value);
-	const [meterId, setMeterId] = useState(metaData?.usageBasedPrice?.meter_id);
+	const [billingModel, setBillingModel] = useState(
+		metaData?.usageBasedPrice?.billing_model || data?.billing_model || billingModels[0].value,
+	);
+	const [meterId, setMeterId] = useState(metaData?.usageBasedPrice?.meter_id || data?.meter_id);
 
-	const [tieredPrices, setTieredPrices] = useState<PriceTier[]>([
-		{ from: 1, up_to: 1 },
-		{ from: 2, up_to: null },
-	]);
+	const [tieredPrices, setTieredPrices] = useState<PriceTier[]>(
+		data?.tiers?.map((tier: any) => ({
+			from: tier.from,
+			up_to: tier.up_to,
+			flat_amount: tier.flat_amount,
+			unit_amount: tier.unit_amount,
+		})) || [
+			{ from: 1, up_to: 1 },
+			{ from: 2, up_to: null },
+		],
+	);
 	const [billingPeriod, setbillingPeriod] = useState(data?.billing_period || billlingPeriodOptions[2].value);
 	const [flatFee, setflatFee] = useState<string>(data?.amount || '');
-	const [packagedFee, setpackagedFee] = useState<{ unit: string; price: string }>({ unit: '', price: '' });
+	const [packagedFee, setpackagedFee] = useState<{ unit: string; price: string }>({
+		unit: data?.transform_quantity?.divide_by ? `${data?.transform_quantity?.divide_by}` : '',
+		price: data?.amount || '',
+	});
 	const [errors, seterrors] = useState<Partial<Record<keyof Price, any>>>({});
 	const [inputErrors, setinputErrors] = useState({
 		flatModelError: '',
@@ -166,6 +178,8 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 		return true;
 	};
 
+	console.log('data', data);
+
 	if (!isEdit) {
 		return (
 			<div className='mb-2'>
@@ -177,7 +191,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 						<p>{activeMeter ? `${activeMeter.name}` : `Usage Based Charge ${label}`}</p>
 						<span className='flex gap-2'>
 							<p className='text-zinc-500 text-xs'>
-								{data?.currency}| {toSentenceCase(data?.billing_period || '')}
+								{data?.currency} | {toSentenceCase(data?.billing_period || '')}
 							</p>
 						</span>
 					</div>
@@ -196,7 +210,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 	}
 
 	return (
-		<div className='card'>
+		<div className='card mb-2'>
 			<Spacer height={'8px'} />
 			<SelectMeter
 				error={errors.meter_id}

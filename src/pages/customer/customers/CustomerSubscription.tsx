@@ -56,6 +56,7 @@ const CustomerSubscription: React.FC = () => {
 			try {
 				setPlansLoading(true);
 				const plansResponse = await PlanApi.getActiveExpandedPlan();
+
 				const normalizedPlans = plansResponse.map((plan) => normalizePlan(plan));
 				setPlans(normalizedPlans);
 

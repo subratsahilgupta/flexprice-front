@@ -5,17 +5,7 @@ import { Meter } from '@/models/Meter';
 import formatChips from '@/utils/common/format_chips';
 import formatDate from '@/utils/common/format_date';
 import { MeterApi } from '@/utils/api_requests/MeterApi';
-
-const formatAggregationType = (data: string): string => {
-	switch (data) {
-		case 'SUM':
-			return 'Sum';
-		case 'COUNT':
-			return 'Count';
-		default:
-			return 'Sum';
-	}
-};
+import { formatAggregationType } from '@/components/organisms/MeterForm/MeterForm';
 
 export interface BillableMetricTableProps {
 	data: Meter[];

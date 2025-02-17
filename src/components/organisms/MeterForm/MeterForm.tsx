@@ -14,6 +14,17 @@ interface Props {
 	onSubmit: (data: Meter, mode: 'add' | 'edit') => void;
 }
 
+export const formatAggregationType = (data: string): string => {
+	switch (data) {
+		case 'SUM':
+			return 'Sum';
+		case 'COUNT':
+			return 'Count';
+		default:
+			return 'Sum';
+	}
+};
+
 // Zod Schema for Validation
 const MeterFormSchema = z.object({
 	eventName: z.string().min(1, { message: 'Event Name is required' }),
@@ -210,9 +221,9 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 							<Select
 								disabled={isEditMode}
 								options={[
-									{ label: 'SUM', value: 'SUM' },
-									{ label: 'COUNT', value: 'COUNT' },
-									{ label: 'COUNT UNIQUE', value: 'c1' },
+									{ label: 'Sum', value: 'SUM' },
+									{ label: 'Count', value: 'COUNT' },
+									{ label: 'Count Unique', value: 'COUNT_UNIQUE' },
 								]}
 								value={aggregationFunction}
 								onChange={setAggregationFunction}

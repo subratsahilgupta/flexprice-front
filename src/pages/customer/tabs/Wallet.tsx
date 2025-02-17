@@ -149,7 +149,7 @@ const WalletTab = () => {
 			<FormHeader
 				className='!my-6'
 				title='Wallets'
-				subtitle="Make changes to your account here. Click save when you're done."
+				subtitle='Manage credits for usage-based billing that can apply to invoices pre-tax'
 				variant='sub-header'
 			/>
 			<div className='w-full flex justify-between items-center mb-3'>

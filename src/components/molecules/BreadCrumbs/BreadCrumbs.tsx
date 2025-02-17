@@ -10,10 +10,10 @@ const BreadCrumbs = () => {
 	useEffect(() => {
 		const path = location.pathname;
 		const pathSegments = path.split('/').filter(Boolean);
-		console.log('Path segments:', pathSegments);
+		// console.log('Path segments:', pathSegments);
 
 		if (breadcrumbCache[path]) {
-			console.log('Using cached breadcrumbs for', path);
+			// console.log('Using cached breadcrumbs for', path);
 			setBreadcrumbs(breadcrumbCache[path], true);
 			return;
 		} else {
@@ -23,19 +23,18 @@ const BreadCrumbs = () => {
 				const path = `/${arr.slice(0, index + 1).join('/')}`;
 
 				if (breadcrumbs[index]?.path === path) {
-					console.log('Using cached breadcrumb for', path);
+					// console.log('Using cached breadcrumb for', path);
 					return breadcrumbs[index];
 				} else {
 					return { label, path };
 				}
-				// return { label, path };
 			});
-			console.log('New breadcrumbs:', newBreadcrumbs);
+			// console.log('New breadcrumbs:', newBreadcrumbs);
 
 			// Only update breadcrumbs if they're different from the current ones
 			if (!areBreadcrumbsEqual(newBreadcrumbs, breadcrumbs)) {
 				setBreadcrumbs(newBreadcrumbs);
-				console.log('Updating breadcrumbs:', newBreadcrumbs);
+				// console.log('Updating breadcrumbs:', newBreadcrumbs);
 			}
 		}
 	}, [location.pathname, breadcrumbs, setBreadcrumbs]);

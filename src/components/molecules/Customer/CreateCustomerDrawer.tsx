@@ -24,7 +24,7 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 	const isControlled = open !== undefined && onOpenChange !== undefined;
 	const [showBillingDetails, setShowBillingDetails] = useState(false);
 
-	const handleChange = (name: keyof typeof formData, value: string) => {
+	const handleChange = (name: keyof typeof formData, value: string | undefined) => {
 		setFormData((prev) => ({ ...prev, [name]: value }));
 	};
 
@@ -33,7 +33,6 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 		if (data) {
 			setShowBillingDetails(true);
 		}
-		console.log('customer data', data);
 	}, [data]);
 
 	const currentOpen = isControlled ? open : internalOpen;
@@ -46,9 +45,9 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 	};
 
 	const countriesOptions: SelectOption[] = Country.getAllCountries().map(({ name, isoCode }) => ({ label: name, value: isoCode }));
-	const statesOptions: SelectOption[] = State.getStatesOfCountry(formData.address_country).map(({ name, isoCode }) => ({
+	const statesOptions: SelectOption[] = State.getStatesOfCountry(formData.address_country).map(({ name }) => ({
 		label: name,
-		value: isoCode,
+		value: name,
 	}));
 
 	const citiesOptions: SelectOption[] =
@@ -136,14 +135,13 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 			}
 		},
 		retry: 2,
-		onSuccess: async () => {
+		onSuccess: async (details) => {
+			console.log('details', details);
 			if (data) {
-				toast.success('Customer updated successfully');
 				await queryClient.invalidateQueries({
 					queryKey: ['fetchCustomerDetails', formData.id],
 				});
 			} else {
-				toast.success('Customer added successfully');
 				await queryClient.invalidateQueries({
 					queryKey: ['fetchCustomers'],
 				});
@@ -154,9 +152,22 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 				exact: false,
 			});
 
+			// if (!details) {
+			// 	toast.error('Error adding customer');
+			// } else
+			if (data) {
+				toast.success('Customer updated successfully');
+			} else {
+				toast.success('Customer added successfully');
+			}
+
 			toggleOpen();
 		},
-		onError: () => toast.error('Error adding customer'),
+		onError: (error) => {
+			console.log(error);
+
+			toast.error('Error adding customer');
+		},
 	});
 
 	const handleSubmit = () => {

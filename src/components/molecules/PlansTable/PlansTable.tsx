@@ -41,8 +41,10 @@ const PlansTable: FC<PlansTableProps> = ({ data }) => {
 			render: (row) => (
 				<ActionButton
 					id={row.id}
-					isArchiveDisabled={row.status === 'archived'}
-					isEditDisabled={row.status === 'archived'}
+					isArchiveDisabled={true}
+					isEditDisabled={true}
+					// isArchiveDisabled={row.status === 'archived' || false}
+					// isEditDisabled={row.status === 'archived' || false}
 					editPath={`/product-catalog/pricing-plan/edit-plan?id=${row.id}`}
 					deleteMutationFn={(id) => PlanApi.deletePlan(id)}
 					refetchQueryKey='fetchPlans'
