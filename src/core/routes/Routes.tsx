@@ -47,7 +47,6 @@ export const RouteNames = {
 	invoiceDetail: '/customer-management/invoices/:invoiceId',
 
 	// import export routes
-	importExport: '/customer-management/import-export',
 
 	// product catalog routes
 	productCatalog: '/product-catalog',
@@ -62,6 +61,7 @@ export const RouteNames = {
 	insights: '/insights-&-tools',
 	integrations: '/insights-&-tools/integrations',
 	integrationDetails: '/insights-&-tools/integrations/:id',
+	importExport: '/insights-&-tools/bulk-imports',
 };
 
 export const MainRouter = createBrowserRouter([
@@ -112,10 +112,6 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: `${RouteNames.customers}`,
 						element: <CustomerPage />,
-					},
-					{
-						path: `${RouteNames.importExport}`,
-						element: <ImportExport />,
 					},
 
 					{
@@ -219,6 +215,10 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: RouteNames.integrationDetails,
 						element: <IntegrationDetails />,
+					},
+					{
+						path: `${RouteNames.importExport}`,
+						element: <ImportExport />,
 					},
 				],
 			},

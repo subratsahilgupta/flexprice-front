@@ -74,12 +74,7 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				url: '/customer-management/invoices',
 				icon: '/assets/svg/receipt.svg',
 			},
-			{
-				title: 'Import - Export',
-				url: RouteNames.importExport,
-				icon: '/assets/svg/import-export.svg',
-				// disabled: true,
-			},
+
 			{
 				title: 'Quotation',
 				url: '/roles',
@@ -105,6 +100,12 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				title: 'Integrations',
 				url: RouteNames.integrations,
 				icon: <Plug2 />,
+			},
+			{
+				title: 'Bulk Imports',
+				url: RouteNames.importExport,
+				icon: '/assets/svg/import-export.svg',
+				// disabled: true,
 			},
 		],
 	};
