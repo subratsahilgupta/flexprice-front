@@ -6,7 +6,7 @@ import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { queryClient } from '@/App';
 import Customer from '@/models/Customer';
 import { Plus } from 'lucide-react';
-import { Country, State, City } from 'country-state-city';
+import { Country, State, City, IState } from 'country-state-city';
 import { z } from 'zod';
 
 interface Props {
@@ -44,10 +44,12 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 		}
 	};
 
+	const [activeState, setactiveState] = useState<IState>();
+
 	const countriesOptions: SelectOption[] = Country.getAllCountries().map(({ name, isoCode }) => ({ label: name, value: isoCode }));
-	const statesOptions: SelectOption[] = State.getStatesOfCountry(formData.address_country).map(({ name }) => ({
+	const statesOptions: SelectOption[] = State.getStatesOfCountry(formData.address_country).map(({ name, isoCode }) => ({
 		label: name,
-		value: name,
+		value: isoCode,
 	}));
 
 	const citiesOptions: SelectOption[] =
@@ -113,7 +115,7 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 					address_country: formData.address_country || undefined,
 					address_line1: formData.address_line1 || undefined,
 					address_line2: formData.address_line2 || undefined,
-					address_state: formData.address_state || undefined,
+					address_state: activeState?.name || undefined,
 					phone: formData.phone || undefined,
 					timezone: formData.timezone || undefined,
 				};
@@ -126,9 +128,9 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 					external_id: formData.external_id!,
 					address_city: formData.address_city!,
 					address_country: formData.address_country!,
+					address_state: activeState?.name,
 					address_line1: formData.address_line1!,
 					address_line2: formData.address_line2!,
-					address_state: formData.address_state!,
 					phone: formData.phone!,
 					timezone: formData.timezone!,
 				});
@@ -259,6 +261,7 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 										value={formData.address_state}
 										onChange={(e) => {
 											setFormData({ ...formData, timezone: undefined, address_city: undefined });
+											setactiveState(State.getStateByCodeAndCountry(e, formData.address_country || ''));
 											handleChange('address_state', e);
 										}}
 										noOptionsText='No states Available'

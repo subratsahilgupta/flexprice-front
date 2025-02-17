@@ -59,12 +59,16 @@ const CreateWallet: FC<Props> = ({ customerId, onClose = () => {} }) => {
 
 	return (
 		<div className='w-2/3'>
-			<FormHeader title='Create Wallet' subtitle={`Make changes to your account here. Click save when you're done.`} variant='form-title' />
+			<FormHeader
+				title='Create Wallet'
+				subtitle={`Manage credits for usage-based billing that can apply to invoices pre-tax.`}
+				variant='form-title'
+			/>
 			<Spacer className='!mt-4' />
 			<div className='card space-y-4'>
 				<FormHeader
 					title='Wallet'
-					subtitle={`Manage credits for usage-based billing that can apply to invoices pre-tax.`}
+					subtitle={`Create a prepaid wallet to add credits that can be consumed for billing purposes.`}
 					variant='sub-header'
 				/>
 				<Input error={errors.walletName} value={walletName} onChange={setwalletName} label='Wallet Name' placeholder='Enter wallet name' />
