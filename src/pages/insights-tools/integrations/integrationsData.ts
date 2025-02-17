@@ -33,7 +33,7 @@ export const integrations: Integration[] = [
 			},
 			{
 				title: 'Stripe Invoicing',
-				description: ['Create and send invoices through Stripe Invoicing directly from OpenMeter and automatically collect payments.'],
+				description: ['Create and send invoices through Stripe Invoicing directly from Flexprice and automatically collect payments.'],
 			},
 			{
 				title: 'Automatic Tax Calculations',
@@ -59,13 +59,13 @@ export const integrations: Integration[] = [
 			{
 				title: 'Overview',
 				description: [
-					'The Flexprice Razorpay app enables invoicing, tax calculations, and payment collection directly through Razorpay. Integrate it seamlessly with OpenMeter (or your billing engine) to streamline your payment workflows.',
+					'The Flexprice Razorpay app enables invoicing, tax calculations, and payment collection directly through Razorpay. Integrate it seamlessly with Flexprice (or your billing engine) to streamline your payment workflows.',
 				],
 			},
 			{
 				title: 'Razorpay Invoicing',
 				description: [
-					'Create and send invoices with a few clicks—right from OpenMeter—using Razorpay’s invoicing capabilities. Payment collection can be automated, reducing manual follow-ups.',
+					'Create and send invoices with a few clicks—right from Flexprice—using Razorpay’s invoicing capabilities. Payment collection can be automated, reducing manual follow-ups.',
 				],
 			},
 			{
