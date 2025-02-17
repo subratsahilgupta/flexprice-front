@@ -28,6 +28,7 @@ const BreadCrumbs = () => {
 				} else {
 					return { label, path };
 				}
+				// return { label, path };
 			});
 			console.log('New breadcrumbs:', newBreadcrumbs);
 

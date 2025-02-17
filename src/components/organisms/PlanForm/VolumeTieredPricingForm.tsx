@@ -119,7 +119,8 @@ const VolumeTieredPricingForm: FC<Props> = ({ setTieredPrices, tieredPrices, cur
 										className='h-9'
 										onChange={(e) => updatePrice(index, 'unit_amount', e)}
 										value={tier.unit_amount?.toString()}
-										placeholder={currency ? `${getCurrencySymbol(currency)} 0` : undefined}
+										inputPrefix={currency ? `${getCurrencySymbol(currency)}` : undefined}
+										placeholder={'0'}
 									/>
 								</td>
 								<td className='px-4 py-2'>
@@ -127,7 +128,8 @@ const VolumeTieredPricingForm: FC<Props> = ({ setTieredPrices, tieredPrices, cur
 										className='h-9'
 										onChange={(e) => updatePrice(index, 'flat_amount', e)}
 										value={tier.flat_amount?.toString()}
-										placeholder={currency ? `${getCurrencySymbol(currency)} 0` : undefined}
+										inputPrefix={currency ? `${getCurrencySymbol(currency)}` : undefined}
+										placeholder={'0'}
 									/>
 								</td>
 								<td className='px-4 py-2 text-center'>

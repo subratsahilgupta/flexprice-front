@@ -7,6 +7,13 @@ export interface CountryData {
 }
 
 export const dataJSON: Record<string, CountryData> = {
+	US: {
+		countryName: 'United States',
+		currency: 'USD',
+		symbol: '$',
+		dateFormat: 'M/d/yyyy',
+		numericCode: 840,
+	},
 	AD: {
 		countryName: 'Andorra',
 		currency: 'EUR',
@@ -1481,13 +1488,7 @@ export const dataJSON: Record<string, CountryData> = {
 		symbol: '$',
 		numericCode: 840,
 	},
-	US: {
-		countryName: 'United States',
-		currency: 'USD',
-		symbol: '$',
-		dateFormat: 'M/d/yyyy',
-		numericCode: 840,
-	},
+
 	UY: {
 		countryName: 'Uruguay',
 		currency: 'UYU',
