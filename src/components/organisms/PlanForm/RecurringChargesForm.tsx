@@ -85,7 +85,7 @@ const RecurringChargesForm = () => {
 						<p>{'Recurring Charge'}</p>
 						<span className='flex gap-2'>
 							<p className='text-zinc-500 text-xs'>
-								{currency}| {toSentenceCase(billingPeriod)}
+								{currency} | {toSentenceCase(billingPeriod)}
 							</p>
 						</span>
 					</div>

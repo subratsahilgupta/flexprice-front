@@ -148,7 +148,7 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 	const importDetails = [
 		{
 			label: 'Type',
-			value: activeImportType?.label,
+			value: uploadedTaskDetails?.entity_type ? toSentenceCase(uploadedTaskDetails.entity_type) : activeImportType?.label,
 		},
 		// {
 		// 	label: 'Meter',
@@ -157,7 +157,12 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 		{
 			label: 'Status',
 			value: (
-				<Chip label={toSentenceCase(uploadedTaskDetails?.task_status || '')} isActive={uploadedTaskDetails?.task_status === 'COMPLETED'} />
+				<Chip
+					inactiveTextColor='#DC2626'
+					inactiveBgColor='#FEE2E2'
+					label={toSentenceCase(uploadedTaskDetails?.task_status || '')}
+					isActive={uploadedTaskDetails?.task_status === 'COMPLETED'}
+				/>
 			),
 		},
 		{
@@ -173,7 +178,8 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 	const processedRows = [
 		{
 			label: 'Total Rows',
-			value: uploadedTaskDetails?.total_records || uploadedFile?.row_count,
+			value:
+				uploadedTaskDetails?.total_records || uploadedTaskDetails?.successful_records || 0 + (uploadedTaskDetails?.failed_records || 0),
 		},
 		{
 			label: 'Failed Rows',
@@ -216,7 +222,11 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 
 	return (
 		<div>
-			<Sheet isOpen={isOpen} onOpenChange={onOpenChange} title={'Import File'} description={'kuch toh dalunga'}>
+			<Sheet
+				isOpen={isOpen}
+				onOpenChange={onOpenChange}
+				title={'Import File'}
+				description={'Select a module to start importing or exporting data'}>
 				<div className='space-y-4 mt-6'>
 					{!taskId && (
 						<div className=''>
@@ -231,7 +241,23 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 								description='Select the type of data you want to import'
 							/>
 							<Spacer height={24} />
-
+							<div className='card !p-4 border flex flex-col items-start justify-center'>
+								<FormHeader
+									title=''
+									variant='form-component-title'
+									subtitle='Download a sample csv file below & compare it to your import file to ensure you have the right format or the import.'
+								/>
+								<Spacer height={24} />
+								<Button
+									className='flex gap-2'
+									variant={'outline'}
+									onClick={() => {
+										window.open('https://www.youtube.com/', '_blank');
+									}}>
+									<Download />
+									Download Sample CSV
+								</Button>
+							</div>
 							{uploadedFile ? (
 								<div className='!mt-4'>
 									<div
@@ -252,19 +278,6 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 								</div>
 							) : (
 								<div className='space-y-4'>
-									<div className='card border flex flex-col items-start justify-center'>
-										<FormHeader title='Download Sample Csv' variant='form-component-title' subtitle='Download a sample csv file' />
-										<Spacer height={32} />
-										<Button
-											className='flex gap-2'
-											variant={'outline'}
-											onClick={() => {
-												window.open('https://www.youtube.com/', '_blank');
-											}}>
-											<Download />
-											Download CSV
-										</Button>
-									</div>
 									<CSVBoxButton
 										key={csvBoxKey}
 										user='user_id'
@@ -286,12 +299,12 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 															'focus-within:border-black',
 															isLoading && 'text-zinc-500',
 														)}>
-														<div className={'p-2 border rounded-lg py-2 px-4'}>
+														<Button variant={'outline'} className={'p-2 border border-[#E4E4E7] rounded-lg py-2 px-4'}>
 															<p className='font-medium flex gap-2 items-center'>
 																<Plus className='size-4' />
-																Choose File
+																Choose File to Upload
 															</p>
-														</div>
+														</Button>
 													</div>
 													<p className={cn('text-sm', 'text-muted-foreground')}>Max File Size: 5 MB. .csv format accepted.</p>
 													{errors.file && <p className='text-sm text-destructive'>{errors.file}</p>}
@@ -381,7 +394,7 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 							<div className='flex gap-2 items-center'>
 								<Button
 									onClick={() => {
-										window.open(uploadedFile?.raw_file, '_blank');
+										window.open(uploadedTaskDetails.file_url || uploadedFile?.raw_file, '_blank');
 									}}
 									variant={'outline'}
 									className='flex gap-2 items-center'>

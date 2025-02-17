@@ -16,8 +16,8 @@ const FormTitle: FC<Props> = ({ variant, subtitle, title, className, subtitleCla
 	if (variant === 'form-title') {
 		return (
 			<div className={className}>
-				<p className={cn('font-bold text-zinc text-[20px]', titleClassName)}>{title}</p>
-				<p className={cn(labelStyle, subtitleClassName)}>{subtitle}</p>
+				{title && <p className={cn('font-bold text-zinc text-[20px]', titleClassName)}>{title}</p>}
+				{subtitle && <p className={cn(labelStyle, subtitleClassName)}>{subtitle}</p>}
 			</div>
 		);
 	}
@@ -43,8 +43,8 @@ const FormTitle: FC<Props> = ({ variant, subtitle, title, className, subtitleCla
 	if (variant === 'form-component-title') {
 		return (
 			<div className={cn('mb-0', className)}>
-				<p className={cn('text-sm text-zinc-950 font-medium font-inter mb-2', titleClassName)}>{title}</p>
-				<p className={cn(labelStyle, subtitleClassName)}>{subtitle}</p>
+				{title && <p className={cn('text-sm text-zinc-950 font-medium font-inter mb-2', titleClassName)}>{title}</p>}
+				{subtitle && <p className={cn(labelStyle, subtitleClassName)}>{subtitle}</p>}
 			</div>
 		);
 	}
