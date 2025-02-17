@@ -49,7 +49,7 @@ const billlingPeriodOptions = [
 const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, addPrice, label }) => {
 	const metaData = usePlanStore((state) => state.metaData);
 
-	const [currency, setCurrency] = useState(metaData?.usageBasedPrice?.currency || currencyOptions[0].value);
+	const [currency, setCurrency] = useState(metaData?.usageBasedPrice?.currency || data?.currency || currencyOptions[0].value);
 	const [billingModel, setBillingModel] = useState(
 		metaData?.usageBasedPrice?.billing_model || data?.billing_model || billingModels[0].value,
 	);
