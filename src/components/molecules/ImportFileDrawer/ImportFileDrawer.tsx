@@ -37,6 +37,16 @@ interface ImportMeta {
 	sheet_name: string;
 }
 
+const mapStatusChips = (status: string) => {
+	if (status === 'COMPLETED') {
+		return 'Successful';
+	} else if (status === 'FAILED') {
+		return 'Failed';
+	} else if (status === 'PROCESSING' || status === 'PENDING') {
+		return 'Queued';
+	}
+};
+
 const getLicenseKey = (tab: string): string => {
 	switch (tab) {
 		case 'events':
@@ -51,8 +61,21 @@ const getLicenseKey = (tab: string): string => {
 			return 'Nd50fKMwC54Ri7AoD4ifG1dxL7koqW';
 	}
 };
+const getTaskStatusChips = (status: string) => {
+	if (status === 'COMPLETED') {
+		return <Chip isActive={true} label={mapStatusChips(status)} />;
+	} else if (status === 'FAILED') {
+		return <Chip isActive={true} activeTextColor='#DC2626' activeBgColor='#FEE2E2' label={mapStatusChips(status)} />;
+	} else if (status === 'PROCESSING' || status === 'PENDING') {
+		return <Chip label={mapStatusChips(status)} />;
+	} else {
+		return <Chip isActive={false} label={status} />;
+	}
+};
 
 const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
+	console.log('got task id as ', taskId);
+
 	const importTypeOptions: SelectOption[] = [
 		{
 			label: 'Events',
@@ -115,6 +138,7 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 				file_type: fileTypeOptions[0].value,
 				file_url: (data?.raw_file ?? uploadedFile?.raw_file) || '',
 				task_type: taskTypeOptions[0].value,
+				file_name: (data?.original_filename ?? uploadedFile?.original_filename) || '',
 			});
 		},
 		onSuccess: (data) => {
@@ -156,14 +180,8 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 		// },
 		{
 			label: 'Status',
-			value: (
-				<Chip
-					inactiveTextColor='#DC2626'
-					inactiveBgColor='#FEE2E2'
-					label={toSentenceCase(uploadedTaskDetails?.task_status || '')}
-					isActive={uploadedTaskDetails?.task_status === 'COMPLETED'}
-				/>
-			),
+			// value: getTaskStatusChips(uploadedTaskDetails?.status || ''),
+			value: getTaskStatusChips('PENDING'),
 		},
 		{
 			label: 'Import Started at',
@@ -227,7 +245,7 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 				onOpenChange={onOpenChange}
 				title={'Import File'}
 				description={'Select a module to start importing or exporting data'}>
-				<div className='space-y-4 mt-6'>
+				<div className='mt-6'>
 					{!taskId && (
 						<div className=''>
 							<Select
@@ -240,79 +258,83 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 								}}
 								description='Select the type of data you want to import'
 							/>
-							<Spacer height={24} />
-							<div className='card !p-4 border flex flex-col items-start justify-center'>
-								<FormHeader
-									title=''
-									variant='form-component-title'
-									subtitle='Download a sample csv file below & compare it to your import file to ensure you have the right format or the import.'
-								/>
-								<Spacer height={24} />
-								<Button
-									className='flex gap-2'
-									variant={'outline'}
-									onClick={() => {
-										window.open('https://www.youtube.com/', '_blank');
-									}}>
-									<Download />
-									Download Sample CSV
-								</Button>
-							</div>
-							{uploadedFile ? (
-								<div className='!mt-4'>
-									<div
-										className={cn(
-											'w-full flex justify-between items-center gap-2 group min-h-9 rounded-md border-dashed bg-gray-200 bg-background border px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground disabled:opacity-50 md:text-sm disabled:cursor-not-allowed',
-											'focus-within:border-black',
-										)}>
-										{uploadedFile.original_filename}
-										<button
-											onClick={() => {
-												setuploadedTaskDetails(undefined);
-												setUploadedFile(undefined);
-											}}
-											className='size-4'>
-											<X className='size-4 ' />
-										</button>
-									</div>
-								</div>
-							) : (
-								<div className='space-y-4'>
-									<CSVBoxButton
-										key={csvBoxKey}
-										user='user_id'
-										onImport={(data: boolean, meta: ImportMeta) => {
-											console.log(data);
-											console.log(meta);
-											setUploadedFile(meta);
-										}}
-										licenseKey={getLicenseKey(activeImportType?.value || '')}
-										render={(launch, isLoading) => (
-											<div onClick={launch} className='cursor-pointer'>
-												<div className='space-y-1 w-full flex flex-col'>
-													{/* Label */}
-													{/* <label className={cn('font-inter block text-sm font-medium', 'text-zinc-950')}>Import file</label> */}
-													<div
-														aria-disabled={isLoading}
-														className={cn(
-															'w-full h-24 flex justify-center items-center gap-2 group min-h-9 rounded-md border-dashed bg-gray-200 bg-background border px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground disabled:opacity-50 md:text-sm disabled:cursor-not-allowed',
-															'focus-within:border-black',
-															isLoading && 'text-zinc-500',
-														)}>
-														<Button variant={'outline'} className={'p-2 border border-[#E4E4E7] rounded-lg py-2 px-4'}>
-															<p className='font-medium flex gap-2 items-center'>
-																<Plus className='size-4' />
-																Choose File to Upload
-															</p>
-														</Button>
-													</div>
-													<p className={cn('text-sm', 'text-muted-foreground')}>Max File Size: 5 MB. .csv format accepted.</p>
-													{errors.file && <p className='text-sm text-destructive'>{errors.file}</p>}
-												</div>
+							<Spacer height={12} />
+							{activeImportType?.value && (
+								<>
+									{uploadedFile ? (
+										<div className='!mt-4'>
+											<div
+												className={cn(
+													'w-full flex justify-between items-center gap-2 group min-h-9 rounded-md border-dashed bg-gray-200 bg-background border px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground disabled:opacity-50 md:text-sm disabled:cursor-not-allowed',
+													'focus-within:border-black',
+												)}>
+												{uploadedFile.original_filename}
+												<button
+													onClick={() => {
+														setuploadedTaskDetails(undefined);
+														setUploadedFile(undefined);
+													}}
+													className='size-4'>
+													<X className='size-4 ' />
+												</button>
 											</div>
-										)}
-									/>
-								</div>
+										</div>
+									) : (
+										<div className='space-y-4'>
+											<div className='card !p-4 border flex flex-col items-start justify-center mb-2'>
+												<FormHeader
+													title=''
+													variant='form-component-title'
+													subtitle='Download a sample csv file below & compare it to your import file to ensure you have the right format or the import.'
+												/>
+												<Spacer height={24} />
+												<Button
+													className='flex gap-2'
+													variant={'outline'}
+													onClick={() => {
+														window.open('https://www.youtube.com/', '_blank');
+													}}>
+													<Download />
+													Download Sample CSV
+												</Button>
+											</div>
+											<CSVBoxButton
+												key={csvBoxKey}
+												user='user_id'
+												onImport={(data: boolean, meta: ImportMeta) => {
+													console.log(data);
+													console.log(meta);
+													setUploadedFile(meta);
+												}}
+												licenseKey={getLicenseKey(activeImportType?.value || '')}
+												render={(launch, isLoading) => (
+													<div onClick={launch} className='cursor-pointer'>
+														<div className='space-y-1 w-full flex flex-col'>
+															{/* Label */}
+															{/* <label className={cn('font-inter block text-sm font-medium', 'text-zinc-950')}>Import file</label> */}
+															<div
+																aria-disabled={isLoading}
+																className={cn(
+																	'w-full h-24 flex justify-center items-center gap-2 group min-h-9 rounded-md border-dashed bg-gray-200 bg-background border px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground disabled:opacity-50 md:text-sm disabled:cursor-not-allowed',
+																	'focus-within:border-black',
+																	isLoading && 'text-zinc-500',
+																)}>
+																<Button variant={'outline'} className={'p-2 border border-[#E4E4E7] rounded-lg py-2 px-4'}>
+																	<p className='font-medium flex gap-2 items-center'>
+																		<Plus className='size-4' />
+																		Choose File to Upload
+																	</p>
+																</Button>
+															</div>
+															<p className={cn('text-sm', 'text-muted-foreground')}>Max File Size: 5 MB. .csv format accepted.</p>
+															{errors.file && <p className='text-sm text-destructive'>{errors.file}</p>}
+														</div>
+													</div>
+												)}
+											/>
+										</div>
+									)}
+								</>
 							)}
 						</div>
 					)}
@@ -361,24 +383,25 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 								{isPending ? <LoaderCircleIcon className='size-4 animate-spin' /> : 'Import Data'}
 							</Button>
 						)}
-						{uploadedTaskDetails?.task_status === 'QUEUED' && (
-							<Button
-								disabled={isPending || isLoading}
-								onClick={() => {
-									// onOpenChange(false);
-									refreshTaskStatus();
-								}}
-								className='flex gap-2 items-center'>
-								{isPending ? (
-									<LoaderCircleIcon className='size-4 animate-spin' />
-								) : (
-									<>
-										<RefreshCcw />
-										Refresh
-									</>
-								)}
-							</Button>
-						)}
+						{uploadedTaskDetails?.task_status === 'PENDING' ||
+							(uploadedTaskDetails?.task_status === 'PROCESSING' && (
+								<Button
+									disabled={isPending || isLoading}
+									onClick={() => {
+										// onOpenChange(false);
+										refreshTaskStatus();
+									}}
+									className='flex gap-2 items-center'>
+									{isPending ? (
+										<LoaderCircleIcon className='size-4 animate-spin' />
+									) : (
+										<>
+											<RefreshCcw />
+											Refresh
+										</>
+									)}
+								</Button>
+							))}
 						{uploadedTaskDetails?.task_status === 'COMPLETED' && (
 							<Button
 								disabled={isPending || isLoading}

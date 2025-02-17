@@ -25,7 +25,7 @@ const MeterFormSchema = z.object({
 		// 	value: z.array(z.string().min(1, { message: 'Filter value is required' })).optional(),
 		// }),
 		.optional(),
-	aggregationFunction: z.enum(['SUM', 'COUNT', 'COUNT UNIQUE'], { errorMap: () => ({ message: 'Invalid aggregation function' }) }),
+	aggregationFunction: z.enum(['SUM', 'COUNT', 'COUNT UNIQUE', 'c1'], { errorMap: () => ({ message: 'Invalid aggregation function' }) }),
 	aggregationValue: z.string().min(1, { message: 'Aggregation Value is required' }),
 	resetPeriod: z.string().optional(),
 });
@@ -101,7 +101,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 				event_name: eventName,
 				name: displayName,
 				aggregation: {
-					type: aggregationFunction,
+					type: aggregationFunction === 'c1' ? 'COUNT' : aggregationFunction,
 					field: aggregationValue,
 				},
 				filters: eventFilters
@@ -212,7 +212,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 								options={[
 									{ label: 'SUM', value: 'SUM' },
 									{ label: 'COUNT', value: 'COUNT' },
-									{ label: 'COUNT UNIQUE', value: 'COUNT' },
+									{ label: 'COUNT UNIQUE', value: 'c1' },
 								]}
 								value={aggregationFunction}
 								onChange={setAggregationFunction}

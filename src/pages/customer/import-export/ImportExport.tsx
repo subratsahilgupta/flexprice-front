@@ -1,5 +1,6 @@
 import { Button, Chip, Loader, SectionHeader } from '@/components/atoms';
 import { ColumnData, DropdownMenu, FlexpriceTable, ImportFileDrawer, Pagination } from '@/components/molecules';
+import { EmptyPage } from '@/components/organisms';
 import usePagination from '@/hooks/usePagination';
 import { ImportTask } from '@/models/ImportTask';
 import TaskApi from '@/utils/api_requests/TaskApi';
@@ -9,6 +10,16 @@ import { useQuery } from '@tanstack/react-query';
 import { Import, RefreshCw } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+
+const mapStatusChips = (status: string) => {
+	if (status === 'COMPLETED') {
+		return 'Successful';
+	} else if (status === 'FAILED') {
+		return 'Failed';
+	} else if (status === 'PROCESSING' || status === 'PENDING') {
+		return 'Queued';
+	}
+};
 
 const columns: ColumnData<ImportTask>[] = [
 	{
@@ -33,7 +44,7 @@ const columns: ColumnData<ImportTask>[] = [
 		render(rowData) {
 			return (
 				<Chip
-					label={toSentenceCase(rowData?.task_status || '')}
+					label={mapStatusChips(rowData?.task_status || '')}
 					isActive={rowData?.task_status === 'COMPLETED'}
 					inactiveTextColor='#DC2626'
 					inactiveBgColor='#FEE2E2'
@@ -93,6 +104,17 @@ const ImportExport = () => {
 		toast.error('Failed to fetch data');
 	}
 
+	if (data?.items.length === 0) {
+		return (
+			<EmptyPage title='Import Tasks' description='No import tasks found'>
+				<Button onClick={() => setdrawerOpen(true)} className='flex gap-2 items-center '>
+					<Import />
+					<span>Import File</span>
+				</Button>
+			</EmptyPage>
+		);
+	}
+
 	return (
 		<div className='page'>
 			{/* import export drawer */}
@@ -123,6 +145,7 @@ const ImportExport = () => {
 					showEmptyRow
 					emptyRowText='No data found'
 				/>
+
 				<Pagination totalPages={Math.ceil((data?.pagination.total ?? 1) / limit)} />
 			</div>
 		</div>

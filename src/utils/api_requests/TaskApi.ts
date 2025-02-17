@@ -7,6 +7,7 @@ interface AddTaskPayload {
 	file_type: string;
 	file_url: string;
 	task_type: string;
+	file_name?: string;
 	metadata?: Record<string, any>;
 }
 
