@@ -1,4 +1,5 @@
 import { Button, Dialog } from '@/components/atoms';
+import { cn } from '@/lib/utils';
 import { Lock } from 'lucide-react';
 import { useState } from 'react';
 
@@ -26,28 +27,31 @@ const PremiumFeature: React.FC<Props> = ({ children, isPremiumFeature = false })
 				titleClassName='font-bold'
 				description='This is a premium feature. You need to upgrade to a premium plan to use this feature.'>
 				<div className='flex gap-2 justify-end items-center'>
-					<Button
-						onClick={() => {
-							window.location.href = 'mailto:manish@flexprice.com';
-						}}>
-						Contact Us
+					<Button>
+						<a href='mailto:manish@flexprice.com'>Contact Us</a>
 					</Button>
 				</div>
 			</Dialog>
-			<div
-				onClick={(e) => {
-					if (isPremiumFeature) {
-						e.preventDefault();
-						e.stopPropagation();
-						setIsOpen(true);
-					}
-				}}
-				style={{
-					pointerEvents: isPremiumFeature ? 'auto' : 'none',
-					cursor: isPremiumFeature ? 'pointer' : 'not-allowed',
-				}}>
-				<div className='pointer-events-none cursor-not-allowed'>{children}</div>
-			</div>
+			{isPremiumFeature ? (
+				<div
+					onClick={(e) => {
+						if (isPremiumFeature) {
+							e.preventDefault();
+							e.stopPropagation();
+							setIsOpen(true);
+						}
+					}}
+					style={{
+						pointerEvents: isPremiumFeature ? 'auto' : 'none',
+						cursor: isPremiumFeature ? 'pointer' : 'not-allowed',
+					}}>
+					<div className={cn(isPremiumFeature && 'pointer-events-none cursor-not-allowed')}>
+						{children}
+					</div>
+				</div>
+			) : (
+				children
+			)}
 		</div>
 	);
 };
