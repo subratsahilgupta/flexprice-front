@@ -2,14 +2,18 @@ import { ChargesForBillingPeriodOne } from '@/components/organisms/Subscription/
 import { getAllISOCodes } from 'iso-country-currency';
 
 export const getCurrencyOptions = () => {
-	return getAllISOCodes();
+	const codes = getAllISOCodes();
+	return [...codes.filter((code) => code.currency === 'USD'), ...codes.filter((code) => code.currency !== 'USD')];
 };
 
 export function getCurrencySymbol(currency: string): string {
-	const info = getAllISOCodes().filter((code) => code.currency === currency.toUpperCase());
-	// const info = getParamByISO(currency.toUpperCase(), 'symbol');
-	// console.log('info', info);
-	return info[0].symbol;
+	try {
+		const info = getAllISOCodes().filter((code) => code.currency === currency.toUpperCase());
+		return info[0].symbol;
+	} catch (error) {
+		console.error('Error getting currency symbol', error);
+		return '';
+	}
 }
 
 export const formatBillingPeriod = (billingPeriod: string) => {

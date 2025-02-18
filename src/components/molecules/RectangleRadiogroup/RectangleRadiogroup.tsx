@@ -1,13 +1,15 @@
-import { FormHeader } from '@/components/atoms';
+import { ComingSoonTag, FormHeader } from '@/components/atoms';
 import { cn } from '@/lib/utils';
 import { LucideProps } from 'lucide-react';
 import React, { FC } from 'react';
+import PremiumFeature, { PremiumFeatureTag } from '../PremiumFeature';
 export interface RectangleRadiogroupOption {
 	value: string;
 	label: string;
 	icon?: React.ForwardRefExoticComponent<Omit<LucideProps, 'ref'> & React.RefAttributes<SVGSVGElement>>;
 	disabled?: boolean;
 	comingSoon?: boolean;
+	premium?: boolean;
 }
 
 interface Props {
@@ -25,26 +27,33 @@ const RectangleRadiogroup: FC<Props> = ({ onChange, options, value, description,
 			<div className='w-full grid grid-cols-2 gap-4'>
 				{options.map((option, index) => {
 					return (
-						<button
-							key={index}
-							onClick={() => {
-								if (!option.disabled) {
-									onChange(option.value);
-								}
-							}}
-							className={cn(
-								'relative p-3 py-6 rounded-md border-2 w-full flex flex-col justify-center items-center',
-								option.value === value ? 'border-[#0F172A]' : 'border-[#E2E8F0]',
-								option.disabled ? 'cursor-default text-zinc-500 ' : 'cursor-pointer',
-							)}>
-							{option.icon && <option.icon size={24} className={cn(option.disabled ? '  ' : 'text-[#020617]')} />}
-							{option.comingSoon && (
-								<div className='absolute top-2 right-2 bg-[#FEF08A] text-[#D97706] text-xs font-semibold px-2 py-1 rounded-2xl opacity-55'>
-									Coming Soon
-								</div>
-							)}
-							<p className={cn(option.disabled ? '' : 'text-[#18181B] font-medium')}>{option.label}</p>
-						</button>
+						<PremiumFeature isPremiumFeature={option.premium}>
+							<button
+								key={index}
+								onClick={() => {
+									if (!option.disabled) {
+										onChange(option.value);
+									}
+								}}
+								className={cn(
+									'relative p-3 py-6 rounded-md border-2 w-full flex flex-col justify-center items-center',
+									option.value === value ? 'border-[#0F172A]' : 'border-[#E2E8F0]',
+									option.disabled && !option.premium ? 'cursor-default text-zinc-500 ' : 'cursor-pointer',
+								)}>
+								{option.icon && <option.icon size={24} className={cn(option.disabled ? '  ' : 'text-[#020617]')} />}
+								{option.comingSoon && (
+									<div className='absolute top-2 right-2'>
+										<ComingSoonTag />
+									</div>
+								)}
+								{option.premium && (
+									<div className='absolute top-2 right-2'>
+										<PremiumFeatureTag />
+									</div>
+								)}
+								<p className={cn(option.disabled ? '' : 'text-[#18181B] font-medium')}>{option.label}</p>
+							</button>
+						</PremiumFeature>
 					);
 				})}
 			</div>
