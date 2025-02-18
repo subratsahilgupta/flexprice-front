@@ -43,7 +43,7 @@ const InvoiceCreditLineItemTable: FC<Props> = ({ data, total_amount, currency, t
 								return (
 									<tr key={index} className=''>
 										<td className='py-3 px-2 text-gray-800'>{item.display_name ?? '--'}</td>
-										<td className='py-3 px-2 text-center text-gray-800'>4</td>
+										<td className='py-3 px-2 text-center text-gray-800'>{item.quantity ?? '--'}</td>
 										<td className='py-3 px-2 text-center text-gray-800'>{'--'}</td>
 										<td className='py-3 px-2 text-right text-[#2A9D90]'>{formatAmount(item.amount ?? '--', item.currency)}</td>
 									</tr>
