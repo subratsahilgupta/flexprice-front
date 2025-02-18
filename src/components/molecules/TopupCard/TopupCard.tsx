@@ -140,7 +140,7 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 			<Spacer className='!mt-4' />
 			<PremiumFeature isPremiumFeature>
 				<div className='card relative'>
-					<span className='absolute top-2 right-2'>
+					<span className='absolute top-3 right-3'>
 						<PremiumFeatureTag />
 					</span>
 					<FormHeader
