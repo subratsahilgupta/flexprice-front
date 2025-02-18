@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { integrations } from './integrationsData';
 import { cn } from '@/lib/utils';
-import { Button, FormHeader, Spacer } from '@/components/atoms';
+import { Button, FormHeader } from '@/components/atoms';
 
 const IntegrationDetails = () => {
 	const { id: name } = useParams() as { id: string };
