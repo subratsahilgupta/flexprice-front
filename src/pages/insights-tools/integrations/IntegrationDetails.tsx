@@ -10,7 +10,7 @@ const IntegrationDetails = () => {
 	return (
 		<div className='page'>
 			<div
-				onClick={() => { }}
+				onClick={() => {}}
 				className={cn('border rounded-xl p-4 flex items-center shadow-sm', !integration.comingSoon && 'cursor-pointer')}>
 				<div className='size-20 flex items-center justify-center bg-gray-100 rounded-lg'>
 					<img src={integration.logo} alt={integration.name} className='size-16 object-contain' />
@@ -38,7 +38,7 @@ const IntegrationDetails = () => {
                         View Dashboard
                     </Button> */}
 					{integration.type === 'available' && (
-						<Button onClick={() => { }} className='flex gap-2 items-center'>
+						<Button onClick={() => {}} className='flex gap-2 items-center'>
 							Install
 						</Button>
 					)}
@@ -68,7 +68,6 @@ const IntegrationDetails = () => {
 					</div>
 				</div>
 			)}
-
 
 			{/* details section */}
 			<div className='card space-y-6 mt-6'>
