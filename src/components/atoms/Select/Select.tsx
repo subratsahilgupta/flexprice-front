@@ -77,10 +77,11 @@ const FlexPriceSelect: React.FC<Props> = ({
 
 			<Select
 				defaultOpen={defaultOpen}
-				defaultValue={value}
+				defaultValue={value || ''}
 				onValueChange={(newValue) => {
+					console.log('newValue', newValue);
 					if (onChange) {
-						onChange(newValue);
+						onChange(newValue === value ? '' : newValue);
 					}
 				}}
 				value={value}

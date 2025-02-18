@@ -9,14 +9,15 @@ interface Props {
 	description?: string;
 	children?: ReactNode;
 	className?: string;
+	titleClassName?: string;
 }
 
-const Dialog: FC<Props> = ({ className, isOpen, onOpenChange, title, description, children }) => {
+const Dialog: FC<Props> = ({ className, isOpen, onOpenChange, title, description, children, titleClassName }) => {
 	return (
 		<ShadcnDialog open={isOpen} onOpenChange={onOpenChange}>
 			<DialogContent className={cn('bg-white', className)}>
 				<DialogHeader>
-					<DialogTitle className='font-medium'>{title}</DialogTitle>
+					<DialogTitle className={cn('font-medium', titleClassName)}>{title}</DialogTitle>
 					{description && <DialogDescription>{description}</DialogDescription>}
 				</DialogHeader>
 				{children}

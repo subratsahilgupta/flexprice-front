@@ -51,3 +51,5 @@ export { default as MultiSelect } from './MultiSelect';
 export { default as SelectFeature } from './SelectFeature';
 
 export { default as Checkbox } from './Checkbox';
+
+export { default as ComingSoonTag } from './ComingSoon';

@@ -40,3 +40,6 @@ export { default as FeatureTable } from './FeatureTable';
 export { default as AddEntitlementDrawer } from './AddEntitlementDrawer';
 
 export { default as ImportFileDrawer } from './ImportFileDrawer';
+
+export { default as PremiumFeature } from './PremiumFeature';
+export { PremiumFeatureTag } from './PremiumFeature';

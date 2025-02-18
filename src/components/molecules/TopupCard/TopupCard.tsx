@@ -38,7 +38,7 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 			label: 'Purchased Credits',
 			icon: Gift,
 			disabled: true,
-			comingSoon: true,
+			premium: true,
 		},
 	];
 
