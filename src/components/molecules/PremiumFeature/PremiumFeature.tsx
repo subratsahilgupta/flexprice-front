@@ -35,12 +35,18 @@ const PremiumFeature: React.FC<Props> = ({ children, isPremiumFeature = false })
 				</div>
 			</Dialog>
 			<div
-				onClick={() => {
+				onClick={(e) => {
 					if (isPremiumFeature) {
+						e.preventDefault();
+						e.stopPropagation();
 						setIsOpen(true);
 					}
+				}}
+				style={{
+					pointerEvents: isPremiumFeature ? 'auto' : 'none',
+					cursor: isPremiumFeature ? 'pointer' : 'not-allowed',
 				}}>
-				{children}
+				<div className='pointer-events-none cursor-not-allowed'>{children}</div>
 			</div>
 		</div>
 	);
