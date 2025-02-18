@@ -1,13 +1,10 @@
 import { SectionHeader, Spacer } from '@/components/atoms';
-import { IoSearch } from 'react-icons/io5';
 import { InvoiceTable, Pagination } from '@/components/molecules';
 import { useQuery } from '@tanstack/react-query';
 import { Spinner } from '@/components/atoms';
 import toast from 'react-hot-toast';
-import { ReactSVG } from 'react-svg';
 import usePagination from '@/hooks/usePagination';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
-import { SlidersHorizontal } from 'lucide-react';
 
 const InvoicesPage = () => {
 	const { limit, offset, page } = usePagination();
@@ -45,44 +42,9 @@ const InvoicesPage = () => {
 		toast.error('Error fetching meters');
 	}
 
-	if (invoiceData?.items.length === 0) {
-		return (
-			<div className='h-screen w-full flex justify-center items-center'>
-				<div className='w-full flex flex-col items-center '>
-					<ReactSVG src={'/assets/svg/empty box.svg'} />
-					<p className='text-[#71717A] font-normal '>
-						{'A billable base metric is used to measure usage, and act as a foundation of pricing (e.g., API calls for an API product).'}
-					</p>
-					{/* <Spacer height={'16px'} /> */}
-					{/* <Link to='/usage-tracking/billable-metric/add-meter'>
-						<Button className='w-32 flex gap-2 bg-[#0F172A] '>
-							<FiFolderPlus />
-							<span>Add Meter</span>
-						</Button>
-					</Link> */}
-				</div>
-			</div>
-		);
-	}
-
 	return (
 		<div className='page'>
-			<SectionHeader title='Invoices'>
-				<div className='flex gap-2 w-full'>
-					<button className='px-2 py-1'>
-						<IoSearch className='size-4 text-[#09090B] ' />
-					</button>
-					<button className='px-2 py-1'>
-						<SlidersHorizontal className='size-4 text-[#09090B] ' />
-					</button>
-					{/* <Link to='/usage-tracking/billable-metric/add-meter'>
-						<Button className='w-32 flex gap-2 bg-[#0F172A] '>
-							<FiFolderPlus />
-							<span>Add Meter</span>
-						</Button>
-					</Link> */}
-				</div>
-			</SectionHeader>
+			<SectionHeader showFilter showSearch title='Invoices' />
 			<div className='px-0'>
 				<InvoiceTable data={invoiceData?.items || []} />
 				<Spacer className='!h-4' />

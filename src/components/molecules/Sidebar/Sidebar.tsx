@@ -10,11 +10,12 @@ import {
 import React from 'react';
 import SidebarNav, { NavItem } from './SidebarMenu';
 import { cn } from '@/lib/utils';
-import { LogOut, Star } from 'lucide-react';
+import { LogOut, Plug2, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import supabase from '@/core/supbase/config';
 import useUser from '@/hooks/useUser';
 import { Skeleton } from '@/components/ui/skeleton';
+import { RouteNames } from '@/core/routes/Routes';
 
 const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }) => {
 	const { open } = useSidebar();
@@ -30,8 +31,8 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 	const navMain: { [key: string]: NavItem[] } = {
 		'Usage Tracking': [
 			{
-				title: 'Billable Metrics',
-				url: '/usage-tracking/billable-metric',
+				title: 'Meter',
+				url: '/usage-tracking/meter',
 				icon: '/assets/svg/billable_metrics.svg',
 			},
 			{
@@ -73,16 +74,11 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				url: '/customer-management/invoices',
 				icon: '/assets/svg/receipt.svg',
 			},
+
 			{
 				title: 'Quotation',
 				url: '/roles',
 				icon: '/assets/svg/quotation.svg',
-				disabled: true,
-			},
-			{
-				title: 'Import - Export',
-				url: '/roles',
-				icon: '/assets/svg/import-export.svg',
 				disabled: true,
 			},
 		],
@@ -97,6 +93,19 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				url: '/product-catalog/features',
 				icon: <Star />,
 				disabled: true,
+			},
+		],
+		'Insights & Tools': [
+			{
+				title: 'Integrations',
+				url: RouteNames.integrations,
+				icon: <Plug2 />,
+			},
+			{
+				title: 'Bulk Imports',
+				url: RouteNames.importExport,
+				icon: '/assets/svg/import-export.svg',
+				// disabled: true,
 			},
 		],
 	};

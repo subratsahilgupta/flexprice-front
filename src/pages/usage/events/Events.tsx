@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Button, DateRangePicker, Input, SectionHeader } from '@/components/atoms';
 import { EventsTable } from '@/components/molecules';
@@ -23,11 +24,15 @@ const EventsPage: React.FC = () => {
 		externalCustomerId?: string;
 		eventName?: string;
 		eventId?: string;
-	}>({});
+	}>({
+		startTime: new Date(new Date().setDate(new Date().getDate() - 7)).toISOString(),
+		endTime: new Date().toISOString(),
+	});
 	const [iterLastKey, setIterLastKey] = useState<string | undefined>(undefined);
 	const observer = useRef<IntersectionObserver | null>(null);
 
 	const lastElementRef = useCallback(
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		(node: any) => {
 			if (loading) return;
 			if (observer.current) observer.current.disconnect();
@@ -92,6 +97,8 @@ const EventsPage: React.FC = () => {
 			<div className='bg-white my-6 rounded-md  mb-6'>
 				<div className='w-full flex items-end gap-4'>
 					<DateRangePicker
+						startDate={queryData.startTime ? new Date(queryData.startTime) : undefined}
+						endDate={queryData.endTime ? new Date(queryData.endTime) : undefined}
 						title='Time Period'
 						placeholder='Select Range'
 						onChange={({ endDate, startDate }) => {
@@ -109,15 +116,15 @@ const EventsPage: React.FC = () => {
 					/>
 
 					<Input
-						label='Customer ID'
-						placeholder='Enter Customer ID'
+						label='External Customer ID'
+						placeholder='Enter External Customer ID'
 						className='h-9'
 						suffix={<Search className='size-4' />}
 						labelClassName='text-muted-foreground font-normal'
 						value={queryData?.externalCustomerId ?? ''}
 						onChange={(e) => setQueryData((prev) => ({ ...prev, externalCustomerId: e === '' ? undefined : e }))}
 					/>
-					<Input
+					{/* <Input
 						label=' Meter name'
 						suffix={<Search className='size-4' />}
 						placeholder='Enter Meter name'
@@ -125,7 +132,7 @@ const EventsPage: React.FC = () => {
 						labelClassName='text-muted-foreground font-normal'
 						value={queryData?.eventId ?? ''}
 						onChange={(e) => setQueryData((prev) => ({ ...prev, eventId: e === '' ? undefined : e }))}
-					/>
+					/> */}
 					<Input
 						label='Event Name'
 						suffix={<Search className='size-4' />}
@@ -138,10 +145,14 @@ const EventsPage: React.FC = () => {
 					<Button
 						variant='outline'
 						onClick={() => {
-							setQueryData({});
+							setQueryData({
+								startTime: new Date(new Date().setDate(new Date().getDate() - 7)).toISOString(),
+								endTime: new Date().toISOString(),
+							});
 							setIterLastKey(undefined);
 							setEvents([]);
 							setHasMore(true);
+
 							fetchEvents(undefined);
 						}}>
 						<RefreshCw />

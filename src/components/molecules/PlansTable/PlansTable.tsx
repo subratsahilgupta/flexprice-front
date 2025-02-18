@@ -5,6 +5,7 @@ import { Plan } from '@/models/Plan';
 import formatChips from '@/utils/common/format_chips';
 import formatDate from '@/utils/common/format_date';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
+import { RouteNames } from '@/core/routes/Routes';
 
 export interface PlansTableProps {
 	data: Plan[];
@@ -40,8 +41,10 @@ const PlansTable: FC<PlansTableProps> = ({ data }) => {
 			render: (row) => (
 				<ActionButton
 					id={row.id}
-					isArchiveDisabled={row.status === 'archived'}
-					isEditDisabled={row.status === 'archived'}
+					isArchiveDisabled={true}
+					isEditDisabled={true}
+					// isArchiveDisabled={row.status === 'archived' || false}
+					// isEditDisabled={row.status === 'archived' || false}
 					editPath={`/product-catalog/pricing-plan/edit-plan?id=${row.id}`}
 					deleteMutationFn={(id) => PlanApi.deletePlan(id)}
 					refetchQueryKey='fetchPlans'
@@ -51,7 +54,7 @@ const PlansTable: FC<PlansTableProps> = ({ data }) => {
 		},
 	];
 
-	return <FlexpriceTable redirectUrl='/product-catalog/pricing-plan/' columns={columns} data={mappedData} />;
+	return <FlexpriceTable redirectUrl={RouteNames.pricingPlan + '/'} columns={columns} data={mappedData} />;
 };
 
 export default PlansTable;

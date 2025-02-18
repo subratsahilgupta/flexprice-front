@@ -7,6 +7,8 @@ import React from 'react';
 export interface SelectOption {
 	value: string;
 	label: string;
+	suffixIcon?: React.ReactNode;
+	prefixIcon?: React.ReactNode;
 	description?: string;
 	disabled?: boolean;
 }
@@ -14,6 +16,7 @@ export interface SelectOption {
 interface Props {
 	options: SelectOption[];
 	value?: string;
+	defaultOpen?: boolean;
 	placeholder?: string;
 	label?: string;
 	description?: string;
@@ -61,6 +64,7 @@ const FlexPriceSelect: React.FC<Props> = ({
 	isRadio,
 	className,
 	noOptionsText,
+	defaultOpen,
 }) => {
 	return (
 		<div className={cn('space-y-1 ')}>
@@ -72,20 +76,19 @@ const FlexPriceSelect: React.FC<Props> = ({
 			)}
 
 			<Select
+				defaultOpen={defaultOpen}
 				defaultValue={value}
-				onValueChange={(value) => {
+				onValueChange={(newValue) => {
 					if (onChange) {
-						onChange(value);
+						onChange(newValue);
 					}
 				}}
 				value={value}
 				disabled={disabled}>
 				<SelectTrigger className={cn(disabled && 'cursor-not-allowed', className)}>
-					{
-						<span className={cn(value ? '' : 'text-muted-foreground')}>
-							{value ? options.find((option) => option.value === value)?.label : placeholder}
-						</span>
-					}
+					<span className={cn('truncate', value ? '' : 'text-muted-foreground')}>
+						{value ? options.find((option) => option.value === value)?.label.trim() : placeholder}
+					</span>
 				</SelectTrigger>
 				<SelectContent>
 					<SelectGroup>
@@ -109,15 +112,26 @@ const FlexPriceSelect: React.FC<Props> = ({
 								} else {
 									return (
 										<ShadcnSelect
-											className={cn(option.disabled && 'select-none cursor-not-allowed')}
+											className={cn(
+												'cursor-pointer',
+												option.disabled && 'select-none cursor-not-allowed',
+												'flex items-center space-x-2 justify-between w-full',
+											)}
 											disabled={option.disabled}
 											key={option.value}
 											value={option.value}>
-											<div className='flex items-center space-x-2'>
+											<div
+												className={cn(
+													'flex w-full items-center space-x-2 justify-between',
+													option.disabled && 'opacity-50 pointer-events-none',
+												)}>
+												{option.prefixIcon && option.prefixIcon}
+
 												<div className='flex flex-col mr-2'>
 													<span>{option.label}</span>
 													{option.description && <span className='text-sm text-gray-500'>{option.description}</span>}
 												</div>
+												{option.suffixIcon && <span className='absolute right-2 top-2'>{option.suffixIcon}</span>}
 											</div>
 										</ShadcnSelect>
 									);

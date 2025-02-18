@@ -1,10 +1,11 @@
 import { getActualPriceForTotal, getPriceTableCharge } from '@/utils/models/transformed_plan';
 import { ChargesForBillingPeriodOne } from './PriceTable';
 import { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'; // Adjust import path if necessary
+import { Card, CardContent } from '@/components/ui/card'; // Adjust import path if necessary
 import { ChevronDownIcon, ChevronUpIcon, Info } from 'lucide-react';
 import { getTotalPayableInfo, getTotalPayableText } from '@/utils/common/helper_functions';
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 interface PreviewProps {
 	data: ChargesForBillingPeriodOne[];
@@ -28,24 +29,31 @@ const Preview = ({ data, className }: PreviewProps) => {
 
 	return (
 		<div>
-			<Card className={cn('max-w-md mx-auto shadow-sm', className)}>
-				<CardHeader className='h-16'>
-					<CardTitle className='text-lg font-semibold text-center'>Subscription Preview</CardTitle>
-				</CardHeader>
-				<CardContent className='bg-gray-50 p-4 space-y-6'>
+			<div className={cn('bg-[#FAFAFA]  border rounded-lg shadow-sm', className)}>
+				<div className='flex justify-between py-3 px-6 items-center w-full'>
+					<p className='font-semibold text-lg'>{'Subscription Preview'}</p>
+				</div>
+				<div className='bg-[#F4F4F5] p-6 space-y-6'>
 					{/* Recurring Charges Section */}
 					{recurringCharges.length > 0 && (
 						<div>
 							<p className='text-sm text-black font-semibold mb-3'>Recurring Charges</p>
 							<div className='space-y-2 border-b border-gray-300 pb-2'>
-								{displayedRecurring.map((charge, index) => (
-									<div key={`recurring-${index}`} className='flex justify-between items-center py-2'>
-										<span className='text-gray-700 font-normal text-sm'>
-											{charge.meter_name ? `${charge.name}/${charge.meter_name}` : charge.name}
-										</span>
-										<span className='text-gray-700 font-normal text-sm'>{getPriceTableCharge(charge)}</span>
-									</div>
-								))}
+								<motion.div
+									initial={{ height: 'auto' }}
+									animate={{ height: showAllRecurringRows ? 'auto' : 'auto' }}
+									transition={{ duration: 0.3, ease: 'easeInOut' }}
+									style={{ overflow: 'hidden' }}>
+									{displayedRecurring.map((charge, index) => (
+										<div key={`recurring-${index}`} className='flex justify-between items-center py-2'>
+											<span className='text-gray-700 font-normal text-sm'>
+												{charge.meter_name ? `${charge.name}/${charge.meter_name}` : charge.name}
+											</span>
+											<span className='text-gray-700 font-normal text-sm'>{getPriceTableCharge(charge)}</span>
+										</div>
+									))}
+								</motion.div>
+
 								{recurringCharges.length > 5 && (
 									<div className='flex justify-center mt-4'>
 										<span className='flex items-center ' onClick={() => setShowAllRecurringRows((prev) => !prev)}>
@@ -69,13 +77,20 @@ const Preview = ({ data, className }: PreviewProps) => {
 					{usageCharges.length > 0 && (
 						<div>
 							<p className='text-sm text-black font-semibold mb-3 mt-6'>Usage Charges</p>
-							<div className='space-y-2 border-b border-gray-300 pb-2'>
-								{displayedUsage.map((charge, index) => (
-									<div key={`usage-${index}`} className='flex justify-between items-center py-2'>
-										<span className='text-gray-700 font-normal text-sm'>{charge.meter_name ? `${charge.meter_name}` : charge.name}</span>
-										<span className='text-gray-700 font-normal text-sm text-end'>{getPriceTableCharge(charge)}</span>
-									</div>
-								))}
+							<div className='space-y-2 border-b border-gray-300 pb-2 transition-all duration-300 ease-in-out'>
+								<motion.div
+									initial={{ height: 'auto' }}
+									animate={{ height: showAllUsageRows ? 'auto' : 'auto' }}
+									transition={{ duration: 0.3, ease: 'easeInOut' }}
+									style={{ overflow: 'hidden' }}>
+									{displayedUsage.map((charge, index) => (
+										<div key={`usage-${index}`} className='flex justify-between items-center py-2'>
+											<span className='text-gray-700 font-normal text-sm'>{charge.meter_name ? `${charge.meter_name}` : charge.name}</span>
+											<span className='text-gray-700 font-normal text-sm text-end'>{getPriceTableCharge(charge)}</span>
+										</div>
+									))}
+								</motion.div>
+
 								{usageCharges.length > 5 && (
 									<div className='flex justify-center mt-4'>
 										<span
@@ -104,8 +119,8 @@ const Preview = ({ data, className }: PreviewProps) => {
 							{getTotalPayableText(recurringCharges, usageCharges, recurringTotal)}
 						</span>
 					</div>
-				</CardContent>
-			</Card>
+				</div>
+			</div>
 
 			<Card className='max-w-md mx-auto mt-4 shadow-sm'>
 				<CardContent className='flex items-center gap-2 p-5'>

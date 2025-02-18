@@ -59,7 +59,11 @@ const CreateWallet: FC<Props> = ({ customerId, onClose = () => {} }) => {
 
 	return (
 		<div className='w-2/3'>
-			<FormHeader title='Create Wallet' subtitle={`Make changes to your account here. Click save when you're done.`} variant='form-title' />
+			<FormHeader
+				title='Create Wallet'
+				subtitle={`Manage credits for usage-based billing that can apply to invoices pre-tax.`}
+				variant='form-title'
+			/>
 			<Spacer className='!mt-4' />
 			<div className='card space-y-4'>
 				<FormHeader
@@ -80,6 +84,7 @@ const CreateWallet: FC<Props> = ({ customerId, onClose = () => {} }) => {
 			</div>
 			<Spacer className='!mt-4' />
 			<TopupCard
+				currency={currency}
 				onSuccess={() => onClose(false)}
 				isPrefunctionLoading={isPending}
 				walletId={walletData?.id}

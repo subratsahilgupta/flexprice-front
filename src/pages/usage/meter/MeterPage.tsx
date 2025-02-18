@@ -1,19 +1,18 @@
 import { Button, SectionHeader, Spacer } from '@/components/atoms';
-import { IoSearch } from 'react-icons/io5';
 import { FiFolderPlus } from 'react-icons/fi';
 import { BillableMetricTable, Pagination } from '@/components/molecules';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { MeterApi } from '@/utils/api_requests/MeterApi';
 import { useQuery } from '@tanstack/react-query';
 import { Spinner } from '@/components/atoms';
 import toast from 'react-hot-toast';
 import { ReactSVG } from 'react-svg';
 import usePagination from '@/hooks/usePagination';
-import { SlidersHorizontal } from 'lucide-react';
+import { RouteNames } from '@/core/routes/Routes';
 
-const BillableMetricsPage = () => {
+const MeterPage = () => {
 	const { limit, offset, page } = usePagination();
-
+	const navigate = useNavigate();
 	const fetchMeters = async () => {
 		return await MeterApi.getAllMeters({
 			limit,
@@ -51,12 +50,12 @@ const BillableMetricsPage = () => {
 			<div className='h-screen w-full flex justify-center items-center'>
 				<div className='w-full flex flex-col items-center '>
 					<ReactSVG src={'/assets/svg/empty box.svg'} />
-					<p className='font-sans text-2xl font-bold'>Add your first billable metric</p>
+					<p className='font-sans text-2xl font-bold'>Add your first Meter</p>
 					<p className='text-[#71717A] font-normal '>
 						{'A billable base metric is used to measure usage, and act as a foundation of pricing (e.g., API calls for an API product).'}
 					</p>
 					<Spacer height={'16px'} />
-					<Link to='/usage-tracking/billable-metric/add-meter'>
+					<Link to='/usage-tracking/meter/add-meter'>
 						<Button className='w-32 flex gap-2 bg-[#0F172A] '>
 							<FiFolderPlus />
 							<span>Add Meter</span>
@@ -69,22 +68,17 @@ const BillableMetricsPage = () => {
 
 	return (
 		<div className='page'>
-			<SectionHeader className='' title='Billable Metric'>
-				<div className='flex gap-2 w-full'>
-					<button className='px-2 py-1'>
-						<IoSearch className='size-4 font-extralight text-[#09090B] ' />
-					</button>
-					<button className='px-2 py-1'>
-						<SlidersHorizontal className='size-4 text-[#09090B] ' />
-					</button>
-					<Link to='/usage-tracking/billable-metric/add-meter'>
-						<Button className='w-32 flex gap-2 bg-[#0F172A] '>
-							<FiFolderPlus />
-							<span>Add Meter</span>
-						</Button>
-					</Link>
-				</div>
-			</SectionHeader>
+			<SectionHeader
+				showButton
+				showFilter
+				showSearch
+				title='Meter'
+				onButtonClick={() => navigate(RouteNames.addMeter)}
+				buttonIcon={<FiFolderPlus />}
+				buttonText='Add Meter'
+				className=''
+			/>
+
 			<div className=''>
 				<BillableMetricTable data={meterData?.items || []} />
 				<Spacer className='!h-4' />
@@ -94,4 +88,4 @@ const BillableMetricsPage = () => {
 	);
 };
 
-export default BillableMetricsPage;
+export default MeterPage;

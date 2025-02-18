@@ -16,7 +16,7 @@ export class PlanApi {
 	}
 
 	public static async getAllPlans({ limit, offset }: PaginationType) {
-		return await AxiosClient.get<GetAllPlansResponse>(`${this.baseUrl}?limit=${limit}&offset=${offset}`);
+		return await AxiosClient.get<GetAllPlansResponse>(`${this.baseUrl}?limit=${limit}&offset=${offset}&expand=entitlements`);
 	}
 	public static async getAllActivePlans() {
 		return await AxiosClient.get<GetAllPlansResponse>(`${this.baseUrl}?status=published`);
@@ -32,7 +32,7 @@ export class PlanApi {
 	}
 
 	public static async getPlanById(id: string) {
-		return await AxiosClient.get<ExpandedPlan>(`${this.baseUrl}/${id}`);
+		return await AxiosClient.get<Plan>(`${this.baseUrl}/${id}?expand=meters`);
 	}
 
 	public static async updatePlan(id: string, data: Partial<Plan>) {

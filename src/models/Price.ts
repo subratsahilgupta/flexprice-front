@@ -24,7 +24,7 @@ export interface Price {
 	readonly meter: Meter;
 }
 
-export interface Meter {
+interface Meter {
 	readonly id: string;
 	readonly name: string;
 }

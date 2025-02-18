@@ -2,7 +2,7 @@ import { FC, ReactNode } from 'react';
 import { Sheet as ShadcnSheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 interface Props {
-	trigger: ReactNode;
+	trigger?: ReactNode;
 	children?: ReactNode;
 	title?: string | ReactNode;
 	description?: string | ReactNode;

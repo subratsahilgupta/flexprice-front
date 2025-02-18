@@ -7,6 +7,7 @@ export class AxiosClient {
 		return response as T;
 	}
 
+	// T is the expected response type, D is the type of the data being sent
 	public static async post<T, D = any>(url: string, data?: D): Promise<T> {
 		const response: AxiosResponse<T> = await axiosClient.post(url, data);
 		return response as T;

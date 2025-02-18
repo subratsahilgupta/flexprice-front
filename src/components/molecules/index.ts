@@ -36,3 +36,7 @@ export { default as InvoiceCreditLineItemTable } from './InvoiceCreditLineItemTa
 export { default as BreadCrumbs } from './BreadCrumbs';
 
 export { default as FeatureTable } from './FeatureTable';
+
+export { default as AddEntitlementDrawer } from './AddEntitlementDrawer';
+
+export { default as ImportFileDrawer } from './ImportFileDrawer';

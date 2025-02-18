@@ -54,8 +54,8 @@ function useQueryParams<T extends Record<string, string>>(initialParams: T = {} 
 	};
 
 	return {
-		queryParams, // Current query params as a typed object
-		setQueryParam, // Function to update a specific query param
+		queryParams,
+		setQueryParam,
 	};
 }
 

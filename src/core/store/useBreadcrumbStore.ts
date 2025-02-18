@@ -27,10 +27,10 @@ export const useBreadcrumbStore = create<BreadcrumbState>()(
 
 				// Only update if cache is missing or forced to change
 				if (cachedBreadcrumbs && !forceChange) {
-					console.log(`Using cached breadcrumbs for ${pathKey}:`, cachedBreadcrumbs);
+					// console.log(`Using cached breadcrumbs for ${pathKey}:`, cachedBreadcrumbs);
 					set({ breadcrumbs: cachedBreadcrumbs });
 				} else {
-					console.log(`Setting new breadcrumbs for ${pathKey}:`, breadcrumbs);
+					// console.log(`Setting new breadcrumbs for ${pathKey}:`, breadcrumbs);
 					set({
 						breadcrumbs,
 						breadcrumbCache: {

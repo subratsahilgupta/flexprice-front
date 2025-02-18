@@ -31,6 +31,7 @@ const ActionButton: FC<ActionProps> = ({
 	isEditDisabled,
 }) => {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
+	const [isOpen, setIsOpen] = useState(false);
 	const navigate = useNavigate();
 
 	const { mutate: deleteEntity } = useMutation({
@@ -47,37 +48,46 @@ const ActionButton: FC<ActionProps> = ({
 
 	return (
 		<>
-			<DropdownMenu>
-				<DropdownMenuTrigger>
-					<BsThreeDotsVertical className='text-base' />
+			<DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+				<DropdownMenuTrigger asChild>
+					<button onClick={() => setIsOpen(!isOpen)}>
+						<BsThreeDotsVertical className='text-base' />
+					</button>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent>
-					<DropdownMenuItem disabled={isEditDisabled}>
-						<div
-							onClick={() => {
-								if (onEdit) {
-									onEdit();
-								} else {
-									navigate(editPath);
-								}
-							}}
-							className='flex gap-2 items-center w-full'>
-							<Pencil />
-							<span>Edit</span>
-						</div>
+				<DropdownMenuContent align='end'>
+					<DropdownMenuItem
+						disabled={isEditDisabled}
+						onSelect={(event) => {
+							event.preventDefault();
+							setIsOpen(false);
+							if (onEdit) {
+								onEdit();
+							} else {
+								navigate(editPath);
+							}
+						}}
+						className='flex gap-2 items-center w-full cursor-pointer'>
+						<Pencil />
+						<span>Edit</span>
 					</DropdownMenuItem>
-					<DropdownMenuItem disabled={isArchiveDisabled} onSelect={() => setIsDialogOpen(true)}>
-						<div className='flex gap-2 items-center w-full'>
-							<EyeOff />
-							<span>Archive</span>
-						</div>
+					<DropdownMenuItem
+						disabled={isArchiveDisabled}
+						onSelect={(event) => {
+							event.preventDefault();
+							setIsOpen(false);
+							setIsDialogOpen(true);
+						}}
+						className='flex gap-2 items-center w-full cursor-pointer'>
+						<EyeOff />
+						<span>Archive</span>
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
+
 			<Dialog title={`Are you sure you want to archive this ${entityName}?`} isOpen={isDialogOpen} onOpenChange={setIsDialogOpen}>
 				<div className='flex flex-col mt-4 gap-4 items-end justify-center'>
 					<div className='flex gap-4'>
-						<Button variant={'outline'} onClick={() => setIsDialogOpen(false)}>
+						<Button variant='outline' onClick={() => setIsDialogOpen(false)}>
 							Cancel
 						</Button>
 						<Button

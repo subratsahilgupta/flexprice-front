@@ -1,5 +1,5 @@
 import { queryClient } from '@/App';
-import { Button, FormHeader, Input, MultiSelect, RadioGroup, RadioMenuItem, Select, Spacer, Textarea, Toggle } from '@/components/atoms';
+import { Button, FormHeader, Input, RadioGroup, RadioMenuItem, Spacer, Textarea, Toggle } from '@/components/atoms';
 import SelectMeter from '@/components/organisms/PlanForm/SelectMeter';
 import { RouteNames } from '@/core/routes/Routes';
 import { cn } from '@/lib/utils';
@@ -18,17 +18,17 @@ const AddFeaturePage = () => {
 	const [data, setdata] = useState<Partial<Feature>>({});
 	const [errors, setErrors] = useState<Partial<Record<keyof Feature, string>>>({});
 	const navigate = useNavigate();
-	const [eventFilters, seteventFilters] = useState<
-		{
-			key: string;
-			values: string[];
-		}[]
-	>([
-		{
-			key: '',
-			values: [],
-		},
-	]);
+	// const [eventFilters, seteventFilters] = useState<
+	// 	{
+	// 		key: string;
+	// 		values: string[];
+	// 	}[]
+	// >([
+	// 	{
+	// 		key: '',
+	// 		values: [],
+	// 	},
+	// ]);
 
 	const featureTypeOptions: RadioMenuItem[] = [
 		{
@@ -44,7 +44,7 @@ const AddFeaturePage = () => {
 			value: 'metered',
 		},
 		{
-			label: 'Configuration',
+			label: 'Static',
 			description: 'Functionality with varying usage however need not be measured based on customer usage.',
 			icon: Wrench,
 			value: 'static',
@@ -77,8 +77,6 @@ const AddFeaturePage = () => {
 		activeMeter: Meter | null;
 		filters: { key: string; values: string[] }[];
 		defineUnits: boolean;
-		singularUnit?: string;
-		pluralUnit?: string;
 	}>({
 		showDescription: false,
 		activeMeter: null,
@@ -157,7 +155,7 @@ const AddFeaturePage = () => {
 									'feature-' +
 									e
 										.toLowerCase()
-										.replace(/ /g, '_')
+										.replace(/ /g, '-')
 										.replace(/[^\w-]+/g, ''),
 							}));
 						}}
@@ -210,7 +208,13 @@ const AddFeaturePage = () => {
 							<RadioGroup
 								items={featureTypeOptions}
 								onChange={(e) => {
-									setdata((prev) => ({ ...prev, type: e.value }));
+									setdata((prev) => ({
+										...prev,
+										type: e.value,
+										unit_plural: undefined,
+										unit_singular: undefined,
+									}));
+									setstate((prev) => ({ ...prev, defineUnits: false }));
 								}}
 							/>
 						</>
@@ -249,21 +253,22 @@ const AddFeaturePage = () => {
 								</div>
 								<Spacer height={'16px'} />
 								<div className='ml-8'>
-									<SelectMeter
-										value={data.meter_id}
-										onChange={(meter) => {
-											setdata((prev) => ({ ...prev, meter_id: meter.id }));
-											setstate((prev) => ({ ...prev, activeMeter: meter }));
-										}}
-										description='The feature will be measured according to the billable metric you choose'
-									/>
-
-									<Spacer height={'16px'} />
+									<div>
+										<SelectMeter
+											className='!w-1/3'
+											value={data.meter_id}
+											onChange={(meter) => {
+												setdata((prev) => ({ ...prev, meter_id: meter.id }));
+												setstate((prev) => ({ ...prev, activeMeter: meter }));
+											}}
+											description='The feature will be measured according to the billable metric you choose'
+										/>
+									</div>
 
 									{state.activeMeter && (
 										<div className=''>
 											{/* event filters */}
-											<div>
+											{/* <div>
 												<div className='border border-zinc-200'></div>
 												<Spacer height={'16px'} />
 												<FormHeader variant='form-component-title' title='Event Filters' />
@@ -312,12 +317,12 @@ const AddFeaturePage = () => {
 													}}>
 													Add Filter
 												</Button>
-											</div>
+											</div> */}
 
 											{/* define units */}
 											<div>
 												<Spacer height={'16px'} />
-												<div className='border border-zinc-200'></div>
+												<div className='h-[1px] bg-zinc-200 '></div>
 												<Spacer height={'16px'} />
 												<Toggle
 													label='Define Units'
@@ -333,16 +338,16 @@ const AddFeaturePage = () => {
 														<div className='gap-4 grid grid-cols-2'>
 															<Input
 																placeholder='singluar'
-																value={state.singularUnit}
+																value={data.unit_singular}
 																onChange={(e) => {
-																	setstate((prev) => ({ ...prev, singularUnit: e }));
+																	setdata((prev) => ({ ...prev, unit_singular: e }));
 																}}
 															/>
 															<Input
 																placeholder='plural'
-																value={state.pluralUnit}
+																value={data.unit_plural}
 																onChange={(e) => {
-																	setstate((prev) => ({ ...prev, pluralUnit: e }));
+																	setdata((prev) => ({ ...prev, unit_plural: e }));
 																}}
 															/>
 														</div>
@@ -359,7 +364,7 @@ const AddFeaturePage = () => {
 						</>
 					)}
 					{data.type && data.type === featureTypeOptions[2].value && (
-						<div className={'border-zinc-200 border bg-white relative'}>
+						<div className={cn('w-full items-start  rounded-lg', 'border-zinc-200 border bg-white relative p-4 ')}>
 							<div className={cn('w-full items-start flex gap-4 p-2  cursor-pointer rounded-lg')}>
 								<Wrench className={'size-5 mt-1'} />
 
@@ -372,21 +377,44 @@ const AddFeaturePage = () => {
 									<p className='font-normal font-inter text-sm text-zinc-500 '>{featureTypeOptions[2].description}</p>
 								</div>
 							</div>
-							<div className='gap-4 p-6 px-9 grid grid-cols-2'>
-								<Input
-									placeholder='singluar'
-									value={state.singularUnit}
+							<div>
+								<Spacer height={'16px'} />
+								<div className=''></div>
+								<Spacer height={'16px'} />
+								<Toggle
+									label='Define Units'
+									checked={state.defineUnits}
 									onChange={(e) => {
-										setstate((prev) => ({ ...prev, singularUnit: e }));
+										setstate((prev) => ({ ...prev, defineUnits: e }));
 									}}
 								/>
-								<Input
-									placeholder='plural'
-									value={state.pluralUnit}
-									onChange={(e) => {
-										setstate((prev) => ({ ...prev, pluralUnit: e }));
-									}}
-								/>
+								{state.defineUnits && (
+									<>
+										<Spacer height={'16px'} />
+										<div className='h-[1px] bg-zinc-200 '></div>
+										<Spacer height={'16px'} />
+										<FormHeader variant='form-component-title' title='Unit Name' />
+										<div className='gap-4 grid grid-cols-2'>
+											<Input
+												placeholder='singluar'
+												value={data.unit_singular}
+												onChange={(e) => {
+													setdata((prev) => ({ ...prev, unit_singular: e }));
+												}}
+											/>
+											<Input
+												placeholder='plural'
+												value={data.unit_plural}
+												onChange={(e) => {
+													setdata((prev) => ({ ...prev, unit_plural: e }));
+												}}
+											/>
+										</div>
+										<p className='text-muted-foreground text-sm'>
+											If the unit name changes when the value is plural, please provide the names of the units
+										</p>
+									</>
+								)}
 							</div>
 						</div>
 					)}

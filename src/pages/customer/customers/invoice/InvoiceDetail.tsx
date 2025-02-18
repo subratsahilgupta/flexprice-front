@@ -2,6 +2,7 @@ import { FormHeader, Spacer, Button, Divider } from '@/components/atoms';
 import { DropdownMenu, DropdownMenuOption, InvoiceLineItemTable } from '@/components/molecules';
 import InvoicePaymentStatusModal from '@/components/molecules/InvoiceTable/InvoicePaymentStatusModal';
 import InvoiceStatusModal from '@/components/molecules/InvoiceTable/InvoiceStatusModal';
+import useUser from '@/hooks/useUser';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
 import { captureToPdf } from '@/utils/common/component_to_pdf';
 import formatDate from '@/utils/common/format_date';
@@ -29,6 +30,8 @@ const InvoiceDetails: FC<Props> = ({ invoice_id }) => {
 		},
 		enabled: !!invoice_id,
 	});
+
+	const { user } = useUser();
 
 	const dropdownOptions: DropdownMenuOption[] = [
 		{
@@ -139,18 +142,18 @@ const InvoiceDetails: FC<Props> = ({ invoice_id }) => {
 				</div>
 
 				<div className='grid grid-cols-2  p-4 border-b border-gray-200'>
-					<div>
-						<FormHeader className='' title='Customer Information' variant='sub-header' titleClassName='font-semibold' />
-						<p className={customerInfoClass}>{data?.customer?.name || '--'}</p>
-						<p className={customerInfoClass}>1234 Main St.</p>
-						<p className={customerInfoClass}>Anytown, CA 12345</p>
+					<div className='text-left'>
+						<FormHeader className='!mb-2' title={user?.tenant.name} variant='sub-header' titleClassName='font-semibold' />
+						<p className={customerInfoClass}>{user?.tenant.name}</p>
+						<p className={customerInfoClass}>{user?.email}</p>
+						<p className={customerInfoClass}>{'--'}</p>
 					</div>
 
-					<div className='text-left'>
-						<FormHeader className='' title='ChatGPT Inc.' variant='sub-header' titleClassName='font-semibold' />
-						<p className={customerInfoClass}>Liam Johnson</p>
-						<p className={customerInfoClass}>1234 Main St.</p>
-						<p className={customerInfoClass}>Anytown, CA 12345</p>
+					<div>
+						<FormHeader className='!mb-2' title='Bill to' variant='sub-header' titleClassName='font-semibold' />
+						<p className={customerInfoClass}>{data?.customer?.name || '--'}</p>
+						<p className={customerInfoClass}>{data?.customer?.address_line1 || '--'}</p>
+						<p className={customerInfoClass}>{data?.customer?.address_line2 || '--'}</p>
 					</div>
 				</div>
 				<InvoiceLineItemTable title='Order Details' data={data?.line_items ?? []} amount_due={data?.amount_due} currency={data?.currency} />

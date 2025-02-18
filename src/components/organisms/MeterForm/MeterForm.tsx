@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { z } from 'zod';
-import { Button, Input, RadioGroup, Select, Spacer } from '@/components/atoms';
+import { Button, CodePreview, Input, RadioGroup, Select } from '@/components/atoms';
 import { EventFilter, EventFilterData } from '@/components/molecules';
 import { LuCircleFadingPlus, LuRefreshCw } from 'react-icons/lu';
 import { cn } from '@/lib/utils';
@@ -8,13 +8,24 @@ import { useNavigate } from 'react-router-dom';
 import { queryClient } from '@/App';
 import { Meter } from '@/models/Meter';
 import { v4 as uuidv4 } from 'uuid';
-import { Copy } from 'lucide-react';
-import toast from 'react-hot-toast';
 
 interface Props {
 	data?: Meter;
 	onSubmit: (data: Meter, mode: 'add' | 'edit') => void;
 }
+
+export const formatAggregationType = (data: string): string => {
+	switch (data) {
+		case 'SUM':
+			return 'Sum';
+		case 'COUNT':
+			return 'Count';
+		case 'COUNT_UNIQUE':
+			return 'Count Unique';
+		default:
+			return 'Sum';
+	}
+};
 
 // Zod Schema for Validation
 const MeterFormSchema = z.object({
@@ -27,7 +38,7 @@ const MeterFormSchema = z.object({
 		// 	value: z.array(z.string().min(1, { message: 'Filter value is required' })).optional(),
 		// }),
 		.optional(),
-	aggregationFunction: z.enum(['SUM', 'COUNT'], { errorMap: () => ({ message: 'Invalid aggregation function' }) }),
+	aggregationFunction: z.enum(['SUM', 'COUNT', 'COUNT_UNIQUE', 'c1'], { errorMap: () => ({ message: 'Invalid aggregation function' }) }),
 	aggregationValue: z.string().min(1, { message: 'Aggregation Value is required' }),
 	resetPeriod: z.string().optional(),
 });
@@ -56,24 +67,24 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 	};
 
 	const curlCommand = `curl --request POST \\
-		--url https://api.cloud.flexprice.io/v1/events \\
-		--header 'Content-Type: application/json' \\
-		--header 'x-api-key: <your_api_key>' \\
-		--data '{
-		  "event_id": "${'event_' + uuidv4().replace(/-/g, '').slice(0, 10)}",
-		  "event_name": "${data?.event_name ?? (eventName || '__MUST_BE_DEFINED__')}",
-		  "external_customer_id": "__CUSTOMER_ID__",
-		  "properties": {${eventFilters.map((filter) => `\n\t\t\t "${filter.key}" : "${filter.values[0] || 'FILTER_VALUE'}"`).join(',')}${aggregationValue ? `,\n\t\t\t "${aggregationValue}":"__${aggregationValue.split(' ').join('_').toUpperCase()}__"` : ''}
-		  },
-		  "source": "api",
+	--url https://api.cloud.flexprice.io/v1/events \\
+	--header 'Content-Type: application/json' \\
+	--header 'x-api-key: <your_api_key>' \\
+	--data '{
+		"event_id": "${'event_' + uuidv4().replace(/-/g, '').slice(0, 10)}",
+		"event_name": "${eventName || '__MUST_BE_DEFINED__'}",
+		"external_customer_id": "__CUSTOMER_ID__",
+		"properties": {${eventFilters.map((filter) => `\n\t\t\t "${filter.key}" : "${filter.values[0] || 'FILTER_VALUE'}"`).join(',')}${aggregationValue ? `,\n\t\t\t "${aggregationValue}":"__${aggregationValue.split(' ').join('_').toUpperCase()}__"` : ''}
+		},
+		"source": "api",
 		"timestamp": "${getRandomDate()}"
-		}'`;
+	}'`;
 
 	const radioMenuItemList = [
 		{
 			label: 'Cumulative',
 			description: 'Track values continuously without resetting, useful for metrics like lifetime usage.',
-			value: 'never',
+			value: 'NEVER',
 			icon: LuCircleFadingPlus,
 		},
 		{
@@ -103,7 +114,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 				event_name: eventName,
 				name: displayName,
 				aggregation: {
-					type: aggregationFunction,
+					type: aggregationFunction === 'c1' ? 'COUNT' : aggregationFunction,
 					field: aggregationValue,
 				},
 				filters: eventFilters
@@ -119,7 +130,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 			queryClient.invalidateQueries({
 				queryKey: ['fetchMeters'],
 			});
-			navigate('/usage-tracking/billable-metric');
+			navigate('/usage-tracking/meter');
 
 			setErrors({});
 		} else {
@@ -141,7 +152,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 			{!isEditMode && (
 				<div className='p-6'>
 					<p className='font-bold text-zinc text-[20px]'>Add Meter</p>
-					<p className={labelStyle}>Make changes to your account here. Click save when you're done.</p>
+					<p className={labelStyle}> Define a usage-based metric to track and bill customers accurately.</p>
 				</div>
 			)}
 
@@ -157,10 +168,19 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 					<div className='p-6 rounded-xl border border-[#E4E4E7]'>
 						<div className='mb-4'>
 							<p className='font-inter font-semibold text-base'>Event Schema</p>
-							<p className={labelStyle}>Assign a name to your event schema to easily identify and track events processed.</p>
+							<p className={labelStyle}> Choose how the usage data should be aggregated for billing.</p>
 						</div>
 
 						<div className='flex flex-col gap-4'>
+							<Input
+								value={displayName}
+								disabled={isEditMode}
+								onChange={setDisplayName}
+								label='Meter Name'
+								placeholder='Total Token'
+								description='This name will be used in the invoices.'
+								error={errors.displayName}
+							/>
 							<Input
 								value={eventName}
 								onChange={setEventName}
@@ -170,15 +190,6 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 								description='A unique identifier for the meter. This is used to refer to the meter in the Flexprice APIs.'
 								error={errors.eventName}
 							/>
-							<Input
-								value={displayName}
-								disabled={isEditMode}
-								onChange={setDisplayName}
-								label='Display Name'
-								placeholder='Total Token'
-								description='This name will be used in the invoices.'
-								error={errors.displayName}
-							/>
 						</div>
 					</div>
 
@@ -186,9 +197,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 					<div className='p-6 rounded-xl border border-[#E4E4E7]'>
 						<div className='mb-4'>
 							<p className='font-inter font-semibold text-base'>Event Filters</p>
-							<p className={labelStyle}>
-								Name of the property key in the data object. The groups should only include low cardinality fields.
-							</p>
+							<p className={labelStyle}>Filter events based on specific properties (e.g., region, user type).</p>
 						</div>
 
 						<div className=''>
@@ -214,8 +223,9 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 							<Select
 								disabled={isEditMode}
 								options={[
-									{ label: 'SUM', value: 'SUM' },
-									{ label: 'COUNT', value: 'COUNT' },
+									{ label: 'Sum', value: 'SUM' },
+									{ label: 'Count', value: 'COUNT' },
+									{ label: 'Count Unique', value: 'COUNT_UNIQUE' },
 								]}
 								value={aggregationFunction}
 								onChange={setAggregationFunction}
@@ -266,25 +276,9 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 				</div>
 
 				{/* preview */}
-				<div className={cn('flex-[3] max-w-lg  relative')}>
-					<div className={cn('sticky border-zinc-300 border top-24 float-right bg-[#0000000D] p-6 rounded-lg')}>
-						<div className='flex   justify-between items-center w-full'>
-							<p className=' font-semibold text-lg'>Test This Snippet</p>
-							<Button
-								onClick={() => {
-									navigator.clipboard.writeText(curlCommand);
-									toast.success('Copied to clipboard');
-								}}
-								className='text-muted-foreground cursor-pointer absolute top-4 right-4 size-8'
-								variant={'ghost'}>
-								<Copy className='' />
-							</Button>
-						</div>
-						<Spacer className='!h-6' />
-						<pre className='text-xs font-fira-code '>
-							{/* <CodePreview className='' code={curlCommand} language='javascript' /> */}
-							{curlCommand}
-						</pre>
+				<div className={cn('flex-F[3] max-w-lg  relative')}>
+					<div className='sticky  top-24 float-right'>
+						<CodePreview title='Event Example' className='sticky top-24' code={curlCommand} language='js' />
 					</div>
 				</div>
 			</div>

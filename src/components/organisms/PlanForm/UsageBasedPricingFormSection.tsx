@@ -81,7 +81,7 @@ const UsageBasedPricingFormSection = () => {
 	return (
 		<div>
 			{/* Render the pricing forms */}
-			{priceList.length > 0 && <FormHeader className='!mb-2' title={'Usage Based Charges'} variant='form-component-title' />}
+			{priceList.length > 0 && <FormHeader className='!my-2' title={'Usage Based Charges'} variant='form-component-title' />}
 			{priceList.map((price, index) => (
 				<div className='space-y-2'>
 					<UsagePricingForm

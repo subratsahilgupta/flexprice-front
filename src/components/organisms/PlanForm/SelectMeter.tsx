@@ -1,4 +1,5 @@
 import { SelectOption, Select } from '@/components/atoms';
+import { cn } from '@/lib/utils';
 import { Meter } from '@/models/Meter';
 import { MeterApi } from '@/utils/api_requests/MeterApi';
 import { useQuery } from '@tanstack/react-query';
@@ -15,6 +16,7 @@ interface Props {
 	label?: string;
 	placeholder?: string;
 	description?: string;
+	className?: string;
 }
 
 const SelectMeter: FC<Props> = ({
@@ -24,6 +26,7 @@ const SelectMeter: FC<Props> = ({
 	label = 'Billable Metric',
 	placeholder = 'Select by meter name',
 	description,
+	className,
 }) => {
 	const {
 		data: metersData,
@@ -57,9 +60,11 @@ const SelectMeter: FC<Props> = ({
 			};
 		});
 
+	console.log('received value', value);
 	return (
-		<div className='min-w-[200px]'>
+		<div className={cn('min-w-[200px]')}>
 			<Select
+				className={className}
 				error={error}
 				value={value}
 				onChange={(e) => onChange(metersData.items.find((meter) => meter.id === e) as Meter)}

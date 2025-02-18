@@ -2,12 +2,12 @@ import usePlanStore, { Price } from '@/store/usePlanStore';
 import { FC, useState } from 'react';
 import { subscriptionTypeOptions } from './SetupChargesSection';
 import { Button, Input, Select, Spacer } from '@/components/atoms';
-import { cn } from '@/lib/utils';
-import { RiDeleteBin6Line } from 'react-icons/ri';
 import SelectMeter from './SelectMeter';
 import { Pencil, Trash2 } from 'lucide-react';
 import { Meter } from '@/models/Meter';
-import { formatBillingPeriod } from '@/utils/common/helper_functions';
+import { formatBillingPeriod, getCurrencySymbol, toSentenceCase } from '@/utils/common/helper_functions';
+import { currencyOptions } from '@/core/data/constants';
+import VolumeTieredPricingForm from './VolumeTieredPricingForm';
 
 const formatAmountWithCommas = (amount: string): string => {
 	return amount.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -26,17 +26,12 @@ interface Props {
 	label?: string;
 }
 
-interface PriceTier {
+export interface PriceTier {
 	from: number;
-	flat_amount: number;
-	unit_amount: number;
 	up_to: number | null;
+	flat_amount?: string;
+	unit_amount?: string;
 }
-
-const currencyOptions = [
-	{ label: 'USD', value: 'USD', currency: '$' },
-	{ label: 'INR', value: 'INR', currency: '₹' },
-];
 
 const billingModels = [
 	{ value: 'FLAT_FEE', label: 'Flat Fee' },
@@ -51,25 +46,32 @@ const billlingPeriodOptions = [
 	{ label: 'Yearly', value: 'ANNUAL' },
 ];
 
-const mapCurrency = (currency: string) => {
-	const selectedCurrency = currencyOptions.find((option) => option.value === currency);
-	return selectedCurrency?.currency || '';
-};
-
 const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, addPrice, label }) => {
 	const metaData = usePlanStore((state) => state.metaData);
 
-	const [currency, setCurrency] = useState(metaData?.usageBasedPrice?.currency || currencyOptions[0].value);
-	const [billingModel, setBillingModel] = useState(metaData?.usageBasedPrice?.billing_model || billingModels[0].value);
-	const [meterId, setMeterId] = useState(metaData?.usageBasedPrice?.meter_id);
+	const [currency, setCurrency] = useState(metaData?.usageBasedPrice?.currency || data?.currency || currencyOptions[0].value);
+	const [billingModel, setBillingModel] = useState(
+		metaData?.usageBasedPrice?.billing_model || data?.billing_model || billingModels[0].value,
+	);
+	const [meterId, setMeterId] = useState(metaData?.usageBasedPrice?.meter_id || data?.meter_id);
 
-	const [tieredPrices, setTieredPrices] = useState<PriceTier[]>([
-		{ from: 1, up_to: 1, unit_amount: 0, flat_amount: 0 },
-		{ from: 2, up_to: null, unit_amount: 0, flat_amount: 0 },
-	]);
+	const [tieredPrices, setTieredPrices] = useState<PriceTier[]>(
+		data?.tiers?.map((tier: any) => ({
+			from: tier.from,
+			up_to: tier.up_to,
+			flat_amount: tier.flat_amount,
+			unit_amount: tier.unit_amount,
+		})) || [
+			{ from: 1, up_to: 1 },
+			{ from: 2, up_to: null },
+		],
+	);
 	const [billingPeriod, setbillingPeriod] = useState(data?.billing_period || billlingPeriodOptions[2].value);
 	const [flatFee, setflatFee] = useState<string>(data?.amount || '');
-	const [packagedFee, setpackagedFee] = useState<{ unit: string; price: string }>({ unit: '', price: '' });
+	const [packagedFee, setpackagedFee] = useState<{ unit: string; price: string }>({
+		unit: data?.transform_quantity?.divide_by ? `${data?.transform_quantity?.divide_by}` : '',
+		price: data?.amount || '',
+	});
 	const [errors, seterrors] = useState<Partial<Record<keyof Price, any>>>({});
 	const [inputErrors, setinputErrors] = useState({
 		flatModelError: '',
@@ -78,56 +80,10 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 	});
 
 	const [activeMeter, setactiveMeter] = useState<Meter | null>();
-	const addTieredPrice = () => {
-		setTieredPrices((prev) => {
-			const lastTier = prev[prev.length - 1];
-
-			if (lastTier.up_to === null) {
-				prev[prev.length - 1] = { ...lastTier, up_to: lastTier.from + 1 };
-			}
-			const newFrom = lastTier.up_to ?? lastTier.from + 1;
-
-			const newTier = { from: newFrom + 1, up_to: null, unit_amount: 0, flat_amount: 0 };
-			return [...prev, newTier];
-		});
-	};
 
 	// Remove a tier
-	const removeTier = (index: number) => {
-		if (index === 0 && tieredPrices.length === 1) {
-			return;
-		}
-		setTieredPrices((prev) => {
-			const updatedTiers = prev.filter((_, i) => i !== index);
-			if (updatedTiers.length > 0 && index === prev.length - 1) {
-				updatedTiers[updatedTiers.length - 1].up_to = null;
-			}
-			return updatedTiers;
-		});
-	};
 
 	// Update a tier value
-	const updateTier = (index: number, key: string, value: number) => {
-		setTieredPrices((prev) => {
-			const updatedTiers = [...prev];
-			updatedTiers[index] = { ...updatedTiers[index], [key]: value };
-
-			// Adjust the 'from' and 'up_to' values based on the tier being updated
-			if (key === 'up_to' && index < prev.length - 1) {
-				// If 'up_to' is updated, adjust the 'from' value of the next tier
-				const nextTier = updatedTiers[index + 1];
-				nextTier.from = value + 1;
-			}
-
-			if (key === 'from' && index > 0) {
-				// If 'from' is updated, adjust the 'up_to' value of the previous tier
-				const previousTier = updatedTiers[index - 1];
-				previousTier.up_to = value - 1;
-			}
-
-			return updatedTiers;
-		});
-	};
 
 	// Handle saving of pricing information
 	const handleAddPrice = () => {
@@ -156,11 +112,17 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 		}
 
 		if (billingModel === billingModels[2].value) {
+			for (let i = 0; i < tieredPrices.length; i++) {
+				if (!tieredPrices[i].up_to && i !== tieredPrices.length - 1) {
+					tieredPrices[i].up_to = tieredPrices[i + 1].up_to ? tieredPrices[i + 1].up_to! - 1 : null;
+				}
+			}
 			data.tiers = tieredPrices.map((tier) => ({
-				up_to: tier.up_to!,
-				unit_amount: tier.unit_amount.toString(),
-				flat_amount: tier.flat_amount.toString(),
-			}));
+				from: tier.from,
+				up_to: tier.up_to,
+				unit_amount: tier.unit_amount || '0',
+				flat_amount: tier.flat_amount || '0',
+			})) as any;
 			data.tier_mode = 'VOLUME';
 		}
 
@@ -192,10 +154,10 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 					return true;
 				}
 
-				if (tier.unit_amount < 0 || tier.flat_amount < 0) {
-					setinputErrors((prev) => ({ ...prev, tieredModelError: `Units and Flat amount cannot be nagative in row ${index + 1}` }));
-					return true;
-				}
+				// if (tier.unit_amount < 0 || tier.flat_amount < 0) {
+				// 	setinputErrors((prev) => ({ ...prev, tieredModelError: `Units and Flat amount cannot be nagative in row ${index + 1}` }));
+				// 	return true;
+				// }
 			});
 		}
 
@@ -216,6 +178,8 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 		return true;
 	};
 
+	console.log('data', data);
+
 	if (!isEdit) {
 		return (
 			<div className='mb-2'>
@@ -223,7 +187,14 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 				<div
 					className='gap-2 w-full flex justify-between group min-h-9 items-center rounded-md border bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground disabled:opacity-50 md:text-sm disabled:cursor-not-allowed cursor-pointer'
 					onClick={handleEdit}>
-					<p>{activeMeter ? `${activeMeter.name}` : `Usage Based Charge ${label}`}</p>
+					<div>
+						<p>{activeMeter ? `${activeMeter.name}` : `Usage Based Charge ${label}`}</p>
+						<span className='flex gap-2'>
+							<p className='text-zinc-500 text-xs'>
+								{data?.currency} | {toSentenceCase(data?.billing_period || '')}
+							</p>
+						</span>
+					</div>
 					<span className='text-[#18181B] flex gap-2 items-center'>
 						<button onClick={handleEdit}>
 							<Pencil size={16} />
@@ -239,7 +210,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 	}
 
 	return (
-		<div>
+		<div className='card mb-2'>
 			<Spacer height={'8px'} />
 			<SelectMeter
 				error={errors.meter_id}
@@ -288,7 +259,8 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 						type='number'
 						error={inputErrors.flatModelError}
 						label='Price'
-						inputPrefix={mapCurrency(currency)}
+						value={flatFee}
+						inputPrefix={getCurrencySymbol(currency)}
 						onChange={(e) => setflatFee(e)}
 						suffix={<span className='text-[#64748B]'>{`/ unit / ${formatBillingPeriod(billingPeriod)}`}</span>}
 					/>
@@ -302,7 +274,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 							type='number'
 							label='Price'
 							value={packagedFee.price}
-							inputPrefix={mapCurrency(currency)}
+							inputPrefix={getCurrencySymbol(currency)}
 							onChange={(e) => setpackagedFee({ ...packagedFee, price: e })}
 						/>
 						<div className='h-[50px] items-center flex gap-2'>
@@ -325,77 +297,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 			)}
 
 			{billingModel === billingModels[2].value && (
-				<div className='space-y-4'>
-					<Spacer height='16px' />
-					<div className={cn('w-full', tieredPrices.length > 0 ? '' : 'hidden')}>
-						<table className='table-auto w-full border-collapse border border-gray-200 overflow-x-auto'>
-							<thead>
-								<tr className='bg-gray-100 text-left border-b'>
-									<th className='px-4 py-2 font-normal bg-white text-nowrap text-[#71717A]'>First unit</th>
-									<th className='px-4 py-2 font-normal bg-white text-nowrap text-[#71717A]'>Last unit</th>
-									<th className='px-4 py-2 font-normal bg-white text-nowrap text-[#71717A]'>{`Per unit price `}</th>
-									<th className='px-4 py-2 font-normal bg-white text-nowrap text-[#71717A]'>Flat fee </th>
-									<th className='px-4 py-2 font-normal bg-white text-nowrap text-[#71717A]'></th>
-								</tr>
-							</thead>
-							<tbody>
-								{tieredPrices.map((tier, index) => (
-									<tr key={index} className='w-full'>
-										<td className='px-4 py-2'>
-											<Input
-												disabled
-												className='h-9'
-												onChange={(e) => updateTier(index, 'from', Number(e))}
-												type='number'
-												value={tier.from}
-												placeholder='From'
-											/>
-										</td>
-										<td className='px-4 py-2'>
-											<Input
-												className='h-9'
-												onChange={(e) => updateTier(index, 'up_to', Number(e))}
-												disabled={tier.up_to === null}
-												value={tier.up_to === null ? '∞' : tier.up_to}
-												placeholder='To (Infinity)'
-											/>
-										</td>
-										<td className='px-4 py-2'>
-											<Input
-												className='h-9'
-												onChange={(e) => updateTier(index, 'unit_amount', Number(e))}
-												type='number'
-												value={tier.unit_amount}
-												placeholder='Rs. 100'
-											/>
-										</td>
-										<td className='px-4 py-2'>
-											<Input
-												className='h-9'
-												onChange={(e) => updateTier(index, 'flat_amount', Number(e))}
-												type='number'
-												value={tier.flat_amount}
-												placeholder='Flat Fee'
-											/>
-										</td>
-										<td className='px-4 py-2 text-center'>
-											<button
-												className='flex justify-center items-center size-9 rounded-md border text-zinc'
-												onClick={() => removeTier(index)}>
-												<RiDeleteBin6Line className='text-zinc' />
-											</button>
-										</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
-					</div>
-					<div className='flex justify-between items-center mt-4'>
-						<Button onClick={addTieredPrice} variant='default' className='flex items-center gap-2'>
-							Add Tier
-						</Button>
-					</div>
-				</div>
+				<VolumeTieredPricingForm setTieredPrices={setTieredPrices} tieredPrices={tieredPrices} currency={currency} />
 			)}
 
 			<Spacer height='16px' />

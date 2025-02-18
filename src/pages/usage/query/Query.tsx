@@ -1,4 +1,4 @@
-import { DateRangePicker, Input, SectionHeader } from '@/components/atoms';
+import { Button, DateRangePicker, Input, SectionHeader } from '@/components/atoms';
 import SelectMeter from '@/components/organisms/PlanForm/SelectMeter';
 import { Skeleton } from '@/components/ui/skeleton';
 import EventsApi from '@/utils/api_requests/EventsApi';
@@ -11,7 +11,7 @@ import { CartesianGrid, Line, LineChart, XAxis, YAxis, Tooltip as RechartsToolti
 import { Card, CardContent } from '@/components/ui/card';
 import { ChartConfig, ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 import { cn } from '@/lib/utils';
-import { Search } from 'lucide-react';
+import { RefreshCw, Search } from 'lucide-react';
 import { formatDateTime } from '@/utils/common/format_date';
 
 const getNext24HoursDate = (date: Date): Date => {
@@ -30,7 +30,6 @@ const QueryPage = () => {
 
 	const [payload, setPayload] = useState<{
 		meter_id?: string;
-		customer_id?: string;
 		end_time?: Date;
 		start_time?: Date;
 		external_customer_id?: string;
@@ -46,18 +45,10 @@ const QueryPage = () => {
 		mutate: fetchUsage,
 		isPending,
 	} = useMutation({
-		mutationKey: [
-			'fetchMeters1',
-			payload.customer_id,
-			payload.end_time,
-			payload.start_time,
-			payload.external_customer_id,
-			payload.window_size,
-		],
+		mutationKey: ['fetchMeters1', payload.end_time, payload.start_time, payload.external_customer_id, payload.window_size],
 		mutationFn: async () => {
 			return await EventsApi.getUsageByMeter({
 				meter_id: payload.meter_id!,
-				customer_id: payload.customer_id,
 				end_time: payload.end_time?.toISOString(),
 				start_time: payload.start_time?.toISOString(),
 				external_customer_id: payload.external_customer_id,
@@ -72,6 +63,7 @@ const QueryPage = () => {
 		if (payload?.meter_id) {
 			fetchUsage();
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [payload]);
 
 	const formattedData = data?.results?.map((item) => ({
@@ -89,21 +81,31 @@ const QueryPage = () => {
 			{/* Filters Section */}
 			<div className={'space-y-6'}>
 				<div className='flex w-full  gap-4 items-end bg-white '>
+					<DateRangePicker
+						title='Time Period'
+						onChange={({ endDate, startDate }) =>
+							setPayload({ ...payload, start_time: startDate, end_time: endDate ? getNext24HoursDate(endDate) : undefined })
+						}
+						startDate={payload.start_time!}
+						endDate={payload.end_time!}
+					/>
+
 					{/* Meter Selection */}
 					<SelectMeter
-						placeholder='Select Billable Metric'
+						label='Meter name'
+						placeholder='Select Meter'
 						onChange={(value) => setPayload({ ...payload, meter_id: value.id })}
 						value={payload.meter_id}
 					/>
 
 					{/* Customer ID Input */}
 					<Input
-						value={payload.customer_id}
+						value={payload.external_customer_id ?? ''}
 						suffix={<Search className='size-4' />}
 						className='!h-10'
-						label='Customer ID'
-						placeholder='Search by Customer ID'
-						onChange={(e) => setPayload({ ...payload, customer_id: e })}
+						label='External Customer ID'
+						placeholder='Search by External Customer ID'
+						onChange={(e) => setPayload({ ...payload, external_customer_id: e })}
 					/>
 
 					{/* Window Size Selector */}
@@ -126,16 +128,19 @@ const QueryPage = () => {
 							})}
 						</div>
 					</div>
-
-					{/* Date Range Picker */}
-					<DateRangePicker
-						title='Time Period'
-						onChange={({ endDate, startDate }) =>
-							setPayload({ ...payload, start_time: startDate, end_time: endDate ? getNext24HoursDate(endDate) : undefined })
-						}
-						startDate={payload.start_time!}
-						endDate={payload.end_time!}
-					/>
+					<Button
+						variant='outline'
+						className='!h-10'
+						onClick={() => {
+							setPayload({
+								window_size: windowSizeOptions[2].value,
+								start_time: new Date(new Date().setDate(new Date().getDate() - 7)),
+								end_time: new Date(),
+								external_customer_id: undefined,
+							});
+						}}>
+						<RefreshCw />
+					</Button>
 				</div>
 
 				{/* Chart Section */}

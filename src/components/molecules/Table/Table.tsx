@@ -25,6 +25,7 @@ export interface FlexpriceTableProps {
 	data: any[];
 	onRowClick?: (row: any) => void;
 	showEmptyRow?: boolean;
+	emptyRowText?: string;
 }
 
 // Table structure components
@@ -91,83 +92,86 @@ const TableCell = React.forwardRef<
 TableCell.displayName = 'TableCell';
 
 // Main FlexpriceTable Component
-const FlexpriceTable: FC<FlexpriceTableProps> = ({ onRowClick, columns, data, redirectUrl, showEmptyRow }) => {
+const FlexpriceTable: FC<FlexpriceTableProps> = ({ onRowClick, columns, data, redirectUrl, showEmptyRow, emptyRowText }) => {
 	const navigate = useNavigate();
 	return (
-		<Table>
-			<TableHeader>
-				<TableRow>
-					{columns.map(({ title, flex = 1, width, color = '#64748B', align = 'left', children, className }, index) => (
-						<TableHead
-							key={index}
-							style={{ flex: width ? undefined : flex }}
-							width={width}
-							align={align}
-							className={cn(color ? `text-[${color}]` : 'text-[#64748B]', className)}>
-							{children ? children : title}
-						</TableHead>
-					))}
-				</TableRow>
-			</TableHeader>
-			<TableBody>
-				{data.length > 0 &&
-					data?.map((row, rowIndex) => (
-						<TableRow
-							onClick={() => {
-								if (onRowClick) {
-									onRowClick(row);
-								}
-							}}
-							key={rowIndex}>
-							{columns.map(
-								(
-									{ fieldName: name, flex = 1, width, textColor = 'inherit', align = 'left', render, redirect = true, onCLick },
-									colIndex,
-								) => (
-									<TableCell
-										onClick={() => {
-											if (redirect && redirectUrl) {
-												navigate(`${redirectUrl}${row.id}`);
-											}
-											if (onCLick) {
-												onCLick(row);
-											}
-										}}
-										key={colIndex}
-										className={cn(
-											textColor ? `text-[${textColor}]` : 'text-[#09090B] w-full ',
-											'font-normal',
-											'!max-h-8 px-4 py-2 text-[14px]',
-											redirect && redirectUrl ? 'cursor-pointer' : 'cursor-default',
-										)}
-										style={{ flex: width ? undefined : flex }}
-										width={width}
-										align={align}>
-										{render ? render(row) : row[name]}
-									</TableCell>
-								),
-							)}
-						</TableRow>
-					))}
-				{data.length === 0 &&
-					showEmptyRow &&
-					columns.map(({ flex = 1, width, textColor = 'inherit', align = 'left', redirect = true }, colIndex) => (
-						<TableCell
-							key={colIndex}
-							className={cn(
-								textColor ? `text-[${textColor}]` : 'text-[#09090B] w-full ',
-								'font-normal',
-								'!max-h-8 px-4 py-2 text-[14px]',
-								redirect && redirectUrl ? 'cursor-pointer' : 'cursor-default',
-							)}
-							style={{ flex: width ? undefined : flex }}
-							width={width}
-							align={align}>
-							--
-						</TableCell>
-					))}
-			</TableBody>
-		</Table>
+		<div>
+			<Table>
+				<TableHeader>
+					<TableRow>
+						{columns.map(({ title, flex = 1, width, color = '#64748B', align = 'left', children, className }, index) => (
+							<TableHead
+								key={index}
+								style={{ flex: width ? undefined : flex }}
+								width={width}
+								align={align}
+								className={cn(color ? `text-[${color}]` : 'text-[#64748B]', className)}>
+								{children ? children : title}
+							</TableHead>
+						))}
+					</TableRow>
+				</TableHeader>
+				<TableBody>
+					{data.length > 0 &&
+						data?.map((row, rowIndex) => (
+							<TableRow
+								onClick={() => {
+									if (onRowClick) {
+										onRowClick(row);
+									}
+								}}
+								key={rowIndex}>
+								{columns.map(
+									(
+										{ fieldName: name, flex = 1, width, textColor = 'inherit', align = 'left', render, redirect = true, onCLick },
+										colIndex,
+									) => (
+										<TableCell
+											onClick={() => {
+												if (redirect && redirectUrl) {
+													navigate(`${redirectUrl}${row?.id}`);
+												}
+												if (onCLick) {
+													onCLick(row);
+												}
+											}}
+											key={colIndex}
+											className={cn(
+												textColor ? `text-[${textColor}]` : 'text-[#09090B] w-full ',
+												'font-normal',
+												'!max-h-8 px-4 py-2 text-[14px]',
+												redirect && redirectUrl ? 'cursor-pointer' : 'cursor-default',
+											)}
+											style={{ flex: width ? undefined : flex }}
+											width={width}
+											align={align}>
+											{render ? render(row) : row[name]}
+										</TableCell>
+									),
+								)}
+							</TableRow>
+						))}
+					{data.length === 0 &&
+						showEmptyRow &&
+						columns.map(({ flex = 1, width, textColor = 'inherit', align = 'left', redirect = true }, colIndex) => (
+							<TableCell
+								key={colIndex}
+								className={cn(
+									textColor ? `text-[${textColor}]` : 'text-[#09090B] w-full ',
+									'font-normal',
+									'!max-h-8 px-4 py-2 text-[14px]',
+									redirect && redirectUrl ? 'cursor-pointer' : 'cursor-default',
+								)}
+								style={{ flex: width ? undefined : flex }}
+								width={width}
+								align={align}>
+								--
+							</TableCell>
+						))}
+				</TableBody>
+			</Table>
+			{data.length === 0 && !showEmptyRow && <p className=' text-[#64748B] text-xs font-normal font-sans mt-4'>{emptyRowText}</p>}
+		</div>
 	);
 };
 

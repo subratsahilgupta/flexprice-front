@@ -6,7 +6,7 @@ import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { queryClient } from '@/App';
 import Customer from '@/models/Customer';
 import { Plus } from 'lucide-react';
-import { Country, State, City } from 'country-state-city';
+import { Country, State, City, IState } from 'country-state-city';
 import { z } from 'zod';
 
 interface Props {
@@ -24,7 +24,7 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 	const isControlled = open !== undefined && onOpenChange !== undefined;
 	const [showBillingDetails, setShowBillingDetails] = useState(false);
 
-	const handleChange = (name: keyof typeof formData, value: string) => {
+	const handleChange = (name: keyof typeof formData, value: string | undefined) => {
 		setFormData((prev) => ({ ...prev, [name]: value }));
 	};
 
@@ -33,7 +33,6 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 		if (data) {
 			setShowBillingDetails(true);
 		}
-		console.log('customer data', data);
 	}, [data]);
 
 	const currentOpen = isControlled ? open : internalOpen;
@@ -44,6 +43,8 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 			setInternalOpen((prev) => !prev);
 		}
 	};
+
+	const [activeState, setactiveState] = useState<IState>();
 
 	const countriesOptions: SelectOption[] = Country.getAllCountries().map(({ name, isoCode }) => ({ label: name, value: isoCode }));
 	const statesOptions: SelectOption[] = State.getStatesOfCountry(formData.address_country).map(({ name, isoCode }) => ({
@@ -114,7 +115,7 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 					address_country: formData.address_country || undefined,
 					address_line1: formData.address_line1 || undefined,
 					address_line2: formData.address_line2 || undefined,
-					address_state: formData.address_state || undefined,
+					address_state: activeState?.name || undefined,
 					phone: formData.phone || undefined,
 					timezone: formData.timezone || undefined,
 				};
@@ -127,23 +128,22 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 					external_id: formData.external_id!,
 					address_city: formData.address_city!,
 					address_country: formData.address_country!,
+					address_state: activeState?.name,
 					address_line1: formData.address_line1!,
 					address_line2: formData.address_line2!,
-					address_state: formData.address_state!,
 					phone: formData.phone!,
 					timezone: formData.timezone!,
 				});
 			}
 		},
 		retry: 2,
-		onSuccess: async () => {
+		onSuccess: async (details) => {
+			console.log('details', details);
 			if (data) {
-				toast.success('Customer updated successfully');
 				await queryClient.invalidateQueries({
 					queryKey: ['fetchCustomerDetails', formData.id],
 				});
 			} else {
-				toast.success('Customer added successfully');
 				await queryClient.invalidateQueries({
 					queryKey: ['fetchCustomers'],
 				});
@@ -154,9 +154,22 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 				exact: false,
 			});
 
+			// if (!details) {
+			// 	toast.error('Error adding customer');
+			// } else
+			if (data) {
+				toast.success('Customer updated successfully');
+			} else {
+				toast.success('Customer added successfully');
+			}
+
 			toggleOpen();
 		},
-		onError: () => toast.error('Error adding customer'),
+		onError: (error) => {
+			console.log(error);
+
+			toast.error('Error adding customer');
+		},
 	});
 
 	const handleSubmit = () => {
@@ -171,7 +184,7 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 				isOpen={currentOpen}
 				onOpenChange={toggleOpen}
 				title={data ? 'Edit Customer' : 'Add Customer'}
-				description='To create a customer, please fill out this form.'
+				description={data ? 'Update customer details and manage billing details' : 'To create a customer, please fill out this form.'}
 				trigger={trigger}>
 				<div className='space-y-4'>
 					<Spacer className='!h-4' />
@@ -248,6 +261,7 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 										value={formData.address_state}
 										onChange={(e) => {
 											setFormData({ ...formData, timezone: undefined, address_city: undefined });
+											setactiveState(State.getStateByCodeAndCountry(e, formData.address_country || ''));
 											handleChange('address_state', e);
 										}}
 										noOptionsText='No states Available'

@@ -28,7 +28,7 @@ const RadioGroup: FC<Props> = ({ items, onChange, selected, title, disabled }) =
 					return (
 						<div
 							className={cn(
-								'w-full items-center flex gap-4 p-2  cursor-pointer rounded-lg',
+								'w-full items-center flex gap-4 p-2  cursor-pointer rounded-lg border',
 								// isSelected ? 'bg-zinc-100' : 'bg-white',
 								disabled ? 'opacity-50 cursor-not-allowed  ' : '',
 								isSelected && 'border-zinc-600 border bg-white',

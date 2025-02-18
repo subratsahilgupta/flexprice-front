@@ -5,17 +5,7 @@ import { Meter } from '@/models/Meter';
 import formatChips from '@/utils/common/format_chips';
 import formatDate from '@/utils/common/format_date';
 import { MeterApi } from '@/utils/api_requests/MeterApi';
-
-const formatAggregationType = (data: string): string => {
-	switch (data) {
-		case 'SUM':
-			return 'Sum';
-		case 'COUNT':
-			return 'Count';
-		default:
-			return 'Sum';
-	}
-};
+import { formatAggregationType } from '@/components/organisms/MeterForm/MeterForm';
 
 export interface BillableMetricTableProps {
 	data: Meter[];
@@ -27,8 +17,14 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 		aggregation_type: meter.aggregation.type,
 		aggregation_field: meter.aggregation.field,
 	}));
-	const columns: ColumnData[] = [
-		{ fieldName: 'event_name', title: 'Event Name', width: '300px' },
+	const columns: ColumnData<
+		Meter & {
+			aggregation_type: string;
+			aggregation_field: string;
+		}
+	>[] = [
+		{ fieldName: 'name', title: 'Meter Name', width: '300px' },
+		// { fieldName: 'event_name', title: 'Event Name', width: '300px' },
 		{
 			fieldName: 'aggregation_type',
 			title: 'Aggregate Type',
@@ -55,7 +51,7 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 			},
 		},
 		{
-			fieldName: 'actions',
+			fieldName: 'aggregation',
 			title: '',
 			redirect: false,
 			render: (row) => (
@@ -63,7 +59,7 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 					isEditDisabled={row.status === 'archived'}
 					isArchiveDisabled={row.status === 'archived'}
 					id={row.id}
-					editPath={`/usage-tracking/billable-metric/edit-meter?id=${row.id}`}
+					editPath={`/usage-tracking/meter/edit-meter?id=${row.id}`}
 					row={row}
 					deleteMutationFn={(id) => MeterApi.deleteMeter(id)}
 					refetchQueryKey={'fetchMeters'}
@@ -73,7 +69,7 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 		},
 	];
 
-	return <FlexpriceTable redirectUrl='/usage-tracking/billable-metric/edit-meter?id=' columns={columns} data={mappedData} />;
+	return <FlexpriceTable redirectUrl='/usage-tracking/meter/edit-meter?id=' columns={columns} data={mappedData} />;
 };
 
 export default BillableMetricTable;

@@ -1,9 +1,9 @@
 import MainLayout from '@/layouts/MainLayout';
 import Auth from '@/pages/auth/Auth';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import CustomerPage from '@/pages/customer/customers/Customer';
+import CustomerPage from '@/pages/customer/customers/Customers';
 import AuthMiddleware from '../auth/AuthProvider';
-import BillableMetricsPage from '@/pages/usage/meter/BillableMetrics';
+import MeterPage from '@/pages/usage/meter/MeterPage';
 import AddMeterPage from '@/pages/usage/meter/AddMeter';
 import EditMeterPage from '@/pages/usage/meter/EditMeterPage';
 import PricingPlans from '@/pages/product-catalog/pricingPlans/PricingPlans';
@@ -24,6 +24,9 @@ import AddCreditPage from '@/pages/customer/invoices/AddCreditPage';
 import CreditNote from '@/pages/customer/tabs/CreditNote';
 import AddFeaturePage from '@/pages/product-catalog/features/AddFeature';
 import FeaturesPage from '@/pages/product-catalog/features/Features';
+import ImportExport from '@/pages/customer/import-export/ImportExport';
+import Integrations from '@/pages/insights-tools/integrations/Integrations';
+import IntegrationDetails from '@/pages/insights-tools/integrations/IntegrationDetails';
 
 export const RouteNames = {
 	home: '/',
@@ -31,9 +34,9 @@ export const RouteNames = {
 
 	// usage tracking routes
 	usageTracking: '/usage-tracking',
-	billableMetric: '/usage-tracking/billable-metric',
-	addMeter: '/usage-tracking/billable-metric/add-meter',
-	editMeter: '/usage-tracking/billable-metric/edit-meter',
+	billableMetric: '/usage-tracking/meter',
+	addMeter: '/usage-tracking/meter/add-meter',
+	editMeter: '/usage-tracking/meter/edit-meter',
 	eventsPage: '/usage-tracking/events',
 	queryPage: '/usage-tracking/query',
 
@@ -43,6 +46,8 @@ export const RouteNames = {
 	invoices: '/customer-management/invoices',
 	invoiceDetail: '/customer-management/invoices/:invoiceId',
 
+	// import export routes
+
 	// product catalog routes
 	productCatalog: '/product-catalog',
 	createPlan: '/product-catalog/pricing-plan/create-plan',
@@ -51,8 +56,13 @@ export const RouteNames = {
 
 	features: '/product-catalog/features',
 	createFeature: '/product-catalog/features/create-feature',
-};
 
+	// insights and tools
+	insights: '/insights-&-tools',
+	integrations: '/insights-&-tools/integrations',
+	integrationDetails: '/insights-&-tools/integrations/:id',
+	importExport: '/insights-&-tools/bulk-imports',
+};
 export const MainRouter = createBrowserRouter([
 	{
 		path: RouteNames.login,
@@ -75,7 +85,7 @@ export const MainRouter = createBrowserRouter([
 				children: [
 					{
 						path: RouteNames.billableMetric,
-						element: <BillableMetricsPage />,
+						element: <MeterPage />,
 					},
 					{
 						path: RouteNames.addMeter,
@@ -102,7 +112,6 @@ export const MainRouter = createBrowserRouter([
 						path: `${RouteNames.customers}`,
 						element: <CustomerPage />,
 					},
-
 					{
 						path: `${RouteNames.customers}/:id/add-subscription`,
 						element: <CustomerSubscription />,
@@ -191,6 +200,23 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: RouteNames.createFeature,
 						element: <AddFeaturePage />,
+					},
+				],
+			},
+			{
+				path: RouteNames.insights,
+				children: [
+					{
+						path: RouteNames.integrations,
+						element: <Integrations />,
+					},
+					{
+						path: RouteNames.integrationDetails,
+						element: <IntegrationDetails />,
+					},
+					{
+						path: `${RouteNames.importExport}`,
+						element: <ImportExport />,
 					},
 				],
 			},

@@ -4,9 +4,8 @@ import { RouteNames } from '@/core/routes/Routes';
 import usePagination from '@/hooks/usePagination';
 import FeatureApi from '@/utils/api_requests/FeatureApi';
 import { useQuery } from '@tanstack/react-query';
-import { SlidersHorizontal, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { IoSearch } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 import { ReactSVG } from 'react-svg';
 
@@ -61,14 +60,8 @@ const FeaturesPage = () => {
 
 	return (
 		<div className='page'>
-			<SectionHeader className='' title='Features'>
+			<SectionHeader showFilter showSearch className='' title='Features'>
 				<div className='flex gap-2 w-full'>
-					<button className='px-2 py-1'>
-						<IoSearch className='size-4 font-extralight text-[#09090B] ' />
-					</button>
-					<button className='px-2 py-1'>
-						<SlidersHorizontal className='size-4 text-[#09090B] ' />
-					</button>
 					<Link to={RouteNames.createFeature}>
 						<Button className='w-32 flex gap-2 bg-[#0F172A]  '>
 							<Star />

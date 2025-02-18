@@ -25,7 +25,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, InputProps>(
 				{/* Input */}
 				<div
 					className={cn(
-						'w-full flex items-center group !min-h-9 rounded-md border bg-background px-3 py-1 text-base ring-offset-background placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+						'w-full flex items-center group  rounded-md border bg-background px-3 py-1 text-base ring-offset-background placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
 						error ? 'border-destructive ring-destructive' : 'border-input focus-within:ring-ring focus-within:ring-offset-2',
 						error ? 'border-destructive' : 'border-input focus-within:ring-ring focus-within:ring-offset-2',
 						'focus-within:border-black',
@@ -36,7 +36,11 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, InputProps>(
 						value={value}
 						disabled={disabled}
 						placeholder={placeholder}
-						className={cn('peer placeholder:m-0 flex-1 bg-transparent outline-none ring-0 focus:outline-none w-full ', 'min-h-20')}
+						className={cn(
+							'peer text-start m-0 p-0  placeholder:m-0 py-1 placeholder:py-1 placeholder:-translate-y-[6px] flex-1 bg-transparent outline-none ring-0 focus:outline-none w-full ',
+
+							'min-h-[100px] w-full text-base focus-visible:outline-none focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+						)}
 						onChange={(e) => {
 							if (onChange) {
 								onChange(e.target.value);
