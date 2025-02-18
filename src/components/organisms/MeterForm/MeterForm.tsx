@@ -59,7 +59,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 
 	const [errors, setErrors] = useState<Record<string, string>>({});
 
-	useEffect(() => {}, [eventFilters]);
+	useEffect(() => { }, [eventFilters]);
 	const getRandomDate = () => {
 		const start = new Date(2020, 0, 1);
 		const end = new Date();
@@ -74,7 +74,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 		"event_id": "${'event_' + uuidv4().replace(/-/g, '').slice(0, 10)}",
 		"event_name": "${eventName || '__MUST_BE_DEFINED__'}",
 		"external_customer_id": "__CUSTOMER_ID__",
-		"properties": {${eventFilters.map((filter) => `\n\t\t\t "${filter.key}" : "${filter.values[0] || 'FILTER_VALUE'}"`).join(',')}${aggregationValue ? `,\n\t\t\t "${aggregationValue}":"__${aggregationValue.split(' ').join('_').toUpperCase()}__"` : ''}
+		"properties": {${[...(data?.filters || []), ...eventFilters,].map((filter) => `\n\t\t\t "${filter.key}" : "${filter.values[0] || 'FILTER_VALUE'}"`).join(',')}${aggregationValue ? `,\n\t\t\t "${aggregationValue}":"__${aggregationValue.split(' ').join('_').toUpperCase()}__"` : ''}
 		},
 		"source": "api",
 		"timestamp": "${getRandomDate()}"

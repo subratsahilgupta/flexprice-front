@@ -26,11 +26,8 @@ const PremiumFeature: React.FC<Props> = ({ children, isPremiumFeature = false })
 				titleClassName='font-bold'
 				description='This is a premium feature. You need to upgrade to a premium plan to use this feature.'>
 				<div className='flex gap-2 justify-end items-center'>
-					<Button
-						onClick={() => {
-							window.location.href = 'mailto:manish@flexprice.com';
-						}}>
-						Contact Us
+					<Button>
+						<a href='mailto:manish@flexprice.com'>Contact Us</a>
 					</Button>
 				</div>
 			</Dialog>
