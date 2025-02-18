@@ -1,11 +1,3 @@
-customer_id,event_name,external_customer_id,event_id,timestamp,source
-123,UserSignup,EXT_456,EVT_001,2025-02-14T10:30:00Z,Web
-124,Purchase,EXT_457,EVT_002,2025-02-14T11:00:00Z,Mobile
-,Login,EXT_458,EVT_003,2025-02-14T11:15:00Z,Web
-125,SubscriptionRenewal,EXT_459,EVT_004,2025-02-14T12:00:00Z,Email
-126,UserSignup,EXT_460,EVT_005,2025-02-14T12:30:00Z,Web
-,Purchase,EXT_461,EVT_006,2025-02-14T13:00:00Z,Mobile
-127,Login,EXT_462,EVT_007,2025-02-14T13:30:00Z,Web
-128,SubscriptionRenewal,EXT_463,EVT_008,2025-02-14T14:00:00Z,Email
-,UserSignup,EXT_464,EVT_009,2025-02-14T14:30:00Z,Web
-129,Purchase,EXT_465,EVT_010,2025-02-14T15:00:00Z,Mobile
+event_name,external_customer_id,event_id,timestamp,source
+authentication,cus_001,event_001,2025-02-14T10:30:00Z,Web
+sign_up,cus_002,event_001,2025-02-14T11:00:00Z,Mobile

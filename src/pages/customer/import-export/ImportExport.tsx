@@ -107,7 +107,7 @@ const ImportExport = () => {
 	if (data?.items.length === 0) {
 		return (
 			<EmptyPage title='Import Tasks' description='No import tasks found'>
-				<ImportFileDrawer taskId={activeTask} isOpen={drawerOpen && Boolean(activeTask)} onOpenChange={(value) => setdrawerOpen(value)} />
+				<ImportFileDrawer taskId={activeTask} isOpen={drawerOpen} onOpenChange={(value) => setdrawerOpen(value)} />
 				<Button onClick={() => setdrawerOpen(true)} className='flex gap-2 items-center '>
 					<Import />
 					<span>Import File</span>

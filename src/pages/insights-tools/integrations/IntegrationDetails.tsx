@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { integrations } from './integrationsData';
 import { cn } from '@/lib/utils';
-import { Button, FormHeader, Spacer } from '@/components/atoms';
+import { Button, FormHeader } from '@/components/atoms';
 
 const IntegrationDetails = () => {
 	const { id: name } = useParams() as { id: string };
@@ -69,9 +69,8 @@ const IntegrationDetails = () => {
 				</div>
 			)}
 
-			<Spacer height={32} />
 			{/* details section */}
-			<div className='card space-y-6'>
+			<div className='card space-y-6 mt-6'>
 				{integration.info?.map((infoItem, idx) => (
 					<div key={idx} className='mt-4'>
 						<FormHeader variant='form-component-title' title={infoItem.title}></FormHeader>
