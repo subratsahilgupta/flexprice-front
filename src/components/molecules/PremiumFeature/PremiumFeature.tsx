@@ -1,4 +1,5 @@
 import { Button, Dialog } from '@/components/atoms';
+import { cn } from '@/lib/utils';
 import { Lock } from 'lucide-react';
 import { useState } from 'react';
 
@@ -31,20 +32,26 @@ const PremiumFeature: React.FC<Props> = ({ children, isPremiumFeature = false })
 					</Button>
 				</div>
 			</Dialog>
-			<div
-				onClick={(e) => {
-					if (isPremiumFeature) {
-						e.preventDefault();
-						e.stopPropagation();
-						setIsOpen(true);
-					}
-				}}
-				style={{
-					pointerEvents: isPremiumFeature ? 'auto' : 'none',
-					cursor: isPremiumFeature ? 'pointer' : 'not-allowed',
-				}}>
-				<div className='pointer-events-none cursor-not-allowed'>{children}</div>
-			</div>
+			{isPremiumFeature ? (
+				<div
+					onClick={(e) => {
+						if (isPremiumFeature) {
+							e.preventDefault();
+							e.stopPropagation();
+							setIsOpen(true);
+						}
+					}}
+					style={{
+						pointerEvents: isPremiumFeature ? 'auto' : 'none',
+						cursor: isPremiumFeature ? 'pointer' : 'not-allowed',
+					}}>
+					<div className={cn(isPremiumFeature && 'pointer-events-none cursor-not-allowed')}>
+						{children}
+					</div>
+				</div>
+			) : (
+				children
+			)}
 		</div>
 	);
 };

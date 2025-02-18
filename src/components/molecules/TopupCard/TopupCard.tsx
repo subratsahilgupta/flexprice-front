@@ -95,6 +95,7 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 
 		if (walletId && !preFunction) {
 			topupWallet(walletId);
+			
 		}
 	};
 
@@ -137,54 +138,60 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 				)}
 			</div>
 
-			<Spacer className='!mt-4' />
-			<PremiumFeature isPremiumFeature>
-				<div className='card relative'>
-					<span className='absolute top-3 right-3'>
-						<PremiumFeatureTag />
-					</span>
-					<FormHeader
-						title='Automatic Wallet Top Up'
-						subtitle={`Never run out of balance. Set up automatic top-ups to stay worry-free.`}
-						variant='sub-header'
-					/>
-					<div className='flex items-center space-x-4 font-open-sans'>
-						<Switch
-							id='airplane-mode'
-							checked={autoTopup}
-							onCheckedChange={(value) => {
-								setautoTopup(value);
-							}}
-						/>
-						<Label htmlFor='airplane-mode'>
-							<p className='font-medium text-sm text-[#18181B] peer-checked:text-black'>Recharge Wallet Automatically</p>
-						</Label>
-					</div>
+			{
+				preFunction && (
+					<>
+						<Spacer className='!mt-4' />
+						<PremiumFeature isPremiumFeature>
+							<div className='card relative'>
+								<span className='absolute top-3 right-3'>
+									<PremiumFeatureTag />
+								</span>
+								<FormHeader
+									title='Automatic Wallet Top Up'
+									subtitle={`Never run out of balance. Set up automatic top-ups to stay worry-free.`}
+									variant='sub-header'
+								/>
+								<div className='flex items-center space-x-4 font-open-sans'>
+									<Switch
+										id='airplane-mode'
+										checked={autoTopup}
+										onCheckedChange={(value) => {
+											setautoTopup(value);
+										}}
+									/>
+									<Label htmlFor='airplane-mode'>
+										<p className='font-medium text-sm text-[#18181B] peer-checked:text-black'>Recharge Wallet Automatically</p>
+									</Label>
+								</div>
 
-					{autoTopup && (
-						<div className='space-y-4 mt-4'>
-							<Input
-								suffix='credits'
-								inputPrefix={currency ? getCurrencySymbol(currency) : undefined}
-								label='Enter minimum balance amount below which we top up '
-								placeholder='Enter Minimum Balance'
-							/>
-							<Input
-								suffix='credits'
-								inputPrefix={currency ? getCurrencySymbol(currency) : undefined}
-								label='How much should we add?'
-								placeholder='Enter Topup Amount'
-								className='w-1/2'
-							/>
-							<div className='flex items-center space-x-2'>
-								{['+100', '+500', '+1000', '+2000'].map((item) => (
-									<button className='text-xs font-medium text-zinc-600 rounded-md px-2 py-[2px] bg-zinc-100'>{item}</button>
-								))}
+								{autoTopup && (
+									<div className='space-y-4 mt-4'>
+										<Input
+											suffix='credits'
+											inputPrefix={currency ? getCurrencySymbol(currency) : undefined}
+											label='Enter minimum balance amount below which we top up '
+											placeholder='Enter Minimum Balance'
+										/>
+										<Input
+											suffix='credits'
+											inputPrefix={currency ? getCurrencySymbol(currency) : undefined}
+											label='How much should we add?'
+											placeholder='Enter Topup Amount'
+											className='w-1/2'
+										/>
+										<div className='flex items-center space-x-2'>
+											{['+100', '+500', '+1000', '+2000'].map((item) => (
+												<button className='text-xs font-medium text-zinc-600 rounded-md px-2 py-[2px] bg-zinc-100'>{item}</button>
+											))}
+										</div>
+									</div>
+								)}
 							</div>
-						</div>
-					)}
-				</div>
-			</PremiumFeature>
+						</PremiumFeature>
+					</>
+				)
+			}
 
 			{/* save meter cta */}
 			{preFunction && (
