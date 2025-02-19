@@ -1,6 +1,6 @@
-import { queryClient } from '@/App';
 import { Button, FormHeader, Spacer, Stepper } from '@/components/atoms';
 import { BillingPrefferencesSection, PlanDetailsSection, SetupChargesSection } from '@/components/organisms';
+import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 import usePlanStore from '@/store/usePlanStore';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
 import { useMutation } from '@tanstack/react-query';
@@ -52,12 +52,7 @@ const CreatePlanPage = () => {
 			toast.success('Plan created successfully');
 			navigate('/product-catalog/pricing-plan');
 			resetStore();
-			await queryClient.invalidateQueries({
-				queryKey: ['fetchPlans'],
-			});
-			await queryClient.refetchQueries({
-				queryKey: ['fetchPlans'],
-			});
+			await refetchQueries(['fetchPlans']);
 		},
 		onError() {
 			toast.error('Failed to create plan');

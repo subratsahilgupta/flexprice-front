@@ -45,9 +45,7 @@ const PremiumFeature: React.FC<Props> = ({ children, isPremiumFeature = false })
 						pointerEvents: isPremiumFeature ? 'auto' : 'none',
 						cursor: isPremiumFeature ? 'pointer' : 'not-allowed',
 					}}>
-					<div className={cn(isPremiumFeature && 'pointer-events-none cursor-not-allowed')}>
-						{children}
-					</div>
+					<div className={cn(isPremiumFeature && 'pointer-events-none cursor-not-allowed')}>{children}</div>
 				</div>
 			) : (
 				children

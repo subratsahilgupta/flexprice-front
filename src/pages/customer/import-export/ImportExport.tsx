@@ -93,7 +93,6 @@ const ImportExport = () => {
 				offset,
 			});
 		},
-		staleTime: 0,
 	});
 
 	if (isLoading) {

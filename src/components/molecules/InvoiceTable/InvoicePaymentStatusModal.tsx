@@ -1,11 +1,10 @@
-import { queryClient } from '@/App';
 import { Button, CheckboxRadioGroupItem, FormHeader, Modal, Select, Spacer } from '@/components/atoms';
+import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 import { Invoice } from '@/models/Invoice';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
 import { useMutation } from '@tanstack/react-query';
 import { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-
 interface Props {
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -68,12 +67,7 @@ const InvoicePaymentStatusModal: FC<Props> = ({ isOpen, onOpenChange, invoice })
 		},
 		async onSuccess() {
 			toast.success('Payment status updated successfully');
-			await queryClient.invalidateQueries({
-				queryKey: ['fetchInvoices'],
-			});
-			await queryClient.refetchQueries({
-				queryKey: ['fetchInvoices'],
-			});
+			await refetchQueries(['fetchInvoices']);
 		},
 		onError() {
 			toast.error('Failed to update payment status');

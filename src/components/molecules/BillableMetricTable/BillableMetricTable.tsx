@@ -63,7 +63,7 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 					row={row}
 					deleteMutationFn={(id) => MeterApi.deleteMeter(id)}
 					refetchQueryKey={'fetchMeters'}
-					entityName={row.event_name}
+					entityName={row.name}
 				/>
 			),
 		},

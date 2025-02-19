@@ -27,8 +27,6 @@ const MeterPage = () => {
 	} = useQuery({
 		queryKey: ['fetchMeters', page],
 		queryFn: fetchMeters,
-		retry: 2,
-		staleTime: 0,
 	});
 
 	if (isLoading) {

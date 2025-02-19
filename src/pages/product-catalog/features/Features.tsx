@@ -12,7 +12,7 @@ import { ReactSVG } from 'react-svg';
 const FeaturesPage = () => {
 	const { limit, offset, page } = usePagination();
 
-	const fetchMeters = async () => {
+	const fetchFeatures = async () => {
 		return await FeatureApi.getAllFeatures({
 			limit,
 			offset,
@@ -25,9 +25,7 @@ const FeaturesPage = () => {
 		isError,
 	} = useQuery({
 		queryKey: ['fetchFeatures', page],
-		queryFn: fetchMeters,
-		retry: 2,
-		staleTime: 0,
+		queryFn: fetchFeatures,
 	});
 
 	if (isLoading) {

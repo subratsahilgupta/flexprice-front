@@ -49,8 +49,6 @@ const SelectFeature: FC<Props> = ({
 	} = useQuery({
 		queryKey: ['fetchFeatures1'],
 		queryFn: fetchFeatures,
-		retry: 2,
-		staleTime: 0,
 	});
 
 	if (isLoading) {

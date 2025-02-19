@@ -4,9 +4,9 @@ import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { queryClient } from '@/App';
 import { Button, Dialog } from '@/components/atoms';
 import { EyeOff, Pencil } from 'lucide-react';
+import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 
 interface ActionProps {
 	id: string;
@@ -38,8 +38,7 @@ const ActionButton: FC<ActionProps> = ({
 		mutationFn: deleteMutationFn,
 		onSuccess: async () => {
 			toast.success(`${entityName} deleted successfully`);
-			await queryClient.refetchQueries({ queryKey: [refetchQueryKey] });
-			await queryClient.invalidateQueries({ queryKey: [refetchQueryKey] });
+			await refetchQueries(refetchQueryKey);
 		},
 		onError: () => {
 			toast.error(`Failed to delete ${entityName}`);

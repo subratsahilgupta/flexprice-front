@@ -1,19 +1,33 @@
 import { Chip, FormHeader, Spacer } from '@/components/atoms';
 import { InvoiceLineItemTable } from '@/components/molecules';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useBreadcrumbStore } from '@/core/store/useBreadcrumbStore';
+import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
+import CustomerApi from '@/utils/api_requests/CustomerApi';
 import SubscriptionApi from '@/utils/api_requests/SubscriptionApi';
 import formatChips from '@/utils/common/format_chips';
 import { formatDateShort, getCurrencySymbol } from '@/utils/common/helper_functions';
 import { useQuery } from '@tanstack/react-query';
 import { FC, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { useLocation, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 const SubscriptionDetails: FC = () => {
 	const { subscription_id, id: customerId } = useParams();
-	const location = useLocation();
-	const { setBreadcrumbs, breadcrumbs } = useBreadcrumbStore();
+	const { updateBreadcrumb } = useBreadcrumbsStore();
+	const { data: subscriptionDetails, isLoading: isSubscriptionDetailsLoading } = useQuery({
+		queryKey: ['subscriptionDetails', subscription_id],
+		queryFn: async () => {
+			return await SubscriptionApi.getSubscriptionById(subscription_id!);
+		},
+		staleTime: 1,
+	});
+
+	const { data: customer } = useQuery({
+		queryKey: ['fetchCustomerDetails', customerId],
+		queryFn: async () => await CustomerApi.getCustomerById(customerId!),
+
+		enabled: !!customerId,
+	});
 
 	const { data, isLoading, isError } = useQuery({
 		queryKey: ['subscriptionInvoices', subscription_id],
@@ -22,36 +36,17 @@ const SubscriptionDetails: FC = () => {
 		},
 	});
 
-	const { data: subscriptionDetails, isLoading: isSubscriptionDetailsLoading } = useQuery({
-		queryKey: ['subscriptionDetails', subscription_id],
-		queryFn: async () => {
-			return await SubscriptionApi.getSubscriptionById(subscription_id!);
-		},
-		staleTime: 1,
-		retry: 1,
-	});
-
 	useEffect(() => {
-		if (subscriptionDetails) {
-			console.log('triggering breadcrumb update logic', [
-				...breadcrumbs.slice(0, 3),
-				{
-					label: subscriptionDetails?.plan.name ?? 'Subscription',
-					path: `/customer-management/customers/${customerId}/${subscriptionDetails?.id}`,
-				},
-			]);
-			setBreadcrumbs(
-				[
-					...breadcrumbs.slice(0, 3),
-					{
-						label: subscriptionDetails.plan.name ?? 'Subscription',
-						path: `/customer-management/customers/${customerId}/${subscriptionDetails.id}`,
-					},
-				],
-				true,
-			);
+		if (subscriptionDetails?.plan?.name) {
+			updateBreadcrumb(4, subscriptionDetails.plan.name);
 		}
-	}, [location.pathname, subscriptionDetails, setBreadcrumbs]);
+
+		updateBreadcrumb(3, 'Subscription');
+
+		if (customer?.external_id) {
+			updateBreadcrumb(2, customer.external_id);
+		}
+	}, [subscriptionDetails, updateBreadcrumb, customer]);
 
 	if (isLoading || isSubscriptionDetailsLoading) {
 		return (

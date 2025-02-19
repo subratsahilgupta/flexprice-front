@@ -6,11 +6,12 @@ import { useMutation } from '@tanstack/react-query';
 import WalletApi from '@/utils/api_requests/WalletApi';
 import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
-import { queryClient } from '@/App';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import PremiumFeature, { PremiumFeatureTag } from '../PremiumFeature';
+import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
+
 export interface TopupCardPayload {
 	free_credits?: number;
 }
@@ -59,16 +60,7 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 			if (!preFunction) {
 				toast.success('Wallet topped up successfully');
 			}
-			queryClient.invalidateQueries({ queryKey: ['fetcWallets'] });
-			queryClient.invalidateQueries({ queryKey: ['fetchWalletBalances'] });
-			queryClient.invalidateQueries({ queryKey: ['fetchWalletsTransactions'] });
-
-			// Optionally, refetcph queries immediately
-			await Promise.all([
-				queryClient.refetchQueries({ queryKey: ['fetcWallets'] }),
-				queryClient.refetchQueries({ queryKey: ['fetchWalletBalances'] }),
-				queryClient.refetchQueries({ queryKey: ['fetchWalletsTransactions'] }),
-			]);
+			await refetchQueries(['fetchWallets', 'fetchWalletBalances', 'fetchWalletsTransactions']);
 		},
 		onSettled: () => {
 			setfreeCredits(undefined);
@@ -95,7 +87,6 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 
 		if (walletId && !preFunction) {
 			topupWallet(walletId);
-			
 		}
 	};
 
@@ -138,60 +129,58 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 				)}
 			</div>
 
-			{
-				preFunction && (
-					<>
-						<Spacer className='!mt-4' />
-						<PremiumFeature isPremiumFeature>
-							<div className='card relative'>
-								<span className='absolute top-3 right-3'>
-									<PremiumFeatureTag />
-								</span>
-								<FormHeader
-									title='Automatic Wallet Top Up'
-									subtitle={`Never run out of balance. Set up automatic top-ups to stay worry-free.`}
-									variant='sub-header'
+			{preFunction && (
+				<>
+					<Spacer className='!mt-4' />
+					<PremiumFeature isPremiumFeature>
+						<div className='card relative'>
+							<span className='absolute top-3 right-3'>
+								<PremiumFeatureTag />
+							</span>
+							<FormHeader
+								title='Automatic Wallet Top Up'
+								subtitle={`Never run out of balance. Set up automatic top-ups to stay worry-free.`}
+								variant='sub-header'
+							/>
+							<div className='flex items-center space-x-4 font-open-sans'>
+								<Switch
+									id='airplane-mode'
+									checked={autoTopup}
+									onCheckedChange={(value) => {
+										setautoTopup(value);
+									}}
 								/>
-								<div className='flex items-center space-x-4 font-open-sans'>
-									<Switch
-										id='airplane-mode'
-										checked={autoTopup}
-										onCheckedChange={(value) => {
-											setautoTopup(value);
-										}}
-									/>
-									<Label htmlFor='airplane-mode'>
-										<p className='font-medium text-sm text-[#18181B] peer-checked:text-black'>Recharge Wallet Automatically</p>
-									</Label>
-								</div>
-
-								{autoTopup && (
-									<div className='space-y-4 mt-4'>
-										<Input
-											suffix='credits'
-											inputPrefix={currency ? getCurrencySymbol(currency) : undefined}
-											label='Enter minimum balance amount below which we top up '
-											placeholder='Enter Minimum Balance'
-										/>
-										<Input
-											suffix='credits'
-											inputPrefix={currency ? getCurrencySymbol(currency) : undefined}
-											label='How much should we add?'
-											placeholder='Enter Topup Amount'
-											className='w-1/2'
-										/>
-										<div className='flex items-center space-x-2'>
-											{['+100', '+500', '+1000', '+2000'].map((item) => (
-												<button className='text-xs font-medium text-zinc-600 rounded-md px-2 py-[2px] bg-zinc-100'>{item}</button>
-											))}
-										</div>
-									</div>
-								)}
+								<Label htmlFor='airplane-mode'>
+									<p className='font-medium text-sm text-[#18181B] peer-checked:text-black'>Recharge Wallet Automatically</p>
+								</Label>
 							</div>
-						</PremiumFeature>
-					</>
-				)
-			}
+
+							{autoTopup && (
+								<div className='space-y-4 mt-4'>
+									<Input
+										suffix='credits'
+										inputPrefix={currency ? getCurrencySymbol(currency) : undefined}
+										label='Enter minimum balance amount below which we top up '
+										placeholder='Enter Minimum Balance'
+									/>
+									<Input
+										suffix='credits'
+										inputPrefix={currency ? getCurrencySymbol(currency) : undefined}
+										label='How much should we add?'
+										placeholder='Enter Topup Amount'
+										className='w-1/2'
+									/>
+									<div className='flex items-center space-x-2'>
+										{['+100', '+500', '+1000', '+2000'].map((item) => (
+											<button className='text-xs font-medium text-zinc-600 rounded-md px-2 py-[2px] bg-zinc-100'>{item}</button>
+										))}
+									</div>
+								</div>
+							)}
+						</div>
+					</PremiumFeature>
+				</>
+			)}
 
 			{/* save meter cta */}
 			{preFunction && (

@@ -23,8 +23,6 @@ const InvoicesPage = () => {
 	} = useQuery({
 		queryKey: ['fetchInvoices', page],
 		queryFn: fetchInvoices,
-		retry: 2,
-		staleTime: 0,
 	});
 
 	if (isLoading) {

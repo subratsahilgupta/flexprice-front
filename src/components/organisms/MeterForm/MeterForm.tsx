@@ -5,9 +5,9 @@ import { EventFilter, EventFilterData } from '@/components/molecules';
 import { LuCircleFadingPlus, LuRefreshCw } from 'react-icons/lu';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
-import { queryClient } from '@/App';
 import { Meter } from '@/models/Meter';
 import { v4 as uuidv4 } from 'uuid';
+import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 
 interface Props {
 	data?: Meter;
@@ -59,7 +59,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 
 	const [errors, setErrors] = useState<Record<string, string>>({});
 
-	useEffect(() => { }, [eventFilters]);
+	useEffect(() => {}, [eventFilters]);
 	const getRandomDate = () => {
 		const start = new Date(2020, 0, 1);
 		const end = new Date();
@@ -74,7 +74,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 		"event_id": "${'event_' + uuidv4().replace(/-/g, '').slice(0, 10)}",
 		"event_name": "${eventName || '__MUST_BE_DEFINED__'}",
 		"external_customer_id": "__CUSTOMER_ID__",
-		"properties": {${[...(data?.filters || []), ...eventFilters,].map((filter) => `\n\t\t\t "${filter.key}" : "${filter.values[0] || 'FILTER_VALUE'}"`).join(',')}${aggregationValue ? `,\n\t\t\t "${aggregationValue}":"__${aggregationValue.split(' ').join('_').toUpperCase()}__"` : ''}
+		"properties": {${[...(data?.filters || []), ...eventFilters].map((filter) => `\n\t\t\t "${filter.key}" : "${filter.values[0] || 'FILTER_VALUE'}"`).join(',')}${aggregationValue ? `,\n\t\t\t "${aggregationValue}":"__${aggregationValue.split(' ').join('_').toUpperCase()}__"` : ''}
 		},
 		"source": "api",
 		"timestamp": "${getRandomDate()}"
@@ -82,16 +82,16 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 
 	const radioMenuItemList = [
 		{
-			label: 'Cumulative',
-			description: 'Track values continuously without resetting, useful for metrics like lifetime usage.',
-			value: 'NEVER',
-			icon: LuCircleFadingPlus,
-		},
-		{
 			label: 'Periodic',
 			description: 'Reset values based on the billing cycle, such as monthly or annual usage',
 			value: 'RESET_PERIOD',
 			icon: LuRefreshCw,
+		},
+		{
+			label: 'Cumulative',
+			description: 'Track values continuously without resetting, useful for metrics like lifetime usage.',
+			value: 'NEVER',
+			icon: LuCircleFadingPlus,
 		},
 	];
 
@@ -127,9 +127,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 			};
 			onSubmit(formData as unknown as Meter, isEditMode ? 'edit' : 'add');
 
-			queryClient.invalidateQueries({
-				queryKey: ['fetchMeters'],
-			});
+			refetchQueries(['fetchMeters']);
 			navigate('/usage-tracking/meter');
 
 			setErrors({});

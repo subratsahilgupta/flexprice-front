@@ -1,7 +1,5 @@
-import { useBreadcrumbStore } from '@/core/store/useBreadcrumbStore';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect } from 'react';
 
 const fetchCustomer = async (customerId: string) => {
 	return await CustomerApi.getCustomerById(customerId);
@@ -15,21 +13,9 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ customerId }) => {
 	const { data: customer, isLoading } = useQuery({
 		queryKey: ['fetchCustomerDetails', customerId],
 		queryFn: () => fetchCustomer(customerId!),
-		retry: 1,
+
 		// staleTime: 1000 * 60 * 5,
-		staleTime: 0,
 	});
-
-	const { setBreadcrumbs, breadcrumbs } = useBreadcrumbStore();
-
-	useEffect(() => {
-		setBreadcrumbs(
-			[...breadcrumbs.slice(0, 2), { label: `${customer?.external_id || ''}`, path: `/customer-management/customers/${customerId}` }],
-			true,
-		);
-
-		return () => setBreadcrumbs([]);
-	}, [setBreadcrumbs, customerId, customer?.name]);
 
 	if (isLoading) {
 		return (
