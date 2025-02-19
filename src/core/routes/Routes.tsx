@@ -27,6 +27,7 @@ import FeaturesPage from '@/pages/product-catalog/features/Features';
 import ImportExport from '@/pages/customer/import-export/ImportExport';
 import Integrations from '@/pages/insights-tools/integrations/Integrations';
 import IntegrationDetails from '@/pages/insights-tools/integrations/IntegrationDetails';
+import CustomerSubscriptionPage from '@/pages/customer/customers/CustomerSubscriptionPage';
 
 export const RouteNames = {
 	home: '/',
@@ -118,7 +119,7 @@ export const MainRouter = createBrowserRouter([
 					},
 					{
 						path: `${RouteNames.customers}/:id/subscription`,
-						element: <Navigate to={'/customer-management/customers'} />,
+						element: <CustomerSubscriptionPage />,
 					},
 					// {
 					// 	path: `${RouteNames.customers}/:id/subscription/:subscription_id`,

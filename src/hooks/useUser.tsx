@@ -2,14 +2,17 @@ import { useQuery } from '@tanstack/react-query';
 import { UserApi } from '@/utils/api_requests/UserApi';
 
 const useUser = () => {
-	const token = localStorage.getItem('sb-vnswkuldxqmqhyiewgsq-auth-token');
+	const tokenStr = localStorage.getItem('sb-vnswkuldxqmqhyiewgsq-auth-token');
+	const {
+		user: { id },
+	} = JSON.parse(tokenStr!) as { user: { id: string } };
 	const {
 		data: user,
 		isLoading: loading,
 		error,
 		refetch,
 	} = useQuery({
-		queryKey: ['user', token],
+		queryKey: ['user', id],
 		queryFn: async () => {
 			return await UserApi.me();
 		},

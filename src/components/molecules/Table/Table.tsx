@@ -141,6 +141,7 @@ const FlexpriceTable: FC<FlexpriceTableProps> = ({ onRowClick, columns, data, re
 												'font-normal',
 												'!max-h-8 px-4 py-2 text-[14px]',
 												redirect && redirectUrl ? 'cursor-pointer' : 'cursor-default',
+												onCLick ? 'cursor-pointer' : 'cursor-default',
 											)}
 											style={{ flex: width ? undefined : flex }}
 											width={width}

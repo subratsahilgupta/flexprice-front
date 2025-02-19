@@ -13,6 +13,8 @@ interface BreadcrumbsState {
 	updateBreadcrumb: (pathOrIndex: string | number, newLabel: string) => void;
 	setLoading: (loading: boolean) => void;
 	setSegmentLoading: (pathOrIndex: string | number, isLoading: boolean) => void;
+	clearBreadcrumbs: () => void;
+	removeBreadcrumb: (pathOrIndex: string | number) => void;
 }
 
 export const useBreadcrumbsStore = create<BreadcrumbsState>((set) => ({
@@ -43,5 +45,10 @@ export const useBreadcrumbsStore = create<BreadcrumbsState>((set) => ({
 				}
 				return crumb;
 			}),
+		})),
+	clearBreadcrumbs: () => set({ breadcrumbs: [] }),
+	removeBreadcrumb: (pathOrIndex) =>
+		set((state) => ({
+			breadcrumbs: state.breadcrumbs.filter((_, index) => index !== pathOrIndex),
 		})),
 }));

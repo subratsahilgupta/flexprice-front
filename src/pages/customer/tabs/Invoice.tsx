@@ -30,7 +30,7 @@ const Invoice = () => {
 	}
 
 	if (activeInvoice) {
-		return <InvoiceDetails invoice_id={activeInvoice} />;
+		return <InvoiceDetails breadcrumb_index={3} invoice_id={activeInvoice} />;
 	}
 
 	return (

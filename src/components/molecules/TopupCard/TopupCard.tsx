@@ -89,7 +89,6 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 			topupWallet(walletId);
 		}
 	};
-
 	return (
 		<div>
 			<div className={cn('card space-y-4 lg:w-full', className)}>
