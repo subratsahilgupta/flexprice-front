@@ -40,7 +40,7 @@ const FLexpricePagination = ({ totalPages }: { totalPages: number }) => {
 					{Array.from({ length: totalPages }, (_, index) => {
 						const page = index + 1;
 						return (
-							<PaginationItem key={page}>
+							<PaginationItem className={cn('cursor-pointer')} key={page}>
 								<PaginationLink isActive={currentPage === page} onClick={() => handlePageChange(page)}>
 									{page}
 								</PaginationLink>
