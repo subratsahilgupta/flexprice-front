@@ -51,17 +51,16 @@ const CustomerDetails = () => {
 		const activeTabData = tabs.find((tab) => tab.id === activeTab);
 		setSegmentLoading(2, true);
 
-		if (customer?.external_id) {
-			updateBreadcrumb(2, customer.external_id);
-		}
 		if (activeTab !== '' && activeTabData) {
 			// Update breadcrumb with tab name for non-overview tabs
 			updateBreadcrumb(3, activeTabData.label);
-		} else {
-			// Remove tab from breadcrumbs for overview
-			updateBreadcrumb(3, '');
 		}
-	}, [activeTab, updateBreadcrumb, setSegmentLoading, customer]);
+		if (customer?.external_id) {
+			updateBreadcrumb(2, customer.external_id);
+		}
+	}, [activeTab, updateBreadcrumb, setSegmentLoading, customer, location.pathname]);
+
+	console.log('activeTab', activeTab);
 
 	const onTabChange = (tabId: TabId) => {
 		navigate(`/customer-management/customers/${customerId}/${tabId}`);

@@ -15,9 +15,10 @@ import { useNavigate } from 'react-router-dom';
 
 interface Props {
 	invoice_id: string;
+	breadcrumb_index: number;
 }
 
-const InvoiceDetails: FC<Props> = ({ invoice_id }) => {
+const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 	// const { invoice_id } = useParams<{ invoice_id: string }>();
 	const navigate = useNavigate();
 	const [state, setState] = useState({
@@ -36,8 +37,8 @@ const InvoiceDetails: FC<Props> = ({ invoice_id }) => {
 	const { user } = useUser();
 
 	useEffect(() => {
-		updateBreadcrumb(2, data?.invoice_number ?? invoice_id);
-	}, [invoice_id, data?.invoice_number]);
+		updateBreadcrumb(breadcrumb_index, data?.invoice_number ?? invoice_id);
+	}, [invoice_id, data?.invoice_number, breadcrumb_index, updateBreadcrumb]);
 
 	const dropdownOptions: DropdownMenuOption[] = [
 		{

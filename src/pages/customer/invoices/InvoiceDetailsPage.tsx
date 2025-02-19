@@ -6,7 +6,7 @@ const InvoiceDetailsPage = () => {
 
 	return (
 		<div>
-			<InvoiceDetails invoice_id={invoiceId!} />
+			<InvoiceDetails breadcrumb_index={2} invoice_id={invoiceId!} />
 		</div>
 	);
 };
