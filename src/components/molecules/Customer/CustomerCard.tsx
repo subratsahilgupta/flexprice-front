@@ -17,9 +17,8 @@ const CustomerCard: React.FC<CustomerCardProps> = ({ customerId, subscriptionDat
 	const { data: customer, isLoading } = useQuery({
 		queryKey: ['fetchCustomerCard', customerId],
 		queryFn: () => fetchCustomer(customerId),
-		retry: 1,
+
 		// staleTime: 1000 * 60 * 5,
-		staleTime: 0,
 	});
 
 	const details = [

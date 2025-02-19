@@ -1,4 +1,3 @@
-import { queryClient } from '@/App';
 import { Spinner } from '@/components/atoms';
 import { MeterForm } from '@/components/organisms';
 import { Meter } from '@/models/Meter';
@@ -7,6 +6,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
+import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 
 const fetchMeterData = async (id: string) => {
 	return await MeterApi.getMeterById(id);
@@ -35,9 +35,6 @@ const EditMeterPage = () => {
 	} = useQuery({
 		queryKey: ['fetchMeterData', id],
 		queryFn: () => fetchMeterData(id!),
-		retry: 1,
-		staleTime: 0,
-		// staleTime: 1000 * 60 * 5,
 	});
 
 	const { mutate: updateMeterData } = useMutation({
@@ -47,10 +44,7 @@ const EditMeterPage = () => {
 				id: id,
 			}),
 		onSuccess: async () => {
-			await queryClient.refetchQueries({ queryKey: ['fetchMeters'] });
-			queryClient.invalidateQueries({ queryKey: ['fetchMeters'] });
-			await queryClient.refetchQueries({ queryKey: ['fetchMeterData'] });
-			queryClient.invalidateQueries({ queryKey: ['fetchMeterData'] });
+			await refetchQueries(['fetchMeters', 'fetchMeterData']);
 			toast.success('Meter updated successfully');
 		},
 		onError() {

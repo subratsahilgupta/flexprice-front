@@ -1,13 +1,14 @@
 import { FormHeader, Loader, SectionHeader, Spacer } from '@/components/atoms';
 import { AddEntitlementDrawer, ColumnData, FeatureTable, FlexpriceTable } from '@/components/molecules';
 import { Price } from '@/models/Price';
+import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
 import formatDate from '@/utils/common/format_date';
 import { formatPriceType, toSentenceCase } from '@/utils/common/helper_functions';
 import { getPriceTableCharge } from '@/utils/models/transformed_plan';
 import { useQuery } from '@tanstack/react-query';
 import { Star } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useParams } from 'react-router-dom';
 
@@ -77,6 +78,14 @@ const PlanViewPage = () => {
 		enabled: !!planId,
 	});
 
+	const { updateBreadcrumb } = useBreadcrumbsStore();
+
+	useEffect(() => {
+		if (planData?.name) {
+			updateBreadcrumb(2, planData.name);
+		}
+	}, [planData, updateBreadcrumb]);
+
 	if (isLoading) {
 		return <Loader />;
 	}
@@ -89,7 +98,13 @@ const PlanViewPage = () => {
 	return (
 		<div className='page'>
 			{/* create entitlement drawer */}
-			<AddEntitlementDrawer planId={planData?.id} isOpen={drawerOpen} onOpenChange={(value) => setdrawerOpen(value)} />
+			<AddEntitlementDrawer
+				selectedFeatures={entittlements?.map((v) => v.feature) || []}
+				entitlements={entittlements}
+				planId={planData?.id}
+				isOpen={drawerOpen}
+				onOpenChange={(value) => setdrawerOpen(value)}
+			/>
 
 			<div className='w-2/3 mb-10'>
 				{/* <div className='w-full !my-5 flex justify-between items-center'>

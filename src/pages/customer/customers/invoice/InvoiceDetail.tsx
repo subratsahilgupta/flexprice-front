@@ -3,12 +3,13 @@ import { DropdownMenu, DropdownMenuOption, InvoiceLineItemTable } from '@/compon
 import InvoicePaymentStatusModal from '@/components/molecules/InvoiceTable/InvoicePaymentStatusModal';
 import InvoiceStatusModal from '@/components/molecules/InvoiceTable/InvoiceStatusModal';
 import useUser from '@/hooks/useUser';
+import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
 import { captureToPdf } from '@/utils/common/component_to_pdf';
 import formatDate from '@/utils/common/format_date';
 import { useQuery } from '@tanstack/react-query';
 import { Download, EllipsisVertical, Loader } from 'lucide-react';
-import { FC, useRef, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
@@ -23,6 +24,7 @@ const InvoiceDetails: FC<Props> = ({ invoice_id }) => {
 		isPaymentModalOpen: false,
 		isStatusModalOpen: false,
 	});
+	const { updateBreadcrumb } = useBreadcrumbsStore();
 	const { data, isLoading, isError } = useQuery({
 		queryKey: ['fetchInvoice', invoice_id],
 		queryFn: async () => {
@@ -32,6 +34,10 @@ const InvoiceDetails: FC<Props> = ({ invoice_id }) => {
 	});
 
 	const { user } = useUser();
+
+	useEffect(() => {
+		updateBreadcrumb(2, data?.invoice_number ?? invoice_id);
+	}, [invoice_id, data?.invoice_number]);
 
 	const dropdownOptions: DropdownMenuOption[] = [
 		{

@@ -1,7 +1,7 @@
 import { Button, Chip, DatePicker, Dialog, FormHeader, Select, SelectOption, Spacer } from '@/components/atoms';
 import { InvoiceCreditLineItemTable } from '@/components/molecules';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useBreadcrumbStore } from '@/core/store/useBreadcrumbStore';
+import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
 import formatDate from '@/utils/common/format_date';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
@@ -24,6 +24,7 @@ const getStatusChip = (status: string) => {
 
 const AddCreditPage = () => {
 	const { invoice_id } = useParams<{ invoice_id: string }>();
+	const { updateBreadcrumb, setSegmentLoading } = useBreadcrumbsStore();
 
 	const { data, isLoading } = useQuery({
 		queryKey: ['fetchInvoice', invoice_id],
@@ -33,21 +34,21 @@ const AddCreditPage = () => {
 
 	const [showModal, setshowModal] = useState(false);
 
-	const { setBreadcrumbs } = useBreadcrumbStore();
-
+	// Update breadcrumbs when invoice data is loaded
 	useEffect(() => {
+		// Set loading states when starting to fetch
+		setSegmentLoading(2, true); // Customer segment
+		setSegmentLoading(3, true); // Invoice segment
+
 		if (data) {
-			setBreadcrumbs(
-				[
-					{ label: 'Customer Management', path: '' },
-					{ label: 'Customers', path: '/customer-management/customers' },
-					{ label: `${data.customer?.external_id}`, path: `/customer-management/customers/${data.customer?.id}` },
-					{ label: `Invoice ${data.invoice_number}`, path: `/customer-management/customers/${data.customer?.id}/invoice/${data.id}` },
-				],
-				true,
-			);
+			// Update customer name (3rd segment)
+			updateBreadcrumb(2, data.customer?.external_id || 'Customer');
+			console.log('data', data);
+
+			// Update invoice number (4th segment)
+			updateBreadcrumb(3, `Invoice ${data.invoice_number}`);
 		}
-	}, [data]);
+	}, [data, updateBreadcrumb, setSegmentLoading]);
 
 	const reasonOptions: SelectOption[] = [
 		{ label: 'Duplicate Charge', value: 'wrong_invoice' },

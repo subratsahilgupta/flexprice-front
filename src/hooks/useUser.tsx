@@ -14,7 +14,6 @@ const useUser = () => {
 			return await UserApi.me();
 		},
 		// staleTime: 1000 * 60 * 5,
-		retry: 1,
 	});
 
 	return { user, loading, error, refetch };

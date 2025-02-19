@@ -41,8 +41,7 @@ const Overview = () => {
 	} = useQuery({
 		queryKey: ['subscriptions', customerId], // Unique key for caching
 		queryFn: () => fetchAllSubscriptions(customerId!),
-		retry: 1,
-		staleTime: 0,
+
 		refetchOnWindowFocus: true,
 		refetchOnMount: 'always', // Refetch when the component is remounted
 	});

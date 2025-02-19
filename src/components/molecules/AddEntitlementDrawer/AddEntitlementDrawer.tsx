@@ -1,6 +1,7 @@
 import { Button, Checkbox, FormHeader, Input, Select, SelectFeature, Sheet, Spacer, Toggle } from '@/components/atoms';
 import { getFeatureIcon } from '@/components/atoms/SelectFeature/SelectFeature';
 import { billlingPeriodOptions } from '@/core/data/constants';
+import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 import { Entitlement } from '@/models/Entitlement';
 import Feature, { FeatureType } from '@/models/Feature';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
@@ -14,11 +15,19 @@ interface Props {
 	isOpen: boolean;
 	onOpenChange: (value: boolean) => void;
 	planId?: string;
+	selectedFeatures?: Feature[];
+	entitlements?: Entitlement[];
 }
 
-const AddEntitlementDrawer: FC<Props> = ({ isOpen, onOpenChange, planId }) => {
+const AddEntitlementDrawer: FC<Props> = ({
+	isOpen,
+	onOpenChange,
+	planId,
+	selectedFeatures: disabledFeatures,
+	entitlements: initialEntitlements,
+}) => {
 	const [entitlements, setEntitlements] = useState<Partial<Entitlement>[]>([]);
-	const [selectedFeatures, setSelectedFeatures] = useState<Feature[]>([]);
+	const [selectedFeatures, setSelectedFeatures] = useState<Feature[]>(disabledFeatures ?? []);
 	const [showSelect, setshowSlect] = useState(true);
 	const [activeFeature, setactiveFeature] = useState<Feature | null>(null);
 	const [tempEntitlement, setentitlement] = useState<Partial<Entitlement>>({});
@@ -27,12 +36,13 @@ const AddEntitlementDrawer: FC<Props> = ({ isOpen, onOpenChange, planId }) => {
 		mutationKey: ['addEntitlement', tempEntitlement],
 		mutationFn: async () => {
 			return await PlanApi.updatePlan(planId!, {
-				entitlements: entitlements as Entitlement[],
+				entitlements: [...(initialEntitlements ?? []), ...entitlements] as Entitlement[],
 			});
 		},
 		onSuccess: () => {
 			toast.success('Entitlements added successfully');
 			onOpenChange(false);
+			refetchQueries(['fetchPlan', planId]);
 		},
 		onError: (error) => {
 			console.log(error);

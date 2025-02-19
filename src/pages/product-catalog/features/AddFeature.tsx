@@ -1,7 +1,7 @@
-import { queryClient } from '@/App';
 import { Button, FormHeader, Input, RadioGroup, RadioMenuItem, Spacer, Textarea, Toggle } from '@/components/atoms';
 import SelectMeter from '@/components/organisms/PlanForm/SelectMeter';
 import { RouteNames } from '@/core/routes/Routes';
+import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 import { cn } from '@/lib/utils';
 import Feature from '@/models/Feature';
 import { Meter } from '@/models/Meter';
@@ -95,10 +95,7 @@ const AddFeaturePage = () => {
 		},
 		onSuccess: async () => {
 			toast.success('Feature created successfully');
-			await queryClient.invalidateQueries({
-				queryKey: ['fetchFeatures'],
-				exact: false,
-			});
+			await refetchQueries(['fetchFeatures']);
 			navigate(RouteNames.features);
 		},
 		onError: (error) => {

@@ -3,11 +3,11 @@ import { FC, useEffect, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
-import { queryClient } from '@/App';
 import Customer from '@/models/Customer';
 import { Plus } from 'lucide-react';
 import { Country, State, City, IState } from 'country-state-city';
 import { z } from 'zod';
+import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 
 interface Props {
 	data?: Customer;
@@ -136,23 +136,16 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 				});
 			}
 		},
-		retry: 2,
+
 		onSuccess: async (details) => {
 			console.log('details', details);
 			if (data) {
-				await queryClient.invalidateQueries({
-					queryKey: ['fetchCustomerDetails', formData.id],
-				});
+				await refetchQueries(['fetchCustomerDetails', formData.id]);
+				await refetchQueries(['fetchCustomers']);
 			} else {
-				await queryClient.invalidateQueries({
-					queryKey: ['fetchCustomers'],
-				});
+				await refetchQueries(['fetchCustomers']);
 				setFormData({});
 			}
-			await queryClient.invalidateQueries({
-				queryKey: ['fetchCustomers'],
-				exact: false,
-			});
 
 			// if (!details) {
 			// 	toast.error('Error adding customer');

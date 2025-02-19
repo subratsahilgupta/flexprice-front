@@ -26,8 +26,6 @@ const CustomerPage = () => {
 	} = useQuery({
 		queryKey: ['fetchCustomers', page],
 		queryFn: fetchCustomers,
-		retry: 2,
-		staleTime: 0,
 	});
 
 	if (isLoading) {

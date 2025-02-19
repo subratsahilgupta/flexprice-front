@@ -151,23 +151,25 @@ const FlexpriceTable: FC<FlexpriceTableProps> = ({ onRowClick, columns, data, re
 								)}
 							</TableRow>
 						))}
-					{data.length === 0 &&
-						showEmptyRow &&
-						columns.map(({ flex = 1, width, textColor = 'inherit', align = 'left', redirect = true }, colIndex) => (
-							<TableCell
-								key={colIndex}
-								className={cn(
-									textColor ? `text-[${textColor}]` : 'text-[#09090B] w-full ',
-									'font-normal',
-									'!max-h-8 px-4 py-2 text-[14px]',
-									redirect && redirectUrl ? 'cursor-pointer' : 'cursor-default',
-								)}
-								style={{ flex: width ? undefined : flex }}
-								width={width}
-								align={align}>
-								--
-							</TableCell>
-						))}
+					{data.length === 0 && showEmptyRow && (
+						<TableRow>
+							{columns.map(({ flex = 1, width, textColor = 'inherit', align = 'left', redirect = true }, colIndex) => (
+								<TableCell
+									key={colIndex}
+									className={cn(
+										textColor ? `text-[${textColor}]` : 'text-[#09090B] w-full ',
+										'font-normal',
+										'!max-h-8 px-4 py-2 text-[14px]',
+										redirect && redirectUrl ? 'cursor-pointer' : 'cursor-default',
+									)}
+									style={{ flex: width ? undefined : flex }}
+									width={width}
+									align={align}>
+									--
+								</TableCell>
+							))}
+						</TableRow>
+					)}
 				</TableBody>
 			</Table>
 			{data.length === 0 && !showEmptyRow && <p className=' text-[#64748B] text-xs font-normal font-sans mt-4'>{emptyRowText}</p>}

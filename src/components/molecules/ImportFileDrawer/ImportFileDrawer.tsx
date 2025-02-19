@@ -9,7 +9,7 @@ import TaskApi from '@/utils/api_requests/TaskApi';
 import { ImportTask } from '@/models/ImportTask';
 import { toSentenceCase } from '@/utils/common/helper_functions';
 import toast from 'react-hot-toast';
-import { queryClient } from '@/App';
+import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 
 interface Props {
 	isOpen: boolean;
@@ -144,8 +144,7 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 			setEntityType(undefined);
 			setUploadedFile(undefined);
 			console.log(data);
-			await queryClient.invalidateQueries({ queryKey: ['importTasks'], exact: false });
-			await queryClient.refetchQueries({ queryKey: ['importTasks'], exact: false });
+			await refetchQueries('importTasks');
 		},
 		onError: (error) => {
 			console.log(error);
@@ -163,7 +162,6 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 			return await TaskApi.getTaskById((taskId ?? task?.id) || '');
 		},
 		enabled: Boolean(taskId ?? task?.id) && isOpen,
-		staleTime: 0,
 	});
 
 	useEffect(() => {

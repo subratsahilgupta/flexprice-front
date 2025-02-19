@@ -5,6 +5,8 @@ import { Sidebar } from '@/components/molecules/Sidebar';
 import { BreadCrumbs } from '@/components/molecules';
 
 const MainLayout: React.FC = () => {
+	// Initialize breadcrumbs
+
 	return (
 		<SidebarProvider className='flex h-screen bg-gray-100 relative'>
 			{/* Sidebar */}

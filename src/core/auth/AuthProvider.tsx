@@ -28,8 +28,7 @@ const AuthMiddleware: React.FC<AuthMiddlewareProps> = ({ children }) => {
 	} = useQuery({
 		queryKey: ['fetchUser'],
 		queryFn: fetchUser,
-		retry: 1,
-		staleTime: 0,
+
 		// staleTime: 1000 * 60 * 5,
 	});
 
