@@ -35,6 +35,9 @@ const FeatureTable: FC<Props> = ({ data, emptyRowMessage, showEmptyRow }) => {
 		{
 			fieldName: 'name',
 			title: 'Feature Name',
+			onCLick(row) {
+				navigate(RouteNames.featureDetails + `/${row?.id}`);
+			},
 		},
 		{
 			fieldName: 'type',

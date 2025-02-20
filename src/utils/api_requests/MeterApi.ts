@@ -1,5 +1,6 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import { Meter } from '@/models/Meter';
+import { PaginationType } from '@/models/Pagination';
 
 interface getAllMetersResponse {
 	items: Meter[];

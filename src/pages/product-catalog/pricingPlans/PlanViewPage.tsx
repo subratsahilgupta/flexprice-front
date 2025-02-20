@@ -1,5 +1,6 @@
 import { FormHeader, Loader, SectionHeader, Spacer } from '@/components/atoms';
 import { AddEntitlementDrawer, ColumnData, FeatureTable, FlexpriceTable } from '@/components/molecules';
+import { DetailsCard } from '@/components/molecules';
 import { Price } from '@/models/Price';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
@@ -123,37 +124,24 @@ const PlanViewPage = () => {
 					)}
 				</div> */}
 
-				<div className='card'>
-					<FormHeader title='Plan details' variant='sub-header' titleClassName='font-semibold' />
-					<div className='w-full flex justify-between items-center'>
-						<p className='text-[#71717A] text-sm'>Plan Name</p>
-						<p className='text-[#09090B] text-sm'>{planData?.name}</p>
-					</div>
-					<Spacer className='!my-4' />
-					<div className='w-full flex justify-between items-center'>
-						<p className='text-[#71717A] text-sm'>Plan Description</p>
-						<p className='text-[#09090B] text-sm'>{planData?.description || '--'}</p>
-					</div>
-					<Spacer className='!my-4' />
-					<div className='w-full flex justify-between items-center'>
-						<p className='text-[#71717A] text-sm'>Created Date</p>
-						<p className='text-[#09090B] text-sm'>{formatDate(planData?.created_at ?? '')}</p>
-					</div>
-				</div>
+				<DetailsCard
+					title='Plan Details'
+					data={[
+						{ label: 'Plan Name', value: planData?.name },
+						{ label: 'Plan Description', value: planData?.description || '--' },
+						{ label: 'Created Date', value: formatDate(planData?.created_at ?? '') },
+					]}
+				/>
 
 				<Spacer className='!my-4' />
-				<div className='card'>
-					<FormHeader title='Billing Preferences' variant='sub-header' titleClassName='font-semibold' />
-					<div className='w-full flex justify-between items-center'>
-						<p className='text-[#71717A] text-sm'>Billing Timing</p>
-						<p className='text-[#09090B] text-sm'>{formatInvoiceCadence(planData?.invoice_cadence ?? '')}</p>
-					</div>
-					<Spacer className='!my-4' />
-					<div className='w-full flex justify-between items-center'>
-						<p className='text-[#71717A] text-sm'>Trial Period</p>
-						<p className='text-[#09090B] text-sm'>{planData?.trial_period ? `${planData?.trial_period} days` : '--'}</p>
-					</div>
-				</div>
+
+				<DetailsCard
+					title='Billing Preferences'
+					data={[
+						{ label: 'Billing Timing', value: formatInvoiceCadence(planData?.invoice_cadence ?? '') },
+						{ label: 'Trial Period', value: planData?.trial_period ? `${planData?.trial_period} days` : '--' },
+					]}
+				/>
 
 				{/* plan charges table */}
 				{(planData?.prices?.length ?? 0) > 0 && (

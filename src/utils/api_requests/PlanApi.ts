@@ -2,6 +2,7 @@ import { AxiosClient } from '@/core/axios/verbs';
 import { Plan as PlanReq } from '@/store/usePlanStore';
 import { Plan } from '@/models/Plan';
 import { ExpandedPlan } from '../models/transformed_plan';
+import { PaginationType } from '@/models/Pagination';
 
 interface GetAllPlansResponse {
 	items: Plan[] | ExpandedPlan[];

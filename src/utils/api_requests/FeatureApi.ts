@@ -1,7 +1,7 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import Feature from '@/models/Feature';
 import { generateQueryParams } from '../common/api_helper';
-
+import { PaginationType } from '@/models/Pagination';
 interface GetFeaturesPayload {
 	end_time?: string;
 	expand?: string;

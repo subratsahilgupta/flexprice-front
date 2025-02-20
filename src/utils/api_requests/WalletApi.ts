@@ -2,6 +2,7 @@ import { AxiosClient } from '@/core/axios/verbs';
 import { Wallet } from '@/models/Wallet';
 import { WalletBalance } from '@/models/WalletBalance';
 import { WalletTransaction } from '@/models/WalletTransaction';
+import { PaginationType } from '@/models/Pagination';
 
 interface WalletTransactionPayload extends PaginationType {
 	walletId: string;

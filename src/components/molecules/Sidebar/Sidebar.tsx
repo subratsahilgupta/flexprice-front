@@ -10,7 +10,7 @@ import {
 import React from 'react';
 import SidebarNav, { NavItem } from './SidebarMenu';
 import { cn } from '@/lib/utils';
-import { LogOut, Plug2, Star } from 'lucide-react';
+import { LogOut, Plug2, Puzzle, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import supabase from '@/core/supbase/config';
 import useUser from '@/hooks/useUser';
@@ -32,18 +32,18 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 		'Usage Tracking': [
 			{
 				title: 'Meter',
-				url: '/usage-tracking/meter',
+				url: RouteNames.billableMetric,
 				icon: '/assets/svg/billable_metrics.svg',
 			},
 			{
 				title: 'Query',
-				url: '/usage-tracking/query',
+				url: RouteNames.queryPage,
 				icon: '/assets/svg/query.svg',
 				disabled: false,
 			},
 			{
 				title: 'Events',
-				url: '/usage-tracking/events',
+				url: RouteNames.events,
 				icon: '/assets/svg/events.svg',
 				isActive: false,
 				// items: [
@@ -65,13 +65,13 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 		'Customer Management': [
 			{
 				title: 'Customers',
-				url: '/customer-management/customers',
+				url: RouteNames.customers,
 				icon: '/assets/svg/customers.svg',
 			},
 
 			{
 				title: 'Invoices',
-				url: '/customer-management/invoices',
+				url: RouteNames.invoices,
 				icon: '/assets/svg/receipt.svg',
 			},
 
@@ -85,13 +85,19 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 		'Product Cataglog': [
 			{
 				title: 'Pricing Plan',
-				url: '/product-catalog/pricing-plan',
+				url: RouteNames.pricingPlan,
 				icon: '/assets/svg/pricing_plan.svg',
 			},
 			{
 				title: 'Features',
-				url: '/product-catalog/features',
+				url: RouteNames.features,
 				icon: <Star />,
+				// disabled: true,
+			},
+			{
+				title: 'Add On',
+				url: RouteNames.importExport,
+				icon: <Puzzle />,
 				// disabled: true,
 			},
 		],
