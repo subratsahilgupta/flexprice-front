@@ -31,28 +31,24 @@ const formatInvoiceCadence = (cadence: string): string => {
 const chargeColumns: ColumnData[] = [
 	{
 		title: 'Subscription Type',
-		fieldName: 'billing_cadence',
 		render: (row) => {
 			return <span className='text-[#09090B]'>{formatPriceType(row.type)}</span>;
 		},
 	},
 	{
 		title: 'Billable Metric',
-		fieldName: 'price',
 		render(rowData) {
 			return <span className='text-[#09090B]'>{rowData.meter?.name ?? '--'}</span>;
 		},
 	},
 	{
 		title: 'Billing Period',
-		fieldName: 'price',
 		render(rowData) {
 			return <span className='text-[#09090B]'>{toSentenceCase(rowData.billing_period as string)}</span>;
 		},
 	},
 	{
 		title: 'Value',
-		fieldName: 'price',
 		render(rowData) {
 			return <ValueCell data={rowData} />;
 		},
@@ -65,6 +61,7 @@ const ValueCell = ({ data }: { data: Price }) => {
 };
 
 const PlanViewPage = () => {
+	// const navigate = useNavigate();
 	const { planId } = useParams<Params>();
 	const [drawerOpen, setdrawerOpen] = useState(false);
 	const {
@@ -86,6 +83,73 @@ const PlanViewPage = () => {
 			updateBreadcrumb(2, planData.name);
 		}
 	}, [planData, updateBreadcrumb]);
+
+	// const columnData: ColumnData<ExtendedEntitlement>[] = [
+	// 	{
+	// 		fieldName: 'feature',
+	// 		title: 'Feature Name',
+	// 		onCLick(row) {
+	// 			navigate(RouteNames.featureDetails + `/${row?.id}`);
+	// 		},
+	// 	},
+	// 	{
+	// 		title: 'Type',
+	// 		align: 'center',
+	// 		render(row) {
+	// 			return getFeatureTypeChips(row?.feature_type || '');
+	// 		},
+	// 	},
+	// 	// {
+	// 	// 	fieldName: 'meter_id',
+	// 	// 	title: 'Linked Billable Metric ',
+	// 	// 	onCLick(row) {
+	// 	// 		if (row.meter_id) {
+	// 	// 			navigate(RouteNames.editMeter + `?id=${row?.meter_id}`);
+	// 	// 		}
+	// 	// 	},
+	// 	// 	render(row) {
+	// 	// 		return row?.meter ? row.meter.name : '--';
+	// 	// 	},
+	// 	// },
+	// 	{
+	// 		title: 'Status',
+	// 		align: 'center',
+	// 		render: (row) => {
+	// 			const label = formatChips(row?.status);
+	// 			return <Chip isActive={label === 'Active'} label={label} />;
+	// 		},
+	// 	},
+	// 	{
+	// 		title: 'Mapped with plan',
+	// 		render: () => {
+	// 			return '--';
+	// 		},
+	// 	},
+	// 	{
+	// 		title: 'Updated At',
+	// 		render: (row) => {
+	// 			return formatDate(row?.updated_at);
+	// 		},
+	// 	},
+	// 	{
+	// 		title: '',
+	// 		render(row) {
+	// 			return (
+	// 				<ActionButton
+	// 					deleteMutationFn={async () => {
+	// 						return await FeatureApi.deleteFeature(row?.id);
+	// 					}}
+	// 					id={row?.id}
+	// 					editPath={''}
+	// 					isEditDisabled={true}
+	// 					isArchiveDisabled={row?.status === 'archived'}
+	// 					refetchQueryKey={'fetchFeatures'}
+	// 					entityName={row?.feature?.name}
+	// 				/>
+	// 			);
+	// 		},
+	// 	},
+	// ];
 
 	if (isLoading) {
 		return <Loader />;

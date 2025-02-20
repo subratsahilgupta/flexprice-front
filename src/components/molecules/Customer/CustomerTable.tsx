@@ -19,7 +19,6 @@ const CustomerTable: FC<Props> = ({ data, onEdit }) => {
 		{ fieldName: 'name', title: 'Name', width: '400px' },
 		{ fieldName: 'external_id', title: 'Slug' },
 		{
-			fieldName: 'status',
 			title: 'Status',
 			align: 'center',
 			render: (row) => {
@@ -28,14 +27,12 @@ const CustomerTable: FC<Props> = ({ data, onEdit }) => {
 			},
 		},
 		{
-			fieldName: 'updated_at',
 			title: 'Updated at',
 			render: (row) => {
 				return <span className='text-[#09090B] '>{formatDate(row.updated_at)}</span>;
 			},
 		},
 		{
-			fieldName: 'actions',
 			title: '',
 			redirect: false,
 			render: (row) => (

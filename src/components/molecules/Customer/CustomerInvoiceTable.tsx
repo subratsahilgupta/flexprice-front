@@ -26,29 +26,24 @@ interface Props {
 const CustomerInvoiceTable: FC<Props> = ({ data, onRowClick }) => {
 	const columnData: ColumnData[] = [
 		{
-			fieldName: 'invoice_number',
 			title: 'Invoice Number',
 			render: (row) => <span>{row.invoice_number || '--'}</span>,
 		},
 		{
-			fieldName: 'id',
 			title: 'Status',
 			render: (row) => <span>{toSentenceCase(row.invoice_status)}</span>,
 		},
 		{
-			fieldName: 'id',
 			title: 'Payment Status',
 			render: (row) => <Chip isActive={row.payment_status === 'SUCCEEDED'} label={formatPaymentStatus(row.payment_status)} />,
 			align: 'center',
 		},
 		{
-			fieldName: 'Amount',
 			title: 'Total Amount',
 			render: (row) => <span>{`${getCurrencySymbol(row.currency)} ${row.amount_due}`}</span>,
 			align: 'center',
 		},
 		{
-			fieldName: 'id',
 			title: '',
 			render: (row) => <ActionButton id={row.id} editPath={''} deleteMutationFn={async () => {}} refetchQueryKey={''} entityName={''} />,
 		},

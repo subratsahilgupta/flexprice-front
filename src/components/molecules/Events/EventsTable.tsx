@@ -32,14 +32,12 @@ const EventsTable: FC<Props> = ({ data }) => {
 		},
 		{
 			title: 'Source',
-			fieldName: 'source',
 			render(rowData) {
 				return <span>{rowData.source || '--'}</span>;
 			},
 		},
 		{
 			title: 'Timestamp',
-			fieldName: 'timestamp',
 			render(rowData) {
 				return <span>{formatDateWithMilliseconds(rowData.timestamp)}</span>;
 			},

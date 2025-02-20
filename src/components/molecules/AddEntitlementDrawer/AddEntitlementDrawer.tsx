@@ -277,7 +277,6 @@ const AddEntitlementDrawer: FC<Props> = ({
 										error={errors.static_value}
 										label='Value'
 										value={tempEntitlement.static_value === undefined ? '' : tempEntitlement.static_value.toString()}
-										type='number'
 										placeholder='Enter value'
 										onChange={(value) => {
 											setEntitlement({

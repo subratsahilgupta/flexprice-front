@@ -96,7 +96,7 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 			},
 			{
 				title: 'Add On',
-				url: RouteNames.importExport,
+				url: RouteNames.addOn,
 				icon: <Puzzle />,
 				// disabled: true,
 			},

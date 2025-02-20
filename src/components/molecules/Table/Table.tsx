@@ -3,21 +3,31 @@ import { FC, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 
-export interface ColumnData<T = any> {
-	fieldName: keyof T;
-	title: string;
+interface BaseColumnData<T = any> {
+	title?: string;
 	flex?: number;
 	width?: number | string;
 	color?: string;
 	textColor?: string;
 	suffixIcon?: ReactNode;
 	align?: 'left' | 'center' | 'right' | 'justify';
-	render?: (rowData: T) => ReactNode;
 	children?: ReactNode;
 	className?: string;
 	redirect?: boolean;
 	onCLick?: (row: T) => void;
 }
+
+interface FieldNameColumn<T> extends BaseColumnData<T> {
+	fieldName: keyof T;
+	render?: never;
+}
+
+interface RenderColumn<T> extends BaseColumnData<T> {
+	fieldName?: never;
+	render: (rowData: T) => ReactNode;
+}
+
+export type ColumnData<T = any> = FieldNameColumn<T> | RenderColumn<T>;
 
 export interface FlexpriceTableProps {
 	columns: ColumnData[];
