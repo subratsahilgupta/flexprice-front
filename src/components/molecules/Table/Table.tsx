@@ -133,15 +133,24 @@ const FlexpriceTable: FC<FlexpriceTableProps> = ({ onRowClick, columns, data, re
 								key={rowIndex}>
 								{columns.map(
 									(
-										{ fieldName: name, flex = 1, width, textColor = 'inherit', align = 'left', render, redirect = true, onCLick },
+										{
+											fieldName: name,
+											flex = 1,
+											width,
+											textColor = 'inherit',
+											align = 'left',
+											render,
+											redirect = true,
+											onCLick,
+											suffixIcon,
+										},
 										colIndex,
 									) => (
 										<TableCell
 											onClick={() => {
 												if (redirect && redirectUrl) {
 													navigate(`${redirectUrl}${row?.id}`);
-												}
-												if (onCLick) {
+												} else if (onCLick) {
 													onCLick(row);
 												}
 											}}
@@ -150,13 +159,19 @@ const FlexpriceTable: FC<FlexpriceTableProps> = ({ onRowClick, columns, data, re
 												textColor ? `text-[${textColor}]` : 'text-[#09090B] w-full ',
 												'font-normal',
 												'!max-h-8 px-4 py-2 text-[14px]',
-												redirect && redirectUrl ? 'cursor-pointer' : 'cursor-default',
-												onCLick ? 'cursor-pointer' : 'cursor-default',
+												(redirect && redirectUrl) || onCLick ? 'cursor-pointer' : 'cursor-default',
 											)}
 											style={{ flex: width ? undefined : flex }}
 											width={width}
 											align={align}>
-											{render ? render(row) : row[name]}
+											{render ? (
+												<span className={cn((redirect && redirectUrl) || onCLick ? 'cursor-pointer' : 'cursor-default')}>
+													{render(row)}
+													{suffixIcon && suffixIcon}
+												</span>
+											) : (
+												row[name]
+											)}
 										</TableCell>
 									),
 								)}

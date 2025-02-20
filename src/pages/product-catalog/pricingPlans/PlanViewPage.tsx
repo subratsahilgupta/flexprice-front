@@ -1,8 +1,12 @@
-import { FormHeader, Loader, SectionHeader, Spacer } from '@/components/atoms';
-import { AddEntitlementDrawer, ColumnData, FeatureTable, FlexpriceTable } from '@/components/molecules';
+import { ActionButton, FormHeader, Loader, SectionHeader } from '@/components/atoms';
+import { AddEntitlementDrawer, ColumnData, FlexpriceTable } from '@/components/molecules';
 import { DetailsCard } from '@/components/molecules';
+import { getFeatureTypeChips } from '@/components/molecules/FeatureTable/FeatureTable';
+import { RouteNames } from '@/core/routes/Routes';
 import { Price } from '@/models/Price';
+import { FeatureType } from '@/models/Feature';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
+import EntitlementApi, { ExtendedEntitlement } from '@/utils/api_requests/EntitlementApi';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
 import formatDate from '@/utils/common/format_date';
 import { formatPriceType, toSentenceCase } from '@/utils/common/helper_functions';
@@ -11,7 +15,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Star } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 type Params = {
 	planId: string;
@@ -55,19 +59,32 @@ const chargeColumns: ColumnData[] = [
 	},
 ];
 
+const getFeatureValue = (entitlement: ExtendedEntitlement) => {
+	switch (entitlement.feature_type) {
+		case FeatureType.static:
+			return entitlement.static_value;
+		case FeatureType.metered:
+			return `${entitlement.usage_limit} units`;
+		case FeatureType.boolean:
+			return entitlement.static_value ? 'Yes' : 'No';
+		default:
+			return '--';
+	}
+};
 const ValueCell = ({ data }: { data: Price }) => {
 	const price = getPriceTableCharge(data as any, false);
 	return <div>{price}</div>;
 };
 
 const PlanViewPage = () => {
-	// const navigate = useNavigate();
+	const navigate = useNavigate();
 	const { planId } = useParams<Params>();
 	const [drawerOpen, setdrawerOpen] = useState(false);
+
 	const {
 		data: planData,
-		isLoading,
-		isError,
+		isLoading: isPlanLoading,
+		isError: isPlanError,
 	} = useQuery({
 		queryKey: ['fetchPlan', planId],
 		queryFn: async () => {
@@ -75,6 +92,26 @@ const PlanViewPage = () => {
 		},
 		enabled: !!planId,
 	});
+
+	const {
+		data: entitlementsData,
+		isLoading: isEntitlementsLoading,
+		isError: isEntitlementsError,
+	} = useQuery({
+		queryKey: ['fetchEntitlements', planId],
+		queryFn: async () => {
+			return await EntitlementApi.getAllEntitlements({
+				plan_ids: [planId!],
+				expand: 'features,meters',
+				status: 'published',
+			});
+		},
+		enabled: !!planId,
+	});
+
+	const entitlements = entitlementsData?.items;
+	const isLoading = isPlanLoading || isEntitlementsLoading;
+	const isError = isPlanError || isEntitlementsError;
 
 	const { updateBreadcrumb } = useBreadcrumbsStore();
 
@@ -84,94 +121,84 @@ const PlanViewPage = () => {
 		}
 	}, [planData, updateBreadcrumb]);
 
-	// const columnData: ColumnData<ExtendedEntitlement>[] = [
-	// 	{
-	// 		fieldName: 'feature',
-	// 		title: 'Feature Name',
-	// 		onCLick(row) {
-	// 			navigate(RouteNames.featureDetails + `/${row?.id}`);
-	// 		},
-	// 	},
-	// 	{
-	// 		title: 'Type',
-	// 		align: 'center',
-	// 		render(row) {
-	// 			return getFeatureTypeChips(row?.feature_type || '');
-	// 		},
-	// 	},
-	// 	// {
-	// 	// 	fieldName: 'meter_id',
-	// 	// 	title: 'Linked Billable Metric ',
-	// 	// 	onCLick(row) {
-	// 	// 		if (row.meter_id) {
-	// 	// 			navigate(RouteNames.editMeter + `?id=${row?.meter_id}`);
-	// 	// 		}
-	// 	// 	},
-	// 	// 	render(row) {
-	// 	// 		return row?.meter ? row.meter.name : '--';
-	// 	// 	},
-	// 	// },
-	// 	{
-	// 		title: 'Status',
-	// 		align: 'center',
-	// 		render: (row) => {
-	// 			const label = formatChips(row?.status);
-	// 			return <Chip isActive={label === 'Active'} label={label} />;
-	// 		},
-	// 	},
-	// 	{
-	// 		title: 'Mapped with plan',
-	// 		render: () => {
-	// 			return '--';
-	// 		},
-	// 	},
-	// 	{
-	// 		title: 'Updated At',
-	// 		render: (row) => {
-	// 			return formatDate(row?.updated_at);
-	// 		},
-	// 	},
-	// 	{
-	// 		title: '',
-	// 		render(row) {
-	// 			return (
-	// 				<ActionButton
-	// 					deleteMutationFn={async () => {
-	// 						return await FeatureApi.deleteFeature(row?.id);
-	// 					}}
-	// 					id={row?.id}
-	// 					editPath={''}
-	// 					isEditDisabled={true}
-	// 					isArchiveDisabled={row?.status === 'archived'}
-	// 					refetchQueryKey={'fetchFeatures'}
-	// 					entityName={row?.feature?.name}
-	// 				/>
-	// 			);
-	// 		},
-	// 	},
-	// ];
+	const columnData: ColumnData<ExtendedEntitlement>[] = [
+		{
+			title: 'Feature Name',
+			onCLick(row) {
+				navigate(RouteNames.featureDetails + `/${row?.id}`);
+			},
+			render(row) {
+				return row?.feature?.name;
+			},
+		},
+		{
+			title: 'Meter',
+			render(row) {
+				return row?.feature.meter?.name ?? '--';
+			},
+		},
+		{
+			title: 'Type',
+			align: 'center',
+			render(row) {
+				return getFeatureTypeChips(row?.feature_type || '');
+			},
+		},
+
+		{
+			title: 'Value',
+			align: 'center',
+			render(row) {
+				return getFeatureValue(row);
+			},
+		},
+		{
+			title: '',
+			redirect: false,
+			width: '30px',
+			render(row) {
+				return (
+					<ActionButton
+						deleteMutationFn={async () => {
+							return await EntitlementApi.deleteEntitlementById(row?.id);
+						}}
+						id={row?.id}
+						editPath={''}
+						isEditDisabled={true}
+						isArchiveDisabled={row?.status === 'archived'}
+						refetchQueryKey={'fetchEntitlements'}
+						entityName={row?.feature?.name}
+					/>
+				);
+			},
+		},
+	];
 
 	if (isLoading) {
 		return <Loader />;
 	}
+
 	if (isError) {
-		toast.error('Error fetching plan');
+		toast.error('Error loading plan data');
+		return null;
 	}
 
-	const entittlements = planData?.entitlements;
+	if (!planData || !entitlements) {
+		toast.error('No plan data available');
+		return null;
+	}
 
 	return (
 		<div className='page'>
-			{/* create entitlement drawer */}
 			<AddEntitlementDrawer
-				selectedFeatures={entittlements?.map((v) => v.feature) || []}
-				entitlements={entittlements}
-				planId={planData?.id}
+				selectedFeatures={entitlements.map((v) => v.feature)}
+				entitlements={entitlements}
+				planId={planData.id}
 				isOpen={drawerOpen}
 				onOpenChange={(value) => setdrawerOpen(value)}
 			/>
 
-			<div className='w-2/3 mb-10'>
+			<div className='w-2/3 mb-10 space-y-4'>
 				{/* <div className='w-full !my-5 flex justify-between items-center'>
 					<FormHeader title={planData?.name} variant='form-title' />
 					{planData?.status === 'published' && (
@@ -197,8 +224,6 @@ const PlanViewPage = () => {
 					]}
 				/>
 
-				<Spacer className='!my-4' />
-
 				<DetailsCard
 					title='Billing Preferences'
 					data={[
@@ -209,13 +234,13 @@ const PlanViewPage = () => {
 
 				{/* plan charges table */}
 				{(planData?.prices?.length ?? 0) > 0 && (
-					<div className='card mt-4'>
+					<div className='card '>
 						<FormHeader title='Charges' variant='sub-header' titleClassName='font-semibold' />
 						<FlexpriceTable columns={chargeColumns} data={planData?.prices ?? []} />
 					</div>
 				)}
 
-				<div className='card mt-4'>
+				<div className='card '>
 					<SectionHeader
 						showSearch
 						showFilter
@@ -226,10 +251,8 @@ const PlanViewPage = () => {
 						onButtonClick={() => setdrawerOpen(true)}
 						buttonText='Add Feature'
 					/>
-					<FeatureTable showEmptyRow emptyRowMessage='No entitlements found' data={entittlements?.map((v) => v.feature) || []} />
-					{(entittlements?.length || 0) === 0 && (
-						<p className=' text-[#64748B] text-xs font-normal font-sans mt-4'>No Entitlements added</p>
-					)}
+					<FlexpriceTable showEmptyRow data={entitlements || []} columns={columnData} />
+					{(entitlements?.length || 0) === 0 && <p className=' text-[#64748B] text-xs font-normal font-sans mt-4'>No Entitlements added</p>}
 				</div>
 			</div>
 		</div>

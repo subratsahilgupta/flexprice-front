@@ -35,6 +35,7 @@ const CustomerTable: FC<Props> = ({ data, onEdit }) => {
 		{
 			title: '',
 			redirect: false,
+			width: '30px',
 			render: (row) => (
 				<ActionButton
 					isArchiveDisabled={row.status === 'archived'}
