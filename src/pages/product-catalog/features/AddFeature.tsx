@@ -94,9 +94,9 @@ const AddFeaturePage = () => {
 			return await FeatureApi.createFeature(data);
 		},
 		onSuccess: async () => {
-			toast.success('Feature created successfully');
 			await refetchQueries(['fetchFeatures']);
 			navigate(RouteNames.features);
+			toast.success('Feature created successfully');
 		},
 		onError: (error) => {
 			toast.error('An error occurred. Please try again later.');

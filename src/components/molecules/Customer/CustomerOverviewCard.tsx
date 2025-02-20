@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import CreateCustomerDrawer from './CreateCustomerDrawer';
 import { Pencil } from 'lucide-react';
 import { Country } from 'country-state-city';
+import { DetailsCard } from '../DetailsCard';
 
 const fetchCustomer = async (customerId: string) => {
 	return await CustomerApi.getCustomerById(customerId);
@@ -87,19 +88,7 @@ const CustomerOverviewCard: React.FC<CustomerCardProps> = ({ customerId }) => {
 			{billingDetails.filter((detail) => detail.value !== '--').length > 0 && (
 				<div>
 					<Spacer className='!h-4' />
-					<div className='card bg-white'>
-						<FormHeader title='Billing Details' variant='sub-header' />
-						<div className='flex items-center space-x-4'>
-							<div className='w-full space-y-4'>
-								{billingDetails.map((detail, index) => (
-									<div key={index} className='grid grid-cols-2 gap-4'>
-										<div className='text-sm font-light text-gray-600'>{detail.label}</div>
-										<div className='text-sm font-normal text-gray-800 text-right'>{detail.value || '--'}</div>
-									</div>
-								))}
-							</div>
-						</div>
-					</div>
+					<DetailsCard title='Billing Details' data={billingDetails} />
 				</div>
 			)}
 		</div>

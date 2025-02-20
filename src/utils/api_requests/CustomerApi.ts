@@ -1,5 +1,6 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import Customer from '@/models/Customer';
+import { PaginationType } from '@/models/Pagination';
 import { Subscription } from '@/models/Subscription';
 
 interface GetCustomerResponse {

@@ -1,6 +1,7 @@
 import { Chip, FormHeader, Spacer } from '@/components/atoms';
 import { InvoiceLineItemTable } from '@/components/molecules';
 import { Skeleton } from '@/components/ui/skeleton';
+import { RouteNames } from '@/core/routes/Routes';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
 import SubscriptionApi from '@/utils/api_requests/SubscriptionApi';
@@ -41,12 +42,12 @@ const SubscriptionDetails: FC = () => {
 			updateBreadcrumb(4, subscriptionDetails.plan.name);
 		}
 
-		updateBreadcrumb(3, 'Subscription');
+		updateBreadcrumb(3, 'Subscription', RouteNames.customers + '/' + customerId);
 
 		if (customer?.external_id) {
 			updateBreadcrumb(2, customer.external_id);
 		}
-	}, [subscriptionDetails, updateBreadcrumb, customer]);
+	}, [subscriptionDetails, updateBreadcrumb, customer, customerId]);
 
 	if (isLoading || isSubscriptionDetailsLoading) {
 		return (

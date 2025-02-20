@@ -1,6 +1,7 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import { Invoice } from '@/models/Invoice';
 import { generateQueryParams } from '../common/api_helper';
+import { PaginationType } from '@/models/Pagination';
 
 interface GetInvoicesResponse {
 	items: Invoice[];

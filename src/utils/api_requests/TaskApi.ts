@@ -1,6 +1,7 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import { ImportTask } from '@/models/ImportTask';
 import { generateQueryParams } from '../common/api_helper';
+import { PaginationType } from '@/models/Pagination';
 
 interface AddTaskPayload {
 	entity_type: string;

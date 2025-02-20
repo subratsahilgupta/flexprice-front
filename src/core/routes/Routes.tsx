@@ -27,7 +27,7 @@ import FeaturesPage from '@/pages/product-catalog/features/Features';
 import ImportExport from '@/pages/customer/import-export/ImportExport';
 import Integrations from '@/pages/insights-tools/integrations/Integrations';
 import IntegrationDetails from '@/pages/insights-tools/integrations/IntegrationDetails';
-import CustomerSubscriptionPage from '@/pages/customer/customers/CustomerSubscriptionPage';
+import FeatureDetails from '@/pages/product-catalog/features/FeatureDetails';
 
 export const RouteNames = {
 	home: '/',
@@ -38,16 +38,13 @@ export const RouteNames = {
 	billableMetric: '/usage-tracking/meter',
 	addMeter: '/usage-tracking/meter/add-meter',
 	editMeter: '/usage-tracking/meter/edit-meter',
-	eventsPage: '/usage-tracking/events',
+	events: '/usage-tracking/events',
 	queryPage: '/usage-tracking/query',
 
 	// customer management routes
 	customerManagement: '/customer-management',
 	customers: '/customer-management/customers',
 	invoices: '/customer-management/invoices',
-	invoiceDetail: '/customer-management/invoices/:invoiceId',
-
-	// import export routes
 
 	// product catalog routes
 	productCatalog: '/product-catalog',
@@ -57,13 +54,18 @@ export const RouteNames = {
 
 	features: '/product-catalog/features',
 	createFeature: '/product-catalog/features/create-feature',
+	featureDetails: '/product-catalog/features',
+
+	// add on routes
+	addOn: '/product-catalog/add-on',
 
 	// insights and tools
 	insights: '/insights-&-tools',
 	integrations: '/insights-&-tools/integrations',
-	integrationDetails: '/insights-&-tools/integrations/:id',
+	integrationDetails: '/insights-&-tools/integrations',
 	importExport: '/insights-&-tools/bulk-imports',
 };
+
 export const MainRouter = createBrowserRouter([
 	{
 		path: RouteNames.login,
@@ -97,7 +99,7 @@ export const MainRouter = createBrowserRouter([
 						element: <EditMeterPage />,
 					},
 					{
-						path: RouteNames.eventsPage,
+						path: RouteNames.events,
 						element: <EventsPage />,
 					},
 					{
@@ -110,21 +112,13 @@ export const MainRouter = createBrowserRouter([
 				path: RouteNames.customerManagement,
 				children: [
 					{
-						path: `${RouteNames.customers}`,
+						path: RouteNames.customers,
 						element: <CustomerPage />,
 					},
 					{
 						path: `${RouteNames.customers}/:id/add-subscription`,
 						element: <CustomerSubscription />,
 					},
-					{
-						path: `${RouteNames.customers}/:id/subscription`,
-						element: <CustomerSubscriptionPage />,
-					},
-					// {
-					// 	path: `${RouteNames.customers}/:id/subscription/:subscription_id`,
-					// 	element: <CustomerSubscription />,
-					// },
 					{
 						path: `${RouteNames.customers}/:id`,
 						element: <CustomerDetails />,
@@ -166,11 +160,11 @@ export const MainRouter = createBrowserRouter([
 						],
 					},
 					{
-						path: `${RouteNames.invoices}`,
+						path: RouteNames.invoices,
 						element: <InvoicePage />,
 					},
 					{
-						path: `${RouteNames.invoiceDetail}`,
+						path: `${RouteNames.invoices}/:invoiceId`,
 						element: <InvoiceDetailsPage />,
 					},
 				],
@@ -202,6 +196,10 @@ export const MainRouter = createBrowserRouter([
 						path: RouteNames.createFeature,
 						element: <AddFeaturePage />,
 					},
+					{
+						path: `${RouteNames.featureDetails}/:id`,
+						element: <FeatureDetails />,
+					},
 				],
 			},
 			{
@@ -212,11 +210,11 @@ export const MainRouter = createBrowserRouter([
 						element: <Integrations />,
 					},
 					{
-						path: RouteNames.integrationDetails,
+						path: `${RouteNames.integrationDetails}/:id`,
 						element: <IntegrationDetails />,
 					},
 					{
-						path: `${RouteNames.importExport}`,
+						path: RouteNames.importExport,
 						element: <ImportExport />,
 					},
 				],

@@ -27,8 +27,11 @@ export type { DropdownMenuOption } from './DropdownMenu';
 export { CreateCustomerDrawer, CustomerCard, CustomerTable, CustomerInvoiceTable } from './Customer';
 
 export { default as InvoiceLineItemTable } from './InvoiceLineItemTable';
+
 export { default as EventsTable } from './Events';
+
 export { default as InfiniteScroll } from './InfiniteScroll';
+
 export { default as InvoiceTable } from './InvoiceTable';
 
 export { default as InvoiceCreditLineItemTable } from './InvoiceCreditLineItemTable';
@@ -42,4 +45,7 @@ export { default as AddEntitlementDrawer } from './AddEntitlementDrawer';
 export { default as ImportFileDrawer } from './ImportFileDrawer';
 
 export { default as PremiumFeature } from './PremiumFeature';
+
 export { PremiumFeatureTag } from './PremiumFeature';
+
+export { DetailsCard, type Detail } from './DetailsCard';

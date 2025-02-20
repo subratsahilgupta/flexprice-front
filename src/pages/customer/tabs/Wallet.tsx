@@ -13,7 +13,7 @@ import CreateWallet from '../customers/CreateWallet';
 import { CircleFadingPlus, EllipsisVertical, Pencil, SlidersHorizontal, Trash2, Wallet as WalletIcon } from 'lucide-react';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import useQueryParams from '@/hooks/useQueryParams';
-
+import { DetailsCard } from '@/components/molecules';
 const formatWalletStatus = (status?: string) => {
 	switch (status) {
 		case 'active':
@@ -184,26 +184,23 @@ const WalletTab = () => {
 			{/* when we have wallets or active wallets */}
 			{activeWallet && !isAdd && (
 				<div>
-					{/* wallet info */}
-					<div className='rounded-xl border border-gray-300 p-6'>
-						<FormHeader title='Wallet Details' variant='sub-header' titleClassName='font-semibold' />
-						<div className='w-full flex justify-between items-center'>
-							<p className='text-[#71717A] text-sm'>Wallet Name</p>
-							<p className='text-[#09090B] text-sm'>{activeWallet?.name || 'Prepaid wallet'}</p>
-						</div>
-						<Spacer className='!my-4' />
-						<div className='w-full flex justify-between items-center'>
-							<p className='text-[#71717A] text-sm'>Status</p>
-							<p className='text-[#09090B] text-sm'>
-								<Chip
-									activeTextColor='#377E6A'
-									activeBgColor='#ECFBE4'
-									isActive={formatWalletStatus(activeWallet?.wallet_status) === 'Active'}
-									label={formatWalletStatus(activeWallet?.wallet_status)}
-								/>
-							</p>
-						</div>
-					</div>
+					<DetailsCard
+						title='Wallet Details'
+						data={[
+							{ label: 'Wallet Name', value: activeWallet?.name || 'Prepaid wallet' },
+							{
+								label: 'Status',
+								value: (
+									<Chip
+										activeTextColor='#377E6A'
+										activeBgColor='#ECFBE4'
+										isActive={formatWalletStatus(activeWallet?.wallet_status) === 'Active'}
+										label={formatWalletStatus(activeWallet?.wallet_status)}
+									/>
+								),
+							},
+						]}
+					/>
 					<Spacer className='!h-4' />
 
 					{/* wallet moneyy */}
