@@ -85,14 +85,12 @@ const FeatureDetails = () => {
 
 	const columns: ColumnData<ExtendedEntitlement>[] = [
 		{
-			fieldName: 'id',
 			title: 'Plan',
 			render: (rowData: ExtendedEntitlement) => {
 				return <span className='text-gray-800'>{rowData?.plan?.name}</span>;
 			},
 		},
 		{
-			fieldName: 'id',
 			title: 'Status',
 			align: 'center',
 			render: (rowData: ExtendedEntitlement) => {
@@ -101,7 +99,6 @@ const FeatureDetails = () => {
 			},
 		},
 		{
-			fieldName: 'id',
 			title: 'Value',
 			align: 'right',
 			render: (rowData: ExtendedEntitlement) => {

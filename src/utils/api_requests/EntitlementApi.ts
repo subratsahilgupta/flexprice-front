@@ -40,6 +40,10 @@ class EntitlementApi {
 	public static async getEntitlementById(id: string) {
 		return await AxiosClient.get<Entitlement>(`${this.baseUrl}/${id}`);
 	}
+
+	public static async deleteEntitlementById(id: string) {
+		return await AxiosClient.delete<void>(`${this.baseUrl}/${id}`);
+	}
 }
 
 export default EntitlementApi;

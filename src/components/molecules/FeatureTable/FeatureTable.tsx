@@ -15,7 +15,7 @@ interface Props {
 	emptyRowMessage?: string;
 }
 
-const getFeatureTypeChips = (type: string) => {
+export const getFeatureTypeChips = (type: string) => {
 	switch (type.toLocaleLowerCase()) {
 		case 'static':
 			return <Chip isActive={false} label={toSentenceCase(type)} />;
@@ -40,7 +40,6 @@ const FeatureTable: FC<Props> = ({ data, emptyRowMessage, showEmptyRow }) => {
 			},
 		},
 		{
-			fieldName: 'type',
 			title: 'Type',
 			align: 'center',
 			render(row) {
@@ -48,7 +47,6 @@ const FeatureTable: FC<Props> = ({ data, emptyRowMessage, showEmptyRow }) => {
 			},
 		},
 		{
-			fieldName: 'meter_id',
 			title: 'Linked Billable Metric ',
 			onCLick(row) {
 				if (row.meter_id) {
@@ -60,7 +58,6 @@ const FeatureTable: FC<Props> = ({ data, emptyRowMessage, showEmptyRow }) => {
 			},
 		},
 		{
-			fieldName: 'status',
 			title: 'Status',
 			align: 'center',
 			render: (row) => {
@@ -69,21 +66,18 @@ const FeatureTable: FC<Props> = ({ data, emptyRowMessage, showEmptyRow }) => {
 			},
 		},
 		{
-			fieldName: 'description',
 			title: 'Mapped with plan',
 			render: () => {
 				return '--';
 			},
 		},
 		{
-			fieldName: 'updated_at',
 			title: 'Updated At',
 			render: (row) => {
 				return formatDate(row?.updated_at);
 			},
 		},
 		{
-			fieldName: 'id',
 			title: '',
 			render(row) {
 				return (

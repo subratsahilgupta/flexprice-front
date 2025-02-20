@@ -56,47 +56,39 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 		},
 		{
 			title: 'Amount',
-			fieldName: 'invoice_number',
 			render: (row) => <span>{`${getCurrencySymbol(row.currency)}${row.amount_due}`}</span>,
 		},
 		{
 			title: 'Invoice Status',
-			fieldName: '',
 			align: 'center',
 			render: (row: Invoice) => getStatusChip(row.invoice_status),
 		},
 		{
 			title: 'Customer Slug',
-			fieldName: 'customer_id',
 			render: (row: Invoice) => <span>{row.customer?.external_id}</span>,
 		},
 		{
 			title: 'Billing Interval',
-			fieldName: '',
 			align: 'center',
 			render: (row: Invoice) => <span>{toSentenceCase(row.billing_period || '')}</span>,
 		},
 		{
 			title: 'Payment Status',
-			fieldName: '',
 			align: 'center',
 			render: (row: Invoice) => getPaymentStatusChip(row.payment_status),
 		},
 		{
 			title: 'Overdue',
-			fieldName: '',
 			align: 'center',
 			render: (row: Invoice) => <span>{formatDateShort(row.due_date)}</span>,
 		},
 		{
 			title: 'Issue Date',
-			fieldName: '',
 			align: 'center',
 			render: (row: Invoice) => <span>{formatDateShort(row.created_at)}</span>,
 		},
 		{
 			title: '',
-			fieldName: '',
 			redirect: false,
 			render: (row: Invoice) => {
 				const menuOptions: DropdownMenuOption[] = [

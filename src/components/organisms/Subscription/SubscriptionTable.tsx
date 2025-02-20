@@ -29,12 +29,10 @@ const SubscriptionTable: FC<SubscriptionTableProps> = ({ data, onRowClick, redir
 			title: 'Plan Name',
 		},
 		{
-			fieldName: 'billing_period',
 			title: 'Billing Period',
 			render: (row) => <span>{toSentenceCase(row.billing_period)}</span>,
 		},
 		{
-			fieldName: 'status',
 			title: 'Status',
 			align: 'center',
 			render: (row) => {
@@ -43,7 +41,6 @@ const SubscriptionTable: FC<SubscriptionTableProps> = ({ data, onRowClick, redir
 			},
 		},
 		{
-			fieldName: 'start_date',
 			title: 'Start Date',
 			render: (row) => <span>{formatDate(row.start_date)}</span>,
 		},

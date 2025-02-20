@@ -28,6 +28,7 @@ import ImportExport from '@/pages/customer/import-export/ImportExport';
 import Integrations from '@/pages/insights-tools/integrations/Integrations';
 import IntegrationDetails from '@/pages/insights-tools/integrations/IntegrationDetails';
 import FeatureDetails from '@/pages/product-catalog/features/FeatureDetails';
+import AddOn from '@/pages/product-catalog/addons/AddOn';
 
 export const RouteNames = {
 	home: '/',
@@ -199,6 +200,10 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: `${RouteNames.featureDetails}/:id`,
 						element: <FeatureDetails />,
+					},
+					{
+						path: RouteNames.addOn,
+						element: <AddOn />,
 					},
 				],
 			},

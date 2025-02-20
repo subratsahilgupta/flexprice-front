@@ -19,7 +19,6 @@ const PlansTable: FC<PlansTableProps> = ({ data }) => {
 	const columns: ColumnData[] = [
 		{ fieldName: 'name', title: 'Name', width: '700px' },
 		{
-			fieldName: 'status',
 			title: 'Status',
 			align: 'center',
 			render: (row) => {
@@ -28,14 +27,12 @@ const PlansTable: FC<PlansTableProps> = ({ data }) => {
 			},
 		},
 		{
-			fieldName: 'updated_at',
 			title: 'Updated at',
 			render: (row) => {
 				return <span className='text-[#09090B]'>{formatDate(row.updated_at)}</span>;
 			},
 		},
 		{
-			fieldName: 'actions',
 			title: '',
 			redirect: false,
 			render: (row) => (

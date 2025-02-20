@@ -25,6 +25,7 @@ interface ValidationErrors {
 	usage_reset_period?: string;
 	is_enabled?: string;
 	general?: string;
+	feature?: string;
 }
 
 const AddEntitlementDrawer: FC<Props> = ({
@@ -41,8 +42,40 @@ const AddEntitlementDrawer: FC<Props> = ({
 	const [activeFeature, setActiveFeature] = useState<Feature | null>(null);
 	const [tempEntitlement, setEntitlement] = useState<Partial<Entitlement>>({});
 
+	// Reset all states when drawer closes
+	const resetState = () => {
+		setEntitlements([]);
+		setErrors({});
+		setSelectedFeatures(disabledFeatures ?? []);
+		setShowSelect(true);
+		setActiveFeature(null);
+		setEntitlement({});
+	};
+
+	// Handle drawer close
+	const handleDrawerClose = (value: boolean) => {
+		if (!value) {
+			resetState();
+		}
+		onOpenChange(value);
+	};
+
+	// Reset states when drawer opens/closes
+	useEffect(() => {
+		if (isOpen) {
+			setSelectedFeatures(disabledFeatures ?? []);
+		} else {
+			resetState();
+		}
+	}, [isOpen, disabledFeatures]);
+
 	const validateMeteredFeature = (): ValidationErrors => {
 		const newErrors: ValidationErrors = {};
+
+		if (!activeFeature?.meter_id) {
+			newErrors.feature = 'Feature must have an associated meter';
+			return newErrors;
+		}
 
 		if (tempEntitlement.usage_limit === undefined && tempEntitlement.usage_limit !== null) {
 			newErrors.usage_limit = 'Usage limit is required';
@@ -65,6 +98,8 @@ const AddEntitlementDrawer: FC<Props> = ({
 			newErrors.static_value = 'Value is required';
 		} else if (typeof staticValue === 'number' && staticValue < 0) {
 			newErrors.static_value = 'Value cannot be negative';
+		} else if (typeof staticValue === 'string' && !staticValue.trim()) {
+			newErrors.static_value = 'Value cannot be empty';
 		}
 
 		return newErrors;
@@ -72,16 +107,15 @@ const AddEntitlementDrawer: FC<Props> = ({
 
 	// const validateBooleanFeature = (): ValidationErrors => {
 	// 	const newErrors: ValidationErrors = {};
-
-	// 	if (tempEntitlement.is_enabled === undefined) {
-	// 		newErrors.is_enabled = 'Please select a value';
-	// 	}
-
+	// 	// Boolean features are always enabled by default
 	// 	return newErrors;
 	// };
 
 	const validateEntitlement = (): boolean => {
-		if (!activeFeature) return false;
+		if (!activeFeature) {
+			setErrors({ feature: 'Please select a feature' });
+			return false;
+		}
 
 		let validationErrors: ValidationErrors = {};
 
@@ -93,8 +127,11 @@ const AddEntitlementDrawer: FC<Props> = ({
 				validationErrors = validateStaticFeature();
 				break;
 			case FeatureType.boolean:
+				// TODO: Add validation for boolean features if needed
 				// validationErrors = validateBooleanFeature();
 				break;
+			default:
+				validationErrors = { feature: 'Invalid feature type' };
 		}
 
 		setErrors(validationErrors);
@@ -104,17 +141,21 @@ const AddEntitlementDrawer: FC<Props> = ({
 	const { mutate: addEntitleMents, isPending } = useMutation({
 		mutationKey: ['addEntitlement', tempEntitlement],
 		mutationFn: async () => {
-			return await PlanApi.updatePlan(planId!, {
+			if (!planId) {
+				throw new Error('Plan ID is required');
+			}
+			return await PlanApi.updatePlan(planId, {
 				entitlements: [...(initialEntitlements ?? []), ...entitlements] as Entitlement[],
 			});
 		},
 		onSuccess: () => {
 			toast.success('Entitlements added successfully');
-			onOpenChange(false);
+			handleDrawerClose(false);
 			refetchQueries(['fetchPlan', planId]);
+			refetchQueries(['fetchEntitlements', planId]);
 		},
 		onError: (error) => {
-			console.error(error);
+			console.error('Error adding entitlements:', error);
 			toast.error('Error adding entitlements');
 			setErrors({ general: 'Failed to add entitlements. Please try again.' });
 		},
@@ -150,7 +191,6 @@ const AddEntitlementDrawer: FC<Props> = ({
 		setEntitlement({});
 		setActiveFeature(null);
 		setErrors({});
-		setShowSelect(true);
 	}
 
 	// Clear errors when feature changes
@@ -158,11 +198,22 @@ const AddEntitlementDrawer: FC<Props> = ({
 		setErrors({});
 	}, [activeFeature]);
 
+	const handleCancel = () => {
+		setShowSelect(true);
+		setActiveFeature(null);
+		setErrors({});
+		// Remove the feature from selectedFeatures if it was added but not saved
+		if (activeFeature) {
+			setSelectedFeatures(selectedFeatures.filter((feature) => feature.id !== activeFeature.id));
+		}
+		setEntitlement({});
+	};
+
 	return (
 		<div>
 			<Sheet
 				isOpen={isOpen}
-				onOpenChange={onOpenChange}
+				onOpenChange={handleDrawerClose}
 				title={'Add Entitlement'}
 				description={"Make changes to your profile here. Click save when you're done."}>
 				<div className='space-y-4 mt-6'>
@@ -277,7 +328,6 @@ const AddEntitlementDrawer: FC<Props> = ({
 										error={errors.static_value}
 										label='Value'
 										value={tempEntitlement.static_value === undefined ? '' : tempEntitlement.static_value.toString()}
-										type='number'
 										placeholder='Enter value'
 										onChange={(value) => {
 											setEntitlement({
@@ -308,13 +358,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 							)} */}
 
 							<div className='w-full mt-6 flex justify-end gap-2'>
-								<Button
-									onClick={() => {
-										setShowSelect(true);
-										setActiveFeature(null);
-										setErrors({});
-									}}
-									variant={'outline'}>
+								<Button onClick={handleCancel} variant={'outline'}>
 									Cancel
 								</Button>
 								<Button onClick={handleAdd}>Add</Button>
@@ -324,17 +368,17 @@ const AddEntitlementDrawer: FC<Props> = ({
 				</div>
 
 				<div className='!space-y-4 mt-4'>
-					{showSelect && (
+					{!showSelect && !activeFeature && (
 						<button
 							onClick={() => {
 								setShowSelect(true);
 							}}
 							className='p-4 h-9 cursor-pointer flex gap-2 items-center bg-[#F4F4F5] rounded-md'>
 							<ReactSVG src='/assets/svg/CirclePlus.svg' />
-							<p className='text-[#18181B] text-sm font-medium'>{'Add another feature '}</p>
+							<p className='text-[#18181B] text-sm font-medium'>{'Add another feature'}</p>
 						</button>
 					)}
-					<Button onClick={handleSubmit} disabled={isPending}>
+					<Button loading={isPending} onClick={handleSubmit} disabled={isPending}>
 						Save
 					</Button>
 				</div>

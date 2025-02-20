@@ -23,14 +23,12 @@ const mapStatusChips = (status: string) => {
 
 const columns: ColumnData<ImportTask>[] = [
 	{
-		fieldName: 'file_name',
 		title: 'File Name',
 		render(rowData) {
 			return <div>{rowData.file_name || '--'}</div>;
 		},
 	},
 	{
-		fieldName: 'task_type',
 		title: 'Import Type',
 		render(rowData) {
 			return <div>{toSentenceCase(rowData.task_type)}</div>;
@@ -38,7 +36,6 @@ const columns: ColumnData<ImportTask>[] = [
 		align: 'center',
 	},
 	{
-		fieldName: 'status',
 		title: 'Status',
 		align: 'center',
 		render(rowData) {
@@ -53,17 +50,14 @@ const columns: ColumnData<ImportTask>[] = [
 		},
 	},
 	{
-		fieldName: 'started_at',
 		title: 'Started At',
 		render: (rowData) => formatDate(rowData.started_at),
 	},
 	{
-		fieldName: 'updated_at',
 		title: 'Updated At',
 		render: (rowData) => formatDate(rowData.updated_at),
 	},
 	{
-		fieldName: 'id',
 		title: '',
 		width: '40px',
 		render: () => <DropdownMenu options={[]}></DropdownMenu>,
