@@ -3,7 +3,7 @@ import { Meter } from '@/models/Meter';
 import { MeterApi } from '@/utils/api_requests/MeterApi';
 import { useMutation } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
+
 const AddMeterPage = () => {
 	const { mutate: createMeter } = useMutation({
 		mutationKey: ['addMeter'],
@@ -14,7 +14,7 @@ const AddMeterPage = () => {
 
 		onSuccess: async () => {
 			toast.success('Meter created successfully');
-			await refetchQueries(['fetchMeters']);
+			// await refetchQueries(['fetchMeters']);
 		},
 		onError: () => {
 			toast.error('Error creating meter');

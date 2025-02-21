@@ -142,6 +142,15 @@ const EventsPage: React.FC = () => {
 						value={queryData?.eventName ?? ''}
 						onChange={(e) => setQueryData((prev) => ({ ...prev, eventName: e === '' ? undefined : e }))}
 					/>
+					<Input
+						label='Event ID'
+						suffix={<Search className='size-4' />}
+						placeholder='Enter Event Id'
+						className='h-9'
+						labelClassName='text-muted-foreground font-normal'
+						value={queryData?.eventId ?? ''}
+						onChange={(e) => setQueryData((prev) => ({ ...prev, eventId: e === '' ? undefined : e }))}
+					/>
 					<Button
 						variant='outline'
 						onClick={() => {

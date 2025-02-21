@@ -1,6 +1,7 @@
 import { Button, SectionHeader, Spacer, Spinner } from '@/components/atoms';
 import { CreateCustomerDrawer, Pagination } from '@/components/molecules';
 import CustomerTable from '@/components/molecules/Customer/CustomerTable';
+import EmptyPage from '@/components/organisms/EmptyPage/EmptyPage';
 import usePagination from '@/hooks/usePagination';
 import Customer from '@/models/Customer';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
@@ -42,6 +43,31 @@ const CustomerPage = () => {
 	if (isError) {
 		toast.error('Error fetching customers');
 		return null;
+	}
+
+	if (customerData?.items?.length === 0) {
+		return (
+			<>
+				<EmptyPage title='No customers added yet' description='Add a customer to get started'>
+					<CreateCustomerDrawer
+						trigger={
+							<Button
+								onClick={() => {
+									setactiveCustomer(undefined);
+									console.log('clicked');
+								}}
+								className='flex gap-2 bg-[#0F172A]'>
+								<FiFolderPlus />
+								<span>Add Customer</span>
+							</Button>
+						}
+						open={customerDrawerOpen}
+						onOpenChange={setcustomerDrawerOpen}
+						data={activeCustomer}
+					/>
+				</EmptyPage>
+			</>
+		);
 	}
 
 	return (

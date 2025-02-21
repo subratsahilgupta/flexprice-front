@@ -65,6 +65,7 @@ const BillingPrefferencesSection = () => {
 							}
 							setPlanField('trial_period', Number(value));
 						}}
+						suffix='days'
 						placeholder='Enter no. of days in trial period'
 					/>
 				</div>
