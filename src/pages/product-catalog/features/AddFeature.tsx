@@ -374,52 +374,13 @@ const AddFeaturePage = () => {
 									<p className='font-normal font-inter text-sm text-zinc-500 '>{featureTypeOptions[2].description}</p>
 								</div>
 							</div>
-							<div>
-								<Spacer height={'16px'} />
-								<div className=''></div>
-								<Spacer height={'16px'} />
-								<Toggle
-									label='Define Units'
-									checked={state.defineUnits}
-									onChange={(e) => {
-										setstate((prev) => ({ ...prev, defineUnits: e }));
-									}}
-								/>
-								{state.defineUnits && (
-									<>
-										<Spacer height={'16px'} />
-										<div className='h-[1px] bg-zinc-200 '></div>
-										<Spacer height={'16px'} />
-										<FormHeader variant='form-component-title' title='Unit Name' />
-										<div className='gap-4 grid grid-cols-2'>
-											<Input
-												placeholder='singluar'
-												value={data.unit_singular}
-												onChange={(e) => {
-													setdata((prev) => ({ ...prev, unit_singular: e }));
-												}}
-											/>
-											<Input
-												placeholder='plural'
-												value={data.unit_plural}
-												onChange={(e) => {
-													setdata((prev) => ({ ...prev, unit_plural: e }));
-												}}
-											/>
-										</div>
-										<p className='text-muted-foreground text-sm'>
-											If the unit name changes when the value is plural, please provide the names of the units
-										</p>
-									</>
-								)}
-							</div>
 						</div>
 					)}
 				</div>
 
 				<Spacer height={'26px'} />
-				<Button disabled={isPending} onClick={handleSubmit}>
-					Save Feature
+				<Button isLoading={isPending} disabled={isPending} onClick={handleSubmit}>
+					{isPending ? 'Saving...' : 'Save Feature'}
 				</Button>
 			</div>
 		</div>

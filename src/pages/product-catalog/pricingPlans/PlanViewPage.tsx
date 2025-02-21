@@ -125,7 +125,7 @@ const PlanViewPage = () => {
 		{
 			title: 'Feature Name',
 			onCLick(row) {
-				navigate(RouteNames.featureDetails + `/${row?.id}`);
+				navigate(RouteNames.featureDetails + `/${row?.feature?.id}`);
 			},
 			render(row) {
 				return row?.feature?.name;
@@ -144,7 +144,6 @@ const PlanViewPage = () => {
 				return getFeatureTypeChips(row?.feature_type || '');
 			},
 		},
-
 		{
 			title: 'Value',
 			align: 'center',

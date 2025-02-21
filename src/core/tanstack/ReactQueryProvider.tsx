@@ -11,6 +11,7 @@ export const queryClient = new QueryClient({
 			refetchOnReconnect: false,
 			refetchInterval: false,
 			refetchIntervalInBackground: false,
+			gcTime: 0,
 		},
 	},
 });

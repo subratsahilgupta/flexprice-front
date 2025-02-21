@@ -9,11 +9,11 @@ import { formatBillingPeriod, getCurrencySymbol, toSentenceCase } from '@/utils/
 import { currencyOptions } from '@/core/data/constants';
 import VolumeTieredPricingForm from './VolumeTieredPricingForm';
 
-const formatAmountWithCommas = (amount: string): string => {
+export const formatAmountWithCommas = (amount: string): string => {
 	return amount.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 };
 
-const removeCommasFromAmount = (amount: string): string => {
+export const removeCommasFromAmount = (amount: string): string => {
 	return amount.replace(/,/g, '');
 };
 
@@ -256,12 +256,15 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 			{billingModel === billingModels[0].value && (
 				<div className='space-y-2'>
 					<Input
+						placeholder='0'
 						type='number'
 						error={inputErrors.flatModelError}
 						label='Price'
-						value={flatFee}
+						value={formatAmountWithCommas(flatFee)}
 						inputPrefix={getCurrencySymbol(currency)}
-						onChange={(e) => setflatFee(e)}
+						onChange={(e) => {
+							setflatFee(removeCommasFromAmount(e));
+						}}
 						suffix={<span className='text-[#64748B]'>{`/ unit / ${formatBillingPeriod(billingPeriod)}`}</span>}
 					/>
 				</div>
@@ -273,6 +276,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 						<Input
 							type='number'
 							label='Price'
+							placeholder='0'
 							value={packagedFee.price}
 							inputPrefix={getCurrencySymbol(currency)}
 							onChange={(e) => setpackagedFee({ ...packagedFee, price: e })}
@@ -283,6 +287,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 						<Input
 							value={formatAmountWithCommas(packagedFee.unit)}
 							type='text'
+							placeholder='0'
 							onChange={(e) =>
 								setpackagedFee({
 									...packagedFee,

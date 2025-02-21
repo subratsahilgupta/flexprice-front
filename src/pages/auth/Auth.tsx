@@ -53,7 +53,7 @@ const AuthPage: React.FC = () => {
 							onChange={(s) => setpassword(s)}
 						/>
 					</div>
-					<Button onClick={() => handleLogin()} className='w-full !mt-4' loading={loading}>
+					<Button onClick={() => handleLogin()} className='w-full !mt-4' isLoading={loading}>
 						Login with email
 					</Button>
 				</form>

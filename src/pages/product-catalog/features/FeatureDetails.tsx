@@ -143,15 +143,11 @@ const FeatureDetails = () => {
 	];
 
 	const additionalDetails: Detail[] = [
-		...(data?.type === 'metered'
-			? [
-					{ label: 'Linked Billable Metric', value: data?.meter?.name },
-					{
-						variant: 'divider' as const,
-						className: 'w-full',
-					},
-				]
-			: []),
+		{ label: 'Linked Billable Metric', value: data?.meter?.name },
+		{
+			variant: 'divider' as const,
+			className: 'w-full',
+		},
 		{
 			variant: 'heading',
 			label: 'Unit Name',
@@ -179,8 +175,7 @@ const FeatureDetails = () => {
 			<div className='space-y-4'>
 				<DetailsCard title='Feature Details' data={featureBasicInfo} />
 
-				<DetailsCard title='Additional Details' data={additionalDetails} />
-
+				{data?.type === FeatureType.metered && <DetailsCard title='Additional Details' data={additionalDetails} />}
 				<div className='card'>
 					<FormHeader variant='sub-header' title='Linked Plans' />
 					<FlexpriceTable showEmptyRow columns={columns} data={linkedEntitlements?.items ?? []} />

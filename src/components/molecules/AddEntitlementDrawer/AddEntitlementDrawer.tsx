@@ -378,7 +378,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 							<p className='text-[#18181B] text-sm font-medium'>{'Add another feature'}</p>
 						</button>
 					)}
-					<Button loading={isPending} onClick={handleSubmit} disabled={isPending}>
+					<Button isLoading={isPending} onClick={handleSubmit} disabled={isPending}>
 						Save
 					</Button>
 				</div>
