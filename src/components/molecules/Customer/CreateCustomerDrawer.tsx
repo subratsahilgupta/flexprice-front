@@ -139,11 +139,11 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 				const updatedData = {
 					email: formData.email || undefined,
 					name: formData.name || undefined,
-					address_city: formData.address_city,
-					address_country: formData.address_country || undefined,
+					address_city: formData.address_city || '',
+					address_country: formData.address_country || '',
 					address_line1: formData.address_line1 || undefined,
 					address_line2: formData.address_line2 || undefined,
-					address_state: activeState?.name || undefined,
+					address_state: activeState?.name || '',
 					phone: formData.phone || undefined,
 					timezone: formData.timezone || undefined,
 				};
@@ -197,6 +197,8 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 			createCustomer();
 		}
 	};
+
+	const isCtaDisabled = !formData.name || !formData.external_id;
 
 	return (
 		<div>
@@ -254,14 +256,14 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 									value={formData.address_country}
 									noOptionsText='No countries Available'
 									onChange={(e) => {
-										setFormData({
-											...formData,
+										setFormData((prev) => ({
+											...prev,
+											address_country: e,
 											timezone: undefined,
-											address_city: undefined,
-											address_state: undefined,
-										});
+											address_city: '',
+											address_state: '',
+										}));
 										setactiveState(undefined);
-										handleChange('address_country', e);
 									}}
 								/>
 								<Input
@@ -328,8 +330,8 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 						</div>
 					)}
 
-					<Spacer className='!h-8' />
-					<Button isLoading={isPending} disabled={isPending} className='bg-[#0F172A] text-white' onClick={handleSubmit}>
+					<Spacer className='!h-4' />
+					<Button isLoading={isPending} disabled={isPending || isCtaDisabled} className='bg-[#0F172A] text-white' onClick={handleSubmit}>
 						{isPending ? 'Saving...' : 'Save Customer'}
 					</Button>
 				</div>

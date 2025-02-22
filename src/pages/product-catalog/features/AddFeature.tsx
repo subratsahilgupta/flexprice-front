@@ -121,6 +121,7 @@ const AddFeaturePage = () => {
 		}
 	};
 
+	const isCtaDisabled = !data.name || !data.lookup_key || !data.type;
 	return (
 		<div className='p-6'>
 			<FormHeader
@@ -383,7 +384,7 @@ const AddFeaturePage = () => {
 				</div>
 
 				<Spacer height={'26px'} />
-				<Button isLoading={isPending} disabled={isPending} onClick={handleSubmit}>
+				<Button isLoading={isPending} disabled={isPending || isCtaDisabled} onClick={handleSubmit}>
 					{isPending ? 'Saving...' : 'Save Feature'}
 				</Button>
 			</div>
