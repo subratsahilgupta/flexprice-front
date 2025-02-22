@@ -336,7 +336,6 @@ const AddEntitlementDrawer: FC<Props> = ({
 												static_value: value === '' ? undefined : value,
 											});
 										}}
-										suffix={<span className='text-muted-foreground text-xs font-sans'>{activeFeature.unit_plural || 'units'}</span>}
 									/>
 								</div>
 							)}

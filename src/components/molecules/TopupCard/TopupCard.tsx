@@ -82,11 +82,17 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 
 		if (preFunction) {
 			const id = await preFunction();
-			topupWallet(id!);
+			if (subscriptionType === subscriptionTypeOptions[0].value && freeCredits && freeCredits > 0) {
+				topupWallet(id!);
+			} else {
+				onSuccess?.();
+			}
 		}
 
-		if (walletId && !preFunction) {
+		if (walletId && !preFunction && subscriptionType === subscriptionTypeOptions[0].value && freeCredits && freeCredits > 0) {
 			topupWallet(walletId);
+		} else {
+			onSuccess?.();
 		}
 	};
 	return (

@@ -31,7 +31,11 @@ const RectangleRadiogroup: FC<Props> = ({ onChange, options, value, description,
 							<button
 								onClick={() => {
 									if (!option.disabled) {
-										onChange(option.value);
+										if (option.value === value) {
+											onChange('');
+										} else {
+											onChange(option.value);
+										}
 									}
 								}}
 								className={cn(
