@@ -3,7 +3,7 @@ import { TopupCard } from '@/components/molecules';
 import { currencyOptions } from '@/core/data/constants';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 import WalletApi from '@/utils/api_requests/WalletApi';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { FC, useState } from 'react';
 import toast from 'react-hot-toast';
 
@@ -14,7 +14,6 @@ interface Props {
 }
 
 const CreateWallet: FC<Props> = ({ customerId, onClose = () => {} }) => {
-	const queryClient = useQueryClient();
 	const [walletName, setwalletName] = useState('Prepaid Wallet');
 	const [currency, setcurrency] = useState(currencyOptions[0].value);
 	const [errors, setErrors] = useState({

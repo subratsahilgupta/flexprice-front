@@ -1,4 +1,4 @@
-import { Button, Chip, FormHeader, Loader, Modal, Select, Spacer } from '@/components/atoms';
+import { Button, Chip, FormHeader, Modal, Select, Spacer } from '@/components/atoms';
 import { DropdownMenu, DropdownMenuOption, Pagination, TopupCard, WalletTransactionsTable } from '@/components/molecules';
 import { Skeleton } from '@/components/ui/skeleton';
 import usePagination from '@/hooks/usePagination';
