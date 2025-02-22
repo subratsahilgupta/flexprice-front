@@ -29,14 +29,14 @@ import Integrations from '@/pages/insights-tools/integrations/Integrations';
 import IntegrationDetails from '@/pages/insights-tools/integrations/IntegrationDetails';
 import FeatureDetails from '@/pages/product-catalog/features/FeatureDetails';
 import AddOn from '@/pages/product-catalog/addons/AddOn';
-
+import CustomerInvoiceDetailsPage from '@/pages/customer/customers/CustomerInvoiceDetailsPage';
 export const RouteNames = {
 	home: '/',
 	login: '/login',
 
 	// usage tracking routes
 	usageTracking: '/usage-tracking',
-	billableMetric: '/usage-tracking/meter',
+	meter: '/usage-tracking/meter',
 	addMeter: '/usage-tracking/meter/add-meter',
 	editMeter: '/usage-tracking/meter/edit-meter',
 	events: '/usage-tracking/events',
@@ -82,13 +82,13 @@ export const MainRouter = createBrowserRouter([
 		children: [
 			{
 				path: '/',
-				element: <Navigate to={RouteNames.billableMetric} />,
+				element: <Navigate to={RouteNames.meter} />,
 			},
 			{
 				path: RouteNames.usageTracking,
 				children: [
 					{
-						path: RouteNames.billableMetric,
+						path: RouteNames.meter,
 						element: <MeterPage />,
 					},
 					{
@@ -148,7 +148,7 @@ export const MainRouter = createBrowserRouter([
 							},
 							{
 								path: 'invoice/:invoice_id',
-								element: <Invoice />,
+								element: <CustomerInvoiceDetailsPage />,
 							},
 							{
 								path: 'invoice/:invoice_id/credit-note',

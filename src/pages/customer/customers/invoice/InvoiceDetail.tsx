@@ -84,11 +84,6 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 
 	if (isError) {
 		toast.error('Something went wrong');
-		return (
-			<div>
-				<p>Something went wrong</p>
-			</div>
-		);
 	}
 
 	return (

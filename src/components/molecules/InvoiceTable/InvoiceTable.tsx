@@ -30,7 +30,7 @@ const getPaymentStatusChip = (status: string) => {
 		case 'PENDING':
 			return <Chip isActive={false} label='Pending' />;
 		case 'SUCCEEDED':
-			return <Chip isActive={true} label='Successful' />;
+			return <Chip isActive={true} label='Succeeded' />;
 		case 'FAILED':
 			return <Chip isActive={true} activeTextColor='#DC2626' activeBgColor='#FEE2E2' label='Failed' />;
 		default:
@@ -90,6 +90,7 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 		{
 			title: '',
 			redirect: false,
+			hideOnEmpty: true,
 			render: (row: Invoice) => {
 				const menuOptions: DropdownMenuOption[] = [
 					// {

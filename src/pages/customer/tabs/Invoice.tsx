@@ -2,15 +2,13 @@ import { FormHeader, Loader, Spacer } from '@/components/atoms';
 import { CustomerInvoiceTable } from '@/components/molecules';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
 import { IoSearch } from 'react-icons/io5';
-import { useParams } from 'react-router-dom';
-import InvoiceDetails from '../customers/invoice/InvoiceDetail';
+import { useNavigate, useParams } from 'react-router-dom';
 import { SlidersHorizontal } from 'lucide-react';
 
 const Invoice = () => {
 	const { id: customerId } = useParams();
-	const [activeInvoice, setactiveInvoice] = useState<string | null>();
+	const navigate = useNavigate();
 
 	const { data, isLoading } = useQuery({
 		queryKey: ['invoice', customerId],
@@ -22,15 +20,11 @@ const Invoice = () => {
 	});
 
 	const handleShowDetails = (invoice: any) => {
-		setactiveInvoice(invoice.id);
+		navigate(`${invoice.id}`);
 	};
 
 	if (isLoading) {
 		return <Loader />;
-	}
-
-	if (activeInvoice) {
-		return <InvoiceDetails breadcrumb_index={3} invoice_id={activeInvoice} />;
 	}
 
 	return (
@@ -48,7 +42,7 @@ const Invoice = () => {
 			</div>
 			<Spacer className='!h-6' />
 
-			{!activeInvoice && <CustomerInvoiceTable onRowClick={handleShowDetails} customerId={customerId} data={data?.items ?? []} />}
+			<CustomerInvoiceTable onRowClick={handleShowDetails} customerId={customerId} data={data?.items ?? []} />
 		</div>
 	);
 };

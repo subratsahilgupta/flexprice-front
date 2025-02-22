@@ -16,7 +16,8 @@ const useUser = () => {
 		queryFn: async () => {
 			return await UserApi.me();
 		},
-		// staleTime: 1000 * 60 * 5,
+		gcTime: 1000 * 60 * 5,
+		staleTime: 1000 * 60 * 5,
 	});
 
 	return { user, loading, error, refetch };

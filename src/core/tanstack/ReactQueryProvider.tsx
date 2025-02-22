@@ -4,7 +4,6 @@ import { PropsWithChildren } from 'react';
 export const queryClient = new QueryClient({
 	defaultOptions: {
 		queries: {
-			retry: 2,
 			staleTime: 0,
 			refetchOnWindowFocus: false,
 			refetchOnMount: false,
@@ -12,6 +11,9 @@ export const queryClient = new QueryClient({
 			refetchInterval: false,
 			refetchIntervalInBackground: false,
 			gcTime: 0,
+		},
+		mutations: {
+			retry: false,
 		},
 	},
 });

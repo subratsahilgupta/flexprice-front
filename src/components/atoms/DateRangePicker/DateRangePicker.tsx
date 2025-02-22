@@ -46,11 +46,11 @@ const DateRangePicker = ({ startDate, endDate, onChange, placeholder = 'Select R
 		setSelectedRange({ from: startDate!, to: endDate! });
 	}, [startDate, endDate]);
 
-	useEffect(() => {
-		if (open) {
-			setSelectedRange(undefined);
-		}
-	}, [open]);
+	// useEffect(() => {
+	// 	if (open) {
+	// 		setSelectedRange(undefined);
+	// 	}
+	// }, [open]);
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>

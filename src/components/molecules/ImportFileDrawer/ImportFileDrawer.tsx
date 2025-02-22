@@ -224,17 +224,18 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 		},
 	];
 
-	const handleImport = () => {
+	const handleImport = (file?: Partial<ImportMeta>) => {
 		seterrors({} as any);
-		if (!uploadedFile) {
+		if (!file && !uploadedFile) {
 			seterrors((prev) => ({ ...prev, file: 'Please upload a file' }));
 		}
 		if (!entityType) {
 			seterrors((prev) => ({ ...prev, entity_type: 'Please select an entity type' }));
 		}
+		console.log(file, uploadedFile, entityType);
 
-		if (uploadedFile && entityType) {
-			addTask(uploadedFile);
+		if (file || (uploadedFile && entityType)) {
+			addTask(file || uploadedFile);
 		}
 	};
 
@@ -314,6 +315,7 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 										onImport={(data: boolean, meta: ImportMeta) => {
 											setUploadedFile(meta);
 											if (data) {
+												handleImport(meta);
 												toast.success(`${meta.original_filename} uploaded successfully`);
 											} else {
 												toast.error(`${meta.original_filename} upload failed`);
