@@ -1,21 +1,9 @@
 import { FC } from 'react';
 import FlexpriceTable, { ColumnData } from '../Table';
 import { getCurrencySymbol, toSentenceCase } from '@/utils/common/helper_functions';
-import { ActionButton, Chip } from '@/components/atoms';
+import { ActionButton } from '@/components/atoms';
 import { Invoice } from '@/models/Invoice';
-
-const formatPaymentStatus = (status: string) => {
-	switch (status.toUpperCase()) {
-		case 'PENDING':
-			return 'Pending';
-		case 'SUCCEEDED':
-			return 'Successful';
-		case 'FAILED':
-			return 'Unsuccessful';
-		default:
-			return 'Unsuccessful';
-	}
-};
+import { getPaymentStatusChip } from '../InvoiceTable/InvoiceTable';
 
 interface Props {
 	data: Invoice[];
@@ -35,8 +23,8 @@ const CustomerInvoiceTable: FC<Props> = ({ data, onRowClick }) => {
 		},
 		{
 			title: 'Payment Status',
-			render: (row) => <Chip isActive={row.payment_status === 'SUCCEEDED'} label={formatPaymentStatus(row.payment_status)} />,
 			align: 'center',
+			render: (row: Invoice) => getPaymentStatusChip(row.payment_status),
 		},
 		{
 			title: 'Total Amount',

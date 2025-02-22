@@ -25,7 +25,7 @@ const getStatusChip = (status: string) => {
 	}
 };
 
-const getPaymentStatusChip = (status: string) => {
+export const getPaymentStatusChip = (status: string) => {
 	switch (status.toUpperCase()) {
 		case 'PENDING':
 			return <Chip isActive={false} label='Pending' />;
