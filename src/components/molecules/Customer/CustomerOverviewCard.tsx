@@ -39,10 +39,10 @@ const CustomerOverviewCard: React.FC<CustomerCardProps> = ({ customerId }) => {
 		{
 			variant: 'divider',
 		},
-		{
-			label: 'Phone',
-			value: customer?.phone || '--',
-		},
+		// {
+		// 	label: 'Phone',
+		// 	value: customer?.phone || '--',
+		// },
 		{
 			label: 'Country',
 			value: customer?.address_country ? Country.getCountryByCode(customer.address_country)?.name : '--',

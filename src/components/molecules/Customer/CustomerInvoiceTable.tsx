@@ -33,6 +33,9 @@ const CustomerInvoiceTable: FC<Props> = ({ data, onRowClick }) => {
 		},
 		{
 			title: '',
+			align: 'center',
+			width: '10%',
+			hideOnEmpty: true,
 			render: (row) => <ActionButton id={row.id} editPath={''} deleteMutationFn={async () => {}} refetchQueryKey={''} entityName={''} />,
 		},
 	];
