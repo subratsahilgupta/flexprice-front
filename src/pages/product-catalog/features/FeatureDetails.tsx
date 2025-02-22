@@ -106,18 +106,16 @@ const FeatureDetails = () => {
 					return <span className='text-gray-800'>{rowData.is_enabled ? 'Yes' : 'No'}</span>;
 				}
 				if (rowData.feature_type === FeatureType.static) {
-					return (
-						<span className='text-gray-800 text-right'>
-							{rowData.static_value || '0'}
-							<span className='text-muted-foreground text-xs font-sans ml-2'>{rowData.feature.unit_plural || 'units'}</span>
-						</span>
-					);
+					return <span className='text-gray-800 text-right'>{rowData.static_value || '0'}</span>;
 				}
 				if (rowData.feature_type === FeatureType.metered) {
+					const usageLimit = rowData.usage_limit ?? 'Unlimited';
+					const unitPlural =
+						rowData.usage_limit || 0 > 1 ? rowData.feature.unit_plural || 'units' : rowData.feature.unit_singular || 'unit';
 					return (
 						<span className='text-gray-800 text-right'>
-							{`${rowData.usage_limit ?? 'Unlimited'}`}
-							<span className='text-muted-foreground text-xs font-sans ml-2'>{rowData.feature.unit_plural || 'units'}</span>
+							{usageLimit}
+							<span className='text-muted-foreground text-xs font-sans ml-2'>{unitPlural}</span>
 						</span>
 					);
 				}

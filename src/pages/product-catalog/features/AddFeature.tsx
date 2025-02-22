@@ -337,7 +337,11 @@ const AddFeaturePage = () => {
 																placeholder='singluar'
 																value={data.unit_singular}
 																onChange={(e) => {
-																	setdata((prev) => ({ ...prev, unit_singular: e }));
+																	setdata((prev) => ({
+																		...prev,
+																		unit_singular: e,
+																		unit_plural: e + 's',
+																	}));
 																}}
 															/>
 															<Input

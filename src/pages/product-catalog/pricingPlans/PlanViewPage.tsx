@@ -155,6 +155,7 @@ const PlanViewPage = () => {
 			title: '',
 			redirect: false,
 			width: '30px',
+			hideOnEmpty: true,
 			render(row) {
 				return (
 					<ActionButton

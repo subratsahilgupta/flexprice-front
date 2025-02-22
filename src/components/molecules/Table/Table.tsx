@@ -14,6 +14,7 @@ interface BaseColumnData<T = any> {
 	children?: ReactNode;
 	className?: string;
 	redirect?: boolean;
+	hideOnEmpty?: boolean;
 	onCLick?: (row: T) => void;
 }
 
@@ -179,7 +180,7 @@ const FlexpriceTable: FC<FlexpriceTableProps> = ({ onRowClick, columns, data, re
 						))}
 					{data.length === 0 && showEmptyRow && (
 						<TableRow>
-							{columns.map(({ flex = 1, width, textColor = 'inherit', align = 'left', redirect = true }, colIndex) => {
+							{columns.map(({ flex = 1, width, textColor = 'inherit', align = 'left', redirect = true, hideOnEmpty }, colIndex) => {
 								const lastRow = colIndex === columns.length - 1;
 								return (
 									<TableCell
@@ -194,7 +195,7 @@ const FlexpriceTable: FC<FlexpriceTableProps> = ({ onRowClick, columns, data, re
 										style={{ flex: width ? undefined : flex }}
 										width={width}
 										align={align}>
-										{lastRow ? '' : '--'}
+										{lastRow && hideOnEmpty ? '' : '--'}
 									</TableCell>
 								);
 							})}
