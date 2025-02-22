@@ -64,7 +64,12 @@ const getFeatureValue = (entitlement: ExtendedEntitlement) => {
 		case FeatureType.static:
 			return entitlement.static_value;
 		case FeatureType.metered:
-			return `${entitlement.usage_limit ?? 'Unlimited'} units`;
+			return (
+				<span className='flex items-center gap-1'>
+					{entitlement.usage_limit ?? 'Unlimited'}
+					<span className='text-[#64748B] text-xs font-normal font-sans'>units</span>
+				</span>
+			);
 		case FeatureType.boolean:
 			return entitlement.static_value ? 'Yes' : 'No';
 		default:
@@ -83,8 +88,8 @@ const PlanViewPage = () => {
 
 	const {
 		data: planData,
-		isLoading: isPlanLoading,
-		isError: isPlanError,
+		isLoading,
+		isError,
 	} = useQuery({
 		queryKey: ['fetchPlan', planId],
 		queryFn: async () => {
@@ -92,26 +97,6 @@ const PlanViewPage = () => {
 		},
 		enabled: !!planId,
 	});
-
-	const {
-		data: entitlementsData,
-		isLoading: isEntitlementsLoading,
-		isError: isEntitlementsError,
-	} = useQuery({
-		queryKey: ['fetchEntitlements', planId],
-		queryFn: async () => {
-			return await EntitlementApi.getAllEntitlements({
-				plan_ids: [planId!],
-				expand: 'features,meters',
-				status: 'published',
-			});
-		},
-		enabled: !!planId,
-	});
-
-	const entitlements = entitlementsData?.items;
-	const isLoading = isPlanLoading || isEntitlementsLoading;
-	const isError = isPlanError || isEntitlementsError;
 
 	const { updateBreadcrumb } = useBreadcrumbsStore();
 
@@ -183,7 +168,7 @@ const PlanViewPage = () => {
 		return null;
 	}
 
-	if (!planData || !entitlements) {
+	if (!planData) {
 		toast.error('No plan data available');
 		return null;
 	}
@@ -191,8 +176,8 @@ const PlanViewPage = () => {
 	return (
 		<div className='page'>
 			<AddEntitlementDrawer
-				selectedFeatures={entitlements.map((v) => v.feature)}
-				entitlements={entitlements}
+				selectedFeatures={planData.entitlements?.map((v) => v.feature)}
+				entitlements={planData.entitlements}
 				planId={planData.id}
 				isOpen={drawerOpen}
 				onOpenChange={(value) => setdrawerOpen(value)}
@@ -251,8 +236,10 @@ const PlanViewPage = () => {
 						onButtonClick={() => setdrawerOpen(true)}
 						buttonText='Add Feature'
 					/>
-					<FlexpriceTable showEmptyRow data={entitlements || []} columns={columnData} />
-					{(entitlements?.length || 0) === 0 && <p className=' text-[#64748B] text-xs font-normal font-sans mt-4'>No Entitlements added</p>}
+					<FlexpriceTable showEmptyRow data={planData.entitlements || []} columns={columnData} />
+					{(planData.entitlements?.length || 0) === 0 && (
+						<p className=' text-[#64748B] text-xs font-normal font-sans mt-4'>No Entitlements added</p>
+					)}
 				</div>
 			</div>
 		</div>

@@ -79,7 +79,6 @@ const FlexPriceSelect: React.FC<Props> = ({
 				defaultOpen={defaultOpen}
 				defaultValue={value || ''}
 				onValueChange={(newValue) => {
-					console.log('newValue', newValue);
 					if (onChange) {
 						onChange(newValue === value ? '' : newValue);
 					}

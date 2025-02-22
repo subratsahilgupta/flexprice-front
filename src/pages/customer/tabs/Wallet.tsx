@@ -61,7 +61,7 @@ const WalletTab = () => {
 		isLoading,
 		isError,
 	} = useQuery({
-		queryKey: ['fetcWallets', customerId],
+		queryKey: ['fetchWallets', customerId],
 		queryFn: async () => {
 			return await WalletApi.getWallets(customerId!);
 		},
@@ -78,8 +78,8 @@ const WalletTab = () => {
 
 	const {
 		data: transactionsData,
-		// isLoading: isTransactionLoading,
-		// isError: isTransactionError,
+		isLoading: isTransactionLoading,
+		isError: isTransactionError,
 	} = useQuery({
 		queryKey: ['fetchWalletsTransactions', customerId, activeWallet?.id],
 		queryFn: async () => {
@@ -112,13 +112,18 @@ const WalletTab = () => {
 		value: wallet.id,
 	}));
 
-	if (isLoading) {
-		return <Loader />;
+	if (isLoading || isTransactionLoading || isBalanceLoading) {
+		return (
+			<div className='w-2/3 h-full   space-y-5'>
+				<Skeleton className='w-full h-16' />
+				<Skeleton className='w-full h-32' />
+				<Skeleton className='w-full h-32' />
+			</div>
+		);
 	}
 
-	if (isError) {
+	if (isError || isTransactionError) {
 		toast.error('An error occurred while fetching wallet details');
-		return <p>Something went wrong</p>;
 	}
 
 	if (isAdd) {
