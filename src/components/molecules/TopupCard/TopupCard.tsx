@@ -122,7 +122,7 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 				{/* toptup amount cta */}
 				{!preFunction && (
 					<div className='w-full justify-end flex'>
-						<Button disabled={isPending || isPrefunctionLoading} onClick={handleTopup}>
+						<Button disabled={isPending || isPrefunctionLoading || !subscriptionType} onClick={handleTopup}>
 							Add
 						</Button>
 					</div>
