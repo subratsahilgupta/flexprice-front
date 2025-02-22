@@ -32,7 +32,7 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 		'Usage Tracking': [
 			{
 				title: 'Meter',
-				url: RouteNames.billableMetric,
+				url: RouteNames.meter,
 				icon: '/assets/svg/billable_metrics.svg',
 			},
 			{
@@ -98,7 +98,7 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				title: 'Add On',
 				url: RouteNames.addOn,
 				icon: <Puzzle />,
-				// disabled: true,
+				disabled: true,
 			},
 		],
 		'Insights & Tools': [

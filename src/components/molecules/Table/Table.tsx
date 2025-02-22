@@ -179,21 +179,25 @@ const FlexpriceTable: FC<FlexpriceTableProps> = ({ onRowClick, columns, data, re
 						))}
 					{data.length === 0 && showEmptyRow && (
 						<TableRow>
-							{columns.map(({ flex = 1, width, textColor = 'inherit', align = 'left', redirect = true }, colIndex) => (
-								<TableCell
-									key={colIndex}
-									className={cn(
-										textColor ? `text-[${textColor}]` : 'text-[#09090B] w-full ',
-										'font-normal',
-										'!max-h-8 px-4 py-2 text-[14px]',
-										redirect && redirectUrl ? 'cursor-pointer' : 'cursor-default',
-									)}
-									style={{ flex: width ? undefined : flex }}
-									width={width}
-									align={align}>
-									--
-								</TableCell>
-							))}
+							{columns.map(({ flex = 1, width, textColor = 'inherit', align = 'left', redirect = true }, colIndex) => {
+								const lastRow = colIndex === columns.length - 1;
+								return (
+									<TableCell
+										key={colIndex}
+										className={cn(
+											textColor ? `text-[${textColor}]` : 'text-[#09090B] w-full ',
+											'font-normal',
+											'!max-h-8 px-4 py-2 text-[14px]',
+											redirect && redirectUrl ? 'cursor-pointer' : 'cursor-default',
+											lastRow ? 'text-center' : '',
+										)}
+										style={{ flex: width ? undefined : flex }}
+										width={width}
+										align={align}>
+										{lastRow ? '' : '--'}
+									</TableCell>
+								);
+							})}
 						</TableRow>
 					)}
 				</TableBody>

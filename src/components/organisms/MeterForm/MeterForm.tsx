@@ -4,14 +4,13 @@ import { Button, CodePreview, Input, RadioGroup, Select } from '@/components/ato
 import { EventFilter, EventFilterData } from '@/components/molecules';
 import { LuCircleFadingPlus, LuRefreshCw } from 'react-icons/lu';
 import { cn } from '@/lib/utils';
-import { useNavigate } from 'react-router-dom';
 import { Meter } from '@/models/Meter';
 import { v4 as uuidv4 } from 'uuid';
-import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 
 interface Props {
 	data?: Meter;
 	onSubmit: (data: Meter, mode: 'add' | 'edit') => void;
+	isLoading?: boolean;
 }
 
 export const formatAggregationType = (data: string): string => {
@@ -38,12 +37,12 @@ const MeterFormSchema = z.object({
 		// 	value: z.array(z.string().min(1, { message: 'Filter value is required' })).optional(),
 		// }),
 		.optional(),
-	aggregationFunction: z.enum(['SUM', 'COUNT', 'COUNT_UNIQUE', 'c1'], { errorMap: () => ({ message: 'Invalid aggregation function' }) }),
+	aggregationFunction: z.enum(['SUM', 'COUNT', 'COUNT_UNIQUE'], { errorMap: () => ({ message: 'Invalid aggregation function' }) }),
 	aggregationValue: z.string().min(1, { message: 'Aggregation Value is required' }),
 	resetPeriod: z.string().optional(),
 });
 
-const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
+const MeterForm: React.FC<Props> = ({ data, onSubmit, isLoading }) => {
 	const labelStyle = 'text-muted-foreground text-sm';
 
 	const isEditMode = Boolean(data);
@@ -55,7 +54,6 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 	const [aggregationFunction, setAggregationFunction] = useState(data?.aggregation.type || 'SUM');
 	const [aggregationValue, setAggregationValue] = useState(data?.aggregation.field || '');
 	const [resetPeriod, setResetPeriod] = useState(data?.reset_usage || '');
-	const navigate = useNavigate();
 
 	const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -132,9 +130,6 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 				reset_usage: resetPeriod,
 			};
 			onSubmit(formData as unknown as Meter, isEditMode ? 'edit' : 'add');
-
-			refetchQueries(['fetchMeters']);
-			navigate('/usage-tracking/meter');
 
 			setErrors({});
 		} else {
@@ -270,6 +265,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 					{isEditMode && (
 						<div className={cn('flex justify-start')}>
 							<Button
+								isLoading={isLoading}
 								disabled={eventFilters.length <= 0}
 								onClick={handleSubmit}
 								className='bg-zinc-900 text-white px-4 py-2 rounded-md hover:bg-primary-dark'>

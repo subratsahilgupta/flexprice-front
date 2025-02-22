@@ -15,11 +15,24 @@ interface Props {
 	variant?: 'default' | 'left-aligned';
 	data: Detail[];
 	className?: string;
+	children?: React.ReactNode;
+	childrenAtTop?: boolean;
 }
 
-const DetailsCard: FC<Props> = ({ title, description, data, variant = 'default', titleClassName, className }) => {
+const DetailsCard: FC<Props> = ({
+	title,
+	description,
+	data,
+	variant = 'default',
+	titleClassName,
+	className,
+	children,
+	childrenAtTop = false,
+}) => {
 	return (
 		<div className={`card bg-white ${className}`}>
+			{children && childrenAtTop && <div className='w-full'>{children}</div>}
+
 			{title && <FormHeader subtitle={description} title={title} variant='sub-header' titleClassName={titleClassName} />}
 			<div className='flex items-center space-x-4'>
 				<div className='w-full space-y-4'>
@@ -43,6 +56,7 @@ const DetailsCard: FC<Props> = ({ title, description, data, variant = 'default',
 					})}
 				</div>
 			</div>
+			{children && !childrenAtTop && <div className='w-full'>{children}</div>}
 		</div>
 	);
 };

@@ -64,7 +64,7 @@ const getFeatureValue = (entitlement: ExtendedEntitlement) => {
 		case FeatureType.static:
 			return entitlement.static_value;
 		case FeatureType.metered:
-			return `${entitlement.usage_limit} units`;
+			return `${entitlement.usage_limit ?? 'Unlimited'} units`;
 		case FeatureType.boolean:
 			return entitlement.static_value ? 'Yes' : 'No';
 		default:
@@ -239,7 +239,7 @@ const PlanViewPage = () => {
 					</div>
 				)}
 
-				<div className='card '>
+				<div className='card'>
 					<SectionHeader
 						showSearch
 						showFilter

@@ -2,8 +2,9 @@ import { FC } from 'react';
 import { cn } from '@/lib/utils';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { Button, Input, Spacer } from '@/components/atoms';
-import { formatAmountWithCommas, PriceTier, removeCommasFromAmount } from './UsagePricingForm';
+import { formatAmountWithCommas, removeCommasFromAmount } from '@/components/atoms';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
+import { PriceTier } from './UsagePricingForm';
 
 interface Props {
 	tieredPrices: PriceTier[];

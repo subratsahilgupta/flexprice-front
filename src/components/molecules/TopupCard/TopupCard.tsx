@@ -108,8 +108,9 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 
 				{subscriptionType === subscriptionTypeOptions[0].value && (
 					<Input
+						inputType='number'
 						onChange={(e) => {
-							setfreeCredits(parseInt(e));
+							setfreeCredits(parseFloat(e));
 						}}
 						suffix='credits'
 						label='Free Credits'

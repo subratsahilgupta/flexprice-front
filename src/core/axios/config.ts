@@ -52,15 +52,19 @@ axiosClient.interceptors.response.use(
 					// Handle other errors
 					break;
 			}
+			// Ensure we reject with the error response data if available
+			const errorData = error.response.data;
+			console.log('errorData', errorData);
+			return Promise.reject(errorData || error);
 		} else if (error.request) {
 			// Request was made but no response received
 			console.error('No response received:', error.request);
+			return Promise.reject(new Error('No response received from server'));
 		} else {
 			// Error in setting up the request
 			console.error('Error:', error.message);
+			return Promise.reject(error);
 		}
-
-		return Promise.reject(error);
 	},
 );
 

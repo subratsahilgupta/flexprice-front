@@ -8,14 +8,8 @@ import { Meter } from '@/models/Meter';
 import { formatBillingPeriod, getCurrencySymbol, toSentenceCase } from '@/utils/common/helper_functions';
 import { currencyOptions } from '@/core/data/constants';
 import VolumeTieredPricingForm from './VolumeTieredPricingForm';
-
-export const formatAmountWithCommas = (amount: string): string => {
-	return amount.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-};
-
-export const removeCommasFromAmount = (amount: string): string => {
-	return amount.replace(/,/g, '');
-};
+import { formatAmountWithCommas } from '@/components/atoms/Input/Input';
+import { removeCommasFromAmount } from '@/components/atoms/Input/Input';
 
 interface Props {
 	data?: Partial<Price>;

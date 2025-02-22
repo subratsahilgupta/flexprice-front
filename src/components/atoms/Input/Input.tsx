@@ -1,6 +1,14 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
+export const formatAmountWithCommas = (amount: string): string => {
+	return amount.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
+export const removeCommasFromAmount = (amount: string): string => {
+	return amount.replace(/,/g, '');
+};
+
 interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
 	label?: string;
 	description?: string;
@@ -14,6 +22,7 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
 	id?: string;
 	inputPrefix?: React.ReactNode;
 	labelClassName?: string;
+	inputType?: 'text' | 'number';
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -32,9 +41,18 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 			value,
 			inputPrefix,
 			labelClassName: titleClassName,
+			inputType = 'text',
 		},
 		ref,
 	) => {
+		const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+			if (inputType === 'number') {
+				e.target.value = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\./g, '$1');
+			}
+			if (onChange) {
+				onChange(e.target.value);
+			}
+		};
 		return (
 			<div className='space-y-1 w-full flex flex-col'>
 				{/* Label */}
@@ -62,11 +80,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 							'peer relative flex-1 bg-transparent outline-none ring-0 focus:outline-none w-full placeholder:text-start placeholder:items-start flex flex-col',
 							disabled && 'text-zinc-500',
 						)}
-						onChange={(e) => {
-							if (onChange) {
-								onChange(e.target.value);
-							}
-						}}
+						onChange={handleChange}
 						ref={ref}
 					/>
 					{suffix && <div className='ml-2'>{suffix}</div>}

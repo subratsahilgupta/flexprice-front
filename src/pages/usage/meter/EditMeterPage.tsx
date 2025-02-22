@@ -6,7 +6,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
-import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
+import { RouteNames } from '@/core/routes/Routes';
 
 const fetchMeterData = async (id: string) => {
 	return await MeterApi.getMeterById(id);
@@ -35,17 +35,18 @@ const EditMeterPage = () => {
 	} = useQuery({
 		queryKey: ['fetchMeterData', id],
 		queryFn: () => fetchMeterData(id!),
+		enabled: !!id,
 	});
 
-	const { mutate: updateMeterData } = useMutation({
+	const { mutate: updateMeterData, isPending } = useMutation({
 		mutationFn: async ({ id, data }: { id: string; data: Partial<Meter> }) =>
 			updateMeter(id, {
 				...data,
 				id: id,
 			}),
 		onSuccess: async () => {
-			await refetchQueries(['fetchMeters', 'fetchMeterData']);
 			toast.success('Meter updated successfully');
+			navigate(RouteNames.meter);
 		},
 		onError() {
 			toast.error('Error updating meter');
@@ -74,6 +75,7 @@ const EditMeterPage = () => {
 				onSubmit={(data) => {
 					updateMeterData({ id: id!, data: { filters: data.filters } });
 				}}
+				isLoading={isPending}
 			/>
 		</div>
 	);
