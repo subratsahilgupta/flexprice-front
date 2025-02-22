@@ -198,6 +198,8 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 		}
 	};
 
+	const isCtaDisabled = !formData.name || !formData.external_id;
+
 	return (
 		<div>
 			<Sheet
@@ -328,8 +330,8 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 						</div>
 					)}
 
-					<Spacer className='!h-8' />
-					<Button isLoading={isPending} disabled={isPending} className='bg-[#0F172A] text-white' onClick={handleSubmit}>
+					<Spacer className='!h-4' />
+					<Button isLoading={isPending} disabled={isPending || isCtaDisabled} className='bg-[#0F172A] text-white' onClick={handleSubmit}>
 						{isPending ? 'Saving...' : 'Save Customer'}
 					</Button>
 				</div>

@@ -99,6 +99,10 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit, isLoading }) => {
 		},
 	];
 
+	const isCtaDisabled = data
+		? !data?.name || !data?.event_name || !data?.aggregation.type
+		: !eventName || !aggregationFunction || !aggregationValue;
+
 	const handleSubmit = () => {
 		// Form data object
 		const formData = {
@@ -258,7 +262,10 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit, isLoading }) => {
 
 					{/* Submit Button */}
 					<div className={cn('flex justify-start', isEditMode && 'hidden')}>
-						<Button onClick={handleSubmit} className='bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark'>
+						<Button
+							onClick={handleSubmit}
+							disabled={isCtaDisabled}
+							className='bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark'>
 							{'Save Meter'}
 						</Button>
 					</div>
