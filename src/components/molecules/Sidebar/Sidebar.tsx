@@ -10,7 +10,7 @@ import {
 import React from 'react';
 import SidebarNav, { NavItem } from './SidebarMenu';
 import { cn } from '@/lib/utils';
-import { LogOut, Plug2, Puzzle, Star, BookOpen, ExternalLink } from 'lucide-react';
+import { LogOut, Plug2, Star, BookOpen, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import supabase from '@/core/supbase/config';
 import useUser from '@/hooks/useUser';
@@ -23,7 +23,7 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 	const handleLogout = async () => {
 		await supabase.auth.signOut();
 		localStorage.clear();
-		navigate('/login');
+		navigate('/auth');
 	};
 
 	const { loading, user } = useUser();
@@ -75,12 +75,12 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				icon: '/assets/svg/receipt.svg',
 			},
 
-			{
-				title: 'Quotation',
-				url: '/roles',
-				icon: '/assets/svg/quotation.svg',
-				disabled: true,
-			},
+			// {
+			// 	title: 'Quotation',
+			// 	url: '/roles',
+			// 	icon: '/assets/svg/quotation.svg',
+			// 	disabled: true,
+			// },
 		],
 		'Product Cataglog': [
 			{
@@ -94,12 +94,12 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				icon: <Star />,
 				// disabled: true,
 			},
-			{
-				title: 'Add On',
-				url: RouteNames.addOn,
-				icon: <Puzzle />,
-				disabled: true,
-			},
+			// {
+			// 	title: 'Add On',
+			// 	url: RouteNames.addOn,
+			// 	icon: <Puzzle />,
+			// 	disabled: true,
+			// },
 		],
 		'Insights & Tools': [
 			{

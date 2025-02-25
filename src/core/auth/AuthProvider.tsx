@@ -4,6 +4,7 @@ import supabase from '../supbase/config';
 import { useUser } from '@/hooks/UserContext';
 import { useQuery } from '@tanstack/react-query';
 import { Spinner } from '@/components/atoms';
+import AuthStateListener from './AuthStateListener';
 
 interface AuthMiddlewareProps {
 	children: ReactNode;
@@ -48,14 +49,15 @@ const AuthMiddleware: React.FC<AuthMiddlewareProps> = ({ children }) => {
 	}
 
 	if (isError || !user) {
-		return <Navigate to='/login' />;
+		return <Navigate to='/auth' />;
 	}
 
 	// if (requiredRole && !requiredRole.includes(user.role)) {
 	//     return <Navigate to="/not-authorized" />;
 	// }
 
-	return <>{children}</>;
+	// Wrap children with AuthStateListener to handle auth state changes
+	return <AuthStateListener>{children}</AuthStateListener>;
 };
 
 export default AuthMiddleware;

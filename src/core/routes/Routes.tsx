@@ -32,7 +32,7 @@ import AddOn from '@/pages/product-catalog/addons/AddOn';
 import CustomerInvoiceDetailsPage from '@/pages/customer/customers/CustomerInvoiceDetailsPage';
 export const RouteNames = {
 	home: '/',
-	login: '/login',
+	login: '/auth',
 
 	// usage tracking routes
 	usageTracking: '/usage-tracking',
