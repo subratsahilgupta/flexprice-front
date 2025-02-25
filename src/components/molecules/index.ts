@@ -49,3 +49,5 @@ export { default as PremiumFeature } from './PremiumFeature';
 export { PremiumFeatureTag } from './PremiumFeature';
 
 export { DetailsCard, type Detail } from './DetailsCard';
+
+export { default as EnvironmentSelector } from './EnvironmentSelector';

@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import supabase from '@/core/supbase/config';
+import EnvironmentApi from '@/utils/api_requests/EnvironmentApi';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -16,6 +17,12 @@ axiosClient.interceptors.request.use(
 		const {
 			data: { session },
 		} = await supabase.auth.getSession();
+
+		// add active environment to the request
+		const activeEnv = EnvironmentApi.getActiveEnvironment();
+		if (activeEnv) {
+			config.headers['X-Environment-ID'] = activeEnv.id;
+		}
 
 		if (session?.access_token) {
 			config.headers.Authorization = `Bearer ${session.access_token}`;

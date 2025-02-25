@@ -10,13 +10,13 @@ import {
 import React from 'react';
 import SidebarNav, { NavItem } from './SidebarMenu';
 import { cn } from '@/lib/utils';
-import { LogOut, Plug2, Puzzle, Star } from 'lucide-react';
+import { LogOut, Plug2, Puzzle, Star, BookOpen, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import supabase from '@/core/supbase/config';
 import useUser from '@/hooks/useUser';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RouteNames } from '@/core/routes/Routes';
-
+import { EnvironmentSelector } from '@/components/molecules';
 const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }) => {
 	const { open } = useSidebar();
 	const navigate = useNavigate();
@@ -136,6 +136,7 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 					)}
 					<SidebarTrigger />
 				</div>
+				<EnvironmentSelector />
 			</SidebarHeader>
 			<SidebarContent className='gap-0'>
 				{Object.entries(navMain).map(([key, value]) => (
@@ -145,11 +146,23 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 			<SidebarFooter>
 				<SidebarMenuButton
 					onClick={() => {
+						window.open('https://docs.flexprice.io', '_blank');
+					}}
+					tooltip={'Documentation'}
+					className={cn(`flex items-center justify-between gap-2 hover:bg-muted transition-colors `)}>
+					<span className='flex items-center gap-2'>
+						<BookOpen className='size-4' />
+						<span className='text-sm select-none'>{'Documentation'}</span>
+					</span>
+					<ExternalLink />
+				</SidebarMenuButton>
+				<SidebarMenuButton
+					onClick={() => {
 						handleLogout();
 					}}
 					tooltip={'Logout'}
 					className={cn(`flex items-center gap-2 hover:bg-muted transition-colors `)}>
-					{<LogOut />}
+					<LogOut />
 					<span className='text-sm select-none'>{'Logout'}</span>
 				</SidebarMenuButton>
 			</SidebarFooter>
