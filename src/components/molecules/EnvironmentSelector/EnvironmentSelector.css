@@ -1,0 +1,56 @@
+/* Environment Selector Dropdown styles */
+.environment-selector-wrapper {
+	width: 100%;
+}
+
+/* Target the radix dropdown content for full width */
+[data-radix-popper-content-wrapper] {
+	width: 100% !important;
+	max-width: 100% !important;
+}
+
+/* Target dropdown content */
+[data-radix-popper-content-wrapper] > div {
+	width: 100% !important;
+	max-width: 100% !important;
+}
+
+/* Style for the trigger button */
+.env-selector-trigger {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 8px;
+	border-radius: 6px;
+	border: 1px solid var(--border, #e2e8f0);
+	background-color: var(--background);
+	transition: all 0.2s ease;
+}
+
+.env-selector-trigger:hover {
+	background-color: var(--accent-50, rgba(0, 0, 0, 0.05));
+}
+
+/* Icon container */
+.env-icon-container {
+	width: 40px;
+	height: 40px;
+	background-color: #000;
+	border-radius: 6px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: white;
+}
+
+/* Text styles */
+.env-name {
+	font-weight: 500;
+	font-size: 16px;
+}
+
+.env-description {
+	font-size: 14px;
+	color: var(--muted-foreground, #64748b);
+}

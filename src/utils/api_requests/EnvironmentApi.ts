@@ -32,55 +32,116 @@ class EnvironmentApi {
 
 	// API Methods
 	public static async getAllEnvironments(): Promise<EnvironmentResponse> {
-		return await AxiosClient.get<EnvironmentResponse>(this.baseUrl);
+		try {
+			return await AxiosClient.get<EnvironmentResponse>(this.baseUrl);
+		} catch (error) {
+			console.error('Error fetching environments:', error);
+			// Return empty environments to prevent UI crashes
+			// Explicitly cast to match the expected type
+			return { environments: [], total: 0 } as EnvironmentResponse;
+		}
 	}
 
-	public static async getEnvironmentById(id: string): Promise<Environment> {
-		return await AxiosClient.get<Environment>(`${this.baseUrl}/${id}`);
+	public static async getEnvironmentById(id: string): Promise<Environment | null> {
+		try {
+			return await AxiosClient.get<Environment>(`${this.baseUrl}/${id}`);
+		} catch (error) {
+			console.error(`Error fetching environment with ID ${id}:`, error);
+			return null;
+		}
 	}
 
-	public static async createEnvironment(payload: CreateEnvironmentPayload): Promise<Environment> {
-		return await AxiosClient.post<Environment>(this.baseUrl, payload);
+	public static async createEnvironment(payload: CreateEnvironmentPayload): Promise<Environment | null> {
+		try {
+			return await AxiosClient.post<Environment>(this.baseUrl, payload);
+		} catch (error) {
+			console.error('Error creating environment:', error);
+			return null;
+		}
 	}
 
 	// Helper Methods
 	public static getStoredEnvironments(): ExtendedEnvironment[] {
-		const stored = localStorage.getItem(STORAGE_KEY);
-		return stored ? JSON.parse(stored) : [];
+		try {
+			const stored = localStorage.getItem(STORAGE_KEY);
+			return stored ? JSON.parse(stored) : [];
+		} catch (error) {
+			console.error('Error retrieving stored environments:', error);
+			return [];
+		}
 	}
 
 	public static setActiveEnvironment(environmentId: string): void {
-		const environments = this.getStoredEnvironments();
-		const updatedEnvironments = environments.map((env) => ({
-			...env,
-			isActive: env.id === environmentId,
-		}));
-		localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedEnvironments));
+		try {
+			const environments = this.getStoredEnvironments();
+			if (environments.length === 0) return;
+
+			// Verify that the environment exists
+			const environmentExists = environments.some((env) => env.id === environmentId);
+			if (!environmentExists) {
+				console.warn(`Environment with ID ${environmentId} does not exist.`);
+				return;
+			}
+
+			const updatedEnvironments = environments.map((env) => ({
+				...env,
+				isActive: env.id === environmentId,
+			}));
+			localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedEnvironments));
+		} catch (error) {
+			console.error('Error setting active environment:', error);
+		}
 	}
 
 	public static getActiveEnvironment(): ExtendedEnvironment | null {
-		const environments = this.getStoredEnvironments();
-		return environments.find((env) => env.isActive) || null;
+		try {
+			const environments = this.getStoredEnvironments();
+			const activeEnv = environments.find((env) => env.isActive);
+
+			// If no active environment, set the first one if available
+			if (!activeEnv && environments.length > 0) {
+				this.setActiveEnvironment(environments[0].id);
+				return environments[0];
+			}
+
+			return activeEnv || null;
+		} catch (error) {
+			console.error('Error getting active environment:', error);
+			return null;
+		}
 	}
 
 	public static saveEnvironments(environments: Environment[]): void {
-		const existingEnvironments = this.getStoredEnvironments();
+		try {
+			if (!environments || !Array.isArray(environments)) {
+				console.warn('Invalid environments data provided to saveEnvironments');
+				return;
+			}
 
-		// Preserve active state when updating environments
-		const updatedEnvironments = environments.map((env) => ({
-			...env,
-			isActive: existingEnvironments.find((e) => e.id === env.id)?.isActive || false,
-		}));
+			const existingEnvironments = this.getStoredEnvironments();
 
-		// If no environment is active, set the first one as active
-		if (!updatedEnvironments.some((env) => env.isActive) && updatedEnvironments.length > 0) {
-			updatedEnvironments[0].isActive = true;
+			// Preserve active state when updating environments
+			const updatedEnvironments = environments.map((env) => ({
+				...env,
+				isActive: existingEnvironments.find((e) => e.id === env.id)?.isActive || false,
+			}));
+
+			// If no environment is active, set the first one as active
+			if (!updatedEnvironments.some((env) => env.isActive) && updatedEnvironments.length > 0) {
+				updatedEnvironments[0].isActive = true;
+			}
+
+			localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedEnvironments));
+		} catch (error) {
+			console.error('Error saving environments:', error);
 		}
-
-		localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedEnvironments));
 	}
 
 	public static sortEnvironments(environments: ExtendedEnvironment[]): ExtendedEnvironment[] {
+		if (!environments || !Array.isArray(environments)) {
+			return [];
+		}
+
 		return [...environments].sort((a, b) => {
 			// Active environments first
 			if (a.isActive && !b.isActive) return -1;
@@ -92,19 +153,30 @@ class EnvironmentApi {
 	}
 
 	static async getLocalEnvironments(): Promise<ExtendedEnvironment[]> {
-		const storedEnvironments = this.getStoredEnvironments();
+		try {
+			const storedEnvironments = this.getStoredEnvironments();
 
-		if (storedEnvironments.length > 0) {
-			return storedEnvironments;
+			if (storedEnvironments.length > 0) {
+				return storedEnvironments;
+			}
+
+			const envData = await this.getAllEnvironments();
+
+			// Check if environments array exists and is not empty
+			if (envData.environments && envData.environments.length > 0) {
+				this.saveEnvironments(envData.environments);
+
+				return envData.environments.map((env) => ({
+					...env,
+					isActive: false, // By default, none active
+				}));
+			}
+
+			return [];
+		} catch (error) {
+			console.error('Error retrieving local environments:', error);
+			return [];
 		}
-
-		const envData = await this.getAllEnvironments();
-		this.saveEnvironments(envData.environments);
-
-		return envData.environments.map((env) => ({
-			...env,
-			isActive: this.getActiveEnvironment()?.id === env.id,
-		}));
 	}
 }
 

@@ -1,29 +1,26 @@
-import { Select, SelectContent, SelectGroup } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import React, { useState, useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SelectOption } from '@/components/atoms';
 import { useQuery } from '@tanstack/react-query';
 import EnvironmentApi from '@/utils/api_requests/EnvironmentApi';
 import { Blocks, Rocket, Server, ChevronsUpDown } from 'lucide-react';
-import * as SelectPrimitive from '@radix-ui/react-select';
 import { queryClient } from '@/core/tanstack/ReactQueryProvider';
+import useUser from '@/hooks/useUser';
+import { Select, SelectContent } from '@/components/ui/select';
+import * as SelectPrimitive from '@radix-ui/react-select';
+import { SelectOption } from '@/components/atoms/Select/Select';
 
+interface Props {
+	disabled?: boolean;
+	className?: string;
+	noOptionsText?: string;
+}
 const SelectTrigger = React.forwardRef<
 	React.ElementRef<typeof SelectPrimitive.Trigger>,
 	React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
 >(({ className, children, ...props }, ref) => (
-	<SelectPrimitive.Trigger
-		ref={ref}
-		className={cn(
-			'flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1',
-			className,
-		)}
-		{...props}>
+	<SelectPrimitive.Trigger ref={ref} className={cn('w-full', className)} {...props}>
 		{children}
-		<SelectPrimitive.Icon asChild>
-			<ChevronsUpDown className='h-4 w-4 opacity-50' />
-		</SelectPrimitive.Icon>
 	</SelectPrimitive.Trigger>
 ));
 
@@ -34,8 +31,7 @@ const SelectItem = React.forwardRef<
 	<SelectPrimitive.Item
 		ref={ref}
 		className={cn(
-			'relative flex w-full cursor-default select-none items-center rounded-sm py-[2px] px-2 text-sm outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-			'data-[state=checked]:bg-gray-100',
+			'relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
 			className,
 		)}
 		{...props}>
@@ -43,38 +39,53 @@ const SelectItem = React.forwardRef<
 	</SelectPrimitive.Item>
 ));
 
-interface Props {
-	disabled?: boolean;
-	className?: string;
-	noOptionsText?: string;
-}
+const EnvironmentSelector: React.FC<Props> = ({ disabled = false, className }) => {
+	const { loading, user } = useUser();
 
-const FlexPriceSelect: React.FC<Props> = ({ disabled = false, className }) => {
-	const { data: environments, isLoading } = useQuery({
+	const {
+		data: environments = [],
+		isLoading,
+		error,
+	} = useQuery({
 		queryKey: ['environments'],
 		queryFn: () => EnvironmentApi.getLocalEnvironments(),
-		// Enable this when ready to use real API
+		// Handle potential API errors
+		retry: 2,
+		staleTime: 5 * 60 * 1000, // 5 minutes
 	});
-	const [activeEnvironment, setActiveEnvironment] = useState(environments?.find((env) => env.isActive) || environments?.[0]);
+
+	const [isOpen, setIsOpen] = useState(false);
+	// Initialize with null to avoid potential race conditions
+	const [activeEnvironment, setActiveEnvironment] = useState<(typeof environments)[0] | null>(null);
 
 	useEffect(() => {
-		setActiveEnvironment(environments?.find((env) => env.isActive) || environments?.[0]);
+		if (environments && environments.length > 0) {
+			setActiveEnvironment(environments.find((env) => env.isActive) || environments[0]);
+		}
 	}, [environments]);
 
-	if (isLoading)
+	if (isLoading || loading)
 		return (
 			<div>
 				<Skeleton className='h-10 w-full' />
 			</div>
 		);
 
-	// Use real environments data when available, fallback to test data
+	// Handle the case where there are no environments
+	if (environments.length === 0) {
+		return <div className='p-2 text-sm text-muted-foreground'>No environments available</div>;
+	}
+
+	// Handle errors
+	if (error) {
+		return <div className='p-2 text-sm text-red-500'>Error loading environments</div>;
+	}
 
 	const getEnvironmentIcon = (type: string) => {
 		switch (type) {
-			case 'production':
+			case 'PRODUCTION':
 				return <Rocket className='h-4 w-4' />;
-			case 'sandbox':
+			case 'SANDBOX':
 				return <Server className='h-4 w-4' />;
 			default:
 				return <Blocks className='h-4 w-4' />;
@@ -86,60 +97,59 @@ const FlexPriceSelect: React.FC<Props> = ({ disabled = false, className }) => {
 			value: env.id,
 			label: env.name,
 			prefixIcon: getEnvironmentIcon(env.type),
+			onSelect: () => handleChange(env.id),
 			// description: env.type === 'production' ? 'Live Environment' : 'Testing Environment',
 		})) || [];
 
 	const handleChange = (newValue: string) => {
 		EnvironmentApi.setActiveEnvironment(newValue);
 		setActiveEnvironment(environments?.find((env) => env.id === newValue) || environments?.[0]);
-		queryClient.invalidateQueries({});
+		// Only invalidate relevant queries instead of all queries
+		queryClient.invalidateQueries({ queryKey: ['environments'] });
+		queryClient.invalidateQueries({ queryKey: ['user'] });
 	};
 
+	// If activeEnvironment is null, use the first environment as a fallback
+	const currentEnvironment = activeEnvironment || environments[0];
+
 	return (
-		<div className={cn('mt-1', className)}>
-			<Select
-				defaultValue={activeEnvironment?.id || ''}
-				onValueChange={handleChange}
-				value={activeEnvironment?.id || ''}
-				disabled={disabled}>
-				<SelectTrigger className={cn('gap-2 bg-white', !disabled && 'cursor-pointer')}>
-					<span className={cn('truncate ', activeEnvironment?.id ? '' : 'text-muted-foreground')}>
-						<div className='flex flex-row items-center gap-2 text-zinc-500'>
-							<span className='size-4 text-muted-foreground'>
-								{options.find((option) => option.value === activeEnvironment?.id)?.prefixIcon}
+		<div className={cn('mt-1 w-full', className)}>
+			<Select open={isOpen} onOpenChange={setIsOpen} value={currentEnvironment?.id} onValueChange={handleChange} disabled={disabled}>
+				<SelectTrigger>
+					<div
+						onClick={() => setIsOpen(!isOpen)}
+						className={`w-full mt-2 flex items-center justify-between h-6 rounded-md gap-2 bg-contain`}>
+						<div className='flex items-center text-start gap-2'>
+							<span className='size-9 bg-black text-white flex justify-center items-center bg-contain rounded-md'>
+								{user?.tenant?.name
+									?.split(' ')
+									.map((n) => n[0])
+									.join('')
+									.slice(0, 2) || 'UN'}
 							</span>
-							{activeEnvironment?.name || 'Select Environment'}
+							<div className='text-start'>
+								<p className='font-semibold text-sm'>{user?.tenant?.name || 'Unknown'}</p>
+								<p className='text-xs text-muted-foreground'>{currentEnvironment?.name || 'No environment'}</p>
+							</div>
 						</div>
-					</span>
+						<button type='button'>
+							<ChevronsUpDown className='h-4 w-4 opacity-50' />
+						</button>
+					</div>
 				</SelectTrigger>
-				<SelectContent className='p-1'>
-					<SelectGroup>
-						<span className='!mb-2 text-muted-foreground text-xs font-medium'>Switch Environment</span>
-						{options.length > 0 &&
-							options.map((option) => (
-								<SelectItem
-									className={cn(
-										'cursor-pointer hover:bg-gray-50',
-										'flex items-center space-x-2 justify-between w-full rounded-md',
-										'transition-colors duration-150 ease-in-out',
-									)}
-									disabled={option.disabled}
-									key={option.value}
-									value={option.value}>
-									<div className={cn('flex w-full items-center gap-3 px-1 py-1', option.disabled && 'opacity-50 pointer-events-none')}>
-										<span className='text-muted-foreground shrink-0 size-4'>{option.prefixIcon}</span>
-										<div className='flex flex-col min-w-0 text-muted-foreground'>
-											<span className=' truncate'>{option.label}</span>
-											{option.description && <span className='text-xs text-muted-foreground truncate'>{option.description}</span>}
-										</div>
-									</div>
-								</SelectItem>
-							))}
-					</SelectGroup>
+				<SelectContent className='w-full mt-2'>
+					{options.map((option) => (
+						<SelectItem key={option.value} value={option.value}>
+							<div className='flex items-center gap-2 text-muted-foreground'>
+								{option.prefixIcon}
+								{option.label}
+							</div>
+						</SelectItem>
+					))}
 				</SelectContent>
 			</Select>
 		</div>
 	);
 };
 
-export default FlexPriceSelect;
+export default EnvironmentSelector;
