@@ -134,6 +134,7 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 							<p className='font-semibold text-[14px]'>{user?.tenant.name}</p>
 						</div>
 					)}
+
 					<SidebarTrigger />
 				</div>
 				<EnvironmentSelector />

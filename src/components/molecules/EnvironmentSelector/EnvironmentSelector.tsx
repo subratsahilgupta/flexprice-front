@@ -1,12 +1,13 @@
 import { Select, SelectContent, SelectGroup } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SelectOption } from '@/components/atoms';
 import { useQuery } from '@tanstack/react-query';
 import EnvironmentApi from '@/utils/api_requests/EnvironmentApi';
 import { Blocks, Rocket, Server, ChevronsUpDown } from 'lucide-react';
 import * as SelectPrimitive from '@radix-ui/react-select';
+import { queryClient } from '@/core/tanstack/ReactQueryProvider';
 
 const SelectTrigger = React.forwardRef<
 	React.ElementRef<typeof SelectPrimitive.Trigger>,
@@ -53,8 +54,12 @@ const FlexPriceSelect: React.FC<Props> = ({ disabled = false, className }) => {
 		queryKey: ['environments'],
 		queryFn: () => EnvironmentApi.getLocalEnvironments(),
 		// Enable this when ready to use real API
-		enabled: false,
 	});
+	const [activeEnvironment, setActiveEnvironment] = useState(environments?.find((env) => env.isActive) || environments?.[0]);
+
+	useEffect(() => {
+		setActiveEnvironment(environments?.find((env) => env.isActive) || environments?.[0]);
+	}, [environments]);
 
 	if (isLoading)
 		return (
@@ -64,26 +69,6 @@ const FlexPriceSelect: React.FC<Props> = ({ disabled = false, className }) => {
 		);
 
 	// Use real environments data when available, fallback to test data
-	const environmentsList = environments || [
-		{
-			id: 'production',
-			name: 'Production',
-			slug: 'production',
-			type: 'production',
-			created_at: '2021-01-01',
-			updated_at: '2021-01-01',
-			isActive: true,
-		},
-		{
-			id: 'sandbox',
-			name: 'Sandbox',
-			slug: 'sandbox',
-			type: 'sandbox',
-			created_at: '2021-01-01',
-			updated_at: '2021-01-01',
-			isActive: false,
-		},
-	];
 
 	const getEnvironmentIcon = (type: string) => {
 		switch (type) {
@@ -96,22 +81,25 @@ const FlexPriceSelect: React.FC<Props> = ({ disabled = false, className }) => {
 		}
 	};
 
-	const options: SelectOption[] = environmentsList.map((env) => ({
-		value: env.id,
-		label: env.name,
-		prefixIcon: getEnvironmentIcon(env.type),
-		// description: env.type === 'production' ? 'Live Environment' : 'Testing Environment',
-	}));
+	const options: SelectOption[] =
+		environments?.map((env) => ({
+			value: env.id,
+			label: env.name,
+			prefixIcon: getEnvironmentIcon(env.type),
+			// description: env.type === 'production' ? 'Live Environment' : 'Testing Environment',
+		})) || [];
 
-	const activeEnvironment = environmentsList.find((env) => env.isActive);
+	const handleChange = (newValue: string) => {
+		EnvironmentApi.setActiveEnvironment(newValue);
+		setActiveEnvironment(environments?.find((env) => env.id === newValue) || environments?.[0]);
+		queryClient.invalidateQueries({});
+	};
 
 	return (
 		<div className={cn('mt-1', className)}>
 			<Select
 				defaultValue={activeEnvironment?.id || ''}
-				onValueChange={(newValue) => {
-					EnvironmentApi.setActiveEnvironment(newValue);
-				}}
+				onValueChange={handleChange}
 				value={activeEnvironment?.id || ''}
 				disabled={disabled}>
 				<SelectTrigger className={cn('gap-2 bg-white', !disabled && 'cursor-pointer')}>

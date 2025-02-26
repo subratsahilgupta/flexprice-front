@@ -1,4 +1,5 @@
 import { AxiosClient } from '@/core/axios/verbs';
+import { PaginationType } from '@/models/Pagination';
 
 export interface Environment {
 	id: string;
@@ -22,12 +23,16 @@ export interface ExtendedEnvironment extends Environment {
 
 const STORAGE_KEY = 'flex_price_environments';
 
+interface EnvironmentResponse extends PaginationType {
+	environments: Environment[];
+}
+
 class EnvironmentApi {
 	private static baseUrl = '/environments';
 
 	// API Methods
-	public static async getAllEnvironments(): Promise<Environment[]> {
-		return await AxiosClient.get<Environment[]>(this.baseUrl);
+	public static async getAllEnvironments(): Promise<EnvironmentResponse> {
+		return await AxiosClient.get<EnvironmentResponse>(this.baseUrl);
 	}
 
 	public static async getEnvironmentById(id: string): Promise<Environment> {
@@ -87,17 +92,16 @@ class EnvironmentApi {
 	}
 
 	static async getLocalEnvironments(): Promise<ExtendedEnvironment[]> {
-		let environments = await this.getAllEnvironments();
+		const storedEnvironments = this.getStoredEnvironments();
 
-		console.log('environments', environments);
-
-		if (environments.length === 0) {
-			const res = await this.getAllEnvironments();
-			environments = res;
-			this.saveEnvironments(environments);
+		if (storedEnvironments.length > 0) {
+			return storedEnvironments;
 		}
 
-		return environments.map((env) => ({
+		const envData = await this.getAllEnvironments();
+		this.saveEnvironments(envData.environments);
+
+		return envData.environments.map((env) => ({
 			...env,
 			isActive: this.getActiveEnvironment()?.id === env.id,
 		}));

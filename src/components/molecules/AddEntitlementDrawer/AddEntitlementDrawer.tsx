@@ -250,7 +250,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 					{activeFeature && (
 						<div className='card p-4'>
 							<div className='flex justify-between items-start gap-4'>
-								<FormHeader title={activeFeature?.name} variant='sub-header' subtitle={activeFeature?.lookup_key} />
+								<FormHeader title={activeFeature?.name} variant='sub-header' />
 								<span className='mt-1'>{getFeatureIcon(activeFeature?.type)}</span>
 							</div>
 

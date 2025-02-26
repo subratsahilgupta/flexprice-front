@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { useNavigate, useLocation } from 'react-router-dom';
 import supabase from '@/core/supbase/config';
 import logo from '@/assets/logo/ic_rounded_flexpirce.svg';
+import { EyeIcon, EyeOff } from 'lucide-react';
 
 type AuthTab = 'login' | 'signup' | 'forgot-password';
 
@@ -13,6 +14,8 @@ const AuthPage: React.FC = () => {
 	const location = useLocation();
 	const userContext = useUser();
 	const [loading, setLoading] = useState(false);
+	const [showPassword, setShowPassword] = useState(false);
+	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
 	// Form fields
 	const [email, setEmail] = useState('');
@@ -83,8 +86,10 @@ const AuthPage: React.FC = () => {
 				email,
 				password,
 				options: {
+					emailRedirectTo: `${window.location.origin}/auth/verify-email`,
 					data: {
-						name,
+						name: name + ' ' + lastName,
+						email: email,
 					},
 				},
 			});
@@ -132,10 +137,14 @@ const AuthPage: React.FC = () => {
 			sessionStorage.setItem('authMode', currentTab);
 			console.log(`Starting Google authentication in ${currentTab} mode`);
 
+			// Get the current site URL (to handle different environments)
+			const siteUrl = window.location.origin;
+			console.log('Using site URL for redirect:', siteUrl + '/auth/verify-email');
+
 			const { data, error } = await supabase.auth.signInWithOAuth({
 				provider: 'google',
 				options: {
-					redirectTo: `${window.location.origin}/`,
+					redirectTo: siteUrl + '/auth/verify-email',
 					queryParams: {
 						// Add a custom parameter to identify if this is from signup page
 						authMode: currentTab,
@@ -145,14 +154,10 @@ const AuthPage: React.FC = () => {
 				},
 			});
 
-			if (error) {
-				console.error('Google auth error:', error);
-				toast.error(error.message);
-				setLoading(false);
-				return;
+			if (data) {
+				toast.success(data.url);
 			}
 
-			// Log the response data
 			console.log('Google auth initiated successfully:', {
 				provider: 'google',
 				url: data?.url,
@@ -160,8 +165,24 @@ const AuthPage: React.FC = () => {
 				timestamp: new Date().toISOString(),
 			});
 
-			// Note: Redirect happens automatically through Supabase
-			// The callback will be handled by AuthStateListener component
+			if (error) {
+				console.error('Google auth error:', error);
+				toast.error(error.message);
+				setLoading(false);
+				return;
+			}
+
+			// Important: Need to navigate to the URL provided by Supabase
+			if (data?.url) {
+				console.log('Redirecting to OAuth URL:', data.url);
+				window.location.href = data.url;
+			} else {
+				console.error('No redirect URL provided by Supabase');
+				toast.error('Authentication failed: No redirect URL provided');
+				setLoading(false);
+			}
+
+			// Note: Redirect will be handled by navigating to the URL
 		} catch (error) {
 			console.error('Unexpected Google auth error:', error);
 			toast.error('An unexpected error occurred');
@@ -283,9 +304,14 @@ const AuthPage: React.FC = () => {
 									Password
 								</label>
 								<Input
+									suffix={
+										<span onClick={() => setShowPassword(!showPassword)} className='cursor-pointer'>
+											{showPassword ? <EyeIcon className='w-5 h-5' /> : <EyeOff className='w-5 h-5' />}
+										</span>
+									}
 									id='password'
 									name='password'
-									type='password'
+									type={showPassword ? 'text' : 'password'}
 									placeholder='Create a password'
 									required
 									onChange={(s) => setPassword(s)}
@@ -298,8 +324,13 @@ const AuthPage: React.FC = () => {
 								</label>
 								<Input
 									id='confirmPassword'
+									suffix={
+										<span onClick={() => setShowConfirmPassword(!showConfirmPassword)} className='cursor-pointer'>
+											{showConfirmPassword ? <EyeIcon className='w-5 h-5' /> : <EyeOff className='w-5 h-5' />}
+										</span>
+									}
 									name='confirmPassword'
-									type='password'
+									type={showConfirmPassword ? 'text' : 'password'}
 									placeholder='Confirm your password'
 									required
 									onChange={(s) => setConfirmPassword(s)}
@@ -313,7 +344,7 @@ const AuthPage: React.FC = () => {
 
 						<p className='mt-6 text-center text-sm text-gray-600'>
 							Already have an account?{' '}
-							<button onClick={() => switchTab('login')} className='text-blue-600 hover:underline font-medium'>
+							<button onClick={() => switchTab('login')} className='text-grey-600 hover:underline font-medium'>
 								Log in
 							</button>
 						</p>
@@ -348,7 +379,7 @@ const AuthPage: React.FC = () => {
 
 						<p className='mt-6 text-center text-sm text-gray-600'>
 							Remember your password?{' '}
-							<button onClick={() => switchTab('login')} className='text-blue-600 hover:underline font-medium'>
+							<button onClick={() => switchTab('login')} className='text-grey-600 hover:underline font-medium'>
 								Back to login
 							</button>
 						</p>
@@ -414,7 +445,7 @@ const AuthPage: React.FC = () => {
 									<label htmlFor='password' className='block text-sm font-medium text-gray-700'>
 										Password
 									</label>
-									<button type='button' onClick={() => switchTab('forgot-password')} className='text-sm text-blue-600 hover:underline'>
+									<button type='button' onClick={() => switchTab('forgot-password')} className='text-sm text-grey-600 hover:underline'>
 										Forgot your password?
 									</button>
 								</div>
@@ -435,7 +466,7 @@ const AuthPage: React.FC = () => {
 
 						<p className='mt-6 text-center text-sm text-gray-600'>
 							Don't have an account?{' '}
-							<button onClick={() => switchTab('signup')} className='text-blue-600 hover:underline font-medium'>
+							<button onClick={() => switchTab('signup')} className='text-grey-600 hover:underline font-medium'>
 								Sign up
 							</button>
 						</p>

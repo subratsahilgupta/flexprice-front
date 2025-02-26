@@ -4,7 +4,6 @@ import supabase from '../supbase/config';
 import { useUser } from '@/hooks/UserContext';
 import { useQuery } from '@tanstack/react-query';
 import { Spinner } from '@/components/atoms';
-import AuthStateListener from './AuthStateListener';
 
 interface AuthMiddlewareProps {
 	children: ReactNode;
@@ -57,7 +56,7 @@ const AuthMiddleware: React.FC<AuthMiddlewareProps> = ({ children }) => {
 	// }
 
 	// Wrap children with AuthStateListener to handle auth state changes
-	return <AuthStateListener>{children}</AuthStateListener>;
+	return <div>{children}</div>;
 };
 
 export default AuthMiddleware;

@@ -3,7 +3,6 @@ import { Meter } from './Meter';
 interface Feature {
 	id: string;
 	name: string;
-	lookup_key: string;
 	description: string;
 	meter_id: string;
 	metadata: Record<string, any>;
