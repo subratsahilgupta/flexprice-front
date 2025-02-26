@@ -7,7 +7,7 @@
 </b>
 </h3 >
 <p align="center">
-🌟 Built with developers in mind, so you don’t have to create
+🌟 Built with developers in mind, so you don't have to create
 billing and metering from scratch. 🌟
 </p>
 
@@ -39,7 +39,7 @@ Usage metering, subscription management and infra cost into one stack
 
 Developers don't need to spend **months** building internal metering and rating systems.
 
-Flexprice offers APIs, SDKs, self serve UI widgest, internal dashboards and more to help you get started in minutes. With Flexprice, you can:
+Flexprice offers APIs, SDKs, self serve UI widgets, internal dashboards and more to help you get started in minutes. With Flexprice, you can:
 
 - **Evolve your pricing with flexibility**: We support Usage-based pricing, Minimum commitments, Volume discounts, Prepaid Credits, Upgrades and downgrades, etc.
 
@@ -49,25 +49,101 @@ Flexprice offers APIs, SDKs, self serve UI widgest, internal dashboards and more
 
 <img src="./assets/open-arch.png" alt="Flexprice Dashboard"/>
 
-### 🚀 Setting up Flexprice from source for development and contributions
+## 🚀 Quick Start Guide
 
-To run Flexprice for local development or running from source, you will need
+### Prerequisites
 
-1. [Golang](https://go.dev/)
-2. Any of the below supported platform environments:
-   1. [Linux based environment](https://en.wikipedia.org/wiki/Comparison_of_Linux_distributions)
-   2. [OSX (Darwin) based environment](https://en.wikipedia.org/wiki/MacOS)
-   3. WSL under Windows
+- Node.js 16+
+- npm/yarn
+- Git
+
+### Frontend Setup
+
+1. **Clone & Install**
 
 ```bash
-git clone https://github.com/flexprice/flexprice
-cd flexprice
-go run cmd/server/main.go
+# Clone repository
+git clone https://github.com/flexprice/flexprice-frontend
+cd flexprice-frontend
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
 ```
 
-### Code Architecture
+2. **Configure Environment**
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for more details on the code architecture and design principles.
+```bash
+# Copy environment template
+cp .env.example .env.local
+
+# Update environment variables
+# Get required API keys from team lead
+```
+
+3. **Install Required Extensions**
+
+- ESLint
+- Prettier
+- Tailwind CSS IntelliSense
+
+### Tech Stack
+
+- React + TypeScript
+- TanStack Query for data fetching
+- Shadcn UI components
+- Tailwind CSS for styling
+
+### Key Features
+
+- Environment management
+- Product catalog
+- Customer management
+- Subscription handling
+- Usage tracking
+- Invoice management
+
+## 🏗️ Project Structure
+
+```
+src/
+├── components/          # Reusable UI components
+│   ├── atoms/          # Basic components (buttons, inputs)
+│   ├── molecules/      # Composite components
+│   └── organisms/      # Complex components
+├── pages/              # Route components
+├── hooks/              # Custom React hooks
+├── store/              # Global state management
+├── utils/              # Helper functions
+│   └── api_requests/   # API integration
+├── models/             # TypeScript interfaces
+└── core/               # Core application logic
+```
+
+## 📚 Development Guidelines
+
+### Branch Management
+
+```bash
+# Create feature branch
+git checkout -b feat/[feature-name]
+
+# Create bugfix branch
+git checkout -b fix/[bug-name]
+```
+
+### Best Practices
+
+- Follow atomic design principles
+- Keep components focused and single-responsibility
+- Use TypeScript for type safety
+- Implement proper error handling
+- Write unit tests for critical logic
+- Follow ESLint and Prettier rules
+
+For detailed development guidelines, check our [Onboarding Guide](docs/onboarding.md).
 
 ## 👨🏻‍💻 Let's Build Together! 👩🏻‍💻
 
@@ -79,6 +155,16 @@ Whether you're a newbie coder or a wizard 🧙‍♀️, your perspective is gol
 
 ❤️ [Code of Conduct](CODE_OF_CONDUCT.md)
 
-## ✨ Resources!
+## ✨ Resources
 
 📖 [API Docs](https://docs.flexprice.io/)
+
+📚 [Onboarding Guide](docs/onboarding.md)
+
+🎯 [Conventions & Best Practices](docs/conventions.md)
+
+## 🆘 Need Help?
+
+- Check our [Troubleshooting Guide](docs/onboarding.md#troubleshooting-common-issues)
+- Join our [Discord Community](https://discord.gg/flexprice)
+- Contact support@flexprice.io

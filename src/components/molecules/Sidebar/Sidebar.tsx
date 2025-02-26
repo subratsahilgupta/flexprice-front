@@ -10,20 +10,20 @@ import {
 import React from 'react';
 import SidebarNav, { NavItem } from './SidebarMenu';
 import { cn } from '@/lib/utils';
-import { LogOut, Plug2, Puzzle, Star } from 'lucide-react';
+import { LogOut, Plug2, Star, BookOpen, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import supabase from '@/core/supbase/config';
 import useUser from '@/hooks/useUser';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RouteNames } from '@/core/routes/Routes';
-
+import { EnvironmentSelector } from '@/components/molecules';
 const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }) => {
 	const { open } = useSidebar();
 	const navigate = useNavigate();
 	const handleLogout = async () => {
 		await supabase.auth.signOut();
 		localStorage.clear();
-		navigate('/login');
+		navigate('/auth');
 	};
 
 	const { loading, user } = useUser();
@@ -75,12 +75,12 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				icon: '/assets/svg/receipt.svg',
 			},
 
-			{
-				title: 'Quotation',
-				url: '/roles',
-				icon: '/assets/svg/quotation.svg',
-				disabled: true,
-			},
+			// {
+			// 	title: 'Quotation',
+			// 	url: '/roles',
+			// 	icon: '/assets/svg/quotation.svg',
+			// 	disabled: true,
+			// },
 		],
 		'Product Cataglog': [
 			{
@@ -94,12 +94,12 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				icon: <Star />,
 				// disabled: true,
 			},
-			{
-				title: 'Add On',
-				url: RouteNames.addOn,
-				icon: <Puzzle />,
-				disabled: true,
-			},
+			// {
+			// 	title: 'Add On',
+			// 	url: RouteNames.addOn,
+			// 	icon: <Puzzle />,
+			// 	disabled: true,
+			// },
 		],
 		'Insights & Tools': [
 			{
@@ -134,8 +134,10 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 							<p className='font-semibold text-[14px]'>{user?.tenant.name}</p>
 						</div>
 					)}
+
 					<SidebarTrigger />
 				</div>
+				<EnvironmentSelector />
 			</SidebarHeader>
 			<SidebarContent className='gap-0'>
 				{Object.entries(navMain).map(([key, value]) => (
@@ -145,11 +147,23 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 			<SidebarFooter>
 				<SidebarMenuButton
 					onClick={() => {
+						window.open('https://docs.flexprice.io', '_blank');
+					}}
+					tooltip={'Documentation'}
+					className={cn(`flex items-center justify-between gap-2 hover:bg-muted transition-colors `)}>
+					<span className='flex items-center gap-2'>
+						<BookOpen className='size-4' />
+						<span className='text-sm select-none'>{'Documentation'}</span>
+					</span>
+					<ExternalLink />
+				</SidebarMenuButton>
+				<SidebarMenuButton
+					onClick={() => {
 						handleLogout();
 					}}
 					tooltip={'Logout'}
 					className={cn(`flex items-center gap-2 hover:bg-muted transition-colors `)}>
-					{<LogOut />}
+					<LogOut />
 					<span className='text-sm select-none'>{'Logout'}</span>
 				</SidebarMenuButton>
 			</SidebarFooter>

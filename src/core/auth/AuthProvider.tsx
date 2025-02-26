@@ -48,14 +48,15 @@ const AuthMiddleware: React.FC<AuthMiddlewareProps> = ({ children }) => {
 	}
 
 	if (isError || !user) {
-		return <Navigate to='/login' />;
+		return <Navigate to='/auth' />;
 	}
 
 	// if (requiredRole && !requiredRole.includes(user.role)) {
 	//     return <Navigate to="/not-authorized" />;
 	// }
 
-	return <>{children}</>;
+	// Wrap children with AuthStateListener to handle auth state changes
+	return <div>{children}</div>;
 };
 
 export default AuthMiddleware;

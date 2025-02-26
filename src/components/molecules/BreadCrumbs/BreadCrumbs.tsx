@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { BsChevronRight } from 'react-icons/bs';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import { useBreadcrumbs } from '@/hooks/useBreadcrumbs';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 
 const BreadCrumbs: FC = () => {
 	useBreadcrumbs();
@@ -24,6 +25,11 @@ const BreadCrumbs: FC = () => {
 			<div className='px-6 py-4'>
 				{/* Breadcrumbs */}
 				<nav className='flex items-center space-x-2 text-sm text-gray-500'>
+					<div className='flex items-center gap-2 mr-2'>
+						<SidebarTrigger className='text-gray-800' />
+						<div className='h-5 w-[1px] border-r border-gray-200'></div>
+					</div>
+
 					{breadcrumbs.map((breadcrumb, index) => (
 						<span key={index} className='flex items-center space-x-2'>
 							{breadcrumb.isLoading ? (

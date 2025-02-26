@@ -20,7 +20,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 			setUser(user);
 		} catch (error) {
 			supabase.auth.signOut();
-			<Navigate to={'/login'} />;
+			<Navigate to={'/auth'} />;
 		}
 	}, []);
 
