@@ -4,7 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
 import EnvironmentApi from '@/utils/api_requests/EnvironmentApi';
 import { Blocks, Rocket, Server, ChevronsUpDown } from 'lucide-react';
-import { queryClient } from '@/core/tanstack/ReactQueryProvider';
+import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 import useUser from '@/hooks/useUser';
 import { Select, SelectContent } from '@/components/ui/select';
 import * as SelectPrimitive from '@radix-ui/react-select';
@@ -103,12 +103,11 @@ const EnvironmentSelector: React.FC<Props> = ({ disabled = false, className }) =
 			// description: env.type === 'production' ? 'Live Environment' : 'Testing Environment',
 		})) || [];
 
-	const handleChange = (newValue: string) => {
+	const handleChange = async (newValue: string) => {
 		EnvironmentApi.setActiveEnvironment(newValue);
 		setActiveEnvironment(environments?.find((env) => env.id === newValue) || environments?.[0]);
-		// Only invalidate relevant queries instead of all queries
-		queryClient.invalidateQueries({ queryKey: ['environments'] });
-		queryClient.invalidateQueries({ queryKey: ['user'] });
+		// Refetch all queries to ensure data consistency across the application
+		await refetchQueries(undefined);
 	};
 
 	// If activeEnvironment is null, use the first environment as a fallback

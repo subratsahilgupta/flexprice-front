@@ -451,7 +451,12 @@ const AuthPage: React.FC = () => {
 								<Input
 									id='password'
 									name='password'
-									type='password'
+									type={showPassword ? 'text' : 'password'}
+									suffix={
+										<span onClick={() => setShowPassword(!showPassword)} className='cursor-pointer'>
+											{showPassword ? <EyeIcon className='w-5 h-5' /> : <EyeOff className='w-5 h-5' />}
+										</span>
+									}
 									placeholder='Enter your password'
 									required
 									onChange={(s) => setPassword(s)}
