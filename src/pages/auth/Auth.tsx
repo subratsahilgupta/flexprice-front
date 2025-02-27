@@ -4,7 +4,6 @@ import { Button, Input, Spacer } from '@/components/atoms';
 import toast from 'react-hot-toast';
 import { useNavigate, useLocation } from 'react-router-dom';
 import supabase from '@/core/supbase/config';
-import logo from '@/assets/logo/ic_rounded_flexpirce.svg';
 import { EyeIcon, EyeOff } from 'lucide-react';
 
 type AuthTab = 'login' | 'signup' | 'forgot-password';
@@ -452,7 +451,12 @@ const AuthPage: React.FC = () => {
 								<Input
 									id='password'
 									name='password'
-									type='password'
+									type={showPassword ? 'text' : 'password'}
+									suffix={
+										<span onClick={() => setShowPassword(!showPassword)} className='cursor-pointer'>
+											{showPassword ? <EyeIcon className='w-5 h-5' /> : <EyeOff className='w-5 h-5' />}
+										</span>
+									}
 									placeholder='Enter your password'
 									required
 									onChange={(s) => setPassword(s)}
@@ -481,7 +485,7 @@ const AuthPage: React.FC = () => {
 			<div className='w-1/2 flex justify-center items-center'>
 				<div className='flex flex-col justify-center max-w-xl w-[60%] mx-auto'>
 					<div className='flex justify-center mb-4'>
-						<img src={logo} alt='Flexprice Logo' className='h-12' />
+						<img src={'/ic_rounded_flexpirce.svg'} alt='Flexprice Logo' className='h-12' />
 					</div>
 
 					{renderForm()}
@@ -492,7 +496,7 @@ const AuthPage: React.FC = () => {
 			<div className='w-1/2 p-4 relative bg-[#D3DAEA] flex flex-col justify-center font-qanelas'>
 				{/* bottom pattern - positioned above bg but below content */}
 				<img
-					src='/src/assets/svg/login_bg_pattern.svg'
+					src={'/assets/png/login_bg_pattern.svg'}
 					alt='Pattern Background'
 					className='w-full absolute bottom-0 z-[1] left-0 filter brightness-0 invert'
 				/>
@@ -505,7 +509,7 @@ const AuthPage: React.FC = () => {
 					</p>
 
 					<div className='mt-8 w-[80%] mx-auto'>
-						<img src='/src/assets/png/ic_login_bg.png' alt='Pricing Plans' className='w-full' />
+						<img src={'/assets/png/ic_login_bg.png'} alt='Pricing Plans' className='w-full' />
 					</div>
 				</div>
 			</div>

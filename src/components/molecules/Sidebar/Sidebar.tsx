@@ -1,32 +1,20 @@
-import {
-	Sidebar,
-	SidebarContent,
-	SidebarFooter,
-	SidebarHeader,
-	SidebarMenuButton,
-	SidebarTrigger,
-	useSidebar,
-} from '@/components/ui/sidebar';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenuButton } from '@/components/ui/sidebar';
 import React from 'react';
 import SidebarNav, { NavItem } from './SidebarMenu';
 import { cn } from '@/lib/utils';
 import { LogOut, Plug2, Star, BookOpen, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import supabase from '@/core/supbase/config';
-import useUser from '@/hooks/useUser';
-import { Skeleton } from '@/components/ui/skeleton';
+
 import { RouteNames } from '@/core/routes/Routes';
 import { EnvironmentSelector } from '@/components/molecules';
 const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }) => {
-	const { open } = useSidebar();
 	const navigate = useNavigate();
 	const handleLogout = async () => {
 		await supabase.auth.signOut();
 		localStorage.clear();
 		navigate('/auth');
 	};
-
-	const { loading, user } = useUser();
 
 	const navMain: { [key: string]: NavItem[] } = {
 		'Usage Tracking': [
@@ -119,24 +107,6 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 	return (
 		<Sidebar collapsible='icon' {...props} className='font-open-sans border-none shadow-md max-w-[256px] bg-[#F8FAFC]'>
 			<SidebarHeader>
-				<div className='w-full mt-2 flex items-center justify-between'>
-					{loading ? (
-						<Skeleton className={`h-6 w-full`}></Skeleton>
-					) : (
-						<div className={`h-6 flex w-full rounded-md items-center gap-2 bg-contain ${!open ? 'hidden' : ''}`}>
-							<span className='size-7 bg-black text-white flex justify-center items-center bg-contain rounded-md'>
-								{user?.tenant.name
-									?.split(' ')
-									.map((n) => n[0])
-									.join('')
-									.slice(0, 2)}
-							</span>
-							<p className='font-semibold text-[14px]'>{user?.tenant.name}</p>
-						</div>
-					)}
-
-					<SidebarTrigger />
-				</div>
 				<EnvironmentSelector />
 			</SidebarHeader>
 			<SidebarContent className='gap-0'>
