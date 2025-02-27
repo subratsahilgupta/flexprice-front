@@ -30,6 +30,7 @@ import IntegrationDetails from '@/pages/insights-tools/integrations/IntegrationD
 import FeatureDetails from '@/pages/product-catalog/features/FeatureDetails';
 import AddOn from '@/pages/product-catalog/addons/AddOn';
 import CustomerInvoiceDetailsPage from '@/pages/customer/customers/CustomerInvoiceDetailsPage';
+import DeveloperPage from '@/pages/developer/developer';
 export const RouteNames = {
 	home: '/',
 	login: '/auth',
@@ -65,6 +66,9 @@ export const RouteNames = {
 	integrations: '/insights-&-tools/integrations',
 	integrationDetails: '/insights-&-tools/integrations',
 	importExport: '/insights-&-tools/bulk-imports',
+
+	// footer
+	developers: '/developers',
 };
 
 export const MainRouter = createBrowserRouter([
@@ -223,6 +227,10 @@ export const MainRouter = createBrowserRouter([
 						element: <ImportExport />,
 					},
 				],
+			},
+			{
+				path: RouteNames.developers,
+				element: <DeveloperPage />,
 			},
 		],
 	},
