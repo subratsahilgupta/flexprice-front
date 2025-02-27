@@ -9,6 +9,7 @@ import useUser from '@/hooks/useUser';
 import { Select, SelectContent } from '@/components/ui/select';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { SelectOption } from '@/components/atoms/Select/Select';
+import { useSidebar } from '@/components/ui/sidebar';
 
 interface Props {
 	disabled?: boolean;
@@ -41,6 +42,7 @@ const SelectItem = React.forwardRef<
 
 const EnvironmentSelector: React.FC<Props> = ({ disabled = false, className }) => {
 	const { loading, user } = useUser();
+	const { open: sidebarOpen } = useSidebar();
 
 	const {
 		data: environments = [],
@@ -127,12 +129,12 @@ const EnvironmentSelector: React.FC<Props> = ({ disabled = false, className }) =
 									.join('')
 									.slice(0, 2) || 'UN'}
 							</span>
-							<div className='text-start'>
+							<div className={cn('text-start', sidebarOpen ? '' : 'hidden')}>
 								<p className='font-semibold text-sm'>{user?.tenant?.name || 'Unknown'}</p>
 								<p className='text-xs text-muted-foreground'>{currentEnvironment?.name || 'No environment'}</p>
 							</div>
 						</div>
-						<button type='button'>
+						<button type='button' className={cn(sidebarOpen ? '' : 'hidden')}>
 							<ChevronsUpDown className='h-4 w-4 opacity-50' />
 						</button>
 					</div>
