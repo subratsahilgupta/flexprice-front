@@ -1,12 +1,13 @@
 import { Button, FormHeader, SectionHeader } from '@/components/atoms';
-import { ColumnData, FlexpriceTable, Pagination } from '@/components/molecules';
+import { ColumnData, DropdownMenu, FlexpriceTable, Pagination, SecretKeyDrawer } from '@/components/molecules';
 import SecretKeysApi from '@/utils/api_requests/SecretKeysApi';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { SecretKey } from '@/models/SecretKey';
 import usePagination from '@/hooks/usePagination';
 import { formatDateShort } from '@/utils/common/helper_functions';
 import { Plus, Eye, Pencil, EyeOff, LucideIcon, ShieldCheck, Key } from 'lucide-react';
-
+import { useState } from 'react';
+import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 // Utility function to format permissions for display
 export const formatPermissionDisplay = (permissions: readonly string[]): string => {
 	const hasRead = permissions.includes('read');
@@ -55,63 +56,7 @@ export const getPermissionColor = (permissions: readonly string[]): string => {
 	}
 };
 
-// Sample data for demonstration
-const sampleSecretKeys: SecretKey[] = [
-	{
-		id: '1',
-		name: 'Production API Key',
-		display_id: 'sk_live_abcd1234efgh5678ijkl9012',
-		permissions: ['read', 'write'],
-		created_at: new Date().toISOString(),
-		expires_at: new Date(Date.now() + 365 * 86400000).toISOString(), // 1 year from now
-		last_used_at: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-		provider: 'flexprice',
-		status: 'active',
-		type: 'secret_key',
-		updated_at: new Date().toISOString(),
-	},
-	{
-		id: '2',
-		name: 'Read-only API Key',
-		display_id: 'sk_live_zxcv4321asdf9876qwer5432',
-		permissions: ['read'],
-		created_at: new Date(Date.now() - 86400000).toISOString(), // Yesterday
-		expires_at: new Date(Date.now() + 180 * 86400000).toISOString(), // 180 days from now
-		last_used_at: new Date(Date.now() - 86400000).toISOString(), // Yesterday
-		provider: 'flexprice',
-		status: 'active',
-		type: 'secret_key',
-		updated_at: new Date(Date.now() - 86400000).toISOString(),
-	},
-	{
-		id: '3',
-		name: 'Write-only API Key',
-		display_id: 'sk_live_mnbv7890poiu1234lkjh5678',
-		permissions: ['write'],
-		created_at: new Date(Date.now() - 2 * 86400000).toISOString(), // 2 days ago
-		expires_at: new Date(Date.now() + 90 * 86400000).toISOString(), // 90 days from now
-		last_used_at: new Date(Date.now() - 2 * 86400000).toISOString(), // 2 days ago
-		provider: 'flexprice',
-		status: 'active',
-		type: 'secret_key',
-		updated_at: new Date(Date.now() - 2 * 86400000).toISOString(),
-	},
-	{
-		id: '4',
-		name: 'Disabled API Key',
-		display_id: 'sk_live_tyui6543ghjk3210fgbn7890',
-		permissions: [],
-		created_at: new Date(Date.now() - 7 * 86400000).toISOString(), // 7 days ago
-		expires_at: new Date(Date.now() - 1 * 86400000).toISOString(), // Expired yesterday
-		last_used_at: new Date(Date.now() - 7 * 86400000).toISOString(), // 7 days ago
-		provider: 'flexprice',
-		status: 'expired',
-		type: 'secret_key',
-		updated_at: new Date(Date.now() - 1 * 86400000).toISOString(),
-	},
-];
-
-const columns: ColumnData<SecretKey>[] = [
+const baseColumns: ColumnData<SecretKey>[] = [
 	{
 		title: 'Name',
 		render(rowData: SecretKey) {
@@ -170,27 +115,57 @@ const DeveloperPage = () => {
 		queryFn: () => SecretKeysApi.getAllSecretKeys({ limit, offset }),
 	});
 
+	const { mutate: deleteSecretKey, isPending: isDeletingSecretKey } = useMutation({
+		mutationFn: (id: string) => SecretKeysApi.deleteSecretKey(id),
+		onSuccess: () => {
+			refetchQueries(['secret-keys']);
+		},
+	});
+
+	const [isSecretKeyDrawerOpen, setIsSecretKeyDrawerOpen] = useState(false);
+
 	const handleAddSecretKey = () => {
-		console.log('add secret key');
+		setIsSecretKeyDrawerOpen(true);
 	};
 
+	const columns: ColumnData<SecretKey>[] = [
+		...baseColumns,
+		{
+			width: 50,
+			align: 'right',
+			render(rowData: SecretKey) {
+				return (
+					<div className='flex justify-end'>
+						<DropdownMenu
+							options={[
+								{
+									label: 'Delete',
+									onSelect: () => deleteSecretKey(rowData.id),
+									disabled: isDeletingSecretKey,
+									icon: <EyeOff size={16} />,
+								},
+							]}
+						/>
+					</div>
+				);
+			},
+		},
+	];
 	console.log(secretKeys);
 
 	return (
 		<div className='page'>
+			<SecretKeyDrawer isOpen={isSecretKeyDrawerOpen} onOpenChange={setIsSecretKeyDrawerOpen} />
 			<div className='w-2/3 flex flex-col gap-4'>
 				<SectionHeader title='Developers' />
 				<div className='w-full flex flex-col gap-4 card'>
 					<div className='flex mb-4 justify-between items-center'>
 						<FormHeader title='Api Keys' variant='sub-header' />
-						<Button
-							onClick={handleAddSecretKey}
-							className='bg-primary text-white px-4 inline-flex items-center py-2 rounded-md hover:bg-primary-dark'>
+						<Button variant={'outline'} className='size-8' onClick={handleAddSecretKey}>
 							<Plus />
-							Create Api Key
 						</Button>
 					</div>
-					<FlexpriceTable columns={columns} data={sampleSecretKeys || []} />
+					<FlexpriceTable columns={columns} data={secretKeys?.items || []} />
 					<Pagination totalPages={secretKeys?.pagination.total || 0} />
 				</div>
 			</div>

@@ -31,9 +31,12 @@ import FeatureDetails from '@/pages/product-catalog/features/FeatureDetails';
 import AddOn from '@/pages/product-catalog/addons/AddOn';
 import CustomerInvoiceDetailsPage from '@/pages/customer/customers/CustomerInvoiceDetailsPage';
 import DeveloperPage from '@/pages/developer/developer';
+import SignupConfirmation from '@/pages/auth/SignupConfirmation';
+
 export const RouteNames = {
 	home: '/',
 	login: '/auth',
+	signupConfirmation: '/auth/signup/confirmation',
 
 	// usage tracking routes
 	usageTracking: '/usage-tracking',
@@ -75,6 +78,10 @@ export const MainRouter = createBrowserRouter([
 	{
 		path: RouteNames.login,
 		element: <Auth />,
+	},
+	{
+		path: RouteNames.signupConfirmation,
+		element: <SignupConfirmation />,
 	},
 	{
 		path: RouteNames.home,

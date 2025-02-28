@@ -2,15 +2,15 @@
  * Represents an API key in the system
  */
 export interface SecretKey {
-	readonly created_at: string;
-	readonly display_id: string;
-	readonly expires_at: string;
-	readonly id: string;
-	readonly last_used_at: string;
-	readonly name: string;
-	readonly permissions: readonly string[];
-	readonly provider: string;
-	readonly status: string;
-	readonly type: string;
-	readonly updated_at: string;
+	created_at: string;
+	display_id: string;
+	expires_at?: string;
+	id: string;
+	last_used_at: string;
+	name: string;
+	permissions: string[];
+	provider: string;
+	status: string;
+	type: string;
+	updated_at: string;
 }

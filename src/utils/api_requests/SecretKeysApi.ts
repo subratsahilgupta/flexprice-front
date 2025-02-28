@@ -27,7 +27,7 @@ interface GetAllSecretKeysResponse {
 interface CreateSecretKeyPayload {
 	name: string;
 	permissions: string[];
-	expires_at: string;
+	expires_at?: string;
 	type: string;
 }
 

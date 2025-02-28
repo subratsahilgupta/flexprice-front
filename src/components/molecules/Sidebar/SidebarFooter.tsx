@@ -26,7 +26,7 @@ const SidebarFooter = () => {
 	if (loading) return <Skeleton className='w-full h-10' />;
 
 	return (
-		<div>
+		<div className='flex flex-col gap-2 w-full'>
 			<SidebarMenuButton
 				isActive={true}
 				onClick={() => {
