@@ -14,6 +14,7 @@ const AuthPage: React.FC = () => {
 
 	// Get current tab from URL or default to login
 	const [currentTab, setCurrentTab] = useState<AuthTab>('login');
+	const environment = import.meta.env.VITE_ENVIRONMENT;
 
 	// Parse query parameters on component mount and tab changes
 	useEffect(() => {
@@ -66,8 +67,27 @@ const AuthPage: React.FC = () => {
 						<img src={'/ic_rounded_flexpirce.svg'} alt='Flexprice Logo' className='h-12' />
 					</div>
 
+					{currentTab === 'signup' && (
+						<>
+							<h2 className='text-3xl font-bold text-center text-gray-800 mb-2'>Create an Account</h2>
+							<p className='text-center text-gray-600 mb-8'>Sign up to start using Flexprice.</p>
+						</>
+					)}
+					{currentTab === 'login' && (
+						<>
+							<h2 className='text-3xl font-bold text-center text-gray-800 mb-2'>Login to your Account</h2>
+							<p className='text-center text-gray-600 mb-8'>Login to start using Flexprice.</p>
+						</>
+					)}
+					{currentTab === 'forgot-password' && (
+						<>
+							<h2 className='text-3xl font-bold text-center text-gray-800 mb-2'>Forgot your Password?</h2>
+							<p className='text-center text-gray-600 mb-8'>Enter your email to reset your password.</p>
+						</>
+					)}
+
 					{/* Google Sign-in Button - Only show on login and signup tabs */}
-					{currentTab !== 'forgot-password' && (
+					{currentTab !== 'forgot-password' && environment != 'self-hosted' && (
 						<>
 							<GoogleSignin />
 							<div className='flex items-center justify-center my-6'>
@@ -86,9 +106,10 @@ const AuthPage: React.FC = () => {
 			<div className='w-1/2 p-4 relative bg-[#D3DAEA] flex flex-col justify-center font-qanelas'>
 				{/* bottom pattern - positioned above bg but below content */}
 				<img
+					loading='lazy'
 					src={'/assets/png/login_bg_pattern.svg'}
 					alt='Pattern Background'
-					className='w-full absolute bottom-0 z-[1] left-0 filter brightness-0 invert'
+					className='w-full absolute max-w-md bottom-0 z-[1] left-0 filter brightness-0 invert'
 				/>
 				<div className='w-[80%] mx-auto text-center relative z-[2]'>
 					<h2 className='text-3xl font-bold text-gray-900'>Developers should focus on building, not billing</h2>

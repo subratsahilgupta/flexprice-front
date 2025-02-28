@@ -8,7 +8,6 @@ import { CodeXml } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import supabase from '@/core/supbase/config';
 import useUser from '@/hooks/useUser';
-import { Spacer } from '@/components/atoms';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Skeleton } from '@/components/ui/skeleton';
 const SidebarFooter = () => {
@@ -55,18 +54,20 @@ const SidebarFooter = () => {
 				<ExternalLink />
 			</SidebarMenuButton>
 
-			<Spacer height={12} />
 			{/* user profile */}
 			<Popover>
 				<PopoverTrigger>
 					<div
 						// onClick={() => setIsOpen(!isOpen)}
 						className={`w-full !my-2 mt-2 flex items-center justify-between h-6 rounded-md gap-2 bg-contain`}>
-						<div className='flex items-center text-start gap-2'>
-							<img
-								src='https://avatar.iran.liara.run/public'
-								className='size-9  text-white flex justify-center items-center bg-contain rounded-md'
-							/>
+						<div className='flex items-center text-start gap-2 flex-grow overflow-x-hidden'>
+							<span className='size-8 bg-black text-white flex justify-center items-center bg-contain rounded-md'>
+								{user?.email
+									?.split(' ')
+									.map((n) => n[0].toUpperCase())
+									.join('')
+									.slice(0, 2) || 'UN'}
+							</span>
 							<div className={cn('text-start', sidebarOpen ? '' : 'hidden')}>
 								{/* <p className='font-semibold text-sm'>{user?.tenant?.name || 'Unknown'}</p> */}
 								<p className='text-xs text-muted-foreground truncate'>{user?.email}</p>
