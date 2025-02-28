@@ -6,7 +6,7 @@ import AuthApi from '@/utils/api_requests/AuthApi';
 import { useMutation } from '@tanstack/react-query';
 import { EyeOff } from 'lucide-react';
 import { EyeIcon } from 'lucide-react';
-
+import { RouteNames } from '@/core/routes/Routes';
 interface SignupFormProps {
 	switchTab: (tab: string) => void;
 }
@@ -39,6 +39,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 			toast.success('Account created successfully! Please check your email to confirm your account.');
 			switchTab('login');
 		},
+
 		onError: (error: any) => {
 			const errorMessage = error.error || 'An unexpected error occurred during signup';
 			toast.error(errorMessage);
@@ -85,25 +86,23 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 			return;
 		}
 		if (environment != 'self-hosted') {
-			const { data, error } = await supabase.auth.signUp({
+			const { error } = await supabase.auth.signUp({
 				email: signupData.email,
 				password: signupData.password,
 				options: {
-					// emailRedirectTo: `${window.location.origin}/auth`,
+					emailRedirectTo: `${window.location.origin}${RouteNames.signupConfirmation}`,
 				},
 			});
 
 			if (error) {
-				toast.error(error.message);
+				toast.error(error.message || 'Something went wrong');
 				console.log('error', error);
 				return;
 			}
-			if (!data) {
-				toast.error('Something went wrong');
-				return;
-			}
+			toast.success('Account created successfully! Please check your email to confirm your account.');
+		} else {
+			signup();
 		}
-		signup();
 	};
 
 	return (
