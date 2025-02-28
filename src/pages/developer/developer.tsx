@@ -1,12 +1,13 @@
 import { Button, FormHeader, SectionHeader } from '@/components/atoms';
-import { ColumnData, FlexpriceTable, Pagination, SecretKeyDrawer } from '@/components/molecules';
+import { ColumnData, DropdownMenu, FlexpriceTable, Pagination, SecretKeyDrawer } from '@/components/molecules';
 import SecretKeysApi from '@/utils/api_requests/SecretKeysApi';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { SecretKey } from '@/models/SecretKey';
 import usePagination from '@/hooks/usePagination';
 import { formatDateShort } from '@/utils/common/helper_functions';
 import { Plus, Eye, Pencil, EyeOff, LucideIcon, ShieldCheck, Key } from 'lucide-react';
 import { useState } from 'react';
+import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 // Utility function to format permissions for display
 export const formatPermissionDisplay = (permissions: readonly string[]): string => {
 	const hasRead = permissions.includes('read');
@@ -55,7 +56,7 @@ export const getPermissionColor = (permissions: readonly string[]): string => {
 	}
 };
 
-const columns: ColumnData<SecretKey>[] = [
+const baseColumns: ColumnData<SecretKey>[] = [
 	{
 		title: 'Name',
 		render(rowData: SecretKey) {
@@ -114,12 +115,42 @@ const DeveloperPage = () => {
 		queryFn: () => SecretKeysApi.getAllSecretKeys({ limit, offset }),
 	});
 
+	const { mutate: deleteSecretKey, isPending: isDeletingSecretKey } = useMutation({
+		mutationFn: (id: string) => SecretKeysApi.deleteSecretKey(id),
+		onSuccess: () => {
+			refetchQueries(['secret-keys']);
+		},
+	});
+
 	const [isSecretKeyDrawerOpen, setIsSecretKeyDrawerOpen] = useState(false);
 
 	const handleAddSecretKey = () => {
 		setIsSecretKeyDrawerOpen(true);
 	};
 
+	const columns: ColumnData<SecretKey>[] = [
+		...baseColumns,
+		{
+			width: 50,
+			align: 'right',
+			render(rowData: SecretKey) {
+				return (
+					<div className='flex justify-end'>
+						<DropdownMenu
+							options={[
+								{
+									label: 'Delete',
+									onSelect: () => deleteSecretKey(rowData.id),
+									disabled: isDeletingSecretKey,
+									icon: <EyeOff size={16} />,
+								},
+							]}
+						/>
+					</div>
+				);
+			},
+		},
+	];
 	console.log(secretKeys);
 
 	return (
