@@ -2,10 +2,21 @@ import { useParams } from 'react-router-dom';
 import { integrations } from './integrationsData';
 import { cn } from '@/lib/utils';
 import { Button, FormHeader } from '@/components/atoms';
+import { useState } from 'react';
+import IntegrationDrawer from '@/components/molecules/IntegrationDrawer/IntegrationDrawer';
 
 const IntegrationDetails = () => {
 	const { id: name } = useParams() as { id: string };
 	const integration = integrations.find((integration) => integration.name.toLocaleLowerCase() === name.toLocaleLowerCase())!;
+
+	const isStripe = integration.name === 'Stripe';
+	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+	const handleInstall = () => {
+		if (isStripe) {
+			setIsDrawerOpen(true);
+		}
+	};
 
 	return (
 		<div className='page'>
@@ -36,15 +47,18 @@ const IntegrationDetails = () => {
                         View Dashboard
                     </Button> */}
 					{integration.type === 'available' && (
-						<Button onClick={() => {}} className='flex gap-2 items-center'>
+						<Button onClick={handleInstall} className='flex gap-2 items-center'>
 							Install
 						</Button>
 					)}
 				</div>
 			</div>
 
+			{/* Integration Drawer for Stripe */}
+			{isStripe && <IntegrationDrawer isOpen={isDrawerOpen} onOpenChange={setIsDrawerOpen} provider='stripe' providerName='Stripe' />}
+
 			{/* Display account details when installed */}
-			{integration.type === 'installed' && (
+			{integration.type === 'installed' && isStripe && (
 				<div className='card p-4 mt-6 !space-y-8 text-sm'>
 					<div className=''>
 						<div className='flex gap-6 mb-4  '>

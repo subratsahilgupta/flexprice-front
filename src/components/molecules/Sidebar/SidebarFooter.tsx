@@ -33,12 +33,12 @@ const SidebarFooter = () => {
 				}}
 				tooltip={'Developers'}
 				className={cn(
-					`flex items-center justify-between gap-2 hover:bg-muted transition-colors `,
+					`flex items-center  justify-between gap-2 hover:bg-muted transition-colors `,
 					location.pathname.startsWith(RouteNames.developers) ? 'bg-[#F4F4F5] font-medium text-sidebar-text-accent-foreground' : '',
 				)}>
 				<span className={cn('flex items-center gap-2')}>
 					<CodeXml className='size-4' />
-					<span className='text-sm select-none'>{'Developers'}</span>
+					<span className='text-sm select-none font-normal'>{'Developers'}</span>
 				</span>
 			</SidebarMenuButton>
 			<SidebarMenuButton

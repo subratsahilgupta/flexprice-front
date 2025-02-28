@@ -45,6 +45,10 @@ class AuthApi {
 	public static async updateUserProfile(userData: any) {
 		return await AxiosClient.put(`${this.baseUrl}/profile`, userData);
 	}
+
+	public static async resendVerificationEmail(email: string) {
+		return await AxiosClient.post(`${this.baseUrl}/resend-verification`, { email });
+	}
 }
 
 export default AuthApi;
