@@ -33,7 +33,7 @@ const FormTitle: FC<Props> = ({ variant, subtitle, title, className, subtitleCla
 
 	if (variant === 'sub-header') {
 		return (
-			<div className={cn('mb-4', className)}>
+			<div className={cn('', className)}>
 				<p className={cn('font-inter font-semibold text-base', titleClassName)}>{title}</p>
 				<p className={cn(labelStyle, subtitleClassName)}>{subtitle}</p>
 			</div>

@@ -4,7 +4,7 @@ import { FC, ReactNode } from 'react';
 interface ModalProps {
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;
-	children: ReactNode;
+	children?: ReactNode;
 	className?: string;
 }
 
