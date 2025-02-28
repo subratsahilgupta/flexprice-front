@@ -44,9 +44,6 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ switchTab }) =>
 
 	return (
 		<>
-			<h2 className='text-3xl font-bold text-center text-gray-800 mb-2'>Reset Password</h2>
-			<p className='text-center text-gray-600 mb-8'>Enter your email to receive a password reset link.</p>
-
 			<form className='space-y-4'>
 				<div>
 					<label htmlFor='email' className='block text-sm font-medium text-gray-700 mb-1'>

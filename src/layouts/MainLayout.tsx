@@ -1,5 +1,4 @@
 import { Outlet } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { Sidebar } from '@/components/molecules/Sidebar';
 import { BreadCrumbs } from '@/components/molecules';
@@ -19,25 +18,6 @@ const MainLayout: React.FC = () => {
 					<Outlet />
 				</main>
 			</SidebarInset>
-
-			{/* Toast Notifications */}
-			<Toaster
-				toastOptions={{
-					success: {
-						iconTheme: {
-							primary: '#5CA7A0',
-							secondary: '#fff',
-						},
-					},
-					error: {
-						iconTheme: {
-							primary: '#E76E50',
-							secondary: '#fff',
-						},
-					},
-				}}
-				position='bottom-center'
-			/>
 		</SidebarProvider>
 	);
 };
