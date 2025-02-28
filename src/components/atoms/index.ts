@@ -53,3 +53,5 @@ export { default as SelectFeature } from './SelectFeature';
 export { default as Checkbox } from './Checkbox';
 
 export { default as ComingSoonTag } from './ComingSoon';
+
+export { default as Page } from './Page';

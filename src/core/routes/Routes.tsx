@@ -32,11 +32,13 @@ import AddOn from '@/pages/product-catalog/addons/AddOn';
 import CustomerInvoiceDetailsPage from '@/pages/customer/customers/CustomerInvoiceDetailsPage';
 import DeveloperPage from '@/pages/developer/developer';
 import SignupConfirmation from '@/pages/auth/SignupConfirmation';
+import ResendVerification from '@/pages/auth/ResendVerification';
 
 export const RouteNames = {
 	home: '/',
 	login: '/auth',
 	signupConfirmation: '/auth/signup/confirmation',
+	resendVerification: '/auth/resend-verification',
 
 	// usage tracking routes
 	usageTracking: '/usage-tracking',
@@ -82,6 +84,10 @@ export const MainRouter = createBrowserRouter([
 	{
 		path: RouteNames.signupConfirmation,
 		element: <SignupConfirmation />,
+	},
+	{
+		path: RouteNames.resendVerification,
+		element: <ResendVerification />,
 	},
 	{
 		path: RouteNames.home,

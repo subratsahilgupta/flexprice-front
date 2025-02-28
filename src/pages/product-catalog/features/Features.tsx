@@ -1,4 +1,4 @@
-import { Button, Loader, SectionHeader, Spacer } from '@/components/atoms';
+import { Button, Loader, Page, SectionHeader, Spacer } from '@/components/atoms';
 import { FeatureTable, Pagination } from '@/components/molecules';
 import { RouteNames } from '@/core/routes/Routes';
 import usePagination from '@/hooks/usePagination';
@@ -57,7 +57,7 @@ const FeaturesPage = () => {
 	}
 
 	return (
-		<div className='page'>
+		<Page className='page'>
 			<SectionHeader showFilter showSearch className='' title='Features'>
 				<div className='flex gap-2 w-full'>
 					<Link to={RouteNames.createFeature}>
@@ -73,7 +73,7 @@ const FeaturesPage = () => {
 				<Spacer className='!h-4' />
 				<Pagination totalPages={Math.ceil((featureData?.pagination.total ?? 1) / limit)} />
 			</div>
-		</div>
+		</Page>
 	);
 };
 

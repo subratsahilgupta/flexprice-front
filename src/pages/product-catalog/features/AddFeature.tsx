@@ -268,7 +268,7 @@ const AddFeaturePage = () => {
 		(data.type === 'metered' &&
 			(!meter.event_name || !meter.aggregation?.type || (meter.aggregation.type !== 'COUNT' && !meter.aggregation?.field)));
 	return (
-		<div className='p-6'>
+		<div className='p-6 page'>
 			<FormHeader
 				title={'Create Feature'}
 				subtitle={"Make changes to your pricing plans here. Click save when you're done."}
