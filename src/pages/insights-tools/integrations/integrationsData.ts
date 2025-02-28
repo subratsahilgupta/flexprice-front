@@ -25,6 +25,7 @@ export const integrations: Integration[] = [
 		accountId: 'acct_1PloOLJiOrSZFKQm',
 		mode: 'Test Mode',
 		apiKey: 'sk_test_***HT1',
+
 		installedAt: 'Feb 12, 2025, 4:17:30 PM',
 		// comingSoon: true,
 		info: [

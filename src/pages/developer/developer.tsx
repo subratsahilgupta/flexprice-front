@@ -165,7 +165,7 @@ const DeveloperPage = () => {
 							<Plus />
 						</Button>
 					</div>
-					<FlexpriceTable columns={columns} data={secretKeys?.items || []} />
+					<FlexpriceTable showEmptyRow columns={columns} data={secretKeys?.items || []} />
 					<Pagination totalPages={secretKeys?.pagination.total || 0} />
 				</div>
 			</div>
