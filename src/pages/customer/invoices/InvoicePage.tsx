@@ -1,4 +1,4 @@
-import { SectionHeader, Spacer } from '@/components/atoms';
+import { Page, SectionHeader, Spacer } from '@/components/atoms';
 import { InvoiceTable, Pagination } from '@/components/molecules';
 import { useQuery } from '@tanstack/react-query';
 import { Spinner } from '@/components/atoms';
@@ -41,14 +41,14 @@ const InvoicesPage = () => {
 	}
 
 	return (
-		<div className='page'>
+		<Page className=''>
 			<SectionHeader showFilter showSearch title='Invoices' />
 			<div className='px-0'>
 				<InvoiceTable data={invoiceData?.items || []} />
 				<Spacer className='!h-4' />
 				<Pagination totalPages={Math.ceil((invoiceData?.pagination.total ?? 1) / limit)} />
 			</div>
-		</div>
+		</Page>
 	);
 };
 

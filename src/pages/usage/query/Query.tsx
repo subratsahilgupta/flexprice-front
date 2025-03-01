@@ -1,4 +1,4 @@
-import { Button, DateRangePicker, Input, SectionHeader } from '@/components/atoms';
+import { Button, DateRangePicker, Input, Page, SectionHeader } from '@/components/atoms';
 import SelectMeter from '@/components/organisms/PlanForm/SelectMeter';
 import { Skeleton } from '@/components/ui/skeleton';
 import EventsApi from '@/utils/api_requests/EventsApi';
@@ -75,7 +75,7 @@ const QueryPage = () => {
 	} satisfies ChartConfig;
 
 	return (
-		<div className='page'>
+		<Page className=''>
 			<SectionHeader title='Query' />
 
 			{/* Filters Section */}
@@ -200,7 +200,7 @@ const QueryPage = () => {
 					</CardContent>
 				</Card>
 			</div>
-		</div>
+		</Page>
 	);
 };
 

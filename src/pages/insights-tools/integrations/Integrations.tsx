@@ -1,4 +1,4 @@
-import { Button, FormHeader, SectionHeader } from '@/components/atoms';
+import { Button, FormHeader, Page, SectionHeader } from '@/components/atoms';
 import { Integration, integrations } from './integrationsData';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -30,7 +30,7 @@ const Integrations = () => {
 	}
 
 	return (
-		<div className='page'>
+		<Page className=''>
 			{installed.length > 0 && (
 				<div>
 					<SectionHeader title='Integrations' />
@@ -52,7 +52,7 @@ const Integrations = () => {
 					))}
 				</div>
 			</div>
-		</div>
+		</Page>
 	);
 };
 

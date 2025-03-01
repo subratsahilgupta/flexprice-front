@@ -1,4 +1,4 @@
-import { Button, Chip, Loader, SectionHeader } from '@/components/atoms';
+import { Button, Chip, Loader, Page, SectionHeader } from '@/components/atoms';
 import { ColumnData, DropdownMenu, FlexpriceTable, ImportFileDrawer, Pagination } from '@/components/molecules';
 import { EmptyPage } from '@/components/organisms';
 import usePagination from '@/hooks/usePagination';
@@ -110,7 +110,7 @@ const ImportExport = () => {
 	}
 
 	return (
-		<div className='page'>
+		<Page className=''>
 			{/* import export drawer */}
 			<ImportFileDrawer taskId={activeTask} isOpen={drawerOpen} onOpenChange={(value) => setdrawerOpen(value)} />
 
@@ -142,7 +142,7 @@ const ImportExport = () => {
 
 				<Pagination totalPages={Math.ceil((data?.pagination.total ?? 1) / limit)} />
 			</div>
-		</div>
+		</Page>
 	);
 };
 

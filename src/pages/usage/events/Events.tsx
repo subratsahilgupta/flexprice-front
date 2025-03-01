@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { Button, DateRangePicker, Input, SectionHeader } from '@/components/atoms';
+import { Button, DateRangePicker, Input, Page, SectionHeader } from '@/components/atoms';
 import { EventsTable } from '@/components/molecules';
 import { Event } from '@/models/Event';
 import EventsApi from '@/utils/api_requests/EventsApi';
@@ -92,7 +92,7 @@ const EventsPage: React.FC = () => {
 	// Refetch all events
 
 	return (
-		<div className='page'>
+		<Page className=''>
 			<SectionHeader title='Events' />
 			<div className='bg-white my-6 rounded-md  mb-6'>
 				<div className='w-full flex items-end gap-4'>
@@ -181,7 +181,7 @@ const EventsPage: React.FC = () => {
 				)}
 				{!hasMore && events.length === 0 && <p className=' text-[#64748B] text-xs font-normal font-sans mt-4'>No events found</p>}
 			</div>
-		</div>
+		</Page>
 	);
 };
 

@@ -1,4 +1,4 @@
-import { Button, SectionHeader, Spacer } from '@/components/atoms';
+import { Button, Page, SectionHeader, Spacer } from '@/components/atoms';
 import { IoSearch } from 'react-icons/io5';
 import { FiFolderPlus } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
@@ -68,7 +68,7 @@ const PricingPlan = () => {
 	}
 
 	return (
-		<div className='page'>
+		<Page className=''>
 			<SectionHeader title='Pricing Plan'>
 				<div className='flex gap-2 w-full'>
 					<button className='px-2 py-1'>
@@ -90,7 +90,7 @@ const PricingPlan = () => {
 				<Spacer className='!h-4' />
 				<Pagination totalPages={Math.ceil((plansData?.pagination.total ?? 1) / limit)} />
 			</div>
-		</div>
+		</Page>
 	);
 };
 

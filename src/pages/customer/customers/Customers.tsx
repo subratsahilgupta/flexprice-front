@@ -1,4 +1,4 @@
-import { Button, SectionHeader, Spacer, Spinner } from '@/components/atoms';
+import { Button, Page, SectionHeader, Spacer, Spinner } from '@/components/atoms';
 import { CreateCustomerDrawer, Pagination } from '@/components/molecules';
 import CustomerTable from '@/components/molecules/Customer/CustomerTable';
 import EmptyPage from '@/components/organisms/EmptyPage/EmptyPage';
@@ -71,7 +71,7 @@ const CustomerPage = () => {
 	}
 
 	return (
-		<div className='page'>
+		<Page className=''>
 			<SectionHeader showFilter showSearch title='Customers'>
 				<CreateCustomerDrawer
 					trigger={
@@ -102,7 +102,7 @@ const CustomerPage = () => {
 				<Spacer className='!h-4' />
 				<Pagination totalPages={Math.ceil((customerData?.pagination.total ?? 1) / limit)} />
 			</div>
-		</div>
+		</Page>
 	);
 };
 
