@@ -306,14 +306,17 @@ const AddFeaturePage = () => {
 							}}
 						/>
 						<Spacer height={'16px'} />
-						<Select
-							label='Feature Type'
-							options={featureTypeOptions}
-							value={data.type}
-							onChange={(e) => {
-								setdata((prev) => ({ ...prev, type: e }));
-							}}
-						/>
+						<div className='w-full min-w-[200px] overflow-hidden'>
+							<Select
+								label='Feature Type'
+								options={featureTypeOptions}
+								className='w-full overflow-hidden'
+								value={data.type}
+								onChange={(e) => {
+									setdata((prev) => ({ ...prev, type: e }));
+								}}
+							/>
+						</div>
 
 						{data.type === featureTypeOptions[1].value && (
 							<>

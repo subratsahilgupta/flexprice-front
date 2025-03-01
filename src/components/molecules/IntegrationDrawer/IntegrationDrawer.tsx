@@ -3,7 +3,6 @@ import { Button, Input, Sheet, Spacer } from '@/components/atoms';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import IntegrationsApi from '@/utils/api_requests/IntegrationsApi';
-import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 import { LoaderCircleIcon } from 'lucide-react';
 
 interface IntegrationDrawerProps {
@@ -11,9 +10,10 @@ interface IntegrationDrawerProps {
 	onOpenChange: (open: boolean) => void;
 	provider: string;
 	providerName: string;
+	onSuccess?: () => void;
 }
 
-const IntegrationDrawer: FC<IntegrationDrawerProps> = ({ isOpen, onOpenChange, provider, providerName }) => {
+const IntegrationDrawer: FC<IntegrationDrawerProps> = ({ isOpen, onOpenChange, provider, providerName, onSuccess }) => {
 	const [formData, setFormData] = useState({
 		name: '',
 		apiKey: '',
@@ -39,7 +39,6 @@ const IntegrationDrawer: FC<IntegrationDrawerProps> = ({ isOpen, onOpenChange, p
 		queryFn: async () => {
 			try {
 				const response = await IntegrationsApi.getIntegration(provider);
-				// The API likely returns the Integration directly
 				return response;
 			} catch (error) {
 				return null;
@@ -51,17 +50,23 @@ const IntegrationDrawer: FC<IntegrationDrawerProps> = ({ isOpen, onOpenChange, p
 	// Mutation for installing integration
 	const { mutate: installIntegration, isPending: isInstalling } = useMutation({
 		mutationFn: async () => {
+			// Combine API key and connection code in the key field if needed
+			const apiKeyWithCode = formData.connectionCode ? `${formData.apiKey}:${formData.connectionCode}` : formData.apiKey;
+
 			return await IntegrationsApi.installIntegration({
 				provider,
 				credentials: {
-					key: formData.apiKey,
+					key: apiKeyWithCode,
 				},
 				name: formData.name,
 			});
 		},
 		onSuccess: () => {
 			toast.success(`${providerName} integration installed successfully`);
-			refetchQueries(['integration', provider]);
+			// Call the onSuccess callback if provided
+			if (onSuccess) {
+				onSuccess();
+			}
 			onOpenChange(false);
 		},
 		onError: (error) => {
@@ -100,8 +105,7 @@ const IntegrationDrawer: FC<IntegrationDrawerProps> = ({ isOpen, onOpenChange, p
 		}
 	};
 
-	// const isLoading = isCheckingIntegration || isInstalling;
-	const hasIntegration = !!existingIntegration;
+	const hasIntegration = (existingIntegration?.items?.length || 0) > 0;
 
 	return (
 		<Sheet
@@ -121,21 +125,21 @@ const IntegrationDrawer: FC<IntegrationDrawerProps> = ({ isOpen, onOpenChange, p
 							<div className='space-y-2'>
 								<div className='flex justify-between'>
 									<span className='text-sm text-muted-foreground'>Name</span>
-									<span className='text-sm'>{existingIntegration?.name}</span>
+									<span className='text-sm'>{existingIntegration?.items[0].name}</span>
 								</div>
 								<div className='flex justify-between'>
 									<span className='text-sm text-muted-foreground'>Status</span>
-									<span className='text-sm'>{existingIntegration?.status}</span>
+									<span className='text-sm'>{existingIntegration?.items[0].status}</span>
 								</div>
 								<div className='flex justify-between'>
 									<span className='text-sm text-muted-foreground'>Created</span>
 									<span className='text-sm'>
-										{existingIntegration?.created_at && new Date(existingIntegration.created_at).toLocaleDateString()}
+										{existingIntegration?.items[0].created_at && new Date(existingIntegration.items[0].created_at).toLocaleDateString()}
 									</span>
 								</div>
 							</div>
 						</div>
-						<Button variant='outline' onClick={() => onOpenChange(false)} className='w-full'>
+						<Button variant='outline' onClick={() => onOpenChange(false)} className='!mt-4'>
 							Close
 						</Button>
 					</div>
@@ -147,8 +151,9 @@ const IntegrationDrawer: FC<IntegrationDrawerProps> = ({ isOpen, onOpenChange, p
 							value={formData.name}
 							onChange={(value) => handleChange('name', value)}
 							error={errors.name}
+							disabled={isInstalling}
 						/>
-						<p className='text-sm text-muted-foreground -mt-2'>The values get reset in the given interval</p>
+						<p className='text-sm text-muted-foreground -mt-2'>A friendly name for this integration</p>
 
 						<Input
 							label='Connection Code'
@@ -156,8 +161,9 @@ const IntegrationDrawer: FC<IntegrationDrawerProps> = ({ isOpen, onOpenChange, p
 							value={formData.connectionCode}
 							onChange={(value) => handleChange('connectionCode', value)}
 							error={errors.connectionCode}
+							disabled={isInstalling}
 						/>
-						<p className='text-sm text-muted-foreground -mt-2'>The values get reset in the given interval</p>
+						<p className='text-sm text-muted-foreground -mt-2'>The connection code from your provider</p>
 
 						<Input
 							label='API Secret Key'
@@ -166,14 +172,20 @@ const IntegrationDrawer: FC<IntegrationDrawerProps> = ({ isOpen, onOpenChange, p
 							value={formData.apiKey}
 							onChange={(value) => handleChange('apiKey', value)}
 							error={errors.apiKey}
+							disabled={isInstalling}
 						/>
-						<p className='text-sm text-muted-foreground -mt-2'>The values get reset in the given interval</p>
+						<p className='text-sm text-muted-foreground -mt-2'>Your API secret key from the provider</p>
 
 						<Spacer className='!h-4' />
 
-						<Button isLoading={isInstalling} disabled={isInstalling} onClick={handleInstall} className='w-full'>
-							Install
-						</Button>
+						<div className='flex gap-2'>
+							<Button variant='outline' onClick={() => onOpenChange(false)} disabled={isInstalling} className='flex-1'>
+								Cancel
+							</Button>
+							<Button isLoading={isInstalling} disabled={isInstalling} onClick={handleInstall} className='flex-1'>
+								Install
+							</Button>
+						</div>
 					</>
 				)}
 			</div>

@@ -84,7 +84,7 @@ const EnvironmentSelector: React.FC<Props> = ({ disabled = false, className }) =
 	}
 
 	const getEnvironmentIcon = (type: string) => {
-		switch (type) {
+		switch (type.toUpperCase()) {
 			case 'PRODUCTION':
 				return <Rocket className='h-4 w-4' />;
 			case 'SANDBOX':

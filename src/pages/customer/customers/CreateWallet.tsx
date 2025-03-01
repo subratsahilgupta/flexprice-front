@@ -1,4 +1,4 @@
-import { FormHeader, Input, Select, Spacer } from '@/components/atoms';
+import { FormHeader, Input, Page, Select, Spacer } from '@/components/atoms';
 import { TopupCard } from '@/components/molecules';
 import { currencyOptions } from '@/core/data/constants';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
@@ -59,7 +59,7 @@ const CreateWallet: FC<Props> = ({ customerId, onClose = () => {} }) => {
 	};
 
 	return (
-		<div className='w-2/3'>
+		<Page className=''>
 			<FormHeader
 				title='Create Wallet'
 				subtitle={`Manage credits for usage-based billing that can apply to invoices pre-tax.`}
@@ -91,7 +91,7 @@ const CreateWallet: FC<Props> = ({ customerId, onClose = () => {} }) => {
 				walletId={walletData?.id}
 				preFunction={async () => await handleCreateWallet()}
 			/>
-		</div>
+		</Page>
 	);
 };
 

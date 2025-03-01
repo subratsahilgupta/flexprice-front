@@ -103,15 +103,19 @@ const AuthPage: React.FC = () => {
 			</div>
 
 			{/* Right side - Marketing Content */}
-			<div className='w-1/2 p-4 relative bg-[#D3DAEA] flex flex-col justify-center font-qanelas'>
-				{/* bottom pattern - positioned above bg but below content */}
-				<img
-					loading='lazy'
-					src={'/assets/png/login_bg_pattern.svg'}
-					alt='Pattern Background'
-					className='w-full absolute max-w-md bottom-0 z-[1] left-0 filter brightness-0 invert'
-				/>
-				<div className='w-[80%] mx-auto text-center relative z-[2]'>
+			<div className='w-1/2 p-4 relative bg-[#D3DAEA] flex flex-col justify-center font-qanelas overflow-hidden'>
+				{/* Background pattern wrapper */}
+				<div className='absolute inset-0 overflow-hidden'>
+					<img
+						loading='lazy'
+						src={'/assets/png/login_bg_pattern.svg'}
+						alt='Pattern Background'
+						className='absolute bottom-0 w-full h-auto max-h-[60%] object-cover opacity-10'
+					/>
+				</div>
+
+				{/* Content container */}
+				<div className='w-[80%] mx-auto text-center relative z-10'>
 					<h2 className='text-3xl font-bold text-gray-900'>Developers should focus on building, not billing</h2>
 					<Spacer height={10} />
 					<p className='text-lg text-gray-700 mb-6'>
@@ -120,7 +124,7 @@ const AuthPage: React.FC = () => {
 					</p>
 
 					<div className='mt-8 w-[80%] mx-auto'>
-						<img src={'/assets/png/ic_login_bg.png'} alt='Pricing Plans' className='w-full' />
+						<img loading='lazy' className='w-full' alt='Pricing Plans' src={'/assets/png/ic_login_bg.png'} />
 					</div>
 				</div>
 			</div>

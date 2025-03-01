@@ -74,9 +74,7 @@ const baseColumns: ColumnData<SecretKey>[] = [
 				<div className='flex items-center gap-2'>
 					<div className='bg-gray-100 px-3 py-1 rounded-md font-mono text-sm flex items-center'>
 						<Key size={14} className='mr-2 text-gray-600' />
-						<span className='text-gray-700'>
-							{rowData.display_id.slice(0, 8)}...{rowData.display_id.slice(-4)}
-						</span>
+						<span className='text-gray-700'>{rowData.display_id}</span>
 					</div>
 				</div>
 			);

@@ -7,6 +7,7 @@ import { useMutation } from '@tanstack/react-query';
 import { EyeOff } from 'lucide-react';
 import { EyeIcon } from 'lucide-react';
 import { RouteNames } from '@/core/routes/Routes';
+import { useNavigate } from 'react-router-dom';
 interface SignupFormProps {
 	switchTab: (tab: string) => void;
 }
@@ -17,6 +18,7 @@ interface SignupData {
 	confirmPassword: string;
 }
 const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
+	const navigate = useNavigate();
 	const environment = import.meta.env.VITE_ENVIRONMENT;
 	console.log('environment', environment);
 	const [signupData, setSignupData] = useState<SignupData>({
@@ -99,7 +101,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 				console.log('error', error);
 				return;
 			}
-			toast.success('Account created successfully! Please check your email to confirm your account.');
+			navigate(RouteNames.resendVerification);
 		} else {
 			signup();
 		}
