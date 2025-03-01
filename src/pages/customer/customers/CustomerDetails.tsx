@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import { useQuery } from '@tanstack/react-query';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
+import { Page } from '@/components/atoms';
 
 const tabs = [
 	{ id: '', label: 'Overview' },
@@ -67,7 +68,7 @@ const CustomerDetails = () => {
 	};
 
 	return (
-		<div className='p-6 space-y-6'>
+		<Page className='space-y-6'>
 			<CustomerHeader customerId={customerId!} />
 			<div className='border-b border-border'>
 				<nav className='flex space-x-4' aria-label='Tabs'>
@@ -86,7 +87,7 @@ const CustomerDetails = () => {
 				</nav>
 			</div>
 			<Outlet />
-		</div>
+		</Page>
 	);
 };
 
