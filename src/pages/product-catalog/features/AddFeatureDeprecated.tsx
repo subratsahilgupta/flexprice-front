@@ -259,7 +259,7 @@
 // 												setdata((prev) => ({ ...prev, meter_id: meter.id }));
 // 												setstate((prev) => ({ ...prev, activeMeter: meter }));
 // 											}}
-// 											description='The feature will be measured according to the billable metric you choose'
+// 											description='The feature will be measured according to the Feature you choose'
 // 										/>
 // 									</div>
 

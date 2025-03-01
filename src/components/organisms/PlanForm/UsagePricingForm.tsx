@@ -8,8 +8,6 @@ import { Meter } from '@/models/Meter';
 import { formatBillingPeriod, getCurrencySymbol, toSentenceCase } from '@/utils/common/helper_functions';
 import { currencyOptions } from '@/core/data/constants';
 import VolumeTieredPricingForm from './VolumeTieredPricingForm';
-import { formatAmountWithCommas } from '@/components/atoms/Input/Input';
-import { removeCommasFromAmount } from '@/components/atoms/Input/Input';
 
 interface Props {
 	data?: Partial<Price>;
@@ -137,7 +135,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 		});
 
 		if (!meterId) {
-			seterrors((prev) => ({ ...prev, meter_id: 'Meter is required' }));
+			seterrors((prev) => ({ ...prev, meter_id: 'Feature is required' }));
 			return false;
 		}
 
@@ -251,13 +249,13 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 				<div className='space-y-2'>
 					<Input
 						placeholder='0'
-						type='number'
+						variant='formatted-number'
 						error={inputErrors.flatModelError}
 						label='Price'
-						value={formatAmountWithCommas(flatFee)}
+						value={flatFee}
 						inputPrefix={getCurrencySymbol(currency)}
 						onChange={(e) => {
-							setflatFee(removeCommasFromAmount(e));
+							setflatFee(e);
 						}}
 						suffix={<span className='text-[#64748B]'>{`/ unit / ${formatBillingPeriod(billingPeriod)}`}</span>}
 					/>
@@ -268,7 +266,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 				<div className='space-y-1'>
 					<div className='flex w-full gap-2 items-end'>
 						<Input
-							type='number'
+							variant='formatted-number'
 							label='Price'
 							placeholder='0'
 							value={packagedFee.price}
@@ -279,13 +277,13 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 							<p className='text-[#18181B] font-medium'>per</p>
 						</div>
 						<Input
-							value={formatAmountWithCommas(packagedFee.unit)}
-							type='text'
+							value={packagedFee.unit}
+							variant='integer'
 							placeholder='0'
 							onChange={(e) =>
 								setpackagedFee({
 									...packagedFee,
-									unit: removeCommasFromAmount(e),
+									unit: e,
 								})
 							}
 							suffix={`/ units / ${formatBillingPeriod(billingPeriod)}`}

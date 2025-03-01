@@ -9,17 +9,15 @@ interface AuthMiddlewareProps {
 	children: ReactNode;
 	requiredRole: string[];
 }
-
-const fetchUser = async () => {
-	const { data, error } = await supabase.auth.getUser();
-	if (error) {
-		throw error;
-	}
-	return data.user;
-};
-
 const AuthMiddleware: React.FC<AuthMiddlewareProps> = ({ children }) => {
 	const userContext = useUser();
+	const fetchUser = async () => {
+		const { data, error } = await supabase.auth.getUser();
+		if (error) {
+			throw error;
+		}
+		return data.user;
+	};
 
 	const {
 		data: user,

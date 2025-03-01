@@ -47,28 +47,11 @@ const FeatureTable: FC<Props> = ({ data, emptyRowMessage, showEmptyRow }) => {
 			},
 		},
 		{
-			title: 'Linked Billable Metric ',
-			onCLick(row) {
-				if (row.meter_id) {
-					navigate(RouteNames.editMeter + `?id=${row?.meter_id}`);
-				}
-			},
-			render(row) {
-				return row?.meter ? row.meter.name : '--';
-			},
-		},
-		{
 			title: 'Status',
 			align: 'center',
 			render: (row) => {
 				const label = formatChips(row?.status);
 				return <Chip isActive={label === 'Active'} label={label} />;
-			},
-		},
-		{
-			title: 'Mapped with plan',
-			render: () => {
-				return '--';
 			},
 		},
 		{

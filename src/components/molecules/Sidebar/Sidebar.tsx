@@ -66,7 +66,7 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				isActive: false,
 				// items: [
 				// 	{
-				// 		title: 'Billable Metrics',
+				// 		title: 'Features',
 				// 		url: '/metering/a',
 				// 	},
 				// 	{

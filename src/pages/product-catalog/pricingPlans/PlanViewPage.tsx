@@ -40,7 +40,7 @@ const chargeColumns: ColumnData[] = [
 		},
 	},
 	{
-		title: 'Billable Metric',
+		title: 'Feature',
 		render(rowData) {
 			return <span className='text-[#09090B]'>{rowData.meter?.name ?? '--'}</span>;
 		},

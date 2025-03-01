@@ -136,7 +136,7 @@ const RecurringChargesForm = () => {
 						setamount(value);
 					}}
 					value={amount}
-					type='number'
+					variant='formatted-number'
 					label='Price'
 					error={errors.amount}
 					inputPrefix={getCurrencySymbol(currency)}

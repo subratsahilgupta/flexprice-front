@@ -141,7 +141,7 @@ const FeatureDetails = () => {
 	];
 
 	const additionalDetails: Detail[] = [
-		{ label: 'Linked Billable Metric', value: data?.meter?.name },
+		{ label: 'Linked Feature', value: data?.meter?.name },
 		{
 			variant: 'divider' as const,
 			className: 'w-full',

@@ -10,6 +10,8 @@ import { Select, SelectContent } from '@/components/ui/select';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { SelectOption } from '@/components/atoms/Select/Select';
 import { useSidebar } from '@/components/ui/sidebar';
+import { useNavigate } from 'react-router-dom';
+import { RouteNames } from '@/core/routes/Routes';
 
 interface Props {
 	disabled?: boolean;
@@ -43,6 +45,7 @@ const SelectItem = React.forwardRef<
 const EnvironmentSelector: React.FC<Props> = ({ disabled = false, className }) => {
 	const { loading, user } = useUser();
 	const { open: sidebarOpen } = useSidebar();
+	const navigate = useNavigate();
 
 	const {
 		data: environments = [],
@@ -108,6 +111,7 @@ const EnvironmentSelector: React.FC<Props> = ({ disabled = false, className }) =
 		setActiveEnvironment(environments?.find((env) => env.id === newValue) || environments?.[0]);
 		// Refetch all queries to ensure data consistency across the application
 		await refetchQueries(undefined);
+		navigate(RouteNames.home);
 	};
 
 	// If activeEnvironment is null, use the first environment as a fallback

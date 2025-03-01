@@ -2,7 +2,6 @@ import { FC } from 'react';
 import { cn } from '@/lib/utils';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { Button, Input, Spacer } from '@/components/atoms';
-import { formatAmountWithCommas, removeCommasFromAmount } from '@/components/atoms';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import { PriceTier } from './UsagePricingForm';
 
@@ -109,15 +108,15 @@ const VolumeTieredPricingForm: FC<Props> = ({ setTieredPrices, tieredPrices, cur
 										disabled
 										className='h-9'
 										// onChange={(e) => updateTier(index, 'from', e)}
-										value={formatAmountWithCommas(tier.from.toString())}
+										value={tier.from.toString()}
 									/>
 								</td>
 								<td className='px-4 py-2'>
 									<Input
 										className='h-9'
-										onChange={(e) => updateTier(index, 'up_to', removeCommasFromAmount(e))}
+										onChange={(e) => updateTier(index, 'up_to', e)}
 										disabled={tier.up_to === null}
-										value={tier.up_to === null ? '∞' : formatAmountWithCommas(tier.up_to.toString())}
+										value={tier.up_to === null ? '∞' : tier.up_to.toString()}
 									/>
 								</td>
 								<td className='px-4 py-2'>
@@ -132,8 +131,8 @@ const VolumeTieredPricingForm: FC<Props> = ({ setTieredPrices, tieredPrices, cur
 								<td className='px-4 py-2'>
 									<Input
 										className='h-9'
-										onChange={(e) => updatePrice(index, 'flat_amount', removeCommasFromAmount(e))}
-										value={formatAmountWithCommas(tier.flat_amount?.toString() ?? '0')}
+										onChange={(e) => updatePrice(index, 'flat_amount', e)}
+										value={tier.flat_amount?.toString() ?? '0'}
 										inputPrefix={currency ? `${getCurrencySymbol(currency)}` : undefined}
 										placeholder={'0'}
 									/>
