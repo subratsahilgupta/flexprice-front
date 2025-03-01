@@ -27,7 +27,7 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 		// { fieldName: 'event_name', title: 'Event Name', width: '300px' },
 		{
 			title: 'Aggregate Type',
-			align: 'center',
+
 			render: (row) => {
 				return <span className='text-[#09090B] '>{formatAggregationType(row.aggregation_type)}</span>;
 			},
@@ -35,10 +35,10 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 		{ fieldName: 'aggregation_field', title: 'Aggregate Value', align: 'center' },
 		{
 			title: 'Status',
-			align: 'center',
+
 			render: (row) => {
 				const label = formatChips(row.status);
-				return <Chip isActive={label === 'Active'} label={label} />;
+				return <Chip label={label} />;
 			},
 		},
 		{
@@ -49,7 +49,6 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 		},
 		{
 			title: '',
-			redirect: false,
 			render: (row) => (
 				<ActionButton
 					isEditDisabled={row.status === 'archived'}
@@ -65,7 +64,7 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 		},
 	];
 
-	return <FlexpriceTable redirectUrl='/usage-tracking/meter/edit-meter?id=' columns={columns} data={mappedData} />;
+	return <FlexpriceTable columns={columns} data={mappedData} />;
 };
 
 export default BillableMetricTable;

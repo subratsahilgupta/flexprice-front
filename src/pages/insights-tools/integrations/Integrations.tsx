@@ -30,11 +30,11 @@ const Integrations = () => {
 	}
 
 	return (
-		<Page className=''>
+		<Page>
 			{installed.length > 0 && (
 				<div>
 					<SectionHeader title='Integrations' />
-					<div className=''>
+					<div>
 						<FormHeader title='Installed' variant='sub-header' />
 						<div className='grid grid-cols-2 gap-4 '>
 							{installed.map((integration, index) => (

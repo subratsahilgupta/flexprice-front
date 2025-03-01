@@ -56,9 +56,8 @@ const CustomerPage = () => {
 									setactiveCustomer(undefined);
 									console.log('clicked');
 								}}
-								className='flex gap-2 bg-[#0F172A]'>
-								<FiFolderPlus />
-								<span>Add Customer</span>
+								prefixIcon={<FiFolderPlus />}>
+								Add Customer
 							</Button>
 						}
 						open={customerDrawerOpen}
@@ -71,8 +70,8 @@ const CustomerPage = () => {
 	}
 
 	return (
-		<Page className=''>
-			<SectionHeader showFilter showSearch title='Customers'>
+		<Page>
+			<SectionHeader title='Customers'>
 				<CreateCustomerDrawer
 					trigger={
 						<Button
@@ -80,9 +79,8 @@ const CustomerPage = () => {
 								setactiveCustomer(undefined);
 								console.log('clicked');
 							}}
-							className='flex gap-2 bg-[#0F172A]'>
-							<FiFolderPlus />
-							<span>Add Customer</span>
+							prefixIcon={<FiFolderPlus />}>
+							Add Customer
 						</Button>
 					}
 					open={customerDrawerOpen}

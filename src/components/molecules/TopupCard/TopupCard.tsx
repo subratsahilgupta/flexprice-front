@@ -100,7 +100,7 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 			<div className={cn('card space-y-4 lg:w-full', className)}>
 				<FormHeader title='Add Credits' subtitle={`Define credits to purchase and to grant upon wallet creation`} variant='sub-header' />
 
-				<div className=''>
+				<div>
 					<RectangleRadiogroup
 						title='Select Credit Type'
 						options={subscriptionTypeOptions}

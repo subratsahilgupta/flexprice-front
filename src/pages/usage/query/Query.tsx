@@ -75,7 +75,7 @@ const QueryPage = () => {
 	} satisfies ChartConfig;
 
 	return (
-		<Page className=''>
+		<Page>
 			<SectionHeader title='Query' />
 
 			{/* Filters Section */}

@@ -49,7 +49,7 @@ const BreadCrumbs: FC = () => {
 								</Link>
 							)}
 							{index < breadcrumbs.length - 1 && (
-								<span className=''>
+								<span>
 									<BsChevronRight />
 								</span>
 							)}

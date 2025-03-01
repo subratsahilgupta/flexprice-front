@@ -399,7 +399,7 @@ const AddFeaturePage = () => {
 									variant='form-component-title'
 								/>
 
-								<div className=''>
+								<div>
 									<EventFilter
 										isArchived={false}
 										isEditMode={false}

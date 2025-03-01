@@ -1,5 +1,5 @@
 import { Button, Chip, Loader, Page, SectionHeader } from '@/components/atoms';
-import { ColumnData, DropdownMenu, FlexpriceTable, ImportFileDrawer, Pagination } from '@/components/molecules';
+import { ColumnData, FlexpriceTable, ImportFileDrawer, Pagination } from '@/components/molecules';
 import { EmptyPage } from '@/components/organisms';
 import usePagination from '@/hooks/usePagination';
 import { ImportTask } from '@/models/ImportTask';
@@ -33,19 +33,13 @@ const columns: ColumnData<ImportTask>[] = [
 		render(rowData) {
 			return <div>{toSentenceCase(rowData.task_type)}</div>;
 		},
-		align: 'center',
 	},
 	{
 		title: 'Status',
-		align: 'center',
+
 		render(rowData) {
 			return (
-				<Chip
-					label={mapStatusChips(rowData?.task_status || '')}
-					isActive={rowData?.task_status === 'COMPLETED'}
-					inactiveTextColor='#DC2626'
-					inactiveBgColor='#FEE2E2'
-				/>
+				<Chip variant={rowData?.task_status === 'COMPLETED' ? 'success' : 'default'} label={mapStatusChips(rowData?.task_status || '')} />
 			);
 		},
 	},
@@ -56,11 +50,6 @@ const columns: ColumnData<ImportTask>[] = [
 	{
 		title: 'Updated At',
 		render: (rowData) => formatDate(rowData.updated_at),
-	},
-	{
-		title: '',
-		width: '40px',
-		render: () => <DropdownMenu options={[]}></DropdownMenu>,
 	},
 ];
 const ImportExport = () => {
@@ -110,7 +99,7 @@ const ImportExport = () => {
 	}
 
 	return (
-		<Page className=''>
+		<Page>
 			{/* import export drawer */}
 			<ImportFileDrawer taskId={activeTask} isOpen={drawerOpen} onOpenChange={(value) => setdrawerOpen(value)} />
 
@@ -137,7 +126,6 @@ const ImportExport = () => {
 					data={data?.items ?? []}
 					columns={columns}
 					showEmptyRow
-					emptyRowText='No data found'
 				/>
 
 				<Pagination totalPages={Math.ceil((data?.pagination.total ?? 1) / limit)} />

@@ -22,12 +22,10 @@ const UsageTable: FC<UsageTableProps> = ({ data }) => {
 		{
 			fieldName: 'quantity',
 			title: 'Quantity',
-			align: 'center',
 		},
 		{
 			fieldName: 'amount',
 			title: 'Amount',
-			align: 'center',
 		},
 	];
 

@@ -12,46 +12,40 @@ import FeatureApi from '@/utils/api_requests/FeatureApi';
 interface Props {
 	data: Feature[];
 	showEmptyRow?: boolean;
-	emptyRowMessage?: string;
 }
 
 export const getFeatureTypeChips = (type: string) => {
 	switch (type.toLocaleLowerCase()) {
 		case 'static':
-			return <Chip isActive={false} label={toSentenceCase(type)} />;
+			return <Chip label={toSentenceCase(type)} />;
 		case 'metered':
-			return <Chip activeBgColor='#F0F9FF' activeTextColor='#1E3A8A' isActive={true} label={toSentenceCase(type)} />;
+			return <Chip textColor='#1E3A8A' bgColor='#F0F9FF' label={toSentenceCase(type)} />;
 		case 'boolean':
-			return <Chip activeBgColor='#F0F9FF' activeTextColor='#075985' isActive={true} label={toSentenceCase(type)} />;
+			return <Chip textColor='#075985' bgColor='#F0F9FF' label={toSentenceCase(type)} />;
 		default:
-			return <Chip activeBgColor='#F0F9FF' activeTextColor='#075985' isActive={true} label={toSentenceCase(type)} />;
+			return <Chip textColor='#075985' bgColor='#F0F9FF' label={toSentenceCase(type)} />;
 	}
 };
 
-const FeatureTable: FC<Props> = ({ data, emptyRowMessage, showEmptyRow }) => {
+const FeatureTable: FC<Props> = ({ data, showEmptyRow }) => {
 	const navigate = useNavigate();
 
 	const columnData: ColumnData<Feature>[] = [
 		{
 			fieldName: 'name',
 			title: 'Feature Name',
-			onCLick(row) {
-				navigate(RouteNames.featureDetails + `/${row?.id}`);
-			},
 		},
 		{
 			title: 'Type',
-			align: 'center',
 			render(row) {
 				return getFeatureTypeChips(row?.type || '');
 			},
 		},
 		{
 			title: 'Status',
-			align: 'center',
 			render: (row) => {
 				const label = formatChips(row?.status);
-				return <Chip isActive={label === 'Active'} label={label} />;
+				return <Chip variant={label === 'Active' ? 'success' : 'default'} label={label} />;
 			},
 		},
 		{
@@ -61,7 +55,7 @@ const FeatureTable: FC<Props> = ({ data, emptyRowMessage, showEmptyRow }) => {
 			},
 		},
 		{
-			title: '',
+			fieldVariant: 'interactive',
 			render(row) {
 				return (
 					<ActionButton
@@ -82,7 +76,14 @@ const FeatureTable: FC<Props> = ({ data, emptyRowMessage, showEmptyRow }) => {
 
 	return (
 		<div>
-			<FlexpriceTable data={data} columns={columnData} showEmptyRow={showEmptyRow} emptyRowText={emptyRowMessage} />
+			<FlexpriceTable
+				data={data}
+				columns={columnData}
+				showEmptyRow={showEmptyRow}
+				onRowClick={(row) => {
+					navigate(RouteNames.featureDetails + `/${row?.id}`);
+				}}
+			/>
 		</div>
 	);
 };

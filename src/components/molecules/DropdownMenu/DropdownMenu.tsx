@@ -23,8 +23,13 @@ export interface DropdownMenuOption {
 }
 
 const DropdownMenu: React.FC<DropdownMenuProps> = ({ options, trigger, isOpen, onOpenChange, dir = 'ltr', className, align = 'end' }) => {
+	const handleClick = (e: React.MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+	};
+
 	return (
-		<div className={cn('', className)}>
+		<div className={cn('', className)} onClick={handleClick} data-interactive='true'>
 			<ShadcnMenu dir={dir} onOpenChange={onOpenChange} open={isOpen}>
 				<DropdownMenuTrigger className='w-full'>{trigger || <BsThreeDotsVertical className='text-base' />}</DropdownMenuTrigger>
 				<DropdownMenuContent className='mr-6 w-full' align={align}>
@@ -34,6 +39,7 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ options, trigger, isOpen, o
 							disabled={option.disabled}
 							key={index}
 							onSelect={(e) => {
+								e.preventDefault();
 								if (option.onSelect && !option.children?.length) {
 									option.onSelect(e);
 								}

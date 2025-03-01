@@ -59,7 +59,7 @@ const CreateWallet: FC<Props> = ({ customerId, onClose = () => {} }) => {
 	};
 
 	return (
-		<Page className=''>
+		<Page>
 			<FormHeader
 				title='Create Wallet'
 				subtitle={`Manage credits for usage-based billing that can apply to invoices pre-tax.`}

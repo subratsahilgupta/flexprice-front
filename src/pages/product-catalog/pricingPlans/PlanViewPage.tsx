@@ -109,7 +109,7 @@ const PlanViewPage = () => {
 	const columnData: ColumnData<ExtendedEntitlement>[] = [
 		{
 			title: 'Feature Name',
-			onCLick(row) {
+			onCellClick(row) {
 				navigate(RouteNames.featureDetails + `/${row?.feature?.id}`);
 			},
 			render(row) {
@@ -124,21 +124,20 @@ const PlanViewPage = () => {
 		},
 		{
 			title: 'Type',
-			align: 'center',
+
 			render(row) {
 				return getFeatureTypeChips(row?.feature_type || '');
 			},
 		},
 		{
 			title: 'Value',
-			align: 'center',
+
 			render(row) {
 				return getFeatureValue(row);
 			},
 		},
 		{
-			title: '',
-			redirect: false,
+			fieldVariant: 'interactive',
 			width: '30px',
 			hideOnEmpty: true,
 			render(row) {

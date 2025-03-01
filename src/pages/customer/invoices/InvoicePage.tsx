@@ -41,7 +41,7 @@ const InvoicesPage = () => {
 	}
 
 	return (
-		<Page className=''>
+		<Page>
 			<SectionHeader showFilter showSearch title='Invoices' />
 			<div className='px-0'>
 				<InvoiceTable data={invoiceData?.items || []} />

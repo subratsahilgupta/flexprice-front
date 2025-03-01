@@ -44,13 +44,13 @@ const getFeatureType = (type: string) => {
 const getStatusChip = (status: string) => {
 	switch (status.toUpperCase()) {
 		case 'PUBLISHED':
-			return <Chip isActive={true} label='Active' />;
+			return <Chip variant='success' label='Active' />;
 		case 'ARCHIVED':
-			return <Chip isActive={false} label='Archived' />;
+			return <Chip variant='default' label='Archived' />;
 		case 'DELETED':
-			return <Chip activeTextColor='#DC2626' activeBgColor='#FEE2E2' isActive={false} label='Deleted' />;
+			return <Chip variant='failed' label='Deleted' />;
 		default:
-			return <Chip isActive={false} activeBgColor='#F0F2F5' activeTextColor='#57646E' label='Draft' />;
+			return <Chip variant='default' label='Draft' />;
 	}
 };
 
@@ -92,10 +92,10 @@ const FeatureDetails = () => {
 		},
 		{
 			title: 'Status',
-			align: 'center',
+
 			render: (rowData: ExtendedEntitlement) => {
 				const label = formatChips(rowData.plan.status);
-				return <Chip isActive={label === 'Active'} label={label} />;
+				return <Chip variant={label === 'Active' ? 'success' : 'default'} label={label} />;
 			},
 		},
 		{

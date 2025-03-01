@@ -92,7 +92,7 @@ const EventsPage: React.FC = () => {
 	// Refetch all events
 
 	return (
-		<Page className=''>
+		<Page>
 			<SectionHeader title='Events' />
 			<div className='bg-white my-6 rounded-md  mb-6'>
 				<div className='w-full flex items-end gap-4'>

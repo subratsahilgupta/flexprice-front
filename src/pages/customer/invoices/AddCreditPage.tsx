@@ -12,13 +12,13 @@ import { useParams } from 'react-router-dom';
 const getStatusChip = (status: string) => {
 	switch (status.toUpperCase()) {
 		case 'VOIDED':
-			return <Chip isActive={false} label='Void' />;
+			return <Chip variant='default' label='Void' />;
 		case 'FINALIZED':
-			return <Chip isActive={true} label='Paid' />;
+			return <Chip variant='success' label='Paid' />;
 		case 'DRAFT':
-			return <Chip activeBgColor='#F0F2F5' activeTextColor='#57646E' isActive={false} label='Draft' />;
+			return <Chip variant='default' label='Draft' />;
 		default:
-			return <Chip isActive={false} activeBgColor='#F0F2F5' activeTextColor='#57646E' label='Draft' />;
+			return <Chip variant='default' label='Draft' />;
 	}
 };
 

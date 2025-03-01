@@ -1,5 +1,4 @@
 import { Button, Page, SectionHeader, Spacer } from '@/components/atoms';
-import { IoSearch } from 'react-icons/io5';
 import { FiFolderPlus } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -10,7 +9,6 @@ import { Pagination, PlansTable } from '@/components/molecules';
 import { Plan } from '@/models/Plan';
 import { ReactSVG } from 'react-svg';
 import usePagination from '@/hooks/usePagination';
-import { SlidersHorizontal } from 'lucide-react';
 
 const PricingPlan = () => {
 	const { limit, offset, page } = usePagination();
@@ -68,24 +66,13 @@ const PricingPlan = () => {
 	}
 
 	return (
-		<Page className=''>
+		<Page>
 			<SectionHeader title='Pricing Plan'>
-				<div className='flex gap-2 w-full'>
-					<button className='px-2 py-1'>
-						<IoSearch className='size-4 text-[#09090B] ' />
-					</button>
-					<button className='px-2 py-1'>
-						<SlidersHorizontal className='size-4 text-[#09090B] ' />
-					</button>
-					<Link to='/product-catalog/pricing-plan/create-plan'>
-						<Button className=' flex gap-2 bg-[#0F172A] '>
-							<FiFolderPlus />
-							<span>Add Pricing Plan</span>
-						</Button>
-					</Link>
-				</div>
+				<Link to='/product-catalog/pricing-plan/create-plan'>
+					<Button prefixIcon={<FiFolderPlus />}>Add Pricing Plan</Button>
+				</Link>
 			</SectionHeader>
-			<div className=''>
+			<div>
 				<PlansTable data={(plansData?.items || []) as Plan[]} />
 				<Spacer className='!h-4' />
 				<Pagination totalPages={Math.ceil((plansData?.pagination.total ?? 1) / limit)} />

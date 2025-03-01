@@ -46,10 +46,7 @@ const FeaturesPage = () => {
 					</p>
 					<Spacer height={'16px'} />
 					<Link to={RouteNames.createFeature}>
-						<Button className='w-32 flex gap-2 bg-[#0F172A] '>
-							<Star />
-							<span>Add Feature</span>
-						</Button>
+						<Button prefixIcon={<Star />}>Add Feature</Button>
 					</Link>
 				</div>
 			</div>
@@ -57,18 +54,14 @@ const FeaturesPage = () => {
 	}
 
 	return (
-		<Page className='page'>
-			<SectionHeader showFilter showSearch className='' title='Features'>
-				<div className='flex gap-2 w-full'>
-					<Link to={RouteNames.createFeature}>
-						<Button className='w-32 flex gap-2 bg-[#0F172A]  '>
-							<Star />
-							<span>Add Feature</span>
-						</Button>
-					</Link>
-				</div>
+		<Page>
+			<SectionHeader title='Features'>
+				<Link to={RouteNames.createFeature}>
+					<Button prefixIcon={<Star />}>Add Feature</Button>
+				</Link>
 			</SectionHeader>
-			<div className=''>
+
+			<div>
 				<FeatureTable data={featureData?.items || []} />
 				<Spacer className='!h-4' />
 				<Pagination totalPages={Math.ceil((featureData?.pagination.total ?? 1) / limit)} />

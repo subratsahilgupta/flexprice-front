@@ -74,10 +74,9 @@ const MeterPage = () => {
 				onButtonClick={() => navigate(RouteNames.addMeter)}
 				buttonIcon={<FiFolderPlus />}
 				buttonText='Add Meter'
-				className=''
 			/>
 
-			<div className=''>
+			<div>
 				<BillableMetricTable data={meterData?.items || []} />
 				<Spacer className='!h-4' />
 				<Pagination totalPages={Math.ceil((meterData?.pagination.total ?? 1) / limit)} />

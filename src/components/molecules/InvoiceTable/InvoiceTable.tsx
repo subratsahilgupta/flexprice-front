@@ -15,26 +15,26 @@ export interface Props {
 const getStatusChip = (status: string) => {
 	switch (status.toUpperCase()) {
 		case 'VOIDED':
-			return <Chip isActive={false} label='Void' />;
+			return <Chip variant='default' label='Void' />;
 		case 'FINALIZED':
-			return <Chip isActive={true} label='Finalized' />;
+			return <Chip variant='success' label='Finalized' />;
 		case 'DRAFT':
-			return <Chip activeBgColor='#F0F2F5' activeTextColor='#57646E' isActive={false} label='Draft' />;
+			return <Chip variant='default' label='Draft' />;
 		default:
-			return <Chip isActive={false} activeBgColor='#F0F2F5' activeTextColor='#57646E' label='Draft' />;
+			return <Chip variant='default' label='Draft' />;
 	}
 };
 
 export const getPaymentStatusChip = (status: string) => {
 	switch (status.toUpperCase()) {
 		case 'PENDING':
-			return <Chip isActive={false} label='Pending' />;
+			return <Chip variant='default' label='Pending' />;
 		case 'SUCCEEDED':
-			return <Chip isActive={true} label='Succeeded' />;
+			return <Chip variant='success' label='Succeeded' />;
 		case 'FAILED':
-			return <Chip isActive={true} activeTextColor='#DC2626' activeBgColor='#FEE2E2' label='Failed' />;
+			return <Chip variant='failed' label='Failed' />;
 		default:
-			return <Chip isActive={false} label='Unknown' />;
+			return <Chip variant='default' label='Unknown' />;
 	}
 };
 
@@ -60,7 +60,7 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 		},
 		{
 			title: 'Invoice Status',
-			align: 'center',
+
 			render: (row: Invoice) => getStatusChip(row.invoice_status),
 		},
 		{
@@ -69,27 +69,26 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 		},
 		{
 			title: 'Billing Interval',
-			align: 'center',
+
 			render: (row: Invoice) => <span>{toSentenceCase(row.billing_period || '')}</span>,
 		},
 		{
 			title: 'Payment Status',
-			align: 'center',
+
 			render: (row: Invoice) => getPaymentStatusChip(row.payment_status),
 		},
 		{
 			title: 'Overdue',
-			align: 'center',
+
 			render: (row: Invoice) => <span>{formatDateShort(row.due_date)}</span>,
 		},
 		{
 			title: 'Issue Date',
-			align: 'center',
+
 			render: (row: Invoice) => <span>{formatDateShort(row.created_at)}</span>,
 		},
 		{
-			title: '',
-			redirect: false,
+			fieldVariant: 'interactive',
 			hideOnEmpty: true,
 			render: (row: Invoice) => {
 				const menuOptions: DropdownMenuOption[] = [
@@ -163,7 +162,14 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 					});
 				}}
 			/>
-			<FlexpriceTable showEmptyRow={true} redirectUrl='/customer-management/invoices/' columns={columns} data={data} />
+			<FlexpriceTable
+				showEmptyRow={true}
+				onRowClick={(row) => {
+					navigate(`/customer-management/invoices/${row.id}`);
+				}}
+				columns={columns}
+				data={data}
+			/>
 			{data.length === 0 && <p className=' text-[#64748B] text-xs font-normal font-sans mt-4'>No Invoices yet</p>}
 		</div>
 	);

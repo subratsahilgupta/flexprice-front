@@ -76,9 +76,7 @@ const SubscriptionDetails: FC = () => {
 					<p className='text-[#71717A] text-sm'>Status</p>
 					<p className='text-[#09090B] text-sm'>
 						<Chip
-							activeTextColor='#377E6A'
-							activeBgColor='#ECFBE4'
-							isActive={formatChips(subscriptionDetails?.status ?? '') === 'Active'}
+							variant={formatChips(subscriptionDetails?.status ?? '') === 'Active' ? 'success' : 'default'}
 							label={formatChips(subscriptionDetails?.status ?? '')}
 						/>
 					</p>
