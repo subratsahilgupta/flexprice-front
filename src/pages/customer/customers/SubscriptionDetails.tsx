@@ -1,4 +1,4 @@
-import { Chip, FormHeader, Spacer } from '@/components/atoms';
+import { Chip, FormHeader, Page, Spacer } from '@/components/atoms';
 import { InvoiceLineItemTable } from '@/components/molecules';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RouteNames } from '@/core/routes/Routes';
@@ -51,11 +51,11 @@ const SubscriptionDetails: FC = () => {
 
 	if (isLoading || isSubscriptionDetailsLoading) {
 		return (
-			<div className='w-2/3'>
+			<Page>
 				<Skeleton className='h-48' />
 				<Spacer className='!my-4' />
 				<Skeleton className='h-60' />
-			</div>
+			</Page>
 		);
 	}
 
@@ -64,7 +64,7 @@ const SubscriptionDetails: FC = () => {
 	}
 
 	return (
-		<div className='w-2/3'>
+		<Page>
 			<div className='card'>
 				<FormHeader title='Subscription details' variant='sub-header' titleClassName='font-semibold' />
 				<div className='w-full flex justify-between items-center'>
@@ -105,7 +105,7 @@ const SubscriptionDetails: FC = () => {
 					/>
 				</div>
 			)}
-		</div>
+		</Page>
 	);
 };
 

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import FeatureApi from '@/utils/api_requests/FeatureApi';
-import { Button, Chip, FormHeader, Loader, SectionHeader, Spacer } from '@/components/atoms';
+import { Button, Chip, FormHeader, Loader, Page, SectionHeader, Spacer } from '@/components/atoms';
 import toast from 'react-hot-toast';
 import { useEffect } from 'react';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
@@ -155,7 +155,7 @@ const FeatureDetails = () => {
 	];
 
 	return (
-		<div className='page w-2/3'>
+		<Page>
 			<SectionHeader title={data?.name || ''}>
 				<div className='flex gap-2'>
 					<Button disabled variant={'outline'} className='flex gap-2'>
@@ -179,7 +179,7 @@ const FeatureDetails = () => {
 					<FlexpriceTable showEmptyRow columns={columns} data={linkedEntitlements?.items ?? []} />
 				</div>
 			</div>
-		</div>
+		</Page>
 	);
 };
 

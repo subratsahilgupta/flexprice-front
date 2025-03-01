@@ -55,7 +55,7 @@ const PricingPlan = () => {
 					<p className='text-[#71717A] font-normal '>Add your first Pricing Plan</p>
 					<Spacer height={'16px'} />
 					<Link to='/product-catalog/pricing-plan/create-plan'>
-						<Button className='w-32 flex gap-2 bg-[#0F172A] '>
+						<Button>
 							<FiFolderPlus />
 							<span>Create Plan</span>
 						</Button>

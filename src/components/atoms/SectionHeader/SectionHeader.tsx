@@ -51,7 +51,7 @@ const SectionHeader: FC<Props> = ({
 					</button>
 				)}
 				{showButton && (
-					<Button onClick={onButtonClick} className='w-32 flex gap-2 bg-[#0F172A] '>
+					<Button onClick={onButtonClick}>
 						{buttonIcon}
 						<span>{buttonText}</span>
 					</Button>

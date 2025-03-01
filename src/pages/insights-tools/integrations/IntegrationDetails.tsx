@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { integrations } from './integrationsData';
 import { cn } from '@/lib/utils';
-import { Button, FormHeader, Loader } from '@/components/atoms';
+import { Button, FormHeader, Loader, Page } from '@/components/atoms';
 import { useState } from 'react';
 import IntegrationDrawer from '@/components/molecules/IntegrationDrawer/IntegrationDrawer';
 import { useQuery, useMutation } from '@tanstack/react-query';
@@ -59,7 +59,7 @@ const IntegrationDetails = () => {
 	}
 
 	return (
-		<div className='page'>
+		<Page>
 			<div className={cn('border rounded-xl p-4 flex items-center shadow-sm', !integration.premium && 'cursor-pointer')}>
 				<div className='size-20 flex items-center justify-center bg-gray-100 rounded-lg'>
 					<img src={integration.logo} alt={integration.name} className='size-16 object-contain' />
@@ -160,7 +160,7 @@ const IntegrationDetails = () => {
 					</div>
 				))}
 			</div>
-		</div>
+		</Page>
 	);
 };
 

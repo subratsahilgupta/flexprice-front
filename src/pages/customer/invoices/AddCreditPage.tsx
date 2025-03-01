@@ -1,4 +1,4 @@
-import { Button, Chip, DatePicker, Dialog, FormHeader, Select, SelectOption, Spacer } from '@/components/atoms';
+import { Button, Chip, DatePicker, Dialog, FormHeader, Page, Select, SelectOption, Spacer } from '@/components/atoms';
 import { InvoiceCreditLineItemTable } from '@/components/molecules';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
@@ -71,7 +71,7 @@ const AddCreditPage = () => {
 	}
 
 	return (
-		<div className='w-2/3'>
+		<Page>
 			{/* confirmation dialog */}
 			<Dialog
 				isOpen={showModal}
@@ -155,7 +155,7 @@ const AddCreditPage = () => {
 			<Button className='mt-8' onClick={() => setshowModal(true)}>
 				Issue Credit Note
 			</Button>
-		</div>
+		</Page>
 	);
 };
 

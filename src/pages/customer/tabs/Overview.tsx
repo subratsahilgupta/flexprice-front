@@ -4,7 +4,7 @@ import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
 import SubscriptionTable from '@/components/organisms/Subscription/SubscriptionTable';
 import { Subscription } from '@/models/Subscription';
-import CustomerOverviewCard from '@/components/molecules/Customer/CustomerOverviewCard';
+
 import { FiFolderPlus } from 'react-icons/fi';
 
 const SkeletonLoader = () => (
@@ -47,15 +47,11 @@ const Overview = () => {
 	});
 
 	return (
-		<div className='space-y-4 w-2/3'>
-			<CustomerOverviewCard customerId={customerId!} />
+		<div className=''>
 			<div className='card border-gray-300'>
 				<div className='flex mb-4 justify-between items-center'>
 					<FormHeader title='Subscriptions' variant='sub-header' />
-					<Button
-						onClick={handleAddSubscription}
-						className='bg-primary text-white px-4 inline-flex items-center py-2 rounded-md hover:bg-primary-dark'>
-						<FiFolderPlus />
+					<Button onClick={handleAddSubscription} prefixIcon={<FiFolderPlus />}>
 						Add Subscription
 					</Button>
 				</div>

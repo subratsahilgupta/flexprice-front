@@ -51,9 +51,7 @@ const TableHeader = React.forwardRef<HTMLTableSectionElement, React.HTMLAttribut
 TableHeader.displayName = 'TableHeader';
 
 const TableBody = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
-	({ className, ...props }, ref) => (
-		<tbody ref={ref} className={cn('border-b border-[#E2E8F0] [&_tr:last-child]:border-0', className)} {...props} />
-	),
+	({ className, ...props }, ref) => <tbody ref={ref} className={cn('[&_tr:last-child]:border-0', className)} {...props} />,
 );
 TableBody.displayName = 'TableBody';
 
@@ -101,7 +99,7 @@ const TableCell = React.forwardRef<
 TableCell.displayName = 'TableCell';
 
 // Main FlexpriceTable Component
-const FlexpriceTable: FC<FlexpriceTableProps<any>> = ({ onRowClick, columns, data, showEmptyRow, hideBottomBorder = false }) => {
+const FlexpriceTable: FC<FlexpriceTableProps<any>> = ({ onRowClick, columns, data, showEmptyRow, hideBottomBorder = data.length > 1 }) => {
 	const isInteractiveElement = (element: HTMLElement | null): boolean => {
 		if (!element) return false;
 
@@ -142,7 +140,7 @@ const FlexpriceTable: FC<FlexpriceTableProps<any>> = ({ onRowClick, columns, dat
 	};
 
 	return (
-		<div>
+		<div className={cn(!hideBottomBorder && 'border-b border-[#E2E8F0]')}>
 			<Table>
 				<TableHeader>
 					<TableRow>
@@ -166,7 +164,8 @@ const FlexpriceTable: FC<FlexpriceTableProps<any>> = ({ onRowClick, columns, dat
 								<TableRow
 									onClick={(e) => handleRowClick(row, e)}
 									className={cn(
-										'border-b border-[#E2E8F0] transition-colors hover:bg-muted/50',
+										'transition-colors hover:bg-muted/50',
+										!lastRow && 'border-b border-[#E2E8F0]',
 										onRowClick && 'cursor-pointer hover:bg-muted/50',
 										lastRow && hideBottomBorder && 'border-b-0',
 									)}
@@ -228,7 +227,7 @@ const FlexpriceTable: FC<FlexpriceTableProps<any>> = ({ onRowClick, columns, dat
 							);
 						})}
 					{data.length === 0 && showEmptyRow && (
-						<TableRow>
+						<TableRow className={cn(hideBottomBorder && 'border-b-0')}>
 							{columns.map(({ flex = 1, width, textColor = 'inherit', align = 'left', hideOnEmpty }, colIndex) => {
 								const lastRow = colIndex === columns.length - 1;
 								return (
@@ -238,7 +237,6 @@ const FlexpriceTable: FC<FlexpriceTableProps<any>> = ({ onRowClick, columns, dat
 											textColor ? `text-[${textColor}]` : 'text-[#09090B] w-full ',
 											'font-normal',
 											'!max-h-8 px-4 py-2 text-[14px]',
-
 											lastRow ? 'text-center' : '',
 										)}
 										style={{ flex: width ? undefined : flex }}

@@ -133,7 +133,7 @@
 // 			<Spacer height={'16px'} />
 
 // 			{/* fetaure details section */}
-// 			<div className='w-2/3'>
+// 			<div >
 // 				<div className='p-6  rounded-xl border border-[#E4E4E7]'>
 // 					<FormHeader
 // 						title={'Feature Details'}

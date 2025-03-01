@@ -39,7 +39,7 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ options, trigger, isOpen, o
 							disabled={option.disabled}
 							key={index}
 							onSelect={(e) => {
-								e.preventDefault();
+								// e.preventDefault();
 								if (option.onSelect && !option.children?.length) {
 									option.onSelect(e);
 								}

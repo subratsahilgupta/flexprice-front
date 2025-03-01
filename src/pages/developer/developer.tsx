@@ -1,4 +1,4 @@
-import { Button, FormHeader, SectionHeader } from '@/components/atoms';
+import { Button, FormHeader, Page, SectionHeader } from '@/components/atoms';
 import { ColumnData, DropdownMenu, FlexpriceTable, Pagination, SecretKeyDrawer } from '@/components/molecules';
 import SecretKeysApi from '@/utils/api_requests/SecretKeysApi';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -152,7 +152,7 @@ const DeveloperPage = () => {
 	console.log(secretKeys);
 
 	return (
-		<div className='page'>
+		<Page>
 			<SecretKeyDrawer isOpen={isSecretKeyDrawerOpen} onOpenChange={setIsSecretKeyDrawerOpen} />
 			<div className='w-2/3 flex flex-col gap-4'>
 				<SectionHeader title='Developers' />
@@ -167,7 +167,7 @@ const DeveloperPage = () => {
 					<Pagination totalPages={secretKeys?.pagination.total || 0} />
 				</div>
 			</div>
-		</div>
+		</Page>
 	);
 };
 

@@ -1,4 +1,4 @@
-import { Button, Chip, FormHeader, Modal, Select, Spacer } from '@/components/atoms';
+import { Button, Chip, FormHeader, Modal, Page, Select, Spacer } from '@/components/atoms';
 import { DropdownMenu, DropdownMenuOption, Pagination, TopupCard, WalletTransactionsTable } from '@/components/molecules';
 import { Skeleton } from '@/components/ui/skeleton';
 import usePagination from '@/hooks/usePagination';
@@ -134,7 +134,7 @@ const WalletTab = () => {
 		return (
 			<div className='card w-full flex justify-between items-center '>
 				<FormHeader title='Wallet' subtitle='No wallet linked to the customer yet.' variant='sub-header' />
-				<Button onClick={() => setisAdd(true)} className='w-32 flex gap-2 bg-[#0F172A] '>
+				<Button onClick={() => setisAdd(true)}>
 					<WalletIcon />
 					<span>Add Wallet</span>
 				</Button>
@@ -143,7 +143,7 @@ const WalletTab = () => {
 	}
 
 	return (
-		<div className='w-2/3'>
+		<Page>
 			{/* topup wallet */}
 			<Modal isOpen={showTopupModal} onOpenChange={() => setshowTopupModal(false)}>
 				<div className='w-[700px] bg-white rounded-xl'>
@@ -172,18 +172,14 @@ const WalletTab = () => {
 					)}
 				</div>
 				<div className='flex items-center space-x-2	'>
-					<Button onClick={() => setisAdd(true)} className='w-32 flex gap-2 bg-[#0F172A] '>
+					<Button onClick={() => setisAdd(true)}>
 						<WalletIcon />
 						<span>Add Wallet</span>
 					</Button>
 
 					<DropdownMenu
 						options={dropdownOptions}
-						trigger={
-							<Button variant={'outline'} className='size-9 '>
-								<EllipsisVertical />
-							</Button>
-						}></DropdownMenu>
+						trigger={<Button variant={'outline'} prefixIcon={<EllipsisVertical />} size={'icon'}></Button>}></DropdownMenu>
 				</div>
 			</div>
 			{/* when we have wallets or active wallets */}
@@ -256,7 +252,7 @@ const WalletTab = () => {
 					)}
 				</div>
 			)}
-		</div>
+		</Page>
 	);
 };
 

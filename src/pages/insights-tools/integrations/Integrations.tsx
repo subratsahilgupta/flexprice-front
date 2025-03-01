@@ -26,7 +26,7 @@ const Integrations = () => {
 	);
 
 	if (isLoading) {
-		return <div className='page'>Loading integrations...</div>;
+		return <Page>Loading integrations...</Page>;
 	}
 
 	return (

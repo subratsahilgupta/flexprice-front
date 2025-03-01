@@ -1,4 +1,4 @@
-import { ActionButton, FormHeader, Loader, SectionHeader } from '@/components/atoms';
+import { ActionButton, FormHeader, Loader, Page, SectionHeader } from '@/components/atoms';
 import { AddEntitlementDrawer, ColumnData, FlexpriceTable } from '@/components/molecules';
 import { DetailsCard } from '@/components/molecules';
 import { getFeatureTypeChips } from '@/components/molecules/FeatureTable/FeatureTable';
@@ -173,7 +173,7 @@ const PlanViewPage = () => {
 	}
 
 	return (
-		<div className='page'>
+		<Page>
 			<AddEntitlementDrawer
 				selectedFeatures={planData.entitlements?.map((v) => v.feature)}
 				entitlements={planData.entitlements}
@@ -241,7 +241,7 @@ const PlanViewPage = () => {
 					)}
 				</div>
 			</div>
-		</div>
+		</Page>
 	);
 };
 

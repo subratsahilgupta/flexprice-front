@@ -1,4 +1,4 @@
-import { Button, SectionHeader, Spacer } from '@/components/atoms';
+import { Button, Page, SectionHeader, Spacer } from '@/components/atoms';
 import { FiFolderPlus } from 'react-icons/fi';
 import { BillableMetricTable, Pagination } from '@/components/molecules';
 import { Link, useNavigate } from 'react-router-dom';
@@ -54,7 +54,7 @@ const MeterPage = () => {
 					</p>
 					<Spacer height={'16px'} />
 					<Link to='/usage-tracking/meter/add-meter'>
-						<Button className='w-32 flex gap-2 bg-[#0F172A] '>
+						<Button>
 							<FiFolderPlus />
 							<span>Add Meter</span>
 						</Button>
@@ -65,7 +65,7 @@ const MeterPage = () => {
 	}
 
 	return (
-		<div className='page'>
+		<Page>
 			<SectionHeader
 				showButton
 				showFilter
@@ -81,7 +81,7 @@ const MeterPage = () => {
 				<Spacer className='!h-4' />
 				<Pagination totalPages={Math.ceil((meterData?.pagination.total ?? 1) / limit)} />
 			</div>
-		</div>
+		</Page>
 	);
 };
 
