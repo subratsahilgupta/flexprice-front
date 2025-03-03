@@ -74,12 +74,10 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 		// },
 		{
 			title: 'Payment Status',
-
 			render: (row: Invoice) => getPaymentStatusChip(row.payment_status),
 		},
 		{
 			title: 'Due Date',
-
 			render: (row: Invoice) => <span>{formatDateShort(row.due_date)}</span>,
 		},
 		// {

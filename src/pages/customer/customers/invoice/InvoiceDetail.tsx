@@ -1,4 +1,4 @@
-import { FormHeader, Spacer, Button, Divider, Page } from '@/components/atoms';
+import { FormHeader, Spacer, Button, Divider, Page, Loader } from '@/components/atoms';
 import { DropdownMenu, DropdownMenuOption, InvoiceLineItemTable } from '@/components/molecules';
 import InvoicePaymentStatusModal from '@/components/molecules/InvoiceTable/InvoicePaymentStatusModal';
 import InvoiceStatusModal from '@/components/molecules/InvoiceTable/InvoiceStatusModal';
@@ -8,7 +8,7 @@ import InvoiceApi from '@/utils/api_requests/InvoiceApi';
 import { captureToPdf } from '@/utils/common/component_to_pdf';
 import formatDate from '@/utils/common/format_date';
 import { useQuery } from '@tanstack/react-query';
-import { Download, EllipsisVertical, Loader } from 'lucide-react';
+import { Download, EllipsisVertical } from 'lucide-react';
 import { FC, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
@@ -75,12 +75,7 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 		captureToPdf(invoiceref, 'invoice');
 	};
 
-	if (isLoading)
-		return (
-			<div className='flex justify-center items-center h-96'>
-				<Loader />
-			</div>
-		);
+	if (isLoading) return <Loader />;
 
 	if (isError) {
 		toast.error('Something went wrong');

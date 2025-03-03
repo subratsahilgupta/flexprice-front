@@ -193,7 +193,7 @@ const FlexpriceTable: FC<FlexpriceTableProps<any>> = ({ onRowClick, columns, dat
 													className={cn(
 														textColor ? `text-[${textColor}]` : 'text-muted-foreground',
 														'font-normal',
-														'!max-h-8 px-4 py-2 text-[14px]',
+														'!max-h-8 px-3 py-2 text-[14px]',
 														onCLick && 'cursor-pointer hover:bg-muted/50',
 														fieldVariant === 'title' ? 'font-medium text-foreground' : '!font-normal text-muted-foreground',
 														fieldVariant === 'link' && 'cursor-pointer text-primary hover:underline',

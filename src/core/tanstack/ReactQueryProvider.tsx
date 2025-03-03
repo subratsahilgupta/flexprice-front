@@ -32,8 +32,9 @@ export const queryClient = new QueryClient({
 });
 
 export const refetchQueries = async (queryKeys?: string | string[]) => {
-	await queryClient.invalidateQueries({ queryKey: queryKeys, exact: false });
-	await queryClient.refetchQueries({ queryKey: queryKeys, exact: false });
+	const keys = typeof queryKeys === 'string' ? [queryKeys] : (queryKeys ?? []);
+	await queryClient.invalidateQueries({ queryKey: keys, exact: false });
+	await queryClient.refetchQueries({ queryKey: keys, exact: false });
 };
 
 export const invalidateQueries = async (queryKeys: string[]) => {

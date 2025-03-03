@@ -1,5 +1,6 @@
 import { FormHeader } from '@/components/atoms';
 import { cn } from '@/lib/utils';
+import { getTypographyClass } from '@/lib/typography';
 import React, { FC } from 'react';
 
 export interface Detail {
@@ -71,13 +72,12 @@ const DetailsCard: FC<Props> = ({
 
 	const getValueClasses = (detail: Detail) => {
 		const variantClasses = {
-			default: 'text-gray-900 font-normal',
-			muted: 'text-gray-500 font-normal',
-			foreground: 'text-gray-700 font-medium',
+			default: getTypographyClass('body-default'),
+			muted: getTypographyClass('status-muted'),
+			foreground: getTypographyClass('status-default'),
 		};
 
 		return cn(
-			'text-sm',
 			variantClasses[detail.valueVariant || 'default'],
 			variant === 'right-aligned' ? 'text-right' : 'text-left',
 			detail.valueClassName,
@@ -104,13 +104,13 @@ const DetailsCard: FC<Props> = ({
 						return <div key={index} className={cn('col-span-full h-[1px] bg-gray-200 my-6', detail.className)} />;
 					}
 
-					const labelClasses = detail.labelStyle === 'semibold' ? 'font-semibold' : 'font-light';
+					const labelClasses = getTypographyClass(detail.labelStyle === 'semibold' ? 'label-semibold' : 'label-default');
 					const colSpanClass = detail.colSpan ? `col-span-${detail.colSpan}` : '';
 
 					if (variant === 'stacked') {
 						return (
 							<div key={index} className={cn('flex flex-col space-y-1', colSpanClass, detail.className)}>
-								<div className={cn('text-sm text-gray-600', labelClasses)}>{detail.label}</div>
+								<div className={labelClasses}>{detail.label}</div>
 								<div className={getValueClasses(detail)}>
 									<span>{detail.value || '--'}</span>
 									{detail.tag && <Tag tag={detail.tag} />}
@@ -121,7 +121,7 @@ const DetailsCard: FC<Props> = ({
 
 					return (
 						<div key={index} className={cn('grid grid-cols-2 gap-4', colSpanClass, detail.className)}>
-							<div className={cn('text-sm text-gray-600', labelClasses)}>{detail.label}</div>
+							<div className={labelClasses}>{detail.label}</div>
 							<div className={getValueClasses(detail)}>
 								<span>{detail.value || '--'}</span>
 								{detail.tag && <Tag tag={detail.tag} />}

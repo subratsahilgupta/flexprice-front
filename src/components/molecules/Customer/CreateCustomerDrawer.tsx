@@ -214,14 +214,14 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 						<span className='absolute -top-4 left-2 text-[#18181B] text-sm bg-white font-medium px-2 py-1'>Customer Details</span>
 						<div className='space-y-4'>
 							<Input
-								label='Customer Name'
-								placeholder='Enter Customer Name'
+								label='Name'
+								placeholder='Enter Name'
 								value={formData.name || ''}
 								onChange={(e) => handleChange('name', e)}
 								error={errors.name}
 							/>
 							<Input
-								label='Customer Slug*'
+								label='External customer ID'
 								placeholder='customer-'
 								value={formData.external_id || ''}
 								onChange={(e) => handleChange('external_id', e)}
@@ -229,7 +229,7 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 								disabled={isEdit}
 							/>
 							<Input
-								label='Customer Email (Optional)'
+								label='Email (Optional)'
 								placeholder='e.g. kaavya@gmail.com'
 								type='email'
 								value={formData.email || ''}

@@ -1,4 +1,4 @@
-import { Button, Chip, FormHeader, Modal, Page, Select, Spacer } from '@/components/atoms';
+import { Button, Chip, FormHeader, Modal, Select, Spacer } from '@/components/atoms';
 import { DropdownMenu, DropdownMenuOption, Pagination, TopupCard, WalletTransactionsTable } from '@/components/molecules';
 import { Skeleton } from '@/components/ui/skeleton';
 import usePagination from '@/hooks/usePagination';
@@ -114,7 +114,7 @@ const WalletTab = () => {
 
 	if (isLoading || isTransactionLoading || isBalanceLoading) {
 		return (
-			<div className='w-2/3 h-full   space-y-5'>
+			<div className=' h-full   space-y-5'>
 				<Skeleton className='w-full h-16' />
 				<Skeleton className='w-full h-32' />
 				<Skeleton className='w-full h-32' />
@@ -143,7 +143,7 @@ const WalletTab = () => {
 	}
 
 	return (
-		<Page>
+		<div>
 			{/* topup wallet */}
 			<Modal isOpen={showTopupModal} onOpenChange={() => setshowTopupModal(false)}>
 				<div className='w-[700px] bg-white rounded-xl'>
@@ -186,6 +186,7 @@ const WalletTab = () => {
 			{activeWallet && !isAdd && (
 				<div>
 					<DetailsCard
+						variant='stacked'
 						title='Wallet Details'
 						data={[
 							{ label: 'Wallet Name', value: activeWallet?.name || 'Prepaid wallet' },
@@ -252,7 +253,7 @@ const WalletTab = () => {
 					)}
 				</div>
 			)}
-		</Page>
+		</div>
 	);
 };
 

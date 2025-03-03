@@ -1,3 +1,4 @@
+import { getTypographyClass } from '@/lib/typography';
 import { cn } from '@/lib/utils';
 import React from 'react';
 
@@ -7,7 +8,7 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 	notchPosition?: 'left' | 'right';
 	notchSize?: 'sm' | 'md' | 'lg';
 	noPadding?: boolean;
-	children: React.ReactNode;
+	children?: React.ReactNode;
 }
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
@@ -66,5 +67,23 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
 );
 
 Card.displayName = 'Card';
+
+interface HeaderProps {
+	title: string;
+	subtitle?: string;
+	cta?: React.ReactNode;
+	className?: string;
+}
+export const CardHeader = ({ title, subtitle, cta, className }: HeaderProps) => {
+	return (
+		<div className={cn('flex items-center justify-between', className)}>
+			<div>
+				<h3 className={getTypographyClass('card-header')}>{title}</h3>
+				{subtitle && <p className={getTypographyClass('card-subtitle')}>{subtitle}</p>}
+			</div>
+			{cta && cta}
+		</div>
+	);
+};
 
 export default Card;

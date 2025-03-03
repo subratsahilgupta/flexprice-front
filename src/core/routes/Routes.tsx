@@ -11,7 +11,7 @@ import CreatePlanPage from '@/pages/product-catalog/pricingPlans/CreatePlan';
 import CustomerSubscription from '@/pages/customer/customers/CustomerSubscription';
 import CustomerDetails from '@/pages/customer/customers/CustomerDetails';
 import ErrorPage from '@/pages/error/ErrorPage';
-import PlanViewPage from '@/pages/product-catalog/pricingPlans/PlanViewPage';
+import PlanDetailsPage from '@/pages/product-catalog/pricingPlans/PlanDetailsPage';
 import EventsPage from '@/pages/usage/events/Events';
 import QueryPage from '@/pages/usage/query/Query';
 import InvoicePage from '@/pages/customer/invoices/InvoicePage';
@@ -200,7 +200,7 @@ export const MainRouter = createBrowserRouter([
 					},
 					{
 						path: `${RouteNames.pricingPlan}/:planId`,
-						element: <PlanViewPage />,
+						element: <PlanDetailsPage />,
 					},
 					{
 						path: RouteNames.createPlan,

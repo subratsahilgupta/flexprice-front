@@ -1,4 +1,4 @@
-import { ActionButton, FormHeader, Loader, Page, SectionHeader, Spacer } from '@/components/atoms';
+import { ActionButton, Button, CardHeader, Loader, Page, Spacer } from '@/components/atoms';
 import { AddEntitlementDrawer, ColumnData, FlexpriceTable } from '@/components/molecules';
 import { DetailsCard } from '@/components/molecules';
 import { getFeatureTypeChips } from '@/components/molecules/FeatureTable/FeatureTable';
@@ -16,7 +16,7 @@ import { Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Card } from '@/components/atoms/Card';
+import { Card } from '@/components/atoms';
 
 type Params = {
 	planId: string;
@@ -82,7 +82,7 @@ const ValueCell = ({ data }: { data: Price }) => {
 	return <div>{price}</div>;
 };
 
-const PlanViewPage = () => {
+const PlanDetailsPage = () => {
 	const navigate = useNavigate();
 	const { planId } = useParams<Params>();
 	const [drawerOpen, setdrawerOpen] = useState(false);
@@ -192,7 +192,7 @@ const PlanViewPage = () => {
 	];
 
 	return (
-		<Page>
+		<Page heading={planData?.name}>
 			<AddEntitlementDrawer
 				selectedFeatures={planData.entitlements?.map((v) => v.feature)}
 				entitlements={planData.entitlements}
@@ -223,20 +223,19 @@ const PlanViewPage = () => {
 				{/* plan charges table */}
 				{(planData?.prices?.length ?? 0) > 0 && (
 					<Card variant='notched'>
-						<FormHeader title='Charges' variant='sub-header' titleClassName='font-semibold' />
+						<CardHeader title='Charges' />
 						<FlexpriceTable columns={chargeColumns} data={planData?.prices ?? []} />
 					</Card>
 				)}
 
 				<Card variant='notched'>
-					<SectionHeader
-						titleVariant='sub-header'
-						showButton
-						variant='sub-header'
+					<CardHeader
 						title='Entitlements'
-						buttonIcon={<Plus />}
-						onButtonClick={() => setdrawerOpen(true)}
-						buttonText='Add Feature'
+						cta={
+							<Button prefixIcon={<Plus />} onClick={() => setdrawerOpen(true)}>
+								Add
+							</Button>
+						}
 					/>
 					<FlexpriceTable showEmptyRow data={planData.entitlements || []} columns={columnData} />
 					{(planData.entitlements?.length || 0) === 0 && (
@@ -250,4 +249,4 @@ const PlanViewPage = () => {
 	);
 };
 
-export default PlanViewPage;
+export default PlanDetailsPage;

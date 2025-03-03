@@ -1,4 +1,4 @@
-import { Button, Loader, Page, SectionHeader, Spacer } from '@/components/atoms';
+import { Button, Loader, Page, Spacer } from '@/components/atoms';
 import { CreateCustomerDrawer, Pagination } from '@/components/molecules';
 import CustomerTable from '@/components/molecules/Customer/CustomerTable';
 import EmptyPage from '@/components/organisms/EmptyPage/EmptyPage';
@@ -8,6 +8,7 @@ import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { BsPeople } from 'react-icons/bs';
 import { FiFolderPlus } from 'react-icons/fi';
 
 const CustomerPage = () => {
@@ -63,8 +64,9 @@ const CustomerPage = () => {
 	}
 
 	return (
-		<Page>
-			<SectionHeader title='Customers'>
+		<Page
+			heading='Customers'
+			headingCTA={
 				<CreateCustomerDrawer
 					trigger={
 						<Button
@@ -72,7 +74,7 @@ const CustomerPage = () => {
 								setactiveCustomer(undefined);
 								console.log('clicked');
 							}}
-							prefixIcon={<FiFolderPlus />}>
+							prefixIcon={<BsPeople />}>
 							Add Customer
 						</Button>
 					}
@@ -80,7 +82,7 @@ const CustomerPage = () => {
 					onOpenChange={setcustomerDrawerOpen}
 					data={activeCustomer}
 				/>
-			</SectionHeader>
+			}>
 			<div>
 				<CustomerTable
 					onEdit={(data) => {
