@@ -151,8 +151,8 @@ const AddEntitlementDrawer: FC<Props> = ({
 		onSuccess: () => {
 			toast.success('Entitlements added successfully');
 			handleDrawerClose(false);
-			refetchQueries(['fetchPlan', planId]);
-			refetchQueries(['fetchEntitlements', planId]);
+			refetchQueries(['fetchPlan', planId || '']);
+			refetchQueries(['fetchEntitlements', planId || '']);
 		},
 		onError: (error) => {
 			console.error('Error adding entitlements:', error);

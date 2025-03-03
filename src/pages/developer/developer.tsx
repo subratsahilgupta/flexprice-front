@@ -154,13 +154,13 @@ const DeveloperPage = () => {
 	return (
 		<Page>
 			<SecretKeyDrawer isOpen={isSecretKeyDrawerOpen} onOpenChange={setIsSecretKeyDrawerOpen} />
-			<div className='w-2/3 flex flex-col gap-4'>
+			<div className='flex flex-col gap-4'>
 				<SectionHeader title='Developers' />
 				<div className='w-full flex flex-col gap-4 card'>
 					<div className='flex mb-4 justify-between items-center'>
 						<FormHeader title='Api Keys' variant='sub-header' />
-						<Button variant={'outline'} className='size-8' onClick={handleAddSecretKey}>
-							<Plus />
+						<Button prefixIcon={<Plus />} onClick={handleAddSecretKey}>
+							Add
 						</Button>
 					</div>
 					<FlexpriceTable showEmptyRow columns={columns} data={secretKeys?.items || []} />

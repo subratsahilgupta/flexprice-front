@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { FC, ReactNode } from 'react';
-import { Button } from '..';
+import { Button, FormHeader } from '..';
 import { IoSearch } from 'react-icons/io5';
 import { SlidersHorizontal } from 'lucide-react';
 
@@ -20,6 +20,8 @@ interface Props {
 	onButtonClick?: () => void;
 	optionsClassName?: string;
 	subtitle?: string;
+	titleClassName?: string;
+	titleVariant?: 'default' | 'sub-header';
 }
 
 const SectionHeader: FC<Props> = ({
@@ -35,10 +37,12 @@ const SectionHeader: FC<Props> = ({
 	buttonText,
 	onButtonClick,
 	optionsClassName,
+	titleVariant = 'default',
+	titleClassName,
 }) => {
 	return (
 		<div className={cn('w-full py-3 px-2 flex items-center justify-between', className)}>
-			<p className='text-xl font-[600] text-zinc-950'>{title}</p>
+			<FormHeader title={title as string} variant={titleVariant} titleClassName={titleClassName} />
 			<div className={cn('flex gap-2 items-center', optionsClassName)}>
 				{showSearch && (
 					<button onClick={onSearchClick} className='px-2 py-1'>

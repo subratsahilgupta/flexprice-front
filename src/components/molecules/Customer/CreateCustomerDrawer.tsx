@@ -168,7 +168,7 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 		onSuccess: async (details) => {
 			console.log('details', details);
 			if (data) {
-				await refetchQueries(['fetchCustomerDetails', formData.id]);
+				await refetchQueries(['fetchCustomerDetails', formData?.id || '']);
 			} else {
 				await refetchQueries(['fetchCustomers']);
 				setFormData({});

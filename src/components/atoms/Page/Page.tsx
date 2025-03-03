@@ -10,7 +10,7 @@ const Page = ({ children, className, type = 'default' }: PageProps) => {
 	return (
 		<div
 			className={cn(
-				'min-h-screen page pb-6  ',
+				'min-h-screen page pb-6 ',
 				type === 'left-aligned' && 'px-6',
 				type === 'default' && 'mx-auto max-w-screen-lg',
 				className,

@@ -182,9 +182,7 @@ const SecretKeyDrawer: FC<Props> = ({ isOpen, onOpenChange }) => {
 					</div>
 
 					<div className='mt-6 flex justify-start'>
-						<Button variant='outline' onClick={() => setIsModalOpen(false)} className='bg-black text-white hover:bg-gray-800 border-0 px-8'>
-							Done
-						</Button>
+						<Button onClick={() => setIsModalOpen(false)}>Done</Button>
 					</div>
 				</div>
 			</Modal>

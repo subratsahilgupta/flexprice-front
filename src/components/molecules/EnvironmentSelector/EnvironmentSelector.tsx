@@ -4,7 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
 import EnvironmentApi from '@/utils/api_requests/EnvironmentApi';
 import { Blocks, Rocket, Server, ChevronsUpDown } from 'lucide-react';
-import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
+import { useGlobalLoading } from '@/core/tanstack/ReactQueryProvider';
 import useUser from '@/hooks/useUser';
 import { Select, SelectContent } from '@/components/ui/select';
 import * as SelectPrimitive from '@radix-ui/react-select';
@@ -46,6 +46,7 @@ const EnvironmentSelector: React.FC<Props> = ({ disabled = false, className }) =
 	const { loading, user } = useUser();
 	const { open: sidebarOpen } = useSidebar();
 	const navigate = useNavigate();
+	const { setLoading } = useGlobalLoading();
 
 	const {
 		data: environments = [],
@@ -55,7 +56,6 @@ const EnvironmentSelector: React.FC<Props> = ({ disabled = false, className }) =
 		queryKey: ['environments'],
 		queryFn: () => EnvironmentApi.getLocalEnvironments(),
 		// Handle potential API errors
-		retry: 2,
 		staleTime: 5 * 60 * 1000, // 5 minutes
 	});
 
@@ -107,10 +107,11 @@ const EnvironmentSelector: React.FC<Props> = ({ disabled = false, className }) =
 		})) || [];
 
 	const handleChange = async (newValue: string) => {
+		setLoading(true); // Start loading state
 		EnvironmentApi.setActiveEnvironment(newValue);
 		setActiveEnvironment(environments?.find((env) => env.id === newValue) || environments?.[0]);
-		// Refetch all queries to ensure data consistency across the application
-		await refetchQueries(undefined);
+		// await refetchQueries(); // Refetch all queries
+		setLoading(false); // End loading state
 		navigate(RouteNames.home);
 	};
 

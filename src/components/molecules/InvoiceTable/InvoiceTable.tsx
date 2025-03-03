@@ -1,7 +1,7 @@
 import { Invoice } from '@/models/Invoice';
 import { FC, useState } from 'react';
 import FlexpriceTable, { ColumnData } from '../Table';
-import { formatDateShort, getCurrencySymbol, toSentenceCase } from '@/utils/common/helper_functions';
+import { formatDateShort, getCurrencySymbol } from '@/utils/common/helper_functions';
 import { Chip } from '@/components/atoms';
 import DropdownMenu, { DropdownMenuOption } from '../DropdownMenu';
 import { useNavigate } from 'react-router-dom';
@@ -53,6 +53,7 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 		{
 			fieldName: 'invoice_number',
 			title: 'Invoice ID',
+			fieldVariant: 'title',
 		},
 		{
 			title: 'Amount',
@@ -67,26 +68,25 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 			title: 'Customer Slug',
 			render: (row: Invoice) => <span>{row.customer?.external_id}</span>,
 		},
-		{
-			title: 'Billing Interval',
-
-			render: (row: Invoice) => <span>{toSentenceCase(row.billing_period || '')}</span>,
-		},
+		// {
+		// 	title: 'Billing Interval',
+		// 	render: (row: Invoice) => <span>{toSentenceCase(row.billing_period || '')}</span>,
+		// },
 		{
 			title: 'Payment Status',
 
 			render: (row: Invoice) => getPaymentStatusChip(row.payment_status),
 		},
 		{
-			title: 'Overdue',
+			title: 'Due Date',
 
 			render: (row: Invoice) => <span>{formatDateShort(row.due_date)}</span>,
 		},
-		{
-			title: 'Issue Date',
+		// {
+		// 	title: 'Issue Date',
 
-			render: (row: Invoice) => <span>{formatDateShort(row.created_at)}</span>,
-		},
+		// 	render: (row: Invoice) => <span>{formatDateShort(row.created_at)}</span>,
+		// },
 		{
 			fieldVariant: 'interactive',
 			hideOnEmpty: true,
