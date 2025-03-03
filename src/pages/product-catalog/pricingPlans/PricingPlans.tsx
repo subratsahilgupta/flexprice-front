@@ -1,11 +1,11 @@
-import { Button, Loader, Page, Spacer } from '@/components/atoms';
+import { Button, Loader, Page, ShortPagination, Spacer } from '@/components/atoms';
 import { FiFolderPlus } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
 import toast from 'react-hot-toast';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
-import { Pagination, PlansTable } from '@/components/molecules';
+import { PlansTable } from '@/components/molecules';
 import { Plan } from '@/models/Plan';
 import { ReactSVG } from 'react-svg';
 import usePagination from '@/hooks/usePagination';
@@ -69,7 +69,7 @@ const PricingPlan = () => {
 			<div>
 				<PlansTable data={(plansData?.items || []) as Plan[]} />
 				<Spacer className='!h-4' />
-				<Pagination totalPages={Math.ceil((plansData?.pagination.total ?? 1) / limit)} />
+				<ShortPagination unit='Pricing Plans' totalItems={plansData?.pagination.total ?? 0} />
 			</div>
 		</Page>
 	);

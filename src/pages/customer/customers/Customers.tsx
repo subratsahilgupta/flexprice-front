@@ -1,5 +1,5 @@
-import { Button, Loader, Page, Spacer } from '@/components/atoms';
-import { CreateCustomerDrawer, Pagination } from '@/components/molecules';
+import { Button, Loader, Page, ShortPagination, Spacer } from '@/components/atoms';
+import { CreateCustomerDrawer } from '@/components/molecules';
 import CustomerTable from '@/components/molecules/Customer/CustomerTable';
 import EmptyPage from '@/components/organisms/EmptyPage/EmptyPage';
 import usePagination from '@/hooks/usePagination';
@@ -93,7 +93,7 @@ const CustomerPage = () => {
 					data={customerData?.items || []}
 				/>
 				<Spacer className='!h-4' />
-				<Pagination totalPages={Math.ceil((customerData?.pagination.total ?? 1) / limit)} />
+				<ShortPagination unit='Customers' totalItems={customerData?.pagination.total ?? 0} />
 			</div>
 		</Page>
 	);

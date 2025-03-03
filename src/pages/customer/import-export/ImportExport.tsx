@@ -1,5 +1,5 @@
-import { Button, Chip, Loader, Page } from '@/components/atoms';
-import { ColumnData, FlexpriceTable, ImportFileDrawer, Pagination } from '@/components/molecules';
+import { Button, Chip, Loader, Page, ShortPagination } from '@/components/atoms';
+import { ColumnData, FlexpriceTable, ImportFileDrawer } from '@/components/molecules';
 import { EmptyPage } from '@/components/organisms';
 import usePagination from '@/hooks/usePagination';
 import { ImportTask } from '@/models/ImportTask';
@@ -130,7 +130,7 @@ const ImportExport = () => {
 					showEmptyRow
 				/>
 
-				<Pagination totalPages={Math.ceil((data?.pagination.total ?? 1) / limit)} />
+				<ShortPagination unit='Import Tasks' totalItems={data?.pagination.total ?? 0} />
 			</div>
 		</Page>
 	);

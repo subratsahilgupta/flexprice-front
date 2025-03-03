@@ -1,6 +1,6 @@
-import { Button, Loader, Page, SectionHeader, Spacer } from '@/components/atoms';
+import { Button, Loader, Page, SectionHeader, ShortPagination, Spacer } from '@/components/atoms';
 import { FiFolderPlus } from 'react-icons/fi';
-import { BillableMetricTable, Pagination } from '@/components/molecules';
+import { BillableMetricTable } from '@/components/molecules';
 import { Link, useNavigate } from 'react-router-dom';
 import { MeterApi } from '@/utils/api_requests/MeterApi';
 import { useQuery } from '@tanstack/react-query';
@@ -71,7 +71,7 @@ const MeterPage = () => {
 			<div>
 				<BillableMetricTable data={meterData?.items || []} />
 				<Spacer className='!h-4' />
-				<Pagination totalPages={Math.ceil((meterData?.pagination.total ?? 1) / limit)} />
+				<ShortPagination unit='Meters' totalItems={meterData?.pagination.total ?? 0} />
 			</div>
 		</Page>
 	);

@@ -1,5 +1,5 @@
-import { Page, Spacer, Loader } from '@/components/atoms';
-import { InvoiceTable, Pagination } from '@/components/molecules';
+import { Page, Spacer, Loader, ShortPagination } from '@/components/atoms';
+import { InvoiceTable } from '@/components/molecules';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import usePagination from '@/hooks/usePagination';
@@ -37,7 +37,7 @@ const InvoicesPage = () => {
 			<div className='px-0'>
 				<InvoiceTable data={invoiceData?.items || []} />
 				<Spacer className='!h-4' />
-				<Pagination totalPages={Math.ceil((invoiceData?.pagination.total ?? 1) / limit)} />
+				<ShortPagination unit='Invoices' totalItems={invoiceData?.pagination.total ?? 0} />
 			</div>
 		</Page>
 	);
