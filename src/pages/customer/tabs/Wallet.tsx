@@ -1,5 +1,5 @@
-import { Button, Chip, FormHeader, Modal, Select, Spacer } from '@/components/atoms';
-import { DropdownMenu, DropdownMenuOption, Pagination, TopupCard, WalletTransactionsTable } from '@/components/molecules';
+import { Button, Chip, FormHeader, Modal, Select, ShortPagination, Spacer } from '@/components/atoms';
+import { DropdownMenu, DropdownMenuOption, TopupCard, WalletTransactionsTable } from '@/components/molecules';
 import { Skeleton } from '@/components/ui/skeleton';
 import usePagination from '@/hooks/usePagination';
 import { Wallet } from '@/models/Wallet';
@@ -248,7 +248,7 @@ const WalletTab = () => {
 							</div>
 							<Spacer className='!h-6' />
 							<WalletTransactionsTable data={transactionsData?.items || []} />
-							<Pagination totalPages={Math.ceil((transactionsData?.pagination.total ?? 1) / limit)} />
+							<ShortPagination unit='Transactions' totalItems={transactionsData?.pagination.total ?? 0} />
 						</div>
 					)}
 				</div>

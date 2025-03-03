@@ -1,5 +1,5 @@
-import { Button, Loader, Page, Spacer } from '@/components/atoms';
-import { FeatureTable, Pagination } from '@/components/molecules';
+import { Button, Loader, Page, ShortPagination, Spacer } from '@/components/atoms';
+import { FeatureTable } from '@/components/molecules';
 import { RouteNames } from '@/core/routes/Routes';
 import usePagination from '@/hooks/usePagination';
 import FeatureApi from '@/utils/api_requests/FeatureApi';
@@ -66,7 +66,7 @@ const FeaturesPage = () => {
 			<div>
 				<FeatureTable data={featureData?.items || []} />
 				<Spacer className='!h-4' />
-				<Pagination totalPages={Math.ceil((featureData?.pagination.total ?? 1) / limit)} />
+				<ShortPagination unit='Features' totalItems={featureData?.pagination.total ?? 0} />
 			</div>
 		</Page>
 	);

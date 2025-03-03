@@ -57,3 +57,5 @@ export { default as ComingSoonTag } from './ComingSoon';
 export { default as Page } from './Page';
 
 export { default as Card, CardHeader } from './Card';
+
+export * from './ShortPagination';
