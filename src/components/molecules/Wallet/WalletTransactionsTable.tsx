@@ -25,6 +25,7 @@ const columnData: ColumnData[] = [
 	{
 		title: 'Transactions',
 		render: (rowData) => fomatTransactionTitle(rowData.type),
+		fieldVariant: 'title',
 	},
 	{
 		title: 'Date',

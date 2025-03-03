@@ -27,6 +27,7 @@ const columns: ColumnData<ImportTask>[] = [
 		render(rowData) {
 			return <div>{rowData.file_name || '--'}</div>;
 		},
+		fieldVariant: 'title',
 	},
 	{
 		title: 'Import Type',

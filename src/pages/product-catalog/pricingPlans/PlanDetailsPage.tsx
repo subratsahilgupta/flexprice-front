@@ -39,6 +39,7 @@ const chargeColumns: ColumnData[] = [
 		render: (row) => {
 			return <span className='text-[#09090B]'>{formatPriceType(row.type)}</span>;
 		},
+		fieldVariant: 'title',
 	},
 	{
 		title: 'Feature',
@@ -113,6 +114,7 @@ const PlanDetailsPage = () => {
 			onCellClick(row) {
 				navigate(RouteNames.featureDetails + `/${row?.feature?.id}`);
 			},
+			fieldVariant: 'title',
 			render(row) {
 				return row?.feature?.name;
 			},

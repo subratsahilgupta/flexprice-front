@@ -99,7 +99,7 @@ const TableCell = React.forwardRef<
 TableCell.displayName = 'TableCell';
 
 // Main FlexpriceTable Component
-const FlexpriceTable: FC<FlexpriceTableProps<any>> = ({ onRowClick, columns, data, showEmptyRow, hideBottomBorder = data.length > 1 }) => {
+const FlexpriceTable: FC<FlexpriceTableProps<any>> = ({ onRowClick, columns, data, showEmptyRow, hideBottomBorder = true }) => {
 	const isInteractiveElement = (element: HTMLElement | null): boolean => {
 		if (!element) return false;
 

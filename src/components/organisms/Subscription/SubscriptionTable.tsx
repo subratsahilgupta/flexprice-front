@@ -26,6 +26,7 @@ const SubscriptionTable: FC<SubscriptionTableProps> = ({ data, onRowClick }) => 
 		{
 			fieldName: 'plan_name',
 			title: 'Plan Name',
+			fieldVariant: 'title',
 		},
 		{
 			title: 'Billing Period',

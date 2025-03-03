@@ -17,7 +17,8 @@ const UsageTable: FC<UsageTableProps> = ({ data }) => {
 	const columns: ColumnData[] = [
 		{
 			fieldName: 'name',
-			title: 'Meter Name',
+			title: 'Feature Name',
+			fieldVariant: 'title',
 		},
 		{
 			fieldName: 'quantity',

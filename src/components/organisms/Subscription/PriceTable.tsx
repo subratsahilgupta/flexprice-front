@@ -25,6 +25,7 @@ const ChargeTable: FC<Props> = ({ data }) => {
 		{
 			fieldName: 'charge',
 			title: 'Charge',
+			fieldVariant: 'title',
 		},
 		{
 			fieldName: 'quantity',
