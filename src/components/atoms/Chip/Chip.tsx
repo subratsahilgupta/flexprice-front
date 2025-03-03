@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 
 interface ChipProps {
 	label?: string;
@@ -7,6 +7,9 @@ interface ChipProps {
 	textColor?: string;
 	bgColor?: string;
 	onClick?: () => void;
+	childrenBefore?: ReactNode;
+	childrenAfter?: ReactNode;
+	className?: string;
 }
 
 const getChipColor = (variant: ChipProps['variant']): { textColor: string; bgColor: string } => {
@@ -24,17 +27,19 @@ const getChipColor = (variant: ChipProps['variant']): { textColor: string; bgCol
 	}
 };
 
-const Chip: FC<ChipProps> = ({ label, variant = 'default', textColor, bgColor, onClick }) => {
+const Chip: FC<ChipProps> = ({ label, variant = 'default', textColor, bgColor, onClick, childrenBefore, childrenAfter, className }) => {
 	const { bgColor: defaultBgColor, textColor: defaultTextColor } = getChipColor(variant);
 	return (
 		<span
 			onClick={onClick}
-			className={cn('px-3 py-1 rounded-lg select-none font-normal transition-all', onClick && 'cursor-pointer')}
+			className={cn('px-3 py-1 rounded-lg select-none font-normal transition-all', onClick && 'cursor-pointer flex gap-2', className)}
 			style={{
 				backgroundColor: bgColor ?? defaultBgColor,
 				color: textColor ?? defaultTextColor,
 			}}>
+			{childrenBefore}
 			{label}
+			{childrenAfter}
 		</span>
 	);
 };

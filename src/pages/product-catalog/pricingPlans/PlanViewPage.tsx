@@ -182,7 +182,7 @@ const PlanViewPage = () => {
 				onOpenChange={(value) => setdrawerOpen(value)}
 			/>
 
-			<div className='w-2/3 mb-10 space-y-4'>
+			<div className=' mb-10 space-y-4'>
 				{/* <div className='w-full !my-5 flex justify-between items-center'>
 					<FormHeader title={planData?.name} variant='form-title' />
 					{planData?.status === 'published' && (

@@ -35,7 +35,7 @@ const PlansTable: FC<PlansTableProps> = ({ data }) => {
 		{
 			title: 'Updated at',
 			render: (row) => {
-				return <span className='text-[#09090B]'>{formatDate(row.updated_at)}</span>;
+				return formatDate(row.updated_at);
 			},
 		},
 		{

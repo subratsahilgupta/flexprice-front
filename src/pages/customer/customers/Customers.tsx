@@ -1,4 +1,4 @@
-import { Button, Page, SectionHeader, Spacer, Spinner } from '@/components/atoms';
+import { Button, Loader, Page, SectionHeader, Spacer } from '@/components/atoms';
 import { CreateCustomerDrawer, Pagination } from '@/components/molecules';
 import CustomerTable from '@/components/molecules/Customer/CustomerTable';
 import EmptyPage from '@/components/organisms/EmptyPage/EmptyPage';
@@ -30,14 +30,7 @@ const CustomerPage = () => {
 	});
 
 	if (isLoading) {
-		return (
-			<div className='fixed inset-0 flex items-center justify-center bg-white/80 z-50'>
-				<div className='flex flex-col items-center gap-2'>
-					<Spinner size={50} className='text-primary' />
-					<p className='text-sm text-gray-500'>Loading...</p>
-				</div>
-			</div>
-		);
+		return <Loader />;
 	}
 
 	if (isError) {

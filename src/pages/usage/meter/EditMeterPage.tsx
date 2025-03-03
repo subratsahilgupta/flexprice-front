@@ -1,4 +1,4 @@
-import { Spinner } from '@/components/atoms';
+import { Loader } from '@/components/atoms';
 import { MeterForm } from '@/components/organisms';
 import { Meter } from '@/models/Meter';
 import { MeterApi } from '@/utils/api_requests/MeterApi';
@@ -54,14 +54,7 @@ const EditMeterPage = () => {
 	});
 
 	if (isLoading) {
-		return (
-			<div className='fixed inset-0 flex items-center justify-center bg-white/80 z-50'>
-				<div className='flex flex-col items-center gap-2'>
-					<Spinner size={50} className='text-primary' />
-					<p className='text-sm text-gray-500'>Loading...</p>
-				</div>
-			</div>
-		);
+		return <Loader />;
 	}
 
 	if (isError) {

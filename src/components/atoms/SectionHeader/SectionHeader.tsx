@@ -6,7 +6,7 @@ import { SlidersHorizontal } from 'lucide-react';
 
 interface Props {
 	children?: ReactNode;
-	title: string;
+	title: ReactNode;
 	className?: string;
 	showSearch?: boolean;
 	onSearch?: (value: string) => void;

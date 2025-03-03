@@ -1,10 +1,9 @@
-import { Button, Page, SectionHeader, Spacer } from '@/components/atoms';
+import { Button, Loader, Page, SectionHeader, Spacer } from '@/components/atoms';
 import { FiFolderPlus } from 'react-icons/fi';
 import { BillableMetricTable, Pagination } from '@/components/molecules';
 import { Link, useNavigate } from 'react-router-dom';
 import { MeterApi } from '@/utils/api_requests/MeterApi';
 import { useQuery } from '@tanstack/react-query';
-import { Spinner } from '@/components/atoms';
 import toast from 'react-hot-toast';
 import { ReactSVG } from 'react-svg';
 import usePagination from '@/hooks/usePagination';
@@ -30,14 +29,7 @@ const MeterPage = () => {
 	});
 
 	if (isLoading) {
-		return (
-			<div className='fixed inset-0 flex items-center justify-center bg-white/80 z-50'>
-				<div className='flex flex-col items-center gap-2'>
-					<Spinner size={50} className='text-primary' />
-					<p className='text-sm text-gray-500'>Loading...</p>
-				</div>
-			</div>
-		);
+		return <Loader />;
 	}
 
 	if (isError) {

@@ -8,22 +8,25 @@ import formatDate from '@/utils/common/format_date';
 import { useNavigate } from 'react-router-dom';
 import { RouteNames } from '@/core/routes/Routes';
 import FeatureApi from '@/utils/api_requests/FeatureApi';
+import { getFeatureIcon } from '@/components/atoms/SelectFeature/SelectFeature';
 
 interface Props {
 	data: Feature[];
 	showEmptyRow?: boolean;
 }
 
-export const getFeatureTypeChips = (type: string) => {
+export const getFeatureTypeChips = (type: string, addIcon: boolean = false) => {
+	const icon = getFeatureIcon(type);
 	switch (type.toLocaleLowerCase()) {
-		case 'static':
-			return <Chip label={toSentenceCase(type)} />;
+		case 'static': {
+			return <Chip label={toSentenceCase(type)} childrenBefore={addIcon ? icon : null} />;
+		}
 		case 'metered':
-			return <Chip textColor='#1E3A8A' bgColor='#F0F9FF' label={toSentenceCase(type)} />;
+			return <Chip textColor='#1E3A8A' bgColor='#F0F9FF' childrenBefore={addIcon ? icon : null} label={toSentenceCase(type)} />;
 		case 'boolean':
-			return <Chip textColor='#075985' bgColor='#F0F9FF' label={toSentenceCase(type)} />;
+			return <Chip textColor='#075985' bgColor='#F0F9FF' childrenBefore={addIcon ? icon : null} label={toSentenceCase(type)} />;
 		default:
-			return <Chip textColor='#075985' bgColor='#F0F9FF' label={toSentenceCase(type)} />;
+			return <Chip textColor='#075985' bgColor='#F0F9FF' childrenBefore={addIcon ? icon : null} label={toSentenceCase(type)} />;
 	}
 };
 
@@ -34,6 +37,7 @@ const FeatureTable: FC<Props> = ({ data, showEmptyRow }) => {
 		{
 			fieldName: 'name',
 			title: 'Feature Name',
+			fieldVariant: 'title',
 		},
 		{
 			title: 'Type',
