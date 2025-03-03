@@ -269,7 +269,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 										label='Value'
 										placeholder='Enter value'
 										disabled={tempEntitlement.usage_limit === null}
-										inputType='number'
+										variant='number'
 										value={tempEntitlement.usage_limit === null ? 'Unlimited' : tempEntitlement.usage_limit?.toString() || ''}
 										onChange={(value) => {
 											const numValue = value === '' ? undefined : Number(value);

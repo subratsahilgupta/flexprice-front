@@ -5,11 +5,13 @@ import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import { useQuery } from '@tanstack/react-query';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { Page } from '@/components/atoms';
+import { cn } from '@/lib/utils';
 
 const tabs = [
 	{ id: '', label: 'Overview' },
 	{ id: 'wallet', label: 'Wallet' },
 	{ id: 'invoice', label: 'Invoice' },
+	{ id: 'information', label: 'Information' },
 	// { id: 'credit-note', label: 'Credit Note' },
 ] as const;
 
@@ -61,8 +63,6 @@ const CustomerDetails = () => {
 		}
 	}, [activeTab, updateBreadcrumb, setSegmentLoading, customer, location.pathname]);
 
-	console.log('activeTab', activeTab);
-
 	const onTabChange = (tabId: TabId) => {
 		navigate(`/customer-management/customers/${customerId}/${tabId}`);
 	};
@@ -76,12 +76,13 @@ const CustomerDetails = () => {
 						<button
 							key={tab.id}
 							onClick={() => onTabChange(tab.id)}
-							className={`relative inline-flex items-center px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none
-								${activeTab === tab.id ? 'text-primary border-b-2 border-primary' : 'text-muted-foreground hover:text-foreground hover:border-muted'}`}
+							className={cn(
+								'px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none',
+								activeTab === tab.id ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
+							)}
 							role='tab'
 							aria-selected={activeTab === tab.id}>
 							{tab.label}
-							{activeTab === tab.id && <span className='absolute bottom-0 left-0 w-full h-[2px] bg-primary rounded' aria-hidden='true' />}
 						</button>
 					))}
 				</nav>

@@ -1,4 +1,4 @@
-import { Button, Chip, DatePicker, Dialog, FormHeader, Select, SelectOption, Spacer } from '@/components/atoms';
+import { Button, Chip, DatePicker, Dialog, FormHeader, Page, Select, SelectOption, Spacer } from '@/components/atoms';
 import { InvoiceCreditLineItemTable } from '@/components/molecules';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
@@ -12,13 +12,13 @@ import { useParams } from 'react-router-dom';
 const getStatusChip = (status: string) => {
 	switch (status.toUpperCase()) {
 		case 'VOIDED':
-			return <Chip isActive={false} label='Void' />;
+			return <Chip variant='default' label='Void' />;
 		case 'FINALIZED':
-			return <Chip isActive={true} label='Paid' />;
+			return <Chip variant='success' label='Paid' />;
 		case 'DRAFT':
-			return <Chip activeBgColor='#F0F2F5' activeTextColor='#57646E' isActive={false} label='Draft' />;
+			return <Chip variant='default' label='Draft' />;
 		default:
-			return <Chip isActive={false} activeBgColor='#F0F2F5' activeTextColor='#57646E' label='Draft' />;
+			return <Chip variant='default' label='Draft' />;
 	}
 };
 
@@ -71,7 +71,7 @@ const AddCreditPage = () => {
 	}
 
 	return (
-		<div className='w-2/3'>
+		<Page>
 			{/* confirmation dialog */}
 			<Dialog
 				isOpen={showModal}
@@ -155,7 +155,7 @@ const AddCreditPage = () => {
 			<Button className='mt-8' onClick={() => setshowModal(true)}>
 				Issue Credit Note
 			</Button>
-		</div>
+		</Page>
 	);
 };
 

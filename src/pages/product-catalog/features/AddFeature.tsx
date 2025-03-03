@@ -1,4 +1,4 @@
-import { Button, CodePreview, FormHeader, Input, RadioGroup, Select, SelectOption, Spacer, Textarea } from '@/components/atoms';
+import { Button, CodePreview, FormHeader, Input, Page, RadioGroup, Select, SelectOption, Spacer, Textarea } from '@/components/atoms';
 import EventFilter from '@/components/molecules/EventFilter';
 import { RouteNames } from '@/core/routes/Routes';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
@@ -78,7 +78,6 @@ const AddFeaturePage = () => {
 
 	const featureSchema = z.object({
 		name: z.string().nonempty('Feature name is required'),
-		lookup_key: z.string().nonempty('Feature slug is required'),
 		description: z.string().optional(),
 		type: z.enum(['boolean', 'metered', 'static']).optional(),
 		meter_id: z.string().optional(),
@@ -268,7 +267,7 @@ const AddFeaturePage = () => {
 		(data.type === 'metered' &&
 			(!meter.event_name || !meter.aggregation?.type || (meter.aggregation.type !== 'COUNT' && !meter.aggregation?.field)));
 	return (
-		<div className='p-6 page'>
+		<Page type='left-aligned'>
 			<FormHeader
 				title={'Create Feature'}
 				subtitle={"Make changes to your pricing plans here. Click save when you're done."}
@@ -278,7 +277,7 @@ const AddFeaturePage = () => {
 			<Spacer height={'16px'} />
 
 			{/* fetaure details section */}
-			<div className={cn('w-2/3 flex gap-6 relative   !mb-24', data.type === featureTypeOptions[1].value && 'w-full')}>
+			<div className={cn('flex gap-6 relative   !mb-24', data.type === featureTypeOptions[1].value && 'w-full')}>
 				<div className=' flex-[8] gap-7  '>
 					<div className='p-6  rounded-xl border border-[#E4E4E7]'>
 						<FormHeader
@@ -295,12 +294,6 @@ const AddFeaturePage = () => {
 								setdata((prev) => ({
 									...prev,
 									name: e,
-									lookup_key:
-										'feature-' +
-										e
-											.toLowerCase()
-											.replace(/ /g, '-')
-											.replace(/[^\w-]+/g, ''),
 								}));
 								setmeter((prev) => ({ ...prev, name: e }));
 							}}
@@ -313,7 +306,10 @@ const AddFeaturePage = () => {
 								className='w-full overflow-hidden'
 								value={data.type}
 								onChange={(e) => {
-									setdata((prev) => ({ ...prev, type: e }));
+									setdata((prev) => ({
+										...prev,
+										type: e,
+									}));
 								}}
 							/>
 						</div>
@@ -403,7 +399,7 @@ const AddFeaturePage = () => {
 									variant='form-component-title'
 								/>
 
-								<div className=''>
+								<div>
 									<EventFilter
 										isArchived={false}
 										isEditMode={false}
@@ -431,7 +427,7 @@ const AddFeaturePage = () => {
 												...prev,
 												aggregation: {
 													type: e,
-													field: prev.aggregation?.field || '',
+													field: '',
 												},
 											}))
 										}
@@ -441,23 +437,25 @@ const AddFeaturePage = () => {
 										error={meterErrors.aggregation_type}
 									/>
 
-									<Input
-										value={meter.aggregation?.field}
-										disabled={meter.aggregation?.type === aggregationOptions[1].value}
-										onChange={(e) =>
-											setmeter((prev) => ({
-												...prev,
-												aggregation: {
-													type: prev.aggregation?.type || '',
-													field: e,
-												},
-											}))
-										}
-										label='Aggregation Value'
-										placeholder='tokens'
-										description='Name of the property in the data object holding the value to aggregate over.'
-										error={meterErrors.aggregation_field}
-									/>
+									{meter.aggregation?.type != aggregationOptions[1].value && (
+										<Input
+											value={meter.aggregation?.field}
+											disabled={meter.aggregation?.type === aggregationOptions[1].value}
+											onChange={(e) =>
+												setmeter((prev) => ({
+													...prev,
+													aggregation: {
+														type: prev.aggregation?.type || '',
+														field: e,
+													},
+												}))
+											}
+											label='Aggregation Value'
+											placeholder='tokens'
+											description='Name of the property in the data object holding the value to aggregate over.'
+											error={meterErrors.aggregation_field}
+										/>
+									)}
 								</div>
 
 								<div className='!mt-6'>
@@ -495,7 +493,7 @@ const AddFeaturePage = () => {
 					)}
 				</div>
 			</div>
-		</div>
+		</Page>
 	);
 };
 

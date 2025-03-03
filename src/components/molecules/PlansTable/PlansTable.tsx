@@ -6,42 +6,45 @@ import formatChips from '@/utils/common/format_chips';
 import formatDate from '@/utils/common/format_date';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
 import { RouteNames } from '@/core/routes/Routes';
-
+import { useNavigate } from 'react-router-dom';
 export interface PlansTableProps {
 	data: Plan[];
 }
 
 const PlansTable: FC<PlansTableProps> = ({ data }) => {
+	const navigate = useNavigate();
 	const mappedData = data?.map((plan) => ({
 		...plan,
 	}));
 
-	const columns: ColumnData[] = [
-		{ fieldName: 'name', title: 'Name', width: '700px' },
+	const columns: ColumnData<Plan>[] = [
+		{
+			fieldName: 'name',
+			title: 'Name',
+			fieldVariant: 'title',
+		},
 		{
 			title: 'Status',
-			align: 'center',
+
+			fieldVariant: 'interactive',
 			render: (row) => {
 				const label = formatChips(row.status);
-				return <Chip isActive={label === 'Active'} label={label} />;
+				return <Chip variant={label === 'Active' ? 'success' : 'default'} label={label} />;
 			},
 		},
 		{
 			title: 'Updated at',
 			render: (row) => {
-				return <span className='text-[#09090B]'>{formatDate(row.updated_at)}</span>;
+				return formatDate(row.updated_at);
 			},
 		},
 		{
-			title: '',
-			redirect: false,
+			fieldVariant: 'interactive',
 			render: (row) => (
 				<ActionButton
 					id={row.id}
 					isArchiveDisabled={true}
 					isEditDisabled={true}
-					// isArchiveDisabled={row.status === 'archived' || false}
-					// isEditDisabled={row.status === 'archived' || false}
 					editPath={`/product-catalog/pricing-plan/edit-plan?id=${row.id}`}
 					deleteMutationFn={(id) => PlanApi.deletePlan(id)}
 					refetchQueryKey='fetchPlans'
@@ -51,7 +54,15 @@ const PlansTable: FC<PlansTableProps> = ({ data }) => {
 		},
 	];
 
-	return <FlexpriceTable redirectUrl={RouteNames.pricingPlan + '/'} columns={columns} data={mappedData} />;
+	return (
+		<FlexpriceTable
+			columns={columns}
+			data={mappedData}
+			onRowClick={(row) => {
+				navigate(RouteNames.pricingPlan + `/${row.id}`);
+			}}
+		/>
+	);
 };
 
 export default PlansTable;

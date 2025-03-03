@@ -64,13 +64,13 @@ const getLicenseKey = (tab: string): string => {
 };
 const getTaskStatusChips = (status: string) => {
 	if (status === 'COMPLETED') {
-		return <Chip isActive={true} label={mapStatusChips(status)} />;
+		return <Chip variant='success' label={mapStatusChips(status)} />;
 	} else if (status === 'FAILED') {
-		return <Chip isActive={true} activeTextColor='#DC2626' activeBgColor='#FEE2E2' label={mapStatusChips(status)} />;
+		return <Chip variant='failed' label={mapStatusChips(status)} />;
 	} else if (status === 'PROCESSING' || status === 'PENDING') {
-		return <Chip label={mapStatusChips(status)} />;
+		return <Chip variant='default' label={mapStatusChips(status)} />;
 	} else {
-		return <Chip isActive={false} label={status} />;
+		return <Chip variant='default' label={status} />;
 	}
 };
 
@@ -460,8 +460,7 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 							disabled={isPending || isLoading || !uploadedFile || !entityType}
 							onClick={() => {
 								handleImport();
-							}}
-							className=''>
+							}}>
 							{isPending ? <LoaderCircleIcon className='size-4 animate-spin' /> : 'Import Data'}
 						</Button>
 					)}

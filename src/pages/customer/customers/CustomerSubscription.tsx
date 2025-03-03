@@ -310,10 +310,7 @@ const CustomerSubscription: React.FC = () => {
 						<Button onClick={navigateBack} className='bg-gray-100 text-black px-4 py-2 rounded-md hover:bg-primary-dark'>
 							Cancel
 						</Button>
-						<Button
-							onClick={handleSubscriptionSubmit}
-							isLoading={isCreating}
-							className='bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark'>
+						<Button onClick={handleSubscriptionSubmit} isLoading={isCreating}>
 							Add Subscription
 						</Button>
 					</div>

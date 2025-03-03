@@ -8,67 +8,48 @@ import formatDate from '@/utils/common/format_date';
 import { useNavigate } from 'react-router-dom';
 import { RouteNames } from '@/core/routes/Routes';
 import FeatureApi from '@/utils/api_requests/FeatureApi';
+import { getFeatureIcon } from '@/components/atoms/SelectFeature/SelectFeature';
 
 interface Props {
 	data: Feature[];
 	showEmptyRow?: boolean;
-	emptyRowMessage?: string;
 }
 
-export const getFeatureTypeChips = (type: string) => {
+export const getFeatureTypeChips = (type: string, addIcon: boolean = false) => {
+	const icon = getFeatureIcon(type);
 	switch (type.toLocaleLowerCase()) {
-		case 'static':
-			return <Chip isActive={false} label={toSentenceCase(type)} />;
+		case 'static': {
+			return <Chip label={toSentenceCase(type)} childrenBefore={addIcon ? icon : null} />;
+		}
 		case 'metered':
-			return <Chip activeBgColor='#F0F9FF' activeTextColor='#1E3A8A' isActive={true} label={toSentenceCase(type)} />;
+			return <Chip textColor='#1E3A8A' bgColor='#F0F9FF' childrenBefore={addIcon ? icon : null} label={toSentenceCase(type)} />;
 		case 'boolean':
-			return <Chip activeBgColor='#F0F9FF' activeTextColor='#075985' isActive={true} label={toSentenceCase(type)} />;
+			return <Chip textColor='#075985' bgColor='#F0F9FF' childrenBefore={addIcon ? icon : null} label={toSentenceCase(type)} />;
 		default:
-			return <Chip activeBgColor='#F0F9FF' activeTextColor='#075985' isActive={true} label={toSentenceCase(type)} />;
+			return <Chip textColor='#075985' bgColor='#F0F9FF' childrenBefore={addIcon ? icon : null} label={toSentenceCase(type)} />;
 	}
 };
 
-const FeatureTable: FC<Props> = ({ data, emptyRowMessage, showEmptyRow }) => {
+const FeatureTable: FC<Props> = ({ data, showEmptyRow }) => {
 	const navigate = useNavigate();
 
 	const columnData: ColumnData<Feature>[] = [
 		{
 			fieldName: 'name',
 			title: 'Feature Name',
-			onCLick(row) {
-				navigate(RouteNames.featureDetails + `/${row?.id}`);
-			},
+			fieldVariant: 'title',
 		},
 		{
 			title: 'Type',
-			align: 'center',
 			render(row) {
 				return getFeatureTypeChips(row?.type || '');
 			},
 		},
 		{
-			title: 'Linked Billable Metric ',
-			onCLick(row) {
-				if (row.meter_id) {
-					navigate(RouteNames.editMeter + `?id=${row?.meter_id}`);
-				}
-			},
-			render(row) {
-				return row?.meter ? row.meter.name : '--';
-			},
-		},
-		{
 			title: 'Status',
-			align: 'center',
 			render: (row) => {
 				const label = formatChips(row?.status);
-				return <Chip isActive={label === 'Active'} label={label} />;
-			},
-		},
-		{
-			title: 'Mapped with plan',
-			render: () => {
-				return '--';
+				return <Chip variant={label === 'Active' ? 'success' : 'default'} label={label} />;
 			},
 		},
 		{
@@ -78,7 +59,7 @@ const FeatureTable: FC<Props> = ({ data, emptyRowMessage, showEmptyRow }) => {
 			},
 		},
 		{
-			title: '',
+			fieldVariant: 'interactive',
 			render(row) {
 				return (
 					<ActionButton
@@ -99,7 +80,14 @@ const FeatureTable: FC<Props> = ({ data, emptyRowMessage, showEmptyRow }) => {
 
 	return (
 		<div>
-			<FlexpriceTable data={data} columns={columnData} showEmptyRow={showEmptyRow} emptyRowText={emptyRowMessage} />
+			<FlexpriceTable
+				data={data}
+				columns={columnData}
+				showEmptyRow={showEmptyRow}
+				onRowClick={(row) => {
+					navigate(RouteNames.featureDetails + `/${row?.id}`);
+				}}
+			/>
 		</div>
 	);
 };

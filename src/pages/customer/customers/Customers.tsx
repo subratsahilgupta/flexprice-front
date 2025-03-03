@@ -1,4 +1,4 @@
-import { Button, SectionHeader, Spacer, Spinner } from '@/components/atoms';
+import { Button, Loader, Page, SectionHeader, Spacer } from '@/components/atoms';
 import { CreateCustomerDrawer, Pagination } from '@/components/molecules';
 import CustomerTable from '@/components/molecules/Customer/CustomerTable';
 import EmptyPage from '@/components/organisms/EmptyPage/EmptyPage';
@@ -30,14 +30,7 @@ const CustomerPage = () => {
 	});
 
 	if (isLoading) {
-		return (
-			<div className='fixed inset-0 flex items-center justify-center bg-white/80 z-50'>
-				<div className='flex flex-col items-center gap-2'>
-					<Spinner size={50} className='text-primary' />
-					<p className='text-sm text-gray-500'>Loading...</p>
-				</div>
-			</div>
-		);
+		return <Loader />;
 	}
 
 	if (isError) {
@@ -56,9 +49,8 @@ const CustomerPage = () => {
 									setactiveCustomer(undefined);
 									console.log('clicked');
 								}}
-								className='flex gap-2 bg-[#0F172A]'>
-								<FiFolderPlus />
-								<span>Add Customer</span>
+								prefixIcon={<FiFolderPlus />}>
+								Add Customer
 							</Button>
 						}
 						open={customerDrawerOpen}
@@ -71,8 +63,8 @@ const CustomerPage = () => {
 	}
 
 	return (
-		<div className='page'>
-			<SectionHeader showFilter showSearch title='Customers'>
+		<Page>
+			<SectionHeader title='Customers'>
 				<CreateCustomerDrawer
 					trigger={
 						<Button
@@ -80,9 +72,8 @@ const CustomerPage = () => {
 								setactiveCustomer(undefined);
 								console.log('clicked');
 							}}
-							className='flex gap-2 bg-[#0F172A]'>
-							<FiFolderPlus />
-							<span>Add Customer</span>
+							prefixIcon={<FiFolderPlus />}>
+							Add Customer
 						</Button>
 					}
 					open={customerDrawerOpen}
@@ -102,7 +93,7 @@ const CustomerPage = () => {
 				<Spacer className='!h-4' />
 				<Pagination totalPages={Math.ceil((customerData?.pagination.total ?? 1) / limit)} />
 			</div>
-		</div>
+		</Page>
 	);
 };
 

@@ -1,4 +1,4 @@
-import { ActionButton, FormHeader, Loader, SectionHeader } from '@/components/atoms';
+import { ActionButton, FormHeader, Loader, Page, SectionHeader } from '@/components/atoms';
 import { AddEntitlementDrawer, ColumnData, FlexpriceTable } from '@/components/molecules';
 import { DetailsCard } from '@/components/molecules';
 import { getFeatureTypeChips } from '@/components/molecules/FeatureTable/FeatureTable';
@@ -40,7 +40,7 @@ const chargeColumns: ColumnData[] = [
 		},
 	},
 	{
-		title: 'Billable Metric',
+		title: 'Feature',
 		render(rowData) {
 			return <span className='text-[#09090B]'>{rowData.meter?.name ?? '--'}</span>;
 		},
@@ -109,7 +109,7 @@ const PlanViewPage = () => {
 	const columnData: ColumnData<ExtendedEntitlement>[] = [
 		{
 			title: 'Feature Name',
-			onCLick(row) {
+			onCellClick(row) {
 				navigate(RouteNames.featureDetails + `/${row?.feature?.id}`);
 			},
 			render(row) {
@@ -124,21 +124,20 @@ const PlanViewPage = () => {
 		},
 		{
 			title: 'Type',
-			align: 'center',
+
 			render(row) {
 				return getFeatureTypeChips(row?.feature_type || '');
 			},
 		},
 		{
 			title: 'Value',
-			align: 'center',
+
 			render(row) {
 				return getFeatureValue(row);
 			},
 		},
 		{
-			title: '',
-			redirect: false,
+			fieldVariant: 'interactive',
 			width: '30px',
 			hideOnEmpty: true,
 			render(row) {
@@ -174,7 +173,7 @@ const PlanViewPage = () => {
 	}
 
 	return (
-		<div className='page'>
+		<Page>
 			<AddEntitlementDrawer
 				selectedFeatures={planData.entitlements?.map((v) => v.feature)}
 				entitlements={planData.entitlements}
@@ -183,7 +182,7 @@ const PlanViewPage = () => {
 				onOpenChange={(value) => setdrawerOpen(value)}
 			/>
 
-			<div className='w-2/3 mb-10 space-y-4'>
+			<div className=' mb-10 space-y-4'>
 				{/* <div className='w-full !my-5 flex justify-between items-center'>
 					<FormHeader title={planData?.name} variant='form-title' />
 					{planData?.status === 'published' && (
@@ -242,7 +241,7 @@ const PlanViewPage = () => {
 					)}
 				</div>
 			</div>
-		</div>
+		</Page>
 	);
 };
 

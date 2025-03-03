@@ -111,9 +111,9 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 			<div ref={invoiceref} className=' mt-6 rounded-xl border border-gray-300 p-6'>
 				<div className='p-4'>
 					<div className='w-full flex justify-between items-center'>
-						<FormHeader className='' title='Invoice Details' variant='sub-header' titleClassName='font-semibold' />
+						<FormHeader title='Invoice Details' variant='sub-header' titleClassName='font-semibold' />
 						<div className='flex gap-4 items-center'>
-							<Button data-html2canvas-ignore='true' className='w-32 flex gap-2 bg-[#0F172A] ' onClick={handleDownlaod}>
+							<Button data-html2canvas-ignore='true' onClick={handleDownlaod}>
 								<Download />
 								<span>Download</span>
 							</Button>

@@ -1,4 +1,4 @@
-import { BsThreeDotsVertical } from 'react-icons/bs';
+import { BsThreeDots } from 'react-icons/bs';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -45,43 +45,52 @@ const ActionButton: FC<ActionProps> = ({
 		},
 	});
 
+	const handleClick = (e: React.MouseEvent) => {
+		// Prevent event from bubbling up to parent elements
+		e.preventDefault();
+		e.stopPropagation();
+		setIsOpen(!isOpen);
+	};
+
 	return (
 		<>
-			<DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-				<DropdownMenuTrigger asChild>
-					<button onClick={() => setIsOpen(!isOpen)}>
-						<BsThreeDotsVertical className='text-base' />
-					</button>
-				</DropdownMenuTrigger>
-				<DropdownMenuContent align='end'>
-					<DropdownMenuItem
-						disabled={isEditDisabled}
-						onSelect={(event) => {
-							event.preventDefault();
-							setIsOpen(false);
-							if (onEdit) {
-								onEdit();
-							} else {
-								navigate(editPath);
-							}
-						}}
-						className='flex gap-2 items-center w-full cursor-pointer'>
-						<Pencil />
-						<span>Edit</span>
-					</DropdownMenuItem>
-					<DropdownMenuItem
-						disabled={isArchiveDisabled}
-						onSelect={(event) => {
-							event.preventDefault();
-							setIsOpen(false);
-							setIsDialogOpen(true);
-						}}
-						className='flex gap-2 items-center w-full cursor-pointer'>
-						<EyeOff />
-						<span>Archive</span>
-					</DropdownMenuItem>
-				</DropdownMenuContent>
-			</DropdownMenu>
+			<div data-interactive='true' onClick={handleClick}>
+				<DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+					<DropdownMenuTrigger asChild>
+						<button>
+							<BsThreeDots className='text-base size-4' />
+						</button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent align='end'>
+						<DropdownMenuItem
+							disabled={isEditDisabled}
+							onSelect={(event) => {
+								event.preventDefault();
+								setIsOpen(false);
+								if (onEdit) {
+									onEdit();
+								} else {
+									navigate(editPath);
+								}
+							}}
+							className='flex gap-2 items-center w-full cursor-pointer'>
+							<Pencil />
+							<span>Edit</span>
+						</DropdownMenuItem>
+						<DropdownMenuItem
+							disabled={isArchiveDisabled}
+							onSelect={(event) => {
+								event.preventDefault();
+								setIsOpen(false);
+								setIsDialogOpen(true);
+							}}
+							className='flex gap-2 items-center w-full cursor-pointer'>
+							<EyeOff />
+							<span>Archive</span>
+						</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
+			</div>
 
 			<Dialog title={`Are you sure you want to archive this ${entityName}?`} isOpen={isDialogOpen} onOpenChange={setIsDialogOpen}>
 				<div className='flex flex-col mt-4 gap-4 items-end justify-center'>

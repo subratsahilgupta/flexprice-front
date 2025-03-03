@@ -1,4 +1,4 @@
-import { Button, FormHeader, SectionHeader } from '@/components/atoms';
+import { Button, FormHeader, Page, SectionHeader } from '@/components/atoms';
 import { Integration, integrations } from './integrationsData';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -26,15 +26,15 @@ const Integrations = () => {
 	);
 
 	if (isLoading) {
-		return <div className='page'>Loading integrations...</div>;
+		return <Page>Loading integrations...</Page>;
 	}
 
 	return (
-		<div className='page'>
+		<Page>
 			{installed.length > 0 && (
 				<div>
 					<SectionHeader title='Integrations' />
-					<div className=''>
+					<div>
 						<FormHeader title='Installed' variant='sub-header' />
 						<div className='grid grid-cols-2 gap-4 '>
 							{installed.map((integration, index) => (
@@ -52,7 +52,7 @@ const Integrations = () => {
 					))}
 				</div>
 			</div>
-		</div>
+		</Page>
 	);
 };
 

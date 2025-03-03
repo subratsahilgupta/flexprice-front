@@ -5,6 +5,8 @@ import formatDate from '@/utils/common/format_date';
 import formatChips from '@/utils/common/format_chips';
 import Customer from '@/models/Customer';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
+import { useNavigate } from 'react-router-dom';
+import { RouteNames } from '@/core/routes/Routes';
 
 export interface Props {
 	data: Customer[];
@@ -12,18 +14,19 @@ export interface Props {
 }
 
 const CustomerTable: FC<Props> = ({ data, onEdit }) => {
+	const navigate = useNavigate();
 	const mappedData = data?.map((customer) => ({
 		...customer,
 	}));
 	const columns: ColumnData[] = [
-		{ fieldName: 'name', title: 'Name', width: '400px' },
+		{ fieldName: 'name', title: 'Name', width: '400px', fieldVariant: 'title' },
 		{ fieldName: 'external_id', title: 'Slug' },
 		{
 			title: 'Status',
-			align: 'center',
+
 			render: (row) => {
 				const label = formatChips(row.status);
-				return <Chip isActive={label === 'Active'} label={label} />;
+				return <Chip variant={label === 'Active' ? 'success' : 'default'} label={label} />;
 			},
 		},
 		{
@@ -34,8 +37,7 @@ const CustomerTable: FC<Props> = ({ data, onEdit }) => {
 		},
 		{
 			title: '',
-			redirect: false,
-			width: '30px',
+			fieldVariant: 'interactive',
 			render: (row) => (
 				<ActionButton
 					isArchiveDisabled={row.status === 'archived'}
@@ -54,7 +56,15 @@ const CustomerTable: FC<Props> = ({ data, onEdit }) => {
 		},
 	];
 
-	return <FlexpriceTable columns={columns} data={mappedData} redirectUrl={`/customer-management/customers/`} />;
+	return (
+		<FlexpriceTable
+			columns={columns}
+			data={mappedData}
+			onRowClick={(row) => {
+				navigate(RouteNames.customers + `/${row?.id}`);
+			}}
+		/>
+	);
 };
 
 export default CustomerTable;

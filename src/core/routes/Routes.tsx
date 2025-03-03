@@ -33,7 +33,7 @@ import CustomerInvoiceDetailsPage from '@/pages/customer/customers/CustomerInvoi
 import DeveloperPage from '@/pages/developer/developer';
 import SignupConfirmation from '@/pages/auth/SignupConfirmation';
 import ResendVerification from '@/pages/auth/ResendVerification';
-
+import CustomerInformation from '@/pages/customer/tabs/CustomerInformation';
 export const RouteNames = {
 	home: '/',
 	login: '/auth',
@@ -150,6 +150,10 @@ export const MainRouter = createBrowserRouter([
 								path: 'overview',
 								element: <Overview />,
 								index: true,
+							},
+							{
+								path: 'information',
+								element: <CustomerInformation />,
 							},
 							{
 								path: 'wallet',

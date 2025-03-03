@@ -1,12 +1,12 @@
 import { cn } from '@/lib/utils';
 import { FC, ReactNode } from 'react';
-import { Button, FormHeader } from '..';
+import { Button } from '..';
 import { IoSearch } from 'react-icons/io5';
 import { SlidersHorizontal } from 'lucide-react';
 
 interface Props {
 	children?: ReactNode;
-	title: string;
+	title: ReactNode;
 	className?: string;
 	showSearch?: boolean;
 	onSearch?: (value: string) => void;
@@ -25,9 +25,7 @@ interface Props {
 const SectionHeader: FC<Props> = ({
 	children,
 	title,
-	subtitle,
 	className,
-	variant = 'default',
 	onFilterClick,
 	onSearchClick,
 	showFilter,
@@ -39,8 +37,8 @@ const SectionHeader: FC<Props> = ({
 	optionsClassName,
 }) => {
 	return (
-		<div className={cn('w-full mb-4 flex items-center justify-between', className)}>
-			<FormHeader subtitle={subtitle} className='m-0' title={title} variant={variant} />
+		<div className={cn('w-full py-3 px-2 flex items-center justify-between', className)}>
+			<p className='text-xl font-[600] text-zinc-950'>{title}</p>
 			<div className={cn('flex gap-2 items-center', optionsClassName)}>
 				{showSearch && (
 					<button onClick={onSearchClick} className='px-2 py-1'>
@@ -53,7 +51,7 @@ const SectionHeader: FC<Props> = ({
 					</button>
 				)}
 				{showButton && (
-					<Button onClick={onButtonClick} className='w-32 flex gap-2 bg-[#0F172A] '>
+					<Button onClick={onButtonClick}>
 						{buttonIcon}
 						<span>{buttonText}</span>
 					</Button>

@@ -203,7 +203,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit, isLoading }) => {
 							<p className={labelStyle}>Filter events based on specific properties (e.g., region, user type).</p>
 						</div>
 
-						<div className=''>
+						<div>
 							<EventFilter
 								isArchived={isArchived}
 								isEditMode={isEditMode}

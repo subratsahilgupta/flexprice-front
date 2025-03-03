@@ -133,7 +133,7 @@
 // 			<Spacer height={'16px'} />
 
 // 			{/* fetaure details section */}
-// 			<div className='w-2/3'>
+// 			<div >
 // 				<div className='p-6  rounded-xl border border-[#E4E4E7]'>
 // 					<FormHeader
 // 						title={'Feature Details'}
@@ -259,12 +259,12 @@
 // 												setdata((prev) => ({ ...prev, meter_id: meter.id }));
 // 												setstate((prev) => ({ ...prev, activeMeter: meter }));
 // 											}}
-// 											description='The feature will be measured according to the billable metric you choose'
+// 											description='The feature will be measured according to the Feature you choose'
 // 										/>
 // 									</div>
 
 // 									{state.activeMeter && (
-// 										<div className=''>
+// 										<div >
 // 											{/* event filters */}
 // 											{/* <div>
 // 												<div className='border border-zinc-200'></div>

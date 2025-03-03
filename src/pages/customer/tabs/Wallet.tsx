@@ -1,4 +1,4 @@
-import { Button, Chip, FormHeader, Modal, Select, Spacer } from '@/components/atoms';
+import { Button, Chip, FormHeader, Modal, Page, Select, Spacer } from '@/components/atoms';
 import { DropdownMenu, DropdownMenuOption, Pagination, TopupCard, WalletTransactionsTable } from '@/components/molecules';
 import { Skeleton } from '@/components/ui/skeleton';
 import usePagination from '@/hooks/usePagination';
@@ -133,8 +133,8 @@ const WalletTab = () => {
 	if (wallets?.length === 0) {
 		return (
 			<div className='card w-full flex justify-between items-center '>
-				<FormHeader className='' title='Wallet' subtitle='No wallet linked to the customer yet.' variant='sub-header' />
-				<Button onClick={() => setisAdd(true)} className='w-32 flex gap-2 bg-[#0F172A] '>
+				<FormHeader title='Wallet' subtitle='No wallet linked to the customer yet.' variant='sub-header' />
+				<Button onClick={() => setisAdd(true)}>
 					<WalletIcon />
 					<span>Add Wallet</span>
 				</Button>
@@ -143,9 +143,9 @@ const WalletTab = () => {
 	}
 
 	return (
-		<div className='w-2/3'>
+		<Page>
 			{/* topup wallet */}
-			<Modal className='' isOpen={showTopupModal} onOpenChange={() => setshowTopupModal(false)}>
+			<Modal isOpen={showTopupModal} onOpenChange={() => setshowTopupModal(false)}>
 				<div className='w-[700px] bg-white rounded-xl'>
 					<TopupCard onSuccess={() => setshowTopupModal(false)} walletId={activeWallet?.id} />
 				</div>
@@ -172,18 +172,14 @@ const WalletTab = () => {
 					)}
 				</div>
 				<div className='flex items-center space-x-2	'>
-					<Button onClick={() => setisAdd(true)} className='w-32 flex gap-2 bg-[#0F172A] '>
+					<Button onClick={() => setisAdd(true)}>
 						<WalletIcon />
 						<span>Add Wallet</span>
 					</Button>
 
 					<DropdownMenu
 						options={dropdownOptions}
-						trigger={
-							<Button variant={'outline'} className='size-9 '>
-								<EllipsisVertical />
-							</Button>
-						}></DropdownMenu>
+						trigger={<Button variant={'outline'} prefixIcon={<EllipsisVertical />} size={'icon'}></Button>}></DropdownMenu>
 				</div>
 			</div>
 			{/* when we have wallets or active wallets */}
@@ -197,9 +193,7 @@ const WalletTab = () => {
 								label: 'Status',
 								value: (
 									<Chip
-										activeTextColor='#377E6A'
-										activeBgColor='#ECFBE4'
-										isActive={formatWalletStatus(activeWallet?.wallet_status) === 'Active'}
+										variant={formatWalletStatus(activeWallet?.wallet_status) === 'Active' ? 'success' : 'default'}
 										label={formatWalletStatus(activeWallet?.wallet_status)}
 									/>
 								),
@@ -258,7 +252,7 @@ const WalletTab = () => {
 					)}
 				</div>
 			)}
-		</div>
+		</Page>
 	);
 };
 

@@ -331,7 +331,7 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 					)}
 
 					<Spacer className='!h-4' />
-					<Button isLoading={isPending} disabled={isPending || isCtaDisabled} className='bg-[#0F172A] text-white' onClick={handleSubmit}>
+					<Button isLoading={isPending} disabled={isPending || isCtaDisabled} onClick={handleSubmit}>
 						{isPending ? 'Saving...' : 'Save Customer'}
 					</Button>
 				</div>

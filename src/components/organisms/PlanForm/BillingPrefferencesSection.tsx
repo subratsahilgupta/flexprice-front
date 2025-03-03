@@ -57,6 +57,7 @@ const BillingPrefferencesSection = () => {
 				<div>
 					<Spacer height={'8px'} />
 					<Input
+						variant='number'
 						error={errors.trial_period}
 						value={plan.trial_period}
 						onChange={(value) => {

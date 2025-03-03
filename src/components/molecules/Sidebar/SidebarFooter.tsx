@@ -33,7 +33,7 @@ const SidebarFooter = () => {
 				}}
 				tooltip={'Developers'}
 				className={cn(
-					`flex items-center  justify-between gap-2 hover:bg-muted transition-colors `,
+					`flex items-center justify-between gap-2 hover:bg-muted transition-colors `,
 					location.pathname.startsWith(RouteNames.developers) ? 'bg-[#F4F4F5] font-medium text-sidebar-text-accent-foreground' : '',
 				)}>
 				<span className={cn('flex items-center gap-2')}>
@@ -46,7 +46,7 @@ const SidebarFooter = () => {
 					window.open('https://docs.flexprice.io', '_blank');
 				}}
 				tooltip={'Documentation'}
-				className={cn(`flex items-center justify-between gap-2 hover:bg-muted transition-colors `)}>
+				className={cn(`flex items-center justify-between gap-2 hover:bg-muted transition-colors my-0 py-1 `)}>
 				<span className='flex items-center gap-2'>
 					<BookOpen className='size-4' />
 					<span className='text-sm select-none'>{'Documentation'}</span>
@@ -57,23 +57,20 @@ const SidebarFooter = () => {
 			{/* user profile */}
 			<Popover>
 				<PopoverTrigger>
-					<div
-						// onClick={() => setIsOpen(!isOpen)}
-						className={`w-full !my-2 mt-2 flex items-center justify-between h-6 rounded-md gap-2 bg-contain`}>
-						<div className='flex items-center text-start gap-2 flex-grow overflow-x-hidden'>
-							<span className='size-8 bg-black text-white flex justify-center items-center bg-contain rounded-md'>
+					<div className='w-full flex items-center justify-between h-10 rounded-md gap-2 px-2'>
+						<div className='flex items-center gap-2 min-w-0 flex-1'>
+							<span className='min-w-7 h-7 bg-black text-white flex justify-center items-center rounded-md flex-shrink-0'>
 								{user?.email
 									?.split(' ')
 									.map((n) => n[0].toUpperCase())
 									.join('')
 									.slice(0, 2) || 'UN'}
 							</span>
-							<div className={cn('text-start', sidebarOpen ? '' : 'hidden')}>
-								{/* <p className='font-semibold text-sm'>{user?.tenant?.name || 'Unknown'}</p> */}
+							<div className={cn('min-w-0 flex-1', sidebarOpen ? '' : 'hidden')}>
 								<p className='text-xs text-muted-foreground truncate'>{user?.email}</p>
 							</div>
 						</div>
-						<button type='button' className={cn(sidebarOpen ? '' : 'hidden')}>
+						<button type='button' className={cn('flex-shrink-0', sidebarOpen ? '' : 'hidden')}>
 							<ChevronsUpDown className='h-4 w-4 opacity-50' />
 						</button>
 					</div>

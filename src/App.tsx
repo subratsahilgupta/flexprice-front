@@ -4,12 +4,15 @@ import { UserProvider } from '@/hooks/UserContext';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import ReactQueryProvider from '@/core/tanstack/ReactQueryProvider';
 import { Toaster } from 'react-hot-toast';
+// import VercelSpeedInsights from '@/core/vercel/vercel';
 
-export default function App() {
+const App = () => {
 	return (
 		<ReactQueryProvider>
 			<UserProvider>
 				<RouterProvider router={MainRouter} />
+				{/* <VercelSpeedInsights /> */}
+
 				{/* Toast Notifications */}
 				<Toaster
 					toastOptions={{
@@ -32,4 +35,6 @@ export default function App() {
 			<ReactQueryDevtools initialIsOpen={false} />
 		</ReactQueryProvider>
 	);
-}
+};
+
+export default App;
