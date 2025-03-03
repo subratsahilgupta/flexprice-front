@@ -31,7 +31,7 @@ class EnvironmentApi {
 	private static baseUrl = '/environments';
 
 	// API Methods
-	public static async getAllEnvironments(): Promise<EnvironmentResponse> {
+	private static async getAllEnvironments(): Promise<EnvironmentResponse> {
 		try {
 			return await AxiosClient.get<EnvironmentResponse>(this.baseUrl);
 		} catch (error) {
@@ -94,21 +94,7 @@ class EnvironmentApi {
 	}
 
 	public static getActiveEnvironment(): ExtendedEnvironment | null {
-		try {
-			const environments = this.getStoredEnvironments();
-			const activeEnv = environments.find((env) => env.isActive);
-
-			// If no active environment, set the first one if available
-			if (!activeEnv && environments.length > 0) {
-				this.setActiveEnvironment(environments[0].id);
-				return environments[0];
-			}
-
-			return activeEnv || null;
-		} catch (error) {
-			console.error('Error getting active environment:', error);
-			return null;
-		}
+		return this.getStoredEnvironments().find((env) => env.isActive) || null;
 	}
 
 	public static saveEnvironments(environments: Environment[]): void {
@@ -152,31 +138,39 @@ class EnvironmentApi {
 		});
 	}
 
-	static async getLocalEnvironments(): Promise<ExtendedEnvironment[]> {
-		try {
-			const storedEnvironments = this.getStoredEnvironments();
+	public static async initializeEnvironments(): Promise<ExtendedEnvironment | null> {
+		const environments = this.getStoredEnvironments();
 
-			if (storedEnvironments.length > 0) {
-				return storedEnvironments;
-			}
-
-			const envData = await this.getAllEnvironments();
-
-			// Check if environments array exists and is not empty
-			if (envData.environments && envData.environments.length > 0) {
-				this.saveEnvironments(envData.environments);
-
-				return envData.environments.map((env) => ({
-					...env,
-					isActive: false, // By default, none active
-				}));
-			}
-
-			return [];
-		} catch (error) {
-			console.error('Error retrieving local environments:', error);
-			return [];
+		if (environments.length > 0) {
+			return this.getActiveEnvironment();
 		}
+
+		try {
+			const envData = await this.getAllEnvironments();
+			if (envData.environments.length > 0) {
+				let activeEnv = envData.environments.find((env) => (env as ExtendedEnvironment).isActive) as ExtendedEnvironment;
+
+				if (!activeEnv) {
+					activeEnv = (envData.environments.find((env) => env.type === 'development') as ExtendedEnvironment) || {
+						...envData.environments[0],
+						isActive: true,
+					};
+				}
+
+				this.saveEnvironments(envData.environments);
+				this.setActiveEnvironment(activeEnv.id);
+
+				return activeEnv;
+			}
+		} catch (error) {
+			console.error('Error initializing environments:', error);
+		}
+
+		return null;
+	}
+
+	public static async getLocalEnvironments(): Promise<ExtendedEnvironment[]> {
+		return this.getStoredEnvironments();
 	}
 }
 
