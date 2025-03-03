@@ -67,6 +67,7 @@ const baseColumns: ColumnData<SecretKey>[] = [
 				</div>
 			);
 		},
+		fieldVariant: 'title',
 	},
 	{
 		title: 'Token',
