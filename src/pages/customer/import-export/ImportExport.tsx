@@ -1,4 +1,4 @@
-import { Button, Chip, Loader, Page, SectionHeader } from '@/components/atoms';
+import { Button, Chip, Loader, Page } from '@/components/atoms';
 import { ColumnData, FlexpriceTable, ImportFileDrawer, Pagination } from '@/components/molecules';
 import { EmptyPage } from '@/components/organisms';
 import usePagination from '@/hooks/usePagination';
@@ -99,23 +99,25 @@ const ImportExport = () => {
 	}
 
 	return (
-		<Page>
+		<Page
+			heading='Bulk Imports'
+			headingCTA={
+				<>
+					<Button
+						variant='outline'
+						onClick={() => {
+							refetchTasks();
+						}}>
+						<RefreshCw />
+					</Button>
+					<Button onClick={() => setdrawerOpen(true)} className='flex gap-2 items-center '>
+						<Import />
+						<span>Import File</span>
+					</Button>
+				</>
+			}>
 			{/* import export drawer */}
 			<ImportFileDrawer taskId={activeTask} isOpen={drawerOpen} onOpenChange={(value) => setdrawerOpen(value)} />
-
-			<SectionHeader showFilter showSearch title='Bulk Imports'>
-				<Button
-					variant='outline'
-					onClick={() => {
-						refetchTasks();
-					}}>
-					<RefreshCw />
-				</Button>
-				<Button onClick={() => setdrawerOpen(true)} className='flex gap-2 items-center '>
-					<Import />
-					<span>Import File</span>
-				</Button>
-			</SectionHeader>
 
 			<div>
 				<FlexpriceTable

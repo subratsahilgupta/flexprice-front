@@ -1,4 +1,4 @@
-import { Page, SectionHeader, Spacer, Loader } from '@/components/atoms';
+import { Page, Spacer, Loader } from '@/components/atoms';
 import { InvoiceTable, Pagination } from '@/components/molecules';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
@@ -33,8 +33,7 @@ const InvoicesPage = () => {
 	}
 
 	return (
-		<Page>
-			<SectionHeader showFilter showSearch title='Invoices' />
+		<Page heading='Invoices'>
 			<div className='px-0'>
 				<InvoiceTable data={invoiceData?.items || []} />
 				<Spacer className='!h-4' />

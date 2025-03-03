@@ -64,7 +64,7 @@ const SubscriptionDetails: FC = () => {
 	}
 
 	return (
-		<Page>
+		<div>
 			<div className='card'>
 				<FormHeader title='Subscription details' variant='sub-header' titleClassName='font-semibold' />
 				<div className='w-full flex justify-between items-center'>
@@ -105,7 +105,7 @@ const SubscriptionDetails: FC = () => {
 					/>
 				</div>
 			)}
-		</Page>
+		</div>
 	);
 };
 

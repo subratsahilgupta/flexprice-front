@@ -1,23 +1,22 @@
 import { cn } from '@/lib/utils';
+import { getTypographyClass } from '@/lib/typography';
 import { FC } from 'react';
 
 interface Props {
 	title?: string;
 	subtitle?: string;
-	variant: 'form-component-title' | 'sub-header' | 'form-title' | 'default' | 'subtitle';
+	variant: 'form-component-title' | 'sub-header' | 'form-title' | 'default' | 'subtitle' | 'card-title';
 	className?: string;
 	titleClassName?: string;
 	subtitleClassName?: string;
 }
 
 const FormTitle: FC<Props> = ({ variant, subtitle, title, className, subtitleClassName, titleClassName }) => {
-	const labelStyle = '!text-zinc-500 text-normal text-sm';
-
 	if (variant === 'form-title') {
 		return (
 			<div className={className}>
-				{title && <p className={cn('font-bold text-zinc text-[20px]', titleClassName)}>{title}</p>}
-				{subtitle && <p className={cn(labelStyle, subtitleClassName)}>{subtitle}</p>}
+				{title && <p className={cn(getTypographyClass('form-title'), titleClassName)}>{title}</p>}
+				{subtitle && <p className={cn(getTypographyClass('helper-text'), subtitleClassName)}>{subtitle}</p>}
 			</div>
 		);
 	}
@@ -25,8 +24,8 @@ const FormTitle: FC<Props> = ({ variant, subtitle, title, className, subtitleCla
 	if (variant === 'default') {
 		return (
 			<div className={className}>
-				<h1 className='font-inter font-bold text-xl '>{title}</h1>
-				<p className={cn(labelStyle, subtitleClassName)}>{subtitle}</p>
+				<h1 className={cn(getTypographyClass('h1'), titleClassName)}>{title}</h1>
+				{subtitle && <p className={cn(getTypographyClass('helper-text'), subtitleClassName)}>{subtitle}</p>}
 			</div>
 		);
 	}
@@ -34,8 +33,8 @@ const FormTitle: FC<Props> = ({ variant, subtitle, title, className, subtitleCla
 	if (variant === 'sub-header') {
 		return (
 			<div className={cn('mb-4', className)}>
-				<p className={cn('font-inter font-semibold text-base', titleClassName)}>{title}</p>
-				<p className={cn(labelStyle, subtitleClassName)}>{subtitle}</p>
+				<p className={cn(getTypographyClass('section-title'), titleClassName)}>{title}</p>
+				{subtitle && <p className={cn(getTypographyClass('helper-text'), subtitleClassName)}>{subtitle}</p>}
 			</div>
 		);
 	}
@@ -43,14 +42,22 @@ const FormTitle: FC<Props> = ({ variant, subtitle, title, className, subtitleCla
 	if (variant === 'form-component-title') {
 		return (
 			<div className={cn('mb-2', className)}>
-				{title && <p className={cn('text-sm text-zinc-950 font-medium font-inter mb-0', titleClassName)}>{title}</p>}
-				{subtitle && <p className={cn(labelStyle, subtitleClassName)}>{subtitle}</p>}
+				{title && <p className={cn(getTypographyClass('subsection-title'), titleClassName)}>{title}</p>}
+				{subtitle && <p className={cn(getTypographyClass('helper-text'), subtitleClassName)}>{subtitle}</p>}
 			</div>
 		);
 	}
 
 	if (variant === 'subtitle') {
-		return <div className={cn('mb-2', className)}>{subtitle && <p className={cn(labelStyle, subtitleClassName)}>{subtitle}</p>}</div>;
+		return (
+			<div className={cn('mb-2', className)}>
+				{subtitle && <p className={cn(getTypographyClass('helper-text'), subtitleClassName)}>{subtitle}</p>}
+			</div>
+		);
+	}
+
+	if (variant === 'card-title') {
+		return <>{title && <p className={cn(getTypographyClass('card-title'), titleClassName)}>{title}</p>}</>;
 	}
 
 	return <div></div>;

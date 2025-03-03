@@ -1,4 +1,4 @@
-import { Button, Loader, Page, SectionHeader, Spacer } from '@/components/atoms';
+import { Button, Loader, Page, Spacer } from '@/components/atoms';
 import { FeatureTable, Pagination } from '@/components/molecules';
 import { RouteNames } from '@/core/routes/Routes';
 import usePagination from '@/hooks/usePagination';
@@ -28,6 +28,8 @@ const FeaturesPage = () => {
 		queryFn: fetchFeatures,
 	});
 
+	console.log(featureData, isLoading);
+
 	if (isLoading) {
 		return <Loader />;
 	}
@@ -54,13 +56,13 @@ const FeaturesPage = () => {
 	}
 
 	return (
-		<Page>
-			<SectionHeader title='Features'>
+		<Page
+			heading='Features'
+			headingCTA={
 				<Link to={RouteNames.createFeature}>
 					<Button prefixIcon={<Star />}>Add Feature</Button>
 				</Link>
-			</SectionHeader>
-
+			}>
 			<div>
 				<FeatureTable data={featureData?.items || []} />
 				<Spacer className='!h-4' />

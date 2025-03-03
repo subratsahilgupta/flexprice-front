@@ -124,7 +124,7 @@ const CreatePlanPage = () => {
 			<Spacer height={'16px'} />
 
 			{/* stepper componenet */}
-			<div className='md:w-1/2 lg:w-2/3 '>
+			<div className='md:w-1/2 lg: '>
 				<Stepper activeStep={activeStep} steps={formSteps} />
 
 				{/* step 1 */}

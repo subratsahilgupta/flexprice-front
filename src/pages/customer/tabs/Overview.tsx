@@ -4,24 +4,9 @@ import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
 import SubscriptionTable from '@/components/organisms/Subscription/SubscriptionTable';
 import { Subscription } from '@/models/Subscription';
-
+import Loader from '@/components/atoms/Loader';
 import { FiFolderPlus } from 'react-icons/fi';
-
-const SkeletonLoader = () => (
-	<div className='rounded-xl border border-gray-300 p-6 space-y-4'>
-		<div className='space-y-3'>
-			<div className='h-4 bg-gray-200 rounded w-3/4 animate-pulse'></div>
-			<div className='h-4 bg-gray-200 rounded w-1/2 animate-pulse'></div>
-			<div className='h-4 bg-gray-200 rounded w-5/6 animate-pulse'></div>
-		</div>
-		<div className='space-y-3'>
-			<div className='h-4 bg-gray-200 rounded w-2/3 animate-pulse'></div>
-			<div className='h-4 bg-gray-200 rounded w-3/4 animate-pulse'></div>
-			<div className='h-4 bg-gray-200 rounded w-1/2 animate-pulse'></div>
-		</div>
-	</div>
-);
-
+import toast from 'react-hot-toast';
 const fetchAllSubscriptions = async (customerId: string) => {
 	const subs = await CustomerApi.getCustomerSubscriptions(customerId);
 	return subs.items;
@@ -46,6 +31,14 @@ const Overview = () => {
 		refetchOnMount: 'always', // Refetch when the component is remounted
 	});
 
+	if (subscriptionsLoading) {
+		return <Loader />;
+	}
+
+	if (subscriptionsError) {
+		toast.error('Something went wrong');
+	}
+
 	return (
 		<div className=''>
 			<div className='card border-gray-300'>
@@ -56,13 +49,7 @@ const Overview = () => {
 					</Button>
 				</div>
 
-				{subscriptionsLoading ? (
-					<SkeletonLoader />
-				) : subscriptionsError ? (
-					<p className='text-red-500 text-sm'>Error loading subscriptions</p>
-				) : (subscriptions ?? []).length === 0 ? (
-					<p className='text-gray-500 text-sm'>No Active Subscriptions Yet</p>
-				) : (
+				{(subscriptions?.length || 0) > 0 ? (
 					<SubscriptionTable
 						onRowClick={(row) => {
 							navigate(`/customer-management/customers/${customerId}/subscription/${row.id}`);
@@ -70,6 +57,8 @@ const Overview = () => {
 						data={subscriptions as Subscription[]}
 						customerId={customerId!}
 					/>
+				) : (
+					<p className='text-gray-500 text-sm'>No Active Subscriptions Yet</p>
 				)}
 			</div>
 		</div>

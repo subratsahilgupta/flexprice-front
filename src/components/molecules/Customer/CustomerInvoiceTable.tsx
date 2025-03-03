@@ -15,11 +15,11 @@ const CustomerInvoiceTable: FC<Props> = ({ data, onRowClick }) => {
 	const columnData: ColumnData[] = [
 		{
 			title: 'Invoice Number',
-			render: (row) => <span>{row.invoice_number || '--'}</span>,
+			render: (row) => <>{row.invoice_number || '--'}</>,
 		},
 		{
 			title: 'Status',
-			render: (row) => <span>{toSentenceCase(row.invoice_status)}</span>,
+			render: (row) => <>{toSentenceCase(row.invoice_status)}</>,
 		},
 		{
 			title: 'Payment Status',
@@ -28,7 +28,7 @@ const CustomerInvoiceTable: FC<Props> = ({ data, onRowClick }) => {
 		},
 		{
 			title: 'Total Amount',
-			render: (row) => <span>{`${getCurrencySymbol(row.currency)} ${row.amount_due}`}</span>,
+			render: (row) => <>{`${getCurrencySymbol(row.currency)} ${row.amount_due}`}</>,
 		},
 		{
 			fieldVariant: 'interactive',

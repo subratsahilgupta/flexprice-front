@@ -7,7 +7,7 @@ import { Button, Input } from '@/components/atoms';
 import { EyeIcon, EyeOff } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import AuthApi from '@/utils/api_requests/AuthApi';
-
+import EnvironmentApi from '@/utils/api_requests/EnvironmentApi';
 interface LoginFormProps {
 	switchTab: (tab: string) => void;
 }
@@ -48,6 +48,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ switchTab }) => {
 				email,
 				password,
 			});
+
+			await EnvironmentApi.initializeEnvironments();
 
 			setLoading(false);
 

@@ -1,4 +1,4 @@
-import { Button, FormHeader, Page, SectionHeader } from '@/components/atoms';
+import { FormHeader, Page } from '@/components/atoms';
 import { Integration, integrations } from './integrationsData';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -30,17 +30,14 @@ const Integrations = () => {
 	}
 
 	return (
-		<Page>
+		<Page heading='Integrations'>
 			{installed.length > 0 && (
 				<div>
-					<SectionHeader title='Integrations' />
-					<div>
-						<FormHeader title='Installed' variant='sub-header' />
-						<div className='grid grid-cols-2 gap-4 '>
-							{installed.map((integration, index) => (
-								<IntegrationCard installed={true} key={index} integration={integration} />
-							))}
-						</div>
+					<FormHeader title='Installed' variant='sub-header' />
+					<div className='grid grid-cols-2 gap-4 '>
+						{installed.map((integration, index) => (
+							<IntegrationCard installed={true} key={index} integration={integration} />
+						))}
 					</div>
 				</div>
 			)}
@@ -56,7 +53,7 @@ const Integrations = () => {
 	);
 };
 
-const IntegrationCard = ({ integration, installed }: { integration: Integration; installed?: boolean }) => {
+const IntegrationCard = ({ integration }: { integration: Integration; installed?: boolean }) => {
 	const navigate = useNavigate();
 
 	const handleCardClick = () => {
@@ -85,9 +82,9 @@ const IntegrationCard = ({ integration, installed }: { integration: Integration;
 								</span>
 							))}
 						</div>
-						{integration.type === 'available' && !integration.premium && !installed && (
+						{/* {integration.type === 'available' && !integration.premium && !installed && (
 							<Button className='flex gap-2 items-center'>Install</Button>
-						)}
+						)} */}
 					</div>
 				</div>
 			</div>

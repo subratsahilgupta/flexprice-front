@@ -1,4 +1,4 @@
-import { Button, FormHeader, Page, SectionHeader } from '@/components/atoms';
+import { Button, Page } from '@/components/atoms';
 import { ColumnData, DropdownMenu, FlexpriceTable, Pagination, SecretKeyDrawer } from '@/components/molecules';
 import SecretKeysApi from '@/utils/api_requests/SecretKeysApi';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -8,6 +8,7 @@ import { formatDateShort } from '@/utils/common/helper_functions';
 import { Plus, Eye, Pencil, EyeOff, LucideIcon, ShieldCheck, Key } from 'lucide-react';
 import { useState } from 'react';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
+
 // Utility function to format permissions for display
 export const formatPermissionDisplay = (permissions: readonly string[]): string => {
 	const hasRead = permissions.includes('read');
@@ -152,20 +153,17 @@ const DeveloperPage = () => {
 	console.log(secretKeys);
 
 	return (
-		<Page>
+		<Page
+			heading='Developers'
+			headingCTA={
+				<Button prefixIcon={<Plus />} onClick={handleAddSecretKey}>
+					Add
+				</Button>
+			}>
 			<SecretKeyDrawer isOpen={isSecretKeyDrawerOpen} onOpenChange={setIsSecretKeyDrawerOpen} />
-			<div className='w-2/3 flex flex-col gap-4'>
-				<SectionHeader title='Developers' />
-				<div className='w-full flex flex-col gap-4 card'>
-					<div className='flex mb-4 justify-between items-center'>
-						<FormHeader title='Api Keys' variant='sub-header' />
-						<Button variant={'outline'} className='size-8' onClick={handleAddSecretKey}>
-							<Plus />
-						</Button>
-					</div>
-					<FlexpriceTable showEmptyRow columns={columns} data={secretKeys?.items || []} />
-					<Pagination totalPages={secretKeys?.pagination.total || 0} />
-				</div>
+			<div>
+				<FlexpriceTable showEmptyRow columns={columns} data={secretKeys?.items || []} />
+				<Pagination totalPages={secretKeys?.pagination.total || 0} />
 			</div>
 		</Page>
 	);

@@ -32,7 +32,7 @@ const CustomerTable: FC<Props> = ({ data, onEdit }) => {
 		{
 			title: 'Updated at',
 			render: (row) => {
-				return <span className='text-[#09090B] '>{formatDate(row.updated_at)}</span>;
+				return <>{formatDate(row.updated_at)}</>;
 			},
 		},
 		{
@@ -43,7 +43,7 @@ const CustomerTable: FC<Props> = ({ data, onEdit }) => {
 					isArchiveDisabled={row.status === 'archived'}
 					isEditDisabled={row.status === 'archived'}
 					entityName='Customer'
-					refetchQueryKey='fetchCustomer'
+					refetchQueryKey='fetchCustomers'
 					deleteMutationFn={(id) => CustomerApi.deleteCustomerById(id)}
 					editPath={`/customer-management/customers/edit-customer?id=${row.id}`}
 					onEdit={() => {

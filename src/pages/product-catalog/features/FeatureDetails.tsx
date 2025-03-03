@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import FeatureApi from '@/utils/api_requests/FeatureApi';
-import { Chip, FormHeader, Loader, Page, SectionHeader, Spacer, Divider } from '@/components/atoms';
+import { Chip, Loader, Page, SectionHeader, Spacer, Divider, Card, CardHeader } from '@/components/atoms';
 import toast from 'react-hot-toast';
 import { useEffect } from 'react';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
@@ -134,15 +134,16 @@ const FeatureDetails = () => {
 		toast.error('Error fetching feature details');
 	}
 	return (
-		<Page>
-			<SectionHeader
-				title={
-					<>
-						{data?.name}
-						<span className='ml-2 text-sm'>{getFeatureTypeChips(data?.type || '')}</span>
-					</>
-				}>
-				{/* <div className='flex gap-2'>
+		<Page
+			header={
+				<SectionHeader
+					title={
+						<>
+							{data?.name}
+							<span className='ml-2 text-sm'>{getFeatureTypeChips(data?.type || '')}</span>
+						</>
+					}>
+					{/* <div className='flex gap-2'>
 					<Button disabled variant={'outline'} className='flex gap-2'>
 						<EyeOff />
 						Archive
@@ -152,19 +153,19 @@ const FeatureDetails = () => {
 						Edit
 					</Button>
 				</div> */}
-			</SectionHeader>
-
+				</SectionHeader>
+			}>
 			<Spacer className='!h-4' />
 			<div className='space-y-6'>
-				<div className='card'>
-					<FormHeader variant='sub-header' title='Linked Plans' />
+				<Card>
+					<CardHeader title='Linked Plans' />
 					<FlexpriceTable showEmptyRow columns={columns} data={linkedEntitlements?.items ?? []} />
-				</div>
+				</Card>
 
 				{data?.type === FeatureType.metered && (
-					<div className='card'>
+					<Card>
 						<div className='!space-y-6'>
-							<FormHeader variant='sub-header' title='Event Details' />
+							<CardHeader title='Event Details' className='!p-0 !mb-2' />
 							<div>
 								<div className='grid grid-cols-[200px_1fr] items-center'>
 									<span className='text-gray-500 text-sm'>Event Name</span>
@@ -174,36 +175,39 @@ const FeatureDetails = () => {
 
 							<Divider />
 
-							<div className='space-y-4'>
-								<span className='text-gray-500 text-sm font-medium block'>Event Filters</span>
-								<div className='space-y-3'>
-									{data?.meter?.filters?.map((filter) => {
-										return (
-											<div className='grid grid-cols-[200px_1fr] items-start'>
-												<span className='text-gray-800 text-sm'>{filter.key}</span>
-												<div className='flex gap-1.5 flex-wrap'>
-													{filter.values.map((value) => {
-														return <Chip className='text-xs py-0.5' variant='default' label={value} />;
-													})}
-												</div>
-											</div>
-										);
-									})}
-								</div>
-							</div>
-
-							<Divider />
+							{data?.meter?.filters?.length > 0 && (
+								<>
+									<div className='space-y-4'>
+										<span className='text-gray-500 text-sm font-medium block'>Event Filters</span>
+										<div className='space-y-3'>
+											{data?.meter?.filters?.map((filter) => {
+												return (
+													<div className='grid grid-cols-[200px_1fr] items-start'>
+														<span className='text-gray-800 text-sm'>{filter.key}</span>
+														<div className='flex gap-1.5 flex-wrap'>
+															{filter.values.map((value) => {
+																return <Chip className='text-xs py-0.5' variant='default' label={value} />;
+															})}
+														</div>
+													</div>
+												);
+											})}
+										</div>
+									</div>
+									<Divider />
+								</>
+							)}
 
 							<div className='space-y-4'>
 								<span className='text-gray-500 text-sm font-medium block'>Aggregation Details</span>
 								<div className='space-y-3'>
 									<div className='grid grid-cols-[200px_1fr] items-center'>
 										<span className='text-gray-500 text-sm'>Aggregation</span>
-										<span className='text-gray-800 text-sm'>{data?.meter?.aggregation.field || '--'}</span>
+										<span className='text-gray-800 text-sm'>{toSentenceCase(data?.meter?.aggregation.type || '--')}</span>
 									</div>
 									<div className='grid grid-cols-[200px_1fr] items-center'>
 										<span className='text-gray-500 text-sm'>Value</span>
-										<span className='text-gray-800 text-sm'>{data?.meter?.aggregation.field || '--'}</span>
+										<span className='text-gray-800 text-sm'>{toSentenceCase(data?.meter?.aggregation.field || '--')}</span>
 									</div>
 									<div className='grid grid-cols-[200px_1fr] items-center'>
 										<span className='text-gray-500 text-sm'>Type</span>
@@ -216,7 +220,7 @@ const FeatureDetails = () => {
 								</div>
 							</div>
 						</div>
-					</div>
+					</Card>
 				)}
 			</div>
 		</Page>

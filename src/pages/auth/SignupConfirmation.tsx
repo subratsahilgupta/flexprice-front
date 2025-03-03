@@ -5,6 +5,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import EnvironmentApi from '@/utils/api_requests/EnvironmentApi';
 
 const SignupConfirmation = () => {
 	const userContext = useUser();
@@ -24,21 +25,24 @@ const SignupConfirmation = () => {
 			userContext.setUser(user.data.user);
 
 			if (user.data.user?.app_metadata.tenant_id) {
+				await EnvironmentApi.initializeEnvironments();
 				navigate('/');
 				return;
 			}
 
-			// check id session exists then only send token to backend
 			if (!session) {
 				toast.error('No session found');
 				navigate('/auth');
 				return;
 			}
 
-			return await AuthApi.signup({
+			const signupResponse = await AuthApi.signup({
 				email: user.data.user?.email || '',
 				token: session?.access_token || '',
 			});
+
+			await EnvironmentApi.initializeEnvironments();
+			return signupResponse;
 		},
 		onSuccess: async (data) => {
 			console.log('data', data);

@@ -118,7 +118,7 @@ const IntegrationDetails = () => {
 
 			{/* Display account details when installed */}
 			{/* {isInstalled && (
-				<div className='w-2/3 mt-6'>
+				<div className=' mt-6'>
 					<FormHeader variant='form-component-title' title='Installed Accounts' />
 					<div className='card'>
 						{existingIntegration?.items.map((item, idx) => (

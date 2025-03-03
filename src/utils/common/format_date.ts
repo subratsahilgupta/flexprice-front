@@ -1,17 +1,17 @@
-const formatDate = (date: string | Date, locale: string = 'en-US'): string => {
+const formatDate = (date: string | Date, locale: string = 'en-US', options?: Intl.DateTimeFormatOptions): string => {
 	const parsedDate = new Date(date);
 
 	if (isNaN(parsedDate.getTime())) {
 		return 'Invalid Date';
 	}
 
-	const options: Intl.DateTimeFormatOptions = {
+	const defaultOptions: Intl.DateTimeFormatOptions = {
 		year: 'numeric',
-		month: 'long',
-		day: 'numeric',
+		month: 'short',
+		day: '2-digit',
 	};
 
-	return parsedDate.toLocaleDateString(locale, options);
+	return parsedDate.toLocaleDateString(locale, { ...defaultOptions, ...options });
 };
 
 export default formatDate;

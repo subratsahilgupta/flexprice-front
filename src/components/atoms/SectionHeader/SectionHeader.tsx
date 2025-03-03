@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { getTypographyClass } from '@/lib/typography';
 import { FC, ReactNode } from 'react';
 import { Button } from '..';
 import { IoSearch } from 'react-icons/io5';
@@ -20,6 +21,8 @@ interface Props {
 	onButtonClick?: () => void;
 	optionsClassName?: string;
 	subtitle?: string;
+	titleClassName?: string;
+	titleVariant?: 'form-component-title' | 'sub-header' | 'form-title' | 'default' | 'subtitle' | 'card-title';
 }
 
 const SectionHeader: FC<Props> = ({
@@ -35,25 +38,26 @@ const SectionHeader: FC<Props> = ({
 	buttonText,
 	onButtonClick,
 	optionsClassName,
+	titleClassName,
 }) => {
 	return (
-		<div className={cn('w-full py-3 px-2 flex items-center justify-between', className)}>
-			<p className='text-xl font-[600] text-zinc-950'>{title}</p>
+		<div className={cn('w-full py-3  flex items-center justify-between', className)}>
+			<p className={cn(getTypographyClass('form-title'), titleClassName)}>{title}</p>
 			<div className={cn('flex gap-2 items-center', optionsClassName)}>
 				{showSearch && (
 					<button onClick={onSearchClick} className='px-2 py-1'>
-						<IoSearch className='size-4 font-extralight text-[#09090B] ' />
+						<IoSearch className='size-4 font-extralight text-zinc-950' />
 					</button>
 				)}
 				{showFilter && (
 					<button onClick={onFilterClick} className='px-2 py-1'>
-						<SlidersHorizontal className='size-4 text-[#09090B] ' />
+						<SlidersHorizontal className='size-4 text-zinc-950' />
 					</button>
 				)}
 				{showButton && (
 					<Button onClick={onButtonClick}>
 						{buttonIcon}
-						<span>{buttonText}</span>
+						<span className={cn(getTypographyClass('button-default'))}>{buttonText}</span>
 					</Button>
 				)}
 				{children}

@@ -1,4 +1,4 @@
-import { Button, Loader, Page, SectionHeader, Spacer } from '@/components/atoms';
+import { Button, Loader, Page, Spacer } from '@/components/atoms';
 import { FiFolderPlus } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -59,12 +59,13 @@ const PricingPlan = () => {
 	}
 
 	return (
-		<Page>
-			<SectionHeader title='Pricing Plan'>
+		<Page
+			heading='Pricing Plan'
+			headingCTA={
 				<Link to='/product-catalog/pricing-plan/create-plan'>
 					<Button prefixIcon={<FiFolderPlus />}>Add Pricing Plan</Button>
 				</Link>
-			</SectionHeader>
+			}>
 			<div>
 				<PlansTable data={(plansData?.items || []) as Plan[]} />
 				<Spacer className='!h-4' />
