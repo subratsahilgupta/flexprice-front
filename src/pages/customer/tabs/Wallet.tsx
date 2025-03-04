@@ -160,15 +160,17 @@ const WalletTab = () => {
 			<div className='w-full flex justify-between items-center mb-3'>
 				<div>
 					{(walletOptions?.length ?? 0) > 1 && (
-						<Select
-							options={walletOptions || []}
-							value={activeWallet?.id}
-							onChange={(value) => {
-								const selectedWallet = wallets?.find((wallet) => wallet.id === value) || null;
-								setActiveWallet(selectedWallet);
-								setQueryParam('activeWalletId', value);
-							}}
-						/>
+						<div className='min-w-[250px]'>
+							<Select
+								options={walletOptions || []}
+								value={activeWallet?.id}
+								onChange={(value) => {
+									const selectedWallet = wallets?.find((wallet) => wallet.id === value) || null;
+									setActiveWallet(selectedWallet);
+									setQueryParam('activeWalletId', value);
+								}}
+							/>
+						</div>
 					)}
 				</div>
 				<div className='flex items-center space-x-2	'>

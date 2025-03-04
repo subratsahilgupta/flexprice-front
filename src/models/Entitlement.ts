@@ -18,5 +18,5 @@ export interface Entitlement {
 	updated_at: string;
 	updated_by: string;
 	usage_limit: number | null;
-	usage_reset_period: string;
+	usage_reset_period: string | null;
 }

@@ -1,4 +1,4 @@
-import { ActionButton, Button, CardHeader, Loader, Page, Spacer } from '@/components/atoms';
+import { ActionButton, Button, CardHeader, Chip, Loader, Page, Spacer } from '@/components/atoms';
 import { AddEntitlementDrawer, ColumnData, FlexpriceTable } from '@/components/molecules';
 import { DetailsCard } from '@/components/molecules';
 import { getFeatureTypeChips } from '@/components/molecules/FeatureTable/FeatureTable';
@@ -17,6 +17,7 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card } from '@/components/atoms';
+import formatChips from '@/utils/common/format_chips';
 
 type Params = {
 	planId: string;
@@ -119,12 +120,12 @@ const PlanDetailsPage = () => {
 				return row?.feature?.name;
 			},
 		},
-		{
-			title: 'Meter',
-			render(row) {
-				return row?.feature.meter?.name ?? '--';
-			},
-		},
+		// {
+		// 	title: 'Meter',
+		// 	render(row) {
+		// 		return row?.feature.meter?.name ?? '--';
+		// 	},
+		// },
 		{
 			title: 'Type',
 
@@ -153,7 +154,7 @@ const PlanDetailsPage = () => {
 						editPath={''}
 						isEditDisabled={true}
 						isArchiveDisabled={row?.status === 'archived'}
-						refetchQueryKey={'fetchEntitlements'}
+						refetchQueryKey={'fetchPlan'}
 						entityName={row?.feature?.name}
 					/>
 				);
@@ -179,7 +180,10 @@ const PlanDetailsPage = () => {
 		{ label: 'Plan Name', value: planData?.name },
 		{ label: 'Plan Description', value: planData?.description || '--' },
 		{ label: 'Created Date', value: formatDate(planData?.created_at ?? '') },
-		{ label: 'Status', value: planData?.status },
+		{
+			label: 'Status',
+			value: <Chip label={formatChips(planData?.status)} variant={planData?.status === 'published' ? 'success' : 'default'} />,
+		},
 		{
 			variant: 'divider' as const,
 			className: 'my-4',

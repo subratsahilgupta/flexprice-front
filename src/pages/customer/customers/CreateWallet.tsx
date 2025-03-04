@@ -39,7 +39,7 @@ const CreateWallet: FC<Props> = ({ customerId, onClose = () => {} }) => {
 		},
 		onSuccess: () => {
 			toast.success('Wallet created successfully');
-			refetchQueries(['fetchWallets', customerId]);
+			refetchQueries(['fetchWallets']);
 		},
 	});
 

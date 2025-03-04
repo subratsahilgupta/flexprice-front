@@ -26,6 +26,7 @@ interface Props {
 	isRadio?: boolean;
 	className?: string;
 	noOptionsText?: string;
+	hideSelectedTick?: boolean;
 }
 
 const RadioSelectItem = React.forwardRef<
@@ -65,6 +66,7 @@ const FlexPriceSelect: React.FC<Props> = ({
 	className,
 	noOptionsText,
 	defaultOpen,
+	hideSelectedTick = false,
 }) => {
 	return (
 		<div className={cn('space-y-1 ')}>
@@ -119,6 +121,8 @@ const FlexPriceSelect: React.FC<Props> = ({
 												'cursor-pointer',
 												option.disabled && 'select-none cursor-not-allowed',
 												'flex items-center space-x-2 justify-between w-full',
+												hideSelectedTick &&
+													'[&_.SelectItemIndicator]:hidden [&_.SelectItemIndicator]:!w-0 [&_.SelectItemIndicator]:!m-0 [&_.SelectItemIndicator]:!p-0 [&]:pl-3',
 											)}
 											disabled={option.disabled}
 											key={option.value}
@@ -128,10 +132,11 @@ const FlexPriceSelect: React.FC<Props> = ({
 													'flex w-full items-center space-x-2 justify-between',
 													option.disabled && 'opacity-50 pointer-events-none',
 													option.suffixIcon && 'pr-8',
+													hideSelectedTick && '!pl-0',
 												)}>
 												{option.prefixIcon && option.prefixIcon}
 
-												<div className='flex flex-col mr-2 w-full'>
+												<div className={cn('flex flex-col w-full', !hideSelectedTick && 'mr-0')}>
 													<span className='break-words'>{option.label}</span>
 													{option.description && (
 														<span className='text-sm text-gray-500 break-words whitespace-normal'>{option.description}</span>

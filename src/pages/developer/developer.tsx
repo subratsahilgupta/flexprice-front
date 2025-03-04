@@ -5,7 +5,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { SecretKey } from '@/models/SecretKey';
 import usePagination from '@/hooks/usePagination';
 import { formatDateShort } from '@/utils/common/helper_functions';
-import { Plus, Eye, Pencil, EyeOff, LucideIcon, ShieldCheck, Key } from 'lucide-react';
+import { Plus, Eye, Pencil, EyeOff, LucideIcon, ShieldCheck, Key, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 
@@ -131,8 +131,9 @@ const DeveloperPage = () => {
 	const columns: ColumnData<SecretKey>[] = [
 		...baseColumns,
 		{
-			width: 50,
+			width: '30px',
 			align: 'right',
+			hideOnEmpty: true,
 			render(rowData: SecretKey) {
 				return (
 					<div className='flex justify-end'>
@@ -142,7 +143,7 @@ const DeveloperPage = () => {
 									label: 'Delete',
 									onSelect: () => deleteSecretKey(rowData.id),
 									disabled: isDeletingSecretKey,
-									icon: <EyeOff size={16} />,
+									icon: <Trash2 size={16} />,
 								},
 							]}
 						/>

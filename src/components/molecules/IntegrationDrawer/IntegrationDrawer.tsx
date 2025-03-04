@@ -17,7 +17,6 @@ const IntegrationDrawer: FC<IntegrationDrawerProps> = ({ isOpen, onOpenChange, p
 	const [formData, setFormData] = useState({
 		name: '',
 		apiKey: '',
-		connectionCode: '',
 	});
 	const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -27,7 +26,6 @@ const IntegrationDrawer: FC<IntegrationDrawerProps> = ({ isOpen, onOpenChange, p
 			setFormData({
 				name: '',
 				apiKey: '',
-				connectionCode: '',
 			});
 			setErrors({});
 		}
@@ -40,7 +38,8 @@ const IntegrationDrawer: FC<IntegrationDrawerProps> = ({ isOpen, onOpenChange, p
 			try {
 				const response = await IntegrationsApi.getIntegration(provider);
 				return response;
-			} catch (error) {
+			} catch (e) {
+				console.log(e);
 				return null;
 			}
 		},
@@ -51,12 +50,11 @@ const IntegrationDrawer: FC<IntegrationDrawerProps> = ({ isOpen, onOpenChange, p
 	const { mutate: installIntegration, isPending: isInstalling } = useMutation({
 		mutationFn: async () => {
 			// Combine API key and connection code in the key field if needed
-			const apiKeyWithCode = formData.connectionCode ? `${formData.apiKey}:${formData.connectionCode}` : formData.apiKey;
 
 			return await IntegrationsApi.installIntegration({
 				provider,
 				credentials: {
-					key: apiKeyWithCode,
+					key: formData.apiKey,
 				},
 				name: formData.name,
 			});
@@ -89,10 +87,6 @@ const IntegrationDrawer: FC<IntegrationDrawerProps> = ({ isOpen, onOpenChange, p
 
 		if (!formData.apiKey.trim()) {
 			newErrors.apiKey = 'API secret key is required';
-		}
-
-		if (!formData.connectionCode.trim()) {
-			newErrors.connectionCode = 'Connection code is required';
 		}
 
 		setErrors(newErrors);
@@ -152,18 +146,8 @@ const IntegrationDrawer: FC<IntegrationDrawerProps> = ({ isOpen, onOpenChange, p
 							onChange={(value) => handleChange('name', value)}
 							error={errors.name}
 							disabled={isInstalling}
+							description='A dummy name for this integration'
 						/>
-						<p className='text-sm text-muted-foreground -mt-2'>A friendly name for this integration</p>
-
-						<Input
-							label='Connection Code'
-							placeholder='Enter Connection Code'
-							value={formData.connectionCode}
-							onChange={(value) => handleChange('connectionCode', value)}
-							error={errors.connectionCode}
-							disabled={isInstalling}
-						/>
-						<p className='text-sm text-muted-foreground -mt-2'>The connection code from your provider</p>
 
 						<Input
 							label='API Secret Key'

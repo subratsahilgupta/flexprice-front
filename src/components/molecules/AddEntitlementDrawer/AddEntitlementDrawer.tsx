@@ -83,7 +83,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 			newErrors.usage_limit = 'Usage limit cannot be negative';
 		}
 
-		if (!tempEntitlement.usage_reset_period) {
+		if (!tempEntitlement.usage_reset_period && tempEntitlement.usage_reset_period !== null) {
 			newErrors.usage_reset_period = 'Usage reset period is required';
 		}
 
@@ -174,7 +174,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 		if (!activeFeature) return;
 
 		if (!validateEntitlement()) {
-			toast.error('Please fix the validation errors');
+			// toast.error('Please fix the validation errors');
 			return;
 		}
 
@@ -289,17 +289,19 @@ const AddEntitlementDrawer: FC<Props> = ({
 											setEntitlement({
 												...tempEntitlement,
 												usage_limit: e ? null : undefined,
+												usage_reset_period: e ? null : undefined,
 											});
 										}}
 									/>
 									<Spacer className='!my-4' />
 									<Select
+										disabled={tempEntitlement.usage_limit === null}
 										error={errors.usage_reset_period}
 										label='Usage reset'
 										placeholder='Select usage reset period'
 										options={billlingPeriodOptions}
 										description='The values get reset in the given interval'
-										value={tempEntitlement.usage_reset_period}
+										value={tempEntitlement.usage_reset_period ?? ''}
 										onChange={(value) => {
 											setEntitlement({
 												...tempEntitlement,

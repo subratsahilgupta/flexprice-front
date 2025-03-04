@@ -201,18 +201,19 @@ const FeatureDetails = () => {
 							<div className='space-y-4'>
 								<span className='text-gray-500 text-sm font-medium block'>Aggregation Details</span>
 								<div className='space-y-3'>
-									<div className='grid grid-cols-[200px_1fr] items-center'>
+									{/* <div className='grid grid-cols-[200px_1fr] items-center'>
 										<span className='text-gray-500 text-sm'>Aggregation</span>
 										<span className='text-gray-800 text-sm'>{toSentenceCase(data?.meter?.aggregation.type || '--')}</span>
-									</div>
-									<div className='grid grid-cols-[200px_1fr] items-center'>
-										<span className='text-gray-500 text-sm'>Value</span>
-										<span className='text-gray-800 text-sm'>{toSentenceCase(data?.meter?.aggregation.field || '--')}</span>
-									</div>
+									</div> */}
 									<div className='grid grid-cols-[200px_1fr] items-center'>
 										<span className='text-gray-500 text-sm'>Type</span>
 										<span className='text-gray-800 text-sm'>{toSentenceCase(data?.meter?.aggregation.type || '--')}</span>
 									</div>
+									<div className='grid grid-cols-[200px_1fr] items-center'>
+										<span className='text-gray-500 text-sm'>Value</span>
+										<span className='text-gray-800 text-sm'>{data?.meter?.aggregation.field || '--'}</span>
+									</div>
+
 									<div className='grid grid-cols-[200px_1fr] items-center'>
 										<span className='text-gray-500 text-sm'>Unit Name</span>
 										<span className='text-gray-800 text-sm'>{`${data.unit_singular || 'unit'} / ${data.unit_plural || 'units'}`}</span>
