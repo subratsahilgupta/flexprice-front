@@ -30,9 +30,9 @@ const columns: ColumnData<ImportTask>[] = [
 		fieldVariant: 'title',
 	},
 	{
-		title: 'Import Type',
+		title: 'Entity Type',
 		render(rowData) {
-			return <div>{toSentenceCase(rowData.task_type)}</div>;
+			return <div>{toSentenceCase(rowData.entity_type)}</div>;
 		},
 	},
 	{

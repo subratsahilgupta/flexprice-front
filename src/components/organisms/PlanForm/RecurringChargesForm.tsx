@@ -32,7 +32,7 @@ const RecurringChargesForm = () => {
 	}, [metaData?.subscriptionType, metaData?.isRecurringEditMode]);
 
 	const [amount, setamount] = useState<string>(charges?.amount || '');
-	const [billingPeriod, setbillingPeriod] = useState(charges?.billing_period || billlingPeriodOptions[2].value);
+	const [billingPeriod, setbillingPeriod] = useState(charges?.billing_period || billlingPeriodOptions[1].value);
 
 	const [currency, setcurrency] = useState(charges.currency || currencyOptions[0].value);
 

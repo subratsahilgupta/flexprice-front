@@ -99,17 +99,24 @@ const SubscriptionActionButton: React.FC<Props> = ({ subscription }) => {
 					},
 				]
 			: []),
-		...(!isCancelled
-			? [
-					{
-						label: 'Cancel Subscription',
-						icon: <X className='h-4 w-4' />,
-						onSelect: () => setState((prev) => ({ ...prev, isCancelModalOpen: true })),
-						disabled: isCancelled,
-						className: 'text-destructive',
-					},
-				]
-			: []),
+		// ...(!isCancelled
+		// 	? [
+		// 		{
+		// 			label: 'Cancel Subscription',
+		// 			icon: <X className='h-4 w-4' />,
+		// 			onSelect: () => setState((prev) => ({ ...prev, isCancelModalOpen: true })),
+		// 			disabled: isCancelled,
+		// 			className: 'text-destructive',
+		// 		},
+		// 	]
+		// 	: []),
+		{
+			label: 'Cancel Subscription',
+			icon: <X className='h-4 w-4' />,
+			onSelect: () => setState((prev) => ({ ...prev, isCancelModalOpen: true })),
+			disabled: isCancelled,
+			className: 'text-destructive',
+		},
 	];
 
 	return (
@@ -181,8 +188,11 @@ const SubscriptionActionButton: React.FC<Props> = ({ subscription }) => {
 				onOpenChange={(open) => setState((prev) => ({ ...prev, isResumeModalOpen: open }))}
 				className='bg-white rounded-lg p-6 w-[800px] max-w-[90vw]'>
 				<div className='space-y-4'>
-					<FormHeader title='Resume Subscription' variant='sub-header' subtitle='lorem' />
+					<FormHeader title='Resume Subscription' variant='sub-header' />
 					<Spacer className='!my-6' />
+					<p className='text-sm text-muted-foreground  mt-4'>
+						{`Resuming the subscription will start a new billing cycle from ${format(new Date(), 'do MMM')} and generate a new invoice. Customers using advance charging will be charged immediately.`}
+					</p>
 					<div className='flex justify-end gap-3 pt-4'>
 						<Button
 							variant='outline'

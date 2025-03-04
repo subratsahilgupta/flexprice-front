@@ -35,6 +35,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
 			const colors: Record<string, string> = {
 				zinc: 'before:bg-zinc-300',
 				primary: 'before:bg-primary',
+				// warning: 'before:bg-red-500',
 				// Add more color options as needed
 			};
 			return colors[color] || `before:bg-[${color}]`;
@@ -56,7 +57,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
 			),
 			bordered: 'border-2 border-gray-300',
 			elevated: 'border border-gray-200 shadow-lg',
-			warning: 'bg-red-50 border border-red-200 text-red-600',
+			warning: ' border border-red-200 text-red-600',
 		};
 
 		return (
