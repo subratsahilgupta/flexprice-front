@@ -23,16 +23,16 @@ type Params = {
 	planId: string;
 };
 
-const formatInvoiceCadence = (cadence: string): string => {
-	switch (cadence.toUpperCase()) {
-		case 'ADVANCE':
-			return 'Advance';
-		case 'ARREAR':
-			return 'Arrear';
-		default:
-			return '';
-	}
-};
+// const formatInvoiceCadence = (cadence: string): string => {
+// 	switch (cadence.toUpperCase()) {
+// 		case 'ADVANCE':
+// 			return 'Advance';
+// 		case 'ARREAR':
+// 			return 'Arrear';
+// 		default:
+// 			return '';
+// 	}
+// };
 
 const chargeColumns: ColumnData[] = [
 	{
@@ -184,17 +184,6 @@ const PlanDetailsPage = () => {
 			label: 'Status',
 			value: <Chip label={formatChips(planData?.status)} variant={planData?.status === 'published' ? 'success' : 'default'} />,
 		},
-		{
-			variant: 'divider' as const,
-			className: 'my-4',
-		},
-		{
-			variant: 'heading' as const,
-			label: 'Billing Details',
-			className: 'mb-4',
-		},
-		{ label: 'Billing Timing', value: formatInvoiceCadence(planData?.invoice_cadence ?? '') },
-		{ label: 'Trial Period', value: planData?.trial_period ? `${planData?.trial_period} days` : '--' },
 	];
 
 	return (

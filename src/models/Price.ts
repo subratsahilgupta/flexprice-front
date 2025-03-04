@@ -1,3 +1,5 @@
+import { Meter } from './Meter';
+
 export interface Price {
 	readonly id: string;
 	readonly amount: string;
@@ -22,9 +24,6 @@ export interface Price {
 	readonly created_by: string;
 	readonly updated_by: string;
 	readonly meter: Meter;
-}
-
-interface Meter {
-	readonly id: string;
-	readonly name: string;
+	invoice_cadence: string;
+	trial_period: number;
 }
