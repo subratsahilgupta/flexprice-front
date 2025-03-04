@@ -2,12 +2,13 @@ import { Price } from '@/models/Price';
 import { FC, useState, useEffect } from 'react';
 import { Button, CheckboxRadioGroup, Input, Select, Spacer } from '@/components/atoms';
 import SelectMeter from './SelectMeter';
-import { Pencil, Trash2 } from 'lucide-react';
+// import { Pencil, Trash2 } from 'lucide-react';
 import { Meter } from '@/models/Meter';
-import { formatBillingPeriod, getCurrencySymbol, toSentenceCase } from '@/utils/common/helper_functions';
+import { formatBillingPeriod, getCurrencySymbol } from '@/utils/common/helper_functions';
 import { billlingPeriodOptions, currencyOptions } from '@/core/data/constants';
 import VolumeTieredPricingForm from './VolumeTieredPricingForm';
 import { InternalPrice } from './SetupChargesSection';
+import UsagePriceItem from './UsagePriceItem';
 
 interface Props {
 	onSave: (price: InternalPrice) => void;
@@ -63,7 +64,7 @@ const UsagePricingForm: FC<Props> = ({ onSave, onDelete, prices }) => {
 
 	// Find the price that's currently being edited
 	const editingPrice = prices.find((p) => p.isEdit);
-	const editingIndex = prices.findIndex((p) => p.isEdit);
+	// const editingIndex = prices.findIndex((p) => p.isEdit);
 
 	// Load price data when editing
 	useEffect(() => {
@@ -143,6 +144,13 @@ const UsagePricingForm: FC<Props> = ({ onSave, onDelete, prices }) => {
 		return true;
 	};
 
+	const handleCancel = () => {
+		if (editingPrice) {
+			// Just close the form without modifying the price data
+			onSave({ ...editingPrice, isEdit: false });
+		}
+	};
+
 	const handleSave = () => {
 		if (!validate()) return;
 
@@ -199,75 +207,29 @@ const UsagePricingForm: FC<Props> = ({ onSave, onDelete, prices }) => {
 
 		// If we're editing an existing price, preserve its ID and other important fields
 		if (editingPrice) {
-			finalPrice = {
+			const finalPriceWithEdit: InternalPrice = {
 				...editingPrice,
 				...finalPrice,
-				type: 'USAGE', // Always ensure it stays as USAGE type
+				type: 'USAGE',
 				meter_id: meterId,
 				meter: activeMeter || editingPrice.meter,
+				isEdit: false,
 			};
+
+			onSave(finalPriceWithEdit);
+		} else {
+			onSave({
+				...finalPrice,
+				isEdit: false,
+			} as InternalPrice);
 		}
-
-		onSave(finalPrice as InternalPrice);
-		resetForm();
-	};
-
-	const resetForm = () => {
-		setCurrency(currencyOptions[0].value);
-		setBillingModel(billingModels[0].value);
-		setMeterId(undefined);
-		setActiveMeter(null);
-		setBillingPeriod(billlingPeriodOptions[1].value);
-		setFlatFee('');
-		setPackagedFee({ unit: '', price: '' });
-		setTieredPrices([
-			{ from: 1, up_to: 1 },
-			{ from: 2, up_to: null },
-		]);
-		setErrors({});
-		setInputErrors({
-			flatModelError: '',
-			packagedModelError: '',
-			tieredModelError: '',
-			invoiceCadenceError: '',
-		});
 	};
 
 	if (!editingPrice) {
 		return (
 			<div className='mb-2 space-y-2'>
 				{prices.map((price, index) => (
-					<div
-						key={index}
-						className='gap-2 w-full flex justify-between group min-h-9 items-center rounded-md border bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground hover:bg-gray-50 transition-colors'>
-						<div>
-							<p className='font-normal text-sm'>
-								{price.meter_id
-									? `${prices.find((p) => p.meter_id === price.meter_id)?.meter?.name || 'Usage Based Charge'}`
-									: 'New Usage Charge'}
-							</p>
-							<div className='flex gap-2 items-center text-zinc-500 text-xs'>
-								<span>{price.currency}</span>
-								<span>•</span>
-								<span>{toSentenceCase(price.billing_period || '')}</span>
-								{price.billing_model && (
-									<>
-										<span>•</span>
-										<span>{toSentenceCase(price.billing_model)}</span>
-									</>
-								)}
-							</div>
-						</div>
-						<span className='text-[#18181B] flex gap-2 items-center opacity-0 group-hover:opacity-100 transition-opacity'>
-							<button onClick={() => onSave({ ...price, isEdit: true } as InternalPrice)} className='p-1 hover:bg-gray-100 rounded-md'>
-								<Pencil size={16} />
-							</button>
-							<div className='border-r h-[16px] border-[#E4E4E7]' />
-							<button onClick={() => onDelete(index)} className='p-1 hover:bg-gray-100 rounded-md text-red-500'>
-								<Trash2 size={16} />
-							</button>
-						</span>
-					</div>
+					<UsagePriceItem key={index} price={price} index={index} onEdit={onSave} onDelete={onDelete} />
 				))}
 			</div>
 		);
@@ -389,11 +351,12 @@ const UsagePricingForm: FC<Props> = ({ onSave, onDelete, prices }) => {
 			<Spacer height={'16px'} />
 			<Spacer height='16px' />
 			<div className='flex justify-end'>
-				<Button onClick={resetForm} variant='secondary' className='mr-4 text-zinc-900'>
+				<Button onClick={handleCancel} variant='secondary' className='mr-4 text-zinc-900'>
 					Cancel
 				</Button>
 				<Button onClick={handleSave} variant='default' className='mr-4 font-normal'>
-					{editingIndex !== null ? 'Update' : 'Add'}
+					{/* {editingIndex !== null ? 'Update' : 'Add'} */}
+					Add
 				</Button>
 			</div>
 		</div>

@@ -8,7 +8,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 const CreatePlanPage = () => {
-	const [activeStep, setActiveStep] = useState(1);
+	const [activeStep, setActiveStep] = useState(0);
 	const formSteps = [{ label: 'Plan Details' }, { label: 'Set up Charges' }];
 	const navigate = useNavigate();
 
@@ -139,7 +139,7 @@ const CreatePlanPage = () => {
 					</Button>
 				</div>
 			</div>
-			<pre>{JSON.stringify(tempPlan, null, 2)}</pre>
+			{/* <pre>{JSON.stringify(tempPlan, null, 2)}</pre> */}
 		</div>
 	);
 };
