@@ -1,9 +1,12 @@
 import { FormHeader, Input, Spacer, Textarea } from '@/components/atoms';
-import usePlanStore from '@/store/usePlanStore';
+import { Plan } from '@/models/Plan';
+interface Props {
+	plan: Partial<Plan>;
+	setPlanField: <K extends keyof Plan>(field: K, value: Plan[K]) => void;
+	errors: Partial<Record<keyof Plan, string>>;
+}
 
-const PlanDetailsSection = () => {
-	const { plan, setPlanField, errors } = usePlanStore();
-
+const PlanDetailsSection = ({ plan, setPlanField, errors }: Props) => {
 	return (
 		<div className='p-6  rounded-xl border border-[#E4E4E7]'>
 			<FormHeader

@@ -1,0 +1,66 @@
+{
+	"name": "Est ullam in quis qu",
+	"description": "Id quas veniam moll",
+	"lookup_key": "Quidem enim ut volup",
+	"prices": [
+		{
+			"meter_id": "meter_01JN0VD8XDSGSQV2NNNPF636DG",
+			"currency": "USD",
+			"billing_period": "MONTHLY",
+			"billing_model": "FLAT_FEE",
+			"type": "USAGE",
+			"amount": "100",
+			"billing_period_count": 1,
+			"billing_cadence": "RECURRING",
+			"trial_period": 89
+		},
+		{
+			"meter_id": "meter_01JN0X6ZR523S6JGSS98Q0K1ZV",
+			"currency": "USD",
+			"billing_period": "MONTHLY",
+			"billing_model": "PACKAGE",
+			"type": "USAGE",
+			"amount": "89",
+			"transform_quantity": {
+				"divide_by": 12
+			},
+			"billing_period_count": 1,
+			"billing_cadence": "RECURRING",
+			"invoice_cadence": "ARREAR",
+			"trial_period": 89
+		},
+		{
+			"meter_id": "meter_01JN0VQ27TZG5HCPKA8WH1WNZP",
+			"currency": "USD",
+			"billing_period": "MONTHLY",
+			"billing_model": "TIERED",
+			"type": "USAGE",
+			"tiers": [
+				{
+					"from": 1,
+					"up_to": 1,
+					"unit_amount": "89",
+					"flat_amount": "067"
+				},
+				{
+					"from": 2,
+					"up_to": null,
+					"unit_amount": "0.999999",
+					"flat_amount": "787"
+				}
+			],
+			"tier_mode": "VOLUME",
+			"billing_period_count": 1,
+			"billing_cadence": "RECURRING"
+		},
+		{
+			"amount": "90",
+			"currency": "USD",
+			"billing_period": "MONTHLY",
+			"type": "FIXED",
+			"billing_period_count": 1,
+			"billing_cadence": "RECURRING",
+			"billing_model": "FLAT_FEE"
+		}
+	]
+}
