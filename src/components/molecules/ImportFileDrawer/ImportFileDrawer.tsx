@@ -55,7 +55,7 @@ const getLicenseKey = (tab: string): string => {
 			return 'Nd50fKMwC54Ri7AoD4ifG1dxL7koqW';
 
 		// this is original license key for customers
-		case 'customer':
+		case 'customers':
 			return 'W5t0iJSKSM3AH8Etzq9Jf3X3lvsKuw';
 
 		case 'feature':
@@ -136,6 +136,7 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 		() => `${entityType?.value ? getLicenseKey(entityType.value) : ''}-${JSON.stringify(entityType?.label)}`,
 		[entityType],
 	);
+	console.log(entityType, csvBoxKey);
 
 	const [errors, seterrors] = useState({
 		file: '',

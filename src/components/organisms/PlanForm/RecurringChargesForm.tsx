@@ -134,7 +134,7 @@ const RecurringChargesForm = ({ price, onAdd, onUpdate, onDelete, isEdit }: Prop
 			{/* starting billing preffercences */}
 
 			<CheckboxRadioGroup
-				title='Billing timing'
+				title='	'
 				value={localPrice.invoice_cadence}
 				checkboxItems={[
 					{ label: 'Advance', value: 'ADVANCE', description: 'Customers are billed at the start of each billing period.' },

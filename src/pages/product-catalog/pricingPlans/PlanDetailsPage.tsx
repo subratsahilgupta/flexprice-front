@@ -9,7 +9,7 @@ import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import EntitlementApi, { ExtendedEntitlement } from '@/utils/api_requests/EntitlementApi';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
 import formatDate from '@/utils/common/format_date';
-import { formatPriceType, toSentenceCase } from '@/utils/common/helper_functions';
+import { formatPriceType } from '@/utils/common/helper_functions';
 import { getPriceTableCharge } from '@/utils/models/transformed_plan';
 import { useQuery } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
@@ -18,6 +18,36 @@ import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card } from '@/components/atoms';
 import formatChips from '@/utils/common/format_chips';
+
+const formatBillingPeriod = (billingPeriod: string) => {
+	switch (billingPeriod.toUpperCase()) {
+		case 'DAILY':
+			return 'Daily';
+		case 'WEEKLY':
+			return 'Weekly';
+		case 'MONTHLY':
+			return 'Monthly';
+		case 'ANNUAL':
+			return 'Yearly';
+		case 'QUARTERLY':
+			return 'Quarterly';
+		case 'HALF_YEARLY':
+			return 'Half Yearly';
+		default:
+			return '--';
+	}
+};
+
+const formatInvoiceCadence = (cadence: string): string => {
+	switch (cadence.toUpperCase()) {
+		case 'ADVANCE':
+			return 'Advance';
+		case 'ARREAR':
+			return 'Arrear';
+		default:
+			return '';
+	}
+};
 
 type Params = {
 	planId: string;
@@ -36,22 +66,28 @@ type Params = {
 
 const chargeColumns: ColumnData[] = [
 	{
-		title: 'Subscription Type',
+		title: 'Charge Type',
 		render: (row) => {
-			return <span className='text-[#09090B]'>{formatPriceType(row.type)}</span>;
+			return <span>{formatPriceType(row.type)}</span>;
 		},
 		fieldVariant: 'title',
 	},
 	{
 		title: 'Feature',
 		render(rowData) {
-			return <span className='text-[#09090B]'>{rowData.meter?.name ?? '--'}</span>;
+			return <span>{rowData.meter?.name ?? '--'}</span>;
+		},
+	},
+	{
+		title: 'Billing timing ',
+		render(rowData) {
+			return <span>{formatInvoiceCadence(rowData.invoice_cadence as string)}</span>;
 		},
 	},
 	{
 		title: 'Billing Period',
 		render(rowData) {
-			return <span className='text-[#09090B]'>{toSentenceCase(rowData.billing_period as string)}</span>;
+			return <span>{formatBillingPeriod(rowData.billing_period as string)}</span>;
 		},
 	},
 	{

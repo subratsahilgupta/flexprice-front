@@ -16,6 +16,19 @@ export function getCurrencySymbol(currency: string): string {
 	}
 }
 
+export const formatBillingModel = (billingModel: string) => {
+	switch (billingModel.toUpperCase()) {
+		case 'FLAT_FEE':
+			return 'Flat Fee';
+		case 'PACKAGE':
+			return 'Package';
+		case 'TIERED':
+			return 'Tiered';
+		default:
+			return '--';
+	}
+};
+
 export const formatBillingPeriod = (billingPeriod: string) => {
 	switch (billingPeriod.toUpperCase()) {
 		case 'DAILY':
@@ -26,6 +39,10 @@ export const formatBillingPeriod = (billingPeriod: string) => {
 			return 'month';
 		case 'ANNUAL':
 			return 'year';
+		case 'QUARTERLY':
+			return 'quarter';
+		case 'HALF_YEARLY':
+			return 'half year';
 		default:
 			return '--';
 	}

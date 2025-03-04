@@ -66,7 +66,7 @@ const FlexPriceSelect: React.FC<Props> = ({
 	className,
 	noOptionsText,
 	defaultOpen,
-	hideSelectedTick = false,
+	hideSelectedTick = true,
 }) => {
 	return (
 		<div className={cn('space-y-1 ')}>
@@ -121,8 +121,6 @@ const FlexPriceSelect: React.FC<Props> = ({
 												'cursor-pointer',
 												option.disabled && 'select-none cursor-not-allowed',
 												'flex items-center space-x-2 justify-between w-full',
-												hideSelectedTick &&
-													'[&_.SelectItemIndicator]:hidden [&_.SelectItemIndicator]:!w-0 [&_.SelectItemIndicator]:!m-0 [&_.SelectItemIndicator]:!p-0 [&]:pl-3',
 											)}
 											disabled={option.disabled}
 											key={option.value}
