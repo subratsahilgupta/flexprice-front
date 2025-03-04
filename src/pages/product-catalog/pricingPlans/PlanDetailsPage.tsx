@@ -74,7 +74,7 @@ const getFeatureValue = (entitlement: ExtendedEntitlement) => {
 				</span>
 			);
 		case FeatureType.boolean:
-			return entitlement.static_value ? 'Yes' : 'No';
+			return entitlement.is_enabled ? 'Yes' : 'No';
 		default:
 			return '--';
 	}
