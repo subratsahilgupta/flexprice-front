@@ -1,6 +1,6 @@
 import { Price } from '@/models/Price';
 import { FC, useState, useEffect } from 'react';
-import { Button, Input, Select, Spacer } from '@/components/atoms';
+import { Button, CheckboxRadioGroup, Input, Select, Spacer } from '@/components/atoms';
 import SelectMeter from './SelectMeter';
 import { Pencil, Trash2 } from 'lucide-react';
 import { Meter } from '@/models/Meter';
@@ -56,7 +56,10 @@ const UsagePricingForm: FC<Props> = ({ onSave, onDelete, prices }) => {
 		flatModelError: '',
 		packagedModelError: '',
 		tieredModelError: '',
+		invoiceCadenceError: '',
 	});
+
+	const [invoiceCadence, setInvoiceCadence] = useState('ARREAR');
 
 	// Find the price that's currently being edited
 	const editingPrice = prices.find((p) => p.isEdit);
@@ -102,6 +105,7 @@ const UsagePricingForm: FC<Props> = ({ onSave, onDelete, prices }) => {
 			flatModelError: '',
 			packagedModelError: '',
 			tieredModelError: '',
+			invoiceCadenceError: '',
 		});
 
 		if (!meterId) {
@@ -151,6 +155,7 @@ const UsagePricingForm: FC<Props> = ({ onSave, onDelete, prices }) => {
 			type: 'USAGE',
 			billing_period_count: 1,
 			billing_cadence: 'RECURRING',
+			invoice_cadence: invoiceCadence,
 		};
 
 		let finalPrice: Partial<Price>;
@@ -224,6 +229,7 @@ const UsagePricingForm: FC<Props> = ({ onSave, onDelete, prices }) => {
 			flatModelError: '',
 			packagedModelError: '',
 			tieredModelError: '',
+			invoiceCadenceError: '',
 		});
 	};
 
@@ -362,6 +368,25 @@ const UsagePricingForm: FC<Props> = ({ onSave, onDelete, prices }) => {
 				<VolumeTieredPricingForm setTieredPrices={setTieredPrices} tieredPrices={tieredPrices} currency={currency} />
 			)}
 
+			<Spacer height='16px' />
+			<CheckboxRadioGroup
+				title='Billing timing'
+				value={invoiceCadence}
+				checkboxItems={[
+					{ label: 'Advance', value: 'ADVANCE', description: 'Customers are billed at the start of each billing period.' },
+
+					{
+						label: 'Arrear',
+						value: 'ARREAR',
+						description: 'Customers are billed at the end of each billing period, based on actual usage.',
+					},
+				]}
+				onChange={(value) => {
+					setInvoiceCadence(value);
+				}}
+				error={inputErrors.invoiceCadenceError}
+			/>
+			<Spacer height={'16px'} />
 			<Spacer height='16px' />
 			<div className='flex justify-end'>
 				<Button onClick={resetForm} variant='secondary' className='mr-4 text-zinc-900'>

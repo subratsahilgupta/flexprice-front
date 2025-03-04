@@ -38,6 +38,7 @@ export const AddChargesButton = ({ onClick, label }: AddChargesButtonProps) => (
 
 export interface InternalPrice extends Partial<Price> {
 	isEdit?: boolean;
+	isTrialPeriod?: boolean;
 }
 
 const SetupChargesSection: React.FC<Props> = ({ plan, setPlanField }) => {
@@ -50,6 +51,7 @@ const SetupChargesSection: React.FC<Props> = ({ plan, setPlanField }) => {
 		billing_period: billlingPeriodOptions[1].value,
 		type,
 		isEdit: true,
+		billing_period_count: 1,
 		billing_model: type === SubscriptionType.FIXED ? 'FLAT_FEE' : undefined,
 		billing_cadence: 'RECURRING',
 	});
@@ -135,7 +137,7 @@ const SetupChargesSection: React.FC<Props> = ({ plan, setPlanField }) => {
 			{/* Fixed Price Forms */}
 			{fixedPrices.length > 0 && (
 				<div>
-					<h3 className='text-lg font-medium mb-4'>Recurring Charges</h3>
+					<FormHeader title='Recurring Charges' variant='form-component-title' />
 					{fixedPrices.map((price, index) => {
 						// Find the global index in the prices array
 						const globalIndex = prices.findIndex((p) => p === price);
@@ -177,7 +179,7 @@ const SetupChargesSection: React.FC<Props> = ({ plan, setPlanField }) => {
 			{/* Usage Price Forms */}
 			{usagePrices.length > 0 && (
 				<div className='mt-6'>
-					<h3 className='text-lg font-medium mb-4'>Usage Based Charges</h3>
+					<FormHeader title='Usage Based Charges' variant='form-component-title' />
 					<UsagePricingForm
 						prices={usagePrices}
 						onSave={(newPrice) => {

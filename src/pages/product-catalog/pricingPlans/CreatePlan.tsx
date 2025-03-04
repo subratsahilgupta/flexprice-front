@@ -2,11 +2,11 @@ import { Button, FormHeader, Spacer, Stepper } from '@/components/atoms';
 import { PlanDetailsSection, SetupChargesSection } from '@/components/organisms';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 import { Plan } from '@/models/Plan';
+import { PlanApi } from '@/utils/api_requests/PlanApi';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-
 const CreatePlanPage = () => {
 	const [activeStep, setActiveStep] = useState(1);
 	const formSteps = [{ label: 'Plan Details' }, { label: 'Set up Charges' }];
@@ -27,33 +27,14 @@ const CreatePlanPage = () => {
 
 	const { mutate: submitPlan, isPending } = useMutation({
 		mutationFn: async () => {
-			// const data = tempPlan;
-			// if (metaData?.usagePrices) {
-			// 	metaData.usagePrices.forEach((price) => {
-			// 		data.prices?.push({
-			// 			...price,
-			// 			billing_period_count: 1,
-			// 			billing_cadence: 'RECURRING',
-			// 		});
-			// 	});
-			// }
-			// if (metaData?.recurringPrice) {
-			// 	data.prices?.push({
-			// 		...metaData.recurringPrice,
-			// 		type: metaData.subscriptionType,
-			// 		billing_period_count: 1,
-			// 		billing_cadence: 'RECURRING',
-			// 		billing_model: 'FLAT_FEE',
-			// 	});
-			// }
-			// const response = await PlanApi.createPlan(data);
-			// return response;
+			return await PlanApi.createPlan({
+				...tempPlan,
+				invoice_cadence: 'ARREAR',
+			} as Partial<Plan>);
 		},
 		async onSuccess() {
 			toast.success('Plan created successfully');
 			navigate('/product-catalog/pricing-plan');
-			// TODO: reset overall plan state after success
-			// resetStore();
 			await refetchQueries(['fetchPlans']);
 		},
 		onError() {
