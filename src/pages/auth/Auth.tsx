@@ -69,19 +69,19 @@ const AuthPage: React.FC = () => {
 
 					{currentTab === 'signup' && (
 						<>
-							<h2 className='text-3xl font-bold text-center text-gray-800 mb-2'>Create an Account</h2>
+							<h2 className='text-3xl font-bold text-center text-gray-800 mb-2'>Create an account</h2>
 							<p className='text-center text-gray-600 mb-8'>Sign up to start using Flexprice.</p>
 						</>
 					)}
 					{currentTab === 'login' && (
 						<>
-							<h2 className='text-3xl font-bold text-center text-gray-800 mb-2'>Login to your Account</h2>
+							<h2 className='text-3xl font-bold text-center text-gray-800 mb-2'>Login to your account</h2>
 							<p className='text-center text-gray-600 mb-8'>Login to start using Flexprice.</p>
 						</>
 					)}
 					{currentTab === 'forgot-password' && (
 						<>
-							<h2 className='text-3xl font-bold text-center text-gray-800 mb-2'>Forgot your Password?</h2>
+							<h2 className='text-3xl font-bold text-center text-gray-800 mb-2'>Forgot your password?</h2>
 							<p className='text-center text-gray-600 mb-8'>Enter your email to reset your password.</p>
 						</>
 					)}

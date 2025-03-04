@@ -1,4 +1,4 @@
-import { Button, Loader, Page, ShortPagination, Spacer } from '@/components/atoms';
+import { AddButton, Button, Loader, Page, ShortPagination, Spacer } from '@/components/atoms';
 import { FeatureTable } from '@/components/molecules';
 import { RouteNames } from '@/core/routes/Routes';
 import usePagination from '@/hooks/usePagination';
@@ -60,7 +60,7 @@ const FeaturesPage = () => {
 			heading='Features'
 			headingCTA={
 				<Link to={RouteNames.createFeature}>
-					<Button prefixIcon={<Star />}>Add Feature</Button>
+					<AddButton />
 				</Link>
 			}>
 			<div>

@@ -1,4 +1,4 @@
-import { Button, Loader, Page, ShortPagination, Spacer } from '@/components/atoms';
+import { AddButton, Button, Loader, Page, ShortPagination, Spacer } from '@/components/atoms';
 import { CreateCustomerDrawer } from '@/components/molecules';
 import CustomerTable from '@/components/molecules/Customer/CustomerTable';
 import EmptyPage from '@/components/organisms/EmptyPage/EmptyPage';
@@ -8,7 +8,6 @@ import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { BsPeople } from 'react-icons/bs';
 import { FiFolderPlus } from 'react-icons/fi';
 
 const CustomerPage = () => {
@@ -69,14 +68,12 @@ const CustomerPage = () => {
 			headingCTA={
 				<CreateCustomerDrawer
 					trigger={
-						<Button
+						<AddButton
 							onClick={() => {
 								setactiveCustomer(undefined);
 								console.log('clicked');
 							}}
-							prefixIcon={<BsPeople />}>
-							Add Customer
-						</Button>
+						/>
 					}
 					open={customerDrawerOpen}
 					onOpenChange={setcustomerDrawerOpen}

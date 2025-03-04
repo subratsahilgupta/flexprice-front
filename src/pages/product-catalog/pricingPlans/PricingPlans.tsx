@@ -1,4 +1,4 @@
-import { Button, Loader, Page, ShortPagination, Spacer } from '@/components/atoms';
+import { AddButton, Button, Loader, Page, ShortPagination, Spacer } from '@/components/atoms';
 import { FiFolderPlus } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -63,7 +63,7 @@ const PricingPlan = () => {
 			heading='Pricing Plan'
 			headingCTA={
 				<Link to='/product-catalog/pricing-plan/create-plan'>
-					<Button prefixIcon={<FiFolderPlus />}>Add Pricing Plan</Button>
+					<AddButton />
 				</Link>
 			}>
 			<div>

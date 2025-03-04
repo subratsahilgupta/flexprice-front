@@ -35,10 +35,11 @@ const SubscriptionActionButton: React.FC<Props> = ({ subscription }) => {
 				pause_days: parseInt(state.pauseDays),
 				pause_mode: 'immediate',
 			}),
-		onSuccess: () => {
+		onSuccess: async () => {
 			setState((prev) => ({ ...prev, isPauseModalOpen: false }));
 			toast.success('Subscription paused successfully');
-			refetchQueries(['subscriptionDetails', 'subscriptions']);
+			await refetchQueries(['subscriptionDetails']);
+			await refetchQueries(['subscriptions']);
 		},
 		onError: () => {
 			toast.error('Failed to pause subscription');
@@ -123,7 +124,7 @@ const SubscriptionActionButton: React.FC<Props> = ({ subscription }) => {
 				<div className=''>
 					<FormHeader
 						title='Pause Subscription'
-						variant='form-title'
+						variant='sub-header'
 						subtitle='Pausing the subscription will stop the subscription from charging the customer for the selected period.'
 					/>
 					<Spacer className='!my-6' />
@@ -137,7 +138,7 @@ const SubscriptionActionButton: React.FC<Props> = ({ subscription }) => {
 						/>
 
 						<Input
-							label='Number of days to pause the subscription for'
+							label='Number of days'
 							value={state.pauseDays}
 							onChange={(value) => setState((prev) => ({ ...prev, pauseDays: value }))}
 							suffix='days'
@@ -180,7 +181,7 @@ const SubscriptionActionButton: React.FC<Props> = ({ subscription }) => {
 				onOpenChange={(open) => setState((prev) => ({ ...prev, isResumeModalOpen: open }))}
 				className='bg-white rounded-lg p-6 w-[800px] max-w-[90vw]'>
 				<div className='space-y-4'>
-					<FormHeader title='Resume Subscription' variant='form-title' subtitle='lorem' />
+					<FormHeader title='Resume Subscription' variant='sub-header' subtitle='lorem' />
 					<Spacer className='!my-6' />
 					<div className='flex justify-end gap-3 pt-4'>
 						<Button
@@ -202,10 +203,11 @@ const SubscriptionActionButton: React.FC<Props> = ({ subscription }) => {
 				onOpenChange={(open) => setState((prev) => ({ ...prev, isCancelModalOpen: open }))}
 				className='bg-white rounded-lg p-6 w-[800px] max-w-[90vw]'>
 				<div className='space-y-4'>
-					<div className='space-y-2'>
-						<h2 className='text-xl font-semibold'>Cancel Subscription?</h2>
-						<p className='text-gray-600'>This action cannot be undone. The subscription will be cancelled immediately.</p>
-					</div>
+					<FormHeader
+						title='Cancel Subscription'
+						variant='sub-header'
+						subtitle='This action cannot be undone. The subscription will be cancelled immediately.'
+					/>
 					<div className='flex justify-end gap-3 pt-4'>
 						<Button
 							variant='outline'

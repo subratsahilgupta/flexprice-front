@@ -1,5 +1,5 @@
 import { Card, FormHeader, Page, Spacer } from '@/components/atoms';
-import { InvoiceLineItemTable } from '@/components/molecules';
+import { InvoiceLineItemTable, SubscriptionPauseWarning } from '@/components/molecules';
 import SubscriptionActionButton from '@/components/organisms/Subscription/SubscriptionActionButton';
 import { getSubscriptionStatus } from '@/components/organisms/Subscription/SubscriptionTable';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -64,8 +64,19 @@ const SubscriptionDetails: FC = () => {
 		toast.error('Something went wrong');
 	}
 
+	const isPaused = subscriptionDetails?.subscription_status.toUpperCase() === 'PAUSED';
+	const activePauseDetails = subscriptionDetails?.pauses?.find((pause) => pause.id === subscriptionDetails.active_pause_id);
+
 	return (
 		<div>
+			{isPaused && activePauseDetails && (
+				<SubscriptionPauseWarning
+					pauseStartDate={activePauseDetails.pause_start}
+					pauseEndDate={activePauseDetails.pause_end}
+					resumeDate={activePauseDetails.resumed_at || activePauseDetails.pause_end}
+				/>
+			)}
+
 			<Card className='card'>
 				<div className='flex justify-between items-center'>
 					<FormHeader title='Subscription details' variant='sub-header' titleClassName='font-semibold' />

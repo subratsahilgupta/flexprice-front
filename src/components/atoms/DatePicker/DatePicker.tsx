@@ -37,7 +37,7 @@ const DatePicker = ({
 				{title && <div className='w-full text-start text-sm text-muted-foreground mb-1'>{title}</div>}
 				<Button
 					variant={'outline'}
-					className={cn('w-[240px] h-10 justify-start text-left font-normal py-1', !date && 'text-muted-foreground', className)}>
+					className={cn('min-w-[240px] h-10 justify-start text-left font-normal py-1', !date && 'text-muted-foreground', className)}>
 					<CalendarIcon className='mr-2 h-4 w-4' />
 					{date ? format(date, 'PPP') : <span>{placeholder}</span>} {/* Use placeholder */}
 				</Button>
