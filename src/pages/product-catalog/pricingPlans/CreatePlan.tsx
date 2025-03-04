@@ -114,7 +114,7 @@ const CreatePlanPage = () => {
 	};
 
 	return (
-		<div className='p-6'>
+		<div className='p-6 w-full'>
 			<FormHeader
 				title={'Plan Details'}
 				subtitle={'Define pricing plans to manage events, billing, and customer subscriptions seamlessly.'}
@@ -124,7 +124,7 @@ const CreatePlanPage = () => {
 			<Spacer height={'16px'} />
 
 			{/* stepper componenet */}
-			<div className='md:w-1/2 lg: '>
+			<div className=' w-2/3 '>
 				<Stepper activeStep={activeStep} steps={formSteps} />
 
 				{/* step 1 */}

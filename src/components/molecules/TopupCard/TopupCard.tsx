@@ -60,14 +60,19 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 			if (!preFunction) {
 				toast.success('Wallet topped up successfully');
 			}
-			await refetchQueries(['fetchWallets', 'fetchWalletBalances', 'fetchWalletsTransactions']);
+			await refetchQueries(['fetchWallets']);
+			await refetchQueries(['fetchWalletBalances']);
+			await refetchQueries(['fetchWalletsTransactions']);
 		},
-		onSettled: () => {
+		onSettled: async () => {
 			setfreeCredits(undefined);
 			setsubscriptionType(undefined);
 			if (onSuccess) {
 				onSuccess();
 			}
+			await refetchQueries(['fetchWallets']);
+			await refetchQueries(['fetchWalletBalances']);
+			await refetchQueries(['fetchWalletsTransactions']);
 		},
 	});
 	const handleTopup = async () => {

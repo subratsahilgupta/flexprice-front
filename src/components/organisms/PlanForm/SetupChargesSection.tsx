@@ -60,11 +60,14 @@ const SetupChargesSection = () => {
 
 	return (
 		<div className='p-6 rounded-xl border border-[#E4E4E7]'>
-			<FormHeader title='Plan Charges' subtitle='Choose the appropriate subscription model for this pricing plan.' variant='sub-header' />
-
 			{/* Subscription Type Section */}
 			{isSubscriptionBtnVisible() && (
 				<div>
+					<FormHeader
+						title='Plan Charges'
+						subtitle='Choose the appropriate subscription model for this pricing plan.'
+						variant='sub-header'
+					/>
 					<FormHeader title='Select the Subscription Type' variant='form-component-title' />
 					<div className='w-full gap-4 grid grid-cols-2'>{subscriptionTypeOptions.map(renderSubscriptionTypeButton)}</div>
 					<Spacer height='4px' />
@@ -83,7 +86,7 @@ const SetupChargesSection = () => {
 
 			{metaData?.subscriptionType && (
 				<>
-					<FormHeader title='Plan Charges' subtitle='Define the charges for this pricing plan.' variant='sub-header' />
+					{/* <FormHeader title='Plan Charges' subtitle='Define the charges for this pricing plan.' variant='sub-header' /> */}
 					<Spacer height='4px' />
 					<RecurringChargesForm />
 					<UsageBasedPricingFormSection />

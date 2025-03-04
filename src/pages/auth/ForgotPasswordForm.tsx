@@ -66,7 +66,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ switchTab }) =>
 
 			<p className='mt-6 text-center text-sm text-gray-600'>
 				Remember your password?{' '}
-				<button onClick={() => switchTab('login')} className='text-grey-600 hover:underline font-medium'>
+				<button onClick={() => switchTab('login')} className='text-grey-600 underline font-medium'>
 					Back to login
 				</button>
 			</p>

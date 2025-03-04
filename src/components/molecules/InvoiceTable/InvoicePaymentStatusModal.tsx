@@ -79,7 +79,7 @@ const InvoicePaymentStatusModal: FC<Props> = ({ isOpen, onOpenChange, invoice })
 			<div className='card bg-white max-w-lg'>
 				<FormHeader
 					title='Update Payment Status'
-					variant='form-title'
+					variant='sub-header'
 					subtitle='Changing the payment status of this invoice will not initiate a payment collection attempt'
 				/>
 				<Spacer className='!my-6' />

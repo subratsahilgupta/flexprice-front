@@ -111,7 +111,7 @@ const AddCreditPage = () => {
 					<Select label='Reason' options={reasonOptions} value={payload?.reason} onChange={(e) => setPayload({ ...payload, reason: e })} />
 				</div>
 				<div className='flex-grow w-full'>
-					<DatePicker title='Issue Date' date={payload?.issueDate} setDate={(e) => setPayload({ ...payload, issueDate: e })} />
+					<DatePicker label='Issue Date' date={payload?.issueDate} setDate={(e) => setPayload({ ...payload, issueDate: e })} />
 				</div>
 			</div>
 

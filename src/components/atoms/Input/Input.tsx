@@ -99,7 +99,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 			id,
 			value,
 			inputPrefix,
-			labelClassName: titleClassName,
+			labelClassName,
 			variant = 'text',
 			formatOptions = DEFAULT_FORMAT_OPTIONS,
 			...props
@@ -165,7 +165,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 			<div className='space-y-1 w-full flex flex-col'>
 				{/* Label */}
 				{label && (
-					<label className={cn('font-inter block text-sm font-medium', disabled ? 'text-zinc-500' : 'text-zinc-950', titleClassName)}>
+					<label className={cn('font-inter block text-sm font-medium', disabled ? 'text-zinc-500' : 'text-zinc-950', labelClassName)}>
 						{label}
 					</label>
 				)}

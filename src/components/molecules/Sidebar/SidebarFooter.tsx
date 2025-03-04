@@ -38,7 +38,7 @@ const SidebarFooter = () => {
 				)}>
 				<span className={cn('flex items-center gap-2')}>
 					<CodeXml className='size-4' />
-					<span className='text-sm select-none font-normal'>{'Developers'}</span>
+					<span className={cn('text-sm select-none font-normal', sidebarOpen ? '' : 'hidden')}>{'Developers'}</span>
 				</span>
 			</SidebarMenuButton>
 			<SidebarMenuButton
@@ -56,33 +56,24 @@ const SidebarFooter = () => {
 
 			{/* user profile */}
 			<Popover>
-				<PopoverTrigger>
-					<div className='w-full flex items-center justify-between h-10 rounded-md gap-2 px-2'>
-						<div className='flex items-center gap-2 min-w-0 flex-1'>
-							<span className='min-w-7 h-7 bg-black text-white flex justify-center items-center rounded-md flex-shrink-0'>
-								{user?.email
-									?.split(' ')
-									.map((n) => n[0].toUpperCase())
-									.join('')
-									.slice(0, 2) || 'UN'}
-							</span>
-							<div className={cn('min-w-0 flex-1', sidebarOpen ? '' : 'hidden')}>
+				<PopoverTrigger asChild>
+					<button className='w-full flex items-center justify-between h-10 rounded-md gap-2 px-2 hover:bg-muted transition-colors'>
+						<div className='flex items-center gap-1 min-w-0 flex-1'>
+							<div className='size-5 text-xs   bg-primary text-primary-foreground flex justify-center items-center rounded-full flex-shrink-0 font-medium'>
+								{user?.email ? user.email.charAt(0).toUpperCase() : 'F'}
+							</div>
+							<div className={cn('min-w-0 flex-1 text-left', sidebarOpen ? '' : 'hidden')}>
+								{/* <p className='text-sm font-medium truncate'>{user?.email?.split('@')[0]}</p> */}
 								<p className='text-xs text-muted-foreground truncate'>{user?.email}</p>
 							</div>
 						</div>
-						<button type='button' className={cn('flex-shrink-0', sidebarOpen ? '' : 'hidden')}>
-							<ChevronsUpDown className='h-4 w-4 opacity-50' />
-						</button>
-					</div>
+						<ChevronsUpDown className={cn('h-4 w-4 text-muted-foreground', sidebarOpen ? '' : 'hidden')} />
+					</button>
 				</PopoverTrigger>
-				<PopoverContent className='max-w-[256px] p-2'>
-					<button
-						onClick={() => {
-							handleLogout();
-						}}
-						className={cn(`p-2 w-full text-sm flex items-center gap-2 hover:bg-muted transition-colors `)}>
+				<PopoverContent className='w-64 p-2'>
+					<button onClick={handleLogout} className='w-full flex items-center gap-2 rounded-md p-2 text-sm hover:bg-muted transition-colors'>
 						<LogOut className='size-4' />
-						<span className='text-sm select-none'>{'Logout'}</span>
+						<span>Logout</span>
 					</button>
 				</PopoverContent>
 			</Popover>

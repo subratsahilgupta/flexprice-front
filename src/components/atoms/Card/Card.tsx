@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import React from 'react';
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-	variant?: 'default' | 'notched' | 'bordered' | 'elevated';
+	variant?: 'default' | 'notched' | 'bordered' | 'elevated' | 'warning';
 	notchColor?: string;
 	notchPosition?: 'left' | 'right';
 	notchSize?: 'sm' | 'md' | 'lg';
@@ -56,6 +56,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
 			),
 			bordered: 'border-2 border-gray-300',
 			elevated: 'border border-gray-200 shadow-lg',
+			warning: 'bg-red-50 border border-red-200 text-red-600',
 		};
 
 		return (

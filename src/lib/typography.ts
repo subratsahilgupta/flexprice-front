@@ -43,6 +43,10 @@ export const typography = {
 	// card styles
 	'card-header': 'text-lg font-semibold text-zinc-950',
 	'card-subtitle': 'text-sm text-zinc-500',
+
+	// modal styles
+	'modal-title': 'text-2xl font-bold text-zinc-950',
+	'modal-subtitle': 'text-sm text-zinc-500',
 } as const;
 
 export type TypographyVariant = keyof typeof typography;

@@ -24,11 +24,8 @@ const Overview = () => {
 		isLoading: subscriptionsLoading,
 		error: subscriptionsError,
 	} = useQuery({
-		queryKey: ['subscriptions', customerId], // Unique key for caching
+		queryKey: ['subscriptions', customerId],
 		queryFn: () => fetchAllSubscriptions(customerId!),
-
-		refetchOnWindowFocus: true,
-		refetchOnMount: 'always', // Refetch when the component is remounted
 	});
 
 	if (subscriptionsLoading) {

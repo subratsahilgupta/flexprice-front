@@ -1,11 +1,12 @@
-import { Chip, FormHeader, Page, Spacer } from '@/components/atoms';
-import { InvoiceLineItemTable } from '@/components/molecules';
+import { Card, FormHeader, Page, Spacer } from '@/components/atoms';
+import { InvoiceLineItemTable, SubscriptionPauseWarning } from '@/components/molecules';
+import SubscriptionActionButton from '@/components/organisms/Subscription/SubscriptionActionButton';
+import { getSubscriptionStatus } from '@/components/organisms/Subscription/SubscriptionTable';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RouteNames } from '@/core/routes/Routes';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
 import SubscriptionApi from '@/utils/api_requests/SubscriptionApi';
-import formatChips from '@/utils/common/format_chips';
 import { formatDateShort, getCurrencySymbol } from '@/utils/common/helper_functions';
 import { useQuery } from '@tanstack/react-query';
 import { FC, useEffect } from 'react';
@@ -63,10 +64,24 @@ const SubscriptionDetails: FC = () => {
 		toast.error('Something went wrong');
 	}
 
+	const isPaused = subscriptionDetails?.subscription_status.toUpperCase() === 'PAUSED';
+	const activePauseDetails = subscriptionDetails?.pauses?.find((pause) => pause.id === subscriptionDetails.active_pause_id);
+
 	return (
 		<div>
-			<div className='card'>
-				<FormHeader title='Subscription details' variant='sub-header' titleClassName='font-semibold' />
+			{isPaused && activePauseDetails && (
+				<SubscriptionPauseWarning
+					pauseStartDate={activePauseDetails.pause_start}
+					pauseEndDate={activePauseDetails.pause_end}
+					resumeDate={activePauseDetails.resumed_at || activePauseDetails.pause_end}
+				/>
+			)}
+
+			<Card className='card'>
+				<div className='flex justify-between items-center'>
+					<FormHeader title='Subscription details' variant='sub-header' titleClassName='font-semibold' />
+					<SubscriptionActionButton subscription={subscriptionDetails!} />
+				</div>
 				<div className='w-full flex justify-between items-center'>
 					<p className='text-[#71717A] text-sm'>Subscription name</p>
 					<p className='text-[#09090B] text-sm'>{subscriptionDetails?.plan.name ?? '--'}</p>
@@ -74,12 +89,7 @@ const SubscriptionDetails: FC = () => {
 				<Spacer className='!my-4' />
 				<div className='w-full flex justify-between items-center'>
 					<p className='text-[#71717A] text-sm'>Status</p>
-					<p className='text-[#09090B] text-sm'>
-						<Chip
-							variant={formatChips(subscriptionDetails?.status ?? '') === 'Active' ? 'success' : 'default'}
-							label={formatChips(subscriptionDetails?.status ?? '')}
-						/>
-					</p>
+					<p className='text-[#09090B] text-sm'>{getSubscriptionStatus(subscriptionDetails?.subscription_status ?? '')}</p>
 				</div>
 				<Spacer className='!my-4' />
 
@@ -93,7 +103,7 @@ const SubscriptionDetails: FC = () => {
 					<p className='text-[#71717A] text-sm'>Upcoming Invoice</p>
 					<p className='text-[#09090B] text-sm'>{`${getCurrencySymbol(data?.currency ?? '')}${data?.amount_due} on ${formatDateShort(subscriptionDetails?.current_period_end ?? '')}`}</p>
 				</div>
-			</div>
+			</Card>
 
 			{(data?.line_items?.length ?? 0) > 0 && (
 				<div className='card !mt-4'>

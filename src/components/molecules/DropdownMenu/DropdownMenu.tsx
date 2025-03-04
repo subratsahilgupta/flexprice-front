@@ -31,7 +31,7 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ options, trigger, isOpen, o
 	return (
 		<div className={cn('', className)} onClick={handleClick} data-interactive='true'>
 			<ShadcnMenu dir={dir} onOpenChange={onOpenChange} open={isOpen}>
-				<DropdownMenuTrigger className='w-full'>{trigger || <BsThreeDotsVertical className='text-base' />}</DropdownMenuTrigger>
+				<DropdownMenuTrigger className='w-full'>{trigger || <BsThreeDotsVertical className='text-base ' />}</DropdownMenuTrigger>
 				<DropdownMenuContent className='mr-6 w-full' align={align}>
 					{options.map((option, index) => (
 						<DropdownMenuItem

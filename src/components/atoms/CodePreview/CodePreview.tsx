@@ -3,7 +3,7 @@ import { HighlightProps, Highlight, themes } from 'prism-react-renderer';
 import { cn } from '@/lib/utils';
 import { Copy } from 'lucide-react';
 import toast from 'react-hot-toast';
-import Button from '../Button';
+import { Button } from '../Button';
 
 const CodeHighlighter = Highlight as unknown as FC<HighlightProps>;
 

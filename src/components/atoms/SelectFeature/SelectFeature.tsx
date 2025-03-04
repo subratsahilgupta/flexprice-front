@@ -81,6 +81,7 @@ const SelectFeature: FC<Props> = ({
 	return (
 		<div className={cn('min-w-[200px]')}>
 			<Select
+				hideSelectedTick={true}
 				className={className}
 				error={error}
 				value={value}

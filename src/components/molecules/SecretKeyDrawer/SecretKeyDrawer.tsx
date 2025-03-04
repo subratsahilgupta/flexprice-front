@@ -168,10 +168,14 @@ const SecretKeyDrawer: FC<Props> = ({ isOpen, onOpenChange }) => {
 
 					<div className='mt-4'>
 						<label className='block text-sm font-medium mb-1'>API Key</label>
-						<div className='relative'>
-							<Input value={showApiKey ? data?.api_key || '' : maskApiKey(data?.api_key || '')} readOnly className='pr-16' />
-							<div className='absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1'>
-								<button onClick={toggleApiKeyVisibility} className='p-1 text-gray-500 hover:text-gray-700' type='button'>
+						<div className='relative bg-gray-100 rounded-md'>
+							<Input
+								value={showApiKey ? data?.api_key || '' : maskApiKey(data?.api_key || '')}
+								readOnly
+								className='pr-16 border-none text-gray-600'
+							/>
+							<div className='bg-gray-100 absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1'>
+								<button onClick={toggleApiKeyVisibility} className='p-1 text-gray-700 hover:text-gray-700' type='button'>
 									{showApiKey ? <EyeOff className='w-4 h-4' /> : <Eye className='w-4 h-4' />}
 								</button>
 								<button onClick={copyApiKey} className='p-1 text-gray-500 hover:text-gray-700' type='button'>

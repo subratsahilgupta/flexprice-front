@@ -53,3 +53,5 @@ export { DetailsCard, type Detail } from './DetailsCard';
 export { default as EnvironmentSelector } from './EnvironmentSelector';
 
 export { default as SecretKeyDrawer } from './SecretKeyDrawer';
+
+export { default as SubscriptionPauseWarning } from './SubscriptionPauseWarning';

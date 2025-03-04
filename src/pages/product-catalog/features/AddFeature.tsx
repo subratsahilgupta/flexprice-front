@@ -36,7 +36,12 @@ const AddFeaturePage = () => {
 	const [errors, setErrors] = useState<Partial<Record<keyof Feature, string>>>({});
 	const navigate = useNavigate();
 
-	const [meter, setmeter] = useState<Partial<Meter>>({});
+	const [meter, setmeter] = useState<Partial<Meter>>({
+		aggregation: {
+			type: 'SUM',
+			field: '',
+		},
+	});
 
 	const [meterErrors, setmeterErrors] = useState<Partial<Record<keyof Meter | 'aggregation_type' | 'aggregation_field', string>>>({});
 
@@ -310,6 +315,16 @@ const AddFeaturePage = () => {
 										...prev,
 										type: e,
 									}));
+									// Initialize meter with default values when type is metered
+									if (e === 'metered') {
+										setmeter((prev) => ({
+											...prev,
+											aggregation: {
+												type: 'SUM',
+												field: '',
+											},
+										}));
+									}
 								}}
 							/>
 						</div>
@@ -435,6 +450,7 @@ const AddFeaturePage = () => {
 										label='Aggregation'
 										placeholder='SUM'
 										error={meterErrors.aggregation_type}
+										hideSelectedTick={true}
 									/>
 
 									{meter.aggregation?.type != aggregationOptions[1].value && (
@@ -482,6 +498,7 @@ const AddFeaturePage = () => {
 										: 'Save Feature'}
 						</Button>
 					</div>
+					<Spacer height={'16px'} />
 				</div>
 
 				{/* right section */}
