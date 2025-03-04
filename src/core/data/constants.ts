@@ -16,8 +16,10 @@ export const currencyOptions = Array.from(
 );
 
 export const billlingPeriodOptions = [
-	{ label: 'Daily', value: 'DAILY' },
+	// { label: 'Daily', value: 'DAILY' },
 	{ label: 'Weekly', value: 'WEEKLY' },
 	{ label: 'Monthly', value: 'MONTHLY' },
 	{ label: 'Yearly', value: 'ANNUAL' },
+	{ label: 'Quarterly', value: 'QUARTERLY' },
+	{ label: 'Half-Yearly', value: 'HALF_YEARLY' },
 ];

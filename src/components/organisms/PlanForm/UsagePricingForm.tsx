@@ -6,7 +6,7 @@ import SelectMeter from './SelectMeter';
 import { Pencil, Trash2 } from 'lucide-react';
 import { Meter } from '@/models/Meter';
 import { formatBillingPeriod, getCurrencySymbol, toSentenceCase } from '@/utils/common/helper_functions';
-import { currencyOptions } from '@/core/data/constants';
+import { billlingPeriodOptions, currencyOptions } from '@/core/data/constants';
 import VolumeTieredPricingForm from './VolumeTieredPricingForm';
 
 interface Props {
@@ -31,13 +31,6 @@ const billingModels = [
 	{ value: 'TIERED', label: 'Volume Tiered' },
 ];
 
-const billlingPeriodOptions = [
-	{ label: 'Daily', value: 'DAILY' },
-	{ label: 'Weekly', value: 'WEEKLY' },
-	{ label: 'Monthly', value: 'MONTHLY' },
-	{ label: 'Yearly', value: 'ANNUAL' },
-];
-
 const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, addPrice, label }) => {
 	const metaData = usePlanStore((state) => state.metaData);
 
@@ -58,7 +51,7 @@ const UsagePricingForm: FC<Props> = ({ data, isEdit, handleDelete, handleEdit, a
 			{ from: 2, up_to: null },
 		],
 	);
-	const [billingPeriod, setbillingPeriod] = useState(data?.billing_period || billlingPeriodOptions[2].value);
+	const [billingPeriod, setbillingPeriod] = useState(data?.billing_period || billlingPeriodOptions[1].value);
 	const [flatFee, setflatFee] = useState<string>(data?.amount || '');
 	const [packagedFee, setpackagedFee] = useState<{ unit: string; price: string }>({
 		unit: data?.transform_quantity?.divide_by ? `${data?.transform_quantity?.divide_by}` : '',

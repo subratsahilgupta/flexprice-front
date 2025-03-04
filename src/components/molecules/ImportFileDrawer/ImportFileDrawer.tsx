@@ -49,11 +49,15 @@ const mapStatusChips = (status: string) => {
 };
 
 const getLicenseKey = (tab: string): string => {
-	switch (tab) {
+	switch (tab.toLowerCase()) {
+		// this is original license key for events
 		case 'events':
 			return 'Nd50fKMwC54Ri7AoD4ifG1dxL7koqW';
-		case 'price':
-			return '3DzHoox4HqnuXcpdmjmgxNRGRR0RWP';
+
+		// this is original license key for customers
+		case 'customer':
+			return 'W5t0iJSKSM3AH8Etzq9Jf3X3lvsKuw';
+
 		case 'feature':
 			return '2tzeM0vIEIITBYCuSStqjhJnhJIhfi';
 		case 'feature_mapping':
@@ -62,6 +66,22 @@ const getLicenseKey = (tab: string): string => {
 			return 'Nd50fKMwC54Ri7AoD4ifG1dxL7koqW';
 	}
 };
+
+const getSampleFileUrl = (tab: string): string => {
+	switch (tab.toLowerCase()) {
+		case 'events':
+			return '/assets/csv/sample.csv';
+		case 'customer':
+			return '/assets/csv/sample_customer.csv';
+		case 'feature':
+			return '/assets/csv/sample.csv';
+		case 'feature_mapping':
+			return '/assets/csv/sample_feature_mapping.csv';
+		default:
+			return '/assets/csv/sample_event.csv';
+	}
+};
+
 const getTaskStatusChips = (status: string) => {
 	if (status === 'COMPLETED') {
 		return <Chip variant='success' label={mapStatusChips(status)} />;
@@ -81,9 +101,8 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 			value: 'EVENTS',
 		},
 		{
-			label: 'Prices',
-			value: 'PRICES',
-			disabled: true,
+			label: 'Customers',
+			value: 'CUSTOMERS',
 		},
 	];
 	const fileTypeOptions: SelectOption[] = [
@@ -354,7 +373,7 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 												className='flex gap-2 !p-0 m-0 underline'
 												variant={'link'}
 												onClick={() => {
-													window.open('/assets/csv/sample.csv', '_blank');
+													window.open(getSampleFileUrl(entityType?.value || ''), '_blank');
 												}}>
 												Sample CSV
 												<Download className='size-4 underline' />
