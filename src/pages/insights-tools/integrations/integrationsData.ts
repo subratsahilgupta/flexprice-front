@@ -115,8 +115,7 @@ export const integrations: Integration[] = [
 		tags: ['CRM'],
 		premium: true,
 		type: 'available',
-		description:
-			'The Zoho Books integration lets you manage critical accounting tasks—such as creating customers and invoices—directly from Flexprice. ',
+		description: 'The Zoho Books integration lets you manage critical accounting tasks directly from Flexprice. ',
 		info: [
 			{
 				title: 'Create Customer in Zoho Books',

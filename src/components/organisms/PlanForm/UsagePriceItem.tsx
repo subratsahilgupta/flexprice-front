@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Trash2 } from 'lucide-react';
-import { toSentenceCase } from '@/utils/common/helper_functions';
+import { formatBillingModel, formatBillingPeriod } from '@/utils/common/helper_functions';
 import { InternalPrice } from './SetupChargesSection';
 
 interface Props {
@@ -18,11 +18,11 @@ const UsagePriceItem: FC<Props> = ({ price, index, onDelete }) => {
 				<div className='flex gap-2 items-center text-zinc-500 text-xs'>
 					<span>{price.currency}</span>
 					<span>•</span>
-					<span>{toSentenceCase(price.billing_period || '')}</span>
+					<span>{formatBillingPeriod(price.billing_period || '')}</span>
 					{price.billing_model && (
 						<>
 							<span>•</span>
-							<span>{toSentenceCase(price.billing_model)}</span>
+							<span>{formatBillingModel(price.billing_model)}</span>
 						</>
 					)}
 				</div>
