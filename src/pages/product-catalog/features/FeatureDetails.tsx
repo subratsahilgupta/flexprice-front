@@ -169,7 +169,7 @@ const FeatureDetails = () => {
 							<div>
 								<div className='grid grid-cols-[200px_1fr] items-center'>
 									<span className='text-gray-500 text-sm'>Event Name</span>
-									<span className='text-gray-800 text-sm'>{data?.meter?.name}</span>
+									<span className='text-gray-800 text-sm'>{data?.meter?.event_name}</span>
 								</div>
 							</div>
 
