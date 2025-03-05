@@ -55,3 +55,5 @@ export { default as EnvironmentSelector } from './EnvironmentSelector';
 export { default as SecretKeyDrawer } from './SecretKeyDrawer';
 
 export { default as SubscriptionPauseWarning } from './SubscriptionPauseWarning';
+
+export { default as DebugMenu } from './DebugMenu';

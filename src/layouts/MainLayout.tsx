@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { Sidebar } from '@/components/molecules/Sidebar';
 import { BreadCrumbs } from '@/components/molecules';
+import { DebugMenu } from '@/components/molecules';
 
 const MainLayout: React.FC = () => {
 	// Initialize breadcrumbs
@@ -14,8 +15,9 @@ const MainLayout: React.FC = () => {
 			<SidebarInset className='flex flex-col flex-1 bg-white h-screen relative overflow-y-auto'>
 				<BreadCrumbs />
 				{/* Main Content */}
-				<main className='flex-1 px-4'>
+				<main className='flex-1 px-4 relative'>
 					<Outlet />
+					<DebugMenu />
 				</main>
 			</SidebarInset>
 		</SidebarProvider>

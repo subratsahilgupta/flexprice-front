@@ -31,6 +31,10 @@ export default {
 					DEFAULT: 'hsl(var(--popover))',
 					foreground: 'hsl(var(--popover-foreground))',
 				},
+				blue: {
+					DEFAULT: '#3293D9',
+					light: '#E5F0FF',
+				},
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))',
