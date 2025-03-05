@@ -4,7 +4,7 @@ import { Button, CheckboxRadioGroup, Input, Select, Spacer } from '@/components/
 import SelectMeter from './SelectMeter';
 // import { Pencil, Trash2 } from 'lucide-react';
 import { Meter } from '@/models/Meter';
-import { formatBillingPeriod, getCurrencySymbol } from '@/utils/common/helper_functions';
+import { formatBillingPeriodForPrice, getCurrencySymbol } from '@/utils/common/helper_functions';
 import { billlingPeriodOptions, currencyOptions } from '@/core/data/constants';
 import VolumeTieredPricingForm from './VolumeTieredPricingForm';
 import { InternalPrice } from './SetupChargesSection';
@@ -290,7 +290,7 @@ const UsagePricingForm: FC<Props> = ({ onSave, onDelete, prices }) => {
 						onChange={(e) => {
 							setFlatFee(e);
 						}}
-						suffix={<span className='text-[#64748B]'>{`/ unit / ${formatBillingPeriod(billingPeriod)}`}</span>}
+						suffix={<span className='text-[#64748B]'>{`/ unit / ${formatBillingPeriodForPrice(billingPeriod)}`}</span>}
 					/>
 				</div>
 			)}
@@ -319,7 +319,7 @@ const UsagePricingForm: FC<Props> = ({ onSave, onDelete, prices }) => {
 									unit: e,
 								})
 							}
-							suffix={`/ units / ${formatBillingPeriod(billingPeriod)}`}
+							suffix={`/ units / ${formatBillingPeriodForPrice(billingPeriod)}`}
 						/>
 					</div>
 					{inputErrors.packagedModelError && <p className='text-red-500 text-sm'>{inputErrors.packagedModelError}</p>}

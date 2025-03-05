@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Pencil, Trash2 } from 'lucide-react';
-import { formatBillingPeriod, getCurrencySymbol, toSentenceCase } from '@/utils/common/helper_functions';
+import { formatBillingPeriodForPrice, getCurrencySymbol, toSentenceCase } from '@/utils/common/helper_functions';
 import { billlingPeriodOptions, currencyOptions } from '@/core/data/constants';
 import { InternalPrice } from './SetupChargesSection';
 import { CheckboxRadioGroup, FormHeader, Input, Spacer, Button, Select } from '@/components/atoms';
@@ -82,7 +82,7 @@ const RecurringChargesForm = ({ price, onAdd, onUpdate, onDelete, isEdit }: Prop
 						<span>•</span>
 						<span>
 							{getCurrencySymbol(localPrice.currency || '')}
-							{localPrice.amount} / {formatBillingPeriod(localPrice.billing_period || '')}
+							{localPrice.amount} / {formatBillingPeriodForPrice(localPrice.billing_period || '')}
 						</span>
 					</div>
 				</div>
@@ -128,7 +128,7 @@ const RecurringChargesForm = ({ price, onAdd, onUpdate, onDelete, isEdit }: Prop
 				label='Price'
 				error={errors.amount}
 				inputPrefix={getCurrencySymbol(localPrice.currency || '')}
-				suffix={<span className='text-[#64748B]'> {`per ${formatBillingPeriod(localPrice.billing_period || '')}`}</span>}
+				suffix={<span className='text-[#64748B]'> {`per ${formatBillingPeriodForPrice(localPrice.billing_period || '')}`}</span>}
 			/>
 			<Spacer height={'16px'} />
 			{/* starting billing preffercences */}
