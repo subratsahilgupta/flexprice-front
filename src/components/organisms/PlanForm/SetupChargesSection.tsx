@@ -146,12 +146,12 @@ const SetupChargesSection: React.FC<Props> = ({ plan, setPlanField }) => {
 			{fixedPrices.length > 0 && (
 				<div>
 					<FormHeader title='Recurring Charges' variant='form-component-title' />
-					{fixedPrices.map((price, index) => {
-						// Find the global index in the prices array
-						const globalIndex = prices.findIndex((p) => p === price);
+					{fixedPrices.map((price) => {
+						// Find the global index in the prices array using internal_id
+						const globalIndex = prices.findIndex((p) => p.internal_id === price.internal_id);
 						return (
 							<RecurringChargesForm
-								key={index}
+								key={price.internal_id}
 								price={price}
 								isEdit={price.isEdit || false}
 								onAdd={(newPrice) => {
@@ -159,6 +159,7 @@ const SetupChargesSection: React.FC<Props> = ({ plan, setPlanField }) => {
 										...newPrice,
 										type: SubscriptionType.FIXED,
 										isEdit: false,
+										internal_id: price.internal_id, // Preserve the internal_id
 									});
 								}}
 								onUpdate={(newPrice) => {
@@ -167,13 +168,15 @@ const SetupChargesSection: React.FC<Props> = ({ plan, setPlanField }) => {
 										handlePriceUpdate(globalIndex, {
 											...price,
 											isEdit: true,
+											internal_id: price.internal_id, // Preserve the internal_id
 										});
 									} else {
-										// Update the price while preserving the type
+										// Update the price while preserving the type and internal_id
 										handlePriceUpdate(globalIndex, {
 											...newPrice,
 											type: SubscriptionType.FIXED,
 											isEdit: false,
+											internal_id: price.internal_id, // Preserve the internal_id
 										});
 									}
 								}}
@@ -238,7 +241,7 @@ const SetupChargesSection: React.FC<Props> = ({ plan, setPlanField }) => {
 							}
 						}}
 						onDelete={(index) => {
-							const globalIndex = prices.findIndex((p) => p === usagePrices[index]);
+							const globalIndex = prices.findIndex((p) => p.internal_id === usagePrices[index].internal_id);
 							handlePriceDelete(globalIndex);
 						}}
 					/>
