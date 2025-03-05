@@ -11,8 +11,8 @@ import { PlanApi } from '@/utils/api_requests/PlanApi';
 import formatDate from '@/utils/common/format_date';
 import { formatPriceType } from '@/utils/common/helper_functions';
 import { getPriceTableCharge } from '@/utils/models/transformed_plan';
-import { useQuery } from '@tanstack/react-query';
-import { Plus } from 'lucide-react';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { EyeOff, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -137,6 +137,19 @@ const PlanDetailsPage = () => {
 		enabled: !!planId,
 	});
 
+	const { mutate: archivePlan } = useMutation({
+		mutationFn: async () => {
+			return await PlanApi.deletePlan(planId!);
+		},
+		onSuccess: () => {
+			toast.success('Plan archived successfully');
+			navigate(RouteNames.pricingPlan);
+		},
+		onError: () => {
+			toast.error('Failed to archive plan');
+		},
+	});
+
 	const { updateBreadcrumb } = useBreadcrumbsStore();
 
 	useEffect(() => {
@@ -223,7 +236,14 @@ const PlanDetailsPage = () => {
 	];
 
 	return (
-		<Page heading={planData?.name}>
+		<Page
+			heading={planData?.name}
+			headingCTA={
+				<Button onClick={() => archivePlan()} disabled={planData?.status !== 'published'} variant={'outline'} className='flex gap-2'>
+					<EyeOff />
+					Archive
+				</Button>
+			}>
 			<AddEntitlementDrawer
 				selectedFeatures={planData.entitlements?.map((v) => v.feature)}
 				entitlements={planData.entitlements}
@@ -233,22 +253,6 @@ const PlanDetailsPage = () => {
 			/>
 
 			<div className='space-y-6'>
-				{/* <div className='w-full !my-5 flex justify-between items-center'>
-					<FormHeader title={planData?.name} variant='form-title' />
-					{planData?.status === 'published' && (
-						<div className='flex gap-2'>
-							<Button disabled variant={'outline'} className='flex gap-2'>
-								<EyeOff />
-								Archive
-							</Button>
-							<Button disabled className='flex gap-2'>
-								<Pencil />
-								Edit
-							</Button>
-						</div>
-					)}
-				</div> */}
-
 				<DetailsCard variant='stacked' title='Plan Details' data={planDetails} />
 
 				{/* plan charges table */}

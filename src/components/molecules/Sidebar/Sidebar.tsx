@@ -1,7 +1,7 @@
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/components/ui/sidebar';
 import React from 'react';
 import SidebarNav, { NavItem } from './SidebarMenu';
-import { Plug2, Star, Puzzle, FileSearch, CalendarClock } from 'lucide-react';
+import { Plug2, Star, FileSearch, CalendarClock } from 'lucide-react';
 import FlexpriceSidebarFooter from './SidebarFooter';
 
 import { RouteNames } from '@/core/routes/Routes';
@@ -20,12 +20,12 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				url: RouteNames.pricingPlan,
 				icon: '/assets/svg/pricing_plan.svg',
 			},
-			{
-				title: 'Add On',
-				url: RouteNames.addOn,
-				icon: <Puzzle />,
-				disabled: true,
-			},
+			// {
+			// 	title: 'Add On',
+			// 	url: RouteNames.addOn,
+			// 	icon: <Puzzle />,
+			// 	disabled: true,
+			// },
 		],
 		'Customer Management': [
 			{
