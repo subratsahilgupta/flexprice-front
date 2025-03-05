@@ -37,11 +37,11 @@ const ActionButton: FC<ActionProps> = ({
 	const { mutate: deleteEntity } = useMutation({
 		mutationFn: deleteMutationFn,
 		onSuccess: async () => {
-			toast.success(`${entityName} deleted successfully`);
+			toast.success(`${entityName} archived successfully`);
 			await refetchQueries(refetchQueryKey);
 		},
 		onError: () => {
-			toast.error(`Failed to delete ${entityName}`);
+			toast.error(`Failed to archive ${entityName}`);
 		},
 	});
 

@@ -29,7 +29,12 @@ export const formatBillingModel = (billingModel: string) => {
 	}
 };
 
-export const formatBillingPeriod = (billingPeriod: string) => {
+/**
+ * Formats billing period for price display (e.g., "50rs/month", "100rs/day")
+ * @param billingPeriod - The billing period to format
+ * @returns The billing period in short form (day, month, year, etc.)
+ */
+export const formatBillingPeriodForPrice = (billingPeriod: string) => {
 	switch (billingPeriod.toUpperCase()) {
 		case 'DAILY':
 			return 'day';
@@ -48,7 +53,31 @@ export const formatBillingPeriod = (billingPeriod: string) => {
 	}
 };
 
-export const formatPriceType = (type: string): string => {
+/**
+ * Formats billing period for sentence display (e.g., "You will be billed monthly")
+ * @param billingPeriod - The billing period to format
+ * @returns The billing period in adjective form (monthly, annually, etc.)
+ */
+export const formatBillingPeriodForDisplay = (billingPeriod: string) => {
+	switch (billingPeriod.toUpperCase()) {
+		case 'DAILY':
+			return 'daily';
+		case 'WEEKLY':
+			return 'weekly';
+		case 'MONTHLY':
+			return 'monthly';
+		case 'ANNUAL':
+			return 'annually';
+		case 'QUARTERLY':
+			return 'quarterly';
+		case 'HALF_YEARLY':
+			return 'half-yearly';
+		default:
+			return '--';
+	}
+};
+
+export const getPriceTypeLabel = (type: string): string => {
 	switch (type.toUpperCase()) {
 		case 'FIXED':
 			return 'Recurring';

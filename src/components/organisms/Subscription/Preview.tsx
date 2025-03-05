@@ -3,7 +3,7 @@ import { ChargesForBillingPeriodOne } from './PriceTable';
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card'; // Adjust import path if necessary
 import { ChevronDownIcon, ChevronUpIcon, Info } from 'lucide-react';
-import { getTotalPayableInfo, getTotalPayableText } from '@/utils/common/helper_functions';
+import { formatBillingPeriodForDisplay, getTotalPayableInfo, getTotalPayableText } from '@/utils/common/helper_functions';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
@@ -133,7 +133,7 @@ const Preview = ({ data, className }: PreviewProps) => {
 							recurringCharges,
 							usageCharges,
 							recurringTotal,
-						)} for this subscription every month.`}
+						)} for this subscription every ${formatBillingPeriodForDisplay(data[0].billing_period || '')}`}
 					</p>
 				</CardContent>
 			</Card>

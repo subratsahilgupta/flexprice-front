@@ -150,7 +150,7 @@ const FlexpriceTable: FC<FlexpriceTableProps<any>> = ({ onRowClick, columns, dat
 								style={{ flex: width ? undefined : flex }}
 								width={width}
 								align={align}
-								className={cn(color ? `text-[${color}]` : 'text-muted-foreground', 'font-sans font-medium', className)}>
+								className={cn(color ? `text-[${color}]` : 'text-muted-foreground', 'font-sans font-medium px-3', className)}>
 								{children ? children : title}
 							</TableHead>
 						))}

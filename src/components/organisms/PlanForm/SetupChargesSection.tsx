@@ -39,11 +39,17 @@ export const AddChargesButton = ({ onClick, label }: AddChargesButtonProps) => (
 export interface InternalPrice extends Partial<Price> {
 	isEdit?: boolean;
 	isTrialPeriod?: boolean;
+	internal_id?: string;
 }
 
 const SetupChargesSection: React.FC<Props> = ({ plan, setPlanField }) => {
 	const [subscriptionType, setSubscriptionType] = useState<string>();
-	const [prices, setPrices] = useState<InternalPrice[]>(plan.prices || []);
+	const [prices, setPrices] = useState<InternalPrice[]>(
+		plan.prices?.map((price) => ({
+			...price,
+			internal_id: crypto.randomUUID(),
+		})) || [],
+	);
 
 	const getEmptyPrice = (type: SubscriptionType): InternalPrice => ({
 		amount: '',
@@ -52,8 +58,10 @@ const SetupChargesSection: React.FC<Props> = ({ plan, setPlanField }) => {
 		type,
 		isEdit: true,
 		billing_period_count: 1,
+		invoice_cadence: 'ARREAR',
 		billing_model: type === SubscriptionType.FIXED ? 'FLAT_FEE' : undefined,
 		billing_cadence: 'RECURRING',
+		internal_id: crypto.randomUUID(),
 	});
 
 	const handleSubscriptionTypeChange = (type: (typeof subscriptionTypeOptions)[0]) => {
@@ -183,19 +191,34 @@ const SetupChargesSection: React.FC<Props> = ({ plan, setPlanField }) => {
 					<UsagePricingForm
 						prices={usagePrices}
 						onSave={(newPrice) => {
+							console.log('=== Debug Usage Price Form Save ===');
+							console.log('1. New Price Object:', newPrice);
+							console.log('2. Current Usage Prices:', usagePrices);
+							console.log('3. All Prices:', prices);
+
 							const existingIndex = usagePrices.findIndex((p) => p.isEdit);
+							console.log('4. Existing Edit Index:', existingIndex);
+
 							if (existingIndex !== -1) {
-								// Update existing price
+								console.log('5. Updating existing price');
 								const globalIndex = prices.findIndex((p) => p === usagePrices[existingIndex]);
-								// Preserve the type and ensure it stays as USAGE
+								console.log('6. Global Index for Update:', globalIndex);
 								handlePriceUpdate(globalIndex, {
 									...newPrice,
 									type: SubscriptionType.USAGE,
 									isEdit: false,
 								});
 							} else if (newPrice.isEdit) {
-								// Set a price to edit mode
-								const globalIndex = prices.findIndex((p) => p === usagePrices.find((up) => up === newPrice));
+								console.log('7. Attempting to enter edit mode');
+								console.log('8. New Price to Edit:', newPrice);
+								const globalIndex = prices.findIndex((p) => p.internal_id === newPrice.internal_id);
+								console.log('10. Global Index for Edit:', globalIndex);
+
+								if (globalIndex === -1) {
+									console.warn('Warning: Could not find price to edit in global prices array');
+									return;
+								}
+
 								handlePriceUpdate(globalIndex, {
 									...prices[globalIndex],
 									type: SubscriptionType.USAGE,
@@ -209,6 +232,7 @@ const SetupChargesSection: React.FC<Props> = ({ plan, setPlanField }) => {
 										...newPrice,
 										type: SubscriptionType.USAGE,
 										isEdit: false,
+										internal_id: crypto.randomUUID(),
 									},
 								]);
 							}
