@@ -27,12 +27,15 @@ const RectangleRadiogroup: FC<Props> = ({ onChange, options, value, description,
 			<div className='w-full grid grid-cols-2 gap-4'>
 				{options.map((option, index) => {
 					return (
-						<PremiumFeature isPremiumFeature={option.premium}>
+						<PremiumFeature key={index} isPremiumFeature={option.premium}>
 							<button
-								key={index}
 								onClick={() => {
 									if (!option.disabled) {
-										onChange(option.value);
+										if (option.value === value) {
+											onChange('');
+										} else {
+											onChange(option.value);
+										}
 									}
 								}}
 								className={cn(

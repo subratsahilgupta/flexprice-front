@@ -49,8 +49,6 @@ const SelectFeature: FC<Props> = ({
 	} = useQuery({
 		queryKey: ['fetchFeatures1'],
 		queryFn: fetchFeatures,
-		retry: 2,
-		staleTime: 0,
 	});
 
 	if (isLoading) {
@@ -83,9 +81,11 @@ const SelectFeature: FC<Props> = ({
 	return (
 		<div className={cn('min-w-[200px]')}>
 			<Select
+				hideSelectedTick={true}
 				className={className}
 				error={error}
 				value={value}
+				noOptionsText='No features added yet'
 				onChange={(e) => onChange(featuresData.items.find((feature) => feature.id === e) as Feature)}
 				options={options}
 				placeholder={placeholder}

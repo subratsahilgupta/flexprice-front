@@ -13,6 +13,7 @@ export default {
 				inter: ['Inter', 'sans-serif'],
 				'open-sans': ['Open Sans', 'sans-serif'],
 				'fira-code': ['Fira Code', 'monospace'],
+				qanelas: ['Qanelas', 'sans-serif'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

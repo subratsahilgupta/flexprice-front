@@ -1,14 +1,14 @@
 import { AxiosClient } from '@/core/axios/verbs';
-import { LineItem } from '@/models/Invoice';
-import { SubscriptionUsage } from '@/models/Subscription';
+import { LineItem as InvoiceLineItem } from '@/models/Invoice';
+import { Subscription, SubscriptionUsage } from '@/models/Subscription';
 
-interface GetSubscriptionDetailsPaylaod {
+interface GetSubscriptionDetailsPayload {
 	subscription_id: string;
 	period_end?: string;
 	period_start?: string;
 }
 
-interface GetSubscriptionDetailsResponse {
+interface GetSubscriptionPreviewResponse {
 	amount_due: number;
 	amount_paid: number;
 	amount_remaining: number;
@@ -27,7 +27,7 @@ interface GetSubscriptionDetailsResponse {
 	invoice_pdf_url: string;
 	invoice_status: string;
 	invoice_type: string;
-	line_items: LineItem[];
+	line_items: InvoiceLineItem[];
 	metadata: Record<string, any>;
 	paid_at: string;
 	payment_status: string;
@@ -42,114 +42,46 @@ interface GetSubscriptionDetailsResponse {
 	voided_at: string;
 }
 
-interface SubscriptionPlan {
-	created_at: string;
-	created_by: string;
-	description: string;
-	id: string;
-	invoice_cadence: string;
-	lookup_key: string;
-	name: string;
-	prices: Price[];
-	status: string;
-	tenant_id: string;
-	trial_period: number;
-	updated_at: string;
-	updated_by: string;
+interface PauseSubscriptionPayload {
+	dry_run?: boolean;
+	metadata?: Record<string, any>;
+	pause_days?: number;
+	pause_end?: string;
+	pause_mode?: 'immediate';
+	pause_start?: string;
+	reason?: string;
 }
 
-interface Price {
-	amount: number;
-	billing_cadence: string;
-	billing_model: string;
-	billing_period: string;
-	billing_period_count: number;
+interface ResumeSubscriptionPayload {
+	dry_run?: boolean;
+	metadata?: Record<string, any>;
+	resume_mode?: 'immediate';
+}
+
+interface SubscriptionPauseResponse {
 	created_at: string;
 	created_by: string;
-	currency: string;
-	description: string;
-	display_amount: string;
-	filter_values: Record<string, any>;
+	environment_id: string;
 	id: string;
-	lookup_key: string;
 	metadata: Record<string, any>;
-	meter: Meter;
-	meter_id: string;
-	plan_id: string;
-	status: string;
+	original_period_end: string;
+	original_period_start: string;
+	pause_end: string;
+	pause_mode: any;
+	pause_start: string;
+	pause_status: any;
+	reason: string;
+	resume_mode: any;
+	resumed_at: string;
+	status: 'published';
+	subscription_id: string;
 	tenant_id: string;
-	tier_mode: string;
-	tiers: Tier[];
-	transform_quantity: TransformQuantity;
-	type: string;
 	updated_at: string;
 	updated_by: string;
 }
 
-interface Meter {
-	aggregation: Aggregation;
-	created_at: string;
-	event_name: string;
-	filters: Filter[];
-	id: string;
-	name: string;
-	reset_usage: string;
-	status: string;
-	tenant_id: string;
-	updated_at: string;
-}
-
-interface Aggregation {
-	field: string;
-	type: string;
-}
-
-interface Filter {
-	key: string;
-	values: string[];
-}
-
-interface Tier {
-	flat_amount: number;
-	unit_amount: number;
-	up_to: number;
-}
-
-interface TransformQuantity {
-	divide_by: number;
-	round: string;
-}
-
-interface Subscription {
-	billing_anchor: string;
-	billing_cadence: string;
-	billing_period: string;
-	billing_period_count: number;
-	cancel_at: string;
-	cancel_at_period_end: boolean;
-	cancelled_at: string;
-	created_at: string;
-	created_by: string;
-	currency: string;
-	current_period_end: string;
-	current_period_start: string;
-	customer_id: string;
-	end_date: string;
-	id: string;
-	invoice_cadence: string;
-	lookup_key: string;
-	plan: SubscriptionPlan;
-	plan_id: string;
-	start_date: string;
-	status: string;
-	subscription_status: string;
-	tenant_id: string;
-	trial_end: string;
-	trial_start: string;
-	updated_at: string;
-	updated_by: string;
-	version: number;
-}
+// Since both responses have the same structure, we can reuse the interface
+type SubscriptionResumeResponse = SubscriptionPauseResponse;
 
 class SubscriptionApi {
 	private static baseUrl = '/subscriptions';
@@ -162,8 +94,8 @@ class SubscriptionApi {
 		subscription_id,
 		period_end,
 		period_start,
-	}: GetSubscriptionDetailsPaylaod): Promise<GetSubscriptionDetailsResponse> {
-		return await AxiosClient.post<GetSubscriptionDetailsResponse>('invoices/preview ', {
+	}: GetSubscriptionDetailsPayload): Promise<GetSubscriptionPreviewResponse> {
+		return await AxiosClient.post<GetSubscriptionPreviewResponse>('invoices/preview', {
 			subscription_id: subscription_id,
 			period_end: period_end,
 			period_start: period_start,
@@ -172,6 +104,18 @@ class SubscriptionApi {
 
 	static async getSubscriptionById(id: string): Promise<Subscription> {
 		return await AxiosClient.get(`${this.baseUrl}/${id}`);
+	}
+
+	static async pauseSubscription(id: string, payload: PauseSubscriptionPayload): Promise<SubscriptionPauseResponse> {
+		return await AxiosClient.post(`${this.baseUrl}/${id}/pause`, payload);
+	}
+
+	static async resumeSubscription(id: string, payload: ResumeSubscriptionPayload): Promise<SubscriptionResumeResponse> {
+		return await AxiosClient.post(`${this.baseUrl}/${id}/resume`, payload);
+	}
+
+	static async cancelSubscription(id: string): Promise<void> {
+		return await AxiosClient.post(`${this.baseUrl}/${id}/cancel`);
 	}
 }
 

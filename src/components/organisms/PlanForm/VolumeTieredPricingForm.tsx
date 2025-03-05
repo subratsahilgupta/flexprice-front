@@ -2,8 +2,8 @@ import { FC } from 'react';
 import { cn } from '@/lib/utils';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { Button, Input, Spacer } from '@/components/atoms';
-import { PriceTier } from './UsagePricingForm';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
+import { PriceTier } from './UsagePricingForm';
 
 interface Props {
 	tieredPrices: PriceTier[];
@@ -104,7 +104,12 @@ const VolumeTieredPricingForm: FC<Props> = ({ setTieredPrices, tieredPrices, cur
 						{tieredPrices.map((tier, index) => (
 							<tr key={index}>
 								<td className='px-4 py-2'>
-									<Input disabled className='h-9' onChange={(e) => updateTier(index, 'from', e)} value={tier.from.toString()} />
+									<Input
+										disabled
+										className='h-9'
+										// onChange={(e) => updateTier(index, 'from', e)}
+										value={tier.from.toString()}
+									/>
 								</td>
 								<td className='px-4 py-2'>
 									<Input
@@ -127,7 +132,7 @@ const VolumeTieredPricingForm: FC<Props> = ({ setTieredPrices, tieredPrices, cur
 									<Input
 										className='h-9'
 										onChange={(e) => updatePrice(index, 'flat_amount', e)}
-										value={tier.flat_amount?.toString()}
+										value={tier.flat_amount?.toString() ?? '0'}
 										inputPrefix={currency ? `${getCurrencySymbol(currency)}` : undefined}
 										placeholder={'0'}
 									/>

@@ -11,7 +11,7 @@ import CreatePlanPage from '@/pages/product-catalog/pricingPlans/CreatePlan';
 import CustomerSubscription from '@/pages/customer/customers/CustomerSubscription';
 import CustomerDetails from '@/pages/customer/customers/CustomerDetails';
 import ErrorPage from '@/pages/error/ErrorPage';
-import PlanViewPage from '@/pages/product-catalog/pricingPlans/PlanViewPage';
+import PlanDetailsPage from '@/pages/product-catalog/pricingPlans/PlanDetailsPage';
 import EventsPage from '@/pages/usage/events/Events';
 import QueryPage from '@/pages/usage/query/Query';
 import InvoicePage from '@/pages/customer/invoices/InvoicePage';
@@ -27,26 +27,31 @@ import FeaturesPage from '@/pages/product-catalog/features/Features';
 import ImportExport from '@/pages/customer/import-export/ImportExport';
 import Integrations from '@/pages/insights-tools/integrations/Integrations';
 import IntegrationDetails from '@/pages/insights-tools/integrations/IntegrationDetails';
-
+import FeatureDetails from '@/pages/product-catalog/features/FeatureDetails';
+import AddOn from '@/pages/product-catalog/addons/AddOn';
+import CustomerInvoiceDetailsPage from '@/pages/customer/customers/CustomerInvoiceDetailsPage';
+import DeveloperPage from '@/pages/developer/developer';
+import SignupConfirmation from '@/pages/auth/SignupConfirmation';
+import ResendVerification from '@/pages/auth/ResendVerification';
+import CustomerInformation from '@/pages/customer/tabs/CustomerInformation';
 export const RouteNames = {
 	home: '/',
-	login: '/login',
+	login: '/auth',
+	signupConfirmation: '/auth/signup/confirmation',
+	resendVerification: '/auth/resend-verification',
 
 	// usage tracking routes
 	usageTracking: '/usage-tracking',
-	billableMetric: '/usage-tracking/meter',
+	meter: '/usage-tracking/meter',
 	addMeter: '/usage-tracking/meter/add-meter',
 	editMeter: '/usage-tracking/meter/edit-meter',
-	eventsPage: '/usage-tracking/events',
+	events: '/usage-tracking/events',
 	queryPage: '/usage-tracking/query',
 
 	// customer management routes
 	customerManagement: '/customer-management',
 	customers: '/customer-management/customers',
 	invoices: '/customer-management/invoices',
-	invoiceDetail: '/customer-management/invoices/:invoiceId',
-
-	// import export routes
 
 	// product catalog routes
 	productCatalog: '/product-catalog',
@@ -56,17 +61,33 @@ export const RouteNames = {
 
 	features: '/product-catalog/features',
 	createFeature: '/product-catalog/features/create-feature',
+	featureDetails: '/product-catalog/features',
+
+	// add on routes
+	addOn: '/product-catalog/add-on',
 
 	// insights and tools
 	insights: '/insights-&-tools',
 	integrations: '/insights-&-tools/integrations',
-	integrationDetails: '/insights-&-tools/integrations/:id',
+	integrationDetails: '/insights-&-tools/integrations',
 	importExport: '/insights-&-tools/bulk-imports',
+
+	// footer
+	developers: '/developers',
 };
+
 export const MainRouter = createBrowserRouter([
 	{
 		path: RouteNames.login,
 		element: <Auth />,
+	},
+	{
+		path: RouteNames.signupConfirmation,
+		element: <SignupConfirmation />,
+	},
+	{
+		path: RouteNames.resendVerification,
+		element: <ResendVerification />,
 	},
 	{
 		path: RouteNames.home,
@@ -78,13 +99,13 @@ export const MainRouter = createBrowserRouter([
 		children: [
 			{
 				path: '/',
-				element: <Navigate to={RouteNames.billableMetric} />,
+				element: <Navigate to={RouteNames.features} />,
 			},
 			{
 				path: RouteNames.usageTracking,
 				children: [
 					{
-						path: RouteNames.billableMetric,
+						path: RouteNames.meter,
 						element: <MeterPage />,
 					},
 					{
@@ -96,7 +117,7 @@ export const MainRouter = createBrowserRouter([
 						element: <EditMeterPage />,
 					},
 					{
-						path: RouteNames.eventsPage,
+						path: RouteNames.events,
 						element: <EventsPage />,
 					},
 					{
@@ -109,21 +130,13 @@ export const MainRouter = createBrowserRouter([
 				path: RouteNames.customerManagement,
 				children: [
 					{
-						path: `${RouteNames.customers}`,
+						path: RouteNames.customers,
 						element: <CustomerPage />,
 					},
 					{
 						path: `${RouteNames.customers}/:id/add-subscription`,
 						element: <CustomerSubscription />,
 					},
-					{
-						path: `${RouteNames.customers}/:id/subscription`,
-						element: <Navigate to={'/customer-management/customers'} />,
-					},
-					// {
-					// 	path: `${RouteNames.customers}/:id/subscription/:subscription_id`,
-					// 	element: <CustomerSubscription />,
-					// },
 					{
 						path: `${RouteNames.customers}/:id`,
 						element: <CustomerDetails />,
@@ -139,6 +152,10 @@ export const MainRouter = createBrowserRouter([
 								index: true,
 							},
 							{
+								path: 'information',
+								element: <CustomerInformation />,
+							},
+							{
 								path: 'wallet',
 								element: <WalletTab />,
 							},
@@ -152,7 +169,7 @@ export const MainRouter = createBrowserRouter([
 							},
 							{
 								path: 'invoice/:invoice_id',
-								element: <Invoice />,
+								element: <CustomerInvoiceDetailsPage />,
 							},
 							{
 								path: 'invoice/:invoice_id/credit-note',
@@ -165,11 +182,11 @@ export const MainRouter = createBrowserRouter([
 						],
 					},
 					{
-						path: `${RouteNames.invoices}`,
+						path: RouteNames.invoices,
 						element: <InvoicePage />,
 					},
 					{
-						path: `${RouteNames.invoiceDetail}`,
+						path: `${RouteNames.invoices}/:invoiceId`,
 						element: <InvoiceDetailsPage />,
 					},
 				],
@@ -183,7 +200,7 @@ export const MainRouter = createBrowserRouter([
 					},
 					{
 						path: `${RouteNames.pricingPlan}/:planId`,
-						element: <PlanViewPage />,
+						element: <PlanDetailsPage />,
 					},
 					{
 						path: RouteNames.createPlan,
@@ -201,6 +218,14 @@ export const MainRouter = createBrowserRouter([
 						path: RouteNames.createFeature,
 						element: <AddFeaturePage />,
 					},
+					{
+						path: `${RouteNames.featureDetails}/:id`,
+						element: <FeatureDetails />,
+					},
+					{
+						path: RouteNames.addOn,
+						element: <AddOn />,
+					},
 				],
 			},
 			{
@@ -211,14 +236,18 @@ export const MainRouter = createBrowserRouter([
 						element: <Integrations />,
 					},
 					{
-						path: RouteNames.integrationDetails,
+						path: `${RouteNames.integrationDetails}/:id`,
 						element: <IntegrationDetails />,
 					},
 					{
-						path: `${RouteNames.importExport}`,
+						path: RouteNames.importExport,
 						element: <ImportExport />,
 					},
 				],
+			},
+			{
+				path: RouteNames.developers,
+				element: <DeveloperPage />,
 			},
 		],
 	},

@@ -1,7 +1,7 @@
 import { AxiosClient } from '@/core/axios/verbs';
-import { Plan as PlanReq } from '@/store/usePlanStore';
 import { Plan } from '@/models/Plan';
 import { ExpandedPlan } from '../models/transformed_plan';
+import { PaginationType } from '@/models/Pagination';
 
 interface GetAllPlansResponse {
 	items: Plan[] | ExpandedPlan[];
@@ -11,8 +11,8 @@ interface GetAllPlansResponse {
 export class PlanApi {
 	private static baseUrl = '/plans';
 
-	public static async createPlan(data: Partial<PlanReq>) {
-		return await AxiosClient.post<Plan, Partial<PlanReq>>(this.baseUrl, data);
+	public static async createPlan(data: Partial<Plan>) {
+		return await AxiosClient.post<Plan, Partial<Plan>>(this.baseUrl, data);
 	}
 
 	public static async getAllPlans({ limit, offset }: PaginationType) {

@@ -1,5 +1,5 @@
-import { queryClient } from '@/App';
 import { Button, CheckboxRadioGroupItem, FormHeader, Modal, Select, Spacer } from '@/components/atoms';
+import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 import { Invoice } from '@/models/Invoice';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
 import { useMutation } from '@tanstack/react-query';
@@ -69,12 +69,7 @@ const InvoiceStatusModal: FC<InvoiceStatusProps> = ({ isOpen, onOpenChange, invo
 		},
 		onSuccess: async () => {
 			toast.success('Invoice status updated successfully');
-			await queryClient.invalidateQueries({
-				queryKey: ['fetchInvoices'],
-			});
-			await queryClient.refetchQueries({
-				queryKey: ['fetchInvoices'],
-			});
+			await refetchQueries(['fetchInvoices']);
 		},
 		onError: () => {
 			toast.error('Failed to update invoice status');
@@ -96,7 +91,7 @@ const InvoiceStatusModal: FC<InvoiceStatusProps> = ({ isOpen, onOpenChange, invo
 			<div className='card bg-white max-w-lg'>
 				<FormHeader
 					title='Update Invoice Status'
-					variant='form-title'
+					variant='sub-header'
 					subtitle='Updating the invoice status will not impact the payment status.'
 				/>
 				<Spacer className='!my-6' />

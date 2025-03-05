@@ -1,4 +1,4 @@
-export { default as Button } from './Button';
+export { Button, AddButton } from './Button';
 export { default as Input } from './Input';
 export { default as SectionHeader } from './SectionHeader';
 export { default as Chip } from './Chip';
@@ -32,7 +32,7 @@ export { default as DatePicker } from './DatePicker';
 
 export { default as Sheet } from './Sheet';
 
-export { default as Loader } from './Loader';
+export { default as Loader, PageLoader } from './Loader';
 
 export { default as Divider } from './Divider';
 
@@ -53,3 +53,9 @@ export { default as SelectFeature } from './SelectFeature';
 export { default as Checkbox } from './Checkbox';
 
 export { default as ComingSoonTag } from './ComingSoon';
+
+export { default as Page } from './Page';
+
+export { default as Card, CardHeader } from './Card';
+
+export * from './ShortPagination';

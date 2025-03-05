@@ -1,6 +1,7 @@
 import { FormHeader, Input, Select, Spacer } from '@/components/atoms';
 import { TopupCard } from '@/components/molecules';
 import { currencyOptions } from '@/core/data/constants';
+import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 import WalletApi from '@/utils/api_requests/WalletApi';
 import { useMutation } from '@tanstack/react-query';
 import { FC, useState } from 'react';
@@ -33,12 +34,12 @@ const CreateWallet: FC<Props> = ({ customerId, onClose = () => {} }) => {
 				name: walletName,
 			});
 		},
-
 		onError: () => {
 			toast.error('An error occurred while creating wallet');
 		},
 		onSuccess: () => {
 			toast.success('Wallet created successfully');
+			refetchQueries(['fetchWallets']);
 		},
 	});
 
@@ -58,7 +59,7 @@ const CreateWallet: FC<Props> = ({ customerId, onClose = () => {} }) => {
 	};
 
 	return (
-		<div className='w-2/3'>
+		<div>
 			<FormHeader
 				title='Create Wallet'
 				subtitle={`Manage credits for usage-based billing that can apply to invoices pre-tax.`}

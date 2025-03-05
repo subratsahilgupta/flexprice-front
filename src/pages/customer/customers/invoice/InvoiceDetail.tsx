@@ -1,28 +1,31 @@
-import { FormHeader, Spacer, Button, Divider } from '@/components/atoms';
+import { FormHeader, Spacer, Button, Divider, Page, Loader } from '@/components/atoms';
 import { DropdownMenu, DropdownMenuOption, InvoiceLineItemTable } from '@/components/molecules';
 import InvoicePaymentStatusModal from '@/components/molecules/InvoiceTable/InvoicePaymentStatusModal';
 import InvoiceStatusModal from '@/components/molecules/InvoiceTable/InvoiceStatusModal';
 import useUser from '@/hooks/useUser';
+import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
 import { captureToPdf } from '@/utils/common/component_to_pdf';
 import formatDate from '@/utils/common/format_date';
 import { useQuery } from '@tanstack/react-query';
-import { Download, EllipsisVertical, Loader } from 'lucide-react';
-import { FC, useRef, useState } from 'react';
+import { Download, EllipsisVertical } from 'lucide-react';
+import { FC, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
 interface Props {
 	invoice_id: string;
+	breadcrumb_index: number;
 }
 
-const InvoiceDetails: FC<Props> = ({ invoice_id }) => {
+const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 	// const { invoice_id } = useParams<{ invoice_id: string }>();
 	const navigate = useNavigate();
 	const [state, setState] = useState({
 		isPaymentModalOpen: false,
 		isStatusModalOpen: false,
 	});
+	const { updateBreadcrumb } = useBreadcrumbsStore();
 	const { data, isLoading, isError } = useQuery({
 		queryKey: ['fetchInvoice', invoice_id],
 		queryFn: async () => {
@@ -32,6 +35,10 @@ const InvoiceDetails: FC<Props> = ({ invoice_id }) => {
 	});
 
 	const { user } = useUser();
+
+	useEffect(() => {
+		updateBreadcrumb(breadcrumb_index, data?.invoice_number ?? invoice_id);
+	}, [invoice_id, data?.invoice_number, breadcrumb_index, updateBreadcrumb]);
 
 	const dropdownOptions: DropdownMenuOption[] = [
 		{
@@ -68,25 +75,14 @@ const InvoiceDetails: FC<Props> = ({ invoice_id }) => {
 		captureToPdf(invoiceref, 'invoice');
 	};
 
-	if (isLoading)
-		return (
-			<div className='flex justify-center items-center h-96'>
-				<Loader />
-			</div>
-		);
+	if (isLoading) return <Loader />;
 
 	if (isError) {
 		toast.error('Something went wrong');
-		return (
-			<div>
-				<p>Something went wrong</p>
-			</div>
-		);
 	}
 
 	return (
-		<div>
-			{' '}
+		<Page className='space-y-6'>
 			<InvoiceStatusModal
 				invoice={data}
 				isOpen={state.isStatusModalOpen}
@@ -110,9 +106,9 @@ const InvoiceDetails: FC<Props> = ({ invoice_id }) => {
 			<div ref={invoiceref} className=' mt-6 rounded-xl border border-gray-300 p-6'>
 				<div className='p-4'>
 					<div className='w-full flex justify-between items-center'>
-						<FormHeader className='' title='Invoice Details' variant='sub-header' titleClassName='font-semibold' />
+						<FormHeader title='Invoice Details' variant='sub-header' titleClassName='font-semibold' />
 						<div className='flex gap-4 items-center'>
-							<Button data-html2canvas-ignore='true' className='w-32 flex gap-2 bg-[#0F172A] ' onClick={handleDownlaod}>
+							<Button data-html2canvas-ignore='true' onClick={handleDownlaod}>
 								<Download />
 								<span>Download</span>
 							</Button>
@@ -158,7 +154,7 @@ const InvoiceDetails: FC<Props> = ({ invoice_id }) => {
 				</div>
 				<InvoiceLineItemTable title='Order Details' data={data?.line_items ?? []} amount_due={data?.amount_due} currency={data?.currency} />
 			</div>
-		</div>
+		</Page>
 	);
 };
 export default InvoiceDetails;

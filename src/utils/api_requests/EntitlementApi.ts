@@ -1,7 +1,9 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import { Entitlement } from '@/models/Entitlement';
+import { Plan } from '@/models/Plan';
 import { generateQueryParams } from '../common/api_helper';
-
+import { PaginationType } from '@/models/Pagination';
+import Feature from '@/models/Feature';
 interface EntitlementFilters {
 	end_time?: string;
 	expand?: string;
@@ -17,12 +19,30 @@ interface EntitlementFilters {
 	status?: 'published' | 'deleted' | 'archived';
 }
 
+export interface ExtendedEntitlement extends Entitlement {
+	plan: Plan;
+	feature: Feature;
+}
+
+interface EntitlementResponse {
+	items: ExtendedEntitlement[] | Entitlement[];
+	pagination: PaginationType;
+}
+
 class EntitlementApi {
 	private static baseUrl = '/entitlements';
 
-	public static async getEntitlements(filters: EntitlementFilters) {
+	public static async getAllEntitlements(filters: EntitlementFilters) {
 		const url = generateQueryParams(this.baseUrl, filters);
-		return await AxiosClient.get<Entitlement[]>(url);
+		return await AxiosClient.get<EntitlementResponse>(url);
+	}
+
+	public static async getEntitlementById(id: string) {
+		return await AxiosClient.get<Entitlement>(`${this.baseUrl}/${id}`);
+	}
+
+	public static async deleteEntitlementById(id: string) {
+		return await AxiosClient.delete<void>(`${this.baseUrl}/${id}`);
 	}
 }
 

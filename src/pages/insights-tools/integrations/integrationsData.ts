@@ -21,10 +21,11 @@ export const integrations: Integration[] = [
 		logo: 'https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg',
 		description: 'Send invoices, calculate tax, and collect payments.',
 		tags: ['Payments', 'Invoices'],
-		type: 'installed',
+		type: 'available',
 		accountId: 'acct_1PloOLJiOrSZFKQm',
 		mode: 'Test Mode',
 		apiKey: 'sk_test_***HT1',
+
 		installedAt: 'Feb 12, 2025, 4:17:30 PM',
 		// comingSoon: true,
 		info: [
@@ -114,8 +115,7 @@ export const integrations: Integration[] = [
 		tags: ['CRM'],
 		premium: true,
 		type: 'available',
-		description:
-			'The Zoho Books integration lets you manage critical accounting tasks—such as creating customers and invoices—directly from Flexprice. ',
+		description: 'The Zoho Books integration lets you manage critical accounting tasks directly from Flexprice. ',
 		info: [
 			{
 				title: 'Create Customer in Zoho Books',

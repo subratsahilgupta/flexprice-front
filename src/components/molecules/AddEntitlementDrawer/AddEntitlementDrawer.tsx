@@ -1,12 +1,13 @@
 import { Button, Checkbox, FormHeader, Input, Select, SelectFeature, Sheet, Spacer, Toggle } from '@/components/atoms';
 import { getFeatureIcon } from '@/components/atoms/SelectFeature/SelectFeature';
 import { billlingPeriodOptions } from '@/core/data/constants';
+import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 import { Entitlement } from '@/models/Entitlement';
 import Feature, { FeatureType } from '@/models/Feature';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
 import { useMutation } from '@tanstack/react-query';
 import { X } from 'lucide-react';
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { ReactSVG } from 'react-svg';
 
@@ -14,49 +15,210 @@ interface Props {
 	isOpen: boolean;
 	onOpenChange: (value: boolean) => void;
 	planId?: string;
+	selectedFeatures?: Feature[];
+	entitlements?: Entitlement[];
 }
 
-const AddEntitlementDrawer: FC<Props> = ({ isOpen, onOpenChange, planId }) => {
+interface ValidationErrors {
+	usage_limit?: string;
+	static_value?: string;
+	usage_reset_period?: string;
+	is_enabled?: string;
+	general?: string;
+	feature?: string;
+}
+
+const AddEntitlementDrawer: FC<Props> = ({
+	isOpen,
+	onOpenChange,
+	planId,
+	selectedFeatures: disabledFeatures,
+	entitlements: initialEntitlements,
+}) => {
 	const [entitlements, setEntitlements] = useState<Partial<Entitlement>[]>([]);
-	const [selectedFeatures, setSelectedFeatures] = useState<Feature[]>([]);
-	const [showSelect, setshowSlect] = useState(true);
-	const [activeFeature, setactiveFeature] = useState<Feature | null>(null);
-	const [tempEntitlement, setentitlement] = useState<Partial<Entitlement>>({});
+	const [errors, setErrors] = useState<ValidationErrors>({});
+	const [selectedFeatures, setSelectedFeatures] = useState<Feature[]>(disabledFeatures ?? []);
+	const [showSelect, setShowSelect] = useState(true);
+	const [activeFeature, setActiveFeature] = useState<Feature | null>(null);
+	const [tempEntitlement, setEntitlement] = useState<Partial<Entitlement>>({});
+
+	// Reset all states when drawer closes
+	const resetState = () => {
+		setEntitlements([]);
+		setErrors({});
+		setSelectedFeatures(disabledFeatures ?? []);
+		setShowSelect(true);
+		setActiveFeature(null);
+		setEntitlement({});
+	};
+
+	// Handle drawer close
+	const handleDrawerClose = (value: boolean) => {
+		if (!value) {
+			resetState();
+		}
+		onOpenChange(value);
+	};
+
+	// Reset states when drawer opens/closes
+	useEffect(() => {
+		if (isOpen) {
+			setSelectedFeatures(disabledFeatures ?? []);
+		} else {
+			resetState();
+		}
+	}, [isOpen, disabledFeatures]);
+
+	const validateMeteredFeature = (): ValidationErrors => {
+		const newErrors: ValidationErrors = {};
+
+		if (!activeFeature?.meter_id) {
+			newErrors.feature = 'Feature must have an associated meter';
+			return newErrors;
+		}
+
+		if (tempEntitlement.usage_limit === undefined && tempEntitlement.usage_limit !== null) {
+			newErrors.usage_limit = 'Usage limit is required';
+		} else if (tempEntitlement.usage_limit !== null && tempEntitlement.usage_limit < 0) {
+			newErrors.usage_limit = 'Usage limit cannot be negative';
+		}
+
+		if (!tempEntitlement.usage_reset_period && tempEntitlement.usage_reset_period !== null) {
+			newErrors.usage_reset_period = 'Usage reset period is required';
+		}
+
+		return newErrors;
+	};
+
+	const validateStaticFeature = (): ValidationErrors => {
+		const newErrors: ValidationErrors = {};
+
+		const staticValue = tempEntitlement.static_value;
+		if (staticValue === undefined || staticValue === null) {
+			newErrors.static_value = 'Value is required';
+		} else if (typeof staticValue === 'number' && staticValue < 0) {
+			newErrors.static_value = 'Value cannot be negative';
+		} else if (typeof staticValue === 'string' && !staticValue.trim()) {
+			newErrors.static_value = 'Value cannot be empty';
+		}
+
+		return newErrors;
+	};
+
+	// const validateBooleanFeature = (): ValidationErrors => {
+	// 	const newErrors: ValidationErrors = {};
+	// 	// Boolean features are always enabled by default
+	// 	return newErrors;
+	// };
+
+	const validateEntitlement = (): boolean => {
+		if (!activeFeature) {
+			setErrors({ feature: 'Please select a feature' });
+			return false;
+		}
+
+		let validationErrors: ValidationErrors = {};
+
+		switch (activeFeature.type) {
+			case FeatureType.metered:
+				validationErrors = validateMeteredFeature();
+				break;
+			case FeatureType.static:
+				validationErrors = validateStaticFeature();
+				break;
+			case FeatureType.boolean:
+				// TODO: Add validation for boolean features if needed
+				// validationErrors = validateBooleanFeature();
+				break;
+			default:
+				validationErrors = { feature: 'Invalid feature type' };
+		}
+
+		setErrors(validationErrors);
+		return Object.keys(validationErrors).length === 0;
+	};
 
 	const { mutate: addEntitleMents, isPending } = useMutation({
 		mutationKey: ['addEntitlement', tempEntitlement],
 		mutationFn: async () => {
-			return await PlanApi.updatePlan(planId!, {
-				entitlements: entitlements as Entitlement[],
+			if (!planId) {
+				throw new Error('Plan ID is required');
+			}
+			return await PlanApi.updatePlan(planId, {
+				entitlements: [...(initialEntitlements ?? []), ...entitlements] as Entitlement[],
 			});
 		},
 		onSuccess: () => {
 			toast.success('Entitlements added successfully');
-			onOpenChange(false);
+			handleDrawerClose(false);
+			refetchQueries(['fetchPlan', planId || '']);
+			refetchQueries(['fetchEntitlements', planId || '']);
 		},
 		onError: (error) => {
-			console.log(error);
+			console.error('Error adding entitlements:', error);
 			toast.error('Error adding entitlements');
-			// onOpenChange(false)
+			setErrors({ general: 'Failed to add entitlements. Please try again.' });
 		},
 	});
 
 	const handleSubmit = () => {
-		console.log(entitlements);
 		if (entitlements.length === 0) {
+			setErrors({ general: 'Please add at least one entitlement' });
+			toast.error('Please add at least one entitlement');
 			return;
 		}
 		addEntitleMents();
+	};
+
+	function handleAdd(): void {
+		if (!activeFeature) return;
+
+		if (!validateEntitlement()) {
+			// toast.error('Please fix the validation errors');
+			return;
+		}
+
+		setEntitlements([
+			...entitlements,
+			{
+				...tempEntitlement,
+				feature: activeFeature,
+				feature_id: activeFeature.id,
+				feature_type: activeFeature.type,
+				is_enabled: activeFeature.type === FeatureType.boolean ? true : undefined,
+			},
+		]);
+		setEntitlement({});
+		setActiveFeature(null);
+		setErrors({});
+	}
+
+	// Clear errors when feature changes
+	useEffect(() => {
+		setErrors({});
+	}, [activeFeature]);
+
+	const handleCancel = () => {
+		setShowSelect(true);
+		setActiveFeature(null);
+		setErrors({});
+		// Remove the feature from selectedFeatures if it was added but not saved
+		if (activeFeature) {
+			setSelectedFeatures(selectedFeatures.filter((feature) => feature.id !== activeFeature.id));
+		}
+		setEntitlement({});
 	};
 
 	return (
 		<div>
 			<Sheet
 				isOpen={isOpen}
-				onOpenChange={onOpenChange}
+				onOpenChange={handleDrawerClose}
 				title={'Add Entitlement'}
 				description={"Make changes to your profile here. Click save when you're done."}>
 				<div className='space-y-4 mt-6'>
+					{errors.general && <div className='p-3 rounded-md bg-red-50 text-red-600 text-sm mb-4'>{errors.general}</div>}
+
 					{entitlements.map((entitlement, index) => (
 						<div key={index} className='rounded-md border !p-2 !px-3 flex w-full justify-between items-center'>
 							<p className='text-[#18181B] text-sm font-medium'>{entitlement.feature?.name}</p>
@@ -74,9 +236,10 @@ const AddEntitlementDrawer: FC<Props> = ({ isOpen, onOpenChange, planId }) => {
 						<SelectFeature
 							disabledFeatures={selectedFeatures.map((feature) => feature.id)}
 							onChange={(feature) => {
-								setactiveFeature(feature);
+								setActiveFeature(feature);
 								setSelectedFeatures([...selectedFeatures, feature]);
-								setshowSlect(false);
+								setShowSelect(false);
+								setErrors({});
 							}}
 							label='Features'
 							placeholder='Select feature'
@@ -87,43 +250,60 @@ const AddEntitlementDrawer: FC<Props> = ({ isOpen, onOpenChange, planId }) => {
 					{activeFeature && (
 						<div className='card p-4'>
 							<div className='flex justify-between items-start gap-4'>
-								<FormHeader title={activeFeature?.name} variant='sub-header' subtitle={activeFeature?.lookup_key} />
-
+								<FormHeader title={activeFeature?.name} variant='sub-header' />
 								<span className='mt-1'>{getFeatureIcon(activeFeature?.type)}</span>
 							</div>
 
 							{/* metered feature */}
 							{activeFeature.type === FeatureType.metered && (
 								<div>
-									{activeFeature.meter_id && (
-										<div className='wf-ull flex justify-between items-center'>
+									{activeFeature.type === FeatureType.metered && activeFeature.meter_id && (
+										<div className='w-full flex justify-between items-center'>
 											<span className='text-muted-foreground text-sm font-sans'>Meter</span>
-
 											<span className='text-[#09090B] text-sm font-sans'>{activeFeature.meter?.name}</span>
 										</div>
 									)}
 									<Spacer className='!my-6' />
 									<Input
+										error={errors.usage_limit}
 										label='Value'
 										placeholder='Enter value'
+										disabled={tempEntitlement.usage_limit === null}
+										variant='number'
+										value={tempEntitlement.usage_limit === null ? 'Unlimited' : tempEntitlement.usage_limit?.toString() || ''}
+										onChange={(value) => {
+											const numValue = value === '' ? undefined : Number(value);
+											setEntitlement({
+												...tempEntitlement,
+												usage_limit: numValue,
+											});
+										}}
 										suffix={<span className='text-muted-foreground text-xs font-sans'>{activeFeature.unit_plural || 'units'}</span>}
 									/>
 									<Spacer className='!my-4' />
 									<Checkbox
-										// checked={false}
 										id='set-infinite'
 										label='Set value to infinite'
-										// onCheckedChange={(e) => { }}
+										checked={tempEntitlement.usage_limit === null}
+										onCheckedChange={(e) => {
+											setEntitlement({
+												...tempEntitlement,
+												usage_limit: e ? null : undefined,
+												usage_reset_period: e ? null : undefined,
+											});
+										}}
 									/>
 									<Spacer className='!my-4' />
 									<Select
+										disabled={tempEntitlement.usage_limit === null}
+										error={errors.usage_reset_period}
 										label='Usage reset'
 										placeholder='Select usage reset period'
 										options={billlingPeriodOptions}
 										description='The values get reset in the given interval'
-										value={tempEntitlement.usage_reset_period}
+										value={tempEntitlement.usage_reset_period ?? ''}
 										onChange={(value) => {
-											setentitlement({
+											setEntitlement({
 												...tempEntitlement,
 												usage_reset_period: value,
 											});
@@ -135,84 +315,72 @@ const AddEntitlementDrawer: FC<Props> = ({ isOpen, onOpenChange, planId }) => {
 										label='Soft Limit'
 										description='When soft limit is enabled, the access is always granted, even with zero balance'
 										onChange={(value) => {
-											setentitlement({
+											setEntitlement({
 												...tempEntitlement,
 												is_soft_limit: value,
 											});
 										}}
 									/>
-									<Spacer className='!my-4' />
-									{/* <Toggle
-                                        checked={false}
-                                        label='Preserve Overage at reset'
-                                        onChange={(value) => { 
-                                            setentitlement({
-                                                ...tempEntitlement,
-                                                preserve_overage: value
-                                            })
-                                        }}
-                                    /> */}
 								</div>
 							)}
-
-							{/* boolean features */}
 
 							{/* static features */}
 							{activeFeature.type === FeatureType.static && (
 								<div>
 									<Input
+										error={errors.static_value}
 										label='Value'
+										value={tempEntitlement.static_value === undefined ? '' : tempEntitlement.static_value.toString()}
 										placeholder='Enter value'
-										suffix={<span className='text-muted-foreground text-xs font-sans'>{activeFeature.unit_plural || 'units'}</span>}
+										onChange={(value) => {
+											setEntitlement({
+												...tempEntitlement,
+												static_value: value === '' ? undefined : value,
+											});
+										}}
 									/>
 								</div>
 							)}
 
+							{/* boolean features */}
+							{/* {activeFeature.type === FeatureType.boolean && (
+								<div>
+									<Toggle
+										error={errors.is_enabled}
+										checked={tempEntitlement.is_enabled ?? false}
+										label='Enable Feature'
+										onChange={(value) => {
+											setEntitlement({
+												...tempEntitlement,
+												is_enabled: value,
+											});
+										}}
+									/>
+								</div>
+							)} */}
+
 							<div className='w-full mt-6 flex justify-end gap-2'>
-								<Button
-									onClick={() => {
-										setshowSlect(true);
-										setactiveFeature(null);
-										console.log(tempEntitlement);
-									}}
-									variant={'outline'}>
+								<Button onClick={handleCancel} variant={'outline'}>
 									Cancel
 								</Button>
-								<Button
-									onClick={() => {
-										setshowSlect(true);
-										setEntitlements([
-											...entitlements,
-											{
-												...tempEntitlement,
-												feature: activeFeature,
-												feature_id: activeFeature.id,
-												feature_type: activeFeature.type,
-											},
-										]);
-										setentitlement({});
-										setactiveFeature(null);
-										console.log(tempEntitlement);
-									}}>
-									Add
-								</Button>
+								<Button onClick={handleAdd}>Add</Button>
 							</div>
 						</div>
 					)}
 				</div>
 
 				<div className='!space-y-4 mt-4'>
-					{showSelect && (
+					{!showSelect && !activeFeature && (
 						<button
 							onClick={() => {
-								setshowSlect(true);
+								setShowSelect(true);
 							}}
 							className='p-4 h-9 cursor-pointer flex gap-2 items-center bg-[#F4F4F5] rounded-md'>
 							<ReactSVG src='/assets/svg/CirclePlus.svg' />
-							<p className='text-[#18181B] text-sm font-medium'>{'Add another feature '}</p>
+							<p className='text-[#18181B] text-sm font-medium'>{'Add another feature'}</p>
 						</button>
 					)}
-					<Button onClick={handleSubmit} disabled={isPending}>
+					<Button isLoading={isPending} onClick={handleSubmit} disabled={isPending}>
 						Save
 					</Button>
 				</div>

@@ -1,5 +1,5 @@
-import { Button, Chip, Loader, SectionHeader } from '@/components/atoms';
-import { ColumnData, DropdownMenu, FlexpriceTable, ImportFileDrawer, Pagination } from '@/components/molecules';
+import { Button, Chip, Loader, Page, ShortPagination } from '@/components/atoms';
+import { ColumnData, FlexpriceTable, ImportFileDrawer } from '@/components/molecules';
 import { EmptyPage } from '@/components/organisms';
 import usePagination from '@/hooks/usePagination';
 import { ImportTask } from '@/models/ImportTask';
@@ -23,50 +23,34 @@ const mapStatusChips = (status: string) => {
 
 const columns: ColumnData<ImportTask>[] = [
 	{
-		fieldName: 'file_name',
 		title: 'File Name',
 		render(rowData) {
 			return <div>{rowData.file_name || '--'}</div>;
 		},
+		fieldVariant: 'title',
 	},
 	{
-		fieldName: 'task_type',
-		title: 'Import Type',
+		title: 'Entity Type',
 		render(rowData) {
-			return <div>{toSentenceCase(rowData.task_type)}</div>;
+			return <div>{toSentenceCase(rowData.entity_type)}</div>;
 		},
-		align: 'center',
 	},
 	{
-		fieldName: 'status',
 		title: 'Status',
-		align: 'center',
+
 		render(rowData) {
 			return (
-				<Chip
-					label={mapStatusChips(rowData?.task_status || '')}
-					isActive={rowData?.task_status === 'COMPLETED'}
-					inactiveTextColor='#DC2626'
-					inactiveBgColor='#FEE2E2'
-				/>
+				<Chip variant={rowData?.task_status === 'COMPLETED' ? 'success' : 'default'} label={mapStatusChips(rowData?.task_status || '')} />
 			);
 		},
 	},
 	{
-		fieldName: 'started_at',
 		title: 'Started At',
 		render: (rowData) => formatDate(rowData.started_at),
 	},
 	{
-		fieldName: 'updated_at',
 		title: 'Updated At',
 		render: (rowData) => formatDate(rowData.updated_at),
-	},
-	{
-		fieldName: 'id',
-		title: '',
-		width: '40px',
-		render: () => <DropdownMenu options={[]}></DropdownMenu>,
 	},
 ];
 const ImportExport = () => {
@@ -93,7 +77,6 @@ const ImportExport = () => {
 				offset,
 			});
 		},
-		staleTime: 0,
 	});
 
 	if (isLoading) {
@@ -117,23 +100,25 @@ const ImportExport = () => {
 	}
 
 	return (
-		<div className='page'>
+		<Page
+			heading='Bulk Imports'
+			headingCTA={
+				<>
+					<Button
+						variant='outline'
+						onClick={() => {
+							refetchTasks();
+						}}>
+						<RefreshCw />
+					</Button>
+					<Button onClick={() => setdrawerOpen(true)} className='flex gap-2 items-center '>
+						<Import />
+						<span>Import File</span>
+					</Button>
+				</>
+			}>
 			{/* import export drawer */}
 			<ImportFileDrawer taskId={activeTask} isOpen={drawerOpen} onOpenChange={(value) => setdrawerOpen(value)} />
-
-			<SectionHeader showFilter showSearch title='Bulk Imports'>
-				<Button
-					variant='outline'
-					onClick={() => {
-						refetchTasks();
-					}}>
-					<RefreshCw />
-				</Button>
-				<Button onClick={() => setdrawerOpen(true)} className='flex gap-2 items-center '>
-					<Import />
-					<span>Import File</span>
-				</Button>
-			</SectionHeader>
 
 			<div>
 				<FlexpriceTable
@@ -144,12 +129,11 @@ const ImportExport = () => {
 					data={data?.items ?? []}
 					columns={columns}
 					showEmptyRow
-					emptyRowText='No data found'
 				/>
 
-				<Pagination totalPages={Math.ceil((data?.pagination.total ?? 1) / limit)} />
+				<ShortPagination unit='Import Tasks' totalItems={data?.pagination.total ?? 0} />
 			</div>
-		</div>
+		</Page>
 	);
 };
 

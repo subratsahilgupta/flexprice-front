@@ -1,5 +1,5 @@
-import { Button, Loader, SectionHeader, Spacer } from '@/components/atoms';
-import { FeatureTable, Pagination } from '@/components/molecules';
+import { AddButton, Button, Loader, Page, ShortPagination, Spacer } from '@/components/atoms';
+import { FeatureTable } from '@/components/molecules';
 import { RouteNames } from '@/core/routes/Routes';
 import usePagination from '@/hooks/usePagination';
 import FeatureApi from '@/utils/api_requests/FeatureApi';
@@ -12,7 +12,7 @@ import { ReactSVG } from 'react-svg';
 const FeaturesPage = () => {
 	const { limit, offset, page } = usePagination();
 
-	const fetchMeters = async () => {
+	const fetchFeatures = async () => {
 		return await FeatureApi.getAllFeatures({
 			limit,
 			offset,
@@ -25,10 +25,10 @@ const FeaturesPage = () => {
 		isError,
 	} = useQuery({
 		queryKey: ['fetchFeatures', page],
-		queryFn: fetchMeters,
-		retry: 2,
-		staleTime: 0,
+		queryFn: fetchFeatures,
 	});
+
+	console.log(featureData, isLoading);
 
 	if (isLoading) {
 		return <Loader />;
@@ -48,10 +48,7 @@ const FeaturesPage = () => {
 					</p>
 					<Spacer height={'16px'} />
 					<Link to={RouteNames.createFeature}>
-						<Button className='w-32 flex gap-2 bg-[#0F172A] '>
-							<Star />
-							<span>Add Feature</span>
-						</Button>
+						<Button prefixIcon={<Star />}>Add Feature</Button>
 					</Link>
 				</div>
 			</div>
@@ -59,23 +56,19 @@ const FeaturesPage = () => {
 	}
 
 	return (
-		<div className='page'>
-			<SectionHeader showFilter showSearch className='' title='Features'>
-				<div className='flex gap-2 w-full'>
-					<Link to={RouteNames.createFeature}>
-						<Button className='w-32 flex gap-2 bg-[#0F172A]  '>
-							<Star />
-							<span>Add Feature</span>
-						</Button>
-					</Link>
-				</div>
-			</SectionHeader>
-			<div className=''>
+		<Page
+			heading='Features'
+			headingCTA={
+				<Link to={RouteNames.createFeature}>
+					<AddButton />
+				</Link>
+			}>
+			<div>
 				<FeatureTable data={featureData?.items || []} />
 				<Spacer className='!h-4' />
-				<Pagination totalPages={Math.ceil((featureData?.pagination.total ?? 1) / limit)} />
+				<ShortPagination unit='Features' totalItems={featureData?.pagination.total ?? 0} />
 			</div>
-		</div>
+		</Page>
 	);
 };
 

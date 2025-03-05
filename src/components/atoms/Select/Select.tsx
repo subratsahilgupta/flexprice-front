@@ -26,6 +26,7 @@ interface Props {
 	isRadio?: boolean;
 	className?: string;
 	noOptionsText?: string;
+	hideSelectedTick?: boolean;
 }
 
 const RadioSelectItem = React.forwardRef<
@@ -65,12 +66,13 @@ const FlexPriceSelect: React.FC<Props> = ({
 	className,
 	noOptionsText,
 	defaultOpen,
+	hideSelectedTick = true,
 }) => {
 	return (
 		<div className={cn('space-y-1 ')}>
 			{/* Label */}
 			{label && (
-				<label className={cn('font-inter block text-sm font-medium text-zinc', disabled ? 'text-zinc-500' : 'text-zinc-950')}>
+				<label className={cn('font-inter block text-sm font-medium text-zinc break-words', disabled ? 'text-zinc-500' : 'text-zinc-950')}>
 					{label}
 				</label>
 			)}
@@ -79,7 +81,6 @@ const FlexPriceSelect: React.FC<Props> = ({
 				defaultOpen={defaultOpen}
 				defaultValue={value || ''}
 				onValueChange={(newValue) => {
-					console.log('newValue', newValue);
 					if (onChange) {
 						onChange(newValue === value ? '' : newValue);
 					}
@@ -91,7 +92,7 @@ const FlexPriceSelect: React.FC<Props> = ({
 						{value ? options.find((option) => option.value === value)?.label.trim() : placeholder}
 					</span>
 				</SelectTrigger>
-				<SelectContent>
+				<SelectContent className='w-[var(--radix-select-trigger-width)]'>
 					<SelectGroup>
 						{options.length > 0 &&
 							options.map((option) => {
@@ -102,10 +103,12 @@ const FlexPriceSelect: React.FC<Props> = ({
 											disabled={option.disabled}
 											key={option.value}
 											value={option.value}>
-											<div className='flex items-center space-x-2'>
-												<div className='flex flex-col mr-2'>
-													<span>{option.label}</span>
-													{option.description && <span className='text-sm text-gray-500'>{option.description}</span>}
+											<div className='flex items-center space-x-2 w-full'>
+												<div className='flex flex-col mr-2 w-full'>
+													<span className='break-words'>{option.label}</span>
+													{option.description && (
+														<span className='text-sm text-gray-500 break-words whitespace-normal'>{option.description}</span>
+													)}
 												</div>
 											</div>
 										</RadioSelectItem>
@@ -114,6 +117,7 @@ const FlexPriceSelect: React.FC<Props> = ({
 									return (
 										<ShadcnSelect
 											className={cn(
+												'w-full',
 												'cursor-pointer',
 												option.disabled && 'select-none cursor-not-allowed',
 												'flex items-center space-x-2 justify-between w-full',
@@ -125,14 +129,18 @@ const FlexPriceSelect: React.FC<Props> = ({
 												className={cn(
 													'flex w-full items-center space-x-2 justify-between',
 													option.disabled && 'opacity-50 pointer-events-none',
+													option.suffixIcon && 'pr-8',
+													hideSelectedTick && '!pl-0',
 												)}>
 												{option.prefixIcon && option.prefixIcon}
 
-												<div className='flex flex-col mr-2'>
-													<span>{option.label}</span>
-													{option.description && <span className='text-sm text-gray-500'>{option.description}</span>}
+												<div className={cn('flex flex-col w-full', !hideSelectedTick && 'mr-0')}>
+													<span className='break-words'>{option.label}</span>
+													{option.description && (
+														<span className='text-sm text-gray-500 break-words whitespace-normal'>{option.description}</span>
+													)}
 												</div>
-												{option.suffixIcon && <span className='absolute right-2 top-2'>{option.suffixIcon}</span>}
+												{option.suffixIcon && <span className='absolute right-2 top-1/2 -translate-y-1/2'>{option.suffixIcon}</span>}
 											</div>
 										</ShadcnSelect>
 									);
@@ -140,9 +148,9 @@ const FlexPriceSelect: React.FC<Props> = ({
 							})}
 						{options.length === 0 && noOptionsText && (
 							<ShadcnSelect value='no-items' disabled>
-								<div className='flex items-center space-x-2'>
-									<div className='flex flex-col mr-2'>
-										<span>{noOptionsText}</span>
+								<div className='flex items-center space-x-2 w-full'>
+									<div className='flex flex-col mr-2 w-full'>
+										<span className='break-words'>{noOptionsText}</span>
 									</div>
 								</div>
 							</ShadcnSelect>
@@ -151,10 +159,10 @@ const FlexPriceSelect: React.FC<Props> = ({
 				</SelectContent>
 			</Select>
 			{/* Description */}
-			{description && <p className='text-sm text-muted-foreground'>{description}</p>}
+			{description && <p className='text-sm text-muted-foreground break-words'>{description}</p>}
 
 			{/* Error Message */}
-			{error && <p className='text-sm text-destructive'>{error}</p>}
+			{error && <p className='text-sm text-destructive break-words'>{error}</p>}
 		</div>
 	);
 };

@@ -1,31 +1,40 @@
 import * as React from 'react';
 import { FC, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
-import { useNavigate } from 'react-router-dom';
 
-export interface ColumnData<T = any> {
-	fieldName: keyof T;
-	title: string;
+interface BaseColumnData<T> {
+	title?: string;
 	flex?: number;
 	width?: number | string;
 	color?: string;
 	textColor?: string;
 	suffixIcon?: ReactNode;
 	align?: 'left' | 'center' | 'right' | 'justify';
-	render?: (rowData: T) => ReactNode;
-	children?: ReactNode;
 	className?: string;
-	redirect?: boolean;
-	onCLick?: (row: T) => void;
+	fieldVariant?: 'default' | 'title' | 'link' | 'icon' | 'interactive';
+	hideOnEmpty?: boolean;
+	onCellClick?: (row: T, e: React.MouseEvent) => void;
+	children?: ReactNode;
 }
 
-export interface FlexpriceTableProps {
-	columns: ColumnData[];
-	redirectUrl?: string;
-	data: any[];
-	onRowClick?: (row: any) => void;
+interface FieldNameColumn<T> extends BaseColumnData<T> {
+	fieldName: keyof T;
+	render?: never;
+}
+
+interface RenderColumn<T> extends BaseColumnData<T> {
+	fieldName?: never;
+	render: (rowData: T) => ReactNode;
+}
+
+export type ColumnData<T = any> = FieldNameColumn<T> | RenderColumn<T>;
+
+export interface FlexpriceTableProps<T> {
+	columns: ColumnData<T>[];
+	data: T[];
+	onRowClick?: (row: T) => void;
 	showEmptyRow?: boolean;
-	emptyRowText?: string;
+	hideBottomBorder?: boolean;
 }
 
 // Table structure components
@@ -42,9 +51,7 @@ const TableHeader = React.forwardRef<HTMLTableSectionElement, React.HTMLAttribut
 TableHeader.displayName = 'TableHeader';
 
 const TableBody = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
-	({ className, ...props }, ref) => (
-		<tbody ref={ref} className={cn('border-b border-[#E2E8F0] [&_tr:last-child]:border-0', className)} {...props} />
-	),
+	({ className, ...props }, ref) => <tbody ref={ref} className={cn('[&_tr:last-child]:border-0', className)} {...props} />,
 );
 TableBody.displayName = 'TableBody';
 
@@ -92,20 +99,58 @@ const TableCell = React.forwardRef<
 TableCell.displayName = 'TableCell';
 
 // Main FlexpriceTable Component
-const FlexpriceTable: FC<FlexpriceTableProps> = ({ onRowClick, columns, data, redirectUrl, showEmptyRow, emptyRowText }) => {
-	const navigate = useNavigate();
+const FlexpriceTable: FC<FlexpriceTableProps<any>> = ({ onRowClick, columns, data, showEmptyRow, hideBottomBorder = true }) => {
+	const isInteractiveElement = (element: HTMLElement | null): boolean => {
+		if (!element) return false;
+
+		// Check for data-interactive attribute
+		if (element.getAttribute('data-interactive') === 'true') return true;
+
+		// Check for interactive elements
+		const interactiveElements = ['button', 'a', 'input', 'select', 'textarea'];
+		if (interactiveElements.includes(element.tagName.toLowerCase())) return true;
+
+		// Check parent elements
+		return element.closest('[data-interactive="true"]') !== null;
+	};
+
+	const handleRowClick = (row: any, e: React.MouseEvent) => {
+		const target = e.target as HTMLElement;
+
+		// Don't trigger row click if the click was on or within an interactive element
+		if (isInteractiveElement(target)) {
+			return;
+		}
+
+		onRowClick?.(row);
+	};
+
+	const handleCellClick = (e: React.MouseEvent, row: any, onCellClick?: (row: any, e: React.MouseEvent) => void) => {
+		const target = e.target as HTMLElement;
+
+		// Don't trigger cell click if the click was on or within an interactive element
+		if (isInteractiveElement(target)) {
+			return;
+		}
+
+		if (onCellClick) {
+			e.stopPropagation(); // Stop row click if cell has click handler
+			onCellClick(row, e);
+		}
+	};
+
 	return (
-		<div>
+		<div className={cn(!hideBottomBorder && 'border-b border-[#E2E8F0]')}>
 			<Table>
 				<TableHeader>
 					<TableRow>
-						{columns.map(({ title, flex = 1, width, color = '#64748B', align = 'left', children, className }, index) => (
+						{columns.map(({ title, flex = 1, width, color = '#64748B', align = 'left', className, children }, index) => (
 							<TableHead
 								key={index}
 								style={{ flex: width ? undefined : flex }}
 								width={width}
 								align={align}
-								className={cn(color ? `text-[${color}]` : 'text-[#64748B]', className)}>
+								className={cn(color ? `text-[${color}]` : 'text-muted-foreground', 'font-sans font-medium', className)}>
 								{children ? children : title}
 							</TableHead>
 						))}
@@ -113,64 +158,98 @@ const FlexpriceTable: FC<FlexpriceTableProps> = ({ onRowClick, columns, data, re
 				</TableHeader>
 				<TableBody>
 					{data.length > 0 &&
-						data?.map((row, rowIndex) => (
-							<TableRow
-								onClick={() => {
-									if (onRowClick) {
-										onRowClick(row);
-									}
-								}}
-								key={rowIndex}>
-								{columns.map(
-									(
-										{ fieldName: name, flex = 1, width, textColor = 'inherit', align = 'left', render, redirect = true, onCLick },
-										colIndex,
-									) => (
-										<TableCell
-											onClick={() => {
-												if (redirect && redirectUrl) {
-													navigate(`${redirectUrl}${row?.id}`);
-												}
-												if (onCLick) {
-													onCLick(row);
-												}
-											}}
-											key={colIndex}
-											className={cn(
-												textColor ? `text-[${textColor}]` : 'text-[#09090B] w-full ',
-												'font-normal',
-												'!max-h-8 px-4 py-2 text-[14px]',
-												redirect && redirectUrl ? 'cursor-pointer' : 'cursor-default',
-											)}
-											style={{ flex: width ? undefined : flex }}
-											width={width}
-											align={align}>
-											{render ? render(row) : row[name]}
-										</TableCell>
-									),
-								)}
-							</TableRow>
-						))}
-					{data.length === 0 &&
-						showEmptyRow &&
-						columns.map(({ flex = 1, width, textColor = 'inherit', align = 'left', redirect = true }, colIndex) => (
-							<TableCell
-								key={colIndex}
-								className={cn(
-									textColor ? `text-[${textColor}]` : 'text-[#09090B] w-full ',
-									'font-normal',
-									'!max-h-8 px-4 py-2 text-[14px]',
-									redirect && redirectUrl ? 'cursor-pointer' : 'cursor-default',
-								)}
-								style={{ flex: width ? undefined : flex }}
-								width={width}
-								align={align}>
-								--
-							</TableCell>
-						))}
+						data?.map((row, rowIndex) => {
+							const lastRow = rowIndex === data.length - 1;
+							return (
+								<TableRow
+									onClick={(e) => handleRowClick(row, e)}
+									className={cn(
+										'transition-colors hover:bg-muted/50',
+										!lastRow && 'border-b border-[#E2E8F0]',
+										onRowClick && 'cursor-pointer hover:bg-muted/50',
+										lastRow && hideBottomBorder && 'border-b-0',
+									)}
+									key={rowIndex}>
+									{columns.map(
+										(
+											{
+												fieldName: name,
+												flex = 1,
+												width,
+												textColor = 'inherit',
+												align = 'left',
+												render,
+												onCellClick: onCLick,
+												suffixIcon,
+												fieldVariant = 'default',
+											},
+											colIndex,
+										) => {
+											return (
+												<TableCell
+													onClick={(e) => handleCellClick(e, row, onCLick)}
+													key={colIndex}
+													data-interactive={fieldVariant === 'interactive'}
+													className={cn(
+														textColor ? `text-[${textColor}]` : 'text-muted-foreground',
+														'font-normal',
+														'!max-h-8 px-3 py-2 text-[14px]',
+														onCLick && 'cursor-pointer hover:bg-muted/50',
+														fieldVariant === 'title' ? 'font-medium text-foreground' : '!font-normal text-muted-foreground',
+														fieldVariant === 'link' && 'cursor-pointer text-primary hover:underline',
+														fieldVariant === 'icon' && 'w-10',
+														fieldVariant === 'interactive' && 'cursor-default',
+													)}
+													style={{ flex: width ? undefined : flex }}
+													width={width}
+													align={align}>
+													{render ? (
+														<div
+															data-interactive={fieldVariant === 'interactive'}
+															className={cn(
+																onCLick && 'cursor-pointer',
+																fieldVariant === 'interactive' && 'data-interactive="true"',
+																fieldVariant === 'link' && 'cursor-pointer hover:underline',
+															)}>
+															{render(row)}
+															{suffixIcon && suffixIcon}
+														</div>
+													) : (
+														<div className={cn(onCLick && 'cursor-pointer', fieldVariant === 'link' && 'cursor-pointer hover:underline')}>
+															{row[name]}
+														</div>
+													)}
+												</TableCell>
+											);
+										},
+									)}
+								</TableRow>
+							);
+						})}
+					{data.length === 0 && showEmptyRow && (
+						<TableRow className={cn(hideBottomBorder && 'border-b-0')}>
+							{columns.map(({ flex = 1, width, textColor = 'inherit', align = 'left', hideOnEmpty }, colIndex) => {
+								const lastRow = colIndex === columns.length - 1;
+								return (
+									<TableCell
+										key={colIndex}
+										className={cn(
+											textColor ? `text-[${textColor}]` : 'text-[#09090B] w-full ',
+											'font-normal',
+											'!max-h-8 px-4 py-2 text-[14px]',
+											lastRow ? 'text-center' : '',
+										)}
+										style={{ flex: width ? undefined : flex }}
+										width={width}
+										align={align}>
+										{lastRow && hideOnEmpty ? '' : '--'}
+									</TableCell>
+								);
+							})}
+						</TableRow>
+					)}
 				</TableBody>
 			</Table>
-			{data.length === 0 && !showEmptyRow && <p className=' text-[#64748B] text-xs font-normal font-sans mt-4'>{emptyRowText}</p>}
 		</div>
 	);
 };

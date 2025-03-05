@@ -9,7 +9,7 @@ import TaskApi from '@/utils/api_requests/TaskApi';
 import { ImportTask } from '@/models/ImportTask';
 import { toSentenceCase } from '@/utils/common/helper_functions';
 import toast from 'react-hot-toast';
-import { queryClient } from '@/App';
+import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 
 interface Props {
 	isOpen: boolean;
@@ -49,11 +49,15 @@ const mapStatusChips = (status: string) => {
 };
 
 const getLicenseKey = (tab: string): string => {
-	switch (tab) {
+	switch (tab.toLowerCase()) {
+		// this is original license key for events
 		case 'events':
 			return 'Nd50fKMwC54Ri7AoD4ifG1dxL7koqW';
-		case 'price':
-			return '3DzHoox4HqnuXcpdmjmgxNRGRR0RWP';
+
+		// this is original license key for customers
+		case 'customers':
+			return 'W5t0iJSKSM3AH8Etzq9Jf3X3lvsKuw';
+
 		case 'feature':
 			return '2tzeM0vIEIITBYCuSStqjhJnhJIhfi';
 		case 'feature_mapping':
@@ -62,15 +66,31 @@ const getLicenseKey = (tab: string): string => {
 			return 'Nd50fKMwC54Ri7AoD4ifG1dxL7koqW';
 	}
 };
+
+const getSampleFileUrl = (tab: string): string => {
+	switch (tab.toLowerCase()) {
+		case 'events':
+			return '/assets/csv/sample.csv';
+		case 'customer':
+			return '/assets/csv/sample_customer.csv';
+		case 'feature':
+			return '/assets/csv/sample.csv';
+		case 'feature_mapping':
+			return '/assets/csv/sample_feature_mapping.csv';
+		default:
+			return '/assets/csv/sample_event.csv';
+	}
+};
+
 const getTaskStatusChips = (status: string) => {
 	if (status === 'COMPLETED') {
-		return <Chip isActive={true} label={mapStatusChips(status)} />;
+		return <Chip variant='success' label={mapStatusChips(status)} />;
 	} else if (status === 'FAILED') {
-		return <Chip isActive={true} activeTextColor='#DC2626' activeBgColor='#FEE2E2' label={mapStatusChips(status)} />;
+		return <Chip variant='failed' label={mapStatusChips(status)} />;
 	} else if (status === 'PROCESSING' || status === 'PENDING') {
-		return <Chip label={mapStatusChips(status)} />;
+		return <Chip variant='default' label={mapStatusChips(status)} />;
 	} else {
-		return <Chip isActive={false} label={status} />;
+		return <Chip variant='default' label={status} />;
 	}
 };
 
@@ -81,9 +101,8 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 			value: 'EVENTS',
 		},
 		{
-			label: 'Prices',
-			value: 'PRICES',
-			disabled: true,
+			label: 'Customers',
+			value: 'CUSTOMERS',
 		},
 	];
 	const fileTypeOptions: SelectOption[] = [
@@ -117,6 +136,7 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 		() => `${entityType?.value ? getLicenseKey(entityType.value) : ''}-${JSON.stringify(entityType?.label)}`,
 		[entityType],
 	);
+	console.log(entityType, csvBoxKey);
 
 	const [errors, seterrors] = useState({
 		file: '',
@@ -144,8 +164,7 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 			setEntityType(undefined);
 			setUploadedFile(undefined);
 			console.log(data);
-			await queryClient.invalidateQueries({ queryKey: ['importTasks'], exact: false });
-			await queryClient.refetchQueries({ queryKey: ['importTasks'], exact: false });
+			await refetchQueries('importTasks');
 		},
 		onError: (error) => {
 			console.log(error);
@@ -163,7 +182,6 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 			return await TaskApi.getTaskById((taskId ?? task?.id) || '');
 		},
 		enabled: Boolean(taskId ?? task?.id) && isOpen,
-		staleTime: 0,
 	});
 
 	useEffect(() => {
@@ -226,17 +244,18 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 		},
 	];
 
-	const handleImport = () => {
+	const handleImport = (file?: Partial<ImportMeta>) => {
 		seterrors({} as any);
-		if (!uploadedFile) {
+		if (!file && !uploadedFile) {
 			seterrors((prev) => ({ ...prev, file: 'Please upload a file' }));
 		}
 		if (!entityType) {
 			seterrors((prev) => ({ ...prev, entity_type: 'Please select an entity type' }));
 		}
+		console.log(file, uploadedFile, entityType);
 
-		if (uploadedFile && entityType) {
-			addTask(uploadedFile);
+		if (file || (uploadedFile && entityType)) {
+			addTask(file || uploadedFile);
 		}
 	};
 
@@ -316,6 +335,7 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 										onImport={(data: boolean, meta: ImportMeta) => {
 											setUploadedFile(meta);
 											if (data) {
+												handleImport(meta);
 												toast.success(`${meta.original_filename} uploaded successfully`);
 											} else {
 												toast.error(`${meta.original_filename} upload failed`);
@@ -354,7 +374,7 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 												className='flex gap-2 !p-0 m-0 underline'
 												variant={'link'}
 												onClick={() => {
-													window.open('/assets/csv/sample.csv', '_blank');
+													window.open(getSampleFileUrl(entityType?.value || ''), '_blank');
 												}}>
 												Sample CSV
 												<Download className='size-4 underline' />
@@ -460,8 +480,7 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 							disabled={isPending || isLoading || !uploadedFile || !entityType}
 							onClick={() => {
 								handleImport();
-							}}
-							className=''>
+							}}>
 							{isPending ? <LoaderCircleIcon className='size-4 animate-spin' /> : 'Import Data'}
 						</Button>
 					)}

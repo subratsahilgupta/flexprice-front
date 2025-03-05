@@ -1,7 +1,6 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import { generateQueryParams } from '../common/api_helper';
 import { Event } from '@/models/Event';
-
 interface GetEventsPayload {
 	external_customer_id?: string;
 	event_name?: string;

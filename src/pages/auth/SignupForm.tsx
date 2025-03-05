@@ -1,0 +1,173 @@
+import React, { useState } from 'react';
+import { Button, Input } from '@/components/atoms';
+import toast from 'react-hot-toast';
+import supabase from '@/core/supbase/config';
+import AuthApi from '@/utils/api_requests/AuthApi';
+import { useMutation } from '@tanstack/react-query';
+import { EyeOff } from 'lucide-react';
+import { EyeIcon } from 'lucide-react';
+import { RouteNames } from '@/core/routes/Routes';
+import { useNavigate } from 'react-router-dom';
+interface SignupFormProps {
+	switchTab: (tab: string) => void;
+}
+
+interface SignupData {
+	email: string;
+	password: string;
+	confirmPassword: string;
+}
+const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
+	const navigate = useNavigate();
+	const environment = import.meta.env.VITE_ENVIRONMENT;
+	console.log('environment', environment);
+	const [signupData, setSignupData] = useState<SignupData>({
+		email: '',
+		password: '',
+		confirmPassword: '',
+	});
+	const [showPassword, setShowPassword] = useState(false);
+	const [errors, setErrors] = useState<Partial<SignupData>>({});
+
+	// Use React Query for signup mutation
+	const { mutate: signup, isPending: isSignupPending } = useMutation({
+		mutationFn: async () => {
+			return await AuthApi.signup({
+				email: signupData.email,
+				password: signupData.password,
+			});
+		},
+		onSuccess: () => {
+			toast.success('Account created successfully! Please check your email to confirm your account.');
+			switchTab('login');
+		},
+
+		onError: (error: any) => {
+			const errorMessage = error.error || 'An unexpected error occurred during signup';
+			toast.error(errorMessage);
+			console.log(error);
+		},
+	});
+
+	const validateForm = () => {
+		let isValid = true;
+
+		// Email validation
+		if (!signupData.email) {
+			setErrors({ email: 'Email is required' });
+			isValid = false;
+		} else if (!/\S+@\S+\.\S+/.test(signupData.email)) {
+			setErrors({ ...errors, email: 'Please enter a valid email address' });
+			isValid = false;
+		}
+
+		// Password validation
+		if (!signupData.password) {
+			setErrors({ password: 'Password is required' });
+			isValid = false;
+		} else if (signupData.password.length < 6) {
+			setErrors({ ...errors, password: 'Password must be at least 6 characters long' });
+			isValid = false;
+		}
+
+		// Confirm password validation
+		if (!signupData.confirmPassword) {
+			setErrors({ ...errors, confirmPassword: 'Please confirm your password' });
+			isValid = false;
+		} else if (signupData.password !== signupData.confirmPassword) {
+			setErrors({ ...errors, confirmPassword: 'Passwords do not match' });
+			isValid = false;
+		}
+
+		return isValid;
+	};
+
+	const handleSignup = async () => {
+		// Validate form
+		if (!validateForm()) {
+			return;
+		}
+		if (environment != 'self-hosted') {
+			const { error } = await supabase.auth.signUp({
+				email: signupData.email,
+				password: signupData.password,
+				options: {
+					emailRedirectTo: `${window.location.origin}${RouteNames.signupConfirmation}`,
+				},
+			});
+
+			if (error) {
+				toast.error(error.message || 'Something went wrong');
+				console.log('error', error);
+				return;
+			}
+			navigate(RouteNames.resendVerification);
+		} else {
+			signup();
+		}
+	};
+
+	return (
+		<>
+			<div className='space-y-4'>
+				<Input
+					id='email'
+					name='email'
+					type='email'
+					label='Email'
+					placeholder='Enter your email address'
+					required
+					onChange={(s) => setSignupData({ ...signupData, email: s })}
+					value={signupData.email}
+					error={errors.email}
+				/>
+
+				<Input
+					id='password'
+					name='password'
+					label='Password'
+					placeholder='Enter your password'
+					required
+					onChange={(s) => setSignupData({ ...signupData, password: s })}
+					value={signupData.password}
+					error={errors.password}
+					type={showPassword ? 'text' : 'password'}
+					suffix={
+						<span onClick={() => setShowPassword(!showPassword)} className='cursor-pointer'>
+							{showPassword ? <EyeIcon className='w-5 h-5' /> : <EyeOff className='w-5 h-5' />}
+						</span>
+					}
+				/>
+
+				<Input
+					id='confirmPassword'
+					name='confirmPassword'
+					label='Confirm Password'
+					placeholder='Confirm your password'
+					required
+					onChange={(s) => setSignupData({ ...signupData, confirmPassword: s })}
+					value={signupData.confirmPassword}
+					error={errors.confirmPassword}
+					type={showPassword ? 'text' : 'password'}
+					suffix={
+						<span onClick={() => setShowPassword(!showPassword)} className='cursor-pointer'>
+							{showPassword ? <EyeIcon className='w-5 h-5' /> : <EyeOff className='w-5 h-5' />}
+						</span>
+					}
+				/>
+				<Button onClick={handleSignup} className='w-full !mt-6' isLoading={isSignupPending}>
+					Create Account
+				</Button>
+			</div>
+
+			<p className='mt-6 text-center text-sm text-gray-600'>
+				Already have an account?{' '}
+				<button onClick={() => switchTab('login')} className='text-grey-600 underline font-medium'>
+					Log in
+				</button>
+			</p>
+		</>
+	);
+};
+
+export default SignupForm;

@@ -5,12 +5,13 @@ import ChargeTable from '@/components/organisms/Subscription/PriceTable';
 import UsageTable from '@/components/organisms/Subscription/UsageTable';
 import { cn } from '@/lib/utils';
 import { SubscriptionUsage } from '@/models/Subscription';
+import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import CustomerApi, { CreateCustomerSubscriptionPayload } from '@/utils/api_requests/CustomerApi';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
 import SubscriptionApi from '@/utils/api_requests/SubscriptionApi';
 import { toSentenceCase } from '@/utils/common/helper_functions';
 import { NormalizedPlan, normalizePlan } from '@/utils/models/transformed_plan';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -36,6 +37,19 @@ const CustomerSubscription: React.FC = () => {
 	const [plans, setPlans] = useState<NormalizedPlan[] | null>(null);
 	const [plansLoading, setPlansLoading] = useState(false);
 	const [plansError, setPlansError] = useState(false);
+	const updateBreadcrumb = useBreadcrumbsStore((state) => state.updateBreadcrumb);
+
+	const { data: customerData } = useQuery({
+		queryKey: ['customerSubscription', customerId, subscription_id],
+		queryFn: () => CustomerApi.getCustomerById(customerId!),
+		enabled: !!customerId,
+	});
+
+	useEffect(() => {
+		if (customerData?.external_id) {
+			updateBreadcrumb(2, customerData.external_id);
+		}
+	}, [customerData, updateBreadcrumb]);
 
 	const [susbcriptionData, setSubscriptionData] = useState<SubscriptionUsage | null>(null);
 	const [subscriptionState, setSubscriptionState] = useState<SubscriptionState>({
@@ -97,7 +111,7 @@ const CustomerSubscription: React.FC = () => {
 		mutationFn: async (data: CreateCustomerSubscriptionPayload) => {
 			return await CustomerApi.createCustomerSubscription(data);
 		},
-		retry: 1,
+
 		onSuccess: async () => {
 			toast.success('Subscription created successfully');
 			navigate(`/customer-management/customers/${customerId}`);
@@ -296,10 +310,7 @@ const CustomerSubscription: React.FC = () => {
 						<Button onClick={navigateBack} className='bg-gray-100 text-black px-4 py-2 rounded-md hover:bg-primary-dark'>
 							Cancel
 						</Button>
-						<Button
-							onClick={handleSubscriptionSubmit}
-							loading={isCreating}
-							className='bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark'>
+						<Button onClick={handleSubscriptionSubmit} isLoading={isCreating}>
 							Add Subscription
 						</Button>
 					</div>

@@ -26,34 +26,29 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 		{ fieldName: 'name', title: 'Meter Name', width: '300px' },
 		// { fieldName: 'event_name', title: 'Event Name', width: '300px' },
 		{
-			fieldName: 'aggregation_type',
 			title: 'Aggregate Type',
-			align: 'center',
+
 			render: (row) => {
 				return <span className='text-[#09090B] '>{formatAggregationType(row.aggregation_type)}</span>;
 			},
 		},
 		{ fieldName: 'aggregation_field', title: 'Aggregate Value', align: 'center' },
 		{
-			fieldName: 'status',
 			title: 'Status',
-			align: 'center',
+
 			render: (row) => {
 				const label = formatChips(row.status);
-				return <Chip isActive={label === 'Active'} label={label} />;
+				return <Chip label={label} />;
 			},
 		},
 		{
-			fieldName: 'updated_at',
 			title: 'Updated At',
 			render: (row) => {
 				return <span className='text-[#09090B] '>{formatDate(row.updated_at)}</span>;
 			},
 		},
 		{
-			fieldName: 'aggregation',
 			title: '',
-			redirect: false,
 			render: (row) => (
 				<ActionButton
 					isEditDisabled={row.status === 'archived'}
@@ -63,13 +58,13 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 					row={row}
 					deleteMutationFn={(id) => MeterApi.deleteMeter(id)}
 					refetchQueryKey={'fetchMeters'}
-					entityName={row.event_name}
+					entityName={row.name}
 				/>
 			),
 		},
 	];
 
-	return <FlexpriceTable redirectUrl='/usage-tracking/meter/edit-meter?id=' columns={columns} data={mappedData} />;
+	return <FlexpriceTable columns={columns} data={mappedData} />;
 };
 
 export default BillableMetricTable;

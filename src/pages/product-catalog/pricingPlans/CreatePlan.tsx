@@ -1,68 +1,47 @@
-import { queryClient } from '@/App';
 import { Button, FormHeader, Spacer, Stepper } from '@/components/atoms';
-import { BillingPrefferencesSection, PlanDetailsSection, SetupChargesSection } from '@/components/organisms';
-import usePlanStore from '@/store/usePlanStore';
+import { PlanDetailsSection, SetupChargesSection } from '@/components/organisms';
+import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
+import { Plan } from '@/models/Plan';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
 import { useMutation } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-
 const CreatePlanPage = () => {
-	const [activeStep, setactiveStep] = useState(0);
-	const formSteps = [{ label: 'Plan Details' }, { label: 'Billing Preferences' }, { label: 'Set up Charges' }];
-	const { setError, clearAllErrors, resetStore } = usePlanStore();
-	const plan = usePlanStore((state) => state.plan);
-	const metaData = usePlanStore((state) => state.metaData);
+	const [activeStep, setActiveStep] = useState(0);
+	const formSteps = [{ label: 'Plan Details' }, { label: 'Set up Charges' }];
 	const navigate = useNavigate();
 
-	useEffect(() => {
-		return () => {
-			resetStore();
-		};
-	}, []);
+	const [tempPlan, setTempPlan] = useState<Partial<Plan>>({
+		name: '',
+		description: '',
+		lookup_key: 'plan-',
+		prices: [],
+	});
+
+	const setPlanField = <K extends keyof Plan>(field: K, value: Plan[K]) => {
+		setTempPlan((prev) => ({ ...prev, [field]: value }));
+	};
+
+	const [errors, setErrors] = useState<Partial<Record<keyof Plan, string>>>({});
 
 	const { mutate: submitPlan, isPending } = useMutation({
 		mutationFn: async () => {
-			const data = plan;
-			if (metaData?.usagePrices) {
-				metaData.usagePrices.forEach((price) => {
-					data.prices?.push({
-						...price,
-						billing_period_count: 1,
-						billing_cadence: 'RECURRING',
-					});
-				});
-			}
-
-			if (metaData?.recurringPrice) {
-				data.prices?.push({
-					...metaData.recurringPrice,
-					type: metaData.subscriptionType,
-					billing_period_count: 1,
-					billing_cadence: 'RECURRING',
-					billing_model: 'FLAT_FEE',
-				});
-			}
-
-			const response = await PlanApi.createPlan(data);
-			return response;
+			return await PlanApi.createPlan({
+				...tempPlan,
+				invoice_cadence: 'ARREAR',
+			} as Partial<Plan>);
 		},
 		async onSuccess() {
 			toast.success('Plan created successfully');
 			navigate('/product-catalog/pricing-plan');
-			resetStore();
-			await queryClient.invalidateQueries({
-				queryKey: ['fetchPlans'],
-			});
-			await queryClient.refetchQueries({
-				queryKey: ['fetchPlans'],
-			});
+			await refetchQueries(['fetchPlans']);
 		},
 		onError() {
 			toast.error('Failed to create plan');
 		},
 	});
+
 	const handleNext = () => {
 		if (isPending) {
 			return;
@@ -78,48 +57,50 @@ const CreatePlanPage = () => {
 		if (!validateSteps()) {
 			return;
 		}
-		setactiveStep((prev) => prev + 1);
+		setActiveStep((prev) => prev + 1);
 	};
 
 	const handleBack = () => {
 		if (activeStep === 0) {
 			return;
 		}
-		setactiveStep((prev) => prev - 1);
+		setActiveStep((prev) => prev - 1);
 	};
 
 	const validateSteps = () => {
-		clearAllErrors();
+		setErrors({});
 		if (activeStep === 0) {
-			if (!plan.name) {
-				setError('name', 'Plan name is required');
+			if (!tempPlan.name) {
+				setErrors({ name: 'Plan name is required' });
 				return false;
 			}
-			if (!plan.lookup_key) {
-				setError('lookup_key', 'Plan slug is required');
+			if (!tempPlan.lookup_key) {
+				setErrors({ lookup_key: 'Plan slug is required' });
 				return false;
 			}
-		} else if (activeStep === 1) {
-			if (!plan.invoice_cadence) {
-				setError('invoice_cadence', 'Billing Timing is required');
+		}
+		// else if (activeStep === 1) {
+		// 	if (!tempPlan.invoice_cadence) {
+		// 		setErrors({ invoice_cadence: 'Billing Timing is required' });
+		// 		return false;
+		// 	}
+		// 	if (metaData?.isTrialPeriod && !tempPlan.trial_period) {
+		// 		setErrors({ trial_period: 'Trial period is required' });
+		// 		return false;
+		// 	}
+		// }
+		else if (activeStep === 1) {
+			if (!tempPlan.prices || tempPlan.prices.length === 0) {
+				setErrors({ prices: 'At least one price tier is required' });
 				return false;
 			}
-			if (metaData?.isTrialPeriod && !plan.trial_period) {
-				setError('trial_period', 'Trial period is required');
-				return false;
-			}
-		} else if (activeStep === 2) {
-			// if (!plan.prices || plan.prices.length === 0) {
-			// 	setError('prices', 'At least one price tier is required');
-			// 	return false;
-			// }
 		}
 
 		return true;
 	};
 
 	return (
-		<div className='p-6'>
+		<div className='p-6 w-full'>
 			<FormHeader
 				title={'Plan Details'}
 				subtitle={'Define pricing plans to manage events, billing, and customer subscriptions seamlessly.'}
@@ -128,37 +109,37 @@ const CreatePlanPage = () => {
 
 			<Spacer height={'16px'} />
 
-			{/* stepper componenet */}
-			<div className='md:w-1/2 lg:w-2/3 '>
+			<div className='w-2/3'>
 				<Stepper activeStep={activeStep} steps={formSteps} />
 
-				{/* step 1 */}
-				{/* Plan Features */}
 				<Spacer height={'16px'} />
 
-				{activeStep === 0 && <PlanDetailsSection />}
-				{activeStep === 1 && <BillingPrefferencesSection />}
-				{activeStep === 2 && <SetupChargesSection />}
+				{activeStep === 0 && <PlanDetailsSection plan={tempPlan} setPlanField={setPlanField} errors={errors} />}
 
-				{/* next / back buttons */}
+				{activeStep === 1 && (
+					// <BillingPrefferencesSection
+					// 	plan={tempPlan}
+					// 	setPlanField={setPlanField}
+					// 	errors={errors}
+					// />
+					<SetupChargesSection plan={tempPlan} setPlanField={setPlanField} />
+				)}
+
+				{activeStep === 2 && <SetupChargesSection plan={tempPlan} setPlanField={setPlanField} />}
+
 				<Spacer height={'16px'} />
 				<div>
 					{activeStep > 0 && (
-						<Button onClick={handleBack} variant='secondary' className='mr-4 text-zinc-900 '>
+						<Button onClick={handleBack} variant='secondary' className='mr-4 text-zinc-900'>
 							Go Back
 						</Button>
 					)}
-
-					{/* {activeStep === 0 && (
-						<Button onClick={handleBack} variant='secondary' className='mr-4 text-zinc-900 '>
-							Save Draft
-						</Button>
-					)} */}
 					<Button onClick={handleNext} variant='default' className='mr-4'>
 						{formSteps.length - 1 === activeStep ? 'Save' : 'Next'}
 					</Button>
 				</div>
 			</div>
+			{/* <pre>{JSON.stringify(tempPlan, null, 2)}</pre> */}
 		</div>
 	);
 };

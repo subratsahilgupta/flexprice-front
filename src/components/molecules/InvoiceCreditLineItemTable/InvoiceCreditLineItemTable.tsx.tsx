@@ -41,7 +41,7 @@ const InvoiceCreditLineItemTable: FC<Props> = ({ data, total_amount, currency, t
 						<tbody>
 							{data?.map((item, index) => {
 								return (
-									<tr key={index} className=''>
+									<tr key={index}>
 										<td className='py-3 px-2 text-gray-800'>{item.display_name ?? '--'}</td>
 										<td className='py-3 px-2 text-center text-gray-800'>{item.quantity ?? '--'}</td>
 										<td className='py-3 px-2 text-center text-gray-800'>{'--'}</td>
@@ -61,7 +61,7 @@ const InvoiceCreditLineItemTable: FC<Props> = ({ data, total_amount, currency, t
 						</div>
 						<div className='flex justify-between'>
 							<span>Tax</span>
-							<span className=''>{tax || '--'}</span>
+							<span>{tax || '--'}</span>
 						</div>
 						<div className=' border-t '></div>
 						<div className='flex justify-between font-bold text-gray-900 '>

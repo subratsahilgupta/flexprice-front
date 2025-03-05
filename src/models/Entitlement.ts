@@ -17,6 +17,6 @@ export interface Entitlement {
 	tenant_id: string;
 	updated_at: string;
 	updated_by: string;
-	usage_limit: number;
-	usage_reset_period: string;
+	usage_limit: number | null;
+	usage_reset_period: string | null;
 }

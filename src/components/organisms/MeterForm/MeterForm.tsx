@@ -1,17 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { z } from 'zod';
 import { Button, CodePreview, Input, RadioGroup, Select } from '@/components/atoms';
 import { EventFilter, EventFilterData } from '@/components/molecules';
 import { LuCircleFadingPlus, LuRefreshCw } from 'react-icons/lu';
 import { cn } from '@/lib/utils';
-import { useNavigate } from 'react-router-dom';
-import { queryClient } from '@/App';
 import { Meter } from '@/models/Meter';
 import { v4 as uuidv4 } from 'uuid';
 
 interface Props {
 	data?: Meter;
 	onSubmit: (data: Meter, mode: 'add' | 'edit') => void;
+	isLoading?: boolean;
 }
 
 export const formatAggregationType = (data: string): string => {
@@ -38,12 +37,12 @@ const MeterFormSchema = z.object({
 		// 	value: z.array(z.string().min(1, { message: 'Filter value is required' })).optional(),
 		// }),
 		.optional(),
-	aggregationFunction: z.enum(['SUM', 'COUNT', 'COUNT_UNIQUE', 'c1'], { errorMap: () => ({ message: 'Invalid aggregation function' }) }),
+	aggregationFunction: z.enum(['SUM', 'COUNT', 'COUNT_UNIQUE'], { errorMap: () => ({ message: 'Invalid aggregation function' }) }),
 	aggregationValue: z.string().min(1, { message: 'Aggregation Value is required' }),
 	resetPeriod: z.string().optional(),
 });
 
-const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
+const MeterForm: React.FC<Props> = ({ data, onSubmit, isLoading }) => {
 	const labelStyle = 'text-muted-foreground text-sm';
 
 	const isEditMode = Boolean(data);
@@ -55,45 +54,54 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 	const [aggregationFunction, setAggregationFunction] = useState(data?.aggregation.type || 'SUM');
 	const [aggregationValue, setAggregationValue] = useState(data?.aggregation.field || '');
 	const [resetPeriod, setResetPeriod] = useState(data?.reset_usage || '');
-	const navigate = useNavigate();
 
 	const [errors, setErrors] = useState<Record<string, string>>({});
 
-	useEffect(() => { }, [eventFilters]);
-	const getRandomDate = () => {
+	const staticDate = useMemo(() => {
 		const start = new Date(2020, 0, 1);
 		const end = new Date();
 		return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime())).toISOString();
-	};
+	}, []);
+
+	const staticEventId = useMemo(() => {
+		return 'event_' + uuidv4().replace(/-/g, '').slice(0, 10);
+	}, []);
 
 	const curlCommand = `curl --request POST \\
 	--url https://api.cloud.flexprice.io/v1/events \\
 	--header 'Content-Type: application/json' \\
 	--header 'x-api-key: <your_api_key>' \\
 	--data '{
-		"event_id": "${'event_' + uuidv4().replace(/-/g, '').slice(0, 10)}",
+		"event_id": "${staticEventId}",
 		"event_name": "${eventName || '__MUST_BE_DEFINED__'}",
 		"external_customer_id": "__CUSTOMER_ID__",
-		"properties": {${[...(data?.filters || []), ...eventFilters,].map((filter) => `\n\t\t\t "${filter.key}" : "${filter.values[0] || 'FILTER_VALUE'}"`).join(',')}${aggregationValue ? `,\n\t\t\t "${aggregationValue}":"__${aggregationValue.split(' ').join('_').toUpperCase()}__"` : ''}
+		"properties": {${[...(data?.filters || []), ...eventFilters]
+			.filter((filter) => filter.key && filter.key.trim() !== '')
+			.map((filter) => `\n\t\t\t "${filter.key}" : "${filter.values[0] || 'FILTER_VALUE'}"`)
+			.join(',')}${aggregationValue ? `,\n\t\t\t "${aggregationValue}":"__${aggregationValue.split(' ').join('_').toUpperCase()}__"` : ''}
 		},
 		"source": "api",
-		"timestamp": "${getRandomDate()}"
+		"timestamp": "${staticDate}"
 	}'`;
 
 	const radioMenuItemList = [
-		{
-			label: 'Cumulative',
-			description: 'Track values continuously without resetting, useful for metrics like lifetime usage.',
-			value: 'NEVER',
-			icon: LuCircleFadingPlus,
-		},
 		{
 			label: 'Periodic',
 			description: 'Reset values based on the billing cycle, such as monthly or annual usage',
 			value: 'RESET_PERIOD',
 			icon: LuRefreshCw,
 		},
+		{
+			label: 'Cumulative',
+			description: 'Track values continuously without resetting, useful for metrics like lifetime usage.',
+			value: 'NEVER',
+			icon: LuCircleFadingPlus,
+		},
 	];
+
+	const isCtaDisabled = data
+		? !data?.name || !data?.event_name || !data?.aggregation.type
+		: !eventName || !aggregationFunction || !aggregationValue;
 
 	const handleSubmit = () => {
 		// Form data object
@@ -126,11 +134,6 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 				reset_usage: resetPeriod,
 			};
 			onSubmit(formData as unknown as Meter, isEditMode ? 'edit' : 'add');
-
-			queryClient.invalidateQueries({
-				queryKey: ['fetchMeters'],
-			});
-			navigate('/usage-tracking/meter');
 
 			setErrors({});
 		} else {
@@ -200,7 +203,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 							<p className={labelStyle}>Filter events based on specific properties (e.g., region, user type).</p>
 						</div>
 
-						<div className=''>
+						<div>
 							<EventFilter
 								isArchived={isArchived}
 								isEditMode={isEditMode}
@@ -259,13 +262,17 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit }) => {
 
 					{/* Submit Button */}
 					<div className={cn('flex justify-start', isEditMode && 'hidden')}>
-						<Button onClick={handleSubmit} className='bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark'>
+						<Button
+							onClick={handleSubmit}
+							disabled={isCtaDisabled}
+							className='bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark'>
 							{'Save Meter'}
 						</Button>
 					</div>
 					{isEditMode && (
 						<div className={cn('flex justify-start')}>
 							<Button
+								isLoading={isLoading}
 								disabled={eventFilters.length <= 0}
 								onClick={handleSubmit}
 								className='bg-zinc-900 text-white px-4 py-2 rounded-md hover:bg-primary-dark'>

@@ -22,7 +22,7 @@ const CheckboxRadioGroup: FC<Props> = ({ error, checkboxItems, defaultValue, onC
 	return (
 		<div>
 			{title && <p className='text-sm text-zinc-950 font-medium font-inter mb-2'>{title}</p>}
-			<RadioGroup defaultValue={defaultValue} value={value} className=''>
+			<RadioGroup defaultValue={defaultValue} value={value}>
 				{checkboxItems.map((item) => (
 					<div
 						key={item.value}

@@ -1,7 +1,7 @@
-import { Button, Chip, DatePicker, Dialog, FormHeader, Select, SelectOption, Spacer } from '@/components/atoms';
+import { Button, Chip, DatePicker, Dialog, FormHeader, Page, Select, SelectOption, Spacer } from '@/components/atoms';
 import { InvoiceCreditLineItemTable } from '@/components/molecules';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useBreadcrumbStore } from '@/core/store/useBreadcrumbStore';
+import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
 import formatDate from '@/utils/common/format_date';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
@@ -12,18 +12,19 @@ import { useParams } from 'react-router-dom';
 const getStatusChip = (status: string) => {
 	switch (status.toUpperCase()) {
 		case 'VOIDED':
-			return <Chip isActive={false} label='Void' />;
+			return <Chip variant='default' label='Void' />;
 		case 'FINALIZED':
-			return <Chip isActive={true} label='Paid' />;
+			return <Chip variant='success' label='Paid' />;
 		case 'DRAFT':
-			return <Chip activeBgColor='#F0F2F5' activeTextColor='#57646E' isActive={false} label='Draft' />;
+			return <Chip variant='default' label='Draft' />;
 		default:
-			return <Chip isActive={false} activeBgColor='#F0F2F5' activeTextColor='#57646E' label='Draft' />;
+			return <Chip variant='default' label='Draft' />;
 	}
 };
 
 const AddCreditPage = () => {
 	const { invoice_id } = useParams<{ invoice_id: string }>();
+	const { updateBreadcrumb, setSegmentLoading } = useBreadcrumbsStore();
 
 	const { data, isLoading } = useQuery({
 		queryKey: ['fetchInvoice', invoice_id],
@@ -33,21 +34,21 @@ const AddCreditPage = () => {
 
 	const [showModal, setshowModal] = useState(false);
 
-	const { setBreadcrumbs } = useBreadcrumbStore();
-
+	// Update breadcrumbs when invoice data is loaded
 	useEffect(() => {
+		// Set loading states when starting to fetch
+		setSegmentLoading(2, true); // Customer segment
+		setSegmentLoading(3, true); // Invoice segment
+
 		if (data) {
-			setBreadcrumbs(
-				[
-					{ label: 'Customer Management', path: '' },
-					{ label: 'Customers', path: '/customer-management/customers' },
-					{ label: `${data.customer?.external_id}`, path: `/customer-management/customers/${data.customer?.id}` },
-					{ label: `Invoice ${data.invoice_number}`, path: `/customer-management/customers/${data.customer?.id}/invoice/${data.id}` },
-				],
-				true,
-			);
+			// Update customer name (3rd segment)
+			updateBreadcrumb(2, data.customer?.external_id || 'Customer');
+			console.log('data', data);
+
+			// Update invoice number (4th segment)
+			updateBreadcrumb(3, `Invoice ${data.invoice_number}`);
 		}
-	}, [data]);
+	}, [data, updateBreadcrumb, setSegmentLoading]);
 
 	const reasonOptions: SelectOption[] = [
 		{ label: 'Duplicate Charge', value: 'wrong_invoice' },
@@ -70,7 +71,7 @@ const AddCreditPage = () => {
 	}
 
 	return (
-		<div className='w-2/3'>
+		<Page>
 			{/* confirmation dialog */}
 			<Dialog
 				isOpen={showModal}
@@ -110,7 +111,7 @@ const AddCreditPage = () => {
 					<Select label='Reason' options={reasonOptions} value={payload?.reason} onChange={(e) => setPayload({ ...payload, reason: e })} />
 				</div>
 				<div className='flex-grow w-full'>
-					<DatePicker title='Issue Date' date={payload?.issueDate} setDate={(e) => setPayload({ ...payload, issueDate: e })} />
+					<DatePicker label='Issue Date' date={payload?.issueDate} setDate={(e) => setPayload({ ...payload, issueDate: e })} />
 				</div>
 			</div>
 
@@ -154,7 +155,7 @@ const AddCreditPage = () => {
 			<Button className='mt-8' onClick={() => setshowModal(true)}>
 				Issue Credit Note
 			</Button>
-		</div>
+		</Page>
 	);
 };
 

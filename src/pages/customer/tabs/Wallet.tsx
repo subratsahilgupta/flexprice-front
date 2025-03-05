@@ -1,5 +1,5 @@
-import { Button, Chip, FormHeader, Loader, Modal, Select, Spacer } from '@/components/atoms';
-import { DropdownMenu, DropdownMenuOption, Pagination, TopupCard, WalletTransactionsTable } from '@/components/molecules';
+import { Button, Chip, FormHeader, Modal, Select, ShortPagination, Spacer } from '@/components/atoms';
+import { DropdownMenu, DropdownMenuOption, TopupCard, WalletTransactionsTable } from '@/components/molecules';
 import { Skeleton } from '@/components/ui/skeleton';
 import usePagination from '@/hooks/usePagination';
 import { Wallet } from '@/models/Wallet';
@@ -13,7 +13,7 @@ import CreateWallet from '../customers/CreateWallet';
 import { CircleFadingPlus, EllipsisVertical, Pencil, SlidersHorizontal, Trash2, Wallet as WalletIcon } from 'lucide-react';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import useQueryParams from '@/hooks/useQueryParams';
-
+import { DetailsCard } from '@/components/molecules';
 const formatWalletStatus = (status?: string) => {
 	switch (status) {
 		case 'active':
@@ -61,7 +61,7 @@ const WalletTab = () => {
 		isLoading,
 		isError,
 	} = useQuery({
-		queryKey: ['fetcWallets', customerId],
+		queryKey: ['fetchWallets', customerId],
 		queryFn: async () => {
 			return await WalletApi.getWallets(customerId!);
 		},
@@ -78,8 +78,8 @@ const WalletTab = () => {
 
 	const {
 		data: transactionsData,
-		// isLoading: isTransactionLoading,
-		// isError: isTransactionError,
+		isLoading: isTransactionLoading,
+		isError: isTransactionError,
 	} = useQuery({
 		queryKey: ['fetchWalletsTransactions', customerId, activeWallet?.id],
 		queryFn: async () => {
@@ -112,13 +112,18 @@ const WalletTab = () => {
 		value: wallet.id,
 	}));
 
-	if (isLoading) {
-		return <Loader />;
+	if (isLoading || isTransactionLoading || isBalanceLoading) {
+		return (
+			<div className=' h-full   space-y-5'>
+				<Skeleton className='w-full h-16' />
+				<Skeleton className='w-full h-32' />
+				<Skeleton className='w-full h-32' />
+			</div>
+		);
 	}
 
-	if (isError) {
+	if (isError || isTransactionError) {
 		toast.error('An error occurred while fetching wallet details');
-		return <p>Something went wrong</p>;
 	}
 
 	if (isAdd) {
@@ -128,8 +133,8 @@ const WalletTab = () => {
 	if (wallets?.length === 0) {
 		return (
 			<div className='card w-full flex justify-between items-center '>
-				<FormHeader className='' title='Wallet' subtitle='No wallet linked to the customer yet.' variant='sub-header' />
-				<Button onClick={() => setisAdd(true)} className='w-32 flex gap-2 bg-[#0F172A] '>
+				<FormHeader title='Wallet' subtitle='No wallet linked to the customer yet.' variant='sub-header' />
+				<Button onClick={() => setisAdd(true)}>
 					<WalletIcon />
 					<span>Add Wallet</span>
 				</Button>
@@ -138,9 +143,9 @@ const WalletTab = () => {
 	}
 
 	return (
-		<div className='w-2/3'>
+		<div>
 			{/* topup wallet */}
-			<Modal className='' isOpen={showTopupModal} onOpenChange={() => setshowTopupModal(false)}>
+			<Modal isOpen={showTopupModal} onOpenChange={() => setshowTopupModal(false)}>
 				<div className='w-[700px] bg-white rounded-xl'>
 					<TopupCard onSuccess={() => setshowTopupModal(false)} walletId={activeWallet?.id} />
 				</div>
@@ -155,55 +160,49 @@ const WalletTab = () => {
 			<div className='w-full flex justify-between items-center mb-3'>
 				<div>
 					{(walletOptions?.length ?? 0) > 1 && (
-						<Select
-							options={walletOptions || []}
-							value={activeWallet?.id}
-							onChange={(value) => {
-								const selectedWallet = wallets?.find((wallet) => wallet.id === value) || null;
-								setActiveWallet(selectedWallet);
-								setQueryParam('activeWalletId', value);
-							}}
-						/>
+						<div className='min-w-[250px]'>
+							<Select
+								options={walletOptions || []}
+								value={activeWallet?.id}
+								onChange={(value) => {
+									const selectedWallet = wallets?.find((wallet) => wallet.id === value) || null;
+									setActiveWallet(selectedWallet);
+									setQueryParam('activeWalletId', value);
+								}}
+							/>
+						</div>
 					)}
 				</div>
 				<div className='flex items-center space-x-2	'>
-					<Button onClick={() => setisAdd(true)} className='w-32 flex gap-2 bg-[#0F172A] '>
+					<Button onClick={() => setisAdd(true)}>
 						<WalletIcon />
 						<span>Add Wallet</span>
 					</Button>
 
 					<DropdownMenu
 						options={dropdownOptions}
-						trigger={
-							<Button variant={'outline'} className='size-9 '>
-								<EllipsisVertical />
-							</Button>
-						}></DropdownMenu>
+						trigger={<Button variant={'outline'} prefixIcon={<EllipsisVertical />} size={'icon'}></Button>}></DropdownMenu>
 				</div>
 			</div>
 			{/* when we have wallets or active wallets */}
 			{activeWallet && !isAdd && (
 				<div>
-					{/* wallet info */}
-					<div className='rounded-xl border border-gray-300 p-6'>
-						<FormHeader title='Wallet Details' variant='sub-header' titleClassName='font-semibold' />
-						<div className='w-full flex justify-between items-center'>
-							<p className='text-[#71717A] text-sm'>Wallet Name</p>
-							<p className='text-[#09090B] text-sm'>{activeWallet?.name || 'Prepaid wallet'}</p>
-						</div>
-						<Spacer className='!my-4' />
-						<div className='w-full flex justify-between items-center'>
-							<p className='text-[#71717A] text-sm'>Status</p>
-							<p className='text-[#09090B] text-sm'>
-								<Chip
-									activeTextColor='#377E6A'
-									activeBgColor='#ECFBE4'
-									isActive={formatWalletStatus(activeWallet?.wallet_status) === 'Active'}
-									label={formatWalletStatus(activeWallet?.wallet_status)}
-								/>
-							</p>
-						</div>
-					</div>
+					<DetailsCard
+						variant='stacked'
+						title='Wallet Details'
+						data={[
+							{ label: 'Wallet Name', value: activeWallet?.name || 'Prepaid wallet' },
+							{
+								label: 'Status',
+								value: (
+									<Chip
+										variant={formatWalletStatus(activeWallet?.wallet_status) === 'Active' ? 'success' : 'default'}
+										label={formatWalletStatus(activeWallet?.wallet_status)}
+									/>
+								),
+							},
+						]}
+					/>
 					<Spacer className='!h-4' />
 
 					{/* wallet moneyy */}
@@ -251,7 +250,7 @@ const WalletTab = () => {
 							</div>
 							<Spacer className='!h-6' />
 							<WalletTransactionsTable data={transactionsData?.items || []} />
-							<Pagination totalPages={Math.ceil((transactionsData?.pagination.total ?? 1) / limit)} />
+							<ShortPagination unit='Transactions' totalItems={transactionsData?.pagination.total ?? 0} />
 						</div>
 					)}
 				</div>

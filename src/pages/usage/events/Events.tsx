@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { Button, DateRangePicker, Input, SectionHeader } from '@/components/atoms';
+import { Button, DateRangePicker, Input, Page } from '@/components/atoms';
 import { EventsTable } from '@/components/molecules';
 import { Event } from '@/models/Event';
 import EventsApi from '@/utils/api_requests/EventsApi';
@@ -92,8 +92,7 @@ const EventsPage: React.FC = () => {
 	// Refetch all events
 
 	return (
-		<div className='page'>
-			<SectionHeader title='Events' />
+		<Page heading='Events'>
 			<div className='bg-white my-6 rounded-md  mb-6'>
 				<div className='w-full flex items-end gap-4'>
 					<DateRangePicker
@@ -142,6 +141,15 @@ const EventsPage: React.FC = () => {
 						value={queryData?.eventName ?? ''}
 						onChange={(e) => setQueryData((prev) => ({ ...prev, eventName: e === '' ? undefined : e }))}
 					/>
+					<Input
+						label='Event ID'
+						suffix={<Search className='size-4' />}
+						placeholder='Enter Event Id'
+						className='h-9'
+						labelClassName='text-muted-foreground font-normal'
+						value={queryData?.eventId ?? ''}
+						onChange={(e) => setQueryData((prev) => ({ ...prev, eventId: e === '' ? undefined : e }))}
+					/>
 					<Button
 						variant='outline'
 						onClick={() => {
@@ -172,7 +180,7 @@ const EventsPage: React.FC = () => {
 				)}
 				{!hasMore && events.length === 0 && <p className=' text-[#64748B] text-xs font-normal font-sans mt-4'>No events found</p>}
 			</div>
-		</div>
+		</Page>
 	);
 };
 

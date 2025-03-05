@@ -3,23 +3,21 @@ import { Navigate } from 'react-router-dom';
 import supabase from '../supbase/config';
 import { useUser } from '@/hooks/UserContext';
 import { useQuery } from '@tanstack/react-query';
-import { Spinner } from '@/components/atoms';
+import { PageLoader } from '@/components/atoms';
 
 interface AuthMiddlewareProps {
 	children: ReactNode;
 	requiredRole: string[];
 }
-
-const fetchUser = async () => {
-	const { data, error } = await supabase.auth.getUser();
-	if (error) {
-		throw error;
-	}
-	return data.user;
-};
-
 const AuthMiddleware: React.FC<AuthMiddlewareProps> = ({ children }) => {
 	const userContext = useUser();
+	const fetchUser = async () => {
+		const { data, error } = await supabase.auth.getUser();
+		if (error) {
+			throw error;
+		}
+		return data.user;
+	};
 
 	const {
 		data: user,
@@ -28,9 +26,6 @@ const AuthMiddleware: React.FC<AuthMiddlewareProps> = ({ children }) => {
 	} = useQuery({
 		queryKey: ['fetchUser'],
 		queryFn: fetchUser,
-		retry: 1,
-		staleTime: 0,
-		// staleTime: 1000 * 60 * 5,
 	});
 
 	useEffect(() => {
@@ -40,25 +35,19 @@ const AuthMiddleware: React.FC<AuthMiddlewareProps> = ({ children }) => {
 	}, [user, userContext]);
 
 	if (isLoading) {
-		return (
-			<div className='fixed inset-0 flex items-center justify-center bg-white/80 z-50'>
-				<div className='flex flex-col items-center gap-2'>
-					<Spinner size={50} className='text-primary' />
-					<p className='text-sm text-gray-500'>Loading...</p>
-				</div>
-			</div>
-		);
+		return <PageLoader />;
 	}
 
 	if (isError || !user) {
-		return <Navigate to='/login' />;
+		return <Navigate to='/auth' />;
 	}
 
 	// if (requiredRole && !requiredRole.includes(user.role)) {
 	//     return <Navigate to="/not-authorized" />;
 	// }
 
-	return <>{children}</>;
+	// Wrap children with AuthStateListener to handle auth state changes
+	return <div>{children}</div>;
 };
 
 export default AuthMiddleware;

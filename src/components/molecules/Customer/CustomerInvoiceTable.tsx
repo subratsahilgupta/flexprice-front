@@ -1,21 +1,9 @@
 import { FC } from 'react';
 import FlexpriceTable, { ColumnData } from '../Table';
 import { getCurrencySymbol, toSentenceCase } from '@/utils/common/helper_functions';
-import { ActionButton, Chip } from '@/components/atoms';
+import { ActionButton } from '@/components/atoms';
 import { Invoice } from '@/models/Invoice';
-
-const formatPaymentStatus = (status: string) => {
-	switch (status.toUpperCase()) {
-		case 'PENDING':
-			return 'Pending';
-		case 'SUCCEEDED':
-			return 'Successful';
-		case 'FAILED':
-			return 'Unsuccessful';
-		default:
-			return 'Unsuccessful';
-	}
-};
+import { getPaymentStatusChip } from '../InvoiceTable/InvoiceTable';
 
 interface Props {
 	data: Invoice[];
@@ -26,37 +14,33 @@ interface Props {
 const CustomerInvoiceTable: FC<Props> = ({ data, onRowClick }) => {
 	const columnData: ColumnData[] = [
 		{
-			fieldName: 'invoice_number',
 			title: 'Invoice Number',
-			render: (row) => <span>{row.invoice_number || '--'}</span>,
+			render: (row) => <>{row.invoice_number || '--'}</>,
+			fieldVariant: 'title',
 		},
 		{
-			fieldName: 'id',
 			title: 'Status',
-			render: (row) => <span>{toSentenceCase(row.invoice_status)}</span>,
+			render: (row) => <>{toSentenceCase(row.invoice_status)}</>,
 		},
 		{
-			fieldName: 'id',
 			title: 'Payment Status',
-			render: (row) => <Chip isActive={row.payment_status === 'SUCCEEDED'} label={formatPaymentStatus(row.payment_status)} />,
-			align: 'center',
+
+			render: (row: Invoice) => getPaymentStatusChip(row.payment_status),
 		},
 		{
-			fieldName: 'Amount',
 			title: 'Total Amount',
-			render: (row) => <span>{`${getCurrencySymbol(row.currency)} ${row.amount_due}`}</span>,
-			align: 'center',
+			render: (row) => <>{`${getCurrencySymbol(row.currency)} ${row.amount_due}`}</>,
 		},
 		{
-			fieldName: 'id',
-			title: '',
+			fieldVariant: 'interactive',
+			hideOnEmpty: true,
 			render: (row) => <ActionButton id={row.id} editPath={''} deleteMutationFn={async () => {}} refetchQueryKey={''} entityName={''} />,
 		},
 	];
 
 	return (
 		<div>
-			<FlexpriceTable emptyRowText='No Invoices yet' showEmptyRow onRowClick={onRowClick} columns={columnData} data={data ?? []} />
+			<FlexpriceTable showEmptyRow onRowClick={onRowClick} columns={columnData} data={data ?? []} />
 			{data.length === 0 && <p className=' text-[#64748B] text-xs font-normal font-sans mt-4'>No Invoices yet</p>}
 		</div>
 	);

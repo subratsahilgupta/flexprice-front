@@ -1,6 +1,7 @@
-import { Button, SectionHeader, Spacer, Spinner } from '@/components/atoms';
-import { CreateCustomerDrawer, Pagination } from '@/components/molecules';
+import { AddButton, Button, Loader, Page, ShortPagination, Spacer } from '@/components/atoms';
+import { CreateCustomerDrawer } from '@/components/molecules';
 import CustomerTable from '@/components/molecules/Customer/CustomerTable';
+import EmptyPage from '@/components/organisms/EmptyPage/EmptyPage';
 import usePagination from '@/hooks/usePagination';
 import Customer from '@/models/Customer';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
@@ -26,19 +27,10 @@ const CustomerPage = () => {
 	} = useQuery({
 		queryKey: ['fetchCustomers', page],
 		queryFn: fetchCustomers,
-		retry: 2,
-		staleTime: 0,
 	});
 
 	if (isLoading) {
-		return (
-			<div className='fixed inset-0 flex items-center justify-center bg-white/80 z-50'>
-				<div className='flex flex-col items-center gap-2'>
-					<Spinner size={50} className='text-primary' />
-					<p className='text-sm text-gray-500'>Loading...</p>
-				</div>
-			</div>
-		);
+		return <Loader />;
 	}
 
 	if (isError) {
@@ -46,26 +38,48 @@ const CustomerPage = () => {
 		return null;
 	}
 
+	if (customerData?.items?.length === 0) {
+		return (
+			<>
+				<EmptyPage title='No customers added yet' description='Add a customer to get started'>
+					<CreateCustomerDrawer
+						trigger={
+							<Button
+								onClick={() => {
+									setactiveCustomer(undefined);
+									console.log('clicked');
+								}}
+								prefixIcon={<FiFolderPlus />}>
+								Add Customer
+							</Button>
+						}
+						open={customerDrawerOpen}
+						onOpenChange={setcustomerDrawerOpen}
+						data={activeCustomer}
+					/>
+				</EmptyPage>
+			</>
+		);
+	}
+
 	return (
-		<div className='page'>
-			<SectionHeader showFilter showSearch title='Customers'>
+		<Page
+			heading='Customers'
+			headingCTA={
 				<CreateCustomerDrawer
 					trigger={
-						<Button
+						<AddButton
 							onClick={() => {
 								setactiveCustomer(undefined);
 								console.log('clicked');
 							}}
-							className='flex gap-2 bg-[#0F172A]'>
-							<FiFolderPlus />
-							<span>Add Customer</span>
-						</Button>
+						/>
 					}
 					open={customerDrawerOpen}
 					onOpenChange={setcustomerDrawerOpen}
 					data={activeCustomer}
 				/>
-			</SectionHeader>
+			}>
 			<div>
 				<CustomerTable
 					onEdit={(data) => {
@@ -76,9 +90,9 @@ const CustomerPage = () => {
 					data={customerData?.items || []}
 				/>
 				<Spacer className='!h-4' />
-				<Pagination totalPages={Math.ceil((customerData?.pagination.total ?? 1) / limit)} />
+				<ShortPagination unit='Customers' totalItems={customerData?.pagination.total ?? 0} />
 			</div>
-		</div>
+		</Page>
 	);
 };
 

@@ -1,76 +1,141 @@
-import { queryClient } from '@/App';
-import { Button, FormHeader, Input, RadioGroup, RadioMenuItem, Spacer, Textarea, Toggle } from '@/components/atoms';
-import SelectMeter from '@/components/organisms/PlanForm/SelectMeter';
+import { Button, CodePreview, FormHeader, Input, Page, RadioGroup, Select, SelectOption, Spacer, Textarea } from '@/components/atoms';
+import EventFilter from '@/components/molecules/EventFilter';
 import { RouteNames } from '@/core/routes/Routes';
+import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 import { cn } from '@/lib/utils';
 import Feature from '@/models/Feature';
 import { Meter } from '@/models/Meter';
 import FeatureApi from '@/utils/api_requests/FeatureApi';
+import { MeterApi } from '@/utils/api_requests/MeterApi';
 import { useMutation } from '@tanstack/react-query';
-import { Gauge, SquareCheckBig, Wrench, X } from 'lucide-react';
-import { useState } from 'react';
+import { Gauge, SquareCheckBig, Wrench } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
+import { LuCircleFadingPlus } from 'react-icons/lu';
+import { LuRefreshCw } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
 import { ReactSVG } from 'react-svg';
+import { v4 as uuidv4 } from 'uuid';
 import { z } from 'zod';
+
+export const formatAggregationType = (data: string): string => {
+	switch (data) {
+		case 'SUM':
+			return 'Sum';
+		case 'COUNT':
+			return 'Count';
+		case 'COUNT_UNIQUE':
+			return 'Count Unique';
+		default:
+			return 'Sum';
+	}
+};
 
 const AddFeaturePage = () => {
 	const [data, setdata] = useState<Partial<Feature>>({});
 	const [errors, setErrors] = useState<Partial<Record<keyof Feature, string>>>({});
 	const navigate = useNavigate();
-	// const [eventFilters, seteventFilters] = useState<
-	// 	{
-	// 		key: string;
-	// 		values: string[];
-	// 	}[]
-	// >([
-	// 	{
-	// 		key: '',
-	// 		values: [],
-	// 	},
-	// ]);
 
-	const featureTypeOptions: RadioMenuItem[] = [
+	const [meter, setmeter] = useState<Partial<Meter>>({
+		aggregation: {
+			type: 'SUM',
+			field: '',
+		},
+	});
+
+	const [meterErrors, setmeterErrors] = useState<Partial<Record<keyof Meter | 'aggregation_type' | 'aggregation_field', string>>>({});
+
+	const featureTypeOptions: SelectOption[] = [
 		{
 			label: 'Boolean',
 			description: 'Functionality that customers can either have access to or not',
-			icon: SquareCheckBig,
+			suffixIcon: <SquareCheckBig className='size-4' />,
 			value: 'boolean',
 		},
 		{
 			label: 'Metered',
 			description: 'Functionality with varying usage based on selected plan & can be measured',
-			icon: Gauge,
+			suffixIcon: <Gauge className='size-4' />,
 			value: 'metered',
 		},
 		{
 			label: 'Static',
 			description: 'Functionality with varying usage however need not be measured based on customer usage.',
-			icon: Wrench,
+			suffixIcon: <Wrench className='size-4' />,
 			value: 'static',
+		},
+	];
+
+	const radioMenuItemList = [
+		{
+			label: 'Periodic',
+			description: 'Reset values based on the billing cycle, such as monthly or annual usage',
+			value: 'RESET_PERIOD',
+			icon: LuRefreshCw,
+		},
+		{
+			label: 'Cumulative',
+			description: 'Track values continuously without resetting, useful for metrics like lifetime usage.',
+			value: 'NEVER',
+			icon: LuCircleFadingPlus,
 		},
 	];
 
 	const featureSchema = z.object({
 		name: z.string().nonempty('Feature name is required'),
-		lookup_key: z.string().nonempty('Feature slug is required'),
 		description: z.string().optional(),
 		type: z.enum(['boolean', 'metered', 'static']).optional(),
-		meter_id: z
-			.string()
-			.optional()
-			.refine(
-				(val) => {
-					if (data.type === 'metered' && !val) {
-						return false;
-					}
-					return true;
-				},
-				{
-					message: 'Meter ID is required when feature type is metered',
-				},
-			),
+		meter_id: z.string().optional(),
 	});
+
+	const staticDate = useMemo(() => {
+		const start = new Date(2020, 0, 1);
+		const end = new Date();
+		return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime())).toISOString();
+	}, []);
+
+	const staticEventId = useMemo(() => {
+		return 'event_' + uuidv4().replace(/-/g, '').slice(0, 10);
+	}, []);
+
+	const curlCommand = `curl --request POST \\
+	--url https://api.cloud.flexprice.io/v1/events \\
+	--header 'Content-Type: application/json' \\
+	--header 'x-api-key: <your_api_key>' \\
+	--data '{
+		"event_id": "${staticEventId}",
+		"event_name": "${meter.event_name || '__MUST_BE_DEFINED__'}",
+		"external_customer_id": "__CUSTOMER_ID__",
+		"properties": {${[...(meter.filters || [])]
+			.filter((filter) => filter.key && filter.key.trim() !== '')
+			.map((filter) => `\n\t\t\t "${filter.key}" : "${filter.values[0] || 'FILTER_VALUE'}"`)
+			.join(',')}${meter.aggregation?.field ? `,\n\t\t\t "${meter.aggregation.field}":"__VALUE__"` : ''}
+		},
+		"source": "api",
+		"timestamp": "${staticDate}"
+	}'`;
+
+	// Custom validation function for meters
+	const validateMeter = (meterData: Partial<Meter>): Record<string, string> | null => {
+		const errors: Record<string, string> = {};
+
+		if (!meterData.event_name || meterData.event_name.trim() === '') {
+			errors.event_name = 'Event Name is required';
+		}
+
+		if (!meterData.aggregation?.type || meterData.aggregation.type.trim() === '') {
+			errors.aggregation_type = 'Aggregation type is required';
+		}
+
+		// Only validate field if aggregation type is not COUNT
+		if (meterData.aggregation?.type !== 'COUNT') {
+			if (!meterData.aggregation?.field || meterData.aggregation.field.trim() === '') {
+				errors.aggregation_field = 'Aggregation field is required for this aggregation type';
+			}
+		}
+
+		return Object.keys(errors).length > 0 ? errors : null;
+	};
 
 	const [state, setstate] = useState<{
 		showDescription: boolean;
@@ -89,43 +154,125 @@ const AddFeaturePage = () => {
 		defineUnits: false,
 	});
 
-	const { isPending, mutate: createFeature } = useMutation({
+	const { isPending: isUpdating, mutate: createMeter } = useMutation({
 		mutationFn: async () => {
-			return await FeatureApi.createFeature(data);
+			const sanitizedMeter: Partial<Meter> = {
+				...meter,
+				event_name: meter.event_name,
+				aggregation:
+					meter.aggregation?.type === 'COUNT'
+						? { type: meter.aggregation.type, field: '' } // Empty field for COUNT
+						: {
+								type: meter.aggregation?.type || '',
+								field: meter.aggregation?.field || '', // Required field for other types
+							},
+				reset_usage: meter.reset_usage || '',
+				filters: meter.filters?.filter((filter) => filter.key !== '' && filter.values.length > 0),
+			};
+			return await MeterApi.createMeter(sanitizedMeter);
 		},
-		onSuccess: async () => {
-			toast.success('Feature created successfully');
-			await queryClient.invalidateQueries({
-				queryKey: ['fetchFeatures'],
-				exact: false,
-			});
-			navigate(RouteNames.features);
+		onSuccess: async (newMeter) => {
+			console.log(newMeter);
+			if (newMeter?.id) {
+				// Update state for completeness, but don't rely on it for the next action
+				setdata((prev) => ({ ...prev, meter_id: newMeter.id }));
+				// Pass the meter_id directly to createFeature instead of relying on state update
+				createFeatureWithMeterId(newMeter.id);
+			} else {
+				toast.error('Failed to get meter ID from response');
+			}
 		},
 		onError: (error) => {
-			toast.error('An error occurred. Please try again later.');
+			toast.error('Failed to create meter. Please check the form and try again.');
+			console.log(error);
+		},
+		retry: 3,
+	});
+
+	// New function to create feature with meter ID
+	const createFeatureWithMeterId = (meterId: string) => {
+		const featureData = {
+			...data,
+			meter_id: meterId, // Use the meter ID directly
+		};
+		createFeature(featureData);
+	};
+
+	const aggregationOptions = [
+		{ label: 'Sum', value: 'SUM' },
+		{ label: 'Count', value: 'COUNT' },
+		{ label: 'Count Unique', value: 'COUNT_UNIQUE' },
+	];
+
+	const { isPending, mutate: createFeature } = useMutation({
+		mutationFn: async (featureData: Partial<Feature> = data) => {
+			console.log(featureData);
+			const sanitizedData: Partial<Feature> = {
+				...featureData,
+				meter_id: featureData.meter_id || '',
+			};
+
+			return await FeatureApi.createFeature(sanitizedData);
+		},
+		onSuccess: async () => {
+			await refetchQueries(['fetchFeatures']);
+
+			navigate(RouteNames.features);
+			toast.success('Feature created successfully');
+		},
+		onError: (error) => {
+			toast.error('An error occurred while creating feature. Please try again.');
 			console.log(error);
 		},
 	});
 
 	const handleSubmit = () => {
-		const result = featureSchema.safeParse(data);
-		if (!result.success) {
+		// Validate feature data first
+		const featureResult = featureSchema.safeParse(data);
+
+		if (!featureResult.success) {
 			const newErrors: Partial<Record<keyof Feature, string>> = {};
-			result.error.errors.forEach((error) => {
+			featureResult.error.errors.forEach((error) => {
 				const field = error.path[0] as keyof Feature;
 				newErrors[field] = error.message;
 			});
-			console.log('errors', newErrors);
-
 			setErrors(newErrors);
 			return false;
+		}
+
+		// If type is metered, validate and create meter first
+		if (data.type === 'metered') {
+			// Validate meter data with our custom function
+			const meterValidationErrors = validateMeter(meter);
+
+			if (meterValidationErrors) {
+				const newMeterErrors: Partial<Record<keyof Meter | 'aggregation_type' | 'aggregation_field', string>> = {};
+
+				Object.entries(meterValidationErrors).forEach(([key, message]) => {
+					newMeterErrors[key as keyof typeof newMeterErrors] = message;
+				});
+
+				setmeterErrors(newMeterErrors);
+				return false;
+			}
+
+			// Create meter first, then feature will be created in the onSuccess callback
+			createMeter();
 		} else {
-			createFeature();
+			// For non-metered features, create feature directly
+			createFeature(data);
 		}
 	};
 
+	const isCtaDisabled =
+		!data.name ||
+		!data.type ||
+		isPending ||
+		isUpdating ||
+		(data.type === 'metered' &&
+			(!meter.event_name || !meter.aggregation?.type || (meter.aggregation.type !== 'COUNT' && !meter.aggregation?.field)));
 	return (
-		<div className='p-6'>
+		<Page type='left-aligned'>
 			<FormHeader
 				title={'Create Feature'}
 				subtitle={"Make changes to your pricing plans here. Click save when you're done."}
@@ -135,297 +282,235 @@ const AddFeaturePage = () => {
 			<Spacer height={'16px'} />
 
 			{/* fetaure details section */}
-			<div className='w-2/3'>
-				<div className='p-6  rounded-xl border border-[#E4E4E7]'>
-					<FormHeader
-						title={'Feature Details'}
-						subtitle={'Assign a name to your event schema to easily identify and track events processed.'}
-						variant='sub-header'
-					/>
-					<Input
-						label='Feature Name*'
-						placeholder='Enter a name for the feature'
-						value={data.name}
-						error={errors.name}
-						onChange={(e) => {
-							setdata((prev) => ({
-								...prev,
-								name: e,
-								lookup_key:
-									'feature-' +
-									e
-										.toLowerCase()
-										.replace(/ /g, '-')
-										.replace(/[^\w-]+/g, ''),
-							}));
-						}}
-					/>
-					<Spacer height={'20px'} />
-					<Input
-						label='Feature Slug*'
-						placeholder='Enter a slug for the feature'
-						value={data.lookup_key}
-						error={errors.lookup_key}
-						onChange={(e) => {
-							setdata((prev) => ({ ...prev, name: e }));
-						}}
-					/>
-					<Spacer height={'20px'} />
-					{!state.showDescription ? (
-						<button
-							onClick={() => {
-								setstate((prev) => ({ ...prev, showDescription: true }));
-							}}
-							className='p-4 h-9 cursor-pointer flex gap-2 items-center bg-[#F4F4F5] rounded-md'>
-							<ReactSVG src='/assets/svg/CirclePlus.svg' />
-							<p className='text-[#18181B] text-sm font-medium'>{'Add Feature Description'}</p>
-						</button>
-					) : (
-						<Textarea
-							label='Feature Description'
-							placeholder='Enter description'
-							value={data.description}
-							error={errors.description}
-							className='!min-h-32'
+			<div className={cn('flex gap-6 relative   !mb-24', data.type === featureTypeOptions[1].value && 'w-full')}>
+				<div className=' flex-[8] gap-7  '>
+					<div className='p-6  rounded-xl border border-[#E4E4E7]'>
+						<FormHeader
+							title={'Feature Details'}
+							subtitle={'Assign a name to your event schema to easily identify and track events processed.'}
+							variant='sub-header'
+						/>
+						<Input
+							label='Feature Name*'
+							placeholder='Enter a name for the feature'
+							value={data.name}
+							error={errors.name}
 							onChange={(e) => {
-								setdata((prev) => ({ ...prev, description: e }));
+								setdata((prev) => ({
+									...prev,
+									name: e,
+								}));
+								setmeter((prev) => ({ ...prev, name: e }));
 							}}
 						/>
-					)}
-				</div>
-				<Spacer height={'26px'} />
-
-				{/* feature type */}
-				<div className='p-6  rounded-xl border border-[#E4E4E7]'>
-					<FormHeader
-						title={'Feature Type'}
-						subtitle={'Name of the property key in the data object. The groups should only include low cardinality fields.'}
-						variant='sub-header'
-					/>
-
-					{!data.type && (
-						<>
-							<RadioGroup
-								items={featureTypeOptions}
+						<Spacer height={'16px'} />
+						<div className='w-full min-w-[200px] overflow-hidden'>
+							<Select
+								label='Feature Type'
+								options={featureTypeOptions}
+								className='w-full overflow-hidden'
+								value={data.type}
 								onChange={(e) => {
 									setdata((prev) => ({
 										...prev,
-										type: e.value,
-										unit_plural: undefined,
-										unit_singular: undefined,
+										type: e,
 									}));
-									setstate((prev) => ({ ...prev, defineUnits: false }));
+									// Initialize meter with default values when type is metered
+									if (e === 'metered') {
+										setmeter((prev) => ({
+											...prev,
+											aggregation: {
+												type: 'SUM',
+												field: '',
+											},
+										}));
+									}
 								}}
 							/>
-						</>
-					)}
-					{data.type && data.type === featureTypeOptions[0].value && (
-						<>
-							<div
-								className={cn('w-full items-start flex gap-4 p-2  cursor-pointer rounded-lg', 'border-zinc-200 border bg-white relative')}>
-								<SquareCheckBig className={'size-5 mt-1'} />
+						</div>
 
-								<span className='absolute top-2 right-2 text-xs size-4 text-zinc-500'>
-									<X className='text-xs size-4' onClick={() => setdata((prev) => ({ ...prev, type: undefined }))} />
-								</span>
-
-								<div>
-									<p className='font-medium font-inter text-sm'>{featureTypeOptions[0].label}</p>
-									<p className='font-normal font-inter text-sm text-zinc-500 '>{featureTypeOptions[0].description}</p>
-								</div>
-							</div>
-						</>
-					)}
-					{data.type && data.type === featureTypeOptions[1].value && (
-						<>
-							<div className={cn('w-full items-start  rounded-lg', 'border-zinc-200 border bg-white relative p-4 ')}>
-								<div className={cn('w-full items-start flex gap-4 ', '')}>
-									<Gauge className={'size-5 mt-1'} />
-
-									<span className='absolute top-2 right-2 text-xs size-4 text-zinc-500'>
-										<X className='text-xs size-4' onClick={() => setdata((prev) => ({ ...prev, type: undefined }))} />
-									</span>
-
-									<div>
-										<p className='font-medium font-inter text-sm'>{featureTypeOptions[1].label}</p>
-										<p className='font-normal font-inter text-sm text-zinc-500 '>{featureTypeOptions[1].description}</p>
-									</div>
-								</div>
+						{data.type === featureTypeOptions[1].value && (
+							<>
 								<Spacer height={'16px'} />
-								<div className='ml-8'>
-									<div>
-										<SelectMeter
-											className='!w-1/3'
-											value={data.meter_id}
-											onChange={(meter) => {
-												setdata((prev) => ({ ...prev, meter_id: meter.id }));
-												setstate((prev) => ({ ...prev, activeMeter: meter }));
-											}}
-											description='The feature will be measured according to the billable metric you choose'
-										/>
-									</div>
-
-									{state.activeMeter && (
-										<div className=''>
-											{/* event filters */}
-											{/* <div>
-												<div className='border border-zinc-200'></div>
-												<Spacer height={'16px'} />
-												<FormHeader variant='form-component-title' title='Event Filters' />
-												{eventFilters.map((filter, index) => {
-													return (
-														<div key={index} className='gap-4 grid grid-cols-2'>
-															<Select
-																label='Key'
-																placeholder='Select Key'
-																options={state.activeMeter?.filters.map((filter) => ({ label: filter.key, value: filter.key })) || []}
-																value={filter.key}
-																onChange={(key) => {
-																	seteventFilters((prev) => {
-																		const newFilters = [...prev];
-																		newFilters[index].key = key;
-																		return newFilters;
-																	});
-																}}
-																noOptionsText='No Keys Available'
-															/>
-															<MultiSelect
-																onValueChange={(values) => {
-																	seteventFilters((prev) => {
-																		const newFilters = [...prev];
-																		newFilters[index].values = values;
-																		return newFilters;
-																	});
-																}}
-																label='Values'
-																placeholder='Select Filters'
-																options={
-																	state.activeMeter?.filters
-																		.find((filter) => filter.key === filter.key)
-																		?.values.map((value) => ({ label: value, value: value })) || []
-																}
-																noOptionsText='No Filters Available'
-															/>
-														</div>
-													);
-												})}
-												<Spacer height={'16px'} />
-												<Button
-													variant={'outline'}
-													onClick={() => {
-														seteventFilters((prev) => [...prev, { key: '', values: [] }]);
-													}}>
-													Add Filter
-												</Button>
-											</div> */}
-
-											{/* define units */}
-											<div>
-												<Spacer height={'16px'} />
-												<div className='h-[1px] bg-zinc-200 '></div>
-												<Spacer height={'16px'} />
-												<Toggle
-													label='Define Units'
-													checked={state.defineUnits}
-													onChange={(e) => {
-														setstate((prev) => ({ ...prev, defineUnits: e }));
-													}}
-												/>
-												{state.defineUnits && (
-													<>
-														<Spacer height={'16px'} />
-														<FormHeader variant='form-component-title' title='Unit Name' />
-														<div className='gap-4 grid grid-cols-2'>
-															<Input
-																placeholder='singluar'
-																value={data.unit_singular}
-																onChange={(e) => {
-																	setdata((prev) => ({ ...prev, unit_singular: e }));
-																}}
-															/>
-															<Input
-																placeholder='plural'
-																value={data.unit_plural}
-																onChange={(e) => {
-																	setdata((prev) => ({ ...prev, unit_plural: e }));
-																}}
-															/>
-														</div>
-														<p className='text-muted-foreground text-sm'>
-															If the unit name changes when the value is plural, please provide the names of the units
-														</p>
-													</>
-												)}
-											</div>
-										</div>
-									)}
+								<FormHeader variant='form-component-title' title='Unit Name' />
+								<div className='gap-4 grid grid-cols-2'>
+									<Input
+										placeholder='singluar'
+										value={data.unit_singular}
+										onChange={(e) => {
+											setdata((prev) => ({
+												...prev,
+												unit_singular: e,
+												unit_plural: e + 's',
+											}));
+										}}
+									/>
+									<Input
+										placeholder='plural'
+										value={data.unit_plural}
+										onChange={(e) => {
+											setdata((prev) => ({ ...prev, unit_plural: e }));
+										}}
+									/>
 								</div>
-							</div>
-						</>
-					)}
-					{data.type && data.type === featureTypeOptions[2].value && (
-						<div className={cn('w-full items-start  rounded-lg', 'border-zinc-200 border bg-white relative p-4 ')}>
-							<div className={cn('w-full items-start flex gap-4 p-2  cursor-pointer rounded-lg')}>
-								<Wrench className={'size-5 mt-1'} />
+								<FormHeader
+									variant='subtitle'
+									subtitle='If the unit name changes when the value is plural, please provide the names of the units'
+								/>
+							</>
+						)}
+						<Spacer height={'16px'} />
 
-								<span className='absolute top-2 right-2 text-xs size-4 text-zinc-500'>
-									<X className='text-xs size-4' onClick={() => setdata((prev) => ({ ...prev, type: undefined }))} />
-								</span>
+						{!state.showDescription ? (
+							<button
+								onClick={() => {
+									setstate((prev) => ({ ...prev, showDescription: true }));
+								}}
+								className='p-4 h-9 cursor-pointer flex gap-2 items-center bg-[#F4F4F5] rounded-md'>
+								<ReactSVG src='/assets/svg/CirclePlus.svg' />
+								<p className='text-[#18181B] text-sm font-medium'>{'Add Feature Description'}</p>
+							</button>
+						) : (
+							<Textarea
+								label='Feature Description'
+								placeholder='Enter description'
+								value={data.description}
+								error={errors.description}
+								className='!min-h-32'
+								onChange={(e) => {
+									setdata((prev) => ({ ...prev, description: e }));
+								}}
+							/>
+						)}
+					</div>
+					<Spacer height={'26px'} />
 
-								<div>
-									<p className='font-medium font-inter text-sm'>{featureTypeOptions[2].label}</p>
-									<p className='font-normal font-inter text-sm text-zinc-500 '>{featureTypeOptions[2].description}</p>
-								</div>
-							</div>
-							<div>
+					{/* feature type */}
+					{data.type === featureTypeOptions[1].value && (
+						<div className='w-full'>
+							<div className='card'>
+								<FormHeader
+									title={'Feature Type'}
+									subtitle={'Name of the property key in the data object. The groups should only include low cardinality fields.'}
+									variant='sub-header'
+								/>
 								<Spacer height={'16px'} />
-								<div className=''></div>
-								<Spacer height={'16px'} />
-								<Toggle
-									label='Define Units'
-									checked={state.defineUnits}
+
+								<Input
+									value={meter?.event_name}
+									placeholder='tokens_total'
+									label='Event Name'
+									description='A unique identifier for the meter. This is used to refer to the meter in the Flexprice APIs.'
+									error={meterErrors.event_name}
 									onChange={(e) => {
-										setstate((prev) => ({ ...prev, defineUnits: e }));
+										setmeter((prev) => (prev ? { ...prev, event_name: e } : { event_name: e }));
 									}}
 								/>
-								{state.defineUnits && (
-									<>
-										<Spacer height={'16px'} />
-										<div className='h-[1px] bg-zinc-200 '></div>
-										<Spacer height={'16px'} />
-										<FormHeader variant='form-component-title' title='Unit Name' />
-										<div className='gap-4 grid grid-cols-2'>
-											<Input
-												placeholder='singluar'
-												value={data.unit_singular}
-												onChange={(e) => {
-													setdata((prev) => ({ ...prev, unit_singular: e }));
-												}}
-											/>
-											<Input
-												placeholder='plural'
-												value={data.unit_plural}
-												onChange={(e) => {
-													setdata((prev) => ({ ...prev, unit_plural: e }));
-												}}
-											/>
-										</div>
-										<p className='text-muted-foreground text-sm'>
-											If the unit name changes when the value is plural, please provide the names of the units
-										</p>
-									</>
-								)}
+								<Spacer height={'20px'} />
+
+								<FormHeader
+									title='Event Filters'
+									subtitle='Filter events based on specific properties (e.g., region, user type).'
+									variant='form-component-title'
+								/>
+
+								<div>
+									<EventFilter
+										isArchived={false}
+										isEditMode={false}
+										eventFilters={meter?.filters || []}
+										setEventFilters={(e) => {
+											setmeter((prev) => {
+												const newFilters = Array.isArray(e) ? e : [];
+												return prev ? { ...prev, filters: newFilters } : { filters: newFilters };
+											});
+										}}
+										error={meterErrors.filters}
+										permanentFilters={[]}
+									/>
+								</div>
 							</div>
+							<Spacer height={'16px'} />
+							<div className='card'>
+								<div className='flex flex-col gap-4'>
+									<Select
+										// disabled={isEditMode}
+										options={aggregationOptions}
+										value={meter.aggregation?.type || aggregationOptions[0].value}
+										onChange={(e) =>
+											setmeter((prev) => ({
+												...prev,
+												aggregation: {
+													type: e,
+													field: '',
+												},
+											}))
+										}
+										description='The aggregation function to apply to the event values.'
+										label='Aggregation'
+										placeholder='SUM'
+										error={meterErrors.aggregation_type}
+										hideSelectedTick={true}
+									/>
+
+									{meter.aggregation?.type != aggregationOptions[1].value && (
+										<Input
+											value={meter.aggregation?.field}
+											disabled={meter.aggregation?.type === aggregationOptions[1].value}
+											onChange={(e) =>
+												setmeter((prev) => ({
+													...prev,
+													aggregation: {
+														type: prev.aggregation?.type || '',
+														field: e,
+													},
+												}))
+											}
+											label='Aggregation Value'
+											placeholder='tokens'
+											description='Name of the property in the data object holding the value to aggregate over.'
+											error={meterErrors.aggregation_field}
+										/>
+									)}
+								</div>
+
+								<div className='!mt-6'>
+									<RadioGroup
+										// disabled={isEditMode}
+										items={radioMenuItemList}
+										selected={radioMenuItemList.find((item) => item.value === meter.reset_usage)}
+										title='Aggregation Type'
+										onChange={(value) => setmeter((prev) => ({ ...prev, reset_usage: value.value! }))}
+									/>
+								</div>
+							</div>
+							<Spacer height={'26px'} />
+						</div>
+					)}
+					<div>
+						<Button isLoading={isPending || isUpdating} disabled={isCtaDisabled} onClick={handleSubmit}>
+							{isPending && data.type !== 'metered'
+								? 'Creating Feature...'
+								: isUpdating
+									? 'Creating Meter...'
+									: isPending && data.type === 'metered'
+										? 'Creating Feature...'
+										: 'Save Feature'}
+						</Button>
+					</div>
+					<Spacer height={'16px'} />
+				</div>
+
+				{/* right section */}
+				<div className={cn('flex-F[3] max-w-lg  relative')}>
+					{data.type === featureTypeOptions[1].value && (
+						<div className='sticky  top-24 float-right'>
+							<CodePreview title='Event Example' className='sticky top-24' code={curlCommand} language='js' />
 						</div>
 					)}
 				</div>
-
-				<Spacer height={'26px'} />
-				<Button disabled={isPending} onClick={handleSubmit}>
-					Save Feature
-				</Button>
 			</div>
-		</div>
+		</Page>
 	);
 };
 
