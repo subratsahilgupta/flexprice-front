@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Trash2 } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { formatBillingModel, toSentenceCase } from '@/utils/common/helper_functions';
 import { InternalPrice } from './SetupChargesSection';
 
@@ -10,7 +10,7 @@ interface Props {
 	onDelete: (index: number) => void;
 }
 
-const UsagePriceItem: FC<Props> = ({ price, index, onDelete }) => {
+const UsagePriceItem: FC<Props> = ({ price, index, onDelete, onEdit }) => {
 	return (
 		<div className='gap-2 w-full flex justify-between group min-h-9 items-center rounded-md border bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground hover:bg-gray-50 transition-colors'>
 			<div>
@@ -28,13 +28,17 @@ const UsagePriceItem: FC<Props> = ({ price, index, onDelete }) => {
 				</div>
 			</div>
 			<span className='text-[#18181B] flex gap-2 items-center opacity-0 group-hover:opacity-100 transition-opacity'>
-				{/* <button
-                    onClick={() => onEdit({ ...price, isEdit: true })}
-                    className='p-1 hover:bg-gray-100 rounded-md'
-                >
-                    <Pencil size={16} />
-                </button>
-                <div className='border-r h-[16px] border-[#E4E4E7]' /> */}
+				<button
+					onClick={() => {
+						const newPrice = { ...price, isEdit: true };
+						console.log('updating price in usage price item', newPrice);
+
+						onEdit(newPrice);
+					}}
+					className='p-1 hover:bg-gray-100 rounded-md'>
+					<Pencil size={16} />
+				</button>
+				<div className='border-r h-[16px] border-[#E4E4E7]' />
 				<button onClick={() => onDelete(index)} className='p-1 hover:bg-gray-100 rounded-md text-red-500'>
 					<Trash2 size={16} />
 				</button>

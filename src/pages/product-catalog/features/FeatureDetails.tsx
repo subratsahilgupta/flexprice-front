@@ -11,7 +11,7 @@ import EntitlementApi, { ExtendedEntitlement } from '@/utils/api_requests/Entitl
 import formatChips from '@/utils/common/format_chips';
 import { FeatureType } from '@/models/Feature';
 import { getFeatureTypeChips } from '@/components/molecules/FeatureTable/FeatureTable';
-import { toSentenceCase } from '@/utils/common/helper_functions';
+import { formatAggregationType } from './AddFeature';
 
 // const getFeatureType = (type: string) => {
 // 	const className = 'items-center justify-end text-sm font-normal text-gray-800 flex gap-2';
@@ -207,7 +207,7 @@ const FeatureDetails = () => {
 									</div> */}
 									<div className='grid grid-cols-[200px_1fr] items-center'>
 										<span className='text-gray-500 text-sm'>Type</span>
-										<span className='text-gray-800 text-sm'>{toSentenceCase(data?.meter?.aggregation.type || '--')}</span>
+										<span className='text-gray-800 text-sm'>{formatAggregationType(data?.meter?.aggregation.type || '--')}</span>
 									</div>
 									<div className='grid grid-cols-[200px_1fr] items-center'>
 										<span className='text-gray-500 text-sm'>Value</span>

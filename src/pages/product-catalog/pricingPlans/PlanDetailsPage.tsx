@@ -9,7 +9,7 @@ import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import EntitlementApi, { ExtendedEntitlement } from '@/utils/api_requests/EntitlementApi';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
 import formatDate from '@/utils/common/format_date';
-import { formatPriceType } from '@/utils/common/helper_functions';
+import { getPriceTypeLabel } from '@/utils/common/helper_functions';
 import { getPriceTableCharge } from '@/utils/models/transformed_plan';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { EyeOff, Plus } from 'lucide-react';
@@ -68,7 +68,7 @@ const chargeColumns: ColumnData[] = [
 	{
 		title: 'Charge Type',
 		render: (row) => {
-			return <span>{formatPriceType(row.type)}</span>;
+			return <span>{getPriceTypeLabel(row.type)}</span>;
 		},
 		fieldVariant: 'title',
 	},
