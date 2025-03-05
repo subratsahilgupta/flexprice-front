@@ -36,7 +36,8 @@ import ResendVerification from '@/pages/auth/ResendVerification';
 import CustomerInformation from '@/pages/customer/tabs/CustomerInformation';
 export const RouteNames = {
 	home: '/',
-	login: '/auth',
+	login: '/login',
+	auth: '/auth',
 	signupConfirmation: '/auth/signup/confirmation',
 	resendVerification: '/auth/resend-verification',
 
@@ -79,6 +80,10 @@ export const RouteNames = {
 export const MainRouter = createBrowserRouter([
 	{
 		path: RouteNames.login,
+		element: <Auth />,
+	},
+	{
+		path: RouteNames.auth,
 		element: <Auth />,
 	},
 	{
