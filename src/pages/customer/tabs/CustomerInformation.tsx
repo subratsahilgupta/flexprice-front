@@ -38,10 +38,6 @@ const CustomerInformation = () => {
 			label: 'Billing ID',
 			value: customer?.external_id || '--',
 			labelStyle: 'semibold',
-			tag: {
-				text: 'stripe',
-				variant: 'subtle',
-			},
 		},
 		{
 			variant: 'divider',
