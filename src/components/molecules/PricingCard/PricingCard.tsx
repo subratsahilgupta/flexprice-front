@@ -12,8 +12,9 @@ export interface PricingCardProps {
 	price: {
 		amount?: string;
 		currency?: string;
-		displayAmount?: string;
 		billingPeriod?: string;
+		type?: string;
+		displayType: 'free' | 'usage' | 'fixed';
 	};
 	entitlements: Array<{
 		id: string;
@@ -50,9 +51,17 @@ const formatEntitlementValue = ({
 	}
 };
 
+const PRICE_DISPLAY_CONFIG = {
+	free: { text: 'Free', showBillingPeriod: false },
+	usage: { text: 'Pay as you go', showBillingPeriod: false },
+	fixed: { text: '', showBillingPeriod: true },
+} as const;
+
 const PricingCard: React.FC<PricingCardProps> = ({ id, name, price, entitlements, className = '' }) => {
 	const navigate = useNavigate();
-	const displayAmount = price.displayAmount || `${getCurrencySymbol(price.currency || '')}${price.amount}`;
+
+	const config = PRICE_DISPLAY_CONFIG[price.displayType];
+	const displayAmount = config.text || `${getCurrencySymbol(price.currency || '')}${price.amount}`;
 
 	return (
 		<div className={`rounded-3xl border border-gray-100 p-7 bg-white hover:border-gray-200 transition-all shadow-sm ${className}`}>
@@ -66,7 +75,9 @@ const PricingCard: React.FC<PricingCardProps> = ({ id, name, price, entitlements
 			<div className='mt-6'>
 				<div className='flex items-baseline'>
 					<span className='text-4xl font-normal text-gray-900'>{displayAmount}</span>
-					<span className='ml-2 text-sm text-gray-500'>/{formatBillingPeriodForPrice(price.billingPeriod || '')}</span>
+					{config.showBillingPeriod && (
+						<span className='ml-2 text-sm text-gray-500'>/{formatBillingPeriodForPrice(price.billingPeriod || '')}</span>
+					)}
 				</div>
 			</div>
 
