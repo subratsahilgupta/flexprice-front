@@ -18,20 +18,17 @@ const Page: FC<Props> = ({ children, className, type = 'default', header, headin
 	}
 
 	return (
-		<div
-			className={cn(
-				'min-h-screen page pb-6 ',
-				type === 'left-aligned' && 'px-6',
-				type === 'default' && 'mx-auto max-w-screen-lg',
-				className,
-			)}>
-			{header && header}
-			{heading && (
-				<SectionHeader title={heading} titleClassName={headingClassName}>
-					{headingCTA}
-				</SectionHeader>
-			)}
-			{children}
+		<div className='min-h-screen flex flex-col'>
+			<div
+				className={cn('flex-1 page w-full', type === 'left-aligned' && 'px-6', type === 'default' && 'mx-auto max-w-screen-lg', className)}>
+				{header && header}
+				{heading && (
+					<SectionHeader title={heading} titleClassName={headingClassName}>
+						{headingCTA}
+					</SectionHeader>
+				)}
+				<div className='mb-12'>{children}</div>
+			</div>
 		</div>
 	);
 };

@@ -199,7 +199,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 							}
 						}}
 					/>
-					{suffix && <div className='ml-2'>{suffix}</div>}
+					{suffix && <div className='ml-2 text-muted-foreground'>{suffix}</div>}
 				</div>
 				{/* Description */}
 				{description && <p className={cn('text-sm', disabled ? 'text-zinc-500' : 'text-muted-foreground')}>{description}</p>}

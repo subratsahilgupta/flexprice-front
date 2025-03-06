@@ -1,4 +1,4 @@
-import { Button, Chip, FormHeader, Modal, Select, ShortPagination, Spacer } from '@/components/atoms';
+import { AddButton, Button, Card, CardHeader, Chip, FormHeader, Modal, Select, ShortPagination, Spacer } from '@/components/atoms';
 import { DropdownMenu, DropdownMenuOption, TopupCard, WalletTransactionsTable } from '@/components/molecules';
 import { Skeleton } from '@/components/ui/skeleton';
 import usePagination from '@/hooks/usePagination';
@@ -39,6 +39,11 @@ const WalletTab = () => {
 	const [isAdd, setisAdd] = useState(false);
 	const [showTopupModal, setshowTopupModal] = useState(false);
 	const dropdownOptions: DropdownMenuOption[] = [
+		{
+			icon: <WalletIcon />,
+			label: 'Create Wallet',
+			onSelect: () => setisAdd(true),
+		},
 		{
 			icon: <CircleFadingPlus />,
 			label: 'Topup Wallet',
@@ -132,13 +137,9 @@ const WalletTab = () => {
 
 	if (wallets?.length === 0) {
 		return (
-			<div className='card w-full flex justify-between items-center '>
-				<FormHeader title='Wallet' subtitle='No wallet linked to the customer yet.' variant='sub-header' />
-				<Button onClick={() => setisAdd(true)}>
-					<WalletIcon />
-					<span>Add Wallet</span>
-				</Button>
-			</div>
+			<Card variant='notched'>
+				<CardHeader title='Wallet' subtitle='No wallet linked to the customer yet' cta={<AddButton onClick={() => setisAdd(true)} />} />
+			</Card>
 		);
 	}
 
@@ -174,10 +175,10 @@ const WalletTab = () => {
 					)}
 				</div>
 				<div className='flex items-center space-x-2	'>
-					<Button onClick={() => setisAdd(true)}>
+					{/* <Button onClick={() => setisAdd(true)}>
 						<WalletIcon />
 						<span>Add Wallet</span>
-					</Button>
+					</Button> */}
 
 					<DropdownMenu
 						options={dropdownOptions}

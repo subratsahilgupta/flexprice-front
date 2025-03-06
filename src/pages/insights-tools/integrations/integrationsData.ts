@@ -53,10 +53,9 @@ export const integrations: Integration[] = [
 	},
 	{
 		name: 'Razorpay',
-		description:
-			'Razorpay is a payments solution in India that allows businesses to accept, process and disburse payments with its product suite.',
+		description: 'Accept, process and disburse payments.',
 		logo: 'https://upload.wikimedia.org/wikipedia/commons/7/77/Razorpay_logo.png',
-		tags: [],
+		tags: ['Payments', 'Invoices'],
 		info: [
 			{
 				title: 'Overview',
@@ -96,7 +95,7 @@ export const integrations: Integration[] = [
 	{
 		name: 'Salesforce',
 		description: 'Salesforce is a customer relationship management (CRM) platform.',
-		logo: 'https://www.salesforce.com/news/wp-content/uploads/sites/3/2024/02/Salesforce-logo.jpg?w=2048&h=1152',
+		logo: 'https://upload.wikimedia.org/wikipedia/commons/f/f9/Salesforce.com_logo.svg',
 		tags: ['CRM'],
 		premium: true,
 		type: 'available',

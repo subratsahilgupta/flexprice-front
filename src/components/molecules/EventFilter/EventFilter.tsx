@@ -2,7 +2,7 @@ import { Button, Input, MultiChipInput } from '@/components/atoms';
 import { cn } from '@/lib/utils';
 import React, { FC, useEffect } from 'react';
 import { RiDeleteBin6Line } from 'react-icons/ri';
-
+import { Plus } from 'lucide-react';
 interface Props {
 	eventFilters: EventFilterData[];
 	permanentFilters?: EventFilterData[];
@@ -111,7 +111,10 @@ const EventFilter: FC<Props> = ({ eventFilters, setEventFilters, error, permanen
 				onClick={() => {
 					setEventFilters([...eventFilters, { key: '', values: [] }]);
 				}}>
-				<span className='font-normal'>Add Event Filter</span>
+				<span className='font-normal flex items-center gap-2'>
+					<Plus className='size-4' />
+					Add Event Filter
+				</span>
 			</Button>
 		</div>
 	);

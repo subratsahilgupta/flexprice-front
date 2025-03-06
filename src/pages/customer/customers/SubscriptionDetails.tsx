@@ -27,11 +27,10 @@ const SubscriptionDetails: FC = () => {
 	const { data: customer } = useQuery({
 		queryKey: ['fetchCustomerDetails', customerId],
 		queryFn: async () => await CustomerApi.getCustomerById(customerId!),
-
 		enabled: !!customerId,
 	});
 
-	const { data, isLoading, isError } = useQuery({
+	const { data, isLoading, isError, refetch } = useQuery({
 		queryKey: ['subscriptionInvoices', subscription_id],
 		queryFn: async () => {
 			return await SubscriptionApi.getSubscriptionInvoicesPreview({ subscription_id: subscription_id! });
@@ -108,6 +107,7 @@ const SubscriptionDetails: FC = () => {
 			{(data?.line_items?.length ?? 0) > 0 && (
 				<div className='card !mt-4'>
 					<InvoiceLineItemTable
+						refetch={refetch}
 						currency={data?.currency}
 						amount_due={data?.amount_due}
 						title='Upcoming Invoices'

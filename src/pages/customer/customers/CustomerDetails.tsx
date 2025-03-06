@@ -70,7 +70,7 @@ const CustomerDetails = () => {
 	return (
 		<Page className='space-y-6'>
 			<CustomerHeader customerId={customerId!} />
-			<div className='border-b border-border'>
+			<div className='border-b border-border mt-4 mb-6'>
 				<nav className='flex space-x-4' aria-label='Tabs'>
 					{tabs.map((tab) => (
 						<button

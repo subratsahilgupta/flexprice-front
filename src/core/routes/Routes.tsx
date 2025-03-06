@@ -6,12 +6,12 @@ import AuthMiddleware from '../auth/AuthProvider';
 import MeterPage from '@/pages/usage/meter/MeterPage';
 import AddMeterPage from '@/pages/usage/meter/AddMeter';
 import EditMeterPage from '@/pages/usage/meter/EditMeterPage';
-import PricingPlans from '@/pages/product-catalog/pricingPlans/PricingPlans';
-import CreatePlanPage from '@/pages/product-catalog/pricingPlans/CreatePlan';
+import PricingPlans from '@/pages/product-catalog/plans/Plans';
+import CreatePlanPage from '@/pages/product-catalog/plans/CreatePlan';
 import CustomerSubscription from '@/pages/customer/customers/CustomerSubscription';
 import CustomerDetails from '@/pages/customer/customers/CustomerDetails';
 import ErrorPage from '@/pages/error/ErrorPage';
-import PlanDetailsPage from '@/pages/product-catalog/pricingPlans/PlanDetailsPage';
+import PlanDetailsPage from '@/pages/product-catalog/plans/PlanDetailsPage';
 import EventsPage from '@/pages/usage/events/Events';
 import QueryPage from '@/pages/usage/query/Query';
 import InvoicePage from '@/pages/customer/invoices/InvoicePage';
@@ -34,6 +34,8 @@ import DeveloperPage from '@/pages/developer/developer';
 import SignupConfirmation from '@/pages/auth/SignupConfirmation';
 import ResendVerification from '@/pages/auth/ResendVerification';
 import CustomerInformation from '@/pages/customer/tabs/CustomerInformation';
+import PricingPage from '@/pages/product-catalog/plans/Pricing';
+import OnboardingPage from '@/pages/onboarding/onboarding';
 export const RouteNames = {
 	home: '/',
 	login: '/login',
@@ -56,9 +58,10 @@ export const RouteNames = {
 
 	// product catalog routes
 	productCatalog: '/product-catalog',
-	createPlan: '/product-catalog/pricing-plan/create-plan',
-	pricingPlan: '/product-catalog/pricing-plan',
-	editPlan: '/product-catalog/pricing-plan/edit-plan',
+	createPlan: '/product-catalog/plan/create-plan',
+	plan: '/product-catalog/plan',
+	editPlan: '/product-catalog/plan/edit-plan',
+	pricing: '/product-catalog/pricing',
 
 	features: '/product-catalog/features',
 	createFeature: '/product-catalog/features/create-feature',
@@ -75,6 +78,7 @@ export const RouteNames = {
 
 	// footer
 	developers: '/developers',
+	onboarding: '/onboarding',
 };
 
 export const MainRouter = createBrowserRouter([
@@ -104,7 +108,7 @@ export const MainRouter = createBrowserRouter([
 		children: [
 			{
 				path: '/',
-				element: <Navigate to={RouteNames.features} />,
+				element: <Navigate to={RouteNames.pricing} />,
 			},
 			{
 				path: RouteNames.usageTracking,
@@ -200,11 +204,15 @@ export const MainRouter = createBrowserRouter([
 				path: RouteNames.productCatalog,
 				children: [
 					{
-						path: RouteNames.pricingPlan,
+						path: RouteNames.plan,
 						element: <PricingPlans />,
 					},
 					{
-						path: `${RouteNames.pricingPlan}/:planId`,
+						path: RouteNames.pricing,
+						element: <PricingPage />,
+					},
+					{
+						path: `${RouteNames.plan}/:planId`,
 						element: <PlanDetailsPage />,
 					},
 					{
@@ -253,6 +261,10 @@ export const MainRouter = createBrowserRouter([
 			{
 				path: RouteNames.developers,
 				element: <DeveloperPage />,
+			},
+			{
+				path: RouteNames.onboarding,
+				element: <OnboardingPage />,
 			},
 		],
 	},

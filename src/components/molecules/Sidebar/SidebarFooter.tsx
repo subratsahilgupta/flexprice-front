@@ -1,15 +1,13 @@
-import { ChevronsUpDown, LogOut } from 'lucide-react';
-import { ExternalLink } from 'lucide-react';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, ExternalLink, ChevronsUpDown, CodeXml, LogOut, ListChecks } from 'lucide-react';
 import { RouteNames } from '@/core/routes/Routes';
 import { SidebarMenuButton, useSidebar } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
-import { CodeXml } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import supabase from '@/core/supbase/config';
 import useUser from '@/hooks/useUser';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Skeleton } from '@/components/ui/skeleton';
+
 const SidebarFooter = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
@@ -23,6 +21,21 @@ const SidebarFooter = () => {
 	const { open: sidebarOpen } = useSidebar();
 
 	if (loading) return <Skeleton className='w-full h-10' />;
+
+	const dropdownItems = [
+		{
+			label: 'Onboarding',
+			icon: ListChecks,
+			onClick: () => {
+				navigate(RouteNames.onboarding);
+			},
+		},
+		{
+			label: 'Logout',
+			icon: LogOut,
+			onClick: handleLogout,
+		},
+	];
 
 	return (
 		<div className='flex flex-col gap-2 w-full'>
@@ -70,11 +83,18 @@ const SidebarFooter = () => {
 						<ChevronsUpDown className={cn('h-4 w-4 text-muted-foreground', sidebarOpen ? '' : 'hidden')} />
 					</button>
 				</PopoverTrigger>
-				<PopoverContent className='w-64 p-2'>
-					<button onClick={handleLogout} className='w-full flex items-center gap-2 rounded-md p-2 text-sm hover:bg-muted transition-colors'>
-						<LogOut className='size-4' />
-						<span>Logout</span>
-					</button>
+				<PopoverContent className='!w-56 mx-auto p-2 space-y-1'>
+					{dropdownItems.map((item, index) => {
+						return (
+							<button
+								key={index}
+								onClick={item.onClick}
+								className='w-full flex items-center gap-2 rounded-md px-2 py-1 text-sm hover:bg-muted transition-colors'>
+								{item.icon && <item.icon className='size-4' />}
+								<span className='text-sm'>{item.label}</span>
+							</button>
+						);
+					})}
 				</PopoverContent>
 			</Popover>
 		</div>

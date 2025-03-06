@@ -39,7 +39,6 @@ const loadingQuotes = [
 	'Turning usage into beautiful stories 📖',
 	'Making sure every click counts (literally!) 🖱️',
 	"Doing complex math so you don't have to 🧮",
-	'Your usage data is getting a spa treatment 💆‍♂️',
 ];
 
 export default loadingQuotes;

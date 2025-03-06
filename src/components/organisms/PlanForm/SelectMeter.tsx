@@ -24,7 +24,7 @@ const SelectMeter: FC<Props> = ({
 	value,
 	error,
 	label = 'Feature',
-	placeholder = 'Select by feature name',
+	placeholder = 'Select a metered feature',
 	description,
 	className,
 }) => {

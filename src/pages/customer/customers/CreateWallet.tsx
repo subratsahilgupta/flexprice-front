@@ -67,11 +67,7 @@ const CreateWallet: FC<Props> = ({ customerId, onClose = () => {} }) => {
 			/>
 			<Spacer className='!mt-4' />
 			<div className='card space-y-4'>
-				<FormHeader
-					title='Wallet'
-					subtitle={`Create a prepaid wallet to add credits that can be consumed for billing purposes.`}
-					variant='sub-header'
-				/>
+				<FormHeader title='Wallet setup' subtitle={`Define the wallet details and the currency it will operate in.`} variant='sub-header' />
 				<Input error={errors.walletName} value={walletName} onChange={setwalletName} label='Wallet Name' placeholder='Enter wallet name' />
 
 				<Select

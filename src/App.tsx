@@ -32,7 +32,7 @@ const App = () => {
 					position='bottom-center'
 				/>
 			</UserProvider>
-			<ReactQueryDevtools initialIsOpen={false} />
+			<ReactQueryDevtools buttonPosition='top-right' initialIsOpen={false} />
 		</ReactQueryProvider>
 	);
 };

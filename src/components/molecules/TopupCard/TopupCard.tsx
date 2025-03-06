@@ -34,6 +34,7 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 			label: 'Free Credits',
 			icon: Receipt,
 			disabled: false,
+			description: 'Grant credits without a charge.',
 		},
 		{
 			value: 'USAGE',
@@ -41,6 +42,7 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 			icon: Gift,
 			disabled: true,
 			premium: true,
+			description: 'Add credits that require payment.',
 		},
 	];
 
@@ -103,7 +105,7 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 	return (
 		<div>
 			<div className={cn('card space-y-4 lg:w-full', className)}>
-				<FormHeader title='Add Credits' subtitle={`Define credits to purchase and to grant upon wallet creation`} variant='sub-header' />
+				<FormHeader title='Add Credits' subtitle={`Define number of credits to add to the wallet`} variant='sub-header' />
 
 				<div>
 					<RectangleRadiogroup
