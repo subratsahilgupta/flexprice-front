@@ -121,7 +121,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 		}, [cursorPosition]);
 
 		const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-			let newValue = e.target.value.trim();
+			let newValue = e.target.value;
 			const oldValue = (value as string) || '';
 			const currentCursorPosition = e.target.selectionStart || 0;
 
