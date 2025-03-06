@@ -35,6 +35,7 @@ import SignupConfirmation from '@/pages/auth/SignupConfirmation';
 import ResendVerification from '@/pages/auth/ResendVerification';
 import CustomerInformation from '@/pages/customer/tabs/CustomerInformation';
 import PricingPlansView from '@/pages/product-catalog/pricingPlans/PricingPlansView';
+import OnboardingPage from '@/pages/onboarding/onboarding';
 export const RouteNames = {
 	home: '/',
 	login: '/auth',
@@ -76,6 +77,7 @@ export const RouteNames = {
 
 	// footer
 	developers: '/developers',
+	onboarding: '/onboarding',
 };
 
 export const MainRouter = createBrowserRouter([
@@ -254,6 +256,10 @@ export const MainRouter = createBrowserRouter([
 			{
 				path: RouteNames.developers,
 				element: <DeveloperPage />,
+			},
+			{
+				path: RouteNames.onboarding,
+				element: <OnboardingPage />,
 			},
 		],
 	},

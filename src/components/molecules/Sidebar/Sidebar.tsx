@@ -21,7 +21,7 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				icon: '/assets/svg/pricing_plan.svg',
 			},
 			{
-				title: 'Pricing Page',
+				title: 'Pricing',
 				url: RouteNames.pricing,
 				icon: <Gem />,
 			},
