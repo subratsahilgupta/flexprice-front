@@ -284,7 +284,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 									<Spacer className='!my-4' />
 									<Checkbox
 										id='set-infinite'
-										label='Set value to infinite'
+										label='Set to infinite'
 										checked={tempEntitlement.usage_limit === null}
 										onCheckedChange={(e) => {
 											setEntitlement({
@@ -314,7 +314,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 									<Toggle
 										checked={tempEntitlement.is_soft_limit ?? false}
 										label='Soft Limit'
-										description='When soft limit is enabled, the access is always granted, even with zero balance'
+										description='If enabled, access is always granted, even if the limit is exceeded.'
 										onChange={(value) => {
 											setEntitlement({
 												...tempEntitlement,

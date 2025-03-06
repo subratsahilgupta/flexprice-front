@@ -13,18 +13,37 @@ const formatAmount = (type: string, amount: number) => {
 		</span>
 	);
 };
-const fomatTransactionTitle = (type: string) => {
-	return <span className={cn('text-[#18181B] ')}>{type === 'credit' ? 'Credits Invoiced' : 'Credits Offered'}</span>;
+const fomatTransactionTitle = ({ type, reason }: { type: string; reason: string }) => {
+	switch (reason) {
+		case 'INVOICE_PAYMENT':
+			return 'Invoice Payment';
+		case 'FREE_CREDIT_GRANT':
+			return 'Free Credits Added';
+		case 'SUBSCRIPTION_CREDIT_GRANT':
+			return 'Subscription Credits Added';
+		case 'PURCHASED_CREDIT_INVOICED':
+			return 'Purchased Credits (Invoiced)';
+		case 'PURCHASED_CREDIT_DIRECT':
+			return 'Purchased Credits';
+		case 'INVOICE_REFUND':
+			return 'Invoice Refund';
+		case 'CREDIT_EXPIRED':
+			return 'Credits Expired';
+		case 'WALLET_TERMINATION':
+			return 'Wallet Terminated';
+	}
+
+	return type === 'credit' ? 'Credited' : 'Debited';
 };
 
 interface Props {
 	data: WalletTransaction[];
 }
 
-const columnData: ColumnData[] = [
+const columnData: ColumnData<WalletTransaction>[] = [
 	{
 		title: 'Transactions',
-		render: (rowData) => fomatTransactionTitle(rowData.type),
+		render: (rowData) => fomatTransactionTitle({ type: rowData.type, reason: rowData.transaction_reason }),
 		fieldVariant: 'title',
 	},
 	{

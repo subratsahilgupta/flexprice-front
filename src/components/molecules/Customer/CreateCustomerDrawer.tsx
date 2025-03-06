@@ -206,7 +206,9 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 				isOpen={currentOpen}
 				onOpenChange={toggleOpen}
 				title={data ? 'Edit Customer' : 'Add Customer'}
-				description={data ? 'Update customer details and manage billing details' : 'To create a customer, please fill out this form.'}
+				description={
+					data ? 'Enter customer details to update the account.' : 'Enter customer details to create a new account in the system.'
+				}
 				trigger={trigger}>
 				<div className='space-y-4'>
 					<Spacer className='!h-4' />

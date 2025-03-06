@@ -156,7 +156,7 @@ const DeveloperPage = () => {
 
 	return (
 		<Page
-			heading='Developers'
+			heading='API Keys'
 			headingCTA={
 				<Button prefixIcon={<Plus />} onClick={handleAddSecretKey}>
 					Add
