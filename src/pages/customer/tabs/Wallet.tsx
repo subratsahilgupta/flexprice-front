@@ -40,6 +40,11 @@ const WalletTab = () => {
 	const [showTopupModal, setshowTopupModal] = useState(false);
 	const dropdownOptions: DropdownMenuOption[] = [
 		{
+			icon: <WalletIcon />,
+			label: 'Create Wallet',
+			onSelect: () => setisAdd(true),
+		},
+		{
 			icon: <CircleFadingPlus />,
 			label: 'Topup Wallet',
 			onSelect: () => setshowTopupModal(true),
@@ -174,10 +179,10 @@ const WalletTab = () => {
 					)}
 				</div>
 				<div className='flex items-center space-x-2	'>
-					<Button onClick={() => setisAdd(true)}>
+					{/* <Button onClick={() => setisAdd(true)}>
 						<WalletIcon />
 						<span>Add Wallet</span>
-					</Button>
+					</Button> */}
 
 					<DropdownMenu
 						options={dropdownOptions}

@@ -1,7 +1,7 @@
 import { RouterProvider } from 'react-router-dom';
 import { MainRouter } from '@/core/routes/Routes';
 import { UserProvider } from '@/hooks/UserContext';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+// import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import ReactQueryProvider from '@/core/tanstack/ReactQueryProvider';
 import { Toaster } from 'react-hot-toast';
 // import VercelSpeedInsights from '@/core/vercel/vercel';
@@ -32,7 +32,7 @@ const App = () => {
 					position='bottom-center'
 				/>
 			</UserProvider>
-			<ReactQueryDevtools initialIsOpen={false} />
+			{/* <ReactQueryDevtools initialIsOpen={false} /> */}
 		</ReactQueryProvider>
 	);
 };

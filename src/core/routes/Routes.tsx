@@ -34,6 +34,8 @@ import DeveloperPage from '@/pages/developer/developer';
 import SignupConfirmation from '@/pages/auth/SignupConfirmation';
 import ResendVerification from '@/pages/auth/ResendVerification';
 import CustomerInformation from '@/pages/customer/tabs/CustomerInformation';
+import PricingPlansView from '@/pages/product-catalog/pricingPlans/PricingPlansView';
+import OnboardingPage from '@/pages/onboarding/onboarding';
 export const RouteNames = {
 	home: '/',
 	login: '/auth',
@@ -55,9 +57,10 @@ export const RouteNames = {
 
 	// product catalog routes
 	productCatalog: '/product-catalog',
-	createPlan: '/product-catalog/pricing-plan/create-plan',
-	pricingPlan: '/product-catalog/pricing-plan',
-	editPlan: '/product-catalog/pricing-plan/edit-plan',
+	createPlan: '/product-catalog/plan/create-plan',
+	plan: '/product-catalog/plan',
+	editPlan: '/product-catalog/plan/edit-plan',
+	pricing: '/product-catalog/pricing',
 
 	features: '/product-catalog/features',
 	createFeature: '/product-catalog/features/create-feature',
@@ -74,6 +77,7 @@ export const RouteNames = {
 
 	// footer
 	developers: '/developers',
+	onboarding: '/onboarding',
 };
 
 export const MainRouter = createBrowserRouter([
@@ -195,11 +199,15 @@ export const MainRouter = createBrowserRouter([
 				path: RouteNames.productCatalog,
 				children: [
 					{
-						path: RouteNames.pricingPlan,
+						path: RouteNames.plan,
 						element: <PricingPlans />,
 					},
 					{
-						path: `${RouteNames.pricingPlan}/:planId`,
+						path: RouteNames.pricing,
+						element: <PricingPlansView />,
+					},
+					{
+						path: `${RouteNames.plan}/:planId`,
 						element: <PlanDetailsPage />,
 					},
 					{
@@ -248,6 +256,10 @@ export const MainRouter = createBrowserRouter([
 			{
 				path: RouteNames.developers,
 				element: <DeveloperPage />,
+			},
+			{
+				path: RouteNames.onboarding,
+				element: <OnboardingPage />,
 			},
 		],
 	},

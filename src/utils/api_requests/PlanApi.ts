@@ -3,7 +3,7 @@ import { Plan } from '@/models/Plan';
 import { ExpandedPlan } from '../models/transformed_plan';
 import { PaginationType } from '@/models/Pagination';
 
-interface GetAllPlansResponse {
+export interface GetAllPlansResponse {
 	items: Plan[] | ExpandedPlan[];
 	pagination: PaginationType;
 }
@@ -16,14 +16,16 @@ export class PlanApi {
 	}
 
 	public static async getAllPlans({ limit, offset }: PaginationType) {
-		return await AxiosClient.get<GetAllPlansResponse>(`${this.baseUrl}?limit=${limit}&offset=${offset}&expand=entitlements`);
+		return await AxiosClient.get<GetAllPlansResponse>(
+			`${this.baseUrl}?limit=${limit}&offset=${offset}&expand=entitlements%2Cprices%2Cmeters%2Cfeatures`,
+		);
 	}
 	public static async getAllActivePlans() {
 		return await AxiosClient.get<GetAllPlansResponse>(`${this.baseUrl}?status=published`);
 	}
 
 	public static async getExpandedPlan() {
-		const response = await AxiosClient.get<GetAllPlansResponse>(`${this.baseUrl}?expand=prices%2Cmeters`);
+		const response = await AxiosClient.get<GetAllPlansResponse>(`${this.baseUrl}?expand=prices%2Cmeters%2Centitlements`);
 		return response.items as ExpandedPlan[];
 	}
 	public static async getActiveExpandedPlan() {

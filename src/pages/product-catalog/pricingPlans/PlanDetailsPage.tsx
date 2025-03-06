@@ -143,7 +143,7 @@ const PlanDetailsPage = () => {
 		},
 		onSuccess: () => {
 			toast.success('Plan archived successfully');
-			navigate(RouteNames.pricingPlan);
+			navigate(RouteNames.plan);
 		},
 		onError: () => {
 			toast.error('Failed to archive plan');

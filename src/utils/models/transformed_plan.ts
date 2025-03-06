@@ -1,7 +1,8 @@
 import { Price } from '@/models/Price';
 import { getCurrencySymbol } from '../common/helper_functions';
 import { ChargesForBillingPeriodOne } from '@/components/organisms/Subscription/PriceTable';
-
+import { Entitlement } from '@/models/Entitlement';
+import { Meter } from '@/models/Meter';
 export type PriceTier = {
 	flat_amount: number;
 	unit_amount: number;
@@ -22,6 +23,8 @@ export interface ExpandedPlan {
 	readonly created_by: string;
 	readonly updated_by: string;
 	readonly prices: Price[] | null;
+	readonly entitlements: Entitlement[] | null;
+	readonly meters: Meter[] | null;
 }
 
 export type NormalizedPlan = {

@@ -27,7 +27,6 @@ const SubscriptionDetails: FC = () => {
 	const { data: customer } = useQuery({
 		queryKey: ['fetchCustomerDetails', customerId],
 		queryFn: async () => await CustomerApi.getCustomerById(customerId!),
-
 		enabled: !!customerId,
 	});
 

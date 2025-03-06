@@ -59,7 +59,7 @@ const PlansTable: FC<PlansTableProps> = ({ data }) => {
 			columns={columns}
 			data={mappedData}
 			onRowClick={(row) => {
-				navigate(RouteNames.pricingPlan + `/${row.id}`);
+				navigate(RouteNames.plan + `/${row.id}`);
 			}}
 		/>
 	);
