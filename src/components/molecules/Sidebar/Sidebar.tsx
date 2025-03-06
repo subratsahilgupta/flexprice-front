@@ -1,34 +1,34 @@
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/components/ui/sidebar';
 import React from 'react';
 import SidebarNav, { NavItem } from './SidebarMenu';
-import { Plug2, Star, FileSearch, CalendarClock, Gem } from 'lucide-react';
 import FlexpriceSidebarFooter from './SidebarFooter';
-
 import { RouteNames } from '@/core/routes/Routes';
 import { EnvironmentSelector } from '@/components/molecules';
+import { Star, FileText, Gem, Users, Receipt, FileSearch, CalendarClock, Plug2, FileInput } from 'lucide-react';
+
 const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }) => {
 	const navMain: { [key: string]: NavItem[] } = {
 		'Product Cataglog': [
 			{
 				title: 'Features',
 				url: RouteNames.features,
-				icon: <Star />,
+				icon: Star,
 				// disabled: true,
 			},
 			{
 				title: 'Plans',
 				url: RouteNames.plan,
-				icon: '/assets/svg/pricing_plan.svg',
+				icon: FileText,
 			},
 			{
 				title: 'Pricing',
 				url: RouteNames.pricing,
-				icon: <Gem />,
+				icon: Gem,
 			},
 			// {
 			// 	title: 'Add On',
 			// 	url: RouteNames.addOn,
-			// 	icon: <Puzzle />,
+			// 	icon: Puzzle,
 			// 	disabled: true,
 			// },
 		],
@@ -36,19 +36,17 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 			{
 				title: 'Customers',
 				url: RouteNames.customers,
-				icon: '/assets/svg/customers.svg',
+				icon: Users,
 			},
-
 			{
 				title: 'Invoices',
 				url: RouteNames.invoices,
-				icon: '/assets/svg/receipt.svg',
+				icon: Receipt,
 			},
-
 			// {
 			// 	title: 'Quotation',
 			// 	url: '/roles',
-			// 	icon: '/assets/svg/quotation.svg',
+			// 	icon: Receipt,
 			// 	disabled: true,
 			// },
 		],
@@ -56,18 +54,18 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 			// {
 			// 	title: 'Meter',
 			// 	url: RouteNames.meter,
-			// 	icon: '/assets/svg/billable_metrics.svg',
+			// 	icon: FileText,
 			// },
 			{
 				title: 'Query',
 				url: RouteNames.queryPage,
-				icon: <FileSearch />,
+				icon: FileSearch,
 				disabled: false,
 			},
 			{
 				title: 'Events',
 				url: RouteNames.events,
-				icon: <CalendarClock />,
+				icon: CalendarClock,
 				isActive: false,
 				// items: [
 				// 	{
@@ -85,17 +83,16 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				// ],
 			},
 		],
-
 		'Insights & Tools': [
 			{
 				title: 'Integrations',
 				url: RouteNames.integrations,
-				icon: <Plug2 />,
+				icon: Plug2,
 			},
 			{
 				title: 'Bulk Imports',
 				url: RouteNames.importExport,
-				icon: '/assets/svg/import-export.svg',
+				icon: FileInput,
 				// disabled: true,
 			},
 		],

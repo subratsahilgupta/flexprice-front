@@ -4,7 +4,6 @@ import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButto
 import { ChevronRight } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Link, useNavigate } from 'react-router-dom';
-import { ReactSVG } from 'react-svg';
 import { cn } from '@/lib/utils';
 
 const SidebarItem: FC<NavItem> = (item) => {
@@ -15,7 +14,10 @@ const SidebarItem: FC<NavItem> = (item) => {
 			navigate(url);
 		}
 	};
+
 	const hasChildren = item.items && item.items.length > 0;
+	const Icon = item.icon;
+
 	return (
 		<Collapsible key={item.title} asChild defaultOpen={item.isActive} className='group/collapsible'>
 			<SidebarMenuItem>
@@ -27,12 +29,11 @@ const SidebarItem: FC<NavItem> = (item) => {
 						}}
 						tooltip={item.title}
 						className={cn(
-							`flex items-center gap-2 hover:bg-muted transition-colors `,
+							`flex items-center gap-2 hover:bg-muted transition-colors`,
 							item.isActive && 'bg-[#F4F4F5] font-medium text-sidebar-text-accent-foreground',
-							item.disabled && 'cursor-not-allowed',
+							item.disabled && 'cursor-not-allowed opacity-50',
 						)}>
-						{typeof item.icon === 'string' && <ReactSVG src={item.icon} className='size-4' />}
-						{typeof item.icon === 'object' && item.icon}
+						{Icon && <Icon className='size-4 stroke-4' />}
 						<span className='text-sm select-none'>{item.title}</span>
 						{hasChildren && (
 							<ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
