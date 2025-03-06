@@ -1,5 +1,4 @@
-import { AddButton, Button, Loader, Page, ShortPagination, Spacer } from '@/components/atoms';
-import { FiFolderPlus } from 'react-icons/fi';
+import { AddButton, Loader, Page, ShortPagination, Spacer } from '@/components/atoms';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
@@ -9,6 +8,7 @@ import { PlansTable } from '@/components/molecules';
 import { Plan } from '@/models/Plan';
 import { ReactSVG } from 'react-svg';
 import usePagination from '@/hooks/usePagination';
+import { RouteNames } from '@/core/routes/Routes';
 
 const PricingPlan = () => {
 	const { limit, offset, page } = usePagination();
@@ -47,11 +47,8 @@ const PricingPlan = () => {
 					<p className='font-sans text-2xl font-bold'>Add your first Plan </p>
 					<p className='text-[#71717A] font-normal '>Add your first Pricing Plan</p>
 					<Spacer height={'16px'} />
-					<Link to='/product-catalog/pricing-plan/create-plan'>
-						<Button>
-							<FiFolderPlus />
-							<span>Create Plan</span>
-						</Button>
+					<Link to={RouteNames.createPlan}>
+						<AddButton />
 					</Link>
 				</div>
 			</div>
@@ -62,7 +59,7 @@ const PricingPlan = () => {
 		<Page
 			heading='Plans'
 			headingCTA={
-				<Link to='/product-catalog/pricing-plan/create-plan'>
+				<Link to={RouteNames.createPlan}>
 					<AddButton />
 				</Link>
 			}>

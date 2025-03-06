@@ -37,6 +37,14 @@ interface GetUsageByMeterResponse {
 	}[];
 }
 
+interface FireEventsPayload {
+	customer_id?: string;
+	subscription_id?: string;
+	feature_id?: string;
+	duration?: number;
+	amount?: number;
+}
+
 class EventsApi {
 	private static baseUrl = '/events';
 
@@ -47,6 +55,12 @@ class EventsApi {
 
 	public static async getUsageByMeter(payload: GetUsageByMeterPayload): Promise<GetUsageByMeterResponse> {
 		return await AxiosClient.post<GetUsageByMeterResponse>(`${EventsApi.baseUrl}/usage/meter`, {
+			...payload,
+		});
+	}
+
+	public static async fireEvents(payload: FireEventsPayload): Promise<void> {
+		return await AxiosClient.post<void>(`/portal/onboarding/events`, {
 			...payload,
 		});
 	}

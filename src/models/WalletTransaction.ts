@@ -11,4 +11,5 @@ export type WalletTransaction = {
 	readonly transaction_status: string;
 	readonly type: string;
 	readonly wallet_id: string;
+	readonly transaction_reason: string;
 };

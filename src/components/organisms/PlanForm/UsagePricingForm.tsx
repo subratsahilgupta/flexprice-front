@@ -335,12 +335,15 @@ const UsagePricingForm: FC<Props> = ({ onSave, onDelete, prices }) => {
 				title='Billing timing'
 				value={invoiceCadence}
 				checkboxItems={[
-					{ label: 'Advance', value: 'ADVANCE', description: 'Customers are billed at the start of each billing period.' },
-
+					{
+						label: 'Advance',
+						value: 'ADVANCE',
+						description: 'Charge at the start of each billing cycle.',
+					},
 					{
 						label: 'Arrear',
 						value: 'ARREAR',
-						description: 'Customers are billed at the end of each billing period, based on actual usage.',
+						description: 'Charge at the end of the billing cycle.',
 					},
 				]}
 				onChange={(value) => {

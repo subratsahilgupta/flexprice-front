@@ -1,9 +1,11 @@
-import { Spacer } from '@/components/atoms';
+import { FormHeader, Spacer, Button } from '@/components/atoms';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
 import { Country } from 'country-state-city';
-import { Detail, DetailsCard } from '@/components/molecules';
+import { CreateCustomerDrawer, Detail, DetailsCard } from '@/components/molecules';
 import { useParams } from 'react-router-dom';
+import { Pencil } from 'lucide-react';
+import { useState } from 'react';
 
 const fetchCustomer = async (customerId: string) => {
 	return await CustomerApi.getCustomerById(customerId);
@@ -18,10 +20,18 @@ const CustomerInformation = () => {
 		enabled: !!customerId,
 	});
 
+	const [customerDrawerOpen, setcustomerDrawerOpen] = useState(false);
+
 	const billingDetails: Detail[] = [
 		{
-			label: 'Customer',
+			label: 'Name',
 			value: customer?.name || '--',
+			labelStyle: 'semibold',
+		},
+
+		{
+			label: 'External ID',
+			value: customer?.external_id || '--',
 			labelStyle: 'semibold',
 		},
 		{
@@ -30,41 +40,37 @@ const CustomerInformation = () => {
 			labelStyle: 'semibold',
 		},
 		{
-			label: 'Phone',
-			value: customer?.phone || '--',
-			labelStyle: 'semibold',
-		},
-		{
-			label: 'Billing ID',
-			value: customer?.external_id || '--',
-			labelStyle: 'semibold',
-		},
-		{
 			variant: 'divider',
 		},
 		{
 			variant: 'heading',
 			label: 'Billing Details',
+			labelStyle: 'semibold',
 		},
 		{
-			label: 'Address',
+			label: 'Address Line 1',
 			value: customer?.address_line1 || '--',
+			labelStyle: 'semibold',
 		},
 		{
 			label: 'Country',
 			value: customer?.address_country ? Country.getCountryByCode(customer.address_country)?.name : '--',
+			labelStyle: 'semibold',
+		},
+		{
+			label: 'Address Line 2',
+			value: customer?.address_line2 || '--',
+			labelStyle: 'semibold',
 		},
 		{
 			label: 'State',
 			value: customer?.address_state || '--',
+			labelStyle: 'semibold',
 		},
 		{
 			label: 'City',
 			value: customer?.address_city || '--',
-		},
-		{
-			label: 'Timezone',
-			value: customer?.timezone || '--',
+			labelStyle: 'semibold',
 		},
 	];
 
@@ -80,6 +86,20 @@ const CustomerInformation = () => {
 		<div>
 			{billingDetails.filter((detail) => detail.value !== '--').length > 0 && (
 				<div>
+					<Spacer className='!h-4' />
+					<div className='flex justify-between items-center'>
+						<FormHeader title={'Customer Details'} variant='form-component-title' />
+						<CreateCustomerDrawer
+							trigger={
+								<Button variant={'outline'} size={'icon'}>
+									<Pencil />
+								</Button>
+							}
+							open={customerDrawerOpen}
+							onOpenChange={setcustomerDrawerOpen}
+							data={customer}
+						/>
+					</div>
 					<Spacer className='!h-4' />
 					<DetailsCard variant='stacked' data={billingDetails} childrenAtTop cardStyle='borderless'>
 						{/* <div className='flex justify-end items-center mb-4'>

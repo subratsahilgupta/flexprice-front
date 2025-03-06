@@ -15,11 +15,13 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				icon: Star,
 				// disabled: true,
 			},
+
 			{
 				title: 'Plans',
 				url: RouteNames.plan,
 				icon: FileText,
 			},
+
 			{
 				title: 'Pricing',
 				url: RouteNames.pricing,

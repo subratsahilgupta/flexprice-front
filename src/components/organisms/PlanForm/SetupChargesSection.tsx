@@ -2,13 +2,14 @@ import { FormHeader, Spacer } from '@/components/atoms';
 import { IoRepeat } from 'react-icons/io5';
 import { FiDatabase } from 'react-icons/fi';
 import { cn } from '@/lib/utils';
-import { ReactSVG } from 'react-svg';
 import { Plan } from '@/models/Plan';
 import { useState } from 'react';
 import { Price } from '@/models/Price';
 import { currencyOptions, billlingPeriodOptions } from '@/core/data/constants';
 import RecurringChargesForm from './RecurringChargesForm';
 import UsagePricingForm from './UsagePricingForm';
+import { CirclePlus } from 'lucide-react';
+
 interface Props {
 	plan: Partial<Plan>;
 	setPlanField: <K extends keyof Plan>(field: K, value: Plan[K]) => void;
@@ -20,8 +21,19 @@ enum SubscriptionType {
 }
 
 export const subscriptionTypeOptions = [
-	{ value: SubscriptionType.FIXED, label: 'Recurring', icon: IoRepeat },
-	{ value: SubscriptionType.USAGE, label: 'Usage Based', icon: FiDatabase },
+	{
+		value: SubscriptionType.FIXED,
+		label: 'Recurring',
+		icon: IoRepeat,
+		description: 'Fixed pricing billed on a set schedule.',
+	},
+
+	{
+		value: SubscriptionType.USAGE,
+		label: 'Usage Based',
+		icon: FiDatabase,
+		description: 'Charges based on actual consumption.',
+	},
 ];
 
 interface AddChargesButtonProps {
@@ -31,7 +43,7 @@ interface AddChargesButtonProps {
 
 export const AddChargesButton = ({ onClick, label }: AddChargesButtonProps) => (
 	<button onClick={onClick} className='p-4 h-9 cursor-pointer flex gap-2 items-center bg-[#F4F4F5] rounded-md'>
-		<ReactSVG src='/assets/svg/CirclePlus.svg' />
+		<CirclePlus size={16} />
 		<p className='text-[#18181B] text-sm font-medium'>{label}</p>
 	</button>
 );
@@ -112,12 +124,8 @@ const SetupChargesSection: React.FC<Props> = ({ plan, setPlanField }) => {
 			{/* Subscription Type Section */}
 			{!prices.length && (
 				<div>
-					<FormHeader
-						title='Plan Charges'
-						subtitle='Choose the appropriate subscription model for this pricing plan.'
-						variant='sub-header'
-					/>
-					<FormHeader title='Select the Subscription Type' variant='form-component-title' />
+					<FormHeader title='Plan Charges' subtitle='Set how customers are charged for this plan.' variant='sub-header' />
+					<FormHeader title='Choose a Pricing Model' variant='form-component-title' />
 					<div className='w-full gap-4 grid grid-cols-2'>
 						{subscriptionTypeOptions.map((type) => (
 							<button
@@ -129,15 +137,10 @@ const SetupChargesSection: React.FC<Props> = ({ plan, setPlanField }) => {
 								)}>
 								{type.icon && <type.icon size={24} className='text-[#020617]' />}
 								<p className='text-[#18181B] font-medium mt-2'>{type.label}</p>
+								<p className='text-sm text-muted-foreground'>{type.description}</p>
 							</button>
 						))}
 					</div>
-					<Spacer height='4px' />
-					<p className='text-sm text-muted-foreground'>
-						{subscriptionType === SubscriptionType.FIXED
-							? 'Customers are charged on a recurring basis (e.g., monthly or yearly).'
-							: 'Customers are charged based on their actual usage (e.g., per API call, compute time).'}
-					</p>
 					<Spacer height='16px' />
 				</div>
 			)}

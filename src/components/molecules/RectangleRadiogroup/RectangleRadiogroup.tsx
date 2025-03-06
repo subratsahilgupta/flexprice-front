@@ -10,6 +10,7 @@ export interface RectangleRadiogroupOption {
 	disabled?: boolean;
 	comingSoon?: boolean;
 	premium?: boolean;
+	description?: string;
 }
 
 interface Props {
@@ -55,6 +56,7 @@ const RectangleRadiogroup: FC<Props> = ({ onChange, options, value, description,
 									</div>
 								)}
 								<p className={cn(option.disabled ? '' : 'text-[#18181B] font-medium')}>{option.label}</p>
+								{option.description && <p className='text-sm text-[#64748B] font-sans '>{option.description}</p>}
 							</button>
 						</PremiumFeature>
 					);

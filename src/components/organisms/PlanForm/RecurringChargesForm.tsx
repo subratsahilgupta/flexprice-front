@@ -22,7 +22,7 @@ const RecurringChargesForm = ({ price, onAdd, onUpdate, onDelete, isEdit }: Prop
 		const newErrors: Partial<Record<keyof InternalPrice, string>> = {};
 
 		if (!localPrice.amount) {
-			newErrors.amount = 'Amount is required';
+			newErrors.amount = 'Price is required';
 		}
 		if (!localPrice.billing_period) {
 			newErrors.billing_period = 'Billing Period is required';
@@ -101,14 +101,11 @@ const RecurringChargesForm = ({ price, onAdd, onUpdate, onDelete, isEdit }: Prop
 
 	return (
 		<div className='card'>
-			<FormHeader title='Recurring Charges' variant='form-component-title' />
-			<Spacer height={'8px'} />
 			<Select
 				value={localPrice.currency}
 				options={currencyOptions}
-				label='Select Currency'
+				label='Currency'
 				onChange={(value) => setLocalPrice({ ...localPrice, currency: value })}
-				placeholder='Select Currency'
 				error={errors.currency}
 			/>
 			<Spacer height={'8px'} />
@@ -117,7 +114,6 @@ const RecurringChargesForm = ({ price, onAdd, onUpdate, onDelete, isEdit }: Prop
 				options={billlingPeriodOptions}
 				onChange={(value) => setLocalPrice({ ...localPrice, billing_period: value })}
 				label='Billing Period'
-				placeholder='Select The Billing Period'
 				error={errors.billing_period}
 			/>
 			<Spacer height={'8px'} />
@@ -126,23 +122,28 @@ const RecurringChargesForm = ({ price, onAdd, onUpdate, onDelete, isEdit }: Prop
 				value={localPrice.amount}
 				variant='formatted-number'
 				label='Price'
+				placeholder='0'
 				error={errors.amount}
 				inputPrefix={getCurrencySymbol(localPrice.currency || '')}
 				suffix={<span className='text-[#64748B]'> {`per ${formatBillingPeriodForPrice(localPrice.billing_period || '')}`}</span>}
 			/>
 			<Spacer height={'16px'} />
+			<FormHeader title='Billing Timing' variant='form-component-title' />
 			{/* starting billing preffercences */}
 
 			<CheckboxRadioGroup
 				title='	'
 				value={localPrice.invoice_cadence}
 				checkboxItems={[
-					{ label: 'Advance', value: 'ADVANCE', description: 'Customers are billed at the start of each billing period.' },
-
+					{
+						label: 'Advance',
+						value: 'ADVANCE',
+						description: 'Charge at the start of each billing cycle.',
+					},
 					{
 						label: 'Arrear',
 						value: 'ARREAR',
-						description: 'Customers are billed at the end of each billing period, based on actual usage.',
+						description: 'Charge at the end of the billing cycle.',
 					},
 				]}
 				onChange={(value) => {
@@ -181,7 +182,7 @@ const RecurringChargesForm = ({ price, onAdd, onUpdate, onDelete, isEdit }: Prop
 							setLocalPrice({ ...localPrice, trial_period: Number(value) });
 						}}
 						suffix='days'
-						placeholder='Enter no. of days in trial period'
+						placeholder='Number of trial days'
 					/>
 				</div>
 			)}

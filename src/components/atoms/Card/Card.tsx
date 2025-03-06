@@ -78,12 +78,14 @@ interface HeaderProps {
 }
 export const CardHeader = ({ title, subtitle, cta, className }: HeaderProps) => {
 	return (
-		<div className={cn('flex items-center justify-between', className)}>
-			<div>
-				<h3 className={getTypographyClass('card-header')}>{title}</h3>
-				{subtitle && <p className={getTypographyClass('card-subtitle')}>{subtitle}</p>}
+		<div>
+			<div className={cn('flex items-center justify-between', className)}>
+				<div>
+					<h3 className={getTypographyClass('card-header')}>{title}</h3>
+				</div>
+				{cta && cta}
 			</div>
-			{cta && cta}
+			{subtitle && <p className={getTypographyClass('card-subtitle')}>{subtitle}</p>}
 		</div>
 	);
 };

@@ -54,6 +54,17 @@ import { formatAggregationType } from './AddFeature';
 // 	}
 // };
 
+const formatUsageReset = (usageReset: string) => {
+	switch (usageReset) {
+		case 'RESET_PERIOD':
+			return 'Periodic';
+		case 'NEVER':
+			return 'Cumulative';
+		default:
+			return usageReset;
+	}
+};
+
 const FeatureDetails = () => {
 	const { id: featureId } = useParams() as { id: string };
 	const { updateBreadcrumb } = useBreadcrumbsStore();
@@ -80,8 +91,6 @@ const FeatureDetails = () => {
 			updateBreadcrumb(2, data?.name, RouteNames.featureDetails + featureId);
 		}
 	}, [data, featureId, updateBreadcrumb]);
-
-	console.log(linkedEntitlements);
 
 	const columns: ColumnData<ExtendedEntitlement>[] = [
 		{
@@ -113,11 +122,13 @@ const FeatureDetails = () => {
 				if (rowData.feature_type === FeatureType.metered) {
 					const usageLimit = rowData.usage_limit ?? 'Unlimited';
 					const unitPlural =
-						rowData.usage_limit || 0 > 1 ? rowData.feature.unit_plural || 'units' : rowData.feature.unit_singular || 'unit';
+						rowData.usage_limit === null || rowData.usage_limit > 1
+							? rowData.feature.unit_plural || 'units'
+							: rowData.feature.unit_singular || 'unit';
 					return (
 						<span className='text-right'>
 							{usageLimit}
-							<span className='text-muted-foreground text-xs font-sans ml-2'>{unitPlural}</span>
+							<span className='text-muted-foreground text-sm font-sans ml-2'>{unitPlural}</span>
 						</span>
 					);
 				}
@@ -157,13 +168,13 @@ const FeatureDetails = () => {
 			}>
 			<Spacer className='!h-4' />
 			<div className='space-y-6'>
-				<Card>
+				<Card variant='notched'>
 					<CardHeader title='Linked Plans' />
 					<FlexpriceTable showEmptyRow columns={columns} data={linkedEntitlements?.items ?? []} />
 				</Card>
 
 				{data?.type === FeatureType.metered && (
-					<Card>
+					<Card variant='notched'>
 						<div className='!space-y-6'>
 							<CardHeader title='Event Details' className='!p-0 !mb-2' />
 							<div>
@@ -217,6 +228,10 @@ const FeatureDetails = () => {
 									<div className='grid grid-cols-[200px_1fr] items-center'>
 										<span className='text-gray-500 text-sm'>Unit Name</span>
 										<span className='text-gray-800 text-sm'>{`${data.unit_singular || 'unit'} / ${data.unit_plural || 'units'}`}</span>
+									</div>
+									<div className='grid grid-cols-[200px_1fr] items-center'>
+										<span className='text-gray-500 text-sm'>Usage Reset </span>
+										<span className='text-gray-800 text-sm'>{formatUsageReset(data?.meter?.reset_usage || '--')}</span>
 									</div>
 								</div>
 							</div>
