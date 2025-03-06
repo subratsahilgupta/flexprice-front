@@ -41,6 +41,7 @@ const AddFeaturePage = () => {
 			type: 'SUM',
 			field: '',
 		},
+		reset_usage: 'RESET_PERIOD',
 	});
 
 	const [meterErrors, setmeterErrors] = useState<Partial<Record<keyof Meter | 'aggregation_type' | 'aggregation_field', string>>>({});
@@ -48,19 +49,19 @@ const AddFeaturePage = () => {
 	const featureTypeOptions: SelectOption[] = [
 		{
 			label: 'Boolean',
-			description: 'Functionality that customers can either have access to or not',
+			description: 'Functionality that customers can either have access to or not i.e. SSO, CRM Integration, etc.',
 			suffixIcon: <SquareCheckBig className='size-4' />,
 			value: 'boolean',
 		},
 		{
 			label: 'Metered',
-			description: 'Functionality with varying usage based on selected plan & can be measured',
+			description: 'Functionality with varying usage that needs to be measured i.e. API calls, llm tokens, etc.',
 			suffixIcon: <Gauge className='size-4' />,
 			value: 'metered',
 		},
 		{
 			label: 'Static',
-			description: 'Functionality with varying usage however need not be measured based on customer usage.',
+			description: 'Funtionality that can be configured for a customer i.e. log retention period, support tier, etc.',
 			suffixIcon: <Wrench className='size-4' />,
 			value: 'static',
 		},
@@ -69,13 +70,13 @@ const AddFeaturePage = () => {
 	const radioMenuItemList = [
 		{
 			label: 'Periodic',
-			description: 'Reset values based on the billing cycle, such as monthly or annual usage',
+			description: 'Resets aggregation at the start of each billing cycle e.g., monthly API call limits.',
 			value: 'RESET_PERIOD',
 			icon: LuRefreshCw,
 		},
 		{
 			label: 'Cumulative',
-			description: 'Track values continuously without resetting, useful for metrics like lifetime usage.',
+			description: 'Tracks total usage continuously across billing periods e.g., file storage over time.',
 			value: 'NEVER',
 			icon: LuCircleFadingPlus,
 		},
@@ -86,6 +87,8 @@ const AddFeaturePage = () => {
 		description: z.string().optional(),
 		type: z.enum(['boolean', 'metered', 'static']).optional(),
 		meter_id: z.string().optional(),
+		unit_singular: z.string().optional(),
+		unit_plural: z.string().optional(),
 	});
 
 	const staticDate = useMemo(() => {
@@ -198,10 +201,23 @@ const AddFeaturePage = () => {
 		createFeature(featureData);
 	};
 
-	const aggregationOptions = [
-		{ label: 'Sum', value: 'SUM' },
-		{ label: 'Count', value: 'COUNT' },
-		{ label: 'Count Unique', value: 'COUNT_UNIQUE' },
+	const aggregationOptions: SelectOption[] = [
+		{
+			label: 'Sum',
+			value: 'SUM',
+			description: 'Sum a defined property for incoming events.',
+		},
+		{
+			label: 'Count',
+			value: 'COUNT',
+			description: 'Count the number of times an incoming event occurs.',
+		},
+
+		{
+			label: 'Count Unique',
+			value: 'COUNT_UNIQUE',
+			description: 'Count the number of unique value of a defined property for incoming events.',
+		},
 	];
 
 	const { isPending, mutate: createFeature } = useMutation({
@@ -275,7 +291,7 @@ const AddFeaturePage = () => {
 		<Page type='left-aligned'>
 			<FormHeader
 				title={'Create Feature'}
-				subtitle={"Make changes to your pricing plans here. Click save when you're done."}
+				subtitle={'Fetaure resprents a funtionality in the product that can be monitized i.e. api calls, storage, etc.'}
 				variant='form-title'
 			/>
 
@@ -286,12 +302,12 @@ const AddFeaturePage = () => {
 				<div className=' flex-[8] gap-7  '>
 					<div className='p-6  rounded-xl border border-[#E4E4E7]'>
 						<FormHeader
-							title={'Feature Details'}
-							subtitle={'Assign a name to your event schema to easily identify and track events processed.'}
+							title={'Details'}
+							subtitle={'Assign a name to your feature to easily identify and track it.'}
 							variant='sub-header'
 						/>
 						<Input
-							label='Feature Name*'
+							label='Name*'
 							placeholder='Enter a name for the feature'
 							value={data.name}
 							error={errors.name}
@@ -306,7 +322,7 @@ const AddFeaturePage = () => {
 						<Spacer height={'16px'} />
 						<div className='w-full min-w-[200px] overflow-hidden'>
 							<Select
-								label='Feature Type'
+								label='Type'
 								options={featureTypeOptions}
 								className='w-full overflow-hidden'
 								value={data.type}
@@ -390,8 +406,8 @@ const AddFeaturePage = () => {
 						<div className='w-full'>
 							<div className='card'>
 								<FormHeader
-									title={'Feature Type'}
-									subtitle={'Name of the property key in the data object. The groups should only include low cardinality fields.'}
+									title={'Event Details'}
+									subtitle={'Assign a name to your event to easily identify and track it.'}
 									variant='sub-header'
 								/>
 								<Spacer height={'16px'} />
@@ -399,8 +415,8 @@ const AddFeaturePage = () => {
 								<Input
 									value={meter?.event_name}
 									placeholder='tokens_total'
-									label='Event Name'
-									description='A unique identifier for the meter. This is used to refer to the meter in the Flexprice APIs.'
+									label='Name'
+									description='A unique identifier for the event used to filter and measure usage e.g. user_signup, api_calls, etc.'
 									error={meterErrors.event_name}
 									onChange={(e) => {
 										setmeter((prev) => (prev ? { ...prev, event_name: e } : { event_name: e }));
@@ -409,8 +425,8 @@ const AddFeaturePage = () => {
 								<Spacer height={'20px'} />
 
 								<FormHeader
-									title='Event Filters'
-									subtitle='Filter events based on specific properties (e.g., region, user type).'
+									title='Filters'
+									subtitle='Filter events based on specific properties e.g., region, user type or custom attributes to refine tracking.'
 									variant='form-component-title'
 								/>
 
@@ -430,8 +446,16 @@ const AddFeaturePage = () => {
 									/>
 								</div>
 							</div>
-							<Spacer height={'16px'} />
+
+							<Spacer height={'26px'} />
+
 							<div className='card'>
+								<FormHeader
+									title={'Define Aggregation'}
+									subtitle={'Aggregation helps determine how event values are computed over time.'}
+									variant='sub-header'
+								/>
+								<Spacer height={'16px'} />
 								<div className='flex flex-col gap-4'>
 									<Select
 										// disabled={isEditMode}
@@ -446,8 +470,8 @@ const AddFeaturePage = () => {
 												},
 											}))
 										}
-										description='The aggregation function to apply to the event values.'
-										label='Aggregation'
+										description='Choose how values are aggregated.'
+										label='Function'
 										placeholder='SUM'
 										error={meterErrors.aggregation_type}
 										hideSelectedTick={true}
@@ -466,9 +490,9 @@ const AddFeaturePage = () => {
 													},
 												}))
 											}
-											label='Aggregation Value'
+											label='Field'
 											placeholder='tokens'
-											description='Name of the property in the data object holding the value to aggregate over.'
+											description='Specify the property in the event data that will be aggregated. e.g. tokens, messages_sent, storage_used.											'
 											error={meterErrors.aggregation_field}
 										/>
 									)}
@@ -479,7 +503,7 @@ const AddFeaturePage = () => {
 										// disabled={isEditMode}
 										items={radioMenuItemList}
 										selected={radioMenuItemList.find((item) => item.value === meter.reset_usage)}
-										title='Aggregation Type'
+										title='Usage Reset'
 										onChange={(value) => setmeter((prev) => ({ ...prev, reset_usage: value.value! }))}
 									/>
 								</div>

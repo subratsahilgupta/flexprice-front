@@ -104,9 +104,9 @@ const getFeatureValue = (entitlement: ExtendedEntitlement) => {
 			return entitlement.static_value;
 		case FeatureType.metered:
 			return (
-				<span className='flex items-center gap-1'>
+				<span className='flex items-end gap-1'>
 					{entitlement.usage_limit ?? 'Unlimited'}
-					<span className='text-[#64748B] text-xs font-normal font-sans'>units</span>
+					<span className='text-[#64748B] text-sm font-normal font-sans'>units</span>
 				</span>
 			);
 		case FeatureType.boolean:

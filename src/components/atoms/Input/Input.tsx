@@ -121,7 +121,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 		}, [cursorPosition]);
 
 		const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-			let newValue = e.target.value;
+			let newValue = e.target.value.trim();
 			const oldValue = (value as string) || '';
 			const currentCursorPosition = e.target.selectionStart || 0;
 
@@ -199,7 +199,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 							}
 						}}
 					/>
-					{suffix && <div className='ml-2'>{suffix}</div>}
+					{suffix && <div className='ml-2 text-muted-foreground'>{suffix}</div>}
 				</div>
 				{/* Description */}
 				{description && <p className={cn('text-sm', disabled ? 'text-zinc-500' : 'text-muted-foreground')}>{description}</p>}

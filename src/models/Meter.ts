@@ -16,3 +16,8 @@ export interface Meter {
 	updated_at: string;
 	created_at: string;
 }
+
+export enum MeterResetPeriod {
+	NEVER = 'NEVER',
+	RESET_PERIOD = 'RESET_PERIOD',
+}

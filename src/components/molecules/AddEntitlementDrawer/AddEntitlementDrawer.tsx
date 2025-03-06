@@ -4,6 +4,7 @@ import { billlingPeriodOptions } from '@/core/data/constants';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 import { Entitlement } from '@/models/Entitlement';
 import Feature, { FeatureType } from '@/models/Feature';
+import { MeterResetPeriod } from '@/models/Meter';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
 import { useMutation } from '@tanstack/react-query';
 import { X } from 'lucide-react';
@@ -215,7 +216,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 				isOpen={isOpen}
 				onOpenChange={handleDrawerClose}
 				title={'Add Entitlement'}
-				description={"Make changes to your profile here. Click save when you're done."}>
+				description={'Define the features that customers will be entitled to.'}>
 				<div className='space-y-4 mt-6'>
 					{errors.general && <div className='p-3 rounded-md bg-red-50 text-red-600 text-sm mb-4'>{errors.general}</div>}
 
@@ -257,13 +258,13 @@ const AddEntitlementDrawer: FC<Props> = ({
 							{/* metered feature */}
 							{activeFeature.type === FeatureType.metered && (
 								<div>
-									{activeFeature.type === FeatureType.metered && activeFeature.meter_id && (
+									{/* {activeFeature.type === FeatureType.metered && activeFeature.meter_id && (
 										<div className='w-full flex justify-between items-center'>
 											<span className='text-muted-foreground text-sm font-sans'>Meter</span>
 											<span className='text-[#09090B] text-sm font-sans'>{activeFeature.meter?.name}</span>
 										</div>
-									)}
-									<Spacer className='!my-6' />
+									)} */}
+									{/* <Spacer className='!my-6' /> */}
 									<Input
 										error={errors.usage_limit}
 										label='Value'
@@ -295,7 +296,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 									/>
 									<Spacer className='!my-4' />
 									<Select
-										disabled={tempEntitlement.usage_limit === null}
+										disabled={tempEntitlement.usage_limit === null || activeFeature.meter.reset_usage === MeterResetPeriod.NEVER}
 										error={errors.usage_reset_period}
 										label='Usage reset'
 										placeholder='Select usage reset period'

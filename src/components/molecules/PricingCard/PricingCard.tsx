@@ -64,7 +64,7 @@ const PricingCard: React.FC<PricingCardProps> = ({ id, name, price, entitlements
 	const displayAmount = config.text || `${getCurrencySymbol(price.currency || '')}${price.amount}`;
 
 	return (
-		<div className={`rounded-3xl border border-gray-200 p-7 bg-white hover:border-gray-300 transition-all shadow-sm ${className}`}>
+		<div className={`rounded-3xl border border-gray-200 p-7 bg-white hover:border-gray-300 transition-all shadow-md ${className}`}>
 			{/* Header */}
 			<div className='space-y-2'>
 				<h3 className='text-xl font-medium text-gray-900'>{name}</h3>

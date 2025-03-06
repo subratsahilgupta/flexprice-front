@@ -8,6 +8,7 @@ import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { Link } from 'react-router-dom';
 import { Progress } from '@/components/ui/progress';
 import { RouteNames } from '@/core/routes/Routes';
+import EventsApi from '@/utils/api_requests/EventsApi';
 const STREAM_DURATION = 30000; // 30 seconds
 const TOTAL_EVENTS = 30; // Number of events to simulate
 
@@ -53,7 +54,6 @@ const DebugMenu = () => {
 				setIsStreaming(false);
 				setEventsCompleted(true);
 				setEventCount(TOTAL_EVENTS);
-				// Automatically open the popover when streaming completes
 				setIsOpen(true);
 			}
 		}, 100);
@@ -69,6 +69,11 @@ const DebugMenu = () => {
 		setProgress(0);
 		setEventsCompleted(false);
 		setEventCount(0);
+		EventsApi.fireEvents({
+			// customer_id: customerData?.items[0]?.id,
+			subscription_id: subscriptions?.items[0]?.id,
+			duration: STREAM_DURATION / 1000,
+		});
 	};
 
 	const handleClose = () => {

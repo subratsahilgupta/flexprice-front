@@ -1,4 +1,4 @@
-import { FormHeader, Input, Spacer, Textarea } from '@/components/atoms';
+import { Input, Spacer, Textarea } from '@/components/atoms';
 import { Plan } from '@/models/Plan';
 interface Props {
 	plan: Partial<Plan>;
@@ -9,14 +9,14 @@ interface Props {
 const PlanDetailsSection = ({ plan, setPlanField, errors }: Props) => {
 	return (
 		<div className='p-6  rounded-xl border border-[#E4E4E7]'>
-			<FormHeader
+			{/* <FormHeader
 				title={'Plan Details'}
 				subtitle={'Provide details about your pricing plan to help organize and track event data efficiently.'}
 				variant='sub-header'
-			/>
+			/> */}
 			<Input
 				placeholder='Enter a name for the plan'
-				description={'A descriptive name to identify this pricing plan.'}
+				description={'A descriptive name for this pricing plan.'}
 				label='Plan Name'
 				value={plan.name}
 				error={errors.name}
@@ -28,12 +28,12 @@ const PlanDetailsSection = ({ plan, setPlanField, errors }: Props) => {
 
 			<Spacer height={'20px'} />
 			<Input
+				label='Lookup Key'
 				error={errors.lookup_key}
 				onChange={(e) => setPlanField('lookup_key', e)}
 				value={plan.lookup_key}
 				placeholder='Enter a slug for the plan'
-				description={'A unique identifier for this plan, used as a reference in API calls and system integrations.'}
-				label='Plan Slug'
+				description={'A system identifier used for API calls and integrations.'}
 			/>
 			<Spacer height={'20px'} />
 			<Textarea
@@ -41,7 +41,7 @@ const PlanDetailsSection = ({ plan, setPlanField, errors }: Props) => {
 				onChange={(e) => setPlanField('description', e)}
 				className='min-h-[100px]'
 				placeholder='Enter description'
-				label='Plan Description'
+				label='Description'
 				description='Helps your team to understand the purpose of this plan.'
 			/>
 		</div>

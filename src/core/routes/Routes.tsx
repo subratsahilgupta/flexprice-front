@@ -103,7 +103,7 @@ export const MainRouter = createBrowserRouter([
 		children: [
 			{
 				path: '/',
-				element: <Navigate to={RouteNames.features} />,
+				element: <Navigate to={RouteNames.pricing} />,
 			},
 			{
 				path: RouteNames.usageTracking,

@@ -45,7 +45,7 @@ const PlansTable: FC<PlansTableProps> = ({ data }) => {
 					id={row.id}
 					isArchiveDisabled={row.status !== 'published'}
 					isEditDisabled={true}
-					editPath={`/product-catalog/pricing-plan/edit-plan?id=${row.id}`}
+					editPath={`${RouteNames.plan}/edit-plan?id=${row.id}`}
 					deleteMutationFn={(id) => PlanApi.deletePlan(id)}
 					refetchQueryKey='fetchPlans'
 					entityName='Plan'

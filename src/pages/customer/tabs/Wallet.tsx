@@ -1,4 +1,4 @@
-import { Button, Chip, FormHeader, Modal, Select, ShortPagination, Spacer } from '@/components/atoms';
+import { AddButton, Button, Card, CardHeader, Chip, FormHeader, Modal, Select, ShortPagination, Spacer } from '@/components/atoms';
 import { DropdownMenu, DropdownMenuOption, TopupCard, WalletTransactionsTable } from '@/components/molecules';
 import { Skeleton } from '@/components/ui/skeleton';
 import usePagination from '@/hooks/usePagination';
@@ -137,13 +137,9 @@ const WalletTab = () => {
 
 	if (wallets?.length === 0) {
 		return (
-			<div className='card w-full flex justify-between items-center '>
-				<FormHeader title='Wallet' subtitle='No wallet linked to the customer yet.' variant='sub-header' />
-				<Button onClick={() => setisAdd(true)}>
-					<WalletIcon />
-					<span>Add Wallet</span>
-				</Button>
-			</div>
+			<Card variant='notched'>
+				<CardHeader title='Wallet' subtitle='No wallet linked to the customer yet' cta={<AddButton onClick={() => setisAdd(true)} />} />
+			</Card>
 		);
 	}
 
