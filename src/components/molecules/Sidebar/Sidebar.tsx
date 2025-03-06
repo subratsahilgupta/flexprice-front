@@ -8,7 +8,7 @@ import { Star, FileText, Gem, Users, Receipt, FileSearch, CalendarClock, Plug2, 
 
 const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }) => {
 	const navMain: { [key: string]: NavItem[] } = {
-		'Product Cataglog': [
+		'Product Catalog': [
 			{
 				title: 'Features',
 				url: RouteNames.features,
