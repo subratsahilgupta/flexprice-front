@@ -21,7 +21,7 @@ const DebugMenu = () => {
 
 	// Fetch first customer
 	const { data: customerData, isLoading: isCustomerLoading } = useQuery({
-		queryKey: ['fetchCustomers', 1, 0],
+		queryKey: ['debug-customers', 1, 0],
 		queryFn: async () => {
 			return await CustomerApi.getAllCustomers({ limit: 1, offset: 0 });
 		},
@@ -29,7 +29,7 @@ const DebugMenu = () => {
 
 	// Fetch customer's subscriptions
 	const { data: subscriptions, isLoading: isSubscriptionLoading } = useQuery({
-		queryKey: ['subscriptions', customerData?.items[0]?.id],
+		queryKey: ['debug-subscriptions', customerData?.items[0]?.id],
 		queryFn: async () => await CustomerApi.getCustomerSubscriptions(customerData?.items[0]?.id || ''),
 		enabled: !!customerData?.items[0]?.id,
 	});

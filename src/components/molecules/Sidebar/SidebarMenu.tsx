@@ -1,14 +1,15 @@
 'use client';
 
-import { FC, ReactNode } from 'react';
+import { FC } from 'react';
 import { SidebarGroup, SidebarGroupLabel, SidebarMenu } from '@/components/ui/sidebar';
 import SidebarItem from './SidebarItem';
 import { useLocation } from 'react-router-dom';
+import { LucideIcon } from 'lucide-react';
 
 export type NavItem = {
 	title: string;
 	url: string;
-	icon?: string | ReactNode;
+	icon?: LucideIcon;
 	isActive?: boolean;
 	disabled?: boolean;
 	items?: {

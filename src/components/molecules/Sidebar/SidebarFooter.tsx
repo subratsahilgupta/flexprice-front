@@ -84,9 +84,10 @@ const SidebarFooter = () => {
 					</button>
 				</PopoverTrigger>
 				<PopoverContent className='!w-56 mx-auto p-2 space-y-1'>
-					{dropdownItems.map((item) => {
+					{dropdownItems.map((item, index) => {
 						return (
 							<button
+								key={index}
 								onClick={item.onClick}
 								className='w-full flex items-center gap-2 rounded-md px-2 py-1 text-sm hover:bg-muted transition-colors'>
 								{item.icon && <item.icon className='size-4' />}
