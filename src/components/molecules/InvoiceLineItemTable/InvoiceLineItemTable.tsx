@@ -1,13 +1,14 @@
-import { FormHeader } from '@/components/atoms';
+import { Button, FormHeader } from '@/components/atoms';
 import { LineItem } from '@/models/Invoice';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import { FC } from 'react';
-
+import { RefreshCw } from 'lucide-react';
 interface Props {
 	data: LineItem[];
 	currency?: string;
 	amount_due?: number;
 	title?: string;
+	refetch?: () => void;
 }
 
 const formatToShortDate = (dateString: string): string => {
@@ -31,7 +32,7 @@ const formatPriceType = (value: string): string => {
 	}
 };
 
-const InvoiceLineItemTable: FC<Props> = ({ data, amount_due, currency, title }) => {
+const InvoiceLineItemTable: FC<Props> = ({ data, amount_due, currency, title, refetch }) => {
 	if (data.length === 0) {
 		return <div></div>;
 	}
@@ -39,7 +40,22 @@ const InvoiceLineItemTable: FC<Props> = ({ data, amount_due, currency, title }) 
 	return (
 		<div>
 			<div className='w-full  p-4'>
-				<FormHeader className='!mb-0' title={title} variant='sub-header' titleClassName='font-semibold' />
+				<div className='flex justify-between items-center'>
+					<FormHeader className='!mb-0' title={title} variant='sub-header' titleClassName='font-semibold' />
+					{refetch && (
+						<Button
+							onClick={() => {
+								const icon = document.querySelector('.refresh-icon');
+								icon?.classList.add('animate-spin');
+								refetch();
+								icon?.classList.remove('animate-spin');
+							}}
+							variant='outline'
+							size='sm'>
+							<RefreshCw className='refresh-icon' />
+						</Button>
+					)}
+				</div>
 
 				<div className='overflow-x-auto'>
 					<table className='table-auto w-full border-collapse text-left text-sm text-gray-800 my-4 px-4'>

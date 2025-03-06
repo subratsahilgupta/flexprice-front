@@ -60,7 +60,7 @@ const PricingPlan = () => {
 
 	return (
 		<Page
-			heading='Pricing Plan'
+			heading='Plans'
 			headingCTA={
 				<Link to='/product-catalog/pricing-plan/create-plan'>
 					<AddButton />

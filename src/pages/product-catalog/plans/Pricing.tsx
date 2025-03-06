@@ -86,7 +86,7 @@ const findBestPriceCombination = (
 	};
 };
 
-const PricingPlansView = () => {
+const PricingPage = () => {
 	const { limit, offset, page } = usePagination();
 	const [selectedBillingPeriod, setSelectedBillingPeriod] = useState<string>('');
 	const [selectedCurrency, setSelectedCurrency] = useState<string>('');
@@ -226,7 +226,7 @@ const PricingPlansView = () => {
 	}
 
 	return (
-		<Page headingClassName='items-center' heading='Pricing Plans'>
+		<Page headingClassName='items-center' heading='Pricing'>
 			{/* filters */}
 			<div className='w-full flex justify-end gap-4 mb-8'>
 				<Select
@@ -270,4 +270,4 @@ const PricingPlansView = () => {
 	);
 };
 
-export default PricingPlansView;
+export default PricingPage;

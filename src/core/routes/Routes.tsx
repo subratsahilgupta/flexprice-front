@@ -6,12 +6,12 @@ import AuthMiddleware from '../auth/AuthProvider';
 import MeterPage from '@/pages/usage/meter/MeterPage';
 import AddMeterPage from '@/pages/usage/meter/AddMeter';
 import EditMeterPage from '@/pages/usage/meter/EditMeterPage';
-import PricingPlans from '@/pages/product-catalog/pricingPlans/PricingPlans';
-import CreatePlanPage from '@/pages/product-catalog/pricingPlans/CreatePlan';
+import PricingPlans from '@/pages/product-catalog/plans/Plans';
+import CreatePlanPage from '@/pages/product-catalog/plans/CreatePlan';
 import CustomerSubscription from '@/pages/customer/customers/CustomerSubscription';
 import CustomerDetails from '@/pages/customer/customers/CustomerDetails';
 import ErrorPage from '@/pages/error/ErrorPage';
-import PlanDetailsPage from '@/pages/product-catalog/pricingPlans/PlanDetailsPage';
+import PlanDetailsPage from '@/pages/product-catalog/plans/PlanDetailsPage';
 import EventsPage from '@/pages/usage/events/Events';
 import QueryPage from '@/pages/usage/query/Query';
 import InvoicePage from '@/pages/customer/invoices/InvoicePage';
@@ -34,7 +34,7 @@ import DeveloperPage from '@/pages/developer/developer';
 import SignupConfirmation from '@/pages/auth/SignupConfirmation';
 import ResendVerification from '@/pages/auth/ResendVerification';
 import CustomerInformation from '@/pages/customer/tabs/CustomerInformation';
-import PricingPlansView from '@/pages/product-catalog/pricingPlans/PricingPlansView';
+import PricingPage from '@/pages/product-catalog/plans/Pricing';
 import OnboardingPage from '@/pages/onboarding/onboarding';
 export const RouteNames = {
 	home: '/',
@@ -204,7 +204,7 @@ export const MainRouter = createBrowserRouter([
 					},
 					{
 						path: RouteNames.pricing,
-						element: <PricingPlansView />,
+						element: <PricingPage />,
 					},
 					{
 						path: `${RouteNames.plan}/:planId`,
