@@ -110,7 +110,7 @@ const PricingCard: React.FC<PricingCardProps> = ({ id, name, price, entitlements
 									})}
 								</span>
 								{entitlement.description && (
-									<TooltipProvider>
+									<TooltipProvider delayDuration={0}>
 										<Tooltip>
 											<TooltipTrigger className='cursor-pointer'>
 												<div>

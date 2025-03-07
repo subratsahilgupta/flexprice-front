@@ -1,4 +1,4 @@
-import { FormHeader, Page } from '@/components/atoms';
+import { FormHeader, Loader, Page } from '@/components/atoms';
 import { Integration, integrations } from './integrationsData';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -26,7 +26,7 @@ const Integrations = () => {
 	);
 
 	if (isLoading) {
-		return <Page>Loading integrations...</Page>;
+		return <Loader />;
 	}
 
 	return (

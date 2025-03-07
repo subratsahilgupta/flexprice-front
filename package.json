@@ -10,7 +10,8 @@
     "build-storybook": "storybook build",
     "format": "prettier --write src",
     "preview": "vite preview",
-    "prepare": "husky"
+    "prepare": "husky",
+    "start": "vite --port 3000 --host 0.0.0.0 "
   },
   "dependencies": {
     "@csvbox/react": "^1.1.11",

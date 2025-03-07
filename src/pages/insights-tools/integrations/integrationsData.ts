@@ -19,7 +19,7 @@ export const integrations: Integration[] = [
 	{
 		name: 'Stripe',
 		logo: 'https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg',
-		description: 'Send invoices, calculate tax, and collect payments.',
+		description: 'Send invoices, calculate tax, and collect payments using our native connector to Stripe.',
 		tags: ['Payments', 'Invoices'],
 		type: 'available',
 		accountId: 'acct_1PloOLJiOrSZFKQm',
@@ -53,7 +53,7 @@ export const integrations: Integration[] = [
 	},
 	{
 		name: 'Razorpay',
-		description: 'Accept, process and disburse payments.',
+		description: 'Accept, process and disburse payments using our native connector to Razorpay.',
 		logo: 'https://upload.wikimedia.org/wikipedia/commons/7/77/Razorpay_logo.png',
 		tags: ['Payments', 'Invoices'],
 		info: [

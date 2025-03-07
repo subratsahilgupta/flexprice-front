@@ -12,10 +12,10 @@ const MainLayout: React.FC = () => {
 			{/* Sidebar */}
 			<Sidebar />
 			{/* Right Layout */}
-			<SidebarInset className='flex flex-col flex-1 bg-white h-screen relative overflow-y-auto'>
+			<SidebarInset className='flex flex-col flex-1 bg-white h-screen relative'>
 				<BreadCrumbs />
 				{/* Main Content */}
-				<main className='flex-1 px-4 relative'>
+				<main className='flex-1 px-4 relative overflow-y-auto '>
 					<Outlet />
 					<DebugMenu />
 				</main>
