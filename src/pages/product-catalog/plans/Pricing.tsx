@@ -202,6 +202,7 @@ const PricingPage = () => {
 			entitlements:
 				plan.entitlements?.map((e) => ({
 					id: e.id,
+					feature_id: e.feature?.id || '',
 					name: e.feature?.name || '',
 					type: e.feature_type.toUpperCase() as 'STATIC' | 'BOOLEAN' | 'METERED',
 					value:

@@ -8,46 +8,42 @@ interface TutorialItem {
 	onClick: () => void;
 }
 
-const openDocs = () => {
-	window.open('https://docs.flexprice.io/', '_blank');
-};
-
 const tutorials: TutorialItem[] = [
 	{
 		id: 1,
-		title: 'Getting Started Guide',
+		title: 'Getting Started',
 		description: 'Learn the basics of Flexprice in 5 minutes',
-		onClick: openDocs,
+		onClick: () => window.open('https://docs.flexprice.io/guides/getting-started/video', '_blank'),
 	},
 	{
 		id: 2,
-		title: 'Setup Your First Price',
-		description: 'Create and configure your first dynamic price',
-		onClick: openDocs,
+		title: 'Set Up Pricing Plans',
+		description: 'Create and configure your first pricing plan',
+		onClick: () => window.open('https://docs.flexprice.io/guides/plan/pricing-plan-create', '_blank'),
 	},
 	{
 		id: 3,
-		title: 'API Integration Guide',
-		description: 'Learn how to integrate Flexprice with your application',
-		onClick: openDocs,
+		title: 'Define Usage Metering',
+		description: 'Set up billable metrics to track customer usage',
+		onClick: () => window.open('https://docs.flexprice.io/guides/billable-metric/billable-metrics-create', '_blank'),
 	},
 	{
 		id: 4,
-		title: 'Billing Configuration',
-		description: 'Configure your billing settings and preferences',
-		onClick: openDocs,
+		title: 'Configure Credits & Wallets',
+		description: 'Manage prepaid wallets, free credits, and top-ups',
+		onClick: () => window.open('https://docs.flexprice.io/guides/wallet/customers-wallet', '_blank'),
 	},
 	{
 		id: 5,
-		title: 'Watch Tutorial Video',
-		description: 'A comprehensive video guide to get you started',
-		onClick: openDocs,
+		title: 'Customer Management',
+		description: 'Create customers, assign plans, and manage subscriptions',
+		onClick: () => window.open('https://docs.flexprice.io/guides/subscription/customers-create-subscription', '_blank'),
 	},
 	{
 		id: 6,
-		title: 'Connect Your Stripe',
-		description: 'Link your Stripe account with Flexprice',
-		onClick: openDocs,
+		title: 'Self-Hosting & Configuration',
+		description: 'Set up and deploy Flexprice on your own infrastructure',
+		onClick: () => window.open('https://docs.flexprice.io/guides/self-hosted/guide', '_blank'),
 	},
 ];
 
@@ -61,8 +57,13 @@ const OnboardingPage = () => {
 					<div className='flex w-full items-start justify-between'>
 						<div className='w-[60%]'>
 							<h1 className='text-xl font-semibold tracking-tight mb-2'>Welcome to Flexprice!</h1>
-							<p className='text-slate-800 text-sm mb-6'>Let's get Acme's pricing and billing started!</p>
-							<Button>Book a Demo</Button>
+							<p className='text-slate-800 text-sm mb-6'>Let's get your pricing and billing started!</p>
+							<Button
+								onClick={() => {
+									window.open('https://calendly.com/flexprice-30mins-chat/manish', '_blank');
+								}}>
+								Book a Demo
+							</Button>
 						</div>
 						<div className='flex-shrink-0 ml-8 w-[40%]'>
 							<img src='/assets/svg/onboarding_hero.svg' alt='Onboarding Hero' className='h-auto' />
@@ -71,7 +72,11 @@ const OnboardingPage = () => {
 				</div>
 
 				{/* Learn More Container */}
-				<div className='flex-1 bg-[#0B1121] rounded-[20px] p-8 relative overflow-hidden'>
+				<div
+					onClick={() => {
+						window.open(' https://docs.flexprice.io/guides/self-hosted/guide', '_blank');
+					}}
+					className='flex-1 bg-[#0B1121] rounded-[20px] p-8 relative overflow-hidden'>
 					<div className='absolute inset-0'>
 						<div className='absolute inset-0 bg-gradient-to-br from-[#FF6B00]/20 via-[#B114FF]/20 to-[#3B82F6]/20'></div>
 					</div>

@@ -1,7 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
 import { useEffect } from 'react';
 
-const usePagination = (initialLimit: number = 15) => {
+const usePagination = (initialLimit: number = 12) => {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const page = Number(searchParams.get('page') || '1');
 

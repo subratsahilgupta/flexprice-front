@@ -9,8 +9,10 @@ import { Link } from 'react-router-dom';
 import { Progress } from '@/components/ui/progress';
 import { RouteNames } from '@/core/routes/Routes';
 import EventsApi from '@/utils/api_requests/EventsApi';
-const STREAM_DURATION = 30000; // 30 seconds
-const TOTAL_EVENTS = 30; // Number of events to simulate
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+const TOTAL_EVENTS = 60; // Number of events to simulate
+const STREAM_DURATION = TOTAL_EVENTS * 1000; // 1 minute
 
 const DebugMenu = () => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -89,19 +91,33 @@ const DebugMenu = () => {
 
 	return (
 		<>
-			<Button
-				variant='outline'
-				className='fixed bottom-6 right-6 size-10 z-[100] shadow-sm hover:shadow-md transition-all'
-				onClick={() => setIsOpen(!isOpen)}>
-				{isStreaming ? (
-					<div className='relative'>
-						<Rocket className='text-blue-500 size-8 text-3xl' />
-						<div className='absolute -top-2 -right-2 size-3 bg-blue-500 rounded-full animate-pulse' />
-					</div>
-				) : (
-					<Rocket className='text-blue-500 size-8 text-3xl' />
-				)}
-			</Button>
+			<TooltipProvider delayDuration={0}>
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<Button
+							variant='outline'
+							className='fixed bottom-6 right-6 size-10 z-[100] shadow-sm hover:shadow-md transition-all'
+							onClick={() => setIsOpen(!isOpen)}>
+							{isStreaming ? (
+								<div className='relative'>
+									<Rocket className='text-blue-500 size-8 text-3xl' />
+									<div className='absolute -top-2 -right-2 size-3 bg-blue-500 rounded-full animate-pulse' />
+								</div>
+							) : (
+								<Rocket className='text-blue-500 size-8 text-3xl' />
+							)}
+						</Button>
+					</TooltipTrigger>
+					<TooltipContent
+						side='top'
+						align='end'
+						sideOffset={8}
+						className='flex flex-col gap-1 bg-black/90 text-white px-4 py-2 rounded-lg max-w-[240px]'>
+						{/* <div className='font-medium text-white'>Flexprice</div> */}
+						<div className='text-[13px] text-white'>Checkout usage based pricing in action</div>
+					</TooltipContent>
+				</Tooltip>
+			</TooltipProvider>
 
 			<AnimatePresence>
 				{isOpen && (
@@ -162,16 +178,16 @@ const DebugMenu = () => {
 							) : (
 								<>
 									<p className='text-sm text-muted-foreground mb-4'>
-										Watch metering, billing, and entitlements update instantly. Sample events will be fired for
+										Experience how metering, billing, and entitlements update in real time. Sample events will be triggered for
 										<Link to={`${RouteNames.customers}/${customerData?.items[0]?.id}`} className='text-blue-500'>
 											{` ${customerData?.items[0]?.name} `}
-										</Link>
-										for
+										</Link>{' '}
+										under the{' '}
 										<Link
 											to={`${RouteNames.customers}/${customerData?.items[0]?.id}/subscription/${subscriptions?.items[0]?.id}`}
 											className='text-blue-500'>
 											{` ${subscriptions?.items[0]?.plan.name} `}
-										</Link>
+										</Link>{' '}
 										plan.
 									</p>
 

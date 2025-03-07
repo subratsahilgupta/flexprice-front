@@ -4,7 +4,7 @@ import SidebarNav, { NavItem } from './SidebarMenu';
 import FlexpriceSidebarFooter from './SidebarFooter';
 import { RouteNames } from '@/core/routes/Routes';
 import { EnvironmentSelector } from '@/components/molecules';
-import { Star, FileText, Gem, Users, Receipt, FileSearch, CalendarClock, Plug2, FileInput } from 'lucide-react';
+import { Star, FileText, Gem, Users, Receipt, FileSearch, CalendarClock } from 'lucide-react';
 
 const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }) => {
 	const navMain: { [key: string]: NavItem[] } = {
@@ -83,19 +83,6 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				// 		url: '/metering/c',
 				// 	},
 				// ],
-			},
-		],
-		'Insights & Tools': [
-			{
-				title: 'Integrations',
-				url: RouteNames.integrations,
-				icon: Plug2,
-			},
-			{
-				title: 'Bulk Imports',
-				url: RouteNames.importExport,
-				icon: FileInput,
-				// disabled: true,
 			},
 		],
 	};

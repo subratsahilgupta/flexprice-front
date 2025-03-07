@@ -27,7 +27,7 @@ const Page: FC<Props> = ({ children, className, type = 'default', header, headin
 						{headingCTA}
 					</SectionHeader>
 				)}
-				<div className='mb-12'>{children}</div>
+				<div className='pb-12'>{children}</div>
 			</div>
 		</div>
 	);
