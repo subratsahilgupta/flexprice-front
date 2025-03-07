@@ -42,7 +42,6 @@ const formatEntitlementValue = ({
 	usage_reset_period: string;
 	feature_id: string;
 }) => {
-	console.log('feature_id', feature_id);
 	const feature = feature_id ? (
 		<Link
 			to={`${RouteNames.featureDetails}/${feature_id}`}

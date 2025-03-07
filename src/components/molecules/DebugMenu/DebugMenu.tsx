@@ -11,8 +11,8 @@ import { RouteNames } from '@/core/routes/Routes';
 import EventsApi from '@/utils/api_requests/EventsApi';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-const STREAM_DURATION = 120 * 1000; // 2 minutes
-const TOTAL_EVENTS = 120; // Number of events to simulate
+const TOTAL_EVENTS = 60; // Number of events to simulate
+const STREAM_DURATION = TOTAL_EVENTS * 1000; // 1 minute
 
 const DebugMenu = () => {
 	const [isOpen, setIsOpen] = useState(false);
