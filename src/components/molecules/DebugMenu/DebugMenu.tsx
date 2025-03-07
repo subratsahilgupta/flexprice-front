@@ -152,7 +152,7 @@ const DebugMenu = () => {
 							{eventsCompleted ? (
 								<>
 									<p className='text-sm text-muted-foreground mb-4'>
-										{eventCount} events have been fired for
+										{eventCount * 5} events have been fired for
 										<Link to={`${RouteNames.customers}/${customerData?.items[0]?.id}`} className='text-blue-500'>
 											{` ${customerData?.items[0]?.name} `}
 										</Link>
