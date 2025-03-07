@@ -2,7 +2,7 @@ import { Check, Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { formatBillingPeriodForPrice, getCurrencySymbol } from '@/utils/common/helper_functions';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { RouteNames } from '@/core/routes/Routes';
 
 export interface PricingCardProps {
@@ -18,6 +18,7 @@ export interface PricingCardProps {
 	};
 	entitlements: Array<{
 		id: string;
+		feature_id: string;
 		name: string;
 		type: 'STATIC' | 'BOOLEAN' | 'METERED';
 		value: string | number | boolean;
@@ -33,19 +34,41 @@ const formatEntitlementValue = ({
 	value,
 	name,
 	usage_reset_period,
+	feature_id,
 }: {
 	type: string;
 	value: string | number | boolean;
 	name: string;
 	usage_reset_period: string;
+	feature_id: string;
 }) => {
+	console.log('feature_id', feature_id);
+	const feature = feature_id ? (
+		<Link
+			to={`${RouteNames.featureDetails}/${feature_id}`}
+			className='hover:underline decoration-dashed decoration-[0.5px] decoration-muted-foreground/50 underline-offset-4'>
+			{name}
+		</Link>
+	) : (
+		name
+	);
+
 	switch (type) {
 		case 'STATIC':
-			return `${value} ${name}`;
+			return (
+				<>
+					{value} {feature}
+				</>
+			);
 		case 'BOOLEAN':
-			return value ? `${name}` : `${name} Not included`;
+			return <>{value ? feature : `${feature} Not included`}</>;
 		case 'METERED':
-			return `${value} ${name}${usage_reset_period ? ` per ${formatBillingPeriodForPrice(usage_reset_period || '')}` : ''}`;
+			return (
+				<>
+					{value} {feature}
+					{usage_reset_period ? ` per ${formatBillingPeriodForPrice(usage_reset_period)}` : ''}
+				</>
+			);
 		default:
 			return `${value}`;
 	}
@@ -107,6 +130,7 @@ const PricingCard: React.FC<PricingCardProps> = ({ id, name, price, entitlements
 										value: entitlement.value,
 										name: entitlement.name,
 										usage_reset_period: entitlement.usage_reset_period || '',
+										feature_id: entitlement.feature_id,
 									})}
 								</span>
 								{entitlement.description && (

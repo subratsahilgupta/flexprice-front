@@ -40,7 +40,7 @@ const SignupConfirmation = () => {
 				email: user.data.user?.email || '',
 				token: session?.access_token || '',
 			});
-
+			await supabase.auth.refreshSession();
 			await EnvironmentApi.initializeEnvironments();
 			return signupResponse;
 		},
