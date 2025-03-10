@@ -92,7 +92,11 @@ const ActionButton: FC<ActionProps> = ({
 				</DropdownMenu>
 			</div>
 
-			<Dialog title={`Are you sure you want to archive this ${entityName}?`} isOpen={isDialogOpen} onOpenChange={setIsDialogOpen}>
+			<Dialog
+				titleClassName='font-normal'
+				title={`Are you sure you want to archive this ${entityName}?`}
+				isOpen={isDialogOpen}
+				onOpenChange={setIsDialogOpen}>
 				<div className='flex flex-col mt-4 gap-4 items-end justify-center'>
 					<div className='flex gap-4'>
 						<Button variant='outline' onClick={() => setIsDialogOpen(false)}>
