@@ -1,15 +1,19 @@
-FROM node:18-alpine AS build
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-EXPOSE 3000
-# RUN npm run build
-# RUN npm run start
-CMD ["npm", "run", "dev"]
+# Stage 1: Build the React app
+FROM node:20-alpine AS build
 
-# FROM nginx:alpine
-# COPY --from=build /app/dist /usr/share/nginx/html
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
-# EXPOSE 3000
-# CMD ["nginx", "-g", "daemon off;"]
+# Set working directory
+WORKDIR /app
+
+# Copy package.json and yarn.lock
+COPY package.json package-lock.json ./
+
+# Install dependencies
+RUN npm install --frozen-lockfile
+
+# Copy all files to the container
+COPY . .
+
+# Build the Vite app
+RUN npm run build
+
+CMD ["npm", "run", "start"]

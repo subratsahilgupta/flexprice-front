@@ -4,7 +4,7 @@ import SidebarNav, { NavItem } from './SidebarMenu';
 import FlexpriceSidebarFooter from './SidebarFooter';
 import { RouteNames } from '@/core/routes/Routes';
 import { EnvironmentSelector } from '@/components/molecules';
-import { Star, FileText, Gem, Users, Receipt, FileSearch, CalendarClock } from 'lucide-react';
+import { Star, FileText, Gem, Users, Receipt, CalendarClock, Percent, TicketPercent, Plug2, CreditCard } from 'lucide-react';
 
 const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }) => {
 	const navMain: { [key: string]: NavItem[] } = {
@@ -33,6 +33,18 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 			// 	icon: Puzzle,
 			// 	disabled: true,
 			// },
+			{
+				title: 'Discounts',
+				url: RouteNames.addOn,
+				icon: TicketPercent,
+				disabled: true,
+			},
+			{
+				title: 'Taxes',
+				url: RouteNames.addOn,
+				icon: Percent,
+				disabled: true,
+			},
 		],
 		'Customer Management': [
 			{
@@ -59,11 +71,16 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 			// 	icon: FileText,
 			// },
 			{
-				title: 'Query',
-				url: RouteNames.queryPage,
-				icon: FileSearch,
-				disabled: false,
+				title: 'Integrations',
+				url: RouteNames.integrations,
+				icon: Plug2,
 			},
+			// {
+			// 	title: 'Query',
+			// 	url: RouteNames.queryPage,
+			// 	icon: FileSearch,
+			// 	disabled: false,
+			// },
 			{
 				title: 'Events',
 				url: RouteNames.events,
@@ -83,6 +100,12 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				// 		url: '/metering/c',
 				// 	},
 				// ],
+			},
+			{
+				title: 'Payments',
+				url: RouteNames.queryPage,
+				icon: CreditCard,
+				disabled: true,
 			},
 		],
 	};
