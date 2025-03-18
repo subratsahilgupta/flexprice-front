@@ -6,9 +6,3 @@ services:
     ports:
       - "3000:3000"
     restart: unless-stopped
-
-    environment:
-      - VITE_SUPABASE_URL=https://vnswkuldxqmqhyiewgsq.supabase.co
-      - VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZuc3drdWxkeHFtcWh5aWV3Z3NxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTQzOTgyNjgsImV4cCI6MjAyOTk3NDI2OH0.bfyVXH--fR50KeYnzImhFrPJ8VHpw5VDu6uRXohL4as
-      - VITE_API_URL=https://api-dev.cloud.flexprice.io/v1
-
