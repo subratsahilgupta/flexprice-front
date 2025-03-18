@@ -1,4 +1,4 @@
-import { BookOpen, ExternalLink, ChevronsUpDown, CodeXml, LogOut, ListChecks, FileInput, Plug2 } from 'lucide-react';
+import { BookOpen, ExternalLink, ChevronsUpDown, CodeXml, LogOut, ListChecks, FileInput, FileSearch } from 'lucide-react';
 import { RouteNames } from '@/core/routes/Routes';
 import { SidebarMenuButton, useSidebar } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
@@ -24,11 +24,11 @@ const SidebarFooter = () => {
 
 	const dropdownItems = [
 		{
-			label: 'Integrations',
+			label: 'Query',
 			onClick: () => {
-				navigate(RouteNames.integrations);
+				navigate(RouteNames.queryPage);
 			},
-			icon: Plug2,
+			icon: FileSearch,
 		},
 		{
 			label: 'Bulk Imports',
