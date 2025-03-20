@@ -1,7 +1,6 @@
-import { ActionButton, Button, CardHeader, Chip, Loader, Page, Spacer } from '@/components/atoms';
+import { ActionButton, Button, CardHeader, Chip, Loader, Page, Spacer, Progress } from '@/components/atoms';
 import { AddEntitlementDrawer, ColumnData, FlexpriceTable } from '@/components/molecules';
 import { DetailsCard } from '@/components/molecules';
-import { getFeatureTypeChips } from '@/components/molecules/FeatureTable/FeatureTable';
 import { RouteNames } from '@/core/routes/Routes';
 import { Price } from '@/models/Price';
 import { FeatureType } from '@/models/Feature';
@@ -15,9 +14,10 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { EyeOff, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Card } from '@/components/atoms';
 import formatChips from '@/utils/common/format_chips';
+import { getFeatureIcon } from '@/components/atoms/SelectFeature/SelectFeature';
 
 const formatBillingPeriod = (billingPeriod: string) => {
 	switch (billingPeriod.toUpperCase()) {
@@ -53,16 +53,20 @@ type Params = {
 	planId: string;
 };
 
-// const formatInvoiceCadence = (cadence: string): string => {
-// 	switch (cadence.toUpperCase()) {
-// 		case 'ADVANCE':
-// 			return 'Advance';
-// 		case 'ARREAR':
-// 			return 'Arrear';
-// 		default:
-// 			return '';
-// 	}
-// };
+const getFeatureTypeChips = (type: string) => {
+	const icon = getFeatureIcon(type);
+	switch (type.toLocaleLowerCase()) {
+		case 'static': {
+			return <Chip variant='default' label={icon} />;
+		}
+		case 'metered':
+			return <Chip textColor='#1E3A8A' bgColor='#F0F9FF' label={icon} />;
+		case 'boolean':
+			return <Chip textColor='#075985' bgColor='#F0F9FF' label={icon} />;
+		default:
+			return <Chip textColor='#075985' bgColor='#F0F9FF' label={icon} />;
+	}
+};
 
 const chargeColumns: ColumnData[] = [
 	{
@@ -110,7 +114,7 @@ const getFeatureValue = (entitlement: ExtendedEntitlement) => {
 				</span>
 			);
 		case FeatureType.boolean:
-			return entitlement.is_enabled ? 'Yes' : 'No';
+			return entitlement.is_enabled ? 'True' : 'False';
 		default:
 			return '--';
 	}
@@ -119,6 +123,71 @@ const ValueCell = ({ data }: { data: Price }) => {
 	const price = getPriceTableCharge(data as any, false);
 	return <div>{price}</div>;
 };
+
+const columnData: ColumnData<ExtendedEntitlement>[] = [
+	{
+		title: 'Feature',
+		fieldVariant: 'title',
+		render(row) {
+			return (
+				<Link className='inline-flex gap-2 items-center' to={RouteNames.featureDetails + `/${row?.feature?.id}`}>
+					{getFeatureTypeChips(row?.feature_type || '')}
+					{row?.feature?.name}
+				</Link>
+			);
+		},
+	},
+	{
+		title: 'Source	',
+		render() {
+			return <span>{'--'}</span>;
+		},
+	},
+	{
+		title: 'Value',
+		render(row) {
+			return getFeatureValue(row);
+		},
+	},
+	{
+		title: 'Usage',
+		render(row) {
+			if (row?.feature_type != FeatureType.metered) {
+				return '--';
+			}
+			const usage = Math.floor(Math.random() * 100);
+			const limit = row?.usage_limit ?? 100;
+			const value = Math.ceil((usage / limit) * 100);
+			// const resetLabel = row.usage_reset_period ? `Resets ${formatBillingPeriod(row.usage_reset_period)}` : '';
+
+			const indicatorColor = value >= 100 ? 'bg-red-600' : 'bg-green-800';
+			const backgroundColor = value >= 100 ? 'bg-red-50' : 'bg-green-50';
+
+			const label = row.usage_reset_period ? `${usage} / ${limit}` : `${usage} / No Limit`;
+			return <Progress label={label} value={value} className='h-[6px]' indicatorColor={indicatorColor} backgroundColor={backgroundColor} />;
+		},
+	},
+	{
+		fieldVariant: 'interactive',
+		width: '30px',
+		hideOnEmpty: true,
+		render(row) {
+			return (
+				<ActionButton
+					deleteMutationFn={async () => {
+						return await EntitlementApi.deleteEntitlementById(row?.id);
+					}}
+					id={row?.id}
+					editPath={''}
+					isEditDisabled={true}
+					isArchiveDisabled={row?.status === 'archived'}
+					refetchQueryKey={'fetchPlan'}
+					entityName={row?.feature?.name}
+				/>
+			);
+		},
+	},
+];
 
 const PlanDetailsPage = () => {
 	const navigate = useNavigate();
@@ -157,59 +226,6 @@ const PlanDetailsPage = () => {
 			updateBreadcrumb(2, planData.name);
 		}
 	}, [planData, updateBreadcrumb]);
-
-	const columnData: ColumnData<ExtendedEntitlement>[] = [
-		{
-			title: 'Feature Name',
-			onCellClick(row) {
-				navigate(RouteNames.featureDetails + `/${row?.feature?.id}`);
-			},
-			fieldVariant: 'title',
-			render(row) {
-				return row?.feature?.name;
-			},
-		},
-		// {
-		// 	title: 'Meter',
-		// 	render(row) {
-		// 		return row?.feature.meter?.name ?? '--';
-		// 	},
-		// },
-		{
-			title: 'Type',
-
-			render(row) {
-				return getFeatureTypeChips(row?.feature_type || '');
-			},
-		},
-		{
-			title: 'Value',
-
-			render(row) {
-				return getFeatureValue(row);
-			},
-		},
-		{
-			fieldVariant: 'interactive',
-			width: '30px',
-			hideOnEmpty: true,
-			render(row) {
-				return (
-					<ActionButton
-						deleteMutationFn={async () => {
-							return await EntitlementApi.deleteEntitlementById(row?.id);
-						}}
-						id={row?.id}
-						editPath={''}
-						isEditDisabled={true}
-						isArchiveDisabled={row?.status === 'archived'}
-						refetchQueryKey={'fetchPlan'}
-						entityName={row?.feature?.name}
-					/>
-				);
-			},
-		},
-	];
 
 	if (isLoading) {
 		return <Loader />;

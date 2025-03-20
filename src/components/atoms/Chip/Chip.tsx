@@ -32,7 +32,13 @@ const Chip: FC<ChipProps> = ({ label, variant = 'default', textColor, bgColor, o
 	return (
 		<span
 			onClick={onClick}
-			className={cn('px-3 py-1 rounded-lg select-none font-normal transition-all', onClick && 'cursor-pointer flex gap-2', className)}
+			className={cn(
+				'px-3 py-1 rounded-lg select-none font-normal transition-all',
+				onClick && 'cursor-pointer gap-2',
+				childrenBefore || childrenAfter ? 'flex' : '',
+				childrenBefore && childrenAfter ? 'gap-2' : 'gap-0',
+				className,
+			)}
 			style={{
 				backgroundColor: bgColor ?? defaultBgColor,
 				color: textColor ?? defaultTextColor,
