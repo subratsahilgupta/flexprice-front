@@ -59,3 +59,5 @@ export { default as SubscriptionPauseWarning } from './SubscriptionPauseWarning'
 export { default as DebugMenu } from './DebugMenu';
 
 export { default as PricingCard } from './PricingCard';
+
+export { default as ApiDocs, ApiDocsContent } from './ApiDocs';
