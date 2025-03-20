@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 import { FC, ReactNode } from 'react';
 
 interface ChipProps {
-	label?: string;
+	label?: ReactNode;
 	variant?: 'default' | 'success' | 'warning' | 'failed' | 'info';
 	textColor?: string;
 	bgColor?: string;

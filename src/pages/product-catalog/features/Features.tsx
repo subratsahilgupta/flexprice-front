@@ -28,8 +28,6 @@ const FeaturesPage = () => {
 		queryFn: fetchFeatures,
 	});
 
-	console.log(featureData, isLoading);
-
 	if (isLoading) {
 		return <Loader />;
 	}

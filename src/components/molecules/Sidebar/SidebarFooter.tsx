@@ -3,7 +3,7 @@ import { RouteNames } from '@/core/routes/Routes';
 import { SidebarMenuButton, useSidebar } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 import { useNavigate, useLocation } from 'react-router-dom';
-import supabase from '@/core/supbase/config';
+import AuthService from '@/core/auth/AuthService';
 import useUser from '@/hooks/useUser';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -12,7 +12,7 @@ const SidebarFooter = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const handleLogout = async () => {
-		await supabase.auth.signOut();
+		await AuthService.logout();
 		localStorage.clear();
 		navigate('/auth');
 	};
