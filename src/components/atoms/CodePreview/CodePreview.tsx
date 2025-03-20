@@ -41,7 +41,7 @@ const CodePreview: FC<Props> = ({ code, language, className: styles, title }) =>
 							},
 						}}
 						code={code}
-						language={language ?? 'bash'}>
+						language={language ?? 'javascript'}>
 						{({ className, style, tokens, getLineProps, getTokenProps }) => (
 							<pre className={cn(className, styles)} style={{ ...style, padding: '0.5rem', borderRadius: '8px', overflowX: 'auto' }}>
 								{tokens.map((line, i) => (

@@ -3,15 +3,17 @@ import { MainRouter } from '@/core/routes/Routes';
 import { UserProvider } from '@/hooks/UserContext';
 import ReactQueryProvider from '@/core/tanstack/ReactQueryProvider';
 import { Toaster } from 'react-hot-toast';
+import { DocsProvider } from './context/DocsContext';
 // import VercelSpeedInsights from '@/core/vercel/vercel';
 
 const App = () => {
 	return (
 		<ReactQueryProvider>
 			<UserProvider>
-				<RouterProvider router={MainRouter} />
-				{/* <VercelSpeedInsights /> */}
-
+				<DocsProvider>
+					<RouterProvider router={MainRouter} />
+					{/* <VercelSpeedInsights /> */}
+				</DocsProvider>
 				{/* Toast Notifications */}
 				<Toaster
 					toastOptions={{

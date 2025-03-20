@@ -103,9 +103,8 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 			},
 			{
 				title: 'Payments',
-				url: RouteNames.queryPage,
+				url: RouteNames.payments,
 				icon: CreditCard,
-				disabled: true,
 			},
 		],
 	};

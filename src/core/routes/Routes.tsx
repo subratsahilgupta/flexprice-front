@@ -36,6 +36,7 @@ import ResendVerification from '@/pages/auth/ResendVerification';
 import CustomerInformation from '@/pages/customer/tabs/CustomerInformation';
 import PricingPage from '@/pages/product-catalog/plans/Pricing';
 import OnboardingPage from '@/pages/onboarding/onboarding';
+import PaymentPage from '@/pages/usage/payments/PaymentPage';
 export const RouteNames = {
 	home: '/',
 	login: '/auth',
@@ -69,11 +70,12 @@ export const RouteNames = {
 	// add on routes
 	addOn: '/product-catalog/add-on',
 
-	// insights and tools
-	insights: '/insights-&-tools',
-	integrations: '/insights-&-tools/integrations',
-	integrationDetails: '/insights-&-tools/integrations',
-	importExport: '/insights-&-tools/bulk-imports',
+	//
+	insights: '/usage-tracking',
+	integrations: '/usage-tracking/integrations',
+	integrationDetails: '/usage-tracking/integrations',
+	importExport: '/usage-tracking/bulk-imports',
+	payments: '/usage-tracking/payments',
 
 	// footer
 	developers: '/developers',
@@ -250,6 +252,10 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: RouteNames.importExport,
 						element: <ImportExport />,
+					},
+					{
+						path: RouteNames.payments,
+						element: <PaymentPage />,
 					},
 				],
 			},
