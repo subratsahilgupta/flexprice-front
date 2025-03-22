@@ -35,6 +35,7 @@ class AuthService {
 		if (this.environment != ProjectEnvironment.LOCAL) {
 			await supabase.auth.signOut();
 		}
+		localStorage.clear();
 	}
 }
 

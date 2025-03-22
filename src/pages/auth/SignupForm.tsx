@@ -8,6 +8,7 @@ import { EyeOff } from 'lucide-react';
 import { EyeIcon } from 'lucide-react';
 import { RouteNames } from '@/core/routes/Routes';
 import { useNavigate } from 'react-router-dom';
+import { NODE_ENV, NodeEnv } from '@/types/env';
 interface SignupFormProps {
 	switchTab: (tab: string) => void;
 }
@@ -19,8 +20,6 @@ interface SignupData {
 }
 const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 	const navigate = useNavigate();
-	const environment = import.meta.env.VITE_ENVIRONMENT;
-	console.log('environment', environment);
 	const [signupData, setSignupData] = useState<SignupData>({
 		email: '',
 		password: '',
@@ -87,7 +86,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 		if (!validateForm()) {
 			return;
 		}
-		if (environment != 'self-hosted') {
+		if (NODE_ENV != NodeEnv.SELF_HOSTED) {
 			const { error } = await supabase.auth.signUp({
 				email: signupData.email,
 				password: signupData.password,

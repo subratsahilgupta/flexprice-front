@@ -1,9 +1,10 @@
 import React, { ReactNode, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import supabase from '../supbase/config';
 import { useUser } from '@/hooks/UserContext';
 import { useQuery } from '@tanstack/react-query';
 import { PageLoader } from '@/components/atoms';
+import AuthApi from '@/utils/api_requests/AuthApi';
+import useUserhook from '@/hooks/useUser';
 
 interface AuthMiddlewareProps {
 	children: ReactNode;
@@ -11,22 +12,7 @@ interface AuthMiddlewareProps {
 }
 const AuthMiddleware: React.FC<AuthMiddlewareProps> = ({ children }) => {
 	const userContext = useUser();
-	const fetchUser = async () => {
-		const { data, error } = await supabase.auth.getUser();
-		if (error) {
-			throw error;
-		}
-		return data.user;
-	};
-
-	const {
-		data: user,
-		isLoading,
-		isError,
-	} = useQuery({
-		queryKey: ['fetchUser'],
-		queryFn: fetchUser,
-	});
+	const { user, loading, error } = useUserhook();
 
 	useEffect(() => {
 		if (user) {
@@ -34,11 +20,11 @@ const AuthMiddleware: React.FC<AuthMiddlewareProps> = ({ children }) => {
 		}
 	}, [user, userContext]);
 
-	if (isLoading) {
+	if (loading) {
 		return <PageLoader />;
 	}
 
-	if (isError || !user) {
+	if (error || !user) {
 		return <Navigate to='/auth' />;
 	}
 

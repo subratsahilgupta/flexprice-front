@@ -8,6 +8,7 @@ import { EyeIcon, EyeOff } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import AuthApi from '@/utils/api_requests/AuthApi';
 import EnvironmentApi from '@/utils/api_requests/EnvironmentApi';
+import { NODE_ENV, NodeEnv } from '@/types/env';
 interface LoginFormProps {
 	switchTab: (tab: string) => void;
 }
@@ -19,8 +20,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ switchTab }) => {
 	const [password, setPassword] = useState('');
 	const [showPassword, setShowPassword] = useState(false);
 	const [loading, setLoading] = useState(false);
-	const environment = import.meta.env.VITE_ENVIRONMENT;
-	console.log('environment', environment);
 
 	const { mutate: localLogin } = useMutation({
 		mutationFn: async () => {
@@ -43,7 +42,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ switchTab }) => {
 
 		setLoading(true);
 
-		if (environment != 'self-hosted') {
+		if (NODE_ENV != NodeEnv.SELF_HOSTED) {
 			const { error } = await supabase.auth.signInWithPassword({
 				email,
 				password,
@@ -54,7 +53,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ switchTab }) => {
 			setLoading(false);
 
 			if (error) {
-				console.log('error in login forms', error);
 				toast.error(error.message);
 				return;
 			}
