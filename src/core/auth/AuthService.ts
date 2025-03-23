@@ -9,9 +9,15 @@ class AuthService {
 			} = await supabase.auth.getSession();
 			return session?.access_token;
 		} else {
-			const token = localStorage.getItem('token');
-			console.log('token', token);
-			return token;
+			try {
+				const tokenData = localStorage.getItem('token');
+				if (!tokenData) return null;
+				const parsedToken = JSON.parse(tokenData);
+				return parsedToken.token;
+			} catch (error) {
+				console.error('Error parsing token:', error);
+				return null;
+			}
 		}
 	}
 
@@ -20,8 +26,15 @@ class AuthService {
 			const { data } = await supabase.auth.getUser();
 			return data.user;
 		} else {
-			const user = JSON.parse(localStorage.getItem('token') || '{}').user;
-			return user;
+			try {
+				const tokenData = localStorage.getItem('token');
+				if (!tokenData) return null;
+				const parsedToken = JSON.parse(tokenData);
+				return parsedToken.user;
+			} catch (error) {
+				console.error('Error parsing user data:', error);
+				return null;
+			}
 		}
 	}
 

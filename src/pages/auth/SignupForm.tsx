@@ -9,6 +9,7 @@ import { EyeIcon } from 'lucide-react';
 import { RouteNames } from '@/core/routes/Routes';
 import { useNavigate } from 'react-router-dom';
 import { NODE_ENV, NodeEnv } from '@/types/env';
+import EnvironmentApi from '@/utils/api_requests/EnvironmentApi';
 interface SignupFormProps {
 	switchTab: (tab: string) => void;
 }
@@ -43,8 +44,15 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 			if (NODE_ENV != NodeEnv.SELF_HOSTED) {
 				switchTab('login');
 			} else {
-				localStorage.setItem('token', JSON.stringify(data.token));
-				navigate(RouteNames.login);
+				// Store token in a consistent format
+				const tokenData = {
+					token: data.token,
+					user_id: data.user_id,
+					tenant_id: data.tenant_id,
+				};
+				localStorage.setItem('token', JSON.stringify(tokenData));
+				EnvironmentApi.initializeEnvironments();
+				navigate(RouteNames.home);
 			}
 		},
 

@@ -9,6 +9,7 @@ import { useMutation } from '@tanstack/react-query';
 import AuthApi from '@/utils/api_requests/AuthApi';
 import EnvironmentApi from '@/utils/api_requests/EnvironmentApi';
 import { NODE_ENV, NodeEnv } from '@/types/env';
+import { RouteNames } from '@/core/routes/Routes';
 interface LoginFormProps {
 	switchTab: (tab: string) => void;
 }
@@ -26,10 +27,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ switchTab }) => {
 			return await AuthApi.login(email, password);
 		},
 		onSuccess: (data) => {
-			userContext.setUser(data);
-			navigate('/');
-			toast.success('Login successful');
-			localStorage.setItem('user', JSON.stringify(data));
+			// Store token in a consistent format
+			const tokenData = {
+				token: data.token,
+				user_id: data.user_id,
+				tenant_id: data.tenant_id,
+			};
+			localStorage.setItem('token', JSON.stringify(tokenData));
+			EnvironmentApi.initializeEnvironments();
+			navigate(RouteNames.home);
 		},
 		onError: (error) => {
 			toast.error(error.message || 'Something went wrong');
