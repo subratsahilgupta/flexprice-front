@@ -29,7 +29,6 @@ const Invoice = () => {
 	return (
 		<Card variant='notched'>
 			<CardHeader title='Invoices' />
-
 			<CustomerInvoiceTable onRowClick={handleShowDetails} customerId={customerId} data={data?.items ?? []} />
 		</Card>
 	);

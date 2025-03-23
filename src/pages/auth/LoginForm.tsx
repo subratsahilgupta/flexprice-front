@@ -28,6 +28,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ switchTab }) => {
 		onSuccess: (data) => {
 			userContext.setUser(data);
 			navigate('/');
+			toast.success('Login successful');
+			localStorage.setItem('user', JSON.stringify(data));
 		},
 		onError: (error) => {
 			toast.error(error.message || 'Something went wrong');

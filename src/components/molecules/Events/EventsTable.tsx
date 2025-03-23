@@ -1,9 +1,6 @@
 import { FC } from 'react';
-import FlexpriceTable, { ColumnData } from '../Table';
+import FlexpriceTable, { ColumnData, TooltipCell } from '../Table';
 import { formatDateWithMilliseconds } from '@/utils/common/format_date';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Copy } from 'lucide-react';
-import { toast } from 'react-hot-toast';
 
 interface Props {
 	data: Event[];
@@ -24,29 +21,7 @@ const EventsTable: FC<Props> = ({ data }) => {
 		{
 			title: 'Event Id',
 			render(rowData) {
-				const copyToClipboard = () => {
-					navigator.clipboard.writeText(rowData.id);
-					toast.success('Event ID copied to clipboard');
-				};
-
-				return (
-					<TooltipProvider>
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<div className='flex items-center gap-2 group'>
-									<span className='max-w-[100px] truncate cursor-pointer'>{rowData.id || '--'}</span>
-									<Copy
-										onClick={copyToClipboard}
-										className='w-4 h-4 opacity-0 group-hover:opacity-100 cursor-pointer text-muted-foreground hover:text-foreground transition-opacity'
-									/>
-								</div>
-							</TooltipTrigger>
-							<TooltipContent>
-								<p>{rowData.id}</p>
-							</TooltipContent>
-						</Tooltip>
-					</TooltipProvider>
-				);
+				return <TooltipCell tooltipContent={rowData.id} tooltipText={rowData.id} />;
 			},
 		},
 		{

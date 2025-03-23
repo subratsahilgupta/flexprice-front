@@ -1,38 +1,32 @@
+import { NODE_ENV, NodeEnv } from '@/types/env';
 import supabase from '../supbase/config';
 
-export enum ProjectEnvironment {
-	PROD = 'production',
-	DEV = 'development',
-	LOCAL = 'local',
-}
-
 class AuthService {
-	private static readonly environment = import.meta.env.VITE_ENVIRONMENT;
-
 	public static async getAcessToken() {
-		if (this.environment != ProjectEnvironment.LOCAL) {
+		if (NODE_ENV != NodeEnv.SELF_HOSTED) {
 			const {
 				data: { session },
 			} = await supabase.auth.getSession();
 			return session?.access_token;
 		} else {
-			const token = JSON.parse(localStorage.getItem('sb-vnswkuldxqmqhyiewgsq-auth-token') || '{}').access_token;
+			const token = localStorage.getItem('token');
+			console.log('token', token);
 			return token;
 		}
 	}
 
 	public static async getUser() {
-		if (this.environment != ProjectEnvironment.LOCAL) {
+		if (NODE_ENV != NodeEnv.SELF_HOSTED) {
 			const { data } = await supabase.auth.getUser();
 			return data.user;
 		} else {
-			const user = JSON.parse(localStorage.getItem('sb-vnswkuldxqmqhyiewgsq-auth-token') || '{}').user;
+			const user = JSON.parse(localStorage.getItem('token') || '{}').user;
 			return user;
 		}
 	}
 
 	public static async logout() {
-		if (this.environment != ProjectEnvironment.LOCAL) {
+		if (NODE_ENV != NodeEnv.SELF_HOSTED) {
 			await supabase.auth.signOut();
 		}
 		localStorage.clear();

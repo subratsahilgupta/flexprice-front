@@ -1,5 +1,6 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import Customer from '@/models/Customer';
+import { CustomerEntitlement } from '@/models/CustomerEntitlement';
 import { PaginationType } from '@/models/Pagination';
 import { Subscription } from '@/models/Subscription';
 
@@ -11,6 +12,16 @@ interface GetCustomerResponse {
 interface GetCustomerSubscriptionsResponse {
 	items: Subscription[];
 	pagination: PaginationType;
+}
+
+interface GetCustomerEntitlementsResponse {
+	customer_id: string;
+	features: CustomerEntitlement[];
+}
+
+interface GetCustomerEntitlementPayload {
+	customer_id: string;
+	feature_id?: string;
 }
 
 export interface CreateCustomerSubscriptionPayload {
@@ -59,6 +70,10 @@ class CustomerApi {
 	}
 	public static async updateCustomer(customer: Partial<Customer>, id: string): Promise<Customer> {
 		return await AxiosClient.put(`${this.baseUrl}/${id}`, customer);
+	}
+
+	public static async getEntitlements(payload: GetCustomerEntitlementPayload): Promise<GetCustomerEntitlementsResponse> {
+		return await AxiosClient.get(`${this.baseUrl}/${payload.customer_id}/entitlements`);
 	}
 }
 

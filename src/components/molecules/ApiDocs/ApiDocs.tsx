@@ -3,7 +3,7 @@ import DocsDrawer from '../DocsDrawer/DocsDrawer';
 import { CodeSnippet, useApiDocsStore } from '@/store/useApiDocsStore';
 import { useDocs } from '@/context/DocsContext';
 import { Button } from '@/components/atoms';
-import { BookOpen, Code, Code2 } from 'lucide-react';
+import { Code2 } from 'lucide-react';
 
 const ApiDocs: FC = () => {
 	const [isDocsOpen, setIsDocsOpen] = useState(false);

@@ -20,11 +20,13 @@ interface SignupData {
 }
 const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 	const navigate = useNavigate();
+
 	const [signupData, setSignupData] = useState<SignupData>({
 		email: '',
 		password: '',
 		confirmPassword: '',
 	});
+
 	const [showPassword, setShowPassword] = useState(false);
 	const [errors, setErrors] = useState<Partial<SignupData>>({});
 
@@ -36,9 +38,14 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 				password: signupData.password,
 			});
 		},
-		onSuccess: () => {
+		onSuccess: (data) => {
 			toast.success('Account created successfully! Please check your email to confirm your account.');
-			switchTab('login');
+			if (NODE_ENV != NodeEnv.SELF_HOSTED) {
+				switchTab('login');
+			} else {
+				localStorage.setItem('token', JSON.stringify(data.token));
+				navigate(RouteNames.login);
+			}
 		},
 
 		onError: (error: any) => {

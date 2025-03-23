@@ -71,6 +71,32 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 	const customerInfoClass = 'text-sm text-[#71717A] mb-[2px]';
 	const invoiceref = useRef<HTMLDivElement>(null);
 
+	const customerAddress =
+		data?.customer?.address_line1 +
+		' ' +
+		data?.customer?.address_line2 +
+		' ' +
+		data?.customer?.address_city +
+		' ' +
+		data?.customer?.address_state +
+		' ' +
+		data?.customer?.address_postal_code +
+		' ' +
+		data?.customer?.address_country;
+
+	const tenantAddress =
+		user?.tenant.billing_details.address.address_line1 +
+		' ' +
+		user?.tenant.billing_details.address.address_line2 +
+		' ' +
+		user?.tenant.billing_details.address.address_city +
+		' ' +
+		user?.tenant.billing_details.address.address_state +
+		' ' +
+		user?.tenant.billing_details.address.address_postal_code +
+		' ' +
+		user?.tenant.billing_details.address.address_country;
+
 	const handleDownlaod = () => {
 		captureToPdf(invoiceref, 'invoice');
 	};
@@ -103,7 +129,7 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 					});
 				}}
 			/>
-			<div ref={invoiceref} className=' mt-6 rounded-xl border border-gray-300 p-6'>
+			<div ref={invoiceref} className=' rounded-xl border border-gray-300 p-6'>
 				<div className='p-4'>
 					<div className='w-full flex justify-between items-center'>
 						<FormHeader title='Invoice Details' variant='sub-header' titleClassName='font-semibold' />
@@ -142,14 +168,14 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 						<FormHeader className='!mb-2' title={user?.tenant.name} variant='sub-header' titleClassName='font-semibold' />
 						<p className={customerInfoClass}>{user?.tenant.name}</p>
 						<p className={customerInfoClass}>{user?.email}</p>
-						<p className={customerInfoClass}>{'--'}</p>
+						<p className={customerInfoClass}>{tenantAddress || '--'}</p>
 					</div>
 
 					<div>
 						<FormHeader className='!mb-2' title='Bill to' variant='sub-header' titleClassName='font-semibold' />
 						<p className={customerInfoClass}>{data?.customer?.name || '--'}</p>
-						<p className={customerInfoClass}>{data?.customer?.address_line1 || '--'}</p>
-						<p className={customerInfoClass}>{data?.customer?.address_line2 || '--'}</p>
+						<p className={customerInfoClass}>{data?.customer?.email || '--'}</p>
+						<p className={customerInfoClass}>{customerAddress || '--'}</p>
 					</div>
 				</div>
 				<InvoiceLineItemTable title='Order Details' data={data?.line_items ?? []} amount_due={data?.amount_due} currency={data?.currency} />

@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { UserApi } from '@/utils/api_requests/UserApi';
+import AuthService from '@/core/auth/AuthService';
 
 const useUser = () => {
-	const tokenStr = localStorage.getItem('sb-vnswkuldxqmqhyiewgsq-auth-token');
+	const tokenStr = AuthService.getAcessToken();
 
 	const {
 		data: user,

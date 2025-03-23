@@ -1,9 +1,7 @@
 import React, { ReactNode, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useUser } from '@/hooks/UserContext';
-import { useQuery } from '@tanstack/react-query';
 import { PageLoader } from '@/components/atoms';
-import AuthApi from '@/utils/api_requests/AuthApi';
 import useUserhook from '@/hooks/useUser';
 
 interface AuthMiddlewareProps {
