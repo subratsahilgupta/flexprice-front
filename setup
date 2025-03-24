@@ -22,12 +22,12 @@ detect_os() {
 create_env_file() {
     if [ "$(detect_os)" = "windows" ]; then
         # Windows-style file creation
-        echo "VITE_API_URL=https://api-dev.cloud.flexprice.io/v1" > .env
+        echo "VITE_API_URL=http://localhost:8080/v1" > .env
         echo "VITE_ENVIRONMENT=self-hosted" >> .env
     else
         # Unix-style file creation
         cat > .env << EOL
-VITE_API_URL=https://api-dev.cloud.flexprice.io/v1
+VITE_API_URL=http://localhost:8080/v1
 VITE_ENVIRONMENT=self-hosted
 EOL
     fi

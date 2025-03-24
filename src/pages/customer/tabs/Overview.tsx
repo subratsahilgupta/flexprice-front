@@ -6,7 +6,7 @@ import SubscriptionTable from '@/components/organisms/Subscription/SubscriptionT
 import { Subscription } from '@/models/Subscription';
 import Loader from '@/components/atoms/Loader';
 import toast from 'react-hot-toast';
-import CustomerEntitlementTable from '@/components/molecules/CustomerEntitlementTable/CustomerEntitlementTable';
+import CustomerUsageTable from '@/components/molecules/CustomerUsageTable/CustomerUsageTable';
 
 const fetchAllSubscriptions = async (customerId: string) => {
 	const subs = await CustomerApi.getCustomerSubscriptions(customerId);
@@ -30,18 +30,18 @@ const Overview = () => {
 	});
 
 	const {
-		data: entitlementsData,
-		isLoading: entitlementsLoading,
-		error: entitlementsError,
+		data: usageData,
+		isLoading: usageLoading,
+		error: usageError,
 	} = useQuery({
-		queryKey: ['entitlements', customerId],
-		queryFn: () => CustomerApi.getEntitlements({ customer_id: customerId! }),
+		queryKey: ['usage', customerId],
+		queryFn: () => CustomerApi.getUsageSummary({ customer_id: customerId! }),
 	});
-	if (subscriptionsLoading || entitlementsLoading) {
+	if (subscriptionsLoading || usageLoading) {
 		return <Loader />;
 	}
 
-	if (subscriptionsError || entitlementsError) {
+	if (subscriptionsError || usageError) {
 		toast.error('Something went wrong');
 	}
 
@@ -65,7 +65,7 @@ const Overview = () => {
 			{/* customer entitlements table */}
 			<Card variant='notched'>
 				<CardHeader title='Entitlements' />
-				<CustomerEntitlementTable data={entitlementsData?.features ?? []} />
+				<CustomerUsageTable data={usageData?.features ?? []} />
 			</Card>
 		</div>
 	);

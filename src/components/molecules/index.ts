@@ -62,6 +62,6 @@ export { default as PricingCard } from './PricingCard';
 
 export { default as ApiDocs, ApiDocsContent } from './ApiDocs';
 
-export { default as CustomerEntitlementTable } from './CustomerEntitlementTable';
+export { default as CustomerEntitlementTable } from './CustomerUsageTable';
 
 export { default as InvoicePaymentsTable } from './InvoicePaymentsTable';

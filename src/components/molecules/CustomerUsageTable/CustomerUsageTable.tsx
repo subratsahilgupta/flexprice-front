@@ -6,9 +6,10 @@ import { FC } from 'react';
 import { Link } from 'react-router-dom';
 import { getFeatureIcon } from '@/components/atoms/SelectFeature/SelectFeature';
 import { CustomerEntitlement } from '@/models/CustomerEntitlement';
+import CustomerUsage from '@/models/CustomerUsage';
 
 interface Props {
-	data: CustomerEntitlement[];
+	data: CustomerUsage[];
 }
 
 const getFeatureTypeChips = (type: string) => {
@@ -89,7 +90,7 @@ const columnData: ColumnData<CustomerEntitlement>[] = [
 	},
 ];
 
-const CustomerEntitlementTable: FC<Props> = ({ data }) => {
+const CustomerUsageTable: FC<Props> = ({ data }) => {
 	return (
 		<div>
 			<FlexpriceTable showEmptyRow data={data} columns={columnData} />
@@ -98,4 +99,4 @@ const CustomerEntitlementTable: FC<Props> = ({ data }) => {
 	);
 };
 
-export default CustomerEntitlementTable;
+export default CustomerUsageTable;

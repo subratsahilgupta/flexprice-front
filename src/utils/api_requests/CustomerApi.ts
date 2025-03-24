@@ -3,7 +3,7 @@ import Customer from '@/models/Customer';
 import { CustomerEntitlement } from '@/models/CustomerEntitlement';
 import { PaginationType } from '@/models/Pagination';
 import { Subscription } from '@/models/Subscription';
-
+import CustomerUsage from '@/models/CustomerUsage';
 interface GetCustomerResponse {
 	items: Customer[];
 	pagination: PaginationType;
@@ -37,6 +37,17 @@ export interface CreateCustomerSubscriptionPayload {
 	lookup_key: string;
 	trial_end: string | null;
 	trial_start: string | null;
+}
+
+interface GetUsageSummaryResponse {
+	customer_id: string;
+	features: CustomerUsage[];
+	pagination: PaginationType;
+	period: {
+		end_time: string;
+		period: string;
+		start_time: string;
+	};
 }
 
 class CustomerApi {
@@ -74,6 +85,10 @@ class CustomerApi {
 
 	public static async getEntitlements(payload: GetCustomerEntitlementPayload): Promise<GetCustomerEntitlementsResponse> {
 		return await AxiosClient.get(`${this.baseUrl}/${payload.customer_id}/entitlements`);
+	}
+
+	public static async getUsageSummary(payload: GetCustomerEntitlementPayload): Promise<GetUsageSummaryResponse> {
+		return await AxiosClient.get(`${this.baseUrl}/${payload.customer_id}/usage`);
 	}
 }
 

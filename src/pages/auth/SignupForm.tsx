@@ -19,6 +19,7 @@ interface SignupData {
 	password: string;
 	confirmPassword: string;
 }
+
 const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 	const navigate = useNavigate();
 
@@ -40,8 +41,8 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 			});
 		},
 		onSuccess: (data) => {
-			toast.success('Account created successfully! Please check your email to confirm your account.');
 			if (NODE_ENV != NodeEnv.SELF_HOSTED) {
+				toast.success('Account created successfully! Please check your email to confirm your account.');
 				switchTab('login');
 			} else {
 				// Store token in a consistent format
