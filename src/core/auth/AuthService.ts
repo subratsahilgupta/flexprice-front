@@ -1,40 +1,48 @@
+import { NODE_ENV, NodeEnv } from '@/types/env';
 import supabase from '../supbase/config';
 
-export enum ProjectEnvironment {
-	PROD = 'production',
-	DEV = 'development',
-	LOCAL = 'local',
-}
-
 class AuthService {
-	private static readonly environment = import.meta.env.VITE_ENVIRONMENT;
-
 	public static async getAcessToken() {
-		if (this.environment != ProjectEnvironment.LOCAL) {
+		if (NODE_ENV != NodeEnv.SELF_HOSTED) {
 			const {
 				data: { session },
 			} = await supabase.auth.getSession();
 			return session?.access_token;
 		} else {
-			const token = JSON.parse(localStorage.getItem('sb-vnswkuldxqmqhyiewgsq-auth-token') || '{}').access_token;
-			return token;
+			try {
+				const tokenData = localStorage.getItem('token');
+				if (!tokenData) return null;
+				const parsedToken = JSON.parse(tokenData);
+				return parsedToken.token;
+			} catch (error) {
+				console.error('Error parsing token:', error);
+				return null;
+			}
 		}
 	}
 
 	public static async getUser() {
-		if (this.environment != ProjectEnvironment.LOCAL) {
+		if (NODE_ENV != NodeEnv.SELF_HOSTED) {
 			const { data } = await supabase.auth.getUser();
 			return data.user;
 		} else {
-			const user = JSON.parse(localStorage.getItem('sb-vnswkuldxqmqhyiewgsq-auth-token') || '{}').user;
-			return user;
+			try {
+				const tokenData = localStorage.getItem('token');
+				if (!tokenData) return null;
+				const parsedToken = JSON.parse(tokenData);
+				return parsedToken.user;
+			} catch (error) {
+				console.error('Error parsing user data:', error);
+				return null;
+			}
 		}
 	}
 
 	public static async logout() {
-		if (this.environment != ProjectEnvironment.LOCAL) {
+		if (NODE_ENV != NodeEnv.SELF_HOSTED) {
 			await supabase.auth.signOut();
 		}
+		localStorage.clear();
 	}
 }
 

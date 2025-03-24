@@ -6,6 +6,8 @@ import SubscriptionTable from '@/components/organisms/Subscription/SubscriptionT
 import { Subscription } from '@/models/Subscription';
 import Loader from '@/components/atoms/Loader';
 import toast from 'react-hot-toast';
+import CustomerUsageTable from '@/components/molecules/CustomerUsageTable/CustomerUsageTable';
+
 const fetchAllSubscriptions = async (customerId: string) => {
 	const subs = await CustomerApi.getCustomerSubscriptions(customerId);
 	return subs.items;
@@ -27,16 +29,24 @@ const Overview = () => {
 		queryFn: () => fetchAllSubscriptions(customerId!),
 	});
 
-	if (subscriptionsLoading) {
+	const {
+		data: usageData,
+		isLoading: usageLoading,
+		error: usageError,
+	} = useQuery({
+		queryKey: ['usage', customerId],
+		queryFn: () => CustomerApi.getUsageSummary({ customer_id: customerId! }),
+	});
+	if (subscriptionsLoading || usageLoading) {
 		return <Loader />;
 	}
 
-	if (subscriptionsError) {
+	if (subscriptionsError || usageError) {
 		toast.error('Something went wrong');
 	}
 
 	return (
-		<div className=''>
+		<div className='space-y-6'>
 			<Card variant='notched'>
 				<CardHeader title='Subscriptions' cta={<AddButton onClick={handleAddSubscription} />} />
 				{(subscriptions?.length || 0) > 0 ? (
@@ -50,6 +60,12 @@ const Overview = () => {
 				) : (
 					<p className='text-gray-500 text-sm'>No Active Subscriptions Yet</p>
 				)}
+			</Card>
+
+			{/* customer entitlements table */}
+			<Card variant='notched'>
+				<CardHeader title='Entitlements' />
+				<CustomerUsageTable data={usageData?.features ?? []} />
 			</Card>
 		</div>
 	);

@@ -2,7 +2,7 @@ export { Sidebar } from './Sidebar';
 
 export { BillableMetricTable } from './BillableMetricTable';
 
-export { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from './Table';
+export { Table, TableHeader, TableBody, TableHead, TableRow, TableCell, TooltipCell } from './Table';
 export type { ColumnData, FlexpriceTableProps } from './Table';
 
 export { default as FlexpriceTable } from './Table';
@@ -61,3 +61,7 @@ export { default as DebugMenu } from './DebugMenu';
 export { default as PricingCard } from './PricingCard';
 
 export { default as ApiDocs, ApiDocsContent } from './ApiDocs';
+
+export { default as CustomerEntitlementTable } from './CustomerUsageTable';
+
+export { default as InvoicePaymentsTable } from './InvoicePaymentsTable';

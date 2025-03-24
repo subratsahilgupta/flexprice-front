@@ -4,11 +4,11 @@ FROM node:20-alpine AS build
 # Set working directory
 WORKDIR /app
 
-# Copy package.json and yarn.lock
-COPY package.json package-lock.json ./
+# Copy package.json first (and package-lock.json if it exists)
+COPY package*.json ./
 
 # Install dependencies
-RUN npm install --frozen-lockfile
+RUN npm install
 
 # Copy all files to the container
 COPY . .

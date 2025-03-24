@@ -44,8 +44,9 @@ const SnippetBlock: FC<SnippetBlockProps> = ({ snippet }) => {
 
 	return (
 		<div className='mb-8 last:mb-0'>
-			<h3 className='text-lg font-semibold text-gray-900 mb-3'>{snippet.label}</h3>
-			<div className='rounded-lg overflow-hidden border border-gray-200'>
+			<h3 className='text-lg font-normal text-foreground'>{snippet.label}</h3>
+			{snippet.description && <p className='text-sm text-gray-400'>{snippet.description}</p>}
+			<div className='rounded-lg overflow-hidden border border-gray-200 mt-3'>
 				{/* Language Tabs */}
 				<div className='flex overflow-x-auto bg-gray-50 border-b border-gray-200'>
 					{languages.map((lang) => (
@@ -100,12 +101,11 @@ const DocsDrawer: FC<Props> = ({
 		<Sheet isOpen={isOpen} onOpenChange={onOpenChange} title='API Reference' trigger={trigger} size='lg'>
 			<div className='flex flex-col h-full'>
 				{/* Code Snippets Section */}
-				<div className='mb-6 px-1'>
+				<div className='my-6 px-1'>
 					{snippets.map((snippet, index) => (
 						<SnippetBlock key={index} snippet={snippet} />
 					))}
 				</div>
-
 				{/* Documentation iframe */}
 				{/* <div className="flex-1 min-h-0 border-t border-gray-200 pt-4">
                     <iframe

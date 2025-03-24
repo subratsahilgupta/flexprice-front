@@ -2,6 +2,7 @@ import { create } from 'zustand';
 
 export interface CodeSnippet {
 	label: string;
+	description?: string;
 	curl: string;
 }
 

@@ -1,7 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
-import supabase from '@/core/supbase/config';
 import EnvironmentApi from '@/utils/api_requests/EnvironmentApi';
-
+import AuthService from '@/core/auth/AuthService';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const axiosClient: AxiosInstance = axios.create({
@@ -14,18 +13,15 @@ const axiosClient: AxiosInstance = axios.create({
 
 axiosClient.interceptors.request.use(
 	async (config: InternalAxiosRequestConfig) => {
-		const {
-			data: { session },
-		} = await supabase.auth.getSession();
-
+		const token = await AuthService.getAcessToken();
 		// add active environment to the request
 		const activeEnv = EnvironmentApi.getActiveEnvironment();
 		if (activeEnv) {
 			config.headers['X-Environment-ID'] = activeEnv.id;
 		}
 
-		if (session?.access_token) {
-			config.headers.Authorization = `Bearer ${session.access_token}`;
+		if (token) {
+			config.headers.Authorization = `Bearer ${token}`;
 		}
 
 		return config;
@@ -43,7 +39,7 @@ axiosClient.interceptors.response.use(
 		if (error.response) {
 			switch (error.response.status) {
 				case 401:
-					await supabase.auth.signOut();
+					await AuthService.logout();
 					// Redirect to login or show message
 					break;
 				case 403:

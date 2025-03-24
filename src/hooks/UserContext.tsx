@@ -13,13 +13,14 @@ interface UserContextProp {
 const UserContext = createContext<UserContextProp>({} as UserContextProp);
 
 export const UserProvider = ({ children }: UserProviderProps) => {
-	const [user, setUser] = useState<any>({} as any);
+	const [user, setUser] = useState<any>({});
 
 	useEffect(() => {
 		try {
-			const user = JSON.parse(localStorage.getItem('user')!) as any;
+			const user = JSON.parse(localStorage.getItem('user')!);
 			setUser(user);
 		} catch (error) {
+			console.error(error);
 			AuthService.logout();
 			<Navigate to={'/auth'} />;
 		}

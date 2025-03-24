@@ -5,6 +5,8 @@ import LoginForm from './LoginForm';
 import SignupForm from './SignupForm';
 import ForgotPasswordForm from './ForgotPasswordForm';
 import GoogleSignin from './GoogleSignin';
+import { NodeEnv, NODE_ENV } from '@/types/env';
+import AuthService from '@/core/auth/AuthService';
 
 type AuthTab = 'login' | 'signup' | 'forgot-password';
 
@@ -14,7 +16,16 @@ const AuthPage: React.FC = () => {
 
 	// Get current tab from URL or default to login
 	const [currentTab, setCurrentTab] = useState<AuthTab>('login');
-	const environment = import.meta.env.VITE_ENVIRONMENT;
+
+	useEffect(() => {
+		const fetchUser = async () => {
+			const tokenStr = await AuthService.getAcessToken();
+			if (tokenStr) {
+				navigate('/');
+			}
+		};
+		fetchUser();
+	}, []);
 
 	// Parse query parameters on component mount and tab changes
 	useEffect(() => {
@@ -87,7 +98,7 @@ const AuthPage: React.FC = () => {
 					)}
 
 					{/* Google Sign-in Button - Only show on login and signup tabs */}
-					{currentTab !== 'forgot-password' && environment != 'self-hosted' && (
+					{currentTab !== 'forgot-password' && NODE_ENV != NodeEnv.SELF_HOSTED && (
 						<>
 							<GoogleSignin />
 							<div className='flex items-center justify-center my-6'>
