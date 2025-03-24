@@ -83,7 +83,7 @@ const columnData: ColumnData<CustomerUsage>[] = [
 			const indicatorColor = value >= 100 ? 'bg-red-600' : 'bg-green-800';
 			const backgroundColor = value >= 100 ? 'bg-red-50' : 'bg-green-50';
 
-			const label = row.sources[0].usage_limit ? `${usage} / ${limit}` : `${usage} / Unlimited`;
+			const label = row.total_limit ? `${usage} / ${limit}` : `${usage} / Unlimited`;
 			return <Progress label={label} value={value} className='h-[6px]' indicatorColor={indicatorColor} backgroundColor={backgroundColor} />;
 		},
 	},
