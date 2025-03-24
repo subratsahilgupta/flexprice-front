@@ -22,6 +22,7 @@ const PaymentPage = () => {
 	const snippets: CodeSnippet[] = [
 		{
 			label: 'List all payments',
+			description: 'List all payments',
 			curl: `curl --request GET \\
 --url https://api.cloud.flexprice.io/v1/payments \\
 --header 'x-api-key: <api-key>'`,

@@ -5,7 +5,6 @@ import { FeatureType } from '@/models/Feature';
 import { FC } from 'react';
 import { Link } from 'react-router-dom';
 import { getFeatureIcon } from '@/components/atoms/SelectFeature/SelectFeature';
-import { CustomerEntitlement } from '@/models/CustomerEntitlement';
 import CustomerUsage from '@/models/CustomerUsage';
 
 interface Props {
@@ -27,25 +26,25 @@ const getFeatureTypeChips = (type: string) => {
 	}
 };
 
-const getFeatureValue = (data: CustomerEntitlement) => {
+const getFeatureValue = (data: CustomerUsage) => {
 	switch (data.feature.type) {
 		case FeatureType.static:
-			return data.entitlement.static_values[0];
+			return data.sources[0].static_value;
 		case FeatureType.metered:
 			return (
 				<span className='flex items-end gap-1'>
-					{data.entitlement.usage_limit ?? 'Unlimited'}
+					{data.total_limit ?? 'Unlimited'}
 					<span className='text-[#64748B] text-sm font-normal font-sans'>units</span>
 				</span>
 			);
 		case FeatureType.boolean:
-			return data.entitlement.is_enabled ? 'True' : 'False';
+			return data.is_enabled ? 'True' : 'False';
 		default:
 			return '--';
 	}
 };
 
-const columnData: ColumnData<CustomerEntitlement>[] = [
+const columnData: ColumnData<CustomerUsage>[] = [
 	{
 		title: 'Feature',
 		fieldVariant: 'title',
@@ -76,15 +75,15 @@ const columnData: ColumnData<CustomerEntitlement>[] = [
 			if (row?.feature?.type != FeatureType.metered) {
 				return '--';
 			}
-			const usage = Number(row?.entitlement?.usage_limit);
-			const limit = Number(row?.entitlement?.usage_limit);
+			const usage = Number(row?.current_usage);
+			const limit = Number(row?.total_limit);
 			const value = Math.ceil((usage / limit) * 100);
 			// const resetLabel = row.usage_reset_period ? `Resets ${formatBillingPeriod(row.usage_reset_period)}` : '';
 
 			const indicatorColor = value >= 100 ? 'bg-red-600' : 'bg-green-800';
 			const backgroundColor = value >= 100 ? 'bg-red-50' : 'bg-green-50';
 
-			const label = row.entitlement.usage_reset_period ? `${usage} / ${limit}` : `${usage} / No Limit`;
+			const label = row.sources[0].usage_limit ? `${usage} / ${limit}` : `${usage} / Unlimited`;
 			return <Progress label={label} value={value} className='h-[6px]' indicatorColor={indicatorColor} backgroundColor={backgroundColor} />;
 		},
 	},

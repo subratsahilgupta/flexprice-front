@@ -13,7 +13,7 @@ interface CustomerUsage {
 		quantity: number;
 		static_value: string;
 		subscription_id: string;
-		usage_limit: number;
+		usage_limit?: number;
 	}[];
 	total_limit: number;
 	usage_percent: number;

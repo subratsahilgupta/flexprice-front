@@ -23,7 +23,7 @@ const ApiDocs: FC = () => {
 				docsUrl={docsUrl}
 				snippets={snippets}
 				trigger={
-					<Button variant='outline' className='outlin text-sm bg-gray-100 flex items-center gap-2' size='sm'>
+					<Button variant='outline' className='outline-none text-sm bg-gray-100 flex items-center gap-2' size='sm'>
 						<Code2 className='w-4 h-4' />
 						Api
 					</Button>
