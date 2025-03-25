@@ -11,18 +11,26 @@ interface Props {
 	data: CustomerUsage[];
 }
 
-const getFeatureTypeChips = (type: string) => {
+export const getFeatureTypeChips = ({
+	type,
+	showIcon = false,
+	showLabel = false,
+}: {
+	type: string;
+	showIcon?: boolean;
+	showLabel?: boolean;
+}) => {
 	const icon = getFeatureIcon(type);
 	switch (type.toLocaleLowerCase()) {
 		case 'static': {
-			return <Chip variant='default' label={icon} />;
+			return <Chip variant='default' icon={showIcon && icon} label={showLabel && 'Static'} />;
 		}
 		case 'metered':
-			return <Chip textColor='#1E3A8A' bgColor='#F0F9FF' label={icon} />;
+			return <Chip textColor='#1E3A8A' bgColor='#F0F9FF' icon={showIcon && icon} label={showLabel && 'Metered'} />;
 		case 'boolean':
-			return <Chip textColor='#075985' bgColor='#F0F9FF' label={icon} />;
+			return <Chip textColor='#075985' bgColor='#F0F9FF' icon={showIcon && icon} label={showLabel && 'Boolean'} />;
 		default:
-			return <Chip textColor='#075985' bgColor='#F0F9FF' label={icon} />;
+			return <Chip textColor='#075985' bgColor='#F0F9FF' icon={showIcon && icon} label={showLabel && '--'} />;
 	}
 };
 
@@ -51,14 +59,16 @@ const columnData: ColumnData<CustomerUsage>[] = [
 		render(row) {
 			return (
 				<Link className='inline-flex gap-2 items-center' to={RouteNames.featureDetails + `/${row?.feature?.id}`}>
-					{getFeatureTypeChips(row?.feature?.type || '')}
+					{getFeatureTypeChips({
+						type: row?.feature?.type || '',
+					})}
 					{row?.feature?.name}
 				</Link>
 			);
 		},
 	},
 	{
-		title: 'Source	',
+		title: 'Plan',
 		render(row) {
 			return <span>{row?.sources[0]?.plan_name}</span>;
 		},
@@ -80,8 +90,8 @@ const columnData: ColumnData<CustomerUsage>[] = [
 			const value = Math.ceil((usage / limit) * 100);
 			// const resetLabel = row.usage_reset_period ? `Resets ${formatBillingPeriod(row.usage_reset_period)}` : '';
 
-			const indicatorColor = value >= 100 ? 'bg-red-600' : 'bg-green-800';
-			const backgroundColor = value >= 100 ? 'bg-red-50' : 'bg-green-50';
+			const indicatorColor = value >= 100 ? 'bg-red-600' : 'bg-blue-600';
+			const backgroundColor = value >= 100 ? 'bg-red-50' : 'bg-blue-200';
 
 			const label = row.total_limit ? `${usage} / ${limit}` : `${usage} / Unlimited`;
 			return <Progress label={label} value={value} className='h-[6px]' indicatorColor={indicatorColor} backgroundColor={backgroundColor} />;

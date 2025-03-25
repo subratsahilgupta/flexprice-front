@@ -21,7 +21,10 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 			setUser(user);
 		} catch (error) {
 			console.error(error);
+
+			// logout user
 			AuthService.logout();
+
 			<Navigate to={'/auth'} />;
 		}
 	}, []);

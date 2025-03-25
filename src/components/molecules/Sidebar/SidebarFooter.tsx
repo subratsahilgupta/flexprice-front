@@ -24,7 +24,7 @@ const SidebarFooter = () => {
 
 	const dropdownItems = [
 		{
-			label: 'Query',
+			label: 'Query Usage',
 			onClick: () => {
 				navigate(RouteNames.queryPage);
 			},
