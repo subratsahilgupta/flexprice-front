@@ -16,7 +16,7 @@ interface CustomTabsProps {
 export const CustomTabs = ({ tabs, defaultValue = tabs[0]?.value, className }: CustomTabsProps) => {
 	return (
 		<Tabs defaultValue={defaultValue} className={cn('w-full', className)}>
-			<TabsList className='px-4 space-x-6 bg-transparent'>
+			<TabsList className=' space-x-3 bg-transparent'>
 				{tabs.map((tab) => (
 					<TabsTrigger
 						key={tab.value}
@@ -31,9 +31,9 @@ export const CustomTabs = ({ tabs, defaultValue = tabs[0]?.value, className }: C
 					</TabsTrigger>
 				))}
 			</TabsList>
-			<div>
+			<div className='mt-0 p-0'>
 				{tabs.map((tab) => (
-					<TabsContent key={tab.value} value={tab.value}>
+					<TabsContent className='mt-0 p-0' key={tab.value} value={tab.value}>
 						{tab.content}
 					</TabsContent>
 				))}

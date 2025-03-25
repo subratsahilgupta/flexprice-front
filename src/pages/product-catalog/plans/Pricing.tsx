@@ -227,7 +227,7 @@ const PricingPage = () => {
 	}
 
 	return (
-		<Page headingClassName='items-center' heading='Pricing'>
+		<Page headingClassName='items-center' heading='Pricing Widget'>
 			{/* filters */}
 			<div className='w-full flex justify-end gap-4 mb-8'>
 				<Select

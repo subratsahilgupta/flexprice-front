@@ -37,6 +37,7 @@ import CustomerInformation from '@/pages/customer/tabs/CustomerInformation';
 import PricingPage from '@/pages/product-catalog/plans/Pricing';
 import OnboardingPage from '@/pages/onboarding/onboarding';
 import PaymentPage from '@/pages/usage/payments/PaymentPage';
+
 export const RouteNames = {
 	home: '/',
 	login: '/auth',
@@ -61,7 +62,7 @@ export const RouteNames = {
 	createPlan: '/product-catalog/plan/create-plan',
 	plan: '/product-catalog/plan',
 	editPlan: '/product-catalog/plan/edit-plan',
-	pricing: '/product-catalog/pricing',
+	pricing: '/product-catalog/pricing-widget',
 
 	features: '/product-catalog/features',
 	createFeature: '/product-catalog/features/create-feature',
@@ -83,6 +84,7 @@ export const RouteNames = {
 };
 
 export const MainRouter = createBrowserRouter([
+	// public routes
 	{
 		path: RouteNames.login,
 		element: <Auth />,
@@ -95,6 +97,7 @@ export const MainRouter = createBrowserRouter([
 		path: RouteNames.resendVerification,
 		element: <ResendVerification />,
 	},
+	// private routes
 	{
 		path: RouteNames.home,
 		element: (
@@ -104,7 +107,7 @@ export const MainRouter = createBrowserRouter([
 		),
 		children: [
 			{
-				path: '/',
+				path: RouteNames.home,
 				element: <Navigate to={RouteNames.pricing} />,
 			},
 			{

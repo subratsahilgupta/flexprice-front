@@ -8,14 +8,14 @@ import { Page } from '@/components/atoms';
 import { CodeSnippet } from '@/store/useApiDocsStore';
 
 const PaymentPage = () => {
-	const { limit, offset } = usePagination();
+	const { limit, offset, page } = usePagination();
 
 	const {
 		data: payments,
 		isLoading,
 		isError,
 	} = useQuery({
-		queryKey: ['payments'],
+		queryKey: ['payments', page],
 		queryFn: () => PaymentApi.getAllPayments({ limit, offset }),
 	});
 

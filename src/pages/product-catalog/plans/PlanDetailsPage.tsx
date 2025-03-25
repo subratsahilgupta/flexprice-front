@@ -1,7 +1,6 @@
 import { ActionButton, Button, CardHeader, Chip, Loader, Page, Spacer } from '@/components/atoms';
 import { AddEntitlementDrawer, ColumnData, FlexpriceTable } from '@/components/molecules';
 import { DetailsCard } from '@/components/molecules';
-import { getFeatureTypeChips } from '@/components/molecules/FeatureTable/FeatureTable';
 import { RouteNames } from '@/core/routes/Routes';
 import { Price } from '@/models/Price';
 import { FeatureType } from '@/models/Feature';
@@ -18,6 +17,8 @@ import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card } from '@/components/atoms';
 import formatChips from '@/utils/common/format_chips';
+import { getFeatureTypeChips } from '@/components/molecules/CustomerUsageTable/CustomerUsageTable';
+import { formatAmount } from '@/components/atoms/Input/Input';
 
 const formatBillingPeriod = (billingPeriod: string) => {
 	switch (billingPeriod.toUpperCase()) {
@@ -105,7 +106,7 @@ const getFeatureValue = (entitlement: ExtendedEntitlement) => {
 		case FeatureType.metered:
 			return (
 				<span className='flex items-end gap-1'>
-					{entitlement.usage_limit ?? 'Unlimited'}
+					{formatAmount(entitlement.usage_limit?.toFixed() || '') ?? 'Unlimited'}
 					<span className='text-[#64748B] text-sm font-normal font-sans'>units</span>
 				</span>
 			);
@@ -179,7 +180,7 @@ const PlanDetailsPage = () => {
 			title: 'Type',
 
 			render(row) {
-				return getFeatureTypeChips(row?.feature_type || '');
+				return getFeatureTypeChips({ type: row?.feature_type || '', showIcon: true, showLabel: true });
 			},
 		},
 		{

@@ -19,14 +19,14 @@ export const getFeatureTypeChips = (type: string, addIcon: boolean = false) => {
 	const icon = getFeatureIcon(type);
 	switch (type.toLocaleLowerCase()) {
 		case 'static': {
-			return <Chip label={toSentenceCase(type)} childrenBefore={addIcon ? icon : null} />;
+			return <Chip label={toSentenceCase(type)} icon={addIcon ? icon : null} />;
 		}
 		case 'metered':
-			return <Chip textColor='#1E3A8A' bgColor='#F0F9FF' childrenBefore={addIcon ? icon : null} label={toSentenceCase(type)} />;
+			return <Chip textColor='#1E3A8A' bgColor='#F0F9FF' icon={addIcon ? icon : null} label={toSentenceCase(type)} />;
 		case 'boolean':
-			return <Chip textColor='#075985' bgColor='#F0F9FF' childrenBefore={addIcon ? icon : null} label={toSentenceCase(type)} />;
+			return <Chip textColor='#075985' bgColor='#F0F9FF' icon={addIcon ? icon : null} label={toSentenceCase(type)} />;
 		default:
-			return <Chip textColor='#075985' bgColor='#F0F9FF' childrenBefore={addIcon ? icon : null} label={toSentenceCase(type)} />;
+			return <Chip textColor='#075985' bgColor='#F0F9FF' icon={addIcon ? icon : null} label={toSentenceCase(type)} />;
 	}
 };
 
@@ -42,7 +42,7 @@ const FeatureTable: FC<Props> = ({ data, showEmptyRow }) => {
 		{
 			title: 'Type',
 			render(row) {
-				return getFeatureTypeChips(row?.type || '');
+				return getFeatureTypeChips(row?.type || '', true);
 			},
 		},
 		{

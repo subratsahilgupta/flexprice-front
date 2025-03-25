@@ -1,51 +1,80 @@
 import { cn } from '@/lib/utils';
 import { FC, ReactNode } from 'react';
 
-interface ChipProps {
-	label?: ReactNode;
-	variant?: 'default' | 'success' | 'warning' | 'failed' | 'info';
-	textColor?: string;
-	bgColor?: string;
-	onClick?: () => void;
-	childrenBefore?: ReactNode;
-	childrenAfter?: ReactNode;
-	className?: string;
+type ChipVariant = 'default' | 'success' | 'warning' | 'failed' | 'info';
+
+interface ChipColorScheme {
+	textColor: string;
+	bgColor: string;
 }
 
-const getChipColor = (variant: ChipProps['variant']): { textColor: string; bgColor: string } => {
-	switch (variant) {
-		case 'success':
-			return { bgColor: '#ECFBE4', textColor: '#377E6A' };
-		case 'default':
-			return { bgColor: '#F0F2F5', textColor: '#57646E' };
-		case 'failed':
-			return { bgColor: '#FEE2E2', textColor: '#DC2626' };
-		case 'info':
-			return { bgColor: '#EFF8FF', textColor: '#2F6FE2' };
-		default:
-			return { bgColor: '#F0F2F5', textColor: '#57646E' };
-	}
+interface ChipProps {
+	/** The main content of the chip */
+	label?: ReactNode;
+	/** Visual style variant of the chip */
+	variant?: ChipVariant;
+	/** Custom text color (overrides variant) */
+	textColor?: string;
+	/** Custom background color (overrides variant) */
+	bgColor?: string;
+	/** Click handler for the chip */
+	onClick?: () => void;
+	/** Icon to display before the label */
+	icon?: ReactNode;
+	/** Additional content to display after the label */
+	childrenAfter?: ReactNode;
+	/** Additional CSS classes */
+	className?: string;
+	/** Whether the chip is disabled */
+	disabled?: boolean;
+}
+
+const CHIP_COLORS: Record<ChipVariant, ChipColorScheme> = {
+	success: { bgColor: '#ECFBE4', textColor: '#377E6A' },
+	default: { bgColor: '#F0F2F5', textColor: '#57646E' },
+	failed: { bgColor: '#FEE2E2', textColor: '#DC2626' },
+	info: { bgColor: '#EFF8FF', textColor: '#2F6FE2' },
+	warning: { bgColor: '#FFF7ED', textColor: '#C2410C' },
 };
 
-const Chip: FC<ChipProps> = ({ label, variant = 'default', textColor, bgColor, onClick, childrenBefore, childrenAfter, className }) => {
-	const { bgColor: defaultBgColor, textColor: defaultTextColor } = getChipColor(variant);
+const Chip: FC<ChipProps> = ({
+	label,
+	variant = 'default',
+	textColor,
+	bgColor,
+	onClick,
+	icon,
+	childrenAfter,
+	className,
+	disabled = false,
+}) => {
+	const { bgColor: defaultBgColor, textColor: defaultTextColor } = CHIP_COLORS[variant];
+
 	return (
 		<span
-			onClick={onClick}
+			role='button'
+			tabIndex={onClick && !disabled ? 0 : undefined}
+			onClick={disabled ? undefined : onClick}
+			onKeyDown={(e) => {
+				if (onClick && !disabled && (e.key === 'Enter' || e.key === ' ')) {
+					e.preventDefault();
+					onClick();
+				}
+			}}
 			className={cn(
-				'px-3 py-1 rounded-lg select-none font-normal transition-all',
-				onClick && 'cursor-pointer gap-2',
-				childrenBefore || childrenAfter ? 'flex' : '',
-				childrenBefore && childrenAfter ? 'gap-2' : 'gap-0',
+				'inline-flex items-center justify-center  px-3 py-0 rounded-md select-none font-normal transition-all',
+				onClick && !disabled && 'cursor-pointer hover:opacity-90 active:scale-95',
+				disabled && 'opacity-50 cursor-not-allowed',
 				className,
 			)}
 			style={{
 				backgroundColor: bgColor ?? defaultBgColor,
 				color: textColor ?? defaultTextColor,
-			}}>
-			{childrenBefore}
-			{label}
-			{childrenAfter}
+			}}
+			aria-disabled={disabled}>
+			{icon && <span className='flex items-center text-[16px] leading-none'>{icon}</span>}
+			{label && <span className={cn('leading-none text-[14px]', icon ? 'ml-1.5' : '', childrenAfter ? 'mr-1.5' : '')}>{label}</span>}
+			{childrenAfter && <span className='flex items-center text-[16px] leading-none'>{childrenAfter}</span>}
 		</span>
 	);
 };

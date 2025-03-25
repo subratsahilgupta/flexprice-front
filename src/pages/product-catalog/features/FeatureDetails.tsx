@@ -151,7 +151,7 @@ const FeatureDetails = () => {
 					title={
 						<>
 							{data?.name}
-							<span className='ml-2 text-sm'>{getFeatureTypeChips(data?.type || '')}</span>
+							<span className='ml-2 text-sm'>{getFeatureTypeChips(data?.type || '', true)}</span>
 						</>
 					}>
 					{/* <div className='flex gap-2'>
