@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { AddButton, Card, CardHeader } from '@/components/atoms';
+import { AddButton, Card, CardHeader, NoDataCard } from '@/components/atoms';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
 import SubscriptionTable from '@/components/organisms/Subscription/SubscriptionTable';
@@ -47,9 +47,9 @@ const Overview = () => {
 
 	return (
 		<div className='space-y-6'>
-			<Card variant='notched'>
-				<CardHeader title='Subscriptions' cta={<AddButton onClick={handleAddSubscription} />} />
-				{(subscriptions?.length || 0) > 0 ? (
+			{(subscriptions?.length || 0) > 0 ? (
+				<Card variant='notched'>
+					<CardHeader title='Subscriptions' cta={<AddButton onClick={handleAddSubscription} />} />
 					<SubscriptionTable
 						onRowClick={(row) => {
 							navigate(`/customer-management/customers/${customerId}/subscription/${row.id}`);
@@ -57,16 +57,20 @@ const Overview = () => {
 						data={subscriptions as Subscription[]}
 						customerId={customerId!}
 					/>
-				) : (
-					<p className='text-gray-500 text-sm'>No Active Subscriptions Yet</p>
-				)}
-			</Card>
+				</Card>
+			) : (
+				<NoDataCard title='Subscriptions' subtitle='No Active Subscriptions Yet' cta={<AddButton onClick={handleAddSubscription} />} />
+			)}
 
 			{/* customer entitlements table */}
-			<Card variant='notched'>
-				<CardHeader title='Entitlements' />
-				<CustomerUsageTable data={usageData?.features ?? []} />
-			</Card>
+			{(usageData?.features?.length || 0) > 0 ? (
+				<Card variant='notched'>
+					<CardHeader title='Entitlements' />
+					<CustomerUsageTable data={usageData?.features ?? []} />
+				</Card>
+			) : (
+				<NoDataCard title='Entitlements' subtitle='No active entitlements yet' />
+			)}
 		</div>
 	);
 };

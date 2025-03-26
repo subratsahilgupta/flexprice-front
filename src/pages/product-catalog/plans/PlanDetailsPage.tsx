@@ -1,4 +1,4 @@
-import { ActionButton, Button, CardHeader, Chip, Loader, Page, Spacer } from '@/components/atoms';
+import { ActionButton, Button, CardHeader, Chip, Loader, Page, Spacer, NoDataCard } from '@/components/atoms';
 import { AddEntitlementDrawer, ApiDocsContent, ColumnData, FlexpriceTable } from '@/components/molecules';
 import { DetailsCard } from '@/components/molecules';
 import { RouteNames } from '@/core/routes/Routes';
@@ -265,21 +265,22 @@ const PlanDetailsPage = () => {
 					</Card>
 				)}
 
-				<Card variant='notched'>
-					<CardHeader
+				{planData.entitlements?.length || 0 > 0 ? (
+					<Card variant='notched'>
+						<CardHeader title='Entitlements' />
+						<FlexpriceTable showEmptyRow data={planData.entitlements || []} columns={columnData} />
+					</Card>
+				) : (
+					<NoDataCard
 						title='Entitlements'
+						subtitle='No entitlements added to the plan yet'
 						cta={
 							<Button prefixIcon={<Plus />} onClick={() => setdrawerOpen(true)}>
 								Add
 							</Button>
 						}
 					/>
-					<FlexpriceTable showEmptyRow data={planData.entitlements || []} columns={columnData} />
-					{(planData.entitlements?.length || 0) === 0 && (
-						<p className='text-[#64748B] text-xs font-normal font-sans mt-4'>No Entitlements added</p>
-					)}
-				</Card>
-
+				)}
 				<Spacer className='!h-10' />
 			</div>
 		</Page>

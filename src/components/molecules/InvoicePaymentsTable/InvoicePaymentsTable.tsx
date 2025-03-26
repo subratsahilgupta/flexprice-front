@@ -1,7 +1,7 @@
 import { Payment } from '@/models/Payment';
 import FlexpriceTable, { ColumnData, TooltipCell } from '../Table';
 import { formatDateShort } from '@/utils/common/helper_functions';
-import { Chip } from '@/components/atoms';
+import { Chip, NoDataCard } from '@/components/atoms';
 import { toSentenceCase } from '@/utils/common/helper_functions';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import { CreditCard, Banknote, Receipt, CircleDollarSign } from 'lucide-react';
@@ -77,6 +77,14 @@ const columns: ColumnData<Payment>[] = [
 ];
 
 const InvoicePaymentsTable = ({ data }: Props) => {
+	if (data?.length === 0) {
+		return (
+			<div className='my-6'>
+				<NoDataCard title='Payments' subtitle='No payments found' />
+			</div>
+		);
+	}
+
 	return (
 		<div>
 			<FlexpriceTable showEmptyRow columns={columns} data={data} />

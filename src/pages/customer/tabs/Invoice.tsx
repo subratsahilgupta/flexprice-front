@@ -1,4 +1,4 @@
-import { CardHeader, Loader } from '@/components/atoms';
+import { CardHeader, Loader, NoDataCard } from '@/components/atoms';
 import { CustomerInvoiceTable } from '@/components/molecules';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
 import { useQuery } from '@tanstack/react-query';
@@ -24,6 +24,10 @@ const Invoice = () => {
 
 	if (isLoading) {
 		return <Loader />;
+	}
+
+	if (data?.items?.length === 0) {
+		return <NoDataCard title='Invoices' subtitle='No invoices found' />;
 	}
 
 	return (
