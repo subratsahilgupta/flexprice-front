@@ -5,6 +5,7 @@ import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import { useBreadcrumbs } from '@/hooks/useBreadcrumbs';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import ApiDocs from '../ApiDocs';
+import IntercomMessenger from '@/core/intercom/IntercomMessenger';
 const BreadCrumbs: FC = () => {
 	useBreadcrumbs();
 	const { breadcrumbs, isLoading } = useBreadcrumbsStore();
@@ -55,7 +56,11 @@ const BreadCrumbs: FC = () => {
 						</span>
 					))}
 				</nav>
-				<ApiDocs />
+				<div className='flex items-center gap-4'>
+					<IntercomMessenger />
+
+					<ApiDocs />
+				</div>
 			</div>
 		</header>
 	);
