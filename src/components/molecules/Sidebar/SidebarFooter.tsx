@@ -1,4 +1,4 @@
-import { BookOpen, ExternalLink, ChevronsUpDown, CodeXml, LogOut, ListChecks, FileInput, FileSearch } from 'lucide-react';
+import { BookOpen, ExternalLink, ChevronsUpDown, CodeXml, LogOut, ListChecks, FileInput, FileSearch, CreditCard } from 'lucide-react';
 import { RouteNames } from '@/core/routes/Routes';
 import { SidebarMenuButton, useSidebar } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
@@ -43,6 +43,13 @@ const SidebarFooter = () => {
 			icon: ListChecks,
 			onClick: () => {
 				navigate(RouteNames.onboarding);
+			},
+		},
+		{
+			label: 'Billing',
+			icon: CreditCard,
+			onClick: () => {
+				navigate(RouteNames.billing);
 			},
 		},
 		{

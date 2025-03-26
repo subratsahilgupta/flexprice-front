@@ -37,7 +37,7 @@ import CustomerInformation from '@/pages/customer/tabs/CustomerInformation';
 import PricingPage from '@/pages/product-catalog/plans/Pricing';
 import OnboardingPage from '@/pages/onboarding/onboarding';
 import PaymentPage from '@/pages/usage/payments/PaymentPage';
-
+import BillingPage from '@/pages/settings/Billing';
 export const RouteNames = {
 	home: '/',
 	login: '/auth',
@@ -81,6 +81,7 @@ export const RouteNames = {
 	// footer
 	developers: '/developers',
 	onboarding: '/onboarding',
+	billing: '/billing',
 };
 
 export const MainRouter = createBrowserRouter([
@@ -272,6 +273,10 @@ export const MainRouter = createBrowserRouter([
 			{
 				path: RouteNames.onboarding,
 				element: <OnboardingPage />,
+			},
+			{
+				path: RouteNames.billing,
+				element: <BillingPage />,
 			},
 		],
 	},

@@ -1,14 +1,13 @@
 import { AddButton, Loader, Page, ShortPagination, Spacer } from '@/components/atoms';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-
 import toast from 'react-hot-toast';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
 import { PlansTable, ApiDocsContent } from '@/components/molecules';
 import { Plan } from '@/models/Plan';
-import { ReactSVG } from 'react-svg';
 import usePagination from '@/hooks/usePagination';
 import { RouteNames } from '@/core/routes/Routes';
+import { EmptyPage } from '@/components/organisms';
 
 const PricingPlan = () => {
 	const { limit, offset, page } = usePagination();
@@ -19,6 +18,7 @@ const PricingPlan = () => {
 			offset,
 		});
 	};
+	const navigate = useNavigate();
 
 	const {
 		data: plansData,
@@ -41,17 +41,12 @@ const PricingPlan = () => {
 
 	if ((plansData?.items ?? []).length === 0) {
 		return (
-			<div className='h-screen w-full flex justify-center items-center'>
-				<div className='w-full flex flex-col items-center '>
-					<ReactSVG src={'/assets/svg/empty box.svg'} />
-					<p className='font-sans text-2xl font-bold'>Add your first Plan </p>
-					<p className='text-[#71717A] font-normal '>Add your first Pricing Plan</p>
-					<Spacer height={'16px'} />
-					<Link to={RouteNames.createPlan}>
-						<AddButton />
-					</Link>
-				</div>
-			</div>
+			<EmptyPage
+				title='No plans found'
+				description='Add your first Pricing Plan'
+				onAddClick={() => navigate(RouteNames.createPlan)}
+				tags={['Plans']}
+			/>
 		);
 	}
 

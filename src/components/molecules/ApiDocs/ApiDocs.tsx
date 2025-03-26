@@ -36,7 +36,7 @@ interface ApiDocsContentProps {
 	tags?: string[];
 }
 
-const fetchApidocsJson = async (): Promise<any> => {
+export const fetchApidocsJson = async (): Promise<any> => {
 	const { data } = await axios.get('https://raw.githubusercontent.com/flexprice/flexprice-docs/main/api-reference/openapi.json');
 	return data;
 };

@@ -41,8 +41,7 @@ const CustomerPage = () => {
 	if (customerData?.items?.length === 0) {
 		return (
 			<>
-				<EmptyPage title='No customers added yet' description='Add a customer to get started'>
-					<ApiDocsContent tags={['Customers']} />
+				<EmptyPage title='No customers added yet' description='Add a customer to get started' tags={['Customers']}>
 					<CreateCustomerDrawer
 						trigger={
 							<Button
