@@ -15,21 +15,18 @@ const ApiDocs: FC = () => {
 	}
 
 	return (
-		<div className='flex items-center gap-4'>
-			<button className='text-sm text-gray-500 hover:text-gray-800'>Help</button>
-			<DocsDrawer
-				isOpen={isDocsOpen}
-				onOpenChange={setIsDocsOpen}
-				docsUrl={docsUrl}
-				snippets={snippets}
-				trigger={
-					<Button variant='outline' className='outline-none text-sm bg-gray-100 flex items-center gap-2' size='sm'>
-						<Code2 className='w-4 h-4' />
-						Api
-					</Button>
-				}
-			/>
-		</div>
+		<DocsDrawer
+			isOpen={isDocsOpen}
+			onOpenChange={setIsDocsOpen}
+			docsUrl={docsUrl}
+			snippets={snippets}
+			trigger={
+				<Button variant='outline' className='outline-none text-sm bg-gray-100 flex items-center gap-2' size='sm'>
+					<Code2 className='w-4 h-4' />
+					Api
+				</Button>
+			}
+		/>
 	);
 };
 
