@@ -9,6 +9,9 @@ import { ExpandedPlan } from '@/utils/models/transformed_plan';
 import { GetAllPlansResponse } from '@/utils/api_requests/PlanApi';
 import PricingCard, { PricingCardProps } from '@/components/molecules/PricingCard';
 import { ApiDocsContent } from '@/components/molecules';
+import { RouteNames } from '@/core/routes/Routes';
+import { EmptyPage } from '@/components/organisms';
+import { useNavigate } from 'react-router-dom';
 // Add these type definitions at the top
 type PriceType = {
 	currency: string;
@@ -90,6 +93,8 @@ const PricingPage = () => {
 	const { limit, offset, page } = usePagination();
 	const [selectedBillingPeriod, setSelectedBillingPeriod] = useState<string>('');
 	const [selectedCurrency, setSelectedCurrency] = useState<string>('');
+
+	const navigate = useNavigate();
 
 	const fetchPlans = async () => {
 		return await PlanApi.getAllPlans({
@@ -224,6 +229,17 @@ const PricingPage = () => {
 	if (isError) {
 		toast.error('Error fetching plans');
 		return null;
+	}
+
+	if ((plansData?.items ?? []).length === 0) {
+		return (
+			<EmptyPage
+				title='No plans found'
+				description='Add your first Pricing Plan'
+				onAddClick={() => navigate(RouteNames.createPlan)}
+				tags={['Plans']}
+			/>
+		);
 	}
 
 	return (

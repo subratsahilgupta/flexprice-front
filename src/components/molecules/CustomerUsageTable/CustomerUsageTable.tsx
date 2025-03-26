@@ -1,9 +1,8 @@
 import { Chip, Progress } from '@/components/atoms';
-import { ColumnData, FlexpriceTable } from '@/components/molecules';
+import { ColumnData, FlexpriceTable, RedirectCell } from '@/components/molecules';
 import { RouteNames } from '@/core/routes/Routes';
 import { FeatureType } from '@/models/Feature';
 import { FC } from 'react';
-import { Link } from 'react-router-dom';
 import { getFeatureIcon } from '@/components/atoms/SelectFeature/SelectFeature';
 import CustomerUsage from '@/models/CustomerUsage';
 
@@ -58,19 +57,20 @@ const columnData: ColumnData<CustomerUsage>[] = [
 		fieldVariant: 'title',
 		render(row) {
 			return (
-				<Link className='inline-flex gap-2 items-center' to={RouteNames.featureDetails + `/${row?.feature?.id}`}>
+				<RedirectCell redirectUrl={`${RouteNames.featureDetails}/${row?.feature?.id}`}>
 					{getFeatureTypeChips({
 						type: row?.feature?.type || '',
+						showIcon: true,
 					})}
 					{row?.feature?.name}
-				</Link>
+				</RedirectCell>
 			);
 		},
 	},
 	{
 		title: 'Plan',
 		render(row) {
-			return <span>{row?.sources[0]?.plan_name}</span>;
+			return <RedirectCell redirectUrl={`${RouteNames.plan}/${row?.sources[0]?.plan_id}`}>{row?.sources[0]?.plan_name}</RedirectCell>;
 		},
 	},
 	{

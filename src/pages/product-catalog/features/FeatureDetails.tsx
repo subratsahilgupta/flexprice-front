@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import FeatureApi from '@/utils/api_requests/FeatureApi';
-import { Chip, Loader, Page, SectionHeader, Spacer, Divider, Card, CardHeader } from '@/components/atoms';
+import { Chip, Loader, Page, SectionHeader, Spacer, Divider, Card, CardHeader, NoDataCard } from '@/components/atoms';
 import toast from 'react-hot-toast';
 import { useEffect } from 'react';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import { RouteNames } from '@/core/routes/Routes';
-import { ApiDocsContent, ColumnData, FlexpriceTable } from '@/components/molecules';
+import { ApiDocsContent, ColumnData, FlexpriceTable, RedirectCell } from '@/components/molecules';
 import EntitlementApi, { ExtendedEntitlement } from '@/utils/api_requests/EntitlementApi';
 import formatChips from '@/utils/common/format_chips';
 import { FeatureType } from '@/models/Feature';
@@ -96,7 +96,7 @@ const FeatureDetails = () => {
 		{
 			title: 'Plan',
 			render: (rowData: ExtendedEntitlement) => {
-				return rowData?.plan?.name;
+				return <RedirectCell redirectUrl={`${RouteNames.plan}/${rowData?.plan?.id}`}>{rowData?.plan?.name}</RedirectCell>;
 			},
 			fieldVariant: 'title',
 			width: '40%',
@@ -170,11 +170,14 @@ const FeatureDetails = () => {
 
 			<Spacer className='!h-4' />
 			<div className='space-y-6'>
-				<Card variant='notched'>
-					<CardHeader title='Linked Plans' />
-					<FlexpriceTable showEmptyRow columns={columns} data={linkedEntitlements?.items ?? []} />
-				</Card>
-
+				{(linkedEntitlements?.items?.length || 0) > 0 ? (
+					<Card variant='notched'>
+						<CardHeader title='Linked Plans' />
+						<FlexpriceTable showEmptyRow columns={columns} data={linkedEntitlements?.items ?? []} />
+					</Card>
+				) : (
+					<NoDataCard title='Linked Plans' subtitle='No plans linked to the feature yet' />
+				)}
 				{data?.type === FeatureType.metered && (
 					<Card variant='notched'>
 						<div className='!space-y-6'>

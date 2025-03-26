@@ -41,6 +41,7 @@ const FeaturesPage = () => {
 				title='No features found'
 				description='Create a feature to get started'
 				onAddClick={() => navigate(RouteNames.createFeature)}
+				tags={['Features']}
 			/>
 		);
 	}

@@ -98,6 +98,7 @@ export const fetchAndExtractSnippetsByTags = async (tags: string[], json?: any):
 					'C#': csharpCommand,
 					Ruby: rubyCommand,
 					Swift: swiftCommand,
+					url: url,
 				});
 			});
 		});

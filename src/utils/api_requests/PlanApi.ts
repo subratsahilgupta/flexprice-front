@@ -34,7 +34,7 @@ export class PlanApi {
 	}
 
 	public static async getPlanById(id: string) {
-		return await AxiosClient.get<Plan>(`${this.baseUrl}/${id}?expand=meters`);
+		return await AxiosClient.get<Plan>(`${this.baseUrl}/${id}?expand=meters%2Centitlements%2Cprices%2Cfeatures`);
 	}
 
 	public static async updatePlan(id: string, data: Partial<Plan>) {

@@ -5,7 +5,7 @@ import { Loader, ShortPagination } from '@/components/atoms';
 import toast from 'react-hot-toast';
 import { ApiDocsContent, InvoicePaymentsTable } from '@/components/molecules';
 import { Page } from '@/components/atoms';
-
+import { EmptyPage } from '@/components/organisms';
 const PaymentPage = () => {
 	const { limit, offset, page } = usePagination();
 
@@ -24,6 +24,10 @@ const PaymentPage = () => {
 
 	if (isError) {
 		toast.error('Error fetching payments');
+	}
+
+	if ((payments?.items ?? []).length === 0) {
+		return <EmptyPage title='No payments found' description='Create a payment to get started' tags={['Payments']} />;
 	}
 
 	return (

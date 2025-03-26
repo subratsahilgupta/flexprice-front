@@ -96,20 +96,14 @@ const DocsDrawer: FC<Props> = ({ isOpen, onOpenChange, snippets, trigger }) => {
 	return (
 		<Sheet isOpen={isOpen} onOpenChange={onOpenChange} title='API Reference' trigger={trigger} size='lg'>
 			<div className='flex flex-col h-full'>
+				{snippets.length === 0 && <p className='text-sm text-gray-400'>No documentation found</p>}
+
 				{/* Code Snippets Section */}
 				<div className='my-6 px-1 pb-8'>
 					{snippets.map((snippet, index) => (
 						<SnippetBlock key={index} snippet={snippet} />
 					))}
 				</div>
-				{/* Documentation iframe */}
-				{/* <div className="flex-1 min-h-0 border-t border-gray-200 pt-4">
-                    <iframe
-                        src={docsUrl}
-                        className="w-full h-full rounded-lg border border-gray-200"
-                        title="API Documentation"
-                    />
-                </div> */}
 			</div>
 		</Sheet>
 	);

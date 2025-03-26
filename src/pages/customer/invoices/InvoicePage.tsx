@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import usePagination from '@/hooks/usePagination';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
-
+import { EmptyPage } from '@/components/organisms';
 const InvoicesPage = () => {
 	const { limit, offset, page } = usePagination();
 
@@ -30,6 +30,10 @@ const InvoicesPage = () => {
 
 	if (isError) {
 		toast.error('Error fetching meters');
+	}
+
+	if ((invoiceData?.items ?? []).length === 0) {
+		return <EmptyPage title='No invoices found' description='Create an invoice to get started' tags={['Invoices']} />;
 	}
 
 	return (
