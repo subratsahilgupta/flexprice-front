@@ -1,5 +1,5 @@
 import { ActionButton, Button, CardHeader, Chip, Loader, Page, Spacer, NoDataCard } from '@/components/atoms';
-import { AddEntitlementDrawer, ApiDocsContent, ColumnData, FlexpriceTable } from '@/components/molecules';
+import { AddEntitlementDrawer, ApiDocsContent, ColumnData, FlexpriceTable, RedirectCell } from '@/components/molecules';
 import { DetailsCard } from '@/components/molecules';
 import { RouteNames } from '@/core/routes/Routes';
 import { Price } from '@/models/Price';
@@ -65,7 +65,7 @@ type Params = {
 // 	}
 // };
 
-const chargeColumns: ColumnData[] = [
+const chargeColumns: ColumnData<Price>[] = [
 	{
 		title: 'Charge Type',
 		render: (row) => {
@@ -162,12 +162,9 @@ const PlanDetailsPage = () => {
 	const columnData: ColumnData<ExtendedEntitlement>[] = [
 		{
 			title: 'Feature Name',
-			onCellClick(row) {
-				navigate(RouteNames.featureDetails + `/${row?.feature?.id}`);
-			},
 			fieldVariant: 'title',
 			render(row) {
-				return row?.feature?.name;
+				return <RedirectCell redirectUrl={`${RouteNames.featureDetails}/${row?.feature?.id}`}>{row?.feature?.name}</RedirectCell>;
 			},
 		},
 		// {

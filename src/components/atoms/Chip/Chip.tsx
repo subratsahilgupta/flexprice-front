@@ -62,7 +62,7 @@ const Chip: FC<ChipProps> = ({
 				}
 			}}
 			className={cn(
-				'inline-flex items-center justify-center  px-3 py-0 rounded-md select-none font-normal transition-all',
+				'inline-flex items-center justify-center  px-2 py- rounded-md select-none font-normal transition-all',
 				onClick && !disabled && 'cursor-pointer hover:opacity-90 active:scale-95',
 				disabled && 'opacity-50 cursor-not-allowed',
 				className,

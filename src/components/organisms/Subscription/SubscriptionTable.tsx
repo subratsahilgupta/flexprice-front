@@ -1,10 +1,11 @@
 import { FC } from 'react';
 import { Subscription } from '@/models/Subscription';
-import { ColumnData, FlexpriceTable } from '@/components/molecules';
+import { ColumnData, FlexpriceTable, RedirectCell } from '@/components/molecules';
 import { Chip } from '@/components/atoms';
 import { toSentenceCase } from '@/utils/common/helper_functions';
 import formatDate from '@/utils/common/format_date';
 import SubscriptionActionButton from './SubscriptionActionButton';
+import { RouteNames } from '@/core/routes/Routes';
 
 export interface SubscriptionTableProps {
 	customerId: string;
@@ -43,7 +44,7 @@ const SubscriptionTable: FC<SubscriptionTableProps> = ({ data, onRowClick }) => 
 		{
 			title: 'Plan Name',
 			fieldVariant: 'title',
-			render: (row) => <span>{row.plan?.name}</span>,
+			render: (row) => <RedirectCell redirectUrl={`${RouteNames.plan}/${row.plan?.id}`}>{row.plan?.name}</RedirectCell>,
 		},
 		{
 			title: 'Billing Period',

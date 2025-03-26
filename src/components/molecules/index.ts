@@ -2,7 +2,7 @@ export { Sidebar } from './Sidebar';
 
 export { BillableMetricTable } from './BillableMetricTable';
 
-export { Table, TableHeader, TableBody, TableHead, TableRow, TableCell, TooltipCell } from './Table';
+export { Table, TableHeader, TableBody, TableHead, TableRow, TableCell, TooltipCell, RedirectCell } from './Table';
 export type { ColumnData, FlexpriceTableProps } from './Table';
 
 export { default as FlexpriceTable } from './Table';
