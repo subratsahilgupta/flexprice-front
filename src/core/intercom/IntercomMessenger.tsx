@@ -1,7 +1,7 @@
 import useUser from '@/hooks/useUser';
 import Intercom from '@intercom/messenger-js-sdk';
 import './index.css';
-
+import { Button } from '@/components/ui/button';
 const IntercomMessenger = () => {
 	const { user } = useUser();
 
@@ -20,9 +20,9 @@ const IntercomMessenger = () => {
 	});
 
 	return (
-		<button onClick={openIntercom} className='text-sm text-gray-500 hover:text-gray-800'>
+		<Button size='sm' variant='outline' onClick={openIntercom} className='outline-none text-sm bg-gray-100 flex items-center gap-2'>
 			Help
-		</button>
+		</Button>
 	);
 };
 
