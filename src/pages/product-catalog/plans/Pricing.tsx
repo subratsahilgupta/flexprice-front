@@ -228,7 +228,7 @@ const PricingPage = () => {
 
 	return (
 		<Page headingClassName='items-center' heading='Pricing Widget'>
-			<ApiDocsContent tags={['Pricing']} />
+			<ApiDocsContent tags={['Plans', 'Pricing']} />
 			{/* filters */}
 			<div className='w-full flex justify-end gap-4 mb-8'>
 				<Select
