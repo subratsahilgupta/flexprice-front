@@ -13,7 +13,7 @@ import { ChartConfig, ChartContainer, ChartTooltipContent } from '@/components/u
 import { cn } from '@/lib/utils';
 import { RefreshCw, Search } from 'lucide-react';
 import { formatDateTime } from '@/utils/common/format_date';
-
+import { ApiDocsContent } from '@/components/molecules';
 const getNext24HoursDate = (date: Date): Date => {
 	const nextDate = new Date(date);
 	nextDate.setHours(nextDate.getHours() + 23);
@@ -76,6 +76,7 @@ const QueryPage = () => {
 
 	return (
 		<Page heading='Query'>
+			<ApiDocsContent tags={['Events']} />
 			{/* Filters Section */}
 			<div className={'space-y-6'}>
 				<div className='flex w-full  gap-4 items-end bg-white '>

@@ -5,7 +5,7 @@ import usePagination from '@/hooks/usePagination';
 import PaymentApi from '@/utils/api_requests/PaymentApi';
 import { CustomTabs } from '@/components/atoms/CustomTabs';
 import { Loader, Page, ShortPagination } from '@/components/atoms';
-import { InvoicePaymentsTable } from '@/components/molecules';
+import { ApiDocsContent, InvoicePaymentsTable } from '@/components/molecules';
 
 const InvoiceDetailsPage = () => {
 	const { invoiceId } = useParams();
@@ -44,6 +44,7 @@ const InvoiceDetailsPage = () => {
 
 	return (
 		<Page>
+			<ApiDocsContent tags={['Invoices']} />
 			<CustomTabs tabs={tabs} defaultValue='Overview' />
 		</Page>
 	);

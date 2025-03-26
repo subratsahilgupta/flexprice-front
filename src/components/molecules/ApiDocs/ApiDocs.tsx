@@ -1,16 +1,19 @@
 import { FC, useEffect, useState } from 'react';
 import DocsDrawer from '../DocsDrawer/DocsDrawer';
-import { CodeSnippet, useApiDocsStore } from '@/store/useApiDocsStore';
+import { useApiDocsStore, ApiDocsSnippet } from '@/store/useApiDocsStore';
 import { useDocs } from '@/context/DocsContext';
 import { Button } from '@/components/atoms';
 import { Code2 } from 'lucide-react';
+import { fetchAndExtractSnippetsByTags } from './fetch_api_docs';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
 
 const ApiDocs: FC = () => {
 	const [isDocsOpen, setIsDocsOpen] = useState(false);
-	const { docsUrl, snippets } = useApiDocsStore();
+	const { snippets } = useApiDocsStore();
 
 	// Don't render anything if no documentation is configured
-	if (!docsUrl || snippets.length === 0) {
+	if (snippets.length === 0) {
 		return null;
 	}
 
@@ -18,7 +21,6 @@ const ApiDocs: FC = () => {
 		<DocsDrawer
 			isOpen={isDocsOpen}
 			onOpenChange={setIsDocsOpen}
-			docsUrl={docsUrl}
 			snippets={snippets}
 			trigger={
 				<Button variant='outline' className='outline-none text-sm bg-gray-100 flex items-center gap-2' size='sm'>
@@ -31,17 +33,38 @@ const ApiDocs: FC = () => {
 };
 
 interface ApiDocsContentProps {
-	docsUrl: string;
-	snippets: CodeSnippet[];
+	tags?: string[];
 }
 
-export const ApiDocsContent = ({ docsUrl, snippets }: ApiDocsContentProps) => {
+const fetchApidocsJson = async (): Promise<any> => {
+	const { data } = await axios.get('https://raw.githubusercontent.com/flexprice/flexprice-docs/main/api-reference/openapi.json');
+	return data;
+};
+
+export const ApiDocsContent = ({ tags }: ApiDocsContentProps) => {
 	const { setPageDocs, clearPageDocs } = useDocs();
+	const [snippets, setSnippets] = useState<ApiDocsSnippet[]>([]);
+
+	const { data: docs } = useQuery({
+		queryKey: ['openapi-json'],
+		queryFn: fetchApidocsJson,
+		staleTime: 1000 * 60 * 60 * 24,
+	});
 
 	useEffect(() => {
-		setPageDocs(docsUrl, snippets);
+		const fetchSnippets = async (tags: string[]) => {
+			const snippets = await fetchAndExtractSnippetsByTags(tags, docs);
+			setSnippets(snippets);
+		};
+		if (tags) {
+			fetchSnippets(tags);
+		}
+	}, [tags, docs]);
+
+	useEffect(() => {
+		setPageDocs(snippets);
 		return () => clearPageDocs();
-	}, [docsUrl, snippets]);
+	}, [snippets, setPageDocs, clearPageDocs]);
 
 	return null;
 };

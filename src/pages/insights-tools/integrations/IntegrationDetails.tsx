@@ -8,7 +8,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import IntegrationsApi from '@/utils/api_requests/IntegrationsApi';
 import { TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
-
+import { ApiDocsContent } from '@/components/molecules';
 const IntegrationDetails = () => {
 	const { id: name } = useParams() as { id: string };
 	const integration = integrations.find((integration) => integration.name.toLocaleLowerCase() === name.toLocaleLowerCase())!;
@@ -60,6 +60,7 @@ const IntegrationDetails = () => {
 
 	return (
 		<Page>
+			<ApiDocsContent tags={['Integrations', 'secrets']} />
 			<div className={cn('border rounded-xl p-4 flex items-center shadow-sm', !integration.premium && 'cursor-pointer')}>
 				<div className='size-20 flex items-center justify-center bg-gray-100 rounded-lg'>
 					<img src={integration.logo} alt={integration.name} className='size-16 object-contain' />

@@ -1,5 +1,5 @@
 import { AddButton, Loader, Page, ShortPagination, Spacer } from '@/components/atoms';
-import { FeatureTable } from '@/components/molecules';
+import { ApiDocsContent, FeatureTable } from '@/components/molecules';
 import EmptyPage from '@/components/organisms/EmptyPage/EmptyPage';
 import { RouteNames } from '@/core/routes/Routes';
 import usePagination from '@/hooks/usePagination';
@@ -53,6 +53,7 @@ const FeaturesPage = () => {
 					<AddButton />
 				</Link>
 			}>
+			<ApiDocsContent tags={['Features']} />
 			<div>
 				<FeatureTable data={featureData?.items || []} />
 				<Spacer className='!h-4' />
