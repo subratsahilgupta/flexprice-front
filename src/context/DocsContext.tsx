@@ -1,8 +1,8 @@
 import { createContext, useContext, FC, ReactNode } from 'react';
-import { useApiDocsStore, CodeSnippet } from '@/store/useApiDocsStore';
+import { useApiDocsStore, ApiDocsSnippet } from '@/store/useApiDocsStore';
 
 interface DocsContextProps {
-	setPageDocs: (docsUrl: string, snippets: CodeSnippet[]) => void;
+	setPageDocs: (snippets: ApiDocsSnippet[]) => void;
 	clearPageDocs: () => void;
 }
 

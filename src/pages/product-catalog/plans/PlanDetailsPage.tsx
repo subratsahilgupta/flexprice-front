@@ -1,5 +1,5 @@
 import { ActionButton, Button, CardHeader, Chip, Loader, Page, Spacer } from '@/components/atoms';
-import { AddEntitlementDrawer, ColumnData, FlexpriceTable } from '@/components/molecules';
+import { AddEntitlementDrawer, ApiDocsContent, ColumnData, FlexpriceTable } from '@/components/molecules';
 import { DetailsCard } from '@/components/molecules';
 import { RouteNames } from '@/core/routes/Routes';
 import { Price } from '@/models/Price';
@@ -245,6 +245,7 @@ const PlanDetailsPage = () => {
 					Archive
 				</Button>
 			}>
+			<ApiDocsContent tags={['Plans']} />
 			<AddEntitlementDrawer
 				selectedFeatures={planData.entitlements?.map((v) => v.feature)}
 				entitlements={planData.entitlements}

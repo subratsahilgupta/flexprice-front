@@ -110,31 +110,70 @@ export const MainRouter = createBrowserRouter([
 				path: RouteNames.home,
 				element: <Navigate to={RouteNames.pricing} />,
 			},
+
 			{
-				path: RouteNames.usageTracking,
+				path: RouteNames.productCatalog,
 				children: [
 					{
-						path: RouteNames.meter,
-						element: <MeterPage />,
+						path: RouteNames.plan,
+						element: <PricingPlans />,
 					},
 					{
-						path: RouteNames.addMeter,
-						element: <AddMeterPage />,
+						path: RouteNames.pricing,
+						element: <PricingPage />,
 					},
 					{
-						path: RouteNames.editMeter,
-						element: <EditMeterPage />,
+						path: `${RouteNames.plan}/:planId`,
+						element: <PlanDetailsPage />,
 					},
 					{
-						path: RouteNames.events,
-						element: <EventsPage />,
+						path: RouteNames.createPlan,
+						element: <CreatePlanPage />,
 					},
 					{
-						path: RouteNames.queryPage,
-						element: <QueryPage />,
+						path: RouteNames.editPlan,
+						element: <CreatePlanPage />,
+					},
+					{
+						path: RouteNames.features,
+						element: <FeaturesPage />,
+					},
+					{
+						path: RouteNames.createFeature,
+						element: <AddFeaturePage />,
+					},
+					{
+						path: `${RouteNames.featureDetails}/:id`,
+						element: <FeatureDetails />,
+					},
+					{
+						path: RouteNames.addOn,
+						element: <AddOn />,
 					},
 				],
 			},
+			{
+				path: RouteNames.insights,
+				children: [
+					{
+						path: RouteNames.integrations,
+						element: <Integrations />,
+					},
+					{
+						path: `${RouteNames.integrationDetails}/:id`,
+						element: <IntegrationDetails />,
+					},
+					{
+						path: RouteNames.importExport,
+						element: <ImportExport />,
+					},
+					{
+						path: RouteNames.payments,
+						element: <PaymentPage />,
+					},
+				],
+			},
+
 			{
 				path: RouteNames.customerManagement,
 				children: [
@@ -201,67 +240,31 @@ export const MainRouter = createBrowserRouter([
 				],
 			},
 			{
-				path: RouteNames.productCatalog,
+				path: RouteNames.usageTracking,
 				children: [
 					{
-						path: RouteNames.plan,
-						element: <PricingPlans />,
+						path: RouteNames.meter,
+						element: <MeterPage />,
 					},
 					{
-						path: RouteNames.pricing,
-						element: <PricingPage />,
+						path: RouteNames.addMeter,
+						element: <AddMeterPage />,
 					},
 					{
-						path: `${RouteNames.plan}/:planId`,
-						element: <PlanDetailsPage />,
+						path: RouteNames.editMeter,
+						element: <EditMeterPage />,
 					},
 					{
-						path: RouteNames.createPlan,
-						element: <CreatePlanPage />,
+						path: RouteNames.events,
+						element: <EventsPage />,
 					},
 					{
-						path: RouteNames.editPlan,
-						element: <CreatePlanPage />,
-					},
-					{
-						path: RouteNames.features,
-						element: <FeaturesPage />,
-					},
-					{
-						path: RouteNames.createFeature,
-						element: <AddFeaturePage />,
-					},
-					{
-						path: `${RouteNames.featureDetails}/:id`,
-						element: <FeatureDetails />,
-					},
-					{
-						path: RouteNames.addOn,
-						element: <AddOn />,
+						path: RouteNames.queryPage,
+						element: <QueryPage />,
 					},
 				],
 			},
-			{
-				path: RouteNames.insights,
-				children: [
-					{
-						path: RouteNames.integrations,
-						element: <Integrations />,
-					},
-					{
-						path: `${RouteNames.integrationDetails}/:id`,
-						element: <IntegrationDetails />,
-					},
-					{
-						path: RouteNames.importExport,
-						element: <ImportExport />,
-					},
-					{
-						path: RouteNames.payments,
-						element: <PaymentPage />,
-					},
-				],
-			},
+
 			{
 				path: RouteNames.developers,
 				element: <DeveloperPage />,

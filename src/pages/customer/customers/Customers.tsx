@@ -1,5 +1,5 @@
 import { AddButton, Button, Loader, Page, ShortPagination, Spacer } from '@/components/atoms';
-import { CreateCustomerDrawer } from '@/components/molecules';
+import { CreateCustomerDrawer, ApiDocsContent } from '@/components/molecules';
 import CustomerTable from '@/components/molecules/Customer/CustomerTable';
 import EmptyPage from '@/components/organisms/EmptyPage/EmptyPage';
 import usePagination from '@/hooks/usePagination';
@@ -42,6 +42,7 @@ const CustomerPage = () => {
 		return (
 			<>
 				<EmptyPage title='No customers added yet' description='Add a customer to get started'>
+					<ApiDocsContent tags={['Customers']} />
 					<CreateCustomerDrawer
 						trigger={
 							<Button
@@ -80,6 +81,7 @@ const CustomerPage = () => {
 					data={activeCustomer}
 				/>
 			}>
+			<ApiDocsContent tags={['Customers']} />
 			<div>
 				<CustomerTable
 					onEdit={(data) => {

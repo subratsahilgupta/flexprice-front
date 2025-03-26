@@ -1,4 +1,4 @@
-export type SupportedLanguage = 'cURL' | 'Python' | 'JavaScript' | 'PHP' | 'Go' | 'Java';
+export type SupportedLanguage = 'cURL' | 'Python' | 'JavaScript' | 'PHP' | 'Go' | 'Java' | 'Ruby' | 'Swift' | 'C#';
 
 interface ParsedCurl {
 	method: string;

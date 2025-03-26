@@ -8,7 +8,7 @@ import { useState, useMemo } from 'react';
 import { ExpandedPlan } from '@/utils/models/transformed_plan';
 import { GetAllPlansResponse } from '@/utils/api_requests/PlanApi';
 import PricingCard, { PricingCardProps } from '@/components/molecules/PricingCard';
-
+import { ApiDocsContent } from '@/components/molecules';
 // Add these type definitions at the top
 type PriceType = {
 	currency: string;
@@ -228,6 +228,7 @@ const PricingPage = () => {
 
 	return (
 		<Page headingClassName='items-center' heading='Pricing Widget'>
+			<ApiDocsContent tags={['Pricing']} />
 			{/* filters */}
 			<div className='w-full flex justify-end gap-4 mb-8'>
 				<Select

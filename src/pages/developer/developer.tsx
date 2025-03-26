@@ -1,5 +1,5 @@
 import { Button, Page, ShortPagination } from '@/components/atoms';
-import { ColumnData, DropdownMenu, FlexpriceTable, SecretKeyDrawer } from '@/components/molecules';
+import { ColumnData, DropdownMenu, FlexpriceTable, SecretKeyDrawer, ApiDocsContent } from '@/components/molecules';
 import SecretKeysApi from '@/utils/api_requests/SecretKeysApi';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { SecretKey } from '@/models/SecretKey';
@@ -162,6 +162,7 @@ const DeveloperPage = () => {
 					Add
 				</Button>
 			}>
+			<ApiDocsContent tags={['secrets']} />
 			<SecretKeyDrawer isOpen={isSecretKeyDrawerOpen} onOpenChange={setIsSecretKeyDrawerOpen} />
 			<div>
 				<FlexpriceTable showEmptyRow columns={columns} data={secretKeys?.items || []} />

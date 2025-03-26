@@ -2,20 +2,19 @@ import { FC, useState } from 'react';
 import { Sheet } from '@/components/atoms';
 import { Copy } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { convertCurlToLanguage, SupportedLanguage } from '@/utils/curlConverter';
-import { CodeSnippet } from '@/store/useApiDocsStore';
+import { SupportedLanguage } from '@/utils/curlConverter';
 import { Highlight, themes } from 'prism-react-renderer';
+import { ApiDocsSnippet } from '@/store/useApiDocsStore';
 
 interface Props {
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;
-	docsUrl: string;
-	snippets: CodeSnippet[];
+	snippets: ApiDocsSnippet[];
 	trigger?: React.ReactNode;
 }
 
 interface SnippetBlockProps {
-	snippet: CodeSnippet;
+	snippet: ApiDocsSnippet;
 }
 
 const languageMap: Record<SupportedLanguage, string> = {
@@ -26,14 +25,17 @@ const languageMap: Record<SupportedLanguage, string> = {
 	PHP: 'php',
 	Go: 'go',
 	Java: 'java',
+	Ruby: 'ruby',
+	Swift: 'swift',
+	'C#': 'csharp',
 };
 
 const SnippetBlock: FC<SnippetBlockProps> = ({ snippet }) => {
 	const [selectedLanguage, setSelectedLanguage] = useState<SupportedLanguage>('cURL');
-	const languages: SupportedLanguage[] = ['cURL', 'Python', 'JavaScript', 'PHP', 'Go', 'Java'];
+	const languages: SupportedLanguage[] = ['cURL', 'Python', 'JavaScript', 'PHP', 'Go', 'Java', 'Ruby', 'Swift', 'C#'];
 
 	const getCode = () => {
-		return selectedLanguage === 'cURL' ? snippet.curl : convertCurlToLanguage(snippet.curl, selectedLanguage);
+		return selectedLanguage === 'cURL' ? snippet.curl : snippet[selectedLanguage];
 	};
 
 	const handleCopyCode = () => {
@@ -90,18 +92,12 @@ const SnippetBlock: FC<SnippetBlockProps> = ({ snippet }) => {
 	);
 };
 
-const DocsDrawer: FC<Props> = ({
-	isOpen,
-	onOpenChange,
-	// docsUrl,
-	snippets,
-	trigger,
-}) => {
+const DocsDrawer: FC<Props> = ({ isOpen, onOpenChange, snippets, trigger }) => {
 	return (
 		<Sheet isOpen={isOpen} onOpenChange={onOpenChange} title='API Reference' trigger={trigger} size='lg'>
 			<div className='flex flex-col h-full'>
 				{/* Code Snippets Section */}
-				<div className='my-6 px-1'>
+				<div className='my-6 px-1 pb-8'>
 					{snippets.map((snippet, index) => (
 						<SnippetBlock key={index} snippet={snippet} />
 					))}

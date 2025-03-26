@@ -1,4 +1,5 @@
 import { Button, CodePreview, FormHeader, Input, Page, RadioGroup, Select, SelectOption, Spacer, Textarea } from '@/components/atoms';
+import { ApiDocsContent } from '@/components/molecules';
 import EventFilter from '@/components/molecules/EventFilter';
 import { RouteNames } from '@/core/routes/Routes';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
@@ -289,6 +290,7 @@ const AddFeaturePage = () => {
 			(!meter.event_name || !meter.aggregation?.type || (meter.aggregation.type !== 'COUNT' && !meter.aggregation?.field)));
 	return (
 		<Page type='left-aligned'>
+			<ApiDocsContent tags={['Features']} />
 			<FormHeader
 				title={'Create Feature'}
 				subtitle={'Fetaure resprents a funtionality in the product that can be monitized i.e. api calls, storage, etc.'}

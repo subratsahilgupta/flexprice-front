@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import toast from 'react-hot-toast';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
-import { PlansTable } from '@/components/molecules';
+import { PlansTable, ApiDocsContent } from '@/components/molecules';
 import { Plan } from '@/models/Plan';
 import { ReactSVG } from 'react-svg';
 import usePagination from '@/hooks/usePagination';
@@ -63,6 +63,7 @@ const PricingPlan = () => {
 					<AddButton />
 				</Link>
 			}>
+			<ApiDocsContent tags={['Plans']} />
 			<div>
 				<PlansTable data={(plansData?.items || []) as Plan[]} />
 				<Spacer className='!h-4' />

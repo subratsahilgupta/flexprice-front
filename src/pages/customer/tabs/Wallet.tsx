@@ -1,5 +1,5 @@
 import { AddButton, Button, Card, CardHeader, Chip, FormHeader, Modal, Select, ShortPagination, Spacer } from '@/components/atoms';
-import { DropdownMenu, DropdownMenuOption, TopupCard, WalletTransactionsTable } from '@/components/molecules';
+import { DropdownMenu, DropdownMenuOption, TopupCard, WalletTransactionsTable, ApiDocsContent } from '@/components/molecules';
 import { Skeleton } from '@/components/ui/skeleton';
 import usePagination from '@/hooks/usePagination';
 import { Wallet } from '@/models/Wallet';
@@ -146,6 +146,7 @@ const WalletTab = () => {
 	return (
 		<div>
 			{/* topup wallet */}
+			<ApiDocsContent tags={['Wallets', 'Topup']} />
 			<Modal isOpen={showTopupModal} onOpenChange={() => setshowTopupModal(false)}>
 				<div className='w-[700px] bg-white rounded-xl'>
 					<TopupCard onSuccess={() => setshowTopupModal(false)} walletId={activeWallet?.id} />

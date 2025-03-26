@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import { useEffect } from 'react';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import { RouteNames } from '@/core/routes/Routes';
-import { ColumnData, FlexpriceTable } from '@/components/molecules';
+import { ApiDocsContent, ColumnData, FlexpriceTable } from '@/components/molecules';
 import EntitlementApi, { ExtendedEntitlement } from '@/utils/api_requests/EntitlementApi';
 import formatChips from '@/utils/common/format_chips';
 import { FeatureType } from '@/models/Feature';
@@ -166,6 +166,8 @@ const FeatureDetails = () => {
 				</div> */}
 				</SectionHeader>
 			}>
+			<ApiDocsContent tags={['Features']} />
+
 			<Spacer className='!h-4' />
 			<div className='space-y-6'>
 				<Card variant='notched'>
