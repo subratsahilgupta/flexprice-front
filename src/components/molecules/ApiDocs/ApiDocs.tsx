@@ -13,9 +13,9 @@ const ApiDocs: FC = () => {
 	const { snippets } = useApiDocsStore();
 
 	// Don't render anything if no documentation is configured
-	if (snippets.length === 0) {
-		return null;
-	}
+	// if (snippets.length === 0) {
+	// 	return null;
+	// }
 
 	return (
 		<DocsDrawer

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import FeatureApi from '@/utils/api_requests/FeatureApi';
-import { Chip, Loader, Page, SectionHeader, Spacer, Divider, Card, CardHeader } from '@/components/atoms';
+import { Chip, Loader, Page, SectionHeader, Spacer, Divider, Card, CardHeader, NoDataCard } from '@/components/atoms';
 import toast from 'react-hot-toast';
 import { useEffect } from 'react';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
@@ -170,11 +170,14 @@ const FeatureDetails = () => {
 
 			<Spacer className='!h-4' />
 			<div className='space-y-6'>
-				<Card variant='notched'>
-					<CardHeader title='Linked Plans' />
-					<FlexpriceTable showEmptyRow columns={columns} data={linkedEntitlements?.items ?? []} />
-				</Card>
-
+				{(linkedEntitlements?.items?.length || 0) > 0 ? (
+					<Card variant='notched'>
+						<CardHeader title='Linked Plans' />
+						<FlexpriceTable showEmptyRow columns={columns} data={linkedEntitlements?.items ?? []} />
+					</Card>
+				) : (
+					<NoDataCard title='Linked Plans' subtitle='No plans linked to the feature yet' />
+				)}
 				{data?.type === FeatureType.metered && (
 					<Card variant='notched'>
 						<div className='!space-y-6'>

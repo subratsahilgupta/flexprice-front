@@ -1,4 +1,4 @@
-import { AddButton, Button, Card, CardHeader, Chip, FormHeader, Modal, Select, ShortPagination, Spacer } from '@/components/atoms';
+import { AddButton, Button, Chip, FormHeader, Modal, NoDataCard, Select, ShortPagination, Spacer } from '@/components/atoms';
 import { DropdownMenu, DropdownMenuOption, TopupCard, WalletTransactionsTable, ApiDocsContent } from '@/components/molecules';
 import { Skeleton } from '@/components/ui/skeleton';
 import usePagination from '@/hooks/usePagination';
@@ -136,11 +136,7 @@ const WalletTab = () => {
 	}
 
 	if (wallets?.length === 0) {
-		return (
-			<Card variant='notched'>
-				<CardHeader title='Wallet' subtitle='No wallet linked to the customer yet' cta={<AddButton onClick={() => setisAdd(true)} />} />
-			</Card>
-		);
+		return <NoDataCard title='Wallet' subtitle='No wallet linked to the customer yet' cta={<AddButton onClick={() => setisAdd(true)} />} />;
 	}
 
 	return (
