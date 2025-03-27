@@ -53,7 +53,7 @@ const OnboardingPage = () => {
 			{/* Top Containers */}
 			<div className='w-full flex gap-6 mb-16'>
 				{/* Welcome Container */}
-				<div className='flex-1 rounded-[20px] bg-[#dde1eb] p-8'>
+				<div className='flex-1 w-[70%] flex-grow rounded-[20px] bg-[#dde1eb] p-8'>
 					<div className='flex w-full items-start justify-between'>
 						<div className='w-[60%]'>
 							<h1 className='text-xl font-semibold tracking-tight mb-2'>Welcome to Flexprice!</h1>
@@ -71,11 +71,7 @@ const OnboardingPage = () => {
 					</div>
 				</div>
 				{/* Learn More Container */}
-				<div
-					onClick={() => {
-						window.open(' https://docs.flexprice.io/guides/self-hosted/guide', '_blank');
-					}}
-					className='flex-1 bg-[#0B1121] rounded-[20px] relative overflow-hidden'>
+				<div className='flex-1 w-[30%] bg-[#0B1121] rounded-[20px] relative overflow-hidden'>
 					<iframe
 						src='https://www.loom.com/embed/60d8308781254fe0bc5be341501f9fd5'
 						frameBorder='0'
@@ -94,7 +90,7 @@ const OnboardingPage = () => {
 				</div>
 			</div>
 			{/* Quick Start Section */}
-			<div>
+			<div className='w-full'>
 				<h2 className='text-2xl font-semibold text-slate-900 mb-6'>Quick Start</h2>
 				<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5'>
 					{tutorials.map((tutorial) => (

@@ -12,7 +12,7 @@ const ApiDocs: FC = () => {
 	const [isDocsOpen, setIsDocsOpen] = useState(false);
 	const { snippets } = useApiDocsStore();
 
-	// Don't render anything if no documentation is configured
+	// Don't render an  ything if no documentation is configured
 	// if (snippets.length === 0) {
 	// 	return null;
 	// }
