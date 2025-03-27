@@ -13,7 +13,7 @@ interface CustomTabsProps {
 	className?: string;
 }
 
-export const CustomTabs = ({ tabs, defaultValue = tabs[0]?.value, className }: CustomTabsProps) => {
+const CustomTabs = ({ tabs, defaultValue = tabs[0]?.value, className }: CustomTabsProps) => {
 	return (
 		<Tabs defaultValue={defaultValue} className={cn('w-full', className)}>
 			<TabsList className=' space-x-3 bg-transparent'>
@@ -41,3 +41,5 @@ export const CustomTabs = ({ tabs, defaultValue = tabs[0]?.value, className }: C
 		</Tabs>
 	);
 };
+
+export default CustomTabs;
