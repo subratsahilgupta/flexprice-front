@@ -3,7 +3,7 @@ import InvoiceDetails from '../customers/invoice/InvoiceDetail';
 import { useQuery } from '@tanstack/react-query';
 import PaymentApi from '@/utils/api_requests/PaymentApi';
 import { CustomTabs } from '@/components/atoms/CustomTabs';
-import { Loader, ShortPagination } from '@/components/atoms';
+import { Loader, Page, ShortPagination } from '@/components/atoms';
 import { InvoicePaymentsTable } from '@/components/molecules';
 import usePagination from '@/hooks/usePagination';
 
@@ -42,9 +42,9 @@ const CustomerInvoiceDetailsPage = () => {
 	];
 
 	return (
-		<div>
+		<Page>
 			<CustomTabs tabs={tabs} defaultValue='Overview' />
-		</div>
+		</Page>
 	);
 };
 

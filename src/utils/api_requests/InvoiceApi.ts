@@ -62,6 +62,10 @@ class InvoiceApi {
 	public static async finalizeInvoice(invoiceId: string) {
 		return await AxiosClient.post(`${this.baseurl}/${invoiceId}/finalize`);
 	}
+
+	public static async attemptPayment(invoiceId: string) {
+		return await AxiosClient.post(`${this.baseurl}/${invoiceId}/payment/attempt`);
+	}
 }
 
 export default InvoiceApi;

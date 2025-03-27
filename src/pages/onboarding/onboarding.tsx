@@ -70,24 +70,29 @@ const OnboardingPage = () => {
 						</div>
 					</div>
 				</div>
-
 				{/* Learn More Container */}
 				<div
 					onClick={() => {
 						window.open(' https://docs.flexprice.io/guides/self-hosted/guide', '_blank');
 					}}
-					className='flex-1 bg-[#0B1121] rounded-[20px] p-8 relative overflow-hidden'>
-					<div className='absolute inset-0'>
+					className='flex-1 bg-[#0B1121] rounded-[20px] relative overflow-hidden'>
+					<iframe
+						src='https://www.loom.com/embed/60d8308781254fe0bc5be341501f9fd5'
+						frameBorder='0'
+						width='100%'
+						height='100%'
+						allowFullScreen></iframe>
+
+					{/* <div className='absolute inset-0'>
 						<div className='absolute inset-0 bg-gradient-to-br from-[#FF6B00]/20 via-[#B114FF]/20 to-[#3B82F6]/20'></div>
 					</div>
 					<div className='relative z-10'>
 						<span className='inline-block text-[#4ADE80] text-sm font-medium mb-2'>Learn More</span>
 						<h2 className='text-xl font-semibold text-white tracking-tight mb-3'>How to get started with Flexprice</h2>
 						<p className='text-slate-300 text-sm'>Get your billing started in 5 minutes!</p>
-					</div>
+					</div> */}
 				</div>
 			</div>
-
 			{/* Quick Start Section */}
 			<div>
 				<h2 className='text-2xl font-semibold text-slate-900 mb-6'>Quick Start</h2>

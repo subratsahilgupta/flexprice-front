@@ -39,6 +39,7 @@ class AuthService {
 	}
 
 	public static async logout() {
+		window.location.href = '/auth';
 		if (NODE_ENV != NodeEnv.SELF_HOSTED) {
 			await supabase.auth.signOut();
 		}

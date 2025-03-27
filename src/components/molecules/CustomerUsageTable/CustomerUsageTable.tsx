@@ -5,6 +5,7 @@ import { FeatureType } from '@/models/Feature';
 import { FC } from 'react';
 import { getFeatureIcon } from '@/components/atoms/SelectFeature/SelectFeature';
 import CustomerUsage from '@/models/CustomerUsage';
+import { formatAmount } from '@/components/atoms/Input/Input';
 
 interface Props {
 	data: CustomerUsage[];
@@ -40,7 +41,7 @@ const getFeatureValue = (data: CustomerUsage) => {
 		case FeatureType.metered:
 			return (
 				<span className='flex items-end gap-1'>
-					{data.total_limit ?? 'Unlimited'}
+					{data.total_limit ? formatAmount(data.total_limit?.toString()) : 'Unlimited'}
 					<span className='text-[#64748B] text-sm font-normal font-sans'>units</span>
 				</span>
 			);
@@ -87,14 +88,34 @@ const columnData: ColumnData<CustomerUsage>[] = [
 			}
 			const usage = Number(row?.current_usage);
 			const limit = Number(row?.total_limit);
-			const value = Math.ceil((usage / limit) * 100);
-			// const resetLabel = row.usage_reset_period ? `Resets ${formatBillingPeriod(row.usage_reset_period)}` : '';
 
+			// Handle unlimited case (limit is 0 or null)
+			if (!limit) {
+				return (
+					<Progress
+						label={`${formatAmount(usage.toString())} / Unlimited`}
+						value={100}
+						className='h-[6px]'
+						indicatorColor='bg-blue-600'
+						backgroundColor='bg-blue-200'
+					/>
+				);
+			}
+
+			// Handle case with limit
+			const value = Math.ceil((usage / limit) * 100);
 			const indicatorColor = value >= 100 ? 'bg-red-600' : 'bg-blue-600';
 			const backgroundColor = value >= 100 ? 'bg-red-50' : 'bg-blue-200';
 
-			const label = row.total_limit ? `${usage} / ${limit}` : `${usage} / Unlimited`;
-			return <Progress label={label} value={value} className='h-[6px]' indicatorColor={indicatorColor} backgroundColor={backgroundColor} />;
+			return (
+				<Progress
+					label={`${formatAmount(usage.toString())} / ${formatAmount(limit.toString())}`}
+					value={value}
+					className='h-[6px]'
+					indicatorColor={indicatorColor}
+					backgroundColor={backgroundColor}
+				/>
+			);
 		},
 	},
 ];

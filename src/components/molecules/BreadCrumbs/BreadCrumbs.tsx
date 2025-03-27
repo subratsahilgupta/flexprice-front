@@ -58,7 +58,6 @@ const BreadCrumbs: FC = () => {
 				</nav>
 				<div className='flex items-center gap-4'>
 					<IntercomMessenger />
-
 					<ApiDocs />
 				</div>
 			</div>

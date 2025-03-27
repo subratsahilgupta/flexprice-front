@@ -1,4 +1,4 @@
-import { FormHeader, Spacer, Button, Divider, Page, Loader } from '@/components/atoms';
+import { FormHeader, Spacer, Button, Divider, Loader } from '@/components/atoms';
 import { DropdownMenu, DropdownMenuOption, InvoiceLineItemTable } from '@/components/molecules';
 import InvoicePaymentStatusModal from '@/components/molecules/InvoiceTable/InvoicePaymentStatusModal';
 import InvoiceStatusModal from '@/components/molecules/InvoiceTable/InvoiceStatusModal';
@@ -7,7 +7,7 @@ import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
 import { captureToPdf } from '@/utils/common/component_to_pdf';
 import formatDate from '@/utils/common/format_date';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Download, EllipsisVertical } from 'lucide-react';
 import { FC, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -34,6 +34,18 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 		enabled: !!invoice_id,
 	});
 
+	const { mutate: attemptPayment } = useMutation({
+		mutationFn: async () => {
+			return await InvoiceApi.attemptPayment(invoice_id!);
+		},
+		onSuccess: () => {
+			toast.success('Invoice Paid');
+		},
+		onError: () => {
+			toast.error('Unable to pay invoice');
+		},
+	});
+
 	const { user } = useUser();
 
 	useEffect(() => {
@@ -41,6 +53,12 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 	}, [invoice_id, data?.invoice_number, breadcrumb_index, updateBreadcrumb]);
 
 	const dropdownOptions: DropdownMenuOption[] = [
+		{
+			label: 'Attempt Payment',
+			onSelect: () => {
+				attemptPayment();
+			},
+		},
 		{
 			label: 'Update Invoice Status',
 			onSelect: () => {
@@ -108,7 +126,7 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 	}
 
 	return (
-		<Page className='space-y-6'>
+		<div className='space-y-6'>
 			<InvoiceStatusModal
 				invoice={data}
 				isOpen={state.isStatusModalOpen}
@@ -180,7 +198,7 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 				</div>
 				<InvoiceLineItemTable title='Order Details' data={data?.line_items ?? []} amount_due={data?.amount_due} currency={data?.currency} />
 			</div>
-		</Page>
+		</div>
 	);
 };
 export default InvoiceDetails;

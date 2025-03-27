@@ -7,6 +7,9 @@ import DropdownMenu, { DropdownMenuOption } from '../DropdownMenu';
 import { useNavigate } from 'react-router-dom';
 import InvoiceStatusModal from './InvoiceStatusModal';
 import InvoicePaymentStatusModal from './InvoicePaymentStatusModal';
+import { useMutation } from '@tanstack/react-query';
+import InvoiceApi from '@/utils/api_requests/InvoiceApi';
+import toast from 'react-hot-toast';
 
 export interface Props {
 	data: Invoice[];
@@ -47,6 +50,18 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 	}>({
 		isPaymentModalOpen: false,
 		isStatusModalOpen: false,
+	});
+
+	const { mutate: attemptPayment } = useMutation({
+		mutationFn: async (invoice_id: string) => {
+			return await InvoiceApi.attemptPayment(invoice_id);
+		},
+		onSuccess: () => {
+			toast.success('Invoice Paid');
+		},
+		onError: () => {
+			toast.error('Unable to pay invoice');
+		},
 	});
 
 	const columns: ColumnData[] = [
@@ -93,6 +108,12 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 					// {
 					// 	label: 'Download Invoice',
 					// },
+					{
+						label: 'Attempt Payment',
+						onSelect: () => {
+							attemptPayment(row.id);
+						},
+					},
 					{
 						label: 'Update Invoice Status',
 						onSelect: () => {

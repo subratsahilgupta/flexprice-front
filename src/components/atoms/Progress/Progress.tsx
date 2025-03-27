@@ -22,7 +22,7 @@ const Progress = React.forwardRef<React.ElementRef<typeof ProgressPrimitive.Root
 					style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
 				/>
 			</ProgressPrimitive.Root>
-			<p className={cn('text-xs font-medium', labelColor)}>{label}</p>
+			<p className={cn('text-xs font-medium w-full', labelColor)}>{label}</p>
 		</div>
 	),
 );

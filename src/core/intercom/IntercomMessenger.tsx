@@ -2,6 +2,7 @@ import useUser from '@/hooks/useUser';
 import Intercom from '@intercom/messenger-js-sdk';
 import './index.css';
 import { Button } from '@/components/ui/button';
+import { MessageCircleQuestion } from 'lucide-react';
 const IntercomMessenger = () => {
 	const { user } = useUser();
 
@@ -9,7 +10,6 @@ const IntercomMessenger = () => {
 		// @ts-expect-error - Intercom types don't include messenger
 		window.Intercom('show');
 	};
-
 	Intercom({
 		app_id: 'yprjoygg',
 		user_id: user?.id,
@@ -20,7 +20,8 @@ const IntercomMessenger = () => {
 	});
 
 	return (
-		<Button size='sm' variant='outline' onClick={openIntercom} className='outline-none text-sm bg-gray-100 flex items-center gap-2'>
+		<Button size='sm' variant='ghost' onClick={openIntercom} className='outline-none text-sm bg-gray-100 flex items-center gap-2'>
+			<MessageCircleQuestion />
 			Help
 		</Button>
 	);
