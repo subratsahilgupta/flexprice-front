@@ -1,4 +1,4 @@
-import { Card, CardHeader, FormHeader, Input, Loader, NoDataCard, Page } from '@/components/atoms';
+import { Card, CardHeader, FormHeader, Loader, NoDataCard, Page } from '@/components/atoms';
 import { Detail, DetailsCard, FlatTabs } from '@/components/molecules';
 import { ApiDocsContent } from '@/components/molecules';
 import CustomerUsageTable from '@/components/molecules/CustomerUsageTable/CustomerUsageTable';
@@ -42,7 +42,7 @@ const BillingPage = () => {
 		},
 		{
 			label: 'Billing Address',
-			value: user?.tenant?.billing_details?.address?.address_line1 || '--',
+			value: user?.tenant?.billing_details?.address?.address_line1 + ' ' + user?.tenant?.billing_details?.address?.address_line2 || '--',
 			labelStyle: 'normal',
 		},
 		{
