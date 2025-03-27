@@ -12,6 +12,7 @@ import formatChips from '@/utils/common/format_chips';
 import { FeatureType } from '@/models/Feature';
 import { getFeatureTypeChips } from '@/components/molecules/FeatureTable/FeatureTable';
 import { formatAggregationType } from './AddFeature';
+import { formatAmount } from '@/components/atoms/Input/Input';
 
 // const getFeatureType = (type: string) => {
 // 	const className = 'items-center justify-end text-sm font-normal text-gray-800 flex gap-2';
@@ -120,15 +121,15 @@ const FeatureDetails = () => {
 					return rowData.static_value || '0';
 				}
 				if (rowData.feature_type === FeatureType.metered) {
-					const usageLimit = rowData.usage_limit ?? 'Unlimited';
-					const unitPlural =
+					const usageLimit = rowData.usage_limit ? formatAmount(rowData.usage_limit.toString()) : 'Unlimited';
+					const unit =
 						rowData.usage_limit === null || rowData.usage_limit > 1
 							? rowData.feature.unit_plural || 'units'
 							: rowData.feature.unit_singular || 'unit';
 					return (
 						<span className='text-right'>
 							{usageLimit}
-							<span className='text-muted-foreground text-sm font-sans ml-2'>{unitPlural}</span>
+							<span className='text-muted-foreground text-sm font-sans ml-2'>{unit}</span>
 						</span>
 					);
 				}

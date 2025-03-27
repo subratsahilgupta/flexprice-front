@@ -63,13 +63,11 @@ const Overview = () => {
 			)}
 
 			{/* customer entitlements table */}
-			{(usageData?.features?.length || 0) > 0 ? (
+			{(usageData?.features?.length || 0) > 0 && (
 				<Card variant='notched'>
 					<CardHeader title='Entitlements' />
 					<CustomerUsageTable data={usageData?.features ?? []} />
 				</Card>
-			) : (
-				<NoDataCard title='Entitlements' subtitle='No active entitlements yet' />
 			)}
 		</div>
 	);

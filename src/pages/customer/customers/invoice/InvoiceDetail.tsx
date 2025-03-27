@@ -7,7 +7,7 @@ import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
 import { captureToPdf } from '@/utils/common/component_to_pdf';
 import formatDate from '@/utils/common/format_date';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Download, EllipsisVertical } from 'lucide-react';
 import { FC, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -34,6 +34,18 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 		enabled: !!invoice_id,
 	});
 
+	const { mutate: attemptPayment } = useMutation({
+		mutationFn: async () => {
+			return await InvoiceApi.attemptPayment(invoice_id!);
+		},
+		onSuccess: () => {
+			toast.success('Invoice Paid');
+		},
+		onError: () => {
+			toast.error('Unable to pay invoice');
+		},
+	});
+
 	const { user } = useUser();
 
 	useEffect(() => {
@@ -41,6 +53,12 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 	}, [invoice_id, data?.invoice_number, breadcrumb_index, updateBreadcrumb]);
 
 	const dropdownOptions: DropdownMenuOption[] = [
+		{
+			label: 'Attempt Payment',
+			onSelect: () => {
+				attemptPayment();
+			},
+		},
 		{
 			label: 'Update Invoice Status',
 			onSelect: () => {
