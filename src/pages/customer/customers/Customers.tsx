@@ -47,7 +47,6 @@ const CustomerPage = () => {
 							<Button
 								onClick={() => {
 									setactiveCustomer(undefined);
-									console.log('clicked');
 								}}
 								prefixIcon={<FiFolderPlus />}>
 								Add Customer
@@ -71,7 +70,6 @@ const CustomerPage = () => {
 						<AddButton
 							onClick={() => {
 								setactiveCustomer(undefined);
-								console.log('clicked');
 							}}
 						/>
 					}
@@ -84,7 +82,6 @@ const CustomerPage = () => {
 			<div>
 				<CustomerTable
 					onEdit={(data) => {
-						console.log('data', data);
 						setactiveCustomer(data);
 						setcustomerDrawerOpen(true);
 					}}

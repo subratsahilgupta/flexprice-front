@@ -58,7 +58,6 @@ const SelectMeter: FC<Props> = ({
 			};
 		});
 
-	console.log('received value', value);
 	return (
 		<div className={cn('min-w-[200px]')}>
 			<Select

@@ -176,7 +176,6 @@ const AddFeaturePage = () => {
 			return await MeterApi.createMeter(sanitizedMeter);
 		},
 		onSuccess: async (newMeter) => {
-			console.log(newMeter);
 			if (newMeter?.id) {
 				// Update state for completeness, but don't rely on it for the next action
 				setdata((prev) => ({ ...prev, meter_id: newMeter.id }));
@@ -186,9 +185,8 @@ const AddFeaturePage = () => {
 				toast.error('Failed to get meter ID from response');
 			}
 		},
-		onError: (error) => {
+		onError: () => {
 			toast.error('Failed to create meter. Please check the form and try again.');
-			console.log(error);
 		},
 		retry: 3,
 	});
@@ -223,7 +221,6 @@ const AddFeaturePage = () => {
 
 	const { isPending, mutate: createFeature } = useMutation({
 		mutationFn: async (featureData: Partial<Feature> = data) => {
-			console.log(featureData);
 			const sanitizedData: Partial<Feature> = {
 				...featureData,
 				meter_id: featureData.meter_id || '',
@@ -237,9 +234,8 @@ const AddFeaturePage = () => {
 			navigate(RouteNames.features);
 			toast.success('Feature created successfully');
 		},
-		onError: (error) => {
+		onError: () => {
 			toast.error('An error occurred while creating feature. Please try again.');
-			console.log(error);
 		},
 	});
 

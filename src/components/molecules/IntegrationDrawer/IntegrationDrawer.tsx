@@ -4,7 +4,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import IntegrationsApi from '@/utils/api_requests/IntegrationsApi';
 import { LoaderCircleIcon } from 'lucide-react';
-
+import { logger } from '@/utils/common/Logger';
 interface IntegrationDrawerProps {
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -40,7 +40,7 @@ const IntegrationDrawer: FC<IntegrationDrawerProps> = ({ isOpen, onOpenChange, p
 				const response = await IntegrationsApi.getIntegration(provider);
 				return response;
 			} catch (e) {
-				console.log(e);
+				logger.error(e);
 				return null;
 			}
 		},

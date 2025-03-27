@@ -152,7 +152,6 @@ const DeveloperPage = () => {
 			},
 		},
 	];
-	console.log(secretKeys);
 
 	return (
 		<Page

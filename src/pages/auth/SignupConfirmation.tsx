@@ -44,8 +44,7 @@ const SignupConfirmation = () => {
 			await EnvironmentApi.initializeEnvironments();
 			return signupResponse;
 		},
-		onSuccess: async (data) => {
-			console.log('data', data);
+		onSuccess: async () => {
 			await supabase.auth.refreshSession();
 			navigate('/');
 		},

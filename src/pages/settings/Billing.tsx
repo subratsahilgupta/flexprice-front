@@ -19,9 +19,6 @@ const BillingPage = () => {
 		toast.error('Error fetching billing details');
 	}
 
-	if (data) {
-		console.log(data);
-	}
 	return (
 		<Page heading='Billing'>
 			<ApiDocsContent tags={['Billing']} />

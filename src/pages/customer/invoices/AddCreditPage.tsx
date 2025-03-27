@@ -43,7 +43,6 @@ const AddCreditPage = () => {
 		if (data) {
 			// Update customer name (3rd segment)
 			updateBreadcrumb(2, data.customer?.external_id || 'Customer');
-			console.log('data', data);
 
 			// Update invoice number (4th segment)
 			updateBreadcrumb(3, `Invoice ${data.invoice_number}`);

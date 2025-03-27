@@ -60,7 +60,6 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 		onError: (error: any) => {
 			const errorMessage = error.error || 'An unexpected error occurred during signup';
 			toast.error(errorMessage);
-			console.log(error);
 		},
 	});
 
@@ -113,7 +112,6 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 
 			if (error) {
 				toast.error(error.message || 'Something went wrong');
-				console.log('error', error);
 				return;
 			}
 			navigate(RouteNames.resendVerification);
