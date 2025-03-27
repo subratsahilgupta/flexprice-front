@@ -68,13 +68,17 @@ npm install
 
 ```bash
 # Copy environment template
-cp .env.example .env.local
+cp .env.example .env
 
 # Configure these variables in .env.local:
-VITE_API_URL=your-api-url
-VITE_APP_ENV=development
-VITE_AUTH_DOMAIN=your-auth-domain
-VITE_AUTH_CLIENT_ID=your-client-id
+VITE_SUPABASE_URL=your-supabase-utl
+
+VITE_SUPABASE_ANON_KEY=your-supabse-anon-key
+
+VITE_API_URL=http://localhost:8080/v1 or <your-backend-url>
+
+VITE_ENVIRONMENT=development
+
 ```
 
 3. **Start Development**
@@ -148,37 +152,6 @@ nginx -s reload
 npx serve -s dist
 ```
 
-## 💻 Development Tools
-
-### Essential VS Code Extensions
-
-Install these extensions for the best development experience:
-
-```json
-{
-	"recommendations": [
-		"dbaeumer.vscode-eslint",
-		"esbenp.prettier-vscode",
-		"bradlc.vscode-tailwindcss",
-		"dsznajder.es7-react-js-snippets",
-		"christian-kohler.path-intellisense"
-	]
-}
-```
-
-### Recommended Settings
-
-```json
-{
-	"editor.formatOnSave": true,
-	"editor.defaultFormatter": "esbenp.prettier-vscode",
-	"editor.codeActionsOnSave": {
-		"source.fixAll.eslint": true
-	},
-	"typescript.tsdk": "node_modules/typescript/lib"
-}
-```
-
 ## 📚 Available Scripts
 
 ```bash
@@ -186,11 +159,6 @@ Install these extensions for the best development experience:
 npm run dev           # Start development server
 npm run build        # Build for production
 npm run preview      # Preview production build
-
-# Testing
-npm run test         # Run tests
-npm run test:watch   # Run tests in watch mode
-npm run test:coverage # Run tests with coverage
 
 # Code Quality
 npm run lint        # Run ESLint
@@ -251,27 +219,39 @@ rm -rf .vite
 npm install
 ```
 
-2. **Type Errors**
-
-```bash
-# Regenerate TypeScript types
-npm run type-check
-```
-
-3. **Stale Development Server**
+2. **Stale Development Server**
 
 ```bash
 # Reset development server
-npm run clean
+rm -rf node_modules
+rm -rf .vite
+npm install
 npm run dev
 ```
 
-## 📖 Additional Resources
+## 📚 Documentation
 
-- [Component Guidelines](docs/component-guidelines.md)
-- [State Management Guide](docs/state-management.md)
-- [Testing Best Practices](docs/testing.md)
-- [API Integration Guide](docs/api-integration.md)
+Our comprehensive documentation covers all aspects of the FlexPrice frontend:
+
+### Getting Started
+
+- [Getting Started Guide](docs/getting-started.md) - Quick setup and first steps
+- [Project Structure](docs/project-structure.md) - Understanding the codebase organization
+- [Conventions](docs/conventions.md) - Coding standards and best practices
+
+### Development Guides
+
+- [Component Guidelines](docs/component-guidelines.md) - Building and maintaining UI components
+- [State Management](docs/state-management.md) - Managing application state with Zustand and Context
+- [API Integration](docs/api-integration.md) - Working with the backend API
+- [Onboarding Guide](docs/onboarding.md) - New developer onboarding process
+
+### Additional Resources
+
+<!-- - [FAQ](docs/FAQ.md) - Common questions and answers -->
+
+- [Flexprice Docs](https://docs.flexprice.io/introduction) - Documenttation for Flexprice sdk and Apis
+- [Contributing Guide](docs/getting-started.md) - How to contribute to the project
 
 ## 🤝 Contributing
 
@@ -281,13 +261,14 @@ npm run dev
 4. Push to the branch
 5. Create a Pull Request
 
-Please read our [Contributing Guide](CONTRIBUTING.md) for details.
+Please read our [Contributing Guide](docs/getting-started.md) for details.
 
 ## 🆘 Need Help?
 
-- Join our [Discord Community](https://discord.gg/flexprice)
-- Email: support@flexprice.io
-- Check our [FAQ](docs/FAQ.md)
+<!-- - Join our [Discord Community](https://discord.gg/flexprice) -->
+
+- Email: ola@flexprice.io
+<!-- - Check our [FAQ](docs/FAQ.md) -->
 
 ## 📝 License
 
