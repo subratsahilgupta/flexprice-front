@@ -237,10 +237,27 @@ const AddEntitlementDrawer: FC<Props> = ({
 						<SelectFeature
 							disabledFeatures={selectedFeatures.map((feature) => feature.id)}
 							onChange={(feature) => {
-								setActiveFeature(feature);
-								setSelectedFeatures([...selectedFeatures, feature]);
-								setShowSelect(false);
-								setErrors({});
+								if (feature.type === FeatureType.boolean) {
+									// Automatically add boolean features
+									setEntitlements([
+										...entitlements,
+										{
+											feature: feature,
+											feature_id: feature.id,
+											feature_type: feature.type,
+											is_enabled: true,
+										},
+									]);
+									setSelectedFeatures([...selectedFeatures, feature]);
+									setShowSelect(true);
+									setErrors({});
+								} else {
+									// For non-boolean features, show the configuration form
+									setActiveFeature(feature);
+									setSelectedFeatures([...selectedFeatures, feature]);
+									setShowSelect(false);
+									setErrors({});
+								}
 							}}
 							label='Features'
 							placeholder='Select feature'

@@ -55,7 +55,6 @@ const QueryPage = () => {
 				window_size: payload.window_size,
 			});
 		},
-		onSuccess: (data) => console.log(data),
 		onError: () => toast.error('Error fetching data'),
 	});
 

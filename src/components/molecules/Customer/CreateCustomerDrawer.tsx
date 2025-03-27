@@ -8,6 +8,7 @@ import { Plus } from 'lucide-react';
 import { Country, State, City, IState } from 'country-state-city';
 import { z } from 'zod';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
+import { logger } from '@/utils/common/Logger';
 
 interface Props {
 	data?: Customer;
@@ -124,8 +125,6 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 				const field = error.path[0] as keyof Customer;
 				newErrors[field] = error.message;
 			});
-			console.log('errors', newErrors);
-
 			setErrors(newErrors);
 			return false;
 		}
@@ -165,8 +164,7 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 			}
 		},
 
-		onSuccess: async (details) => {
-			console.log('details', details);
+		onSuccess: async () => {
 			if (data) {
 				await refetchQueries(['fetchCustomerDetails', formData?.id || '']);
 			} else {
@@ -186,8 +184,7 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 			toggleOpen();
 		},
 		onError: (error) => {
-			console.log(error);
-
+			logger.error(error);
 			toast.error('Error adding customer');
 		},
 	});

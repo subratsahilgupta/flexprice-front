@@ -197,31 +197,19 @@ const SetupChargesSection: React.FC<Props> = ({ plan, setPlanField }) => {
 					<UsagePricingForm
 						prices={usagePrices}
 						onSave={(newPrice) => {
-							console.log('=== Debug Usage Price Form Save ===');
-							console.log('1. New Price Object:', newPrice);
-							console.log('2. Current Usage Prices:', usagePrices);
-							console.log('3. All Prices:', prices);
-
 							const existingIndex = usagePrices.findIndex((p) => p.isEdit);
-							console.log('4. Existing Edit Index:', existingIndex);
 
 							if (existingIndex !== -1) {
-								console.log('5. Updating existing price');
 								const globalIndex = prices.findIndex((p) => p === usagePrices[existingIndex]);
-								console.log('6. Global Index for Update:', globalIndex);
 								handlePriceUpdate(globalIndex, {
 									...newPrice,
 									type: SubscriptionType.USAGE,
 									isEdit: false,
 								});
 							} else if (newPrice.isEdit) {
-								console.log('7. Attempting to enter edit mode');
-								console.log('8. New Price to Edit:', newPrice);
 								const globalIndex = prices.findIndex((p) => p.internal_id === newPrice.internal_id);
-								console.log('10. Global Index for Edit:', globalIndex);
 
 								if (globalIndex === -1) {
-									console.warn('Warning: Could not find price to edit in global prices array');
 									return;
 								}
 

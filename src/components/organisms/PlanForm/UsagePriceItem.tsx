@@ -31,7 +31,6 @@ const UsagePriceItem: FC<Props> = ({ price, index, onDelete, onEdit }) => {
 				<button
 					onClick={() => {
 						const newPrice = { ...price, isEdit: true };
-						console.log('updating price in usage price item', newPrice);
 
 						onEdit(newPrice);
 					}}

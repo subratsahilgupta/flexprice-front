@@ -136,7 +136,6 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 		() => `${entityType?.value ? getLicenseKey(entityType.value) : ''}-${JSON.stringify(entityType?.label)}`,
 		[entityType],
 	);
-	console.log(entityType, csvBoxKey);
 
 	const [errors, seterrors] = useState({
 		file: '',
@@ -160,14 +159,12 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 				file_name: (data?.original_filename ?? uploadedFile?.original_filename) || '',
 			});
 		},
-		onSuccess: async (data) => {
+		onSuccess: async () => {
 			setEntityType(undefined);
 			setUploadedFile(undefined);
-			console.log(data);
 			await refetchQueries('importTasks');
 		},
-		onError: (error) => {
-			console.log(error);
+		onError: () => {
 			toast.error('Something went wrong');
 		},
 	});
@@ -252,7 +249,6 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 		if (!entityType) {
 			seterrors((prev) => ({ ...prev, entity_type: 'Please select an entity type' }));
 		}
-		console.log(file, uploadedFile, entityType);
 
 		if (file || (uploadedFile && entityType)) {
 			addTask(file || uploadedFile);

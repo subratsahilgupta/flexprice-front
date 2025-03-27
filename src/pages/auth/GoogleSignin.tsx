@@ -10,7 +10,6 @@ const GoogleSignin = () => {
 		mutationFn: async () => {
 			// Get the current site URL (to handle different environments)
 			const siteUrl = window.location.origin;
-			console.log('Using site URL for redirect:', siteUrl + '/auth/signup/confirmation');
 
 			const { data, error } = await supabase.auth.signInWithOAuth({
 				provider: 'google',
@@ -33,21 +32,13 @@ const GoogleSignin = () => {
 			return data;
 		},
 		onSuccess: (data) => {
-			console.log('Google auth initiated successfully:', {
-				provider: 'google',
-				url: data?.url,
-				timestamp: new Date().toISOString(),
-			});
-
 			// Important: Need to navigate to the URL provided by Supabase
 			if (data?.url) {
-				console.log('Redirecting to OAuth URL:', data.url);
 				window.location.href = data.url;
 			}
 		},
 
 		onError: (error: any) => {
-			console.error('Google auth error:', error);
 			toast.error(error.message || 'Authentication failed');
 		},
 	});

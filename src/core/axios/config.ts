@@ -57,7 +57,6 @@ axiosClient.interceptors.response.use(
 			}
 			// Ensure we reject with the error response data if available
 			const errorData = error.response.data;
-			console.log('errorData', errorData);
 			return Promise.reject(errorData || error);
 		} else if (error.request) {
 			// Request was made but no response received
