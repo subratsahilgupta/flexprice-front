@@ -5,9 +5,11 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { SecretKey } from '@/models/SecretKey';
 import usePagination from '@/hooks/usePagination';
 import { formatDateShort } from '@/utils/common/helper_functions';
-import { Plus, Eye, Pencil, EyeOff, LucideIcon, ShieldCheck, Key, Trash2 } from 'lucide-react';
+import { Plus, Eye, Pencil, EyeOff, LucideIcon, ShieldCheck, Key, Trash2, Loader } from 'lucide-react';
 import { useState } from 'react';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
+import { toast } from 'react-hot-toast';
+import { EmptyPage } from '@/components/organisms';
 
 // Utility function to format permissions for display
 export const formatPermissionDisplay = (permissions: readonly string[]): string => {
@@ -110,7 +112,11 @@ const baseColumns: ColumnData<SecretKey>[] = [
 const DeveloperPage = () => {
 	const { page, limit, offset } = usePagination();
 
-	const { data: secretKeys } = useQuery({
+	const {
+		data: secretKeys,
+		isLoading,
+		isError,
+	} = useQuery({
 		queryKey: ['secret-keys', page, limit, offset],
 		queryFn: () => SecretKeysApi.getAllSecretKeys({ limit, offset }),
 	});
@@ -152,6 +158,26 @@ const DeveloperPage = () => {
 			},
 		},
 	];
+
+	if (isLoading) {
+		return <Loader />;
+	}
+
+	if (isError) {
+		toast.error('Error fetching secret keys');
+	}
+
+	if (secretKeys?.items.length === 0) {
+		return (
+			<EmptyPage
+				title='No secret keys found'
+				description='Add a new secret key to get started'
+				onAddClick={handleAddSecretKey}
+				addButtonLabel='Add Secret Key'
+				tags={['secrets']}
+			/>
+		);
+	}
 
 	return (
 		<Page

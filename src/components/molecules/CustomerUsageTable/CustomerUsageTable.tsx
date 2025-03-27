@@ -124,7 +124,6 @@ const CustomerUsageTable: FC<Props> = ({ data }) => {
 	return (
 		<div>
 			<FlexpriceTable showEmptyRow data={data} columns={columnData} />
-			{(data?.length || 0) === 0 && <p className='text-[#64748B] text-xs font-normal font-sans mt-4'>No Entitlements added</p>}
 		</div>
 	);
 };

@@ -58,6 +58,7 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 			onSelect: () => {
 				attemptPayment();
 			},
+			disabled: data?.payment_status === 'SUCCEEDED' || data?.invoice_status === 'VOIDED' || data?.amount_remaining === '0',
 		},
 		{
 			label: 'Update Invoice Status',

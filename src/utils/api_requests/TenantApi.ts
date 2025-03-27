@@ -19,7 +19,7 @@ interface GetBillingdetailsResponse {
 }
 
 class TenantApi {
-	private static baseUrl = '/tenant';
+	private static baseUrl = '/tenants';
 
 	public static async getTenantById(id: string) {
 		return await AxiosClient.get<Tenant>(`${this.baseUrl}/${id}`);

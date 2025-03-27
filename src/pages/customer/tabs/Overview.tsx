@@ -55,7 +55,6 @@ const Overview = () => {
 							navigate(`/customer-management/customers/${customerId}/subscription/${row.id}`);
 						}}
 						data={subscriptions as Subscription[]}
-						customerId={customerId!}
 					/>
 				</Card>
 			) : (

@@ -76,7 +76,6 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 		},
 		{
 			title: 'Invoice Status',
-
 			render: (row: Invoice) => getStatusChip(row.invoice_status),
 		},
 		{
@@ -113,6 +112,7 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 						onSelect: () => {
 							attemptPayment(row.id);
 						},
+						disabled: row?.payment_status === 'SUCCEEDED' || row?.invoice_status === 'VOIDED' || row.amount_remaining === '0',
 					},
 					{
 						label: 'Update Invoice Status',

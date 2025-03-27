@@ -8,7 +8,6 @@ import SubscriptionActionButton from './SubscriptionActionButton';
 import { RouteNames } from '@/core/routes/Routes';
 
 export interface SubscriptionTableProps {
-	customerId: string;
 	data: Subscription[];
 	onRowClick?: (row: Subscription) => void;
 }
