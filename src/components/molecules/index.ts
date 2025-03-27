@@ -65,3 +65,5 @@ export { default as ApiDocs, ApiDocsContent } from './ApiDocs';
 export { default as CustomerEntitlementTable } from './CustomerUsageTable';
 
 export { default as InvoicePaymentsTable } from './InvoicePaymentsTable';
+
+export { FlatTabs, CustomTabs } from './Tabs';

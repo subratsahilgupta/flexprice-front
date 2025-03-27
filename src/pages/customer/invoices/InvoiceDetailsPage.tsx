@@ -3,7 +3,7 @@ import InvoiceDetails from '../customers/invoice/InvoiceDetail';
 import { useQuery } from '@tanstack/react-query';
 import usePagination from '@/hooks/usePagination';
 import PaymentApi from '@/utils/api_requests/PaymentApi';
-import { CustomTabs } from '@/components/atoms/CustomTabs';
+import { CustomTabs } from '@/components/molecules';
 import { Loader, Page, ShortPagination } from '@/components/atoms';
 import { ApiDocsContent, InvoicePaymentsTable } from '@/components/molecules';
 
