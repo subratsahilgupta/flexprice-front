@@ -33,7 +33,7 @@ const InvoicesPage = () => {
 	}
 
 	if ((invoiceData?.items ?? []).length === 0) {
-		return <EmptyPage title='No invoices found' description='Create an invoice to get started' tags={['Invoices']} />;
+		return <EmptyPage title='No invoices found' tags={['Invoices']} />;
 	}
 
 	return (

@@ -42,8 +42,8 @@ const PricingPlan = () => {
 	if ((plansData?.items ?? []).length === 0) {
 		return (
 			<EmptyPage
-				title='No plans found'
-				description='Add your first Pricing Plan'
+				title='Add your first Pricing Plan'
+				description='Add a pricing plan to get started'
 				onAddClick={() => navigate(RouteNames.createPlan)}
 				tags={['Plans']}
 			/>

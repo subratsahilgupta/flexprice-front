@@ -38,8 +38,9 @@ const FeaturesPage = () => {
 	if (featureData?.items.length === 0) {
 		return (
 			<EmptyPage
-				title='No features found'
-				description='Create a feature to get started'
+				description='No features found'
+				addButtonLabel='Create your first feature'
+				title='Create a feature to get started'
 				onAddClick={() => navigate(RouteNames.createFeature)}
 				tags={['Features']}
 			/>

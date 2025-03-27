@@ -27,7 +27,7 @@ const PaymentPage = () => {
 	}
 
 	if ((payments?.items ?? []).length === 0) {
-		return <EmptyPage title='No payments found' description='Create a payment to get started' tags={['Payments']} />;
+		return <EmptyPage title='No payments found' tags={['Payments']} />;
 	}
 
 	return (
