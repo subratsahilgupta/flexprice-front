@@ -31,7 +31,7 @@ export const CustomTabs = ({ tabs, defaultValue = tabs[0]?.value, className }: C
 					</TabsTrigger>
 				))}
 			</TabsList>
-			<div className='mt-0 p-0'>
+			<div className='mt-4'>
 				{tabs.map((tab) => (
 					<TabsContent className='mt-0 p-0' key={tab.value} value={tab.value}>
 						{tab.content}

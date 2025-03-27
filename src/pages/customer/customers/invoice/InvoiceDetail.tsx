@@ -1,4 +1,4 @@
-import { FormHeader, Spacer, Button, Divider, Page, Loader } from '@/components/atoms';
+import { FormHeader, Spacer, Button, Divider, Loader } from '@/components/atoms';
 import { DropdownMenu, DropdownMenuOption, InvoiceLineItemTable } from '@/components/molecules';
 import InvoicePaymentStatusModal from '@/components/molecules/InvoiceTable/InvoicePaymentStatusModal';
 import InvoiceStatusModal from '@/components/molecules/InvoiceTable/InvoiceStatusModal';
@@ -108,7 +108,7 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 	}
 
 	return (
-		<Page className='space-y-6'>
+		<div className='space-y-6'>
 			<InvoiceStatusModal
 				invoice={data}
 				isOpen={state.isStatusModalOpen}
@@ -180,7 +180,7 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 				</div>
 				<InvoiceLineItemTable title='Order Details' data={data?.line_items ?? []} amount_due={data?.amount_due} currency={data?.currency} />
 			</div>
-		</Page>
+		</div>
 	);
 };
 export default InvoiceDetails;
