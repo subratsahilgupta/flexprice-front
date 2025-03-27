@@ -8,11 +8,11 @@ import { getPaymentStatusChip } from '../InvoiceTable/InvoiceTable';
 interface Props {
 	data: Invoice[];
 	customerId?: string;
-	onRowClick?: (row: any) => void;
+	onRowClick?: (row: Invoice) => void;
 }
 
 const CustomerInvoiceTable: FC<Props> = ({ data, onRowClick }) => {
-	const columnData: ColumnData[] = [
+	const columnData: ColumnData<Invoice>[] = [
 		{
 			title: 'Invoice Number',
 			render: (row) => <>{row.invoice_number || '--'}</>,

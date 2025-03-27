@@ -4,6 +4,7 @@ import InvoiceApi from '@/utils/api_requests/InvoiceApi';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card } from '@/components/atoms';
+import { Invoice as InvoiceModel } from '@/models/Invoice';
 
 const Invoice = () => {
 	const { id: customerId } = useParams();
@@ -18,7 +19,7 @@ const Invoice = () => {
 		enabled: !!customerId,
 	});
 
-	const handleShowDetails = (invoice: any) => {
+	const handleShowDetails = (invoice: InvoiceModel) => {
 		navigate(`${invoice.id}`);
 	};
 
