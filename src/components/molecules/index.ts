@@ -24,7 +24,7 @@ export type { RectangleRadiogroupOption } from './RectangleRadiogroup';
 export { default as DropdownMenu } from './DropdownMenu';
 export type { DropdownMenuOption } from './DropdownMenu';
 
-export { CreateCustomerDrawer, CustomerCard, CustomerTable, CustomerInvoiceTable } from './Customer';
+export { CreateCustomerDrawer, CustomerCard, CustomerTable } from './Customer';
 
 export { default as InvoiceLineItemTable } from './InvoiceLineItemTable';
 
@@ -32,7 +32,13 @@ export { default as EventsTable } from './Events';
 
 export { default as InfiniteScroll } from './InfiniteScroll';
 
-export { default as InvoiceTable } from './InvoiceTable';
+export {
+	default as InvoiceTable,
+	CustomerInvoiceTable,
+	InvoiceTableMenu,
+	InvoicePaymentStatusModal,
+	InvoiceStatusModal,
+} from './InvoiceTable';
 
 export { default as InvoiceCreditLineItemTable } from './InvoiceCreditLineItemTable';
 

@@ -41,10 +41,8 @@ const CustomerPage = () => {
 		return (
 			<>
 				<EmptyPage
-					title='Add your first customer'
-					description='No customers added yet'
+					heading='Customer'
 					tags={['Customers']}
-					addButtonLabel='Create your first customer'
 					onAddClick={() => {
 						setactiveCustomer(undefined);
 						setcustomerDrawerOpen(true);

@@ -36,15 +36,7 @@ const FeaturesPage = () => {
 		toast.error('Error fetching features');
 	}
 	if (featureData?.items.length === 0) {
-		return (
-			<EmptyPage
-				description='No features found'
-				addButtonLabel='Create your first feature'
-				title='Create a feature to get started'
-				onAddClick={() => navigate(RouteNames.createFeature)}
-				tags={['Features']}
-			/>
-		);
+		return <EmptyPage heading='Feature' onAddClick={() => navigate(RouteNames.createFeature)} tags={['Features']} />;
 	}
 
 	return (

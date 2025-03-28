@@ -232,14 +232,7 @@ const PricingPage = () => {
 	}
 
 	if ((plansData?.items ?? []).length === 0) {
-		return (
-			<EmptyPage
-				title='Add your first Pricing Plan'
-				description='Add a pricing plan to get started'
-				onAddClick={() => navigate(RouteNames.createPlan)}
-				tags={['Plans']}
-			/>
-		);
+		return <EmptyPage heading='Plan' onAddClick={() => navigate(RouteNames.createPlan)} tags={['Plans']} />;
 	}
 
 	return (

@@ -81,7 +81,7 @@ const BillingPage = () => {
 								{/* customer entitlements table */}
 								<Card variant='notched'>
 									<CardHeader title='Usage' />
-									<CustomerUsageTable data={data?.usage.features ?? []} />
+									<CustomerUsageTable data={data?.usage.features ?? []} allowRedirect={false} />
 								</Card>
 							</div>
 						),
@@ -94,7 +94,7 @@ const BillingPage = () => {
 								{/* customer subscriptions table */}
 								<Card variant='notched'>
 									<CardHeader title='Subscriptions' />
-									<SubscriptionTable data={data?.subscriptions ?? []} />
+									<SubscriptionTable data={data?.subscriptions ?? []} allowRedirect={false} />
 								</Card>
 							</div>
 						),

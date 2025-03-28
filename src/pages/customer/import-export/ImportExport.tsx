@@ -89,7 +89,7 @@ const ImportExport = () => {
 
 	if (data?.items.length === 0) {
 		return (
-			<EmptyPage title='Import Tasks' description='No import tasks found'>
+			<EmptyPage heading='Import Tasks'>
 				<ApiDocsContent tags={['Import Export', 'Tasks']} />
 				<ImportFileDrawer taskId={activeTask} isOpen={drawerOpen} onOpenChange={(value) => setdrawerOpen(value)} />
 				<Button onClick={() => setdrawerOpen(true)} className='flex gap-2 items-center '>

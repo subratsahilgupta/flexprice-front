@@ -1,17 +1,14 @@
 import { FormHeader, Spacer, Button, Divider, Loader } from '@/components/atoms';
-import { DropdownMenu, DropdownMenuOption, InvoiceLineItemTable } from '@/components/molecules';
-import InvoicePaymentStatusModal from '@/components/molecules/InvoiceTable/InvoicePaymentStatusModal';
-import InvoiceStatusModal from '@/components/molecules/InvoiceTable/InvoiceStatusModal';
+import { InvoiceTableMenu, InvoicePaymentStatusModal, InvoiceStatusModal, InvoiceLineItemTable } from '@/components/molecules';
 import useUser from '@/hooks/useUser';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
 import { captureToPdf } from '@/utils/common/component_to_pdf';
 import formatDate from '@/utils/common/format_date';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { Download, EllipsisVertical } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { Download } from 'lucide-react';
 import { FC, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
 
 interface Props {
 	invoice_id: string;
@@ -20,7 +17,6 @@ interface Props {
 
 const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 	// const { invoice_id } = useParams<{ invoice_id: string }>();
-	const navigate = useNavigate();
 	const [state, setState] = useState({
 		isPaymentModalOpen: false,
 		isStatusModalOpen: false,
@@ -34,58 +30,11 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 		enabled: !!invoice_id,
 	});
 
-	const { mutate: attemptPayment } = useMutation({
-		mutationFn: async () => {
-			return await InvoiceApi.attemptPayment(invoice_id!);
-		},
-		onSuccess: () => {
-			toast.success('Invoice Paid');
-		},
-		onError: () => {
-			toast.error('Unable to pay invoice');
-		},
-	});
-
 	const { user } = useUser();
 
 	useEffect(() => {
 		updateBreadcrumb(breadcrumb_index, data?.invoice_number ?? invoice_id);
 	}, [invoice_id, data?.invoice_number, breadcrumb_index, updateBreadcrumb]);
-
-	const dropdownOptions: DropdownMenuOption[] = [
-		{
-			label: 'Attempt Payment',
-			onSelect: () => {
-				attemptPayment();
-			},
-			disabled: data?.payment_status === 'SUCCEEDED' || data?.invoice_status === 'VOIDED' || data?.amount_remaining === '0',
-		},
-		{
-			label: 'Update Invoice Status',
-			onSelect: () => {
-				setState({
-					...state,
-					isStatusModalOpen: true,
-				});
-			},
-		},
-		{
-			label: 'Update Payment Status',
-			onSelect: () => {
-				setState({
-					...state,
-					isPaymentModalOpen: true,
-				});
-			},
-		},
-		{
-			label: 'Issue a Credit Note',
-			disabled: data?.payment_status === 'PENDING' || data?.payment_status === 'FAILED',
-			onSelect: () => {
-				navigate(`/customer-management/customers/${data?.customer_id}/invoice/${data?.id}/credit-note`);
-			},
-		},
-	];
 
 	const customerInfoClass = 'text-sm text-[#71717A] mb-[2px]';
 	const invoiceref = useRef<HTMLDivElement>(null);
@@ -157,13 +106,7 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 								<Download />
 								<span>Download</span>
 							</Button>
-							<DropdownMenu
-								options={dropdownOptions}
-								trigger={
-									<Button variant={'outline'} className='size-9 '>
-										<EllipsisVertical />
-									</Button>
-								}></DropdownMenu>
+							<InvoiceTableMenu data={data!} />
 						</div>
 					</div>
 					<Spacer className='!my-6' />

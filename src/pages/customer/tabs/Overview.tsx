@@ -37,6 +37,7 @@ const Overview = () => {
 		queryKey: ['usage', customerId],
 		queryFn: () => CustomerApi.getUsageSummary({ customer_id: customerId! }),
 	});
+
 	if (subscriptionsLoading || usageLoading) {
 		return <Loader />;
 	}

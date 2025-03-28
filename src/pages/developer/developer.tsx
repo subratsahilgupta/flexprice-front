@@ -169,13 +169,9 @@ const DeveloperPage = () => {
 
 	if (secretKeys?.items.length === 0) {
 		return (
-			<EmptyPage
-				title='No secret keys found'
-				description='Add a new secret key to get started'
-				onAddClick={handleAddSecretKey}
-				addButtonLabel='Add Secret Key'
-				tags={['secrets']}
-			/>
+			<EmptyPage heading='Secret Keys' tags={['secrets']} onAddClick={handleAddSecretKey}>
+				<SecretKeyDrawer isOpen={isSecretKeyDrawerOpen} onOpenChange={setIsSecretKeyDrawerOpen} />
+			</EmptyPage>
 		);
 	}
 

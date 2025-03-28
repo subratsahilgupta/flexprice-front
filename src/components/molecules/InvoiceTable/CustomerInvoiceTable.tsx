@@ -1,9 +1,10 @@
 import { FC } from 'react';
 import FlexpriceTable, { ColumnData } from '../Table';
 import { getCurrencySymbol, toSentenceCase } from '@/utils/common/helper_functions';
-import { ActionButton } from '@/components/atoms';
 import { Invoice } from '@/models/Invoice';
-import { getPaymentStatusChip } from '../InvoiceTable/InvoiceTable';
+import { getPaymentStatusChip } from './InvoiceTable';
+
+import InvoiceTableMenu from './InvoiceTableMenu';
 
 interface Props {
 	data: Invoice[];
@@ -34,14 +35,13 @@ const CustomerInvoiceTable: FC<Props> = ({ data, onRowClick }) => {
 		{
 			fieldVariant: 'interactive',
 			hideOnEmpty: true,
-			render: (row) => <ActionButton id={row.id} editPath={''} deleteMutationFn={async () => {}} refetchQueryKey={''} entityName={''} />,
+			render: (row) => <InvoiceTableMenu data={row} />,
 		},
 	];
 
 	return (
 		<div>
 			<FlexpriceTable showEmptyRow onRowClick={onRowClick} columns={columnData} data={data ?? []} />
-			{data.length === 0 && <p className=' text-[#64748B] text-xs font-normal font-sans mt-4'>No Invoices yet</p>}
 		</div>
 	);
 };

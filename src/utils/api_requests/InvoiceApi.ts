@@ -29,6 +29,12 @@ interface UpdateInvoiceStatusPayload {
 	amount?: number;
 }
 
+interface GetInvoicePreviewPayload {
+	period_end: string;
+	period_start: string;
+	subscription_id: string;
+}
+
 class InvoiceApi {
 	private static baseurl = '/invoices';
 
@@ -65,6 +71,15 @@ class InvoiceApi {
 
 	public static async attemptPayment(invoiceId: string) {
 		return await AxiosClient.post(`${this.baseurl}/${invoiceId}/payment/attempt`);
+	}
+
+	public static async getInvoicePreview(payload: GetInvoicePreviewPayload) {
+		const url = generateQueryParams(`${this.baseurl}/preview`, payload);
+		return await AxiosClient.get(url);
+	}
+
+	public static async getInvoicePdf(invoiceId: string) {
+		return await AxiosClient.get(`${this.baseurl}/${invoiceId}/pdf`);
 	}
 }
 
