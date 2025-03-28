@@ -20,7 +20,7 @@ const IntercomMessenger = () => {
 	});
 
 	return (
-		<Button size='sm' variant='ghost' onClick={openIntercom} className='outline-none text-sm bg-gray-100 flex items-center gap-2'>
+		<Button size='sm' variant='outline' onClick={openIntercom} className='outline-none text-sm  flex items-center gap-2'>
 			<MessageCircleQuestion />
 			Help
 		</Button>

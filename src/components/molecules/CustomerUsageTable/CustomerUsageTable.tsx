@@ -9,6 +9,7 @@ import { formatAmount } from '@/components/atoms/Input/Input';
 
 interface Props {
 	data: CustomerUsage[];
+	allowRedirect?: boolean;
 }
 
 export const getFeatureTypeChips = ({
@@ -52,75 +53,79 @@ const getFeatureValue = (data: CustomerUsage) => {
 	}
 };
 
-const columnData: ColumnData<CustomerUsage>[] = [
-	{
-		title: 'Feature',
-		fieldVariant: 'title',
-		render(row) {
-			return (
-				<RedirectCell redirectUrl={`${RouteNames.featureDetails}/${row?.feature?.id}`}>
-					{getFeatureTypeChips({
-						type: row?.feature?.type || '',
-						showIcon: true,
-					})}
-					{row?.feature?.name}
-				</RedirectCell>
-			);
+const CustomerUsageTable: FC<Props> = ({ data, allowRedirect = true }) => {
+	const columnData: ColumnData<CustomerUsage>[] = [
+		{
+			title: 'Feature',
+			fieldVariant: 'title',
+			render(row) {
+				return (
+					<RedirectCell allowRedirect={allowRedirect} redirectUrl={`${RouteNames.featureDetails}/${row?.feature?.id}`}>
+						{getFeatureTypeChips({
+							type: row?.feature?.type || '',
+							showIcon: true,
+						})}
+						{row?.feature?.name}
+					</RedirectCell>
+				);
+			},
 		},
-	},
-	{
-		title: 'Plan',
-		render(row) {
-			return <RedirectCell redirectUrl={`${RouteNames.plan}/${row?.sources[0]?.plan_id}`}>{row?.sources[0]?.plan_name}</RedirectCell>;
+		{
+			title: 'Plan',
+			render(row) {
+				return (
+					<RedirectCell allowRedirect={allowRedirect} redirectUrl={`${RouteNames.plan}/${row?.sources[0]?.plan_id}`}>
+						{row?.sources[0]?.plan_name}
+					</RedirectCell>
+				);
+			},
 		},
-	},
-	{
-		title: 'Value',
-		render(row) {
-			return getFeatureValue(row);
+		{
+			title: 'Value',
+			render(row) {
+				return getFeatureValue(row);
+			},
 		},
-	},
-	{
-		title: 'Usage',
-		render(row) {
-			if (row?.feature?.type != FeatureType.metered) {
-				return '--';
-			}
-			const usage = Number(row?.current_usage);
-			const limit = Number(row?.total_limit);
+		{
+			title: 'Usage',
+			render(row) {
+				if (row?.feature?.type != FeatureType.metered) {
+					return '--';
+				}
+				const usage = Number(row?.current_usage);
+				const limit = Number(row?.total_limit);
 
-			// Handle unlimited case (limit is 0 or null)
-			if (!limit) {
+				// Handle unlimited case (limit is 0 or null)
+				if (!limit) {
+					return (
+						<Progress
+							label={`${formatAmount(usage.toString())} / Unlimited`}
+							value={100}
+							className='h-[6px]'
+							indicatorColor='bg-blue-600'
+							backgroundColor='bg-blue-200'
+						/>
+					);
+				}
+
+				// Handle case with limit
+				const value = Math.ceil((usage / limit) * 100);
+				const indicatorColor = value >= 100 ? 'bg-red-600' : 'bg-blue-600';
+				const backgroundColor = value >= 100 ? 'bg-red-50' : 'bg-blue-200';
+
 				return (
 					<Progress
-						label={`${formatAmount(usage.toString())} / Unlimited`}
-						value={100}
+						label={`${formatAmount(usage.toString())} / ${formatAmount(limit.toString())}`}
+						value={value}
 						className='h-[6px]'
-						indicatorColor='bg-blue-600'
-						backgroundColor='bg-blue-200'
+						indicatorColor={indicatorColor}
+						backgroundColor={backgroundColor}
 					/>
 				);
-			}
-
-			// Handle case with limit
-			const value = Math.ceil((usage / limit) * 100);
-			const indicatorColor = value >= 100 ? 'bg-red-600' : 'bg-blue-600';
-			const backgroundColor = value >= 100 ? 'bg-red-50' : 'bg-blue-200';
-
-			return (
-				<Progress
-					label={`${formatAmount(usage.toString())} / ${formatAmount(limit.toString())}`}
-					value={value}
-					className='h-[6px]'
-					indicatorColor={indicatorColor}
-					backgroundColor={backgroundColor}
-				/>
-			);
+			},
 		},
-	},
-];
+	];
 
-const CustomerUsageTable: FC<Props> = ({ data }) => {
 	return (
 		<div>
 			<FlexpriceTable showEmptyRow data={data} columns={columnData} />

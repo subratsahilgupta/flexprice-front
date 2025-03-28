@@ -6,6 +6,8 @@ import toast from 'react-hot-toast';
 import { ApiDocsContent, InvoicePaymentsTable } from '@/components/molecules';
 import { Page } from '@/components/atoms';
 import { EmptyPage } from '@/components/organisms';
+import GUIDES from '@/core/constants/guides';
+
 const PaymentPage = () => {
 	const { limit, offset, page } = usePagination();
 
@@ -27,7 +29,7 @@ const PaymentPage = () => {
 	}
 
 	if ((payments?.items ?? []).length === 0) {
-		return <EmptyPage title='No payments found' description='Create a payment to get started' tags={['Payments']} />;
+		return <EmptyPage tutorials={GUIDES.payments.tutorials} heading='Payments' tags={['Payments']} />;
 	}
 
 	return (

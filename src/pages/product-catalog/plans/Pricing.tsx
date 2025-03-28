@@ -12,7 +12,8 @@ import { ApiDocsContent } from '@/components/molecules';
 import { RouteNames } from '@/core/routes/Routes';
 import { EmptyPage } from '@/components/organisms';
 import { useNavigate } from 'react-router-dom';
-// Add these type definitions at the top
+import GUIDES from '@/core/constants/guides';
+
 type PriceType = {
 	currency: string;
 	billing_period: string;
@@ -233,12 +234,7 @@ const PricingPage = () => {
 
 	if ((plansData?.items ?? []).length === 0) {
 		return (
-			<EmptyPage
-				title='No plans found'
-				description='Add your first Pricing Plan'
-				onAddClick={() => navigate(RouteNames.createPlan)}
-				tags={['Plans']}
-			/>
+			<EmptyPage tutorials={GUIDES.plans.tutorials} heading='Plan' onAddClick={() => navigate(RouteNames.createPlan)} tags={['Plans']} />
 		);
 	}
 

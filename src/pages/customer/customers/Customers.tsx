@@ -1,14 +1,14 @@
-import { AddButton, Button, Loader, Page, ShortPagination, Spacer } from '@/components/atoms';
+import { AddButton, Loader, Page, ShortPagination, Spacer } from '@/components/atoms';
 import { CreateCustomerDrawer, ApiDocsContent } from '@/components/molecules';
 import CustomerTable from '@/components/molecules/Customer/CustomerTable';
 import EmptyPage from '@/components/organisms/EmptyPage/EmptyPage';
+import GUIDES from '@/core/constants/guides';
 import usePagination from '@/hooks/usePagination';
 import Customer from '@/models/Customer';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { FiFolderPlus } from 'react-icons/fi';
 
 const CustomerPage = () => {
 	const { limit, offset, page } = usePagination();
@@ -41,21 +41,15 @@ const CustomerPage = () => {
 	if (customerData?.items?.length === 0) {
 		return (
 			<>
-				<EmptyPage title='No customers added yet' description='Add a customer to get started' tags={['Customers']}>
-					<CreateCustomerDrawer
-						trigger={
-							<Button
-								onClick={() => {
-									setactiveCustomer(undefined);
-								}}
-								prefixIcon={<FiFolderPlus />}>
-								Add Customer
-							</Button>
-						}
-						open={customerDrawerOpen}
-						onOpenChange={setcustomerDrawerOpen}
-						data={activeCustomer}
-					/>
+				<EmptyPage
+					heading='Customer'
+					tags={['Customers']}
+					tutorials={GUIDES.customers.tutorials}
+					onAddClick={() => {
+						setactiveCustomer(undefined);
+						setcustomerDrawerOpen(true);
+					}}>
+					<CreateCustomerDrawer open={customerDrawerOpen} onOpenChange={setcustomerDrawerOpen} data={activeCustomer} />
 				</EmptyPage>
 			</>
 		);

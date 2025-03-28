@@ -1,16 +1,10 @@
 import { Invoice } from '@/models/Invoice';
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import FlexpriceTable, { ColumnData } from '../Table';
 import { formatDateShort, getCurrencySymbol } from '@/utils/common/helper_functions';
 import { Chip } from '@/components/atoms';
-import DropdownMenu, { DropdownMenuOption } from '../DropdownMenu';
 import { useNavigate } from 'react-router-dom';
-import InvoiceStatusModal from './InvoiceStatusModal';
-import InvoicePaymentStatusModal from './InvoicePaymentStatusModal';
-import { useMutation } from '@tanstack/react-query';
-import InvoiceApi from '@/utils/api_requests/InvoiceApi';
-import toast from 'react-hot-toast';
-
+import InvoiceTableMenu from './InvoiceTableMenu';
 export interface Props {
 	data: Invoice[];
 }
@@ -43,26 +37,6 @@ export const getPaymentStatusChip = (status: string) => {
 
 const InvoiceTable: FC<Props> = ({ data }) => {
 	const navigate = useNavigate();
-	const [state, setState] = useState<{
-		isPaymentModalOpen: boolean;
-		isStatusModalOpen: boolean;
-		activeInvoice?: Invoice;
-	}>({
-		isPaymentModalOpen: false,
-		isStatusModalOpen: false,
-	});
-
-	const { mutate: attemptPayment } = useMutation({
-		mutationFn: async (invoice_id: string) => {
-			return await InvoiceApi.attemptPayment(invoice_id);
-		},
-		onSuccess: () => {
-			toast.success('Invoice Paid');
-		},
-		onError: () => {
-			toast.error('Unable to pay invoice');
-		},
-	});
 
 	const columns: ColumnData[] = [
 		{
@@ -94,93 +68,17 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 			title: 'Due Date',
 			render: (row: Invoice) => <span>{formatDateShort(row.due_date)}</span>,
 		},
-		// {
-		// 	title: 'Issue Date',
-
-		// 	render: (row: Invoice) => <span>{formatDateShort(row.created_at)}</span>,
-		// },
 		{
 			fieldVariant: 'interactive',
 			hideOnEmpty: true,
 			render: (row: Invoice) => {
-				const menuOptions: DropdownMenuOption[] = [
-					// {
-					// 	label: 'Download Invoice',
-					// },
-					{
-						label: 'Attempt Payment',
-						onSelect: () => {
-							attemptPayment(row.id);
-						},
-						disabled: row?.payment_status === 'SUCCEEDED' || row?.invoice_status === 'VOIDED' || row.amount_remaining === '0',
-					},
-					{
-						label: 'Update Invoice Status',
-						onSelect: () => {
-							setState({
-								...state,
-								isStatusModalOpen: true,
-								activeInvoice: row,
-							});
-						},
-					},
-					{
-						label: 'Update Payment Status',
-						onSelect: () => {
-							setState({
-								...state,
-								isPaymentModalOpen: true,
-								activeInvoice: row,
-							});
-						},
-					},
-					{
-						label: 'Issue a Credit Note',
-						disabled: row?.payment_status === 'PENDING' || row?.payment_status === 'FAILED',
-						onSelect: () => {
-							navigate(`/customer-management/customers/${row?.customer_id}/invoice/${row?.id}/credit-note`);
-						},
-					},
-					{
-						label: 'View Customer',
-						onSelect: () => {
-							navigate(`/customer-management/customers/${row.customer_id}`);
-						},
-					},
-					{
-						label: 'View Subscription',
-						onSelect() {
-							navigate(`/customer-management/customers/${row.customer_id}/subscription/${row.subscription_id}`);
-						},
-					},
-				];
-				return <DropdownMenu options={menuOptions} />;
+				return <InvoiceTableMenu data={row} />;
 			},
 		},
 	];
 
 	return (
 		<div>
-			<InvoiceStatusModal
-				invoice={state.activeInvoice}
-				isOpen={state.isStatusModalOpen}
-				onOpenChange={(open) => {
-					setState({
-						...state,
-						isStatusModalOpen: open,
-					});
-				}}
-			/>
-			<InvoicePaymentStatusModal
-				invoice={state.activeInvoice}
-				isOpen={state.isPaymentModalOpen}
-				onOpenChange={(open) => {
-					setState({
-						...state,
-						isPaymentModalOpen: open,
-					});
-				}}
-			/>
 			<FlexpriceTable
 				showEmptyRow={true}
 				onRowClick={(row) => {
@@ -189,7 +87,6 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 				columns={columns}
 				data={data}
 			/>
-			{data.length === 0 && <p className=' text-[#64748B] text-xs font-normal font-sans mt-4'>No Invoices yet</p>}
 		</div>
 	);
 };

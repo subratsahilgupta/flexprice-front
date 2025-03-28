@@ -8,6 +8,7 @@ import { Plan } from '@/models/Plan';
 import usePagination from '@/hooks/usePagination';
 import { RouteNames } from '@/core/routes/Routes';
 import { EmptyPage } from '@/components/organisms';
+import GUIDES from '@/core/constants/guides';
 
 const PricingPlan = () => {
 	const { limit, offset, page } = usePagination();
@@ -42,10 +43,10 @@ const PricingPlan = () => {
 	if ((plansData?.items ?? []).length === 0) {
 		return (
 			<EmptyPage
-				title='No plans found'
-				description='Add your first Pricing Plan'
-				onAddClick={() => navigate(RouteNames.createPlan)}
+				tutorials={GUIDES.plans.tutorials}
+				heading='Pricing Plan'
 				tags={['Plans']}
+				onAddClick={() => navigate(RouteNames.createPlan)}
 			/>
 		);
 	}

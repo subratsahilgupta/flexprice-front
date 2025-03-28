@@ -14,7 +14,7 @@ interface Props {
 	data?: Customer;
 	open?: boolean;
 	onOpenChange?: (open: boolean) => void;
-	trigger: React.ReactNode;
+	trigger?: React.ReactNode;
 }
 
 const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) => {
