@@ -40,7 +40,7 @@ const EmptyPage: FC<Props> = ({ onAddClick, tags, heading, children, tutorials =
 						{tutorials.map((tutorial, index) => (
 							<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} key={index}>
 								<Card
-									className='h-full group bg-white border border-slate-100 rounded-lg p-6 hover:border-blue-100 hover:bg-slate-50 transition-all duration-200 cursor-pointer hover:shadow-lg hover:shadow-blue-500/5'
+									className='h-full group bg-white border border-slate-100 rounded-lg p-6 shadow-sm hover:border-blue-100 hover:bg-slate-50 transition-all duration-200 cursor-pointer hover:shadow-lg hover:shadow-blue-500/5'
 									onClick={tutorial.onClick}>
 									<div className='flex gap-4'>
 										<div className='flex-shrink-0 mt-1'>

@@ -14,23 +14,33 @@ const GUIDES: Record<
 		tutorials: [
 			{
 				title: 'Overview',
-				description: 'Learn about Features in Flexprice.',
+				description: 'Explore how features work in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/docs/Product%20catalogue/Features/Overview'),
 			},
 			{
 				title: 'Creating a feature',
-				description: 'Learn how to create a feature in Flexprice.',
+				description: 'Create a new feature in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/docs/Product%20catalogue/Features/Creating%20a%20feature'),
 			},
 			{
 				title: 'Link features to plans',
-				description: 'Learn how to link features to plans in Flexprice.',
+				description: 'Link features to plans in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/docs/Product%20catalogue/Features/Link%20features%20to%20plans'),
 			},
 			{
-				title: 'Use cases',
-				description: 'Learn how to use features in Flexprice.',
+				title: 'Use case: Usage based pricing',
+				description: 'Use features to implement usage-based pricing.',
 				onClick: () => openGuide('https://docs.flexprice.io/docs/Product%20catalogue/Features/Use%20cases'),
+			},
+			{
+				title: 'Use case: Open AI pricing',
+				description: 'Model OpenAI-style pricing in Flexprice.',
+				onClick: () => openGuide('https://docs.flexprice.io/docs/Product%20catalogue/Plans/Use%20cases/Clone%20Open%20AI%20pricing'),
+			},
+			{
+				title: 'Use case: Clone Cursor pricing',
+				description: 'Model Cursor-style pricing in Flexprice.',
+				onClick: () => openGuide('https://docs.flexprice.io/docs/Product%20catalogue/Plans/Use%20cases/Clone%20Cursor%20pricing'),
 			},
 		],
 	},
@@ -38,38 +48,33 @@ const GUIDES: Record<
 		tutorials: [
 			{
 				title: 'Overview',
-				description: 'Learn about Plans in Flexprice.',
+				description: 'Explore how plans work in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/docs/Product%20catalogue/Plans/Overview'),
 			},
 			{
 				title: 'Creating a plan',
-				description: 'Learn how to create a plan in Flexprice.',
+				description: 'Create a new plan in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/docs/Product%20catalogue/Plans/Creating%20a%20plan'),
 			},
 			{
-				title: 'Advance vs Arrear',
-				description: 'Learn about Advance vs Arrear in Flexprice.',
-				onClick: () => openGuide('https://docs.flexprice.io/docs/Product%20catalogue/Plans/Charges%20in%20plans/Advancevsarrear'),
-			},
-			// {
-			// 	title: "Localisation",
-			// 	description: "Learn about Localisation in Flexprice.",
-			// 	onClick: () => openGuide("https://docs.flexprice.io/docs/Product%20catalogue/Plans/Localisation"),
-			// },
-			{
 				title: 'Billing Models in plans',
-				description: 'Learn about Billing Models in plans in Flexprice.',
+				description: 'Understand billing models used in plans.',
 				onClick: () => openGuide('https://docs.flexprice.io/docs/Product%20catalogue/Plans/Charges%20in%20plans/Flat%20fee'),
 			},
 			{
-				title: 'Use cases',
-				description: 'Learn about Use cases in Flexprice.',
+				title: 'Use case: Open AI pricing',
+				description: 'Model OpenAI-style pricing in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/docs/Product%20catalogue/Plans/Use%20cases/Clone%20Open%20AI%20pricing'),
 			},
 			{
-				title: 'Archiving a plan',
-				description: 'Learn about Archiving a plan in Flexprice.',
-				onClick: () => openGuide('https://docs.flexprice.io/docs/Product%20catalogue/Plans/Archiving%20a%20plan'),
+				title: 'Use case: Clone Cursor pricing',
+				description: 'Model Cursor-style pricing in Flexprice.',
+				onClick: () => openGuide('https://docs.flexprice.io/docs/Product%20catalogue/Plans/Use%20cases/Clone%20Cursor%20pricing'),
+			},
+			{
+				title: 'Link features to plans',
+				description: 'Link features to plans in Flexprice.',
+				onClick: () => openGuide('https://docs.flexprice.io/docs/Product%20catalogue/Features/Link%20features%20to%20plans'),
 			},
 		],
 	},
@@ -77,23 +82,18 @@ const GUIDES: Record<
 		tutorials: [
 			{
 				title: 'Overview',
-				description: 'Learn about Customers in Flexprice.',
+				description: 'Explore how customers work in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/docs/Customers/Overview'),
 			},
 			{
 				title: 'Creating a customer',
-				description: 'Learn how to create a customer in Flexprice.',
+				description: 'Create a new customer in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/docs/Customers/Creating%20a%20customer'),
 			},
 			{
 				title: 'Archive a customer',
-				description: 'Learn about Archive a customer in Flexprice.',
+				description: 'Archive a customer in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/docs/Customers/Archive%20a%20customer'),
-			},
-			{
-				title: 'Use cases',
-				description: 'Learn about Use cases in Flexprice.',
-				onClick: () => openGuide('https://docs.flexprice.io/api-reference/customers/get-customer-usage-summary'),
 			},
 		],
 	},
@@ -101,17 +101,17 @@ const GUIDES: Record<
 		tutorials: [
 			{
 				title: 'Overview',
-				description: 'Learn about Invoices in Flexprice.',
+				description: 'Explore how invoices work in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/docs/Invoices/Overview'),
 			},
 			{
 				title: 'Managing Invoices',
-				description: 'Learn how to manage invoices in Flexprice.',
+				description: 'Manage invoices in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/docs/Invoices/Managing%20Invoices'),
 			},
 			{
 				title: 'Partial payments',
-				description: 'Learn about Partial payments in Flexprice.',
+				description: 'Handle partial payments in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/docs/Invoices/partial_payments'),
 			},
 		],
@@ -120,27 +120,27 @@ const GUIDES: Record<
 		tutorials: [
 			{
 				title: 'Overview',
-				description: 'Learn about Payments in Flexprice.',
+				description: 'Explore how payments work in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/api-reference/payments/list-payments'),
 			},
 			{
 				title: 'Create a new payment',
-				description: 'Learn how to create a new payment in Flexprice.',
+				description: 'Create a payment in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/api-reference/payments/create-a-new-payment'),
 			},
 			{
 				title: 'Update a payment',
-				description: 'Learn how to update a payment in Flexprice.',
+				description: 'Update an existing payment in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/api-reference/payments/update-a-payment'),
 			},
 			{
 				title: 'Delete a payment',
-				description: 'Learn how to delete a payment in Flexprice.',
+				description: 'Delete a payment in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/api-reference/payments/delete-a-payment'),
 			},
 			{
 				title: 'Process a payment',
-				description: 'Learn how to process a payment in Flexprice.',
+				description: 'Process a payment in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/api-reference/payments/process-a-payment'),
 			},
 		],
@@ -149,17 +149,17 @@ const GUIDES: Record<
 		tutorials: [
 			{
 				title: 'List API keys',
-				description: 'Learn about API keys in Flexprice.',
+				description: 'View all API keys in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/api-reference/secrets/list-api-keys'),
 			},
 			{
 				title: 'Create a new API key',
-				description: 'Learn how to create a new API key in Flexprice.',
+				description: 'Generate a new API key in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/api-reference/secrets/create-a-new-api-key'),
 			},
 			{
 				title: 'Delete an API key',
-				description: 'Learn how to delete an API key in Flexprice.',
+				description: 'Delete an API key in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/api-reference/secrets/delete-an-api-key'),
 			},
 		],
@@ -168,25 +168,26 @@ const GUIDES: Record<
 		tutorials: [
 			{
 				title: 'Overview',
-				description: 'Learn about Import and Export in Flexprice.',
+				description: 'Explore import and export options in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/api-reference/tasks/list-tasks'),
 			},
 			{
 				title: 'Import a file',
-				description: 'Learn how to import a file in Flexprice.',
+				description: 'Import a file into Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/api-reference/tasks/create-a-new-task'),
 			},
 			{
 				title: 'Process import task',
-				description: 'Learn how to process an import task in Flexprice.',
+				description: 'Process an import task in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/api-reference/tasks/process-a-task'),
 			},
 			{
 				title: 'Update import task',
-				description: 'Learn how to update an import task in Flexprice.',
+				description: 'Update an import task in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/api-reference/tasks/update-task-status'),
 			},
 		],
 	},
 };
+
 export default GUIDES;

@@ -80,7 +80,9 @@ class InvoiceApi {
 		return await AxiosClient.get(url);
 	}
 
-	public static async getInvoicePdf(invoiceId: string) {
+	public static async getInvoicePdf(invoiceId: string, invoiceNo?: string) {
+		const downloadFileName = invoiceNo ? `invoice-${invoiceNo}.pdf` : `invoice-${invoiceId}.pdf`;
+
 		const response = await fetch(`${import.meta.env.VITE_API_URL}${this.baseurl}/${invoiceId}/pdf`, {
 			headers: {
 				Authorization: `Bearer ${await AuthService.getAcessToken()}`,
@@ -100,7 +102,7 @@ class InvoiceApi {
 		// Create a temporary link element
 		const link = document.createElement('a');
 		link.href = url;
-		link.download = `invoice-${invoiceId}.pdf`;
+		link.download = downloadFileName;
 
 		// Append to body, click and remove
 		document.body.appendChild(link);
