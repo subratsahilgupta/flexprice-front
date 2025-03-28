@@ -64,13 +64,11 @@ const OnboardingPage = () => {
 					</div>
 				</div>
 				{/* Learn More Container */}
-				<div className='flex-1 w-[30%] bg-[#0B1121] rounded-[20px] relative overflow-hidden'>
+				<div className='flex-1 max-w-[35%] bg-[#0B1121] rounded-[20px] relative overflow-hidden'>
 					<iframe
-						src='https://www.loom.com/embed/60d8308781254fe0bc5be341501f9fd5'
-						frameBorder='0'
-						width='100%'
-						height='100%'
-						allowFullScreen></iframe>
+						src='https://www.loom.com/embed/60d8308781254fe0bc5be341501f9fd5?sid=c034e9a8-e243-4def-ab50-976f08d56cee&amp;hideEmbedTopBar=true&amp;hide_title=true&amp;hide_owner=true&amp;hide_speed=true&amp;hide_share=true'
+						allowFullScreen
+						style={{ position: 'absolute', width: '100%', top: 0, left: 0, height: '100%' }}></iframe>
 
 					{/* <div className='absolute inset-0'>
 						<div className='absolute inset-0 bg-gradient-to-br from-[#FF6B00]/20 via-[#B114FF]/20 to-[#3B82F6]/20'></div>
