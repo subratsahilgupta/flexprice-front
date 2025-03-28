@@ -97,7 +97,7 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ options, trigger, isOpen, o
 				</DropdownMenuTrigger>
 				<DropdownMenuContent
 					className={cn(
-						'min-w-[8rem] p-1 rounded-md border shadow-md',
+						'min-w-[8rem] p-1 rounded-md border shadow-xl',
 						'bg-popover text-popover-foreground',
 						'data-[state=open]:animate-in data-[state=closed]:animate-out',
 						'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
