@@ -10,7 +10,7 @@ import { useState } from 'react';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 import { toast } from 'react-hot-toast';
 import { EmptyPage } from '@/components/organisms';
-
+import GUIDES from '@/core/constants/guides';
 // Utility function to format permissions for display
 export const formatPermissionDisplay = (permissions: readonly string[]): string => {
 	const hasRead = permissions.includes('read');
@@ -169,7 +169,7 @@ const DeveloperPage = () => {
 
 	if (secretKeys?.items.length === 0) {
 		return (
-			<EmptyPage heading='Secret Keys' tags={['secrets']} onAddClick={handleAddSecretKey}>
+			<EmptyPage tutorials={GUIDES.secrets.tutorials} heading='Secret Keys' tags={['secrets']} onAddClick={handleAddSecretKey}>
 				<SecretKeyDrawer isOpen={isSecretKeyDrawerOpen} onOpenChange={setIsSecretKeyDrawerOpen} />
 			</EmptyPage>
 		);

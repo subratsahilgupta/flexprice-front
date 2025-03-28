@@ -2,6 +2,7 @@ import { AddButton, Loader, Page, ShortPagination, Spacer } from '@/components/a
 import { ApiDocsContent, FeatureTable } from '@/components/molecules';
 import EmptyPage from '@/components/organisms/EmptyPage/EmptyPage';
 import { RouteNames } from '@/core/routes/Routes';
+import GUIDES from '@/core/constants/guides';
 import usePagination from '@/hooks/usePagination';
 import FeatureApi from '@/utils/api_requests/FeatureApi';
 import { useQuery } from '@tanstack/react-query';
@@ -36,7 +37,14 @@ const FeaturesPage = () => {
 		toast.error('Error fetching features');
 	}
 	if (featureData?.items.length === 0) {
-		return <EmptyPage heading='Feature' onAddClick={() => navigate(RouteNames.createFeature)} tags={['Features']} />;
+		return (
+			<EmptyPage
+				heading='Feature'
+				onAddClick={() => navigate(RouteNames.createFeature)}
+				tags={['Features']}
+				tutorials={GUIDES.features.tutorials}
+			/>
+		);
 	}
 
 	return (

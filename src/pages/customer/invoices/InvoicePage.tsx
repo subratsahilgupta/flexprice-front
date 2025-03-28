@@ -5,6 +5,8 @@ import toast from 'react-hot-toast';
 import usePagination from '@/hooks/usePagination';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
 import { EmptyPage } from '@/components/organisms';
+import GUIDES from '@/core/constants/guides';
+
 const InvoicesPage = () => {
 	const { limit, offset, page } = usePagination();
 
@@ -33,7 +35,7 @@ const InvoicesPage = () => {
 	}
 
 	if ((invoiceData?.items ?? []).length === 0) {
-		return <EmptyPage heading='Invoices' tags={['Invoices']} />;
+		return <EmptyPage tutorials={GUIDES.invoices.tutorials} heading='Invoices' tags={['Invoices']} />;
 	}
 
 	return (

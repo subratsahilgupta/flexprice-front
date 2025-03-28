@@ -2,6 +2,7 @@ import { AddButton, Loader, Page, ShortPagination, Spacer } from '@/components/a
 import { CreateCustomerDrawer, ApiDocsContent } from '@/components/molecules';
 import CustomerTable from '@/components/molecules/Customer/CustomerTable';
 import EmptyPage from '@/components/organisms/EmptyPage/EmptyPage';
+import GUIDES from '@/core/constants/guides';
 import usePagination from '@/hooks/usePagination';
 import Customer from '@/models/Customer';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
@@ -43,6 +44,7 @@ const CustomerPage = () => {
 				<EmptyPage
 					heading='Customer'
 					tags={['Customers']}
+					tutorials={GUIDES.customers.tutorials}
 					onAddClick={() => {
 						setactiveCustomer(undefined);
 						setcustomerDrawerOpen(true);

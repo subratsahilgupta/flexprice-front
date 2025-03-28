@@ -236,8 +236,8 @@ const EmptyPage: FC<Props> = ({
 				<div>
 					<h2 className='text-2xl font-semibold text-slate-900 mb-6'>Quick Start Guides</h2>
 					<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5'>
-						{tutorials.map((tutorial) => (
-							<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} key={tutorial.id}>
+						{tutorials.map((tutorial, index) => (
+							<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} key={index}>
 								<Card
 									className='group bg-white border border-slate-100 rounded-lg p-6 hover:border-blue-100 hover:bg-slate-50 transition-all duration-200 cursor-pointer hover:shadow-lg hover:shadow-blue-500/5'
 									onClick={tutorial.onClick}>
