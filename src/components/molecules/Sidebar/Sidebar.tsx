@@ -57,6 +57,11 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				url: RouteNames.invoices,
 				icon: Receipt,
 			},
+			{
+				title: 'Payments',
+				url: RouteNames.payments,
+				icon: CreditCard,
+			},
 			// {
 			// 	title: 'Quotation',
 			// 	url: '/roles',
@@ -100,11 +105,6 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				// 		url: '/metering/c',
 				// 	},
 				// ],
-			},
-			{
-				title: 'Payments',
-				url: RouteNames.payments,
-				icon: CreditCard,
 			},
 		],
 	};

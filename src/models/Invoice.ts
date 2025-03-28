@@ -10,6 +10,7 @@ export interface Invoice {
 	payment_status: string;
 	billing_period: string;
 	currency: string;
+	invoice_pdf_url: string;
 	amount_due: number;
 	amount_paid: number;
 	amount_remaining: string;

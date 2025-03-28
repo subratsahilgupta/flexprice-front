@@ -36,7 +36,7 @@ import ResendVerification from '@/pages/auth/ResendVerification';
 import CustomerInformation from '@/pages/customer/tabs/CustomerInformation';
 import PricingPage from '@/pages/product-catalog/plans/Pricing';
 import OnboardingPage from '@/pages/onboarding/onboarding';
-import PaymentPage from '@/pages/usage/payments/PaymentPage';
+import PaymentPage from '@/pages/customer/payments/PaymentPage';
 import BillingPage from '@/pages/settings/Billing';
 export const RouteNames = {
 	home: '/',
@@ -56,6 +56,7 @@ export const RouteNames = {
 	customerManagement: '/customer-management',
 	customers: '/customer-management/customers',
 	invoices: '/customer-management/invoices',
+	payments: '/customer-management/payments',
 
 	// product catalog routes
 	productCatalog: '/product-catalog',
@@ -76,7 +77,6 @@ export const RouteNames = {
 	integrations: '/usage-tracking/integrations',
 	integrationDetails: '/usage-tracking/integrations',
 	importExport: '/usage-tracking/bulk-imports',
-	payments: '/usage-tracking/payments',
 
 	// footer
 	developers: '/developers',
@@ -168,10 +168,6 @@ export const MainRouter = createBrowserRouter([
 						path: RouteNames.importExport,
 						element: <ImportExport />,
 					},
-					{
-						path: RouteNames.payments,
-						element: <PaymentPage />,
-					},
 				],
 			},
 
@@ -185,6 +181,10 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: `${RouteNames.customers}/:id/add-subscription`,
 						element: <CustomerSubscription />,
+					},
+					{
+						path: RouteNames.payments,
+						element: <PaymentPage />,
 					},
 					{
 						path: `${RouteNames.customers}/:id`,

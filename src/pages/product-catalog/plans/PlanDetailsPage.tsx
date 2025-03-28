@@ -264,7 +264,14 @@ const PlanDetailsPage = () => {
 
 				{planData.entitlements?.length || 0 > 0 ? (
 					<Card variant='notched'>
-						<CardHeader title='Entitlements' />
+						<CardHeader
+							title='Entitlements'
+							cta={
+								<Button prefixIcon={<Plus />} onClick={() => setdrawerOpen(true)}>
+									Add
+								</Button>
+							}
+						/>
 						<FlexpriceTable showEmptyRow data={planData.entitlements || []} columns={columnData} />
 					</Card>
 				) : (

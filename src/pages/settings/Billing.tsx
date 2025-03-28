@@ -1,4 +1,4 @@
-import { Card, CardHeader, FormHeader, Loader, NoDataCard, Page } from '@/components/atoms';
+import { Card, CardHeader, FormHeader, Loader, Page } from '@/components/atoms';
 import { Detail, DetailsCard, FlatTabs } from '@/components/molecules';
 import { ApiDocsContent } from '@/components/molecules';
 import CustomerUsageTable from '@/components/molecules/CustomerUsageTable/CustomerUsageTable';
@@ -83,7 +83,6 @@ const BillingPage = () => {
 									<CardHeader title='Usage' />
 									<CustomerUsageTable data={data?.usage.features ?? []} />
 								</Card>
-								<NoDataCard title='Invoices' subtitle='No invoices found' />
 							</div>
 						),
 					},
