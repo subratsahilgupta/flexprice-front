@@ -96,7 +96,7 @@ const DebugMenu = () => {
 					<TooltipTrigger asChild>
 						<Button
 							variant='outline'
-							className='fixed bottom-6 right-6 size-10 z-[100] shadow-sm hover:shadow-md transition-all'
+							className='fixed bottom-6 right-6 size-10 z-[100] shadow-sm hover:shadow-md transition-all bg-white'
 							onClick={() => setIsOpen(!isOpen)}>
 							{isStreaming ? (
 								<div className='relative'>
