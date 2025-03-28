@@ -1,10 +1,11 @@
 import { Invoice } from '@/models/Invoice';
 import { FC } from 'react';
-import FlexpriceTable, { ColumnData } from '../Table';
+import FlexpriceTable, { ColumnData, RedirectCell } from '../Table';
 import { formatDateShort, getCurrencySymbol } from '@/utils/common/helper_functions';
 import { Chip } from '@/components/atoms';
 import { useNavigate } from 'react-router-dom';
 import InvoiceTableMenu from './InvoiceTableMenu';
+import { RouteNames } from '@/core/routes/Routes';
 export interface Props {
 	data: Invoice[];
 }
@@ -54,7 +55,9 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 		},
 		{
 			title: 'Customer Slug',
-			render: (row: Invoice) => <span>{row.customer?.external_id}</span>,
+			render: (row: Invoice) => (
+				<RedirectCell redirectUrl={`${RouteNames.customers}/${row.customer?.id}`}>{row.customer?.external_id}</RedirectCell>
+			),
 		},
 		// {
 		// 	title: 'Billing Interval',

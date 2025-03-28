@@ -9,7 +9,9 @@ import { useQuery } from '@tanstack/react-query';
 import { Download } from 'lucide-react';
 import { FC, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-
+import { Link } from 'react-router-dom';
+import { RouteNames } from '@/core/routes/Routes';
+import { cn } from '@/lib/utils';
 interface Props {
 	invoice_id: string;
 	breadcrumb_index: number;
@@ -135,7 +137,9 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 
 					<div>
 						<FormHeader className='!mb-2' title='Bill to' variant='sub-header' titleClassName='font-semibold' />
-						<p className={customerInfoClass}>{data?.customer?.name || '--'}</p>
+						<Link to={`${RouteNames.customers}/${data?.customer?.id}`} className={cn(customerInfoClass, 'hover:underline')}>
+							{data?.customer?.name || '--'}
+						</Link>
 						<p className={customerInfoClass}>{data?.customer?.email || '--'}</p>
 						<p className={customerInfoClass}>{customerAddress || '--'}</p>
 					</div>

@@ -1,5 +1,5 @@
 import { CardHeader, Loader, NoDataCard } from '@/components/atoms';
-import { CustomerInvoiceTable } from '@/components/molecules';
+import { ApiDocsContent, CustomerInvoiceTable } from '@/components/molecules';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -32,10 +32,13 @@ const Invoice = () => {
 	}
 
 	return (
-		<Card variant='notched'>
-			<CardHeader title='Invoices' />
-			<CustomerInvoiceTable onRowClick={handleShowDetails} customerId={customerId} data={data?.items ?? []} />
-		</Card>
+		<div>
+			<ApiDocsContent tags={['Invoices']} />
+			<Card variant='notched'>
+				<CardHeader title='Invoices' />
+				<CustomerInvoiceTable onRowClick={handleShowDetails} customerId={customerId} data={data?.items ?? []} />
+			</Card>
+		</div>
 	);
 };
 

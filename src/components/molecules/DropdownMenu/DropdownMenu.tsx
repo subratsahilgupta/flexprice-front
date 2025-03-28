@@ -1,5 +1,13 @@
 import { BsThreeDotsVertical } from 'react-icons/bs';
-import { DropdownMenu as ShadcnMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+	DropdownMenu as ShadcnMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+	DropdownMenuGroup,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -20,6 +28,7 @@ export interface DropdownMenuOption {
 	disabled?: boolean;
 	children?: DropdownMenuOption[];
 	className?: string;
+	group?: string;
 }
 
 const DropdownMenu: React.FC<DropdownMenuProps> = ({ options, trigger, isOpen, onOpenChange, dir = 'ltr', className, align = 'end' }) => {
@@ -28,46 +37,87 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ options, trigger, isOpen, o
 		e.stopPropagation();
 	};
 
+	// Group options by their group property
+	const groupedOptions = options.reduce(
+		(acc, option) => {
+			const group = option.group || 'default';
+			if (!acc[group]) {
+				acc[group] = [];
+			}
+			acc[group].push(option);
+			return acc;
+		},
+		{} as Record<string, DropdownMenuOption[]>,
+	);
+
+	const renderMenuItem = (option: DropdownMenuOption) => (
+		<DropdownMenuItem
+			className={cn(
+				'w-full px-3 py-2 text-sm cursor-pointer hover:bg-accent/50 focus:bg-accent/50 focus:text-accent-foreground',
+				option.disabled && 'opacity-50 cursor-not-allowed',
+				option.className,
+			)}
+			disabled={option.disabled}
+			key={option.label}
+			onSelect={(e) => {
+				if (option.onSelect && !option.children?.length) {
+					option.onSelect(e);
+				}
+			}}>
+			{option.children && option.children.length > 0 ? (
+				<DropdownMenu
+					className={cn('w-full', className)}
+					trigger={
+						<div className='flex justify-between gap-2 items-center w-full'>
+							<div className='flex gap-2 items-center w-full'>
+								{option.icon && <span className='text-muted-foreground'>{option.icon}</span>}
+								<span className='font-medium'>{option.label}</span>
+							</div>
+							<span className='text-muted-foreground'>
+								<ChevronRight className='h-4 w-4' />
+							</span>
+						</div>
+					}
+					options={option.children || []}
+				/>
+			) : (
+				<div className={cn('flex gap-2 items-center w-full', option.className)}>
+					{option.icon && <span className='text-muted-foreground'>{option.icon}</span>}
+					<span className='font-medium'>{option.label}</span>
+				</div>
+			)}
+		</DropdownMenuItem>
+	);
+
 	return (
 		<div className={cn('', className)} onClick={handleClick} data-interactive='true'>
 			<ShadcnMenu dir={dir} onOpenChange={onOpenChange} open={isOpen}>
-				<DropdownMenuTrigger className='w-full'>{trigger || <BsThreeDotsVertical className='text-base ' />}</DropdownMenuTrigger>
-				<DropdownMenuContent className='mr-6 w-full' align={align}>
-					{options.map((option, index) => (
-						<DropdownMenuItem
-							className={cn('w-full', option.className)}
-							disabled={option.disabled}
-							key={index}
-							onSelect={(e) => {
-								// e.preventDefault();
-								if (option.onSelect && !option.children?.length) {
-									option.onSelect(e);
-								}
-							}}>
-							{option.children && option.children.length > 0 ? (
-								<DropdownMenu
-									className={cn('w-full', className)}
-									trigger={
-										<div className='flex justify-between gap-2 items-center w-full'>
-											<div className='flex gap-2 items-center w-full'>
-												{option.icon}
-												<span>{option.label}</span>
-											</div>
-
-											<span>
-												<ChevronRight />
-											</span>
-										</div>
-									}
-									options={option.children || []}
-								/>
-							) : (
-								<div className={cn('flex gap-2 items-center w-full', option.className)}>
-									{option.icon}
-									<span>{option.label}</span>
-								</div>
+				<DropdownMenuTrigger className='w-full focus:outline-none rounded-md'>
+					{trigger || <BsThreeDotsVertical className='text-base text-muted-foreground hover:text-foreground transition-colors' />}
+				</DropdownMenuTrigger>
+				<DropdownMenuContent
+					className={cn(
+						'min-w-[8rem] p-1 rounded-md border shadow-md',
+						'bg-popover text-popover-foreground',
+						'data-[state=open]:animate-in data-[state=closed]:animate-out',
+						'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+						'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
+						'data-[side=bottom]:slide-in-from-top-2',
+						'data-[side=left]:slide-in-from-right-2',
+						'data-[side=right]:slide-in-from-left-2',
+						'data-[side=top]:slide-in-from-bottom-2',
+					)}
+					align={align}>
+					{Object.entries(groupedOptions).map(([group, groupOptions], groupIndex) => (
+						<DropdownMenuGroup key={group} className='px-1'>
+							{group !== 'default' && (
+								<>
+									<DropdownMenuLabel className='px-2 py-1.5 text-xs font-semibold text-muted-foreground'>{group}</DropdownMenuLabel>
+									{groupIndex > 0 && <DropdownMenuSeparator className='my-1' />}
+								</>
 							)}
-						</DropdownMenuItem>
+							{groupOptions.map((option) => renderMenuItem(option))}
+						</DropdownMenuGroup>
 					))}
 				</DropdownMenuContent>
 			</ShadcnMenu>

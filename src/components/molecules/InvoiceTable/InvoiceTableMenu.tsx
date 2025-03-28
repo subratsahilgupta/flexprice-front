@@ -53,12 +53,14 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 	const menuOptions: DropdownMenuOption[] = [
 		{
 			label: 'Download Invoice',
+			group: 'Actions',
 			onSelect: () => {
 				downloadInvoice(data.id);
 			},
 		},
 		{
 			label: 'Attempt Payment',
+			group: 'Actions',
 			onSelect: () => {
 				attemptPayment(data.id);
 			},
@@ -66,6 +68,7 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 		},
 		{
 			label: 'Update Invoice Status',
+			group: 'Actions',
 			onSelect: () => {
 				setState({
 					...state,
@@ -76,6 +79,7 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 		},
 		{
 			label: 'Update Payment Status',
+			group: 'Actions',
 			onSelect: () => {
 				setState({
 					...state,
@@ -86,6 +90,7 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 		},
 		{
 			label: 'Issue a Credit Note',
+			group: 'Actions',
 			disabled: data?.payment_status === 'PENDING' || data?.payment_status === 'FAILED',
 			onSelect: () => {
 				navigate(`/customer-management/customers/${data?.customer_id}/invoice/${data?.id}/credit-note`);
@@ -93,12 +98,14 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 		},
 		{
 			label: 'View Customer',
+			group: 'Connections',
 			onSelect: () => {
 				navigate(`/customer-management/customers/${data.customer_id}`);
 			},
 		},
 		{
 			label: 'View Subscription',
+			group: 'Connections',
 			onSelect() {
 				navigate(`/customer-management/customers/${data.customer_id}/subscription/${data.subscription_id}`);
 			},
