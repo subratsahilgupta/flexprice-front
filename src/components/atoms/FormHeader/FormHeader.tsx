@@ -1,9 +1,9 @@
 import { cn } from '@/lib/utils';
 import { getTypographyClass } from '@/lib/typography';
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 
 interface Props {
-	title?: string;
+	title?: ReactNode;
 	subtitle?: string;
 	variant: 'form-component-title' | 'sub-header' | 'form-title' | 'default' | 'subtitle' | 'card-title';
 	className?: string;

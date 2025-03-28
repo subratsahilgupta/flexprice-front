@@ -12,6 +12,7 @@ import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import { RouteNames } from '@/core/routes/Routes';
 import { cn } from '@/lib/utils';
+import { getPaymentStatusChip } from '@/components/molecules/InvoiceTable/InvoiceTable';
 interface Props {
 	invoice_id: string;
 	breadcrumb_index: number;
@@ -102,7 +103,16 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 			<div ref={invoiceref} className=' rounded-xl border border-gray-300 p-6'>
 				<div className='p-4'>
 					<div className='w-full flex justify-between items-center'>
-						<FormHeader title='Invoice Details' variant='sub-header' titleClassName='font-semibold' />
+						<FormHeader
+							title={
+								<span className='flex items-center gap-2'>
+									Invoice Details
+									{getPaymentStatusChip(data?.payment_status ?? '')}
+								</span>
+							}
+							variant='sub-header'
+							titleClassName='font-semibold'
+						/>
 						<div className='flex gap-4 items-center'>
 							<Button data-html2canvas-ignore='true' onClick={handleDownlaod}>
 								<Download />
