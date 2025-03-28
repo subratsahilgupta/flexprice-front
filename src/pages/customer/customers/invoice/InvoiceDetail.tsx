@@ -3,7 +3,6 @@ import { InvoiceTableMenu, InvoicePaymentStatusModal, InvoiceStatusModal, Invoic
 import useUser from '@/hooks/useUser';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
-import { captureToPdf } from '@/utils/common/component_to_pdf';
 import formatDate from '@/utils/common/format_date';
 import { useQuery } from '@tanstack/react-query';
 import { Download } from 'lucide-react';
@@ -69,7 +68,7 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 		user?.tenant.billing_details.address.address_country;
 
 	const handleDownlaod = () => {
-		captureToPdf(invoiceref, 'invoice');
+		InvoiceApi.getInvoicePdf(invoice_id);
 	};
 
 	if (isLoading) return <Loader />;
