@@ -46,7 +46,7 @@ const useQueryParams = <T extends Record<string, string>>(initialParams: T = {} 
 				pathname: location.pathname,
 				search: `?${searchParams.toString()}`,
 			},
-			{ replace: true },
+			// { replace: true },
 		);
 
 		// Update the local state
