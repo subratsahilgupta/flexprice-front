@@ -11,7 +11,7 @@ import formatDate from '@/utils/common/format_date';
 import { getPriceTypeLabel } from '@/utils/common/helper_functions';
 import { getPriceTableCharge } from '@/utils/models/transformed_plan';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { EyeOff, Plus } from 'lucide-react';
+import { EyeOff, Info, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -19,6 +19,8 @@ import { Card } from '@/components/atoms';
 import formatChips from '@/utils/common/format_chips';
 import { getFeatureTypeChips } from '@/components/molecules/CustomerUsageTable/CustomerUsageTable';
 import { formatAmount } from '@/components/atoms/Input/Input';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { getCurrencySymbol } from '@/utils/common/helper_functions';
 
 const formatBillingPeriod = (billingPeriod: string) => {
 	switch (billingPeriod.toUpperCase()) {
@@ -53,17 +55,6 @@ const formatInvoiceCadence = (cadence: string): string => {
 type Params = {
 	planId: string;
 };
-
-// const formatInvoiceCadence = (cadence: string): string => {
-// 	switch (cadence.toUpperCase()) {
-// 		case 'ADVANCE':
-// 			return 'Advance';
-// 		case 'ARREAR':
-// 			return 'Arrear';
-// 		default:
-// 			return '';
-// 	}
-// };
 
 const chargeColumns: ColumnData<Price>[] = [
 	{
@@ -118,7 +109,67 @@ const getFeatureValue = (entitlement: ExtendedEntitlement) => {
 };
 const ValueCell = ({ data }: { data: Price }) => {
 	const price = getPriceTableCharge(data as any, false);
-	return <div>{price}</div>;
+	const tiers = data.tiers as unknown as Array<{
+		up_to: number | null;
+		unit_amount: string;
+		flat_amount: string;
+	}> | null;
+	const isTiered = data.billing_model === 'TIERED' && Array.isArray(tiers) && tiers.length > 0;
+
+	const formatRange = (tier: any, index: number, allTiers: any[]) => {
+		// Calculate 'from' based on previous tier's up_to
+		const from = index === 0 ? 1 : allTiers[index - 1].up_to + 1;
+
+		// For the last tier or when up_to is null, show infinity
+		if (tier.up_to === null || index === allTiers.length - 1) {
+			return `${from} - ∞`;
+		}
+		return `${from} - ${tier.up_to}`;
+	};
+
+	return (
+		<div className='flex items-center gap-2'>
+			<div>{price}</div>
+			{isTiered && (
+				<TooltipProvider delayDuration={0}>
+					<Tooltip>
+						<TooltipTrigger>
+							<Info className='h-4 w-4 text-gray-400 hover:text-gray-500 transition-colors duration-150' />
+						</TooltipTrigger>
+						<TooltipContent
+							sideOffset={5}
+							className='bg-white border border-gray-200 shadow-lg text-sm text-gray-900 px-4 py-3 rounded-lg max-w-[320px]'>
+							<div className='space-y-3'>
+								{/* <div className="font-medium text-base text-gray-900">Volume Pricing</div> */}
+								<div className='space-y-2 '>
+									{tiers.map((tier, index) => (
+										<div key={index} className='flex flex-col gap-1'>
+											<div className='flex items-center justify-between gap-6'>
+												<div className='!font-normal text-muted-foreground'>{formatRange(tier, index, tiers)} units</div>
+												<div className='text-right'>
+													<div className='!font-normal text-muted-foreground'>
+														{getCurrencySymbol(data.currency)}
+														{formatAmount(tier.unit_amount)} per unit
+													</div>
+													{Number(tier.flat_amount) > 0 && (
+														<div className='text-xs text-gray-500'>
+															+ {getCurrencySymbol(data.currency)}
+															{formatAmount(tier.flat_amount)} flat fee
+														</div>
+													)}
+												</div>
+											</div>
+											{index < tiers.length - 1 && <div className='h-px bg-gray-100' />}
+										</div>
+									))}
+								</div>
+							</div>
+						</TooltipContent>
+					</Tooltip>
+				</TooltipProvider>
+			)}
+		</div>
+	);
 };
 
 const PlanDetailsPage = () => {
@@ -167,12 +218,6 @@ const PlanDetailsPage = () => {
 				return <RedirectCell redirectUrl={`${RouteNames.featureDetails}/${row?.feature?.id}`}>{row?.feature?.name}</RedirectCell>;
 			},
 		},
-		// {
-		// 	title: 'Meter',
-		// 	render(row) {
-		// 		return row?.feature.meter?.name ?? '--';
-		// 	},
-		// },
 		{
 			title: 'Type',
 

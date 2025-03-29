@@ -59,7 +59,7 @@ const Overview = () => {
 					/>
 				</Card>
 			) : (
-				<NoDataCard title='Subscriptions' subtitle='No Active Subscriptions Yet' cta={<AddButton onClick={handleAddSubscription} />} />
+				<NoDataCard title='Subscriptions' subtitle='No active subscriptions' cta={<AddButton onClick={handleAddSubscription} />} />
 			)}
 
 			{/* customer entitlements table */}

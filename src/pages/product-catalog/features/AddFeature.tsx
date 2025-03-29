@@ -9,13 +9,12 @@ import { Meter } from '@/models/Meter';
 import FeatureApi from '@/utils/api_requests/FeatureApi';
 import { MeterApi } from '@/utils/api_requests/MeterApi';
 import { useMutation } from '@tanstack/react-query';
-import { Gauge, SquareCheckBig, Wrench } from 'lucide-react';
+import { CirclePlus, Gauge, SquareCheckBig, Wrench } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { LuCircleFadingPlus } from 'react-icons/lu';
 import { LuRefreshCw } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
-import { ReactSVG } from 'react-svg';
 import { v4 as uuidv4 } from 'uuid';
 import { z } from 'zod';
 
@@ -381,7 +380,7 @@ const AddFeaturePage = () => {
 									setstate((prev) => ({ ...prev, showDescription: true }));
 								}}
 								className='p-4 h-9 cursor-pointer flex gap-2 items-center bg-[#F4F4F5] rounded-md'>
-								<ReactSVG src='/assets/svg/CirclePlus.svg' />
+								<CirclePlus />
 								<p className='text-[#18181B] text-sm font-medium'>{'Add Feature Description'}</p>
 							</button>
 						) : (
@@ -526,8 +525,8 @@ const AddFeaturePage = () => {
 				{/* right section */}
 				<div className={cn('flex-F[3] max-w-lg  relative')}>
 					{data.type === featureTypeOptions[1].value && (
-						<div className='sticky  top-24 float-right'>
-							<CodePreview title='Event Example' className='sticky top-24' code={curlCommand} language='js' />
+						<div className='sticky  top-16 float-right'>
+							<CodePreview title='Event Example' className='sticky top-0' code={curlCommand} language='js' />
 						</div>
 					)}
 				</div>

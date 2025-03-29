@@ -1,22 +1,17 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import FlexpriceTable, { ColumnData, TooltipCell } from '../Table';
 import { formatDateWithMilliseconds } from '@/utils/common/format_date';
+import EventPropertiesDrawer from './EventPropertiesDrawer';
+import { Event } from '@/models/Event';
 
 interface Props {
 	data: Event[];
 }
 
-export interface Event {
-	readonly customer_id: string;
-	readonly event_name: string;
-	readonly external_customer_id: string;
-	readonly id: string;
-	readonly properties: Record<string, any>;
-	readonly source: string;
-	readonly timestamp: string;
-}
-
 const EventsTable: FC<Props> = ({ data }) => {
+	const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
 	const columns: ColumnData[] = [
 		{
 			title: 'Event Id',
@@ -47,9 +42,16 @@ const EventsTable: FC<Props> = ({ data }) => {
 			},
 		},
 	];
+
+	const handleRowClick = (event: Event) => {
+		setSelectedEvent(event);
+		setIsDrawerOpen(true);
+	};
+
 	return (
 		<div>
-			<FlexpriceTable showEmptyRow columns={columns} data={data} />
+			<FlexpriceTable showEmptyRow columns={columns} data={data} onRowClick={handleRowClick} />
+			<EventPropertiesDrawer isOpen={isDrawerOpen} onOpenChange={setIsDrawerOpen} event={selectedEvent} />
 		</div>
 	);
 };

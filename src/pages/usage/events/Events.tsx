@@ -94,6 +94,7 @@ const EventsPage: React.FC = () => {
 	return (
 		<Page heading='Events'>
 			<ApiDocsContent tags={['Events']} />
+
 			<div className='bg-white my-6 rounded-md  mb-6'>
 				<div className='w-full flex items-end gap-4'>
 					<DateRangePicker

@@ -90,8 +90,7 @@ const QueryPage = () => {
 
 					{/* Meter Selection */}
 					<SelectMeter
-						label='Meter name'
-						placeholder='Select Meter'
+						placeholder='Select Feature'
 						onChange={(value) => setPayload({ ...payload, meter_id: value.id })}
 						value={payload.meter_id}
 					/>

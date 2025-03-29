@@ -24,7 +24,7 @@ const DebugMenu = () => {
 
 	// Fetch first customer
 	const { data: customerData, isLoading: isCustomerLoading } = useQuery({
-		queryKey: ['debug-customers', 1, 0],
+		queryKey: ['debug-customers'],
 		queryFn: async () => {
 			return await CustomerApi.getAllCustomers({ limit: 1, offset: 0 });
 		},
