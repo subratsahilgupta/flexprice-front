@@ -107,7 +107,7 @@ const getFeatureValue = (entitlement: ExtendedEntitlement) => {
 			return '--';
 	}
 };
-const ValueCell = ({ data }: { data: Price }) => {
+export const ValueCell = ({ data }: { data: Price }) => {
 	const price = getPriceTableCharge(data as any, false);
 	const tiers = data.tiers as unknown as Array<{
 		up_to: number | null;
@@ -140,7 +140,7 @@ const ValueCell = ({ data }: { data: Price }) => {
 							sideOffset={5}
 							className='bg-white border border-gray-200 shadow-lg text-sm text-gray-900 px-4 py-3 rounded-lg max-w-[320px]'>
 							<div className='space-y-3'>
-								{/* <div className="font-medium text-base text-gray-900">Volume Pricing</div> */}
+								<div className='font-medium border-b border-spacing-1 border-gray-200 pb-2 text-base text-gray-900'>Volume Pricing</div>
 								<div className='space-y-2 '>
 									{tiers.map((tier, index) => (
 										<div key={index} className='flex flex-col gap-1'>

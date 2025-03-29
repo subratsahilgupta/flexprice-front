@@ -1,9 +1,10 @@
 import { FC, useState } from 'react';
 import { ColumnData, FlexpriceTable } from '@/components/molecules';
-import { getPriceTableCharge, NormalizedPlan } from '@/utils/models/transformed_plan';
+import { NormalizedPlan } from '@/utils/models/transformed_plan';
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 import { FormHeader } from '@/components/atoms';
 import { motion } from 'framer-motion';
+import { ValueCell } from '@/pages/product-catalog/plans/PlanDetailsPage';
 
 export type ChargesForBillingPeriod = NormalizedPlan['charges'][string][string];
 export type ChargesForBillingPeriodOne = ChargesForBillingPeriod[0];
@@ -13,10 +14,12 @@ export interface Props {
 }
 
 const ChargeTable: FC<Props> = ({ data }) => {
+	console.log(data);
+
 	const mappedData = (data ?? []).map((charge) => ({
 		charge: charge.meter_name ? `${charge.meter_name}` : charge.name,
 		quantity: charge.type === 'FIXED' ? '1' : 'pay as you go',
-		price: getPriceTableCharge(charge),
+		price: <ValueCell data={{ ...charge, currency: charge.currency } as any} />,
 	}));
 
 	const [showAllRows, setShowAllRows] = useState(false);
