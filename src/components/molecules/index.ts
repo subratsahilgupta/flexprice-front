@@ -75,3 +75,5 @@ export { default as InvoicePaymentsTable } from './InvoicePaymentsTable';
 export { FlatTabs, CustomTabs } from './Tabs';
 
 export { default as EditPlanDrawer } from './EditPlanDrawer';
+
+export { default as UpdateTenantDrawer } from './Tenant/UpdateTenantDrawer';

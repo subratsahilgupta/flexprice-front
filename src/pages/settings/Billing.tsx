@@ -7,7 +7,7 @@ import useUser from '@/hooks/useUser';
 import TenantApi from '@/utils/api_requests/TenantApi';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import UpdateTenantDrawer from '@/components/molecules/Tenant/UpdateTenantDrawer';
+import { UpdateTenantDrawer } from '@/components/molecules';
 import { useState } from 'react';
 import { Pencil } from 'lucide-react';
 
