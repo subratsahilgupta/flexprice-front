@@ -1,4 +1,4 @@
-import { Card, CardHeader, FormHeader, Loader, Page } from '@/components/atoms';
+import { Card, CardHeader, FormHeader, Loader, Page, Button } from '@/components/atoms';
 import { Detail, DetailsCard, FlatTabs } from '@/components/molecules';
 import { ApiDocsContent } from '@/components/molecules';
 import CustomerUsageTable from '@/components/molecules/CustomerUsageTable/CustomerUsageTable';
@@ -7,8 +7,12 @@ import useUser from '@/hooks/useUser';
 import TenantApi from '@/utils/api_requests/TenantApi';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
+import UpdateTenantDrawer from '@/components/molecules/Tenant/UpdateTenantDrawer';
+import { useState } from 'react';
+import { Pencil } from 'lucide-react';
 
 const BillingPage = () => {
+	const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
 	const { data, isLoading, isError } = useQuery({
 		queryKey: ['billing'],
 		queryFn: () => {
@@ -99,14 +103,18 @@ const BillingPage = () => {
 							</div>
 						),
 					},
-
 					{
 						value: 'information',
 						label: 'General',
 						content: (
 							<div className='space-y-6'>
 								{/* billing email */}
-								<FormHeader title={'Billing Details'} variant='form-component-title' />
+								<div className='flex items-center justify-between'>
+									<FormHeader title={'Billing Details'} variant='form-component-title' />
+									<Button variant='outline' size='sm' onClick={() => setIsEditDrawerOpen(true)}>
+										<Pencil className='size-4' />
+									</Button>
+								</div>
 								<DetailsCard variant='stacked' data={billingDetails} childrenAtTop cardStyle='borderless'></DetailsCard>
 							</div>
 						),
@@ -121,6 +129,8 @@ const BillingPage = () => {
 					</div>
 				</Card> */}
 			</div>
+
+			<UpdateTenantDrawer data={user} open={isEditDrawerOpen} onOpenChange={setIsEditDrawerOpen} />
 		</Page>
 	);
 };
