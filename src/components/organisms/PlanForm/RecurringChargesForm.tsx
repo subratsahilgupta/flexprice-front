@@ -1,20 +1,21 @@
 import { useState } from 'react';
-import { Pencil, Trash2 } from 'lucide-react';
-import { formatBillingPeriodForPrice, getCurrencySymbol, toSentenceCase } from '@/utils/common/helper_functions';
+import { formatBillingPeriodForPrice, getCurrencySymbol } from '@/utils/common/helper_functions';
 import { billlingPeriodOptions, currencyOptions } from '@/core/data/constants';
 import { InternalPrice } from './SetupChargesSection';
 import { CheckboxRadioGroup, FormHeader, Input, Spacer, Button, Select } from '@/components/atoms';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import RecurringChargePreview from './RecurringChargePreview';
+
 interface Props {
 	price: Partial<InternalPrice>;
 	onAdd: (price: Partial<InternalPrice>) => void;
 	onUpdate: (price: Partial<InternalPrice>) => void;
-	onDelete: () => void;
-	isEdit: boolean;
+	onEditClicked: () => void;
+	onDeleteClicked: () => void;
 }
 
-const RecurringChargesForm = ({ price, onAdd, onUpdate, onDelete, isEdit }: Props) => {
+const RecurringChargesForm = ({ price, onAdd, onUpdate, onEditClicked, onDeleteClicked }: Props) => {
 	const [localPrice, setLocalPrice] = useState<Partial<InternalPrice>>(price);
 	const [errors, setErrors] = useState<Partial<Record<keyof InternalPrice, string>>>({});
 
@@ -46,7 +47,7 @@ const RecurringChargesForm = ({ price, onAdd, onUpdate, onDelete, isEdit }: Prop
 	const handleSubmit = () => {
 		if (!validate()) return;
 
-		if (isEdit) {
+		if (price.internal_state === 'edit') {
 			onUpdate({
 				...localPrice,
 				isEdit: false,
@@ -59,44 +60,8 @@ const RecurringChargesForm = ({ price, onAdd, onUpdate, onDelete, isEdit }: Prop
 		}
 	};
 
-	const handleCancel = () => {
-		if (isEdit) {
-			onUpdate({
-				...price,
-				isEdit: false,
-			});
-		} else {
-			onDelete();
-		}
-	};
-
-	if (!isEdit) {
-		return (
-			<div className='gap-2 w-full flex justify-between group min-h-9 items-center rounded-md border bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground hover:bg-gray-50 transition-colors mb-2'>
-				<div>
-					<p className='font-normal text-sm'>Recurring Charge</p>
-					<div className='flex gap-2 items-center text-zinc-500 text-xs'>
-						<span>{localPrice.currency}</span>
-						<span>•</span>
-						<span>{toSentenceCase(localPrice.billing_period || '')}</span>
-						<span>•</span>
-						<span>
-							{getCurrencySymbol(localPrice.currency || '')}
-							{localPrice.amount} / {formatBillingPeriodForPrice(localPrice.billing_period || '')}
-						</span>
-					</div>
-				</div>
-				<span className='text-[#18181B] flex gap-2 items-center opacity-0 group-hover:opacity-100 transition-opacity'>
-					<button onClick={() => onUpdate({ ...localPrice, isEdit: true })} className='p-1 hover:bg-gray-100 rounded-md'>
-						<Pencil size={16} />
-					</button>
-					<div className='border-r h-[16px] border-[#E4E4E7]' />
-					<button onClick={onDelete} className='p-1 hover:bg-gray-100 rounded-md text-red-500'>
-						<Trash2 size={16} />
-					</button>
-				</span>
-			</div>
-		);
+	if (price.internal_state === 'saved') {
+		return <RecurringChargePreview charge={price} onEditClicked={onEditClicked} onDeleteClicked={onDeleteClicked} />;
 	}
 
 	return (
@@ -188,11 +153,11 @@ const RecurringChargesForm = ({ price, onAdd, onUpdate, onDelete, isEdit }: Prop
 			)}
 			<Spacer height={'16px'} />
 			<div className='flex justify-end'>
-				<Button onClick={handleCancel} variant='secondary' className='mr-4 text-zinc-900'>
-					Cancel
+				<Button onClick={onDeleteClicked} variant='secondary' className='mr-4 text-zinc-900'>
+					{price.internal_state === 'edit' ? 'Delete' : 'Cancel'}
 				</Button>
 				<Button onClick={handleSubmit} variant='default' className='mr-4 font-normal'>
-					Add
+					{price.internal_state === 'edit' ? 'Update' : 'Add'}
 				</Button>
 			</div>
 		</div>

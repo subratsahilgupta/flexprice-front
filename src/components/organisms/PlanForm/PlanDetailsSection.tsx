@@ -4,16 +4,12 @@ interface Props {
 	plan: Partial<Plan>;
 	setPlanField: <K extends keyof Plan>(field: K, value: Plan[K]) => void;
 	errors: Partial<Record<keyof Plan, string>>;
+	isEdit?: boolean;
 }
 
-const PlanDetailsSection = ({ plan, setPlanField, errors }: Props) => {
+const PlanDetailsSection = ({ plan, setPlanField, errors, isEdit = false }: Props) => {
 	return (
 		<div className='p-6  rounded-xl border border-[#E4E4E7]'>
-			{/* <FormHeader
-				title={'Plan Details'}
-				subtitle={'Provide details about your pricing plan to help organize and track event data efficiently.'}
-				variant='sub-header'
-			/> */}
 			<Input
 				placeholder='Enter a name for the plan'
 				description={'A descriptive name for this pricing plan.'}
@@ -29,6 +25,7 @@ const PlanDetailsSection = ({ plan, setPlanField, errors }: Props) => {
 			<Spacer height={'20px'} />
 			<Input
 				label='Lookup Key'
+				disabled={isEdit}
 				error={errors.lookup_key}
 				onChange={(e) => setPlanField('lookup_key', e)}
 				value={plan.lookup_key}

@@ -60,7 +60,7 @@ export { default as EnvironmentSelector } from './EnvironmentSelector';
 
 export { default as SecretKeyDrawer } from './SecretKeyDrawer';
 
-export { default as SubscriptionPauseWarning } from './SubscriptionPauseWarning';
+export { default as SubscriptionPauseWarning } from './CustomerSubscription/SubscriptionPauseWarning';
 
 export { default as DebugMenu } from './DebugMenu';
 
@@ -73,3 +73,5 @@ export { default as CustomerEntitlementTable } from './CustomerUsageTable';
 export { default as InvoicePaymentsTable } from './InvoicePaymentsTable';
 
 export { FlatTabs, CustomTabs } from './Tabs';
+
+export { default as EditPlanDrawer } from './EditPlanDrawer';

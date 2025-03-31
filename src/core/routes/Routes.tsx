@@ -38,6 +38,7 @@ import PricingPage from '@/pages/product-catalog/plans/Pricing';
 import OnboardingPage from '@/pages/onboarding/onboarding';
 import PaymentPage from '@/pages/customer/payments/PaymentPage';
 import BillingPage from '@/pages/settings/Billing';
+import AddChargesPage from '@/pages/product-catalog/plans/AddCharges';
 export const RouteNames = {
 	home: '/',
 	login: '/auth',
@@ -64,6 +65,7 @@ export const RouteNames = {
 	plan: '/product-catalog/plan',
 	editPlan: '/product-catalog/plan/edit-plan',
 	pricing: '/product-catalog/pricing-widget',
+	addCharges: '/product-catalog/plan/:planId/add-charges',
 
 	features: '/product-catalog/features',
 	createFeature: '/product-catalog/features/create-feature',
@@ -150,6 +152,10 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: RouteNames.addOn,
 						element: <AddOn />,
+					},
+					{
+						path: RouteNames.addCharges,
+						element: <AddChargesPage />,
 					},
 				],
 			},

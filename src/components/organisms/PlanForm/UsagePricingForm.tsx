@@ -8,12 +8,14 @@ import { formatBillingPeriodForPrice, getCurrencySymbol } from '@/utils/common/h
 import { billlingPeriodOptions, currencyOptions } from '@/core/data/constants';
 import VolumeTieredPricingForm from './VolumeTieredPricingForm';
 import { InternalPrice } from './SetupChargesSection';
-import UsagePriceItem from './UsagePriceItem';
+import UsageChargePreview from './UsageChargePreview';
 
 interface Props {
-	onSave: (price: InternalPrice) => void;
-	onDelete: (index: number) => void;
-	prices: InternalPrice[];
+	onAdd: (price: InternalPrice) => void;
+	onUpdate: (price: InternalPrice) => void;
+	onEditClicked: () => void;
+	onDeleteClicked: () => void;
+	price: Partial<InternalPrice>;
 }
 
 export interface PriceTier {
@@ -36,17 +38,17 @@ const billingModels = [
 	{ value: 'TIERED', label: 'Volume Tiered' },
 ];
 
-const UsagePricingForm: FC<Props> = ({ onSave, onDelete, prices }) => {
-	const [currency, setCurrency] = useState(currencyOptions[0].value);
-	const [billingModel, setBillingModel] = useState(billingModels[0].value);
-	const [meterId, setMeterId] = useState<string>();
-	const [activeMeter, setActiveMeter] = useState<Meter | null>();
+const UsagePricingForm: FC<Props> = ({ onAdd, onUpdate, onEditClicked, onDeleteClicked, price }) => {
+	const [currency, setCurrency] = useState(price.currency || currencyOptions[0].value);
+	const [billingModel, setBillingModel] = useState(price.billing_model || billingModels[0].value);
+	const [meterId, setMeterId] = useState<string>(price.meter_id || '');
+	const [activeMeter, setActiveMeter] = useState<Meter | null>(price.meter || null);
 	const [tieredPrices, setTieredPrices] = useState<PriceTier[]>([
 		{ from: 1, up_to: 1 },
 		{ from: 2, up_to: null },
 	]);
-	const [billingPeriod, setBillingPeriod] = useState(billlingPeriodOptions[1].value);
-	const [flatFee, setFlatFee] = useState<string>('');
+	const [billingPeriod, setBillingPeriod] = useState(price.billing_period || billlingPeriodOptions[1].value);
+	const [flatFee, setFlatFee] = useState<string>(price.amount || '');
 	const [packagedFee, setPackagedFee] = useState<{ unit: string; price: string }>({
 		unit: '',
 		price: '',
@@ -62,34 +64,30 @@ const UsagePricingForm: FC<Props> = ({ onSave, onDelete, prices }) => {
 
 	const [invoiceCadence, setInvoiceCadence] = useState('ARREAR');
 
-	// Find the price that's currently being edited
-	const editingPrice = prices.find((p) => p.isEdit);
-	// const editingIndex = prices.findIndex((p) => p.isEdit);
-
 	// Load price data when editing
 	useEffect(() => {
-		if (editingPrice) {
-			setCurrency(editingPrice.currency || currencyOptions[0].value);
-			setBillingModel(editingPrice.billing_model || billingModels[0].value);
-			setMeterId(editingPrice.meter_id);
-			if (editingPrice.meter) {
+		if (price.internal_state === 'edit') {
+			setCurrency(price.currency || currencyOptions[0].value);
+			setBillingModel(price.billing_model || billingModels[0].value);
+			setMeterId(price.meter_id || '');
+			if (price.meter) {
 				setActiveMeter({
-					id: editingPrice.meter.id,
-					name: editingPrice.meter.name,
+					id: price.meter.id,
+					name: price.meter.name,
 				} as Meter);
 			}
-			setBillingPeriod(editingPrice.billing_period || billlingPeriodOptions[1].value);
+			setBillingPeriod(price.billing_period || billlingPeriodOptions[1].value);
 
-			if (editingPrice.billing_model === 'FLAT_FEE') {
-				setFlatFee(editingPrice.amount || '');
-			} else if (editingPrice.billing_model === 'PACKAGE') {
+			if (price.billing_model === 'FLAT_FEE') {
+				setFlatFee(price.amount || '');
+			} else if (price.billing_model === 'PACKAGE') {
 				setPackagedFee({
-					price: editingPrice.amount || '',
-					unit: editingPrice.transform_quantity?.divide_by?.toString() || '',
+					price: price.amount || '',
+					unit: price.transform_quantity?.divide_by?.toString() || '',
 				});
-			} else if (editingPrice.billing_model === 'TIERED' && Array.isArray(editingPrice.tiers)) {
+			} else if (price.billing_model === 'TIERED' && Array.isArray(price.tiers)) {
 				setTieredPrices(
-					(editingPrice.tiers as TieredPrice[]).map((tier) => ({
+					(price.tiers as TieredPrice[]).map((tier) => ({
 						from: tier.from,
 						up_to: tier.up_to,
 						unit_amount: tier.unit_amount,
@@ -98,7 +96,7 @@ const UsagePricingForm: FC<Props> = ({ onSave, onDelete, prices }) => {
 				);
 			}
 		}
-	}, [editingPrice]);
+	}, [price]);
 
 	const validate = () => {
 		setErrors({});
@@ -145,13 +143,14 @@ const UsagePricingForm: FC<Props> = ({ onSave, onDelete, prices }) => {
 	};
 
 	const handleCancel = () => {
-		if (editingPrice) {
-			// Just close the form without modifying the price data
-			onSave({ ...editingPrice, isEdit: false });
+		if (price.internal_state === 'edit') {
+			onDeleteClicked();
+		} else {
+			onDeleteClicked();
 		}
 	};
 
-	const handleSave = () => {
+	const handleSubmit = () => {
 		if (!validate()) return;
 
 		const basePrice: Partial<Price> = {
@@ -205,32 +204,31 @@ const UsagePricingForm: FC<Props> = ({ onSave, onDelete, prices }) => {
 			};
 		}
 
+		console.log('finalPrice', finalPrice);
+
 		// If we're editing an existing price, preserve its ID and other important fields
-		if (editingPrice) {
+		if (price.internal_state === 'edit') {
 			const finalPriceWithEdit: InternalPrice = {
-				...editingPrice,
+				...price,
 				...finalPrice,
 				type: 'USAGE',
 				meter_id: meterId,
-				meter: activeMeter || editingPrice.meter,
-				isEdit: false,
+				meter: activeMeter || price.meter,
+				internal_state: 'saved',
 			};
-
-			onSave(finalPriceWithEdit);
+			onUpdate(finalPriceWithEdit);
 		} else {
-			onSave({
+			onAdd({
 				...finalPrice,
-				isEdit: false,
+				internal_state: 'saved',
 			} as InternalPrice);
 		}
 	};
 
-	if (!editingPrice) {
+	if (price.internal_state === 'saved') {
 		return (
 			<div className='mb-2 space-y-2'>
-				{prices.map((price, index) => (
-					<UsagePriceItem key={index} price={price} index={index} onEdit={onSave} onDelete={onDelete} />
-				))}
+				<UsageChargePreview charge={price} index={0} onEdit={onEditClicked} onDelete={onDeleteClicked} />
 			</div>
 		);
 	}
@@ -355,11 +353,10 @@ const UsagePricingForm: FC<Props> = ({ onSave, onDelete, prices }) => {
 			<Spacer height='16px' />
 			<div className='flex justify-end'>
 				<Button onClick={handleCancel} variant='secondary' className='mr-4 text-zinc-900'>
-					Cancel
+					{price.internal_state === 'edit' ? 'Delete' : 'Cancel'}
 				</Button>
-				<Button onClick={handleSave} variant='default' className='mr-4 font-normal'>
-					{/* {editingIndex !== null ? 'Update' : 'Add'} */}
-					Add
+				<Button onClick={handleSubmit} variant='default' className='mr-4 font-normal'>
+					{price.internal_state === 'edit' ? 'Update' : 'Add'}
 				</Button>
 			</div>
 		</div>

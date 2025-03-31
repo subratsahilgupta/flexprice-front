@@ -3,15 +3,17 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
-import { PlansTable, ApiDocsContent } from '@/components/molecules';
+import { PlansTable, ApiDocsContent, EditPlanDrawer } from '@/components/molecules';
 import { Plan } from '@/models/Plan';
 import usePagination from '@/hooks/usePagination';
 import { RouteNames } from '@/core/routes/Routes';
 import { EmptyPage } from '@/components/organisms';
 import GUIDES from '@/core/constants/guides';
-
+import { useState } from 'react';
 const PricingPlan = () => {
 	const { limit, offset, page } = usePagination();
+	const [activePlan, setActivePlan] = useState<Plan | null>(null);
+	const [planDrawerOpen, setPlanDrawerOpen] = useState(false);
 
 	const fetchPlans = async () => {
 		return await PlanApi.getAllPlans({
@@ -59,9 +61,16 @@ const PricingPlan = () => {
 					<AddButton />
 				</Link>
 			}>
+			<EditPlanDrawer data={activePlan!} open={planDrawerOpen} onOpenChange={setPlanDrawerOpen} refetchQueryKeys={['fetchPlans']} />
 			<ApiDocsContent tags={['Plans']} />
 			<div>
-				<PlansTable data={(plansData?.items || []) as Plan[]} />
+				<PlansTable
+					data={(plansData?.items || []) as Plan[]}
+					onEdit={(plan) => {
+						setActivePlan(plan);
+						setPlanDrawerOpen(true);
+					}}
+				/>
 				<Spacer className='!h-4' />
 				<ShortPagination unit='Pricing Plans' totalItems={plansData?.pagination.total ?? 0} />
 			</div>
