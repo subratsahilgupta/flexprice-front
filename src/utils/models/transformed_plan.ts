@@ -99,7 +99,8 @@ export const getPriceTableCharge = (charge: ChargesForBillingPeriodOne, normaliz
 		if (charge.billing_model === 'PACKAGE') {
 			return `${charge.display_amount} / ${formatAmount(charge.transform_quantity.divide_by.toString())} units`;
 		} else if (charge.billing_model === 'FLAT_FEE') {
-			return `${charge.display_amount} / unit`;
+			// return `${charge.display_amount } / unit`;
+			return `${getCurrencySymbol(charge.currency)}${formatAmount(charge.amount.toString())} / unit`;
 		} else if (charge.billing_model === 'TIERED') {
 			return `Starts at ${normalizedPrice ? charge.currency : getCurrencySymbol(charge.currency)}${formatAmount(charge.tiers[0].unit_amount.toString())} / unit`;
 		} else {

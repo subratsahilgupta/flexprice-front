@@ -1,7 +1,8 @@
 import { FC } from 'react';
 import { Pencil, Trash2 } from 'lucide-react';
-import { formatBillingModel, toSentenceCase } from '@/utils/common/helper_functions';
+import { toSentenceCase } from '@/utils/common/helper_functions';
 import { InternalPrice } from './SetupChargesSection';
+import ChargeValueCell from '@/pages/product-catalog/plans/PriceValueCell';
 
 interface Props {
 	charge: InternalPrice;
@@ -23,7 +24,8 @@ const UsageChargePreview: FC<Props> = ({ charge: price, index, onDelete, onEdit,
 					{price.billing_model && (
 						<>
 							<span>•</span>
-							<span>{formatBillingModel(price.billing_model)}</span>
+							{/* <span>{formatBillingModel(price.billing_model)}</span> */}
+							<ChargeValueCell data={{ ...price, currency: price.currency } as any} />
 						</>
 					)}
 				</div>
