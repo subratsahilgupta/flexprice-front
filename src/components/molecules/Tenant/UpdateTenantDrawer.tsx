@@ -130,7 +130,7 @@ const UpdateTenantDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) =>
 			return await UserApi.updateUser(formData);
 		},
 		onSuccess: async () => {
-			await refetchQueries(['billing']);
+			await refetchQueries(['user']);
 			toast.success('Tenant details updated successfully');
 			toggleOpen();
 		},

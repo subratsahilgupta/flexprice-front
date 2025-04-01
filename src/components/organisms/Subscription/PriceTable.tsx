@@ -4,7 +4,7 @@ import { NormalizedPlan } from '@/utils/models/transformed_plan';
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 import { FormHeader } from '@/components/atoms';
 import { motion } from 'framer-motion';
-import ChargeValueCell from '@/pages/product-catalog/plans/PriceValueCell';
+import ChargeValueCell from '@/pages/product-catalog/plans/ChargeValueCell';
 export type ChargesForBillingPeriod = NormalizedPlan['charges'][string][string];
 export type ChargesForBillingPeriodOne = ChargesForBillingPeriod[0];
 

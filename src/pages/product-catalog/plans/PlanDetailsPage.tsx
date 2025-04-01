@@ -18,7 +18,7 @@ import { Card } from '@/components/atoms';
 import formatChips from '@/utils/common/format_chips';
 import { getFeatureTypeChips } from '@/components/molecules/CustomerUsageTable/CustomerUsageTable';
 import { formatAmount } from '@/components/atoms/Input/Input';
-import ChargeValueCell from './PriceValueCell';
+import ChargeValueCell from './ChargeValueCell';
 
 const formatBillingPeriod = (billingPeriod: string) => {
 	switch (billingPeriod.toUpperCase()) {
