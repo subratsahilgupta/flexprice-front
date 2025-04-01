@@ -43,7 +43,7 @@ export class UserApi {
 
 	// Update an existing user
 	public static async updateUser(data: UpdateTenantPayload): Promise<User> {
-		return await AxiosClient.patch<User, UpdateTenantPayload>('/tenants/update', data);
+		return await AxiosClient.put<User, UpdateTenantPayload>('/tenants/update', data);
 	}
 
 	// Delete a user

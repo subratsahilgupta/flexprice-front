@@ -94,10 +94,12 @@ export const normalizePlan = (originalData: ExpandedPlan): NormalizedPlan => {
 
 export const getPriceTableCharge = (charge: ChargesForBillingPeriodOne, normalizedPrice: boolean = true) => {
 	if (charge.type === 'FIXED') {
-		return `${charge.display_amount}`;
+		// return `${charge.display_amount}`;
+		return `${getCurrencySymbol(charge.currency)}${formatAmount(charge.amount.toString())}`;
 	} else {
 		if (charge.billing_model === 'PACKAGE') {
-			return `${charge.display_amount} / ${formatAmount(charge.transform_quantity.divide_by.toString())} units`;
+			// return `${charge.display_amount} / ${formatAmount(charge.transform_quantity.divide_by.toString())} units`;
+			return `${getCurrencySymbol(charge.currency)}${formatAmount(charge.amount.toString())} / ${formatAmount(charge.transform_quantity.divide_by.toString())} units`;
 		} else if (charge.billing_model === 'FLAT_FEE') {
 			// return `${charge.display_amount } / unit`;
 			return `${getCurrencySymbol(charge.currency)}${formatAmount(charge.amount.toString())} / unit`;
