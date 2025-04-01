@@ -74,11 +74,11 @@ export const RouteNames = {
 	// add on routes
 	addOn: '/product-catalog/add-on',
 
-	//
-	insights: '/usage-tracking',
-	integrations: '/usage-tracking/integrations',
-	integrationDetails: '/usage-tracking/integrations',
-	importExport: '/usage-tracking/bulk-imports',
+	// tools routes
+	tools: '/tools',
+	bulkImports: '/tools/bulk-imports',
+	integrations: '/tools/integrations',
+	integrationDetails: '/tools/integrations',
 
 	// footer
 	developers: '/developers',
@@ -160,8 +160,12 @@ export const MainRouter = createBrowserRouter([
 				],
 			},
 			{
-				path: RouteNames.insights,
+				path: RouteNames.tools,
 				children: [
+					{
+						path: RouteNames.bulkImports,
+						element: <ImportExport />,
+					},
 					{
 						path: RouteNames.integrations,
 						element: <Integrations />,
@@ -170,13 +174,8 @@ export const MainRouter = createBrowserRouter([
 						path: `${RouteNames.integrationDetails}/:id`,
 						element: <IntegrationDetails />,
 					},
-					{
-						path: RouteNames.importExport,
-						element: <ImportExport />,
-					},
 				],
 			},
-
 			{
 				path: RouteNames.customerManagement,
 				children: [

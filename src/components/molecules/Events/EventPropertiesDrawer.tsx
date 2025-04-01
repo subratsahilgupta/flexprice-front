@@ -21,16 +21,16 @@ const EventPropertiesDrawer: FC<Props> = ({ isOpen, onOpenChange, event }) => {
 	if (!event) return null;
 
 	return (
-		<Sheet isOpen={isOpen} onOpenChange={onOpenChange} title='Event Properties' size='lg'>
+		<Sheet isOpen={isOpen} onOpenChange={onOpenChange} title='Event Details' size='lg'>
 			<div className='flex flex-col h-full'>
 				<div className='my-6 px-1 pb-8'>
-					<div className='mb-4'>
+					{/* <div className='mb-4'>
 						<h3 className='text-lg font-normal text-foreground'>Event Details</h3>
 						<p className='text-sm text-gray-400'>Properties sent with this event</p>
-					</div>
+					</div> */}
 					<div className='rounded-lg overflow-hidden border border-gray-200'>
 						<div className='relative'>
-							<Highlight theme={themes.nightOwl} code={JSON.stringify(event.properties, null, 2)} language='json'>
+							<Highlight theme={themes.nightOwl} code={JSON.stringify(event, null, 2)} language='json'>
 								{({ className, style, tokens, getLineProps, getTokenProps }) => (
 									<pre className={`${className} p-4 overflow-x-auto`} style={style}>
 										{tokens.map((line, i) => (

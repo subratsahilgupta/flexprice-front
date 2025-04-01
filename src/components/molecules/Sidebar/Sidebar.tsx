@@ -4,7 +4,7 @@ import SidebarNav, { NavItem } from './SidebarMenu';
 import FlexpriceSidebarFooter from './SidebarFooter';
 import { RouteNames } from '@/core/routes/Routes';
 import { EnvironmentSelector } from '@/components/molecules';
-import { Star, FileText, Gem, Users, Receipt, CalendarClock, Plug2, CreditCard } from 'lucide-react';
+import { Star, FileText, Gem, Users, Receipt, CalendarClock, Plug2, CreditCard, FileSearch, FileInput } from 'lucide-react';
 
 const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }) => {
 	const navMain: { [key: string]: NavItem[] } = {
@@ -70,24 +70,8 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 			// },
 		],
 		'Usage Tracking': [
-			// {
-			// 	title: 'Meter',
-			// 	url: RouteNames.meter,
-			// 	icon: FileText,
-			// },
 			{
-				title: 'Integrations',
-				url: RouteNames.integrations,
-				icon: Plug2,
-			},
-			// {
-			// 	title: 'Query',
-			// 	url: RouteNames.queryPage,
-			// 	icon: FileSearch,
-			// 	disabled: false,
-			// },
-			{
-				title: 'Events',
+				title: 'Events Debugger',
 				url: RouteNames.events,
 				icon: CalendarClock,
 				isActive: false,
@@ -105,6 +89,25 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				// 		url: '/metering/c',
 				// 	},
 				// ],
+			},
+			{
+				title: 'Query',
+				url: RouteNames.queryPage,
+				icon: FileSearch,
+				disabled: false,
+			},
+		],
+		Tools: [
+			{
+				title: 'Integrations',
+				url: RouteNames.integrations,
+				icon: Plug2,
+			},
+			{
+				title: 'Bulk Imports',
+				url: RouteNames.bulkImports,
+				icon: FileInput,
+				// disabled: true,
 			},
 		],
 	};

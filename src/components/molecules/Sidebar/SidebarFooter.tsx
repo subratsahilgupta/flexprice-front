@@ -1,4 +1,4 @@
-import { BookOpen, ExternalLink, ChevronsUpDown, CodeXml, LogOut, ListChecks, FileInput, FileSearch, CreditCard } from 'lucide-react';
+import { BookOpen, ExternalLink, ChevronsUpDown, CodeXml, LogOut, ListChecks, CreditCard } from 'lucide-react';
 import { RouteNames } from '@/core/routes/Routes';
 import { SidebarMenuButton, useSidebar } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
@@ -23,21 +23,21 @@ const SidebarFooter = () => {
 	if (loading) return <Skeleton className='w-full h-10' />;
 
 	const dropdownItems = [
-		{
-			label: 'Query Usage',
-			onClick: () => {
-				navigate(RouteNames.queryPage);
-			},
-			icon: FileSearch,
-		},
-		{
-			label: 'Bulk Imports',
-			onClick: () => {
-				navigate(RouteNames.importExport);
-			},
-			icon: FileInput,
-			// disabled: true,
-		},
+		// {
+		// 	label: 'Query Usage',
+		// 	onClick: () => {
+		// 		navigate(RouteNames.queryPage);
+		// 	},
+		// 	icon: FileSearch,
+		// },
+		// {
+		// 	label: 'Bulk Imports',
+		// 	onClick: () => {
+		// 		navigate(RouteNames.importExport);
+		// 	},
+		// 	icon: FileInput,
+		// 	// disabled: true,
+		// },
 		{
 			label: 'Onboarding',
 			icon: ListChecks,
