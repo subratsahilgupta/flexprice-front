@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { Page } from '@/components/atoms';
 import { cn } from '@/lib/utils';
+import { ApiDocsContent } from '@/components/molecules';
 
 const tabs = [
 	{ id: '', label: 'Overview' },
@@ -69,6 +70,7 @@ const CustomerDetails = () => {
 
 	return (
 		<Page className='space-y-6'>
+			<ApiDocsContent tags={['Customers']} />
 			<CustomerHeader customerId={customerId!} />
 			<div className='border-b border-border mt-4 mb-6'>
 				<nav className='flex space-x-4' aria-label='Tabs'>

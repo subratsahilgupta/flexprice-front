@@ -12,7 +12,7 @@ export function getCurrencySymbol(currency: string): string {
 		return info[0].symbol;
 	} catch (error) {
 		console.error('Error getting currency symbol', error);
-		return '';
+		return currency;
 	}
 }
 

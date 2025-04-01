@@ -15,6 +15,9 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
+import { ApiDocsContent } from '@/components/molecules';
+import { invalidateQueries } from '@/core/tanstack/ReactQueryProvider';
+import { RouteNames } from '@/core/routes/Routes';
 
 type Params = {
 	id: string;
@@ -114,7 +117,8 @@ const CustomerSubscription: React.FC = () => {
 
 		onSuccess: async () => {
 			toast.success('Subscription created successfully');
-			navigate(`/customer-management/customers/${customerId}`);
+			navigate(`${RouteNames.customers}/${customerId}`);
+			invalidateQueries(['debug-customers', 'debug-subscriptions']);
 		},
 		onError: () => {
 			toast.error('Error creating subscription');
@@ -212,6 +216,7 @@ const CustomerSubscription: React.FC = () => {
 
 	return (
 		<div className={cn('flex gap-8 mt-5 relative mb-12')}>
+			<ApiDocsContent tags={['Subscriptions']} />
 			<div className='flex-[6] space-y-6 mb-12 overflow-y-auto pr-4'>
 				<CustomerCard customerId={customerId!} subscriptionData={susbcriptionData} />
 

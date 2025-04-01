@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Button, DateRangePicker, Input, Page } from '@/components/atoms';
-import { EventsTable } from '@/components/molecules';
+import { EventsTable, ApiDocsContent } from '@/components/molecules';
 import { Event } from '@/models/Event';
 import EventsApi from '@/utils/api_requests/EventsApi';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -93,6 +93,8 @@ const EventsPage: React.FC = () => {
 
 	return (
 		<Page heading='Events'>
+			<ApiDocsContent tags={['Events']} />
+
 			<div className='bg-white my-6 rounded-md  mb-6'>
 				<div className='w-full flex items-end gap-4'>
 					<DateRangePicker

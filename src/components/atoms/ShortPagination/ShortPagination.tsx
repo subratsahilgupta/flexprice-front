@@ -12,7 +12,7 @@ interface ShortPaginationProps {
 
 const ShortPagination = ({
 	totalItems,
-	pageSize = 15,
+	pageSize = 10,
 	unit = 'items',
 	showPages = false,
 	// Keep these for backward compatibility

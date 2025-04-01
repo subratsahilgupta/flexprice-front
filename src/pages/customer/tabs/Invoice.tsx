@@ -1,9 +1,10 @@
-import { CardHeader, Loader } from '@/components/atoms';
-import { CustomerInvoiceTable } from '@/components/molecules';
+import { CardHeader, Loader, NoDataCard } from '@/components/atoms';
+import { ApiDocsContent, CustomerInvoiceTable } from '@/components/molecules';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card } from '@/components/atoms';
+import { Invoice as InvoiceModel } from '@/models/Invoice';
 
 const Invoice = () => {
 	const { id: customerId } = useParams();
@@ -18,7 +19,7 @@ const Invoice = () => {
 		enabled: !!customerId,
 	});
 
-	const handleShowDetails = (invoice: any) => {
+	const handleShowDetails = (invoice: InvoiceModel) => {
 		navigate(`${invoice.id}`);
 	};
 
@@ -26,12 +27,18 @@ const Invoice = () => {
 		return <Loader />;
 	}
 
-	return (
-		<Card variant='notched'>
-			<CardHeader title='Invoices' />
+	if (data?.items?.length === 0) {
+		return <NoDataCard title='Invoices' subtitle='No invoices found' />;
+	}
 
-			<CustomerInvoiceTable onRowClick={handleShowDetails} customerId={customerId} data={data?.items ?? []} />
-		</Card>
+	return (
+		<div>
+			<ApiDocsContent tags={['Invoices']} />
+			<Card variant='notched'>
+				<CardHeader title='Invoices' />
+				<CustomerInvoiceTable onRowClick={handleShowDetails} customerId={customerId} data={data?.items ?? []} />
+			</Card>
+		</div>
 	);
 };
 

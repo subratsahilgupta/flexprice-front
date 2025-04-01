@@ -47,7 +47,6 @@ const CustomerTable: FC<Props> = ({ data, onEdit }) => {
 					deleteMutationFn={(id) => CustomerApi.deleteCustomerById(id)}
 					editPath={`/customer-management/customers/edit-customer?id=${row.id}`}
 					onEdit={() => {
-						console.log('editing customer', row);
 						onEdit(row);
 					}}
 					id={row.id}

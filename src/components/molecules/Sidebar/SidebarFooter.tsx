@@ -1,9 +1,9 @@
-import { BookOpen, ExternalLink, ChevronsUpDown, CodeXml, LogOut, ListChecks, FileInput, Plug2 } from 'lucide-react';
+import { BookOpen, ExternalLink, ChevronsUpDown, CodeXml, LogOut, ListChecks, FileInput, FileSearch, CreditCard } from 'lucide-react';
 import { RouteNames } from '@/core/routes/Routes';
 import { SidebarMenuButton, useSidebar } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 import { useNavigate, useLocation } from 'react-router-dom';
-import supabase from '@/core/supbase/config';
+import AuthService from '@/core/auth/AuthService';
 import useUser from '@/hooks/useUser';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -12,7 +12,7 @@ const SidebarFooter = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const handleLogout = async () => {
-		await supabase.auth.signOut();
+		await AuthService.logout();
 		localStorage.clear();
 		navigate('/auth');
 	};
@@ -24,11 +24,11 @@ const SidebarFooter = () => {
 
 	const dropdownItems = [
 		{
-			label: 'Integrations',
+			label: 'Query Usage',
 			onClick: () => {
-				navigate(RouteNames.integrations);
+				navigate(RouteNames.queryPage);
 			},
-			icon: Plug2,
+			icon: FileSearch,
 		},
 		{
 			label: 'Bulk Imports',
@@ -43,6 +43,13 @@ const SidebarFooter = () => {
 			icon: ListChecks,
 			onClick: () => {
 				navigate(RouteNames.onboarding);
+			},
+		},
+		{
+			label: 'Billing',
+			icon: CreditCard,
+			onClick: () => {
+				navigate(RouteNames.billing);
 			},
 		},
 		{

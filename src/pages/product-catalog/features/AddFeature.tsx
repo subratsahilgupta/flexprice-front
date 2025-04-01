@@ -1,4 +1,5 @@
 import { Button, CodePreview, FormHeader, Input, Page, RadioGroup, Select, SelectOption, Spacer, Textarea } from '@/components/atoms';
+import { ApiDocsContent } from '@/components/molecules';
 import EventFilter from '@/components/molecules/EventFilter';
 import { RouteNames } from '@/core/routes/Routes';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
@@ -8,13 +9,12 @@ import { Meter } from '@/models/Meter';
 import FeatureApi from '@/utils/api_requests/FeatureApi';
 import { MeterApi } from '@/utils/api_requests/MeterApi';
 import { useMutation } from '@tanstack/react-query';
-import { Gauge, SquareCheckBig, Wrench } from 'lucide-react';
+import { CirclePlus, Gauge, SquareCheckBig, Wrench } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { LuCircleFadingPlus } from 'react-icons/lu';
 import { LuRefreshCw } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
-import { ReactSVG } from 'react-svg';
 import { v4 as uuidv4 } from 'uuid';
 import { z } from 'zod';
 
@@ -175,7 +175,6 @@ const AddFeaturePage = () => {
 			return await MeterApi.createMeter(sanitizedMeter);
 		},
 		onSuccess: async (newMeter) => {
-			console.log(newMeter);
 			if (newMeter?.id) {
 				// Update state for completeness, but don't rely on it for the next action
 				setdata((prev) => ({ ...prev, meter_id: newMeter.id }));
@@ -185,9 +184,8 @@ const AddFeaturePage = () => {
 				toast.error('Failed to get meter ID from response');
 			}
 		},
-		onError: (error) => {
+		onError: () => {
 			toast.error('Failed to create meter. Please check the form and try again.');
-			console.log(error);
 		},
 		retry: 3,
 	});
@@ -222,7 +220,6 @@ const AddFeaturePage = () => {
 
 	const { isPending, mutate: createFeature } = useMutation({
 		mutationFn: async (featureData: Partial<Feature> = data) => {
-			console.log(featureData);
 			const sanitizedData: Partial<Feature> = {
 				...featureData,
 				meter_id: featureData.meter_id || '',
@@ -236,9 +233,8 @@ const AddFeaturePage = () => {
 			navigate(RouteNames.features);
 			toast.success('Feature created successfully');
 		},
-		onError: (error) => {
+		onError: () => {
 			toast.error('An error occurred while creating feature. Please try again.');
-			console.log(error);
 		},
 	});
 
@@ -289,6 +285,7 @@ const AddFeaturePage = () => {
 			(!meter.event_name || !meter.aggregation?.type || (meter.aggregation.type !== 'COUNT' && !meter.aggregation?.field)));
 	return (
 		<Page type='left-aligned'>
+			<ApiDocsContent tags={['Features']} />
 			<FormHeader
 				title={'Create Feature'}
 				subtitle={'Fetaure resprents a funtionality in the product that can be monitized i.e. api calls, storage, etc.'}
@@ -383,7 +380,7 @@ const AddFeaturePage = () => {
 									setstate((prev) => ({ ...prev, showDescription: true }));
 								}}
 								className='p-4 h-9 cursor-pointer flex gap-2 items-center bg-[#F4F4F5] rounded-md'>
-								<ReactSVG src='/assets/svg/CirclePlus.svg' />
+								<CirclePlus />
 								<p className='text-[#18181B] text-sm font-medium'>{'Add Feature Description'}</p>
 							</button>
 						) : (
@@ -528,8 +525,8 @@ const AddFeaturePage = () => {
 				{/* right section */}
 				<div className={cn('flex-F[3] max-w-lg  relative')}>
 					{data.type === featureTypeOptions[1].value && (
-						<div className='sticky  top-24 float-right'>
-							<CodePreview title='Event Example' className='sticky top-24' code={curlCommand} language='js' />
+						<div className='sticky  top-16 float-right'>
+							<CodePreview title='Event Example' className='sticky top-0' code={curlCommand} language='js' />
 						</div>
 					)}
 				</div>

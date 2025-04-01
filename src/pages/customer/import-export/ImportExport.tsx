@@ -1,6 +1,7 @@
 import { Button, Chip, Loader, Page, ShortPagination } from '@/components/atoms';
-import { ColumnData, FlexpriceTable, ImportFileDrawer } from '@/components/molecules';
+import { ApiDocsContent, ColumnData, FlexpriceTable, ImportFileDrawer } from '@/components/molecules';
 import { EmptyPage } from '@/components/organisms';
+import GUIDES from '@/core/constants/guides';
 import usePagination from '@/hooks/usePagination';
 import { ImportTask } from '@/models/ImportTask';
 import TaskApi from '@/utils/api_requests/TaskApi';
@@ -89,12 +90,12 @@ const ImportExport = () => {
 
 	if (data?.items.length === 0) {
 		return (
-			<EmptyPage title='Import Tasks' description='No import tasks found'>
+			<EmptyPage
+				onAddClick={() => setdrawerOpen(true)}
+				tutorials={GUIDES.importExport.tutorials}
+				heading='Import Tasks'
+				tags={['Import Export', 'Tasks']}>
 				<ImportFileDrawer taskId={activeTask} isOpen={drawerOpen} onOpenChange={(value) => setdrawerOpen(value)} />
-				<Button onClick={() => setdrawerOpen(true)} className='flex gap-2 items-center '>
-					<Import />
-					<span>Import File</span>
-				</Button>
 			</EmptyPage>
 		);
 	}
@@ -117,6 +118,7 @@ const ImportExport = () => {
 					</Button>
 				</>
 			}>
+			<ApiDocsContent tags={['Import Export', 'Tasks']} />
 			{/* import export drawer */}
 			<ImportFileDrawer taskId={activeTask} isOpen={drawerOpen} onOpenChange={(value) => setdrawerOpen(value)} />
 

@@ -1,6 +1,7 @@
-import { AddButton, Button, Card, CardHeader, Chip, FormHeader, Modal, Select, ShortPagination, Spacer } from '@/components/atoms';
-import { DropdownMenu, DropdownMenuOption, TopupCard, WalletTransactionsTable } from '@/components/molecules';
+import { AddButton, Button, Chip, FormHeader, Modal, NoDataCard, Select, ShortPagination, Spacer } from '@/components/atoms';
+import { DropdownMenu, DropdownMenuOption, TopupCard, WalletTransactionsTable, ApiDocsContent } from '@/components/molecules';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import usePagination from '@/hooks/usePagination';
 import { Wallet } from '@/models/Wallet';
 import WalletApi from '@/utils/api_requests/WalletApi';
@@ -10,7 +11,7 @@ import toast from 'react-hot-toast';
 import { IoSearch } from 'react-icons/io5';
 import { useParams } from 'react-router-dom';
 import CreateWallet from '../customers/CreateWallet';
-import { CircleFadingPlus, EllipsisVertical, Pencil, SlidersHorizontal, Trash2, Wallet as WalletIcon } from 'lucide-react';
+import { EllipsisVertical, Info, Pencil, SlidersHorizontal, Trash2, Wallet as WalletIcon } from 'lucide-react';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import useQueryParams from '@/hooks/useQueryParams';
 import { DetailsCard } from '@/components/molecules';
@@ -44,11 +45,11 @@ const WalletTab = () => {
 			label: 'Create Wallet',
 			onSelect: () => setisAdd(true),
 		},
-		{
-			icon: <CircleFadingPlus />,
-			label: 'Topup Wallet',
-			onSelect: () => setshowTopupModal(true),
-		},
+		// {
+		// 	icon: <CircleFadingPlus />,
+		// 	label: 'Topup Wallet',
+		// 	onSelect: () => setshowTopupModal(true),
+		// },
 		{
 			icon: <Pencil />,
 			label: 'Edit',
@@ -136,16 +137,13 @@ const WalletTab = () => {
 	}
 
 	if (wallets?.length === 0) {
-		return (
-			<Card variant='notched'>
-				<CardHeader title='Wallet' subtitle='No wallet linked to the customer yet' cta={<AddButton onClick={() => setisAdd(true)} />} />
-			</Card>
-		);
+		return <NoDataCard title='Wallets' subtitle='No wallets linked to the customer' cta={<AddButton onClick={() => setisAdd(true)} />} />;
 	}
 
 	return (
-		<div>
+		<div className='space-y-6'>
 			{/* topup wallet */}
+			<ApiDocsContent tags={['Wallets', 'Topup']} />
 			<Modal isOpen={showTopupModal} onOpenChange={() => setshowTopupModal(false)}>
 				<div className='w-[700px] bg-white rounded-xl'>
 					<TopupCard onSuccess={() => setshowTopupModal(false)} walletId={activeWallet?.id} />
@@ -175,10 +173,10 @@ const WalletTab = () => {
 					)}
 				</div>
 				<div className='flex items-center space-x-2	'>
-					{/* <Button onClick={() => setisAdd(true)}>
+					<Button onClick={() => setshowTopupModal(true)}>
 						<WalletIcon />
-						<span>Add Wallet</span>
-					</Button> */}
+						<span>Topup Wallet</span>
+					</Button>
 
 					<DropdownMenu
 						options={dropdownOptions}
@@ -212,15 +210,40 @@ const WalletTab = () => {
 					) : (
 						<div className='w-full grid grid-cols-2 gap-4'>
 							<div className='card w-full'>
-								<p className='text-[#71717A] text-sm'>Current Balance</p>
+								<p className='text-[#71717A] text-sm flex gap-2 items-center'>
+									Current Balance
+									<TooltipProvider delayDuration={0}>
+										<Tooltip>
+											<TooltipTrigger>
+												<Info className='size-4' />
+											</TooltipTrigger>
+											<TooltipContent>
+												<p>Balance as per latest invoice</p>
+											</TooltipContent>
+										</Tooltip>
+									</TooltipProvider>
+								</p>
 								<Spacer className='!my-2' />
 								<p className='text-[#09090B] font-semibold text-3xl '>
 									{getCurrencySymbol(walletBalance?.currency ?? '')}
 									{walletBalance?.balance}
 								</p>
 							</div>
+
 							<div className='card w-full'>
-								<p className='text-[#71717A] text-sm'>Ongoing Balance</p>
+								<p className='text-[#71717A] text-sm flex gap-2 items-center'>
+									Ongoing Balance
+									<TooltipProvider delayDuration={0}>
+										<Tooltip>
+											<TooltipTrigger>
+												<Info className='size-4' />
+											</TooltipTrigger>
+											<TooltipContent>
+												<p>Includes real-time usage</p>
+											</TooltipContent>
+										</Tooltip>
+									</TooltipProvider>
+								</p>
 								<Spacer className='!my-2' />
 								<p className='text-[#09090B] font-semibold text-3xl '>
 									{getCurrencySymbol(walletBalance?.currency ?? '')}

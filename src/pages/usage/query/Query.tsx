@@ -13,7 +13,7 @@ import { ChartConfig, ChartContainer, ChartTooltipContent } from '@/components/u
 import { cn } from '@/lib/utils';
 import { RefreshCw, Search } from 'lucide-react';
 import { formatDateTime } from '@/utils/common/format_date';
-
+import { ApiDocsContent } from '@/components/molecules';
 const getNext24HoursDate = (date: Date): Date => {
 	const nextDate = new Date(date);
 	nextDate.setHours(nextDate.getHours() + 23);
@@ -55,7 +55,6 @@ const QueryPage = () => {
 				window_size: payload.window_size,
 			});
 		},
-		onSuccess: (data) => console.log(data),
 		onError: () => toast.error('Error fetching data'),
 	});
 
@@ -76,6 +75,7 @@ const QueryPage = () => {
 
 	return (
 		<Page heading='Query'>
+			<ApiDocsContent tags={['Events']} />
 			{/* Filters Section */}
 			<div className={'space-y-6'}>
 				<div className='flex w-full  gap-4 items-end bg-white '>
@@ -90,8 +90,7 @@ const QueryPage = () => {
 
 					{/* Meter Selection */}
 					<SelectMeter
-						label='Meter name'
-						placeholder='Select Meter'
+						placeholder='Select Feature'
 						onChange={(value) => setPayload({ ...payload, meter_id: value.id })}
 						value={payload.meter_id}
 					/>

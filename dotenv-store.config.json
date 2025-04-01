@@ -1,0 +1,7 @@
+{
+  "env-filepath": ".env",
+  "store-file-path": ".env.store",
+  "decrypted-file-path": ".env.store.decrypted",
+  "key-file-path": ".env.store.key",
+  "algorithm": "aes"
+}

@@ -3,6 +3,7 @@ import { getCurrencySymbol } from '../common/helper_functions';
 import { ChargesForBillingPeriodOne } from '@/components/organisms/Subscription/PriceTable';
 import { Entitlement } from '@/models/Entitlement';
 import { Meter } from '@/models/Meter';
+import { formatAmount } from '@/components/atoms/Input/Input';
 export type PriceTier = {
 	flat_amount: number;
 	unit_amount: number;
@@ -75,7 +76,7 @@ export const normalizePlan = (originalData: ExpandedPlan): NormalizedPlan => {
 			amount: price.amount,
 			display_amount: price.display_amount,
 			currency: getCurrencySymbol(price.currency),
-			transform_quantity: price.transform_quantity['divide_by'] || 0,
+			transform_quantity: price.transform_quantity || 0,
 			type: price.type,
 			billing_period: price.billing_period.toLowerCase(),
 			billing_model: price.billing_model,
@@ -96,11 +97,12 @@ export const getPriceTableCharge = (charge: ChargesForBillingPeriodOne, normaliz
 		return `${charge.display_amount}`;
 	} else {
 		if (charge.billing_model === 'PACKAGE') {
-			return `${charge.display_amount} / ${(charge.transform_quantity as any).divide_by || charge.transform_quantity} units`;
+			return `${charge.display_amount} / ${formatAmount(charge.transform_quantity.divide_by.toString())} units`;
 		} else if (charge.billing_model === 'FLAT_FEE') {
-			return `${charge.display_amount} / unit`;
+			// return `${charge.display_amount } / unit`;
+			return `${getCurrencySymbol(charge.currency)}${formatAmount(charge.amount.toString())} / unit`;
 		} else if (charge.billing_model === 'TIERED') {
-			return `Starts at ${normalizedPrice ? charge.currency : getCurrencySymbol(charge.currency)}${charge.tiers[0].unit_amount} / unit`;
+			return `Starts at ${normalizedPrice ? charge.currency : getCurrencySymbol(charge.currency)}${formatAmount(charge.tiers[0].unit_amount.toString())} / unit`;
 		} else {
 			return `${charge.display_amount}`;
 		}

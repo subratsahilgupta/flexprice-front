@@ -1,1 +1,1 @@
-export { default as ShortPagination } from './ShortPagination';
+export { default } from './ShortPagination';

@@ -4,16 +4,17 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import IntegrationsApi from '@/utils/api_requests/IntegrationsApi';
 import { LoaderCircleIcon } from 'lucide-react';
-
+import { logger } from '@/utils/common/Logger';
 interface IntegrationDrawerProps {
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;
 	provider: string;
 	providerName: string;
 	onSuccess?: () => void;
+	trigger?: React.ReactNode;
 }
 
-const IntegrationDrawer: FC<IntegrationDrawerProps> = ({ isOpen, onOpenChange, provider, providerName, onSuccess }) => {
+const IntegrationDrawer: FC<IntegrationDrawerProps> = ({ isOpen, onOpenChange, provider, providerName, onSuccess, trigger }) => {
 	const [formData, setFormData] = useState({
 		name: '',
 		apiKey: '',
@@ -39,7 +40,7 @@ const IntegrationDrawer: FC<IntegrationDrawerProps> = ({ isOpen, onOpenChange, p
 				const response = await IntegrationsApi.getIntegration(provider);
 				return response;
 			} catch (e) {
-				console.log(e);
+				logger.error(e);
 				return null;
 			}
 		},
@@ -106,7 +107,9 @@ const IntegrationDrawer: FC<IntegrationDrawerProps> = ({ isOpen, onOpenChange, p
 			isOpen={isOpen}
 			onOpenChange={onOpenChange}
 			title={`Connect to ${providerName}`}
-			description="Make changes to your profile here. Click save when you're done.">
+			description="Make changes to your profile here. Click save when you're done."
+			trigger={trigger}
+			size='lg'>
 			<div className='space-y-4 mt-4'>
 				{isCheckingIntegration ? (
 					<div className='flex justify-center py-4'>

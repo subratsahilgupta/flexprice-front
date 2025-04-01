@@ -1,14 +1,5 @@
 import { AxiosClient } from '@/core/axios/verbs';
-
-export interface User {
-	id: string;
-	tenant: {
-		id: string;
-		name: string;
-		updated_at: string;
-	};
-	email: string;
-}
+import { User } from '@/models/User';
 
 interface CreateUserRequest {
 	name: string;
@@ -16,9 +7,20 @@ interface CreateUserRequest {
 	password: string;
 }
 
-interface UpdateUserRequest {
-	name?: string;
-	email?: string;
+interface UpdateTenantPayload {
+	billing_details: {
+		address: {
+			address_line1: string;
+			address_line2: string;
+			address_city: string;
+			address_state: string;
+			address_postal_code: string;
+			address_country: string;
+		};
+		email?: string;
+		help_email?: string;
+		phone?: string;
+	};
 }
 
 export class UserApi {
@@ -40,8 +42,8 @@ export class UserApi {
 	}
 
 	// Update an existing user
-	public static async updateUser(userId: string, data: UpdateUserRequest): Promise<User> {
-		return await AxiosClient.patch<User, UpdateUserRequest>(`${this.baseUrl}/${userId}`, data);
+	public static async updateUser(data: UpdateTenantPayload): Promise<User> {
+		return await AxiosClient.patch<User, UpdateTenantPayload>('/tenants/update', data);
 	}
 
 	// Delete a user

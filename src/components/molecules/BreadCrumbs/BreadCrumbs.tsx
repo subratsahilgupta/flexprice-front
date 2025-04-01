@@ -4,10 +4,10 @@ import { BsChevronRight } from 'react-icons/bs';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import { useBreadcrumbs } from '@/hooks/useBreadcrumbs';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-
+import ApiDocs from '../ApiDocs';
+import IntercomMessenger from '@/core/intercom/IntercomMessenger';
 const BreadCrumbs: FC = () => {
 	useBreadcrumbs();
-
 	const { breadcrumbs, isLoading } = useBreadcrumbsStore();
 
 	if (isLoading) {
@@ -22,7 +22,7 @@ const BreadCrumbs: FC = () => {
 
 	return (
 		<header className='bg-white sticky top-0 z-10 shadow-sm'>
-			<div className='px-6 py-4'>
+			<div className='px-6 py-4 flex items-center justify-between'>
 				{/* Breadcrumbs */}
 				<nav className='flex items-center space-x-2 text-sm text-gray-500'>
 					<div className='flex items-center gap-2 mr-2'>
@@ -56,6 +56,10 @@ const BreadCrumbs: FC = () => {
 						</span>
 					))}
 				</nav>
+				<div className='flex items-center gap-4'>
+					<IntercomMessenger />
+					<ApiDocs />
+				</div>
 			</div>
 		</header>
 	);

@@ -7,10 +7,9 @@ import Feature, { FeatureType } from '@/models/Feature';
 import { MeterResetPeriod } from '@/models/Meter';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
 import { useMutation } from '@tanstack/react-query';
-import { X } from 'lucide-react';
+import { CirclePlus, X } from 'lucide-react';
 import { FC, useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { ReactSVG } from 'react-svg';
 
 interface Props {
 	isOpen: boolean;
@@ -237,10 +236,27 @@ const AddEntitlementDrawer: FC<Props> = ({
 						<SelectFeature
 							disabledFeatures={selectedFeatures.map((feature) => feature.id)}
 							onChange={(feature) => {
-								setActiveFeature(feature);
-								setSelectedFeatures([...selectedFeatures, feature]);
-								setShowSelect(false);
-								setErrors({});
+								if (feature.type === FeatureType.boolean) {
+									// Automatically add boolean features
+									setEntitlements([
+										...entitlements,
+										{
+											feature: feature,
+											feature_id: feature.id,
+											feature_type: feature.type,
+											is_enabled: true,
+										},
+									]);
+									setSelectedFeatures([...selectedFeatures, feature]);
+									setShowSelect(true);
+									setErrors({});
+								} else {
+									// For non-boolean features, show the configuration form
+									setActiveFeature(feature);
+									setSelectedFeatures([...selectedFeatures, feature]);
+									setShowSelect(false);
+									setErrors({});
+								}
 							}}
 							label='Features'
 							placeholder='Select feature'
@@ -270,7 +286,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 										label='Value'
 										placeholder='Enter value'
 										disabled={tempEntitlement.usage_limit === null}
-										variant='number'
+										variant='formatted-number'
 										value={tempEntitlement.usage_limit === null ? 'Unlimited' : tempEntitlement.usage_limit?.toString() || ''}
 										onChange={(value) => {
 											const numValue = value === '' ? undefined : Number(value);
@@ -377,7 +393,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 								setShowSelect(true);
 							}}
 							className='p-4 h-9 cursor-pointer flex gap-2 items-center bg-[#F4F4F5] rounded-md'>
-							<ReactSVG src='/assets/svg/CirclePlus.svg' />
+							<CirclePlus />
 							<p className='text-[#18181B] text-sm font-medium'>{'Add another feature'}</p>
 						</button>
 					)}

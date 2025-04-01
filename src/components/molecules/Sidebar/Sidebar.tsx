@@ -4,7 +4,7 @@ import SidebarNav, { NavItem } from './SidebarMenu';
 import FlexpriceSidebarFooter from './SidebarFooter';
 import { RouteNames } from '@/core/routes/Routes';
 import { EnvironmentSelector } from '@/components/molecules';
-import { Star, FileText, Gem, Users, Receipt, FileSearch, CalendarClock } from 'lucide-react';
+import { Star, FileText, Gem, Users, Receipt, CalendarClock, Plug2, CreditCard } from 'lucide-react';
 
 const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }) => {
 	const navMain: { [key: string]: NavItem[] } = {
@@ -23,7 +23,7 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 			},
 
 			{
-				title: 'Pricing',
+				title: 'Pricing Widget',
 				url: RouteNames.pricing,
 				icon: Gem,
 			},
@@ -31,6 +31,18 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 			// 	title: 'Add On',
 			// 	url: RouteNames.addOn,
 			// 	icon: Puzzle,
+			// 	disabled: true,
+			// },
+			// {
+			// 	title: 'Discounts',
+			// 	url: RouteNames.addOn,
+			// 	icon: TicketPercent,
+			// 	disabled: true,
+			// },
+			// {
+			// 	title: 'Taxes',
+			// 	url: RouteNames.addOn,
+			// 	icon: Percent,
 			// 	disabled: true,
 			// },
 		],
@@ -44,6 +56,11 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				title: 'Invoices',
 				url: RouteNames.invoices,
 				icon: Receipt,
+			},
+			{
+				title: 'Payments',
+				url: RouteNames.payments,
+				icon: CreditCard,
 			},
 			// {
 			// 	title: 'Quotation',
@@ -59,11 +76,16 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 			// 	icon: FileText,
 			// },
 			{
-				title: 'Query',
-				url: RouteNames.queryPage,
-				icon: FileSearch,
-				disabled: false,
+				title: 'Integrations',
+				url: RouteNames.integrations,
+				icon: Plug2,
 			},
+			// {
+			// 	title: 'Query',
+			// 	url: RouteNames.queryPage,
+			// 	icon: FileSearch,
+			// 	disabled: false,
+			// },
 			{
 				title: 'Events',
 				url: RouteNames.events,

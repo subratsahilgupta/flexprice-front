@@ -1,7 +1,8 @@
 import { AddButton, Loader, Page, ShortPagination, Spacer } from '@/components/atoms';
-import { FeatureTable } from '@/components/molecules';
+import { ApiDocsContent, FeatureTable } from '@/components/molecules';
 import EmptyPage from '@/components/organisms/EmptyPage/EmptyPage';
 import { RouteNames } from '@/core/routes/Routes';
+import GUIDES from '@/core/constants/guides';
 import usePagination from '@/hooks/usePagination';
 import FeatureApi from '@/utils/api_requests/FeatureApi';
 import { useQuery } from '@tanstack/react-query';
@@ -28,8 +29,6 @@ const FeaturesPage = () => {
 		queryFn: fetchFeatures,
 	});
 
-	console.log(featureData, isLoading);
-
 	if (isLoading) {
 		return <Loader />;
 	}
@@ -40,9 +39,10 @@ const FeaturesPage = () => {
 	if (featureData?.items.length === 0) {
 		return (
 			<EmptyPage
-				title='No features found'
-				description='Create a feature to get started'
+				heading='Feature'
 				onAddClick={() => navigate(RouteNames.createFeature)}
+				tags={['Features']}
+				tutorials={GUIDES.features.tutorials}
 			/>
 		);
 	}
@@ -55,6 +55,7 @@ const FeaturesPage = () => {
 					<AddButton />
 				</Link>
 			}>
+			<ApiDocsContent tags={['Features']} />
 			<div>
 				<FeatureTable data={featureData?.items || []} />
 				<Spacer className='!h-4' />

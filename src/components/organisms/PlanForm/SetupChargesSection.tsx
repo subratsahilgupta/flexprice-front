@@ -51,16 +51,16 @@ export const AddChargesButton = ({ onClick, label }: AddChargesButtonProps) => (
 export interface InternalPrice extends Partial<Price> {
 	isEdit?: boolean;
 	isTrialPeriod?: boolean;
-	internal_id?: string;
+	internal_state?: 'edit' | 'new' | 'saved';
 }
 
 const SetupChargesSection: React.FC<Props> = ({ plan, setPlanField }) => {
 	const [subscriptionType, setSubscriptionType] = useState<string>();
-	const [prices, setPrices] = useState<InternalPrice[]>(
-		plan.prices?.map((price) => ({
-			...price,
-			internal_id: crypto.randomUUID(),
-		})) || [],
+	const [recurringCharges, setRecurringCharges] = useState<InternalPrice[]>(
+		plan.prices?.filter((price) => price.type === SubscriptionType.FIXED) || [],
+	);
+	const [usageCharges, setUsageCharges] = useState<InternalPrice[]>(
+		plan.prices?.filter((price) => price.type === SubscriptionType.USAGE) || [],
 	);
 
 	const getEmptyPrice = (type: SubscriptionType): InternalPrice => ({
@@ -73,56 +73,47 @@ const SetupChargesSection: React.FC<Props> = ({ plan, setPlanField }) => {
 		invoice_cadence: 'ARREAR',
 		billing_model: type === SubscriptionType.FIXED ? 'FLAT_FEE' : undefined,
 		billing_cadence: 'RECURRING',
-		internal_id: crypto.randomUUID(),
+		internal_state: 'new',
 	});
 
 	const handleSubscriptionTypeChange = (type: (typeof subscriptionTypeOptions)[0]) => {
 		setSubscriptionType(type.value);
-		if (prices.length === 0) {
-			setPrices([getEmptyPrice(type.value as SubscriptionType)]);
+		if (type.value === SubscriptionType.FIXED && recurringCharges.length === 0) {
+			setRecurringCharges([getEmptyPrice(SubscriptionType.FIXED)]);
+		} else if (type.value === SubscriptionType.USAGE && usageCharges.length === 0) {
+			setUsageCharges([getEmptyPrice(SubscriptionType.USAGE)]);
 		}
 	};
 
-	const updatePrices = (newPrices: InternalPrice[]) => {
-		setPrices(newPrices);
-		setPlanField('prices', newPrices as unknown as Price[]);
-	};
-
-	const handlePriceUpdate = (index: number, price: InternalPrice) => {
-		const newPrices = prices.map((p, i) => (i === index ? price : p));
-		updatePrices(newPrices);
-	};
-
-	const handlePriceDelete = (index: number) => {
-		const newPrices = prices.filter((_, i) => i !== index);
-		if (newPrices.length === 0) {
-			setSubscriptionType(undefined);
-		}
-		updatePrices(newPrices);
+	const updatePlanPrices = (recurring: InternalPrice[], usage: InternalPrice[]) => {
+		setPlanField('prices', [...recurring, ...usage] as unknown as Price[]);
 	};
 
 	const handleAddNewPrice = (type: SubscriptionType) => {
-		if (type === SubscriptionType.FIXED && prices.filter((p) => p.type === SubscriptionType.FIXED).length > 0) {
-			return;
-		}
-
-		setSubscriptionType(type);
 		const newPrice = getEmptyPrice(type);
-		updatePrices([...prices, newPrice]);
+
+		if (type === SubscriptionType.FIXED) {
+			setRecurringCharges((prev) => {
+				const updated = [...prev, newPrice];
+				return updated;
+			});
+		} else {
+			setUsageCharges((prev) => {
+				const updated = [...prev, newPrice];
+				return updated;
+			});
+		}
 	};
 
-	const fixedPrices = prices.filter((p) => p.type === SubscriptionType.FIXED);
-	const usagePrices = prices.filter((p) => p.type === SubscriptionType.USAGE);
-
-	const isEditing = prices.some((p) => p.isEdit);
+	const isEditing = [...recurringCharges, ...usageCharges].some((p) => p.isEdit);
 	const showAddButtons = Boolean(subscriptionType) && !isEditing;
-	const canAddFixedPrices = showAddButtons && fixedPrices.length === 0;
+	const canAddFixedPrices = showAddButtons && recurringCharges.length === 0;
 	const canAddUsagePrices = showAddButtons;
 
 	return (
 		<div className='p-6 rounded-xl border border-[#E4E4E7]'>
 			{/* Subscription Type Section */}
-			{!prices.length && (
+			{!recurringCharges.length && !usageCharges.length && (
 				<div>
 					<FormHeader title='Plan Charges' subtitle='Set how customers are charged for this plan.' variant='sub-header' />
 					<FormHeader title='Choose a Pricing Model' variant='form-component-title' />
@@ -146,108 +137,116 @@ const SetupChargesSection: React.FC<Props> = ({ plan, setPlanField }) => {
 			)}
 
 			{/* Fixed Price Forms */}
-			{fixedPrices.length > 0 && (
+			{recurringCharges.length > 0 && (
 				<div>
 					<FormHeader title='Recurring Charges' variant='form-component-title' />
-					{fixedPrices.map((price) => {
-						// Find the global index in the prices array using internal_id
-						const globalIndex = prices.findIndex((p) => p.internal_id === price.internal_id);
-						return (
-							<RecurringChargesForm
-								key={price.internal_id}
-								price={price}
-								isEdit={price.isEdit || false}
-								onAdd={(newPrice) => {
-									handlePriceUpdate(globalIndex, {
-										...newPrice,
-										type: SubscriptionType.FIXED,
-										isEdit: false,
-										internal_id: price.internal_id, // Preserve the internal_id
+					{recurringCharges.map((price, index) => (
+						<RecurringChargesForm
+							key={index}
+							price={price}
+							onAdd={(newPrice) => {
+								setRecurringCharges((prevCharges) => {
+									const newCharges = prevCharges.map((p, i) => {
+										if (index === i) {
+											const updatedPrice = {
+												...newPrice,
+												internal_state: 'saved' as const,
+												amount: newPrice.amount || '', // Ensure amount is never undefined
+											};
+											return updatedPrice;
+										}
+										return p;
 									});
-								}}
-								onUpdate={(newPrice) => {
-									if (newPrice.isEdit) {
-										// Just update the edit state
-										handlePriceUpdate(globalIndex, {
-											...price,
-											isEdit: true,
-											internal_id: price.internal_id, // Preserve the internal_id
-										});
-									} else {
-										// Update the price while preserving the type and internal_id
-										handlePriceUpdate(globalIndex, {
+
+									updatePlanPrices(newCharges, usageCharges);
+									return newCharges;
+								});
+							}}
+							onUpdate={(newPrice) => {
+								const newCharges = recurringCharges.map((p, i) => {
+									if (index === i) {
+										const updatedPrice = {
 											...newPrice,
-											type: SubscriptionType.FIXED,
-											isEdit: false,
-											internal_id: price.internal_id, // Preserve the internal_id
-										});
+											internal_state: 'saved' as const,
+											amount: newPrice.amount || '', // Ensure amount is never undefined
+										};
+										return updatedPrice;
 									}
-								}}
-								onDelete={() => handlePriceDelete(globalIndex)}
-							/>
-						);
-					})}
+									return p;
+								});
+
+								setRecurringCharges(newCharges);
+								updatePlanPrices(newCharges, usageCharges);
+							}}
+							onEditClicked={() => {
+								const newCharges = recurringCharges.map((p, i) => {
+									if (index === i) {
+										const updatedPrice = {
+											...p,
+											internal_state: 'edit' as const,
+										};
+										return updatedPrice;
+									}
+									return p;
+								});
+
+								setRecurringCharges(newCharges);
+							}}
+							onDeleteClicked={() => {
+								const newCharges = recurringCharges.filter((_, i) => i !== index);
+
+								setRecurringCharges(newCharges);
+								updatePlanPrices(newCharges, usageCharges);
+							}}
+						/>
+					))}
 				</div>
 			)}
 
 			{/* Usage Price Forms */}
-			{usagePrices.length > 0 && (
+			{usageCharges.length > 0 && (
 				<div className='mt-6'>
 					<FormHeader title='Usage Based Charges' variant='form-component-title' />
-					<UsagePricingForm
-						prices={usagePrices}
-						onSave={(newPrice) => {
-							console.log('=== Debug Usage Price Form Save ===');
-							console.log('1. New Price Object:', newPrice);
-							console.log('2. Current Usage Prices:', usagePrices);
-							console.log('3. All Prices:', prices);
-
-							const existingIndex = usagePrices.findIndex((p) => p.isEdit);
-							console.log('4. Existing Edit Index:', existingIndex);
-
-							if (existingIndex !== -1) {
-								console.log('5. Updating existing price');
-								const globalIndex = prices.findIndex((p) => p === usagePrices[existingIndex]);
-								console.log('6. Global Index for Update:', globalIndex);
-								handlePriceUpdate(globalIndex, {
-									...newPrice,
-									type: SubscriptionType.USAGE,
-									isEdit: false,
+					{usageCharges.map((price, index) => (
+						<UsagePricingForm
+							key={index}
+							price={price}
+							onAdd={(newPrice) => {
+								const newCharges = usageCharges.map((p, i) => {
+									if (index === i) {
+										return { ...newPrice, internal_state: 'saved' as const };
+									}
+									return p;
 								});
-							} else if (newPrice.isEdit) {
-								console.log('7. Attempting to enter edit mode');
-								console.log('8. New Price to Edit:', newPrice);
-								const globalIndex = prices.findIndex((p) => p.internal_id === newPrice.internal_id);
-								console.log('10. Global Index for Edit:', globalIndex);
-
-								if (globalIndex === -1) {
-									console.warn('Warning: Could not find price to edit in global prices array');
-									return;
-								}
-
-								handlePriceUpdate(globalIndex, {
-									...prices[globalIndex],
-									type: SubscriptionType.USAGE,
-									isEdit: true,
+								setUsageCharges(newCharges);
+								updatePlanPrices(recurringCharges, newCharges);
+							}}
+							onUpdate={(newPrice) => {
+								const newCharges = usageCharges.map((p, i) => {
+									if (index === i) {
+										return { ...newPrice, internal_state: 'saved' as const };
+									}
+									return p;
 								});
-							} else {
-								// Add new price
-								updatePrices([
-									...prices,
-									{
-										...newPrice,
-										type: SubscriptionType.USAGE,
-										isEdit: false,
-										internal_id: crypto.randomUUID(),
-									},
-								]);
-							}
-						}}
-						onDelete={(index) => {
-							const globalIndex = prices.findIndex((p) => p.internal_id === usagePrices[index].internal_id);
-							handlePriceDelete(globalIndex);
-						}}
-					/>
+								setUsageCharges(newCharges);
+								updatePlanPrices(recurringCharges, newCharges);
+							}}
+							onEditClicked={() => {
+								const newCharges = usageCharges.map((p, i) => {
+									if (index === i) {
+										return { ...p, internal_state: 'edit' as const };
+									}
+									return p;
+								});
+								setUsageCharges(newCharges);
+							}}
+							onDeleteClicked={() => {
+								const newCharges = usageCharges.filter((_, i) => i !== index);
+								setUsageCharges(newCharges);
+								updatePlanPrices(recurringCharges, newCharges);
+							}}
+						/>
+					))}
 				</div>
 			)}
 
@@ -260,14 +259,7 @@ const SetupChargesSection: React.FC<Props> = ({ plan, setPlanField }) => {
 					{canAddUsagePrices && (
 						<>
 							{canAddFixedPrices && <Spacer height='8px' />}
-							<AddChargesButton
-								onClick={() => {
-									const newPrice = getEmptyPrice(SubscriptionType.USAGE);
-									updatePrices([...prices, { ...newPrice, isEdit: true }]);
-									setSubscriptionType(SubscriptionType.USAGE);
-								}}
-								label='Add Usage Based Charges'
-							/>
+							<AddChargesButton onClick={() => handleAddNewPrice(SubscriptionType.USAGE)} label='Add Usage Based Charges' />
 						</>
 					)}
 				</div>

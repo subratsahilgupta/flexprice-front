@@ -1,9 +1,11 @@
 import { Page, Spacer, Loader, ShortPagination } from '@/components/atoms';
-import { InvoiceTable } from '@/components/molecules';
+import { InvoiceTable, ApiDocsContent } from '@/components/molecules';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import usePagination from '@/hooks/usePagination';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
+import { EmptyPage } from '@/components/organisms';
+import GUIDES from '@/core/constants/guides';
 
 const InvoicesPage = () => {
 	const { limit, offset, page } = usePagination();
@@ -32,8 +34,13 @@ const InvoicesPage = () => {
 		toast.error('Error fetching meters');
 	}
 
+	if ((invoiceData?.items ?? []).length === 0) {
+		return <EmptyPage tutorials={GUIDES.invoices.tutorials} heading='Invoices' tags={['Invoices']} />;
+	}
+
 	return (
 		<Page heading='Invoices'>
+			<ApiDocsContent tags={['Invoices']} />
 			<div className='px-0'>
 				<InvoiceTable data={invoiceData?.items || []} />
 				<Spacer className='!h-4' />

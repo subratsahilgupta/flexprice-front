@@ -1,17 +1,18 @@
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import FeatureApi from '@/utils/api_requests/FeatureApi';
-import { Chip, Loader, Page, SectionHeader, Spacer, Divider, Card, CardHeader } from '@/components/atoms';
+import { Chip, Loader, Page, SectionHeader, Spacer, Divider, Card, CardHeader, NoDataCard } from '@/components/atoms';
 import toast from 'react-hot-toast';
 import { useEffect } from 'react';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import { RouteNames } from '@/core/routes/Routes';
-import { ColumnData, FlexpriceTable } from '@/components/molecules';
+import { ApiDocsContent, ColumnData, FlexpriceTable, RedirectCell } from '@/components/molecules';
 import EntitlementApi, { ExtendedEntitlement } from '@/utils/api_requests/EntitlementApi';
 import formatChips from '@/utils/common/format_chips';
 import { FeatureType } from '@/models/Feature';
 import { getFeatureTypeChips } from '@/components/molecules/FeatureTable/FeatureTable';
 import { formatAggregationType } from './AddFeature';
+import { formatAmount } from '@/components/atoms/Input/Input';
 
 // const getFeatureType = (type: string) => {
 // 	const className = 'items-center justify-end text-sm font-normal text-gray-800 flex gap-2';
@@ -96,7 +97,7 @@ const FeatureDetails = () => {
 		{
 			title: 'Plan',
 			render: (rowData: ExtendedEntitlement) => {
-				return rowData?.plan?.name;
+				return <RedirectCell redirectUrl={`${RouteNames.plan}/${rowData?.plan?.id}`}>{rowData?.plan?.name}</RedirectCell>;
 			},
 			fieldVariant: 'title',
 			width: '40%',
@@ -120,15 +121,15 @@ const FeatureDetails = () => {
 					return rowData.static_value || '0';
 				}
 				if (rowData.feature_type === FeatureType.metered) {
-					const usageLimit = rowData.usage_limit ?? 'Unlimited';
-					const unitPlural =
+					const usageLimit = rowData.usage_limit ? formatAmount(rowData.usage_limit.toString()) : 'Unlimited';
+					const unit =
 						rowData.usage_limit === null || rowData.usage_limit > 1
 							? rowData.feature.unit_plural || 'units'
 							: rowData.feature.unit_singular || 'unit';
 					return (
 						<span className='text-right'>
 							{usageLimit}
-							<span className='text-muted-foreground text-sm font-sans ml-2'>{unitPlural}</span>
+							<span className='text-muted-foreground text-sm font-sans ml-2'>{unit}</span>
 						</span>
 					);
 				}
@@ -151,7 +152,7 @@ const FeatureDetails = () => {
 					title={
 						<>
 							{data?.name}
-							<span className='ml-2 text-sm'>{getFeatureTypeChips(data?.type || '')}</span>
+							<span className='ml-2 text-sm'>{getFeatureTypeChips(data?.type || '', true)}</span>
 						</>
 					}>
 					{/* <div className='flex gap-2'>
@@ -166,13 +167,18 @@ const FeatureDetails = () => {
 				</div> */}
 				</SectionHeader>
 			}>
+			<ApiDocsContent tags={['Features']} />
+
 			<Spacer className='!h-4' />
 			<div className='space-y-6'>
-				<Card variant='notched'>
-					<CardHeader title='Linked Plans' />
-					<FlexpriceTable showEmptyRow columns={columns} data={linkedEntitlements?.items ?? []} />
-				</Card>
-
+				{(linkedEntitlements?.items?.length || 0) > 0 ? (
+					<Card variant='notched'>
+						<CardHeader title='Linked Plans' />
+						<FlexpriceTable showEmptyRow columns={columns} data={linkedEntitlements?.items ?? []} />
+					</Card>
+				) : (
+					<NoDataCard title='Linked Plans' subtitle='No plans linked to the feature yet' />
+				)}
 				{data?.type === FeatureType.metered && (
 					<Card variant='notched'>
 						<div className='!space-y-6'>

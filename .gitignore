@@ -31,3 +31,5 @@ tsconfig.app.tsbuildinfo
 # Sentry Config File
 .env.sentry-build-plugin
 .dev
+# dotenv-store encryption key
+.env.store.key

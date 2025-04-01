@@ -1,10 +1,11 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
-import supabase from '@/core/supbase/config';
+import AuthService from '@/core/auth/AuthService';
 
 interface UserProviderProps {
 	children: ReactNode;
 }
+
 interface UserContextProp {
 	user: any;
 	setUser: (user: any) => void;
@@ -12,14 +13,18 @@ interface UserContextProp {
 const UserContext = createContext<UserContextProp>({} as UserContextProp);
 
 export const UserProvider = ({ children }: UserProviderProps) => {
-	const [user, setUser] = useState<any>({} as any);
+	const [user, setUser] = useState<any>({});
 
 	useEffect(() => {
 		try {
-			const user = JSON.parse(localStorage.getItem('user')!) as any;
+			const user = JSON.parse(localStorage.getItem('user')!);
 			setUser(user);
 		} catch (error) {
-			supabase.auth.signOut();
+			console.error(error);
+
+			// logout user
+			AuthService.logout();
+
 			<Navigate to={'/auth'} />;
 		}
 	}, []);

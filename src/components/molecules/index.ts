@@ -2,7 +2,7 @@ export { Sidebar } from './Sidebar';
 
 export { BillableMetricTable } from './BillableMetricTable';
 
-export { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from './Table';
+export { Table, TableHeader, TableBody, TableHead, TableRow, TableCell, TooltipCell, RedirectCell } from './Table';
 export type { ColumnData, FlexpriceTableProps } from './Table';
 
 export { default as FlexpriceTable } from './Table';
@@ -24,7 +24,7 @@ export type { RectangleRadiogroupOption } from './RectangleRadiogroup';
 export { default as DropdownMenu } from './DropdownMenu';
 export type { DropdownMenuOption } from './DropdownMenu';
 
-export { CreateCustomerDrawer, CustomerCard, CustomerTable, CustomerInvoiceTable } from './Customer';
+export { CreateCustomerDrawer, CustomerCard, CustomerTable } from './Customer';
 
 export { default as InvoiceLineItemTable } from './InvoiceLineItemTable';
 
@@ -32,7 +32,13 @@ export { default as EventsTable } from './Events';
 
 export { default as InfiniteScroll } from './InfiniteScroll';
 
-export { default as InvoiceTable } from './InvoiceTable';
+export {
+	default as InvoiceTable,
+	CustomerInvoiceTable,
+	InvoiceTableMenu,
+	InvoicePaymentStatusModal,
+	InvoiceStatusModal,
+} from './InvoiceTable';
 
 export { default as InvoiceCreditLineItemTable } from './InvoiceCreditLineItemTable';
 
@@ -54,8 +60,20 @@ export { default as EnvironmentSelector } from './EnvironmentSelector';
 
 export { default as SecretKeyDrawer } from './SecretKeyDrawer';
 
-export { default as SubscriptionPauseWarning } from './SubscriptionPauseWarning';
+export { default as SubscriptionPauseWarning } from './CustomerSubscription/SubscriptionPauseWarning';
 
 export { default as DebugMenu } from './DebugMenu';
 
 export { default as PricingCard } from './PricingCard';
+
+export { default as ApiDocs, ApiDocsContent } from './ApiDocs';
+
+export { default as CustomerEntitlementTable } from './CustomerUsageTable';
+
+export { default as InvoicePaymentsTable } from './InvoicePaymentsTable';
+
+export { FlatTabs, CustomTabs } from './Tabs';
+
+export { default as EditPlanDrawer } from './EditPlanDrawer';
+
+export { default as UpdateTenantDrawer } from './Tenant/UpdateTenantDrawer';

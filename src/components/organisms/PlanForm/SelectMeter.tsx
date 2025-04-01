@@ -35,6 +35,7 @@ const SelectMeter: FC<Props> = ({
 	} = useQuery({
 		queryKey: ['fetchMeters1'],
 		queryFn: fetchMeters,
+		staleTime: 1000 * 60 * 5,
 	});
 
 	if (isLoading) {
@@ -58,7 +59,6 @@ const SelectMeter: FC<Props> = ({
 			};
 		});
 
-	console.log('received value', value);
 	return (
 		<div className={cn('min-w-[200px]')}>
 			<Select

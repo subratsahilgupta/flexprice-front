@@ -2,7 +2,7 @@ import { FormHeader, Loader, Page } from '@/components/atoms';
 import { Integration, integrations } from './integrationsData';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { PremiumFeature, PremiumFeatureTag } from '@/components/molecules';
+import { PremiumFeature, PremiumFeatureTag, ApiDocsContent } from '@/components/molecules';
 import { useQuery } from '@tanstack/react-query';
 import IntegrationsApi from '@/utils/api_requests/IntegrationsApi';
 
@@ -31,6 +31,7 @@ const Integrations = () => {
 
 	return (
 		<Page heading='Integrations'>
+			<ApiDocsContent tags={['Integrations', 'secrets']} />
 			{installed.length > 0 && (
 				<div>
 					<FormHeader title='Installed' variant='sub-header' />

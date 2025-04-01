@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
 // Define a type-safe custom hook
-function useQueryParams<T extends Record<string, string>>(initialParams: T = {} as T) {
+const useQueryParams = <T extends Record<string, string>>(initialParams: T = {} as T) => {
 	const location = useLocation();
 	const navigate = useNavigate();
 
@@ -46,7 +46,7 @@ function useQueryParams<T extends Record<string, string>>(initialParams: T = {} 
 				pathname: location.pathname,
 				search: `?${searchParams.toString()}`,
 			},
-			{ replace: true },
+			// { replace: true },
 		);
 
 		// Update the local state
@@ -57,6 +57,6 @@ function useQueryParams<T extends Record<string, string>>(initialParams: T = {} 
 		queryParams,
 		setQueryParam,
 	};
-}
+};
 
 export default useQueryParams;

@@ -2,6 +2,8 @@ import { AxiosClient } from '@/core/axios/verbs';
 import { Invoice } from '@/models/Invoice';
 import { generateQueryParams } from '../common/api_helper';
 import { PaginationType } from '@/models/Pagination';
+import AuthService from '@/core/auth/AuthService';
+import EnvironmentApi from '@/utils/api_requests/EnvironmentApi';
 
 interface GetInvoicesResponse {
 	items: Invoice[];
@@ -27,6 +29,12 @@ interface UpdateInvoiceStatusPayload {
 	invoiceId: string;
 	payment_status?: string;
 	amount?: number;
+}
+
+interface GetInvoicePreviewPayload {
+	period_end: string;
+	period_start: string;
+	subscription_id: string;
 }
 
 class InvoiceApi {
@@ -61,6 +69,48 @@ class InvoiceApi {
 
 	public static async finalizeInvoice(invoiceId: string) {
 		return await AxiosClient.post(`${this.baseurl}/${invoiceId}/finalize`);
+	}
+
+	public static async attemptPayment(invoiceId: string) {
+		return await AxiosClient.post(`${this.baseurl}/${invoiceId}/payment/attempt`);
+	}
+
+	public static async getInvoicePreview(payload: GetInvoicePreviewPayload) {
+		const url = generateQueryParams(`${this.baseurl}/preview`, payload);
+		return await AxiosClient.get(url);
+	}
+
+	public static async getInvoicePdf(invoiceId: string, invoiceNo?: string) {
+		const downloadFileName = invoiceNo ? `invoice-${invoiceNo}.pdf` : `invoice-${invoiceId}.pdf`;
+
+		const response = await fetch(`${import.meta.env.VITE_API_URL}${this.baseurl}/${invoiceId}/pdf`, {
+			headers: {
+				Authorization: `Bearer ${await AuthService.getAcessToken()}`,
+				'X-Environment-ID': EnvironmentApi.getActiveEnvironment()?.id || '',
+				Accept: 'application/pdf',
+			},
+		});
+
+		if (!response.ok) {
+			throw new Error('Failed to fetch PDF');
+		}
+
+		const arrayBuffer = await response.arrayBuffer();
+		const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
+		const url = window.URL.createObjectURL(blob);
+
+		// Create a temporary link element
+		const link = document.createElement('a');
+		link.href = url;
+		link.download = downloadFileName;
+
+		// Append to body, click and remove
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+
+		// Clean up the URL object
+		window.URL.revokeObjectURL(url);
 	}
 }
 

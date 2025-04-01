@@ -11,10 +11,13 @@
     "format": "prettier --write src",
     "preview": "vite preview",
     "prepare": "husky",
-    "start": "vite --port 3000 "
+    "start": "vite --port 3000 --host 0.0.0.0",
+    "env:encrypt": "dotenv-store encrypt",
+    "env:decrypt": "dotenv-store decrypt"
   },
   "dependencies": {
     "@csvbox/react": "^1.1.11",
+    "@intercom/messenger-js-sdk": "^0.0.14",
     "@radix-ui/react-accordion": "^1.2.2",
     "@radix-ui/react-checkbox": "^1.1.4",
     "@radix-ui/react-collapsible": "^1.1.2",
@@ -31,6 +34,7 @@
     "@radix-ui/react-slider": "^1.2.3",
     "@radix-ui/react-slot": "^1.1.2",
     "@radix-ui/react-switch": "^1.1.2",
+    "@radix-ui/react-tabs": "^1.1.3",
     "@radix-ui/react-tooltip": "^1.1.6",
     "@sentry/browser": "^8.50.0",
     "@sentry/react": "^8.50.0",
@@ -86,6 +90,7 @@
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
+    "dotenv-store": "^1.0.3",
     "eslint": "^9.15.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.14",

@@ -1,5 +1,6 @@
 import { Button, FormHeader, Spacer, Stepper } from '@/components/atoms';
 import { PlanDetailsSection, SetupChargesSection } from '@/components/organisms';
+import { ApiDocsContent } from '@/components/molecules';
 import { RouteNames } from '@/core/routes/Routes';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 import { Plan } from '@/models/Plan';
@@ -107,6 +108,7 @@ const CreatePlanPage = () => {
 				subtitle={'A Plan defines the features your customers have access to, the pricing structure, and the billing cadence.'}
 				variant='form-title'
 			/>
+			<ApiDocsContent tags={['Plans']} />
 
 			<Spacer height={'16px'} />
 

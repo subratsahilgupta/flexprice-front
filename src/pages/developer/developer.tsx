@@ -1,14 +1,16 @@
 import { Button, Page, ShortPagination } from '@/components/atoms';
-import { ColumnData, DropdownMenu, FlexpriceTable, SecretKeyDrawer } from '@/components/molecules';
+import { ColumnData, DropdownMenu, FlexpriceTable, SecretKeyDrawer, ApiDocsContent } from '@/components/molecules';
 import SecretKeysApi from '@/utils/api_requests/SecretKeysApi';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { SecretKey } from '@/models/SecretKey';
 import usePagination from '@/hooks/usePagination';
 import { formatDateShort } from '@/utils/common/helper_functions';
-import { Plus, Eye, Pencil, EyeOff, LucideIcon, ShieldCheck, Key, Trash2 } from 'lucide-react';
+import { Plus, Eye, Pencil, EyeOff, LucideIcon, ShieldCheck, Key, Trash2, Loader } from 'lucide-react';
 import { useState } from 'react';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
-
+import { toast } from 'react-hot-toast';
+import { EmptyPage } from '@/components/organisms';
+import GUIDES from '@/core/constants/guides';
 // Utility function to format permissions for display
 export const formatPermissionDisplay = (permissions: readonly string[]): string => {
 	const hasRead = permissions.includes('read');
@@ -110,7 +112,11 @@ const baseColumns: ColumnData<SecretKey>[] = [
 const DeveloperPage = () => {
 	const { page, limit, offset } = usePagination();
 
-	const { data: secretKeys } = useQuery({
+	const {
+		data: secretKeys,
+		isLoading,
+		isError,
+	} = useQuery({
 		queryKey: ['secret-keys', page, limit, offset],
 		queryFn: () => SecretKeysApi.getAllSecretKeys({ limit, offset }),
 	});
@@ -152,7 +158,22 @@ const DeveloperPage = () => {
 			},
 		},
 	];
-	console.log(secretKeys);
+
+	if (isLoading) {
+		return <Loader />;
+	}
+
+	if (isError) {
+		toast.error('Error fetching secret keys');
+	}
+
+	if (secretKeys?.items.length === 0) {
+		return (
+			<EmptyPage tutorials={GUIDES.secrets.tutorials} heading='Secret Keys' tags={['secrets']} onAddClick={handleAddSecretKey}>
+				<SecretKeyDrawer isOpen={isSecretKeyDrawerOpen} onOpenChange={setIsSecretKeyDrawerOpen} />
+			</EmptyPage>
+		);
+	}
 
 	return (
 		<Page
@@ -162,6 +183,7 @@ const DeveloperPage = () => {
 					Add
 				</Button>
 			}>
+			<ApiDocsContent tags={['secrets']} />
 			<SecretKeyDrawer isOpen={isSecretKeyDrawerOpen} onOpenChange={setIsSecretKeyDrawerOpen} />
 			<div>
 				<FlexpriceTable showEmptyRow columns={columns} data={secretKeys?.items || []} />

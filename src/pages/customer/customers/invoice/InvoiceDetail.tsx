@@ -1,18 +1,17 @@
-import { FormHeader, Spacer, Button, Divider, Page, Loader } from '@/components/atoms';
-import { DropdownMenu, DropdownMenuOption, InvoiceLineItemTable } from '@/components/molecules';
-import InvoicePaymentStatusModal from '@/components/molecules/InvoiceTable/InvoicePaymentStatusModal';
-import InvoiceStatusModal from '@/components/molecules/InvoiceTable/InvoiceStatusModal';
+import { FormHeader, Spacer, Button, Divider, Loader } from '@/components/atoms';
+import { InvoiceTableMenu, InvoicePaymentStatusModal, InvoiceStatusModal, InvoiceLineItemTable } from '@/components/molecules';
 import useUser from '@/hooks/useUser';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
-import { captureToPdf } from '@/utils/common/component_to_pdf';
 import formatDate from '@/utils/common/format_date';
 import { useQuery } from '@tanstack/react-query';
-import { Download, EllipsisVertical } from 'lucide-react';
+import { Download } from 'lucide-react';
 import { FC, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
-
+import { Link } from 'react-router-dom';
+import { RouteNames } from '@/core/routes/Routes';
+import { cn } from '@/lib/utils';
+import { getPaymentStatusChip } from '@/components/molecules/InvoiceTable/InvoiceTable';
 interface Props {
 	invoice_id: string;
 	breadcrumb_index: number;
@@ -20,7 +19,6 @@ interface Props {
 
 const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 	// const { invoice_id } = useParams<{ invoice_id: string }>();
-	const navigate = useNavigate();
 	const [state, setState] = useState({
 		isPaymentModalOpen: false,
 		isStatusModalOpen: false,
@@ -40,39 +38,37 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 		updateBreadcrumb(breadcrumb_index, data?.invoice_number ?? invoice_id);
 	}, [invoice_id, data?.invoice_number, breadcrumb_index, updateBreadcrumb]);
 
-	const dropdownOptions: DropdownMenuOption[] = [
-		{
-			label: 'Update Invoice Status',
-			onSelect: () => {
-				setState({
-					...state,
-					isStatusModalOpen: true,
-				});
-			},
-		},
-		{
-			label: 'Update Payment Status',
-			onSelect: () => {
-				setState({
-					...state,
-					isPaymentModalOpen: true,
-				});
-			},
-		},
-		{
-			label: 'Issue a Credit Note',
-			disabled: data?.payment_status === 'PENDING' || data?.payment_status === 'FAILED',
-			onSelect: () => {
-				navigate(`/customer-management/customers/${data?.customer_id}/invoice/${data?.id}/credit-note`);
-			},
-		},
-	];
-
 	const customerInfoClass = 'text-sm text-[#71717A] mb-[2px]';
 	const invoiceref = useRef<HTMLDivElement>(null);
 
+	const customerAddress =
+		data?.customer?.address_line1 +
+		' ' +
+		data?.customer?.address_line2 +
+		' ' +
+		data?.customer?.address_city +
+		' ' +
+		data?.customer?.address_state +
+		' ' +
+		data?.customer?.address_postal_code +
+		' ' +
+		data?.customer?.address_country;
+
+	const tenantAddress =
+		user?.tenant.billing_details.address.address_line1 +
+		' ' +
+		user?.tenant.billing_details.address.address_line2 +
+		' ' +
+		user?.tenant.billing_details.address.address_city +
+		' ' +
+		user?.tenant.billing_details.address.address_state +
+		' ' +
+		user?.tenant.billing_details.address.address_postal_code +
+		' ' +
+		user?.tenant.billing_details.address.address_country;
+
 	const handleDownlaod = () => {
-		captureToPdf(invoiceref, 'invoice');
+		InvoiceApi.getInvoicePdf(invoice_id);
 	};
 
 	if (isLoading) return <Loader />;
@@ -82,7 +78,7 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 	}
 
 	return (
-		<Page className='space-y-6'>
+		<div className='space-y-6'>
 			<InvoiceStatusModal
 				invoice={data}
 				isOpen={state.isStatusModalOpen}
@@ -103,22 +99,25 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 					});
 				}}
 			/>
-			<div ref={invoiceref} className=' mt-6 rounded-xl border border-gray-300 p-6'>
+			<div ref={invoiceref} className=' rounded-xl border border-gray-300 p-6'>
 				<div className='p-4'>
 					<div className='w-full flex justify-between items-center'>
-						<FormHeader title='Invoice Details' variant='sub-header' titleClassName='font-semibold' />
+						<FormHeader
+							title={
+								<span className='flex items-center gap-2'>
+									Invoice Details
+									{getPaymentStatusChip(data?.payment_status ?? '')}
+								</span>
+							}
+							variant='sub-header'
+							titleClassName='font-semibold'
+						/>
 						<div className='flex gap-4 items-center'>
 							<Button data-html2canvas-ignore='true' onClick={handleDownlaod}>
 								<Download />
 								<span>Download</span>
 							</Button>
-							<DropdownMenu
-								options={dropdownOptions}
-								trigger={
-									<Button variant={'outline'} className='size-9 '>
-										<EllipsisVertical />
-									</Button>
-								}></DropdownMenu>
+							<InvoiceTableMenu data={data!} />
 						</div>
 					</div>
 					<Spacer className='!my-6' />
@@ -142,19 +141,21 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 						<FormHeader className='!mb-2' title={user?.tenant.name} variant='sub-header' titleClassName='font-semibold' />
 						<p className={customerInfoClass}>{user?.tenant.name}</p>
 						<p className={customerInfoClass}>{user?.email}</p>
-						<p className={customerInfoClass}>{'--'}</p>
+						<p className={customerInfoClass}>{tenantAddress || '--'}</p>
 					</div>
 
 					<div>
 						<FormHeader className='!mb-2' title='Bill to' variant='sub-header' titleClassName='font-semibold' />
-						<p className={customerInfoClass}>{data?.customer?.name || '--'}</p>
-						<p className={customerInfoClass}>{data?.customer?.address_line1 || '--'}</p>
-						<p className={customerInfoClass}>{data?.customer?.address_line2 || '--'}</p>
+						<Link to={`${RouteNames.customers}/${data?.customer?.id}`} className={cn(customerInfoClass, 'hover:underline')}>
+							{data?.customer?.name || '--'}
+						</Link>
+						<p className={customerInfoClass}>{data?.customer?.email || '--'}</p>
+						<p className={customerInfoClass}>{customerAddress || '--'}</p>
 					</div>
 				</div>
 				<InvoiceLineItemTable title='Order Details' data={data?.line_items ?? []} amount_due={data?.amount_due} currency={data?.currency} />
 			</div>
-		</Page>
+		</div>
 	);
 };
 export default InvoiceDetails;

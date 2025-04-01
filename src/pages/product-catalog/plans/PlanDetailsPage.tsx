@@ -1,7 +1,6 @@
-import { ActionButton, Button, CardHeader, Chip, Loader, Page, Spacer } from '@/components/atoms';
-import { AddEntitlementDrawer, ColumnData, FlexpriceTable } from '@/components/molecules';
+import { ActionButton, Button, CardHeader, Chip, Loader, Page, Spacer, NoDataCard } from '@/components/atoms';
+import { AddEntitlementDrawer, ApiDocsContent, ColumnData, EditPlanDrawer, FlexpriceTable, RedirectCell } from '@/components/molecules';
 import { DetailsCard } from '@/components/molecules';
-import { getFeatureTypeChips } from '@/components/molecules/FeatureTable/FeatureTable';
 import { RouteNames } from '@/core/routes/Routes';
 import { Price } from '@/models/Price';
 import { FeatureType } from '@/models/Feature';
@@ -10,14 +9,16 @@ import EntitlementApi, { ExtendedEntitlement } from '@/utils/api_requests/Entitl
 import { PlanApi } from '@/utils/api_requests/PlanApi';
 import formatDate from '@/utils/common/format_date';
 import { getPriceTypeLabel } from '@/utils/common/helper_functions';
-import { getPriceTableCharge } from '@/utils/models/transformed_plan';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { EyeOff, Plus } from 'lucide-react';
+import { EyeOff, Plus, Pencil } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card } from '@/components/atoms';
 import formatChips from '@/utils/common/format_chips';
+import { getFeatureTypeChips } from '@/components/molecules/CustomerUsageTable/CustomerUsageTable';
+import { formatAmount } from '@/components/atoms/Input/Input';
+import ChargeValueCell from './PriceValueCell';
 
 const formatBillingPeriod = (billingPeriod: string) => {
 	switch (billingPeriod.toUpperCase()) {
@@ -53,18 +54,7 @@ type Params = {
 	planId: string;
 };
 
-// const formatInvoiceCadence = (cadence: string): string => {
-// 	switch (cadence.toUpperCase()) {
-// 		case 'ADVANCE':
-// 			return 'Advance';
-// 		case 'ARREAR':
-// 			return 'Arrear';
-// 		default:
-// 			return '';
-// 	}
-// };
-
-const chargeColumns: ColumnData[] = [
+const chargeColumns: ColumnData<Price>[] = [
 	{
 		title: 'Charge Type',
 		render: (row) => {
@@ -93,7 +83,7 @@ const chargeColumns: ColumnData[] = [
 	{
 		title: 'Value',
 		render(rowData) {
-			return <ValueCell data={rowData} />;
+			return <ChargeValueCell data={rowData} />;
 		},
 	},
 ];
@@ -105,7 +95,7 @@ const getFeatureValue = (entitlement: ExtendedEntitlement) => {
 		case FeatureType.metered:
 			return (
 				<span className='flex items-end gap-1'>
-					{entitlement.usage_limit ?? 'Unlimited'}
+					{formatAmount(entitlement.usage_limit?.toFixed() || '') ?? 'Unlimited'}
 					<span className='text-[#64748B] text-sm font-normal font-sans'>units</span>
 				</span>
 			);
@@ -115,15 +105,12 @@ const getFeatureValue = (entitlement: ExtendedEntitlement) => {
 			return '--';
 	}
 };
-const ValueCell = ({ data }: { data: Price }) => {
-	const price = getPriceTableCharge(data as any, false);
-	return <div>{price}</div>;
-};
 
 const PlanDetailsPage = () => {
 	const navigate = useNavigate();
 	const { planId } = useParams<Params>();
 	const [drawerOpen, setdrawerOpen] = useState(false);
+	const [planDrawerOpen, setPlanDrawerOpen] = useState(false);
 
 	const {
 		data: planData,
@@ -161,25 +148,15 @@ const PlanDetailsPage = () => {
 	const columnData: ColumnData<ExtendedEntitlement>[] = [
 		{
 			title: 'Feature Name',
-			onCellClick(row) {
-				navigate(RouteNames.featureDetails + `/${row?.feature?.id}`);
-			},
 			fieldVariant: 'title',
 			render(row) {
-				return row?.feature?.name;
+				return <RedirectCell redirectUrl={`${RouteNames.featureDetails}/${row?.feature?.id}`}>{row?.feature?.name}</RedirectCell>;
 			},
 		},
-		// {
-		// 	title: 'Meter',
-		// 	render(row) {
-		// 		return row?.feature.meter?.name ?? '--';
-		// 	},
-		// },
 		{
 			title: 'Type',
-
 			render(row) {
-				return getFeatureTypeChips(row?.feature_type || '');
+				return getFeatureTypeChips({ type: row?.feature_type || '', showIcon: true, showLabel: true });
 			},
 		},
 		{
@@ -239,11 +216,20 @@ const PlanDetailsPage = () => {
 		<Page
 			heading={planData?.name}
 			headingCTA={
-				<Button onClick={() => archivePlan()} disabled={planData?.status !== 'published'} variant={'outline'} className='flex gap-2'>
-					<EyeOff />
-					Archive
-				</Button>
+				<>
+					<Button onClick={() => setPlanDrawerOpen(true)} variant={'outline'} className='flex gap-2'>
+						<Pencil />
+						Edit
+					</Button>
+
+					<Button onClick={() => archivePlan()} disabled={planData?.status !== 'published'} variant={'outline'} className='flex gap-2'>
+						<EyeOff />
+						Archive
+					</Button>
+				</>
 			}>
+			<EditPlanDrawer data={planData} open={planDrawerOpen} onOpenChange={setPlanDrawerOpen} refetchQueryKeys={['fetchPlan']} />
+			<ApiDocsContent tags={['Plans']} />
 			<AddEntitlementDrawer
 				selectedFeatures={planData.entitlements?.map((v) => v.feature)}
 				entitlements={planData.entitlements}
@@ -258,26 +244,41 @@ const PlanDetailsPage = () => {
 				{/* plan charges table */}
 				{(planData?.prices?.length ?? 0) > 0 && (
 					<Card variant='notched'>
-						<CardHeader title='Charges' />
+						<CardHeader
+							title='Charges'
+							cta={
+								<Button prefixIcon={<Plus />} onClick={() => navigate(`${RouteNames.plan}/${planId}/add-charges`)}>
+									Add
+								</Button>
+							}
+						/>
 						<FlexpriceTable columns={chargeColumns} data={planData?.prices ?? []} />
 					</Card>
 				)}
 
-				<Card variant='notched'>
-					<CardHeader
+				{planData.entitlements?.length || 0 > 0 ? (
+					<Card variant='notched'>
+						<CardHeader
+							title='Entitlements'
+							cta={
+								<Button prefixIcon={<Plus />} onClick={() => setdrawerOpen(true)}>
+									Add
+								</Button>
+							}
+						/>
+						<FlexpriceTable showEmptyRow data={planData.entitlements || []} columns={columnData} />
+					</Card>
+				) : (
+					<NoDataCard
 						title='Entitlements'
+						subtitle='No entitlements added to the plan yet'
 						cta={
 							<Button prefixIcon={<Plus />} onClick={() => setdrawerOpen(true)}>
 								Add
 							</Button>
 						}
 					/>
-					<FlexpriceTable showEmptyRow data={planData.entitlements || []} columns={columnData} />
-					{(planData.entitlements?.length || 0) === 0 && (
-						<p className='text-[#64748B] text-xs font-normal font-sans mt-4'>No Entitlements added</p>
-					)}
-				</Card>
-
+				)}
 				<Spacer className='!h-10' />
 			</div>
 		</Page>

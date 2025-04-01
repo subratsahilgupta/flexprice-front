@@ -9,9 +9,10 @@ import { RouteNames } from '@/core/routes/Routes';
 import { useNavigate } from 'react-router-dom';
 export interface PlansTableProps {
 	data: Plan[];
+	onEdit: (plan: Plan) => void;
 }
 
-const PlansTable: FC<PlansTableProps> = ({ data }) => {
+const PlansTable: FC<PlansTableProps> = ({ data, onEdit }) => {
 	const navigate = useNavigate();
 	const mappedData = data?.map((plan) => ({
 		...plan,
@@ -44,11 +45,11 @@ const PlansTable: FC<PlansTableProps> = ({ data }) => {
 				<ActionButton
 					id={row.id}
 					isArchiveDisabled={row.status !== 'published'}
-					isEditDisabled={true}
 					editPath={`${RouteNames.plan}/edit-plan?id=${row.id}`}
 					deleteMutationFn={(id) => PlanApi.deletePlan(id)}
 					refetchQueryKey='fetchPlans'
 					entityName='Plan'
+					onEdit={() => onEdit(row)}
 				/>
 			),
 		},

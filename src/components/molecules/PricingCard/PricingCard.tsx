@@ -4,6 +4,7 @@ import { formatBillingPeriodForPrice, getCurrencySymbol } from '@/utils/common/h
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router-dom';
 import { RouteNames } from '@/core/routes/Routes';
+import { formatAmount } from '@/components/atoms/Input/Input';
 
 export interface PricingCardProps {
 	id: string;
@@ -64,12 +65,12 @@ const formatEntitlementValue = ({
 		case 'METERED':
 			return (
 				<>
-					{value} {feature}
+					{formatAmount(value.toString())} {feature}
 					{usage_reset_period ? ` per ${formatBillingPeriodForPrice(usage_reset_period)}` : ''}
 				</>
 			);
 		default:
-			return `${value}`;
+			return `${value} ${feature}`;
 	}
 };
 
@@ -83,7 +84,7 @@ const PricingCard: React.FC<PricingCardProps> = ({ id, name, price, entitlements
 	const navigate = useNavigate();
 
 	const config = PRICE_DISPLAY_CONFIG[price.displayType];
-	const displayAmount = config.text || `${getCurrencySymbol(price.currency || '')}${price.amount}`;
+	const displayAmount = config.text || `${getCurrencySymbol(price.currency || '')}${formatAmount(price.amount || '')}`;
 
 	return (
 		<div className={`rounded-3xl border border-gray-200 p-7 bg-white hover:border-gray-300 transition-all shadow-md ${className}`}>
@@ -107,7 +108,6 @@ const PricingCard: React.FC<PricingCardProps> = ({ id, name, price, entitlements
 			<div className='mt-6'>
 				<Button
 					onClick={() => {
-						console.log('View plan');
 						navigate(`${RouteNames.plan}/${id}`);
 					}}
 					className='w-full bg-gray-50 hover:bg-gray-100 text-gray-900 rounded-2xl py-3 text-sm font-medium transition-colors'

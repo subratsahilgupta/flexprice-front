@@ -8,6 +8,8 @@ import { EyeOff } from 'lucide-react';
 import { EyeIcon } from 'lucide-react';
 import { RouteNames } from '@/core/routes/Routes';
 import { useNavigate } from 'react-router-dom';
+import { NODE_ENV, NodeEnv } from '@/types/env';
+import EnvironmentApi from '@/utils/api_requests/EnvironmentApi';
 interface SignupFormProps {
 	switchTab: (tab: string) => void;
 }
@@ -17,15 +19,16 @@ interface SignupData {
 	password: string;
 	confirmPassword: string;
 }
+
 const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 	const navigate = useNavigate();
-	const environment = import.meta.env.VITE_ENVIRONMENT;
-	console.log('environment', environment);
+
 	const [signupData, setSignupData] = useState<SignupData>({
 		email: '',
 		password: '',
 		confirmPassword: '',
 	});
+
 	const [showPassword, setShowPassword] = useState(false);
 	const [errors, setErrors] = useState<Partial<SignupData>>({});
 
@@ -37,15 +40,26 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 				password: signupData.password,
 			});
 		},
-		onSuccess: () => {
-			toast.success('Account created successfully! Please check your email to confirm your account.');
-			switchTab('login');
+		onSuccess: (data) => {
+			if (NODE_ENV != NodeEnv.SELF_HOSTED) {
+				toast.success('Account created successfully! Please check your email to confirm your account.');
+				switchTab('login');
+			} else {
+				// Store token in a consistent format
+				const tokenData = {
+					token: data.token,
+					user_id: data.user_id,
+					tenant_id: data.tenant_id,
+				};
+				localStorage.setItem('token', JSON.stringify(tokenData));
+				EnvironmentApi.initializeEnvironments();
+				navigate(RouteNames.home);
+			}
 		},
 
 		onError: (error: any) => {
 			const errorMessage = error.error || 'An unexpected error occurred during signup';
 			toast.error(errorMessage);
-			console.log(error);
 		},
 	});
 
@@ -87,7 +101,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 		if (!validateForm()) {
 			return;
 		}
-		if (environment != 'self-hosted') {
+		if (NODE_ENV != NodeEnv.SELF_HOSTED) {
 			const { error } = await supabase.auth.signUp({
 				email: signupData.email,
 				password: signupData.password,
@@ -98,7 +112,6 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 
 			if (error) {
 				toast.error(error.message || 'Something went wrong');
-				console.log('error', error);
 				return;
 			}
 			navigate(RouteNames.resendVerification);

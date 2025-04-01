@@ -1,52 +1,22 @@
-import { FC } from 'react';
-import FlexpriceTable, { ColumnData } from '../Table';
+import { FC, useState } from 'react';
+import FlexpriceTable, { ColumnData, TooltipCell } from '../Table';
 import { formatDateWithMilliseconds } from '@/utils/common/format_date';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Copy } from 'lucide-react';
-import { toast } from 'react-hot-toast';
+import EventPropertiesDrawer from './EventPropertiesDrawer';
+import { Event } from '@/models/Event';
 
 interface Props {
 	data: Event[];
 }
 
-export interface Event {
-	readonly customer_id: string;
-	readonly event_name: string;
-	readonly external_customer_id: string;
-	readonly id: string;
-	readonly properties: Record<string, any>;
-	readonly source: string;
-	readonly timestamp: string;
-}
-
 const EventsTable: FC<Props> = ({ data }) => {
+	const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
 	const columns: ColumnData[] = [
 		{
 			title: 'Event Id',
 			render(rowData) {
-				const copyToClipboard = () => {
-					navigator.clipboard.writeText(rowData.id);
-					toast.success('Event ID copied to clipboard');
-				};
-
-				return (
-					<TooltipProvider>
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<div className='flex items-center gap-2 group'>
-									<span className='max-w-[100px] truncate cursor-pointer'>{rowData.id || '--'}</span>
-									<Copy
-										onClick={copyToClipboard}
-										className='w-4 h-4 opacity-0 group-hover:opacity-100 cursor-pointer text-muted-foreground hover:text-foreground transition-opacity'
-									/>
-								</div>
-							</TooltipTrigger>
-							<TooltipContent>
-								<p>{rowData.id}</p>
-							</TooltipContent>
-						</Tooltip>
-					</TooltipProvider>
-				);
+				return <TooltipCell tooltipContent={rowData.id} tooltipText={rowData.id} />;
 			},
 		},
 		{
@@ -72,9 +42,16 @@ const EventsTable: FC<Props> = ({ data }) => {
 			},
 		},
 	];
+
+	const handleRowClick = (event: Event) => {
+		setSelectedEvent(event);
+		setIsDrawerOpen(true);
+	};
+
 	return (
 		<div>
-			<FlexpriceTable showEmptyRow columns={columns} data={data} />
+			<FlexpriceTable showEmptyRow columns={columns} data={data} onRowClick={handleRowClick} />
+			<EventPropertiesDrawer isOpen={isDrawerOpen} onOpenChange={setIsDrawerOpen} event={selectedEvent} />
 		</div>
 	);
 };

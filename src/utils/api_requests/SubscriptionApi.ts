@@ -95,7 +95,7 @@ class SubscriptionApi {
 		period_end,
 		period_start,
 	}: GetSubscriptionDetailsPayload): Promise<GetSubscriptionPreviewResponse> {
-		return await AxiosClient.post<GetSubscriptionPreviewResponse>('invoices/preview', {
+		return await AxiosClient.post<GetSubscriptionPreviewResponse>('/invoices/preview', {
 			subscription_id: subscription_id,
 			period_end: period_end,
 			period_start: period_start,
