@@ -4,7 +4,6 @@ import { AlignJustify, ArrowRight } from 'lucide-react';
 import { ApiDocsContent } from '@/components/molecules/ApiDocs/ApiDocs';
 import { TutorialItem } from '@/pages/onboarding/onboarding';
 import { motion } from 'framer-motion';
-import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 
 interface Props {
 	onAddClick?: () => void;
@@ -24,7 +23,6 @@ const EmptyPage: FC<Props> = ({ onAddClick, tags, heading, children, tutorials =
 						onClick={() => {
 							if (onAddClick) {
 								onAddClick();
-								refetchQueries();
 							}
 						}}
 					/>
