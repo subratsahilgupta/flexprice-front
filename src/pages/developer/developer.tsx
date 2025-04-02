@@ -111,6 +111,7 @@ const baseColumns: ColumnData<SecretKey>[] = [
 
 const DeveloperPage = () => {
 	const { page, limit, offset } = usePagination();
+	const [isSecretKeyDrawerOpen, setIsSecretKeyDrawerOpen] = useState(false);
 
 	const {
 		data: secretKeys,
@@ -127,8 +128,6 @@ const DeveloperPage = () => {
 			refetchQueries(['secret-keys']);
 		},
 	});
-
-	const [isSecretKeyDrawerOpen, setIsSecretKeyDrawerOpen] = useState(false);
 
 	const handleAddSecretKey = () => {
 		setIsSecretKeyDrawerOpen(true);
@@ -167,30 +166,36 @@ const DeveloperPage = () => {
 		toast.error('Error fetching secret keys');
 	}
 
-	if (secretKeys?.items.length === 0) {
-		return (
-			<EmptyPage tutorials={GUIDES.secrets.tutorials} heading='Secret Keys' tags={['secrets']} onAddClick={handleAddSecretKey}>
-				<SecretKeyDrawer isOpen={isSecretKeyDrawerOpen} onOpenChange={setIsSecretKeyDrawerOpen} />
-			</EmptyPage>
-		);
-	}
-
+	// if (secretKeys?.items.length === 0) {
+	// 	return (
+	// 		<>
+	// 			<EmptyPage tutorials={GUIDES.secrets.tutorials} heading='Secret Keys' tags={['secrets']} onAddClick={handleAddSecretKey} />
+	// 			<SecretKeyDrawer isOpen={isSecretKeyDrawerOpen} onOpenChange={setIsSecretKeyDrawerOpen} />
+	// 		</>
+	// 	);
+	// }
 	return (
-		<Page
-			heading='API Keys'
-			headingCTA={
-				<Button prefixIcon={<Plus />} onClick={handleAddSecretKey}>
-					Add
-				</Button>
-			}>
+		<div>
 			<ApiDocsContent tags={['secrets']} />
 			<SecretKeyDrawer isOpen={isSecretKeyDrawerOpen} onOpenChange={setIsSecretKeyDrawerOpen} />
-			<div>
-				<FlexpriceTable showEmptyRow columns={columns} data={secretKeys?.items || []} />
-				<ShortPagination unit='Secret Keys' totalItems={secretKeys?.pagination.total || 0} />
-			</div>
-		</Page>
+			{secretKeys?.items.length === 0 && (
+				<EmptyPage tutorials={GUIDES.secrets.tutorials} heading='Secret Keys' tags={['secrets']} onAddClick={handleAddSecretKey} />
+			)}
+			{(secretKeys?.items.length || 0) > 0 && (
+				<Page
+					heading='API Keys'
+					headingCTA={
+						<Button prefixIcon={<Plus />} onClick={handleAddSecretKey}>
+							Add
+						</Button>
+					}>
+					<div>
+						<FlexpriceTable showEmptyRow columns={columns} data={secretKeys?.items || []} />
+						<ShortPagination unit='Secret Keys' totalItems={secretKeys?.pagination.total || 0} />
+					</div>
+				</Page>
+			)}
+		</div>
 	);
 };
-
 export default DeveloperPage;

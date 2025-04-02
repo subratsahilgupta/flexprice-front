@@ -22,7 +22,6 @@ const SecretKeyDrawer: FC<Props> = ({ isOpen, onOpenChange }) => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [showApiKey, setShowApiKey] = useState(false);
 
-	// Define options with useMemo to prevent recreation on every render
 	const permissionOptions = useMemo(
 		() => [
 			{ label: 'Read', value: 'read', key_input: ['read'] },
