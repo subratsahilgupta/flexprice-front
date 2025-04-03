@@ -250,7 +250,7 @@ Our comprehensive documentation covers all aspects of the FlexPrice frontend:
 
 <!-- - [FAQ](docs/FAQ.md) - Common questions and answers -->
 
-- [Flexprice Docs](https://docs.flexprice.io/introduction) - Documenttation for Flexprice sdk and Apis
+- [Flexprice Docs](https://docs.flexprice.io) - Documenttation for Flexprice sdk and Apis
 - [Contributing Guide](docs/getting-started.md) - How to contribute to the project
 
 ## 🤝 Contributing
@@ -267,12 +267,8 @@ Please read our [Contributing Guide](docs/getting-started.md) for details.
 
 <!-- - Join our [Discord Community](https://discord.gg/flexprice) -->
 
-- Email: ola@flexprice.io
+- Email: support@flexprice.io
 <!-- - Check our [FAQ](docs/FAQ.md) -->
-
-## 📝 License
-
-[MIT License](LICENSE)
 
 ---
 
