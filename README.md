@@ -1,33 +1,40 @@
 <p align="center">
-  <img align="center" src="./assets/flexprice logo.svg" height="40%" width="40%"  alt="fleprice logo"/>
+  <img align="center" src="./assets/flexprice_logo.png" height="30%" width="30%"  alt="fleprice logo"/>
 </p>
 <h3 align="center">
 <b>
-⚡️ FlexPrice Frontend - Modern UI for Usage Metering and Billing ⚡️
+⚡️ Usage based metering & billing for developers ⚡️
 </b>
-</h3>
+</h3 >
 <p align="center">
-🌟 A powerful React-based dashboard for managing AI company billing and usage metrics 🌟
+Build usage-based, credit-based, or hybrid pricing models with full control. Flexprice handles metering, pricing, and invoicing so you can focus on building, not billing.
 </p>
+
+<h5 align="center">
+
+[Documentation](https://docs.flexprice.io) • [Demo](https://www.loom.com/share/60d8308781254fe0bc5be341501f9fd5) • [Website](https://flexprice.io/) • [LinkedIn](https://www.linkedin.com/company/flexpriceio)
+
+
+[![Go](https://img.shields.io/badge/go-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white)](https://pkg.go.dev/github.com/flexprice/go-sdk) [![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)](https://pypi.org/project/flexprice) [![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)](https://www.npmjs.com/package/@flexprice/sdk) 
+
+</h5>
 
 ---
 
-<h4 align="center">
+## Open architecture
+The Flexprice core (metering, credits, pricing, billing) has an open and composable design. 
 
-[![LinkedIn](https://img.shields.io/badge/linkedin-%230077B5.svg?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/company/flexpriceio)
-[![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)](https://reactjs.org/)
-[![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+<p align="center">
+  <img align="center" src="./assets/open-arch.jpg" alt="open architechture"/>
+</p>
 
-</h4>
+Your application, whether it's running backend APIs, AI agents, or custom workflows, can send usage data to Flexprice. You can directly stream data from data warehouses or analytics pipelines as well.
 
-## 🎯 Features
+At the core, Flexprice processes this data in real time. We handle everything that usually ends up as custom logic built by developers. Our platform calculates pricing based on the customer’s plan, applies any prepaid or promotional credits, enforces feature limits, and generates accurate invoices automatically. Whether you're using seat-based subscriptions, usage-based pricing, or prepaid credit bundles, you can set up and iterate on your pricing model without writing billing infrastructure from scratch.
 
-- **💫 Modern React Dashboard**: Built with React 18, TypeScript, and Vite for optimal performance
-- **🎨 Beautiful UI Components**: Utilizing Shadcn UI and Tailwind CSS for a sleek design
-- **📊 Real-time Analytics**: Live usage metrics and billing information
-- **🔐 Secure Authentication**: Built-in auth system with role-based access
-- **📱 Responsive Design**: Works seamlessly on desktop and mobile devices
+After billing is computed, our platform connects to your existing tools for payments, CPQ, CRM, and accounting, ensuring billing information flows into the systems your business already uses. It can sync invoices to your payment processor, update customer data in your CRM, and push revenue numbers to your accounting tools.
+
+With this architecture, you get full control over how billing works inside your product, while saving your team from the complexity of maintaining it all.
 
 ## 🚀 Quick Setup (One-Click Development)
 
