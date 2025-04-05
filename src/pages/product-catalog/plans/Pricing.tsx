@@ -21,17 +21,61 @@ type PriceType = {
 	type: string;
 	billing_cadence: string;
 	amount?: string;
+	meter?: {
+		id: string;
+		name: string;
+	};
+	tiers: any;
 };
 
-const isPreferredPrice = (price: PriceType) =>
-	price.billing_model === 'FLAT_FEE' && price.type === 'FIXED' && price.billing_cadence === 'RECURRING';
+const parseAmount = (amount: string | undefined): number => {
+	if (!amount) return 0;
+	const parsed = parseFloat(amount);
+	return isNaN(parsed) ? 0 : parsed;
+};
 
-const getPriceDisplayType = (price?: PriceType): 'free' | 'usage' | 'fixed' => {
-	if (!price) return 'usage';
-	if (isPreferredPrice(price)) {
-		return !price.amount || price.amount === '0' ? 'free' : 'fixed';
+const isRecurringPrice = (price: PriceType) => price.type === 'FIXED' && price.billing_cadence === 'RECURRING';
+
+const isUsageBasedPrice = (price: PriceType) => price.type === 'USAGE';
+
+const getPriceDisplayType = (prices: PriceType[]): 'free' | 'hybrid-free' | 'hybrid-paid' | 'usage-only' | 'fixed' => {
+	if (!prices || prices.length === 0) return 'usage-only';
+
+	const recurringPrices = prices.filter(isRecurringPrice);
+	const usagePrices = prices.filter(isUsageBasedPrice);
+
+	// Check if any recurring price has a non-zero amount
+	const hasNonZeroRecurring = recurringPrices.some((p) => parseAmount(p.amount) > 0);
+	// Check if all recurring prices are zero
+	const allRecurringZero = recurringPrices.every((p) => parseAmount(p.amount) === 0);
+
+	// Free plan: Only recurring with amount 0
+	if (recurringPrices.length > 0 && !usagePrices.length && allRecurringZero) {
+		return 'free';
 	}
-	return 'usage';
+
+	// Hybrid Free: Recurring with amount 0 + Usage
+	if (recurringPrices.length > 0 && usagePrices.length > 0 && allRecurringZero) {
+		return 'hybrid-free';
+	}
+
+	// Hybrid Paid: Recurring with amount > 0 + Usage
+	if (recurringPrices.length > 0 && usagePrices.length > 0 && hasNonZeroRecurring) {
+		return 'hybrid-paid';
+	}
+
+	// Usage-only: Only usage based prices
+	if (usagePrices.length > 0 && recurringPrices.length === 0) {
+		return 'usage-only';
+	}
+
+	// Fixed: Only recurring with amount > 0
+	if (recurringPrices.length > 0 && hasNonZeroRecurring) {
+		return 'fixed';
+	}
+
+	// Default to usage-only if nothing else matches
+	return 'usage-only';
 };
 
 const findBestPriceCombination = (
@@ -50,7 +94,7 @@ const findBestPriceCombination = (
 				.map((plan) => ({
 					...plan,
 					prices: plan.prices?.filter(
-						(price) => price.currency.toUpperCase() === currency.value && price.billing_period === period.value && isPreferredPrice(price),
+						(price) => price.currency.toUpperCase() === currency.value && price.billing_period === period.value && isRecurringPrice(price),
 					),
 				}))
 				.filter((plan) => plan.prices && plan.prices.length > 0);
@@ -175,7 +219,7 @@ const PricingPage = () => {
 						(price) => price.currency.toUpperCase() === selectedCurrency && price.billing_period === selectedBillingPeriod,
 					) || [];
 
-				const preferredPrices = allMatchingPrices.filter(isPreferredPrice);
+				const preferredPrices = allMatchingPrices.filter(isRecurringPrice);
 
 				return {
 					...plan,
@@ -184,27 +228,57 @@ const PricingPage = () => {
 			})
 			.filter((plan) => plan.prices?.length > 0);
 
+		const sortedPlans = filtered.sort((a, b) => {
+			const aRecurringPrice = a.prices?.find((price) => price.billing_model === 'RECURRING');
+			const bRecurringPrice = b.prices?.find((price) => price.billing_model === 'RECURRING');
+
+			if (aRecurringPrice && bRecurringPrice) {
+				return Number(aRecurringPrice.amount) - Number(bRecurringPrice.amount);
+			}
+
+			const aPrice = a.prices?.[0] ?? { amount: 0 };
+			const bPrice = b.prices?.[0] ?? { amount: 0 };
+			return Number(aPrice.amount) - Number(bPrice.amount);
+		});
+
 		return {
 			uniqueCurrencies: availableCurrencyOptions,
 			uniqueBillingPeriods: availablePeriodOptions,
-			filteredPlans: filtered,
+			filteredPlans: sortedPlans,
 		};
 	}, [plansData, selectedBillingPeriod, selectedCurrency]);
 
 	const transformedPlans: PricingCardProps[] = filteredPlans.map((plan) => {
-		const price = plan.prices?.[0];
+		const displayType = getPriceDisplayType(plan.prices || []);
+		const recurringPrice = plan.prices?.find(isRecurringPrice);
+		const usageCharges =
+			plan.prices?.filter(isUsageBasedPrice).map((price) => ({
+				amount: price.amount,
+				currency: price.currency,
+				billing_model: price.billing_model,
+				tiers: price.tiers,
+				meter_name: price.meter?.name || 'Usage',
+				billing_period: price.billing_period,
+				type: price.type,
+			})) || [];
+
+		// For display purposes, we prioritize showing the recurring price if it exists
+		const displayPrice = recurringPrice || usageCharges[0];
+
+		// const showUsageCharges = ['hybrid-free', 'hybrid-paid', 'usage-only'].includes(displayType);
 
 		return {
 			id: plan.id,
 			name: plan.name,
 			description: plan.description,
 			price: {
-				amount: price?.amount,
-				currency: price?.currency,
-				billingPeriod: price?.billing_period,
-				type: price?.type,
-				displayType: getPriceDisplayType(price),
+				amount: displayPrice?.amount,
+				currency: displayPrice?.currency,
+				billingPeriod: displayPrice?.billing_period,
+				type: displayPrice?.type,
+				displayType,
 			},
+			usageCharges,
 			entitlements:
 				plan.entitlements?.map((e) => ({
 					id: e.id,

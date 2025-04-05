@@ -5,6 +5,8 @@ import { Chip, NoDataCard } from '@/components/atoms';
 import { toSentenceCase } from '@/utils/common/helper_functions';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import { CreditCard, Banknote, Receipt, CircleDollarSign } from 'lucide-react';
+import { RouteNames } from '@/core/routes/Routes';
+import { RedirectCell } from '../Table';
 
 interface Props {
 	data: Payment[];
@@ -46,6 +48,19 @@ const columns: ColumnData<Payment>[] = [
 		width: 200,
 		render(rowData) {
 			return <TooltipCell tooltipContent={rowData.id} tooltipText={rowData.id} />;
+		},
+	},
+	{
+		title: 'Invoice ID',
+		render: (payment) => {
+			if (payment.destination_type.toUpperCase() === 'INVOICE') {
+				return (
+					<RedirectCell redirectUrl={`${RouteNames.invoices}/${payment.destination_id}`}>
+						{payment.invoice_number || payment.destination_id}
+					</RedirectCell>
+				);
+			}
+			return <span>{payment.destination_id}</span>;
 		},
 	},
 	{

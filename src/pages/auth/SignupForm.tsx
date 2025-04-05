@@ -114,7 +114,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 				toast.error(error.message || 'Something went wrong');
 				return;
 			}
-			navigate(RouteNames.resendVerification);
+			navigate(RouteNames.login);
 		} else {
 			signup();
 		}
