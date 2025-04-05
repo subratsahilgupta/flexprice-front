@@ -3,9 +3,24 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { Sidebar } from '@/components/molecules/Sidebar';
 import { BreadCrumbs } from '@/components/molecules';
 import { DebugMenu } from '@/components/molecules';
+import useUser from '@/hooks/useUser';
+import posthog from 'posthog-js';
+import { useEffect } from 'react';
 
 const MainLayout: React.FC = () => {
-	// Initialize breadcrumbs
+	const { user } = useUser();
+
+	useEffect(() => {
+		if (user) {
+			posthog.identify(user.email, {
+				email: user.email,
+				name: user.tenant?.name,
+				created_at: user.tenant?.created_at ? new Date(user.tenant.created_at).getTime() : undefined,
+			});
+		} else {
+			posthog.reset();
+		}
+	}, [user]);
 
 	return (
 		<SidebarProvider className='flex h-screen bg-gray-100 relative'>
