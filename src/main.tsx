@@ -18,17 +18,17 @@ if (isProd) {
 }
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-	<ReactQueryProvider>
+	<div>
 		{isProd ? (
-			<PosthogProvider>
+			<ReactQueryProvider>
 				<PosthogProvider>
 					<Sentry.ErrorBoundary fallback={<div>Something went wrong</div>}>
 						<App />
 					</Sentry.ErrorBoundary>
 				</PosthogProvider>
-			</PosthogProvider>
+			</ReactQueryProvider>
 		) : (
 			<App />
 		)}
-	</ReactQueryProvider>,
+	</div>,
 );
