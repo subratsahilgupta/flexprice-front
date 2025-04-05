@@ -42,7 +42,8 @@ import AddChargesPage from '@/pages/product-catalog/plans/AddCharges';
 import CreateInvoicePage from '@/pages/customer/invoices/CreateInvoice';
 export const RouteNames = {
 	home: '/',
-	login: '/auth',
+	login: '/login',
+	auth: '/auth',
 	signupConfirmation: '/auth/signup/confirmation',
 	resendVerification: '/auth/resend-verification',
 
@@ -92,6 +93,10 @@ export const MainRouter = createBrowserRouter([
 	// public routes
 	{
 		path: RouteNames.login,
+		element: <Auth />,
+	},
+	{
+		path: RouteNames.auth,
 		element: <Auth />,
 	},
 	{
