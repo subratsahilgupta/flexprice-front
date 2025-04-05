@@ -32,6 +32,7 @@ const App = () => {
 					}}
 					position='bottom-center'
 				/>
+				<div id='modal-root'></div>
 			</UserProvider>
 		</ReactQueryProvider>
 	);
