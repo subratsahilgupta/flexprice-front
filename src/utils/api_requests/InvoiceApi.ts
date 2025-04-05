@@ -39,7 +39,6 @@ interface GetInvoicePreviewPayload {
 
 interface CreateOneOffInvoicePayload {
 	customer_id: string;
-	price_id: string;
 	invoice_type: 'ONE_OFF';
 	currency: string;
 	amount_due: string;
