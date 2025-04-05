@@ -1,1 +1,8 @@
-type HttpStatus = 200 | 201 | 400 | 401 | 403 | 404 | 500;
+export interface ServerError {
+	success: false;
+	error: {
+		message: string;
+		internal_error: string;
+		details: Record<string, string>;
+	};
+}
