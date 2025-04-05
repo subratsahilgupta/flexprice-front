@@ -9,7 +9,7 @@ import Feature, { FeatureType } from '@/models/Feature';
 import { MeterResetPeriod } from '@/models/Meter';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
 import { useMutation } from '@tanstack/react-query';
-import { CirclePlus, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { FC, useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 
