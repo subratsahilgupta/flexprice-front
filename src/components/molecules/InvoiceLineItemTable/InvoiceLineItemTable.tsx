@@ -1,5 +1,5 @@
 import { Button, FormHeader } from '@/components/atoms';
-import { LineItem } from '@/models/Invoice';
+import { LineItem, InvoiceType } from '@/models/Invoice';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import { FC } from 'react';
 import { RefreshCw } from 'lucide-react';
@@ -9,6 +9,7 @@ interface Props {
 	amount_due?: number;
 	title?: string;
 	refetch?: () => void;
+	invoiceType?: InvoiceType;
 }
 
 const formatToShortDate = (dateString: string): string => {
@@ -32,11 +33,7 @@ const formatPriceType = (value: string): string => {
 	}
 };
 
-const InvoiceLineItemTable: FC<Props> = ({ data, amount_due, currency, title, refetch }) => {
-	if (data.length === 0) {
-		return <div></div>;
-	}
-
+const InvoiceLineItemTable: FC<Props> = ({ data, amount_due, currency, title, refetch, invoiceType }) => {
 	return (
 		<div>
 			<div className='w-full  p-4'>
@@ -62,8 +59,8 @@ const InvoiceLineItemTable: FC<Props> = ({ data, amount_due, currency, title, re
 						<thead className='border-b border-gray-200'>
 							<tr>
 								<th className='py-2 px-2 text-gray-600'>Subscription</th>
-								<th className='py-2 px-2 text-gray-600'>Description</th>
-								<th className='py-2 px-2 text-center text-gray-600'>Interval</th>
+								{invoiceType === InvoiceType.SUBSCRIPTION && <th className='py-2 px-2 text-gray-600'>Description</th>}
+								{invoiceType === InvoiceType.SUBSCRIPTION && <th className='py-2 px-2 text-gray-600'>Interval</th>}
 								<th className='py-2 px-2 text-gray-600 text-center'>Quantity</th>
 								{/* <th className='py-2 px-2 text-gray-600 text-center'>Unit Price</th> */}
 								<th className='py-2 px-2 text-gray-600 text-right'>Amount</th>
@@ -74,8 +71,13 @@ const InvoiceLineItemTable: FC<Props> = ({ data, amount_due, currency, title, re
 								return (
 									<tr key={index} className='border-b border-gray-200'>
 										<td className='py-3 px-2 text-gray-800'>{item.display_name ?? '--'}</td>
-										<td className='py-3 px-2 text-gray-800'>{formatPriceType(item.price_type)}</td>
-										<td className='py-3 px-2 text-center text-gray-800'>{`${formatToShortDate(item.period_start)} - ${formatToShortDate(item.period_end)}`}</td>
+
+										{invoiceType === InvoiceType.SUBSCRIPTION && (
+											<td className='py-3 px-2 text-gray-800'>{formatPriceType(item.price_type)}</td>
+										)}
+										{invoiceType === InvoiceType.SUBSCRIPTION && (
+											<td className='py-3 px-2 text-center text-gray-800'>{`${formatToShortDate(item.period_start)} - ${formatToShortDate(item.period_end)}`}</td>
+										)}
 										<td className='py-3 px-2 text-center text-gray-800'>{item.quantity ? item.quantity : '--'}</td>
 										{/* <td className='py-3 px-2 text-center text-gray-800'>{}</td> */}
 										<td className='py-3 px-2 text-right text-gray-800'>{formatAmount(item.amount ?? '--', item.currency)}</td>

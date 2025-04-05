@@ -37,6 +37,20 @@ interface GetInvoicePreviewPayload {
 	subscription_id: string;
 }
 
+interface CreateOneOffInvoicePayload {
+	customer_id: string;
+	price_id: string;
+	invoice_type: 'ONE_OFF';
+	currency: string;
+	amount_due: string;
+	period_start: string;
+	line_items: Array<{
+		display_name: string;
+		quantity: string;
+		amount: number;
+	}>;
+}
+
 class InvoiceApi {
 	private static baseurl = '/invoices';
 
@@ -78,6 +92,10 @@ class InvoiceApi {
 	public static async getInvoicePreview(payload: GetInvoicePreviewPayload) {
 		const url = generateQueryParams(`${this.baseurl}/preview`, payload);
 		return await AxiosClient.get(url);
+	}
+
+	public static async createOneOffInvoice(payload: CreateOneOffInvoicePayload): Promise<Invoice> {
+		return await AxiosClient.post<Invoice>(`${this.baseurl}`, payload);
 	}
 
 	public static async getInvoicePdf(invoiceId: string, invoiceNo?: string) {

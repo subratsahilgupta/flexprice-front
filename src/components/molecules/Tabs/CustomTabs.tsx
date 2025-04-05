@@ -25,9 +25,10 @@ const CustomTabs = ({ tabs, defaultValue = tabs[0]?.value, className }: CustomTa
 							'text-[15px] font-normal text-gray-500 px-3 py-1 rounded-md',
 							'data-[state=active]:text-gray-900 data-[state=active]:bg-[#F9FAFB]',
 							'hover:text-gray-900 transition-colors',
+							'data-[state=inactive]:border  data-[state=inactive]:border-border',
 							'bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0',
 						)}>
-						{tab.label}
+						<p className='text-sm font-medium'>{tab.label}</p>
 					</TabsTrigger>
 				))}
 			</TabsList>
