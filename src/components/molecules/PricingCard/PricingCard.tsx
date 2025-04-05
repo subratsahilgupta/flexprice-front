@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router-dom';
 import { RouteNames } from '@/core/routes/Routes';
 import { formatAmount } from '@/components/atoms/Input/Input';
-
+import { PlanType } from '@/pages/product-catalog/plans/Pricing';
 export interface UsageCharge {
 	amount?: string;
 	currency?: string;
@@ -28,7 +28,7 @@ export interface PricingCardProps {
 		currency?: string;
 		billingPeriod?: string;
 		type?: string;
-		displayType: 'free' | 'hybrid-free' | 'hybrid-paid' | 'usage-only' | 'fixed';
+		displayType: PlanType;
 	};
 	usageCharges?: UsageCharge[];
 	entitlements: Array<{
@@ -90,11 +90,11 @@ const formatEntitlementValue = ({
 };
 
 const PRICE_DISPLAY_CONFIG = {
-	free: { text: 'Free', showBillingPeriod: false, subtext: '' },
-	'hybrid-free': { text: 'Free', showBillingPeriod: false, subtext: '+ usage based pricing' },
-	'hybrid-paid': { text: '', showBillingPeriod: true, subtext: '+ usage based pricing' },
-	'usage-only': { text: 'Pay as you go', showBillingPeriod: false, subtext: '' },
-	fixed: { text: '', showBillingPeriod: true, subtext: '' },
+	[PlanType.FREE]: { text: 'Free', showBillingPeriod: false, subtext: '' },
+	[PlanType.HYBRID_FREE]: { text: '0', showBillingPeriod: true, subtext: '+ Usage' },
+	[PlanType.HYBRID_PAID]: { text: '', showBillingPeriod: true, subtext: '+ Usage' },
+	[PlanType.USAGE_ONLY]: { text: '0', showBillingPeriod: true, subtext: '+ Usage' },
+	[PlanType.FIXED]: { text: '', showBillingPeriod: true, subtext: '' },
 } as const;
 
 const formatUsageCharge = (charge: UsageCharge) => {
@@ -183,7 +183,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
 		<div className={`rounded-3xl border border-gray-200 p-7 bg-white hover:border-gray-300 transition-all shadow-md ${className}`}>
 			{/* Header */}
 			<div className='space-y-2'>
-				<h3 className='text-xl font-medium text-gray-900'>{name}</h3>
+				<h3 className='text-xl font-[300] text-gray-900'>{name}</h3>
 				{/* <p className='text-sm font-normal text-gray-500 leading-relaxed'>{description}</p> */}
 			</div>
 
@@ -192,36 +192,36 @@ const PricingCard: React.FC<PricingCardProps> = ({
 				{/* Base Price */}
 				<div className='flex flex-col'>
 					<div className='flex items-baseline'>
-						<span className='text-4xl font-normal text-gray-900'>{displayAmount}</span>
+						<span className='text-4xl font-normal text-gray-900'>
+							{config.text === '0' ? `${getCurrencySymbol(price.currency || '')}0` : displayAmount}
+						</span>
 						{config.showBillingPeriod && (
-							<span className='ml-2 text-sm text-gray-500'>/{formatBillingPeriodForPrice(price.billingPeriod || '')}</span>
+							<span className='text3 ml-2 text-sm text-gray-500'>
+								/{formatBillingPeriodForPrice(price.billingPeriod || '')}
+								{config.subtext && <span className='ml-1 font-medium text-lg'>{config.subtext}</span>}
+							</span>
 						)}
 					</div>
-					{config.subtext && (
-						<div className='flex items-center gap-1 mt-1'>
-							<span className='text-sm text-gray-500'>{config.subtext}</span>
-							{hasUsageCharges && showUsageCharges && (
-								<TooltipProvider delayDuration={0}>
-									<Tooltip>
-										<TooltipTrigger>
-											<Info className='h-4 w-4 text-gray-400 hover:text-gray-500 transition-colors duration-150' />
-										</TooltipTrigger>
-										<TooltipContent
-											sideOffset={5}
-											className='bg-white border border-gray-200 shadow-lg text-sm text-gray-900 px-4 py-3 rounded-lg max-w-[320px]'>
-											<div className='space-y-2'>
-												{usageCharges.map((charge, index) => (
-													<div key={index} className='flex items-center justify-between gap-4'>
-														<span className='font-medium'>{charge.meter_name}:</span>
-														<span>{formatUsageCharge(charge)}</span>
-													</div>
-												))}
+					{hasUsageCharges && showUsageCharges && (
+						<TooltipProvider delayDuration={0}>
+							<Tooltip>
+								<TooltipTrigger>
+									<Info className='h-4 w-4 text-gray-400 hover:text-gray-500 transition-colors duration-150' />
+								</TooltipTrigger>
+								<TooltipContent
+									sideOffset={5}
+									className='bg-white border border-gray-200 shadow-lg text-sm text-gray-900 px-4 py-3 rounded-lg max-w-[320px]'>
+									<div className='space-y-2'>
+										{usageCharges.map((charge, index) => (
+											<div key={index} className='flex items-center justify-between gap-4'>
+												<span className='font-medium'>{charge.meter_name}:</span>
+												<span>{formatUsageCharge(charge)}</span>
 											</div>
-										</TooltipContent>
-									</Tooltip>
-								</TooltipProvider>
-							)}
-						</div>
+										))}
+									</div>
+								</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
 					)}
 				</div>
 
@@ -296,10 +296,10 @@ const PricingCard: React.FC<PricingCardProps> = ({
 					</ul>
 				) : (
 					<div className='text-center'>
-						<p className='text-sm text-gray-500 mb-2'>No entitlements added yet</p>
+						{/* <p className='text-sm text-gray-500 mb-2'>No entitlements added yet</p> */}
 						<button
 							onClick={() => navigate(`${RouteNames.plan}/${id}`)}
-							className='text-sm text-gray-900 underline hover:text-gray-700 transition-colors'>
+							className='text-sm text-gray-900 underline decoration-dashed decoration-[0.5px] decoration-muted-foreground/50 underline-offset-4 hover:text-gray-700 transition-colors'>
 							Add entitlements
 						</button>
 					</div>

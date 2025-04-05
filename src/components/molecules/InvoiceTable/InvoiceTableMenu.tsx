@@ -89,14 +89,14 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 				});
 			},
 		},
-		{
-			label: 'Issue a Credit Note',
-			group: 'Actions',
-			disabled: data?.payment_status === 'PENDING' || data?.payment_status === 'FAILED',
-			onSelect: () => {
-				navigate(`/customer-management/customers/${data?.customer_id}/invoice/${data?.id}/credit-note`);
-			},
-		},
+		// {
+		// 	label: 'Issue a Credit Note',
+		// 	group: 'Actions',
+		// 	disabled: data?.payment_status === 'PENDING' || data?.payment_status === 'FAILED',
+		// 	onSelect: () => {
+		// 		navigate(`/customer-management/customers/${data?.customer_id}/invoice/${data?.id}/credit-note`);
+		// 	},
+		// },
 		{
 			label: 'View Customer',
 			group: 'Connections',
