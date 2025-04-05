@@ -10,7 +10,7 @@ import { ImportTask } from '@/models/ImportTask';
 import { toSentenceCase } from '@/utils/common/helper_functions';
 import toast from 'react-hot-toast';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
-
+import { ServerError } from '@/core/axios/types';
 interface Props {
 	isOpen: boolean;
 	onOpenChange: (value: boolean) => void;
@@ -164,8 +164,8 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 			setUploadedFile(undefined);
 			await refetchQueries('importTasks');
 		},
-		onError: () => {
-			toast.error('Something went wrong');
+		onError: (error: ServerError) => {
+			toast.error(error.error.message || 'Something went wrong. Please try again.');
 		},
 	});
 

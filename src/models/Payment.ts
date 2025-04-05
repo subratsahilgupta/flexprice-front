@@ -2,6 +2,7 @@ export interface Payment {
 	amount: number;
 	attempts: Attempt[];
 	created_at: string;
+	invoice_number: string;
 	created_by: string;
 	currency: string;
 	destination_id: string;

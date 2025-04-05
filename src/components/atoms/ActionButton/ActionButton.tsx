@@ -41,7 +41,7 @@ const ActionButton: FC<ActionProps> = ({
 			await refetchQueries(refetchQueryKey);
 		},
 		onError: (err: ServerError) => {
-			toast.error(err.error.message);
+			toast.error(err.error.message || `Failed to archive ${entityName}. Please try again.`);
 		},
 	});
 

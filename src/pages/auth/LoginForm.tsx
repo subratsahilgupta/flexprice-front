@@ -10,6 +10,7 @@ import AuthApi from '@/utils/api_requests/AuthApi';
 import EnvironmentApi from '@/utils/api_requests/EnvironmentApi';
 import { NODE_ENV, NodeEnv } from '@/types/env';
 import { RouteNames } from '@/core/routes/Routes';
+import { ServerError } from '@/core/axios/types';
 interface LoginFormProps {
 	switchTab: (tab: string) => void;
 }
@@ -37,8 +38,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ switchTab }) => {
 			EnvironmentApi.initializeEnvironments();
 			navigate(RouteNames.home);
 		},
-		onError: (error) => {
-			toast.error(error.message || 'Something went wrong');
+		onError: (error: ServerError) => {
+			toast.error(error.error.message || 'Something went wrong. Please try again.');
 		},
 	});
 

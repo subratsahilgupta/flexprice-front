@@ -1,5 +1,7 @@
 import { Button, Checkbox, FormHeader, Input, Select, SelectFeature, Sheet, Spacer, Toggle } from '@/components/atoms';
 import { getFeatureIcon } from '@/components/atoms/SelectFeature/SelectFeature';
+import { AddChargesButton } from '@/components/organisms/PlanForm/SetupChargesSection';
+import { ServerError } from '@/core/axios/types';
 import { billlingPeriodOptions } from '@/core/data/constants';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 import { Entitlement } from '@/models/Entitlement';
@@ -154,9 +156,8 @@ const AddEntitlementDrawer: FC<Props> = ({
 			refetchQueries(['fetchPlan', planId || '']);
 			refetchQueries(['fetchEntitlements', planId || '']);
 		},
-		onError: (error) => {
-			console.error('Error adding entitlements:', error);
-			toast.error('Error adding entitlements');
+		onError: (error: ServerError) => {
+			toast.error(error.error.message || 'Failed to add entitlements. Please try again.');
 			setErrors({ general: 'Failed to add entitlements. Please try again.' });
 		},
 	});
@@ -387,16 +388,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 				</div>
 
 				<div className='!space-y-4 mt-4'>
-					{!showSelect && !activeFeature && (
-						<button
-							onClick={() => {
-								setShowSelect(true);
-							}}
-							className='p-4 h-9 cursor-pointer flex gap-2 items-center bg-[#F4F4F5] rounded-md'>
-							<CirclePlus />
-							<p className='text-[#18181B] text-sm font-medium'>{'Add another feature'}</p>
-						</button>
-					)}
+					{!showSelect && !activeFeature && <AddChargesButton onClick={() => setShowSelect(true)} label='Add another feature' />}
 					<Button isLoading={isPending} onClick={handleSubmit} disabled={isPending}>
 						Save
 					</Button>

@@ -5,7 +5,7 @@ import SecretKeysApi from '@/utils/api_requests/SecretKeysApi';
 import { toast } from 'react-hot-toast';
 import { Copy, AlertTriangle, Eye, EyeOff } from 'lucide-react';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
-
+import { ServerError } from '@/core/axios/types';
 interface Props {
 	isOpen: boolean;
 	onOpenChange: (value: boolean) => void;
@@ -102,9 +102,9 @@ const SecretKeyDrawer: FC<Props> = ({ isOpen, onOpenChange }) => {
 			setIsModalOpen(true);
 			onOpenChange(false);
 		},
-		onError: (error) => {
+		onError: (error: ServerError) => {
 			console.error(error);
-			toast.error('Failed to create API key');
+			toast.error(error.error.message || 'Failed to create API key. Please try again.');
 		},
 	});
 

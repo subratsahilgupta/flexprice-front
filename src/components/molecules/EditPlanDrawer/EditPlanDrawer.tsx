@@ -5,7 +5,7 @@ import { useMutation } from '@tanstack/react-query';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
 import toast from 'react-hot-toast';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
-
+import { ServerError } from '@/core/axios/types';
 interface Props {
 	data: Plan;
 	open?: boolean;
@@ -25,8 +25,8 @@ const EditPlanDrawer: FC<Props> = ({ data, open, onOpenChange, trigger, refetchQ
 			onOpenChange?.(false);
 			refetchQueries(refetchQueryKeys);
 		},
-		onError: () => {
-			toast.error('Failed to update plan');
+		onError: (error: ServerError) => {
+			toast.error(error.error.message || 'Failed to update plan. Please try again.');
 		},
 	});
 

@@ -40,6 +40,7 @@ import PaymentPage from '@/pages/customer/payments/PaymentPage';
 import BillingPage from '@/pages/settings/Billing';
 import AddChargesPage from '@/pages/product-catalog/plans/AddCharges';
 import CreateInvoicePage from '@/pages/customer/invoices/CreateInvoice';
+
 export const RouteNames = {
 	home: '/',
 	login: '/login',

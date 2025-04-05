@@ -68,6 +68,7 @@ const InvoicePaymentStatusModal: FC<Props> = ({ isOpen, onOpenChange, invoice })
 		async onSuccess() {
 			toast.success('Payment status updated successfully');
 			await refetchQueries(['fetchInvoices']);
+			await refetchQueries(['fetchInvoice']);
 		},
 		onError() {
 			toast.error('Failed to update payment status');

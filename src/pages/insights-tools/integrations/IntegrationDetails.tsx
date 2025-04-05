@@ -9,6 +9,8 @@ import IntegrationsApi from '@/utils/api_requests/IntegrationsApi';
 import { TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { ApiDocsContent } from '@/components/molecules';
+import { ServerError } from '@/core/axios/types';
+
 const IntegrationDetails = () => {
 	const { id: name } = useParams() as { id: string };
 	const integration = integrations.find((integration) => integration.name.toLocaleLowerCase() === name.toLocaleLowerCase())!;
@@ -36,9 +38,9 @@ const IntegrationDetails = () => {
 			toast.success(`${integration.name} integration uninstalled successfully`);
 			refetchIntegration();
 		},
-		onError: (error) => {
+		onError: (error: ServerError) => {
 			console.error(error);
-			toast.error(`Failed to uninstall ${integration.name} integration`);
+			toast.error(error.error.message || `Failed to uninstall ${integration.name} integration. Please try again.`);
 		},
 	});
 

@@ -9,6 +9,7 @@ import InvoiceStatusModal from './InvoiceStatusModal';
 import InvoicePaymentStatusModal from './InvoicePaymentStatusModal';
 import { useNavigate } from 'react-router-dom';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
+import { ServerError } from '@/core/axios/types';
 interface Props {
 	data: Invoice;
 }
@@ -21,11 +22,11 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 			return await InvoiceApi.attemptPayment(invoice_id);
 		},
 		onSuccess: () => {
-			toast.success('Invoice Paid');
+			toast.success('Invoice paid successfully');
 			refetchQueries();
 		},
-		onError: () => {
-			toast.error('Unable to pay invoice');
+		onError: (error: ServerError) => {
+			toast.error(error.error.message || 'Unable to pay invoice. Please try again.');
 		},
 	});
 
