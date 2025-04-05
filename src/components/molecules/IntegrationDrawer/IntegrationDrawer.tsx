@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import IntegrationsApi from '@/utils/api_requests/IntegrationsApi';
 import { LoaderCircleIcon } from 'lucide-react';
 import { logger } from '@/utils/common/Logger';
+import { ServerError } from '@/core/axios/types';
 interface IntegrationDrawerProps {
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -68,9 +69,9 @@ const IntegrationDrawer: FC<IntegrationDrawerProps> = ({ isOpen, onOpenChange, p
 			}
 			onOpenChange(false);
 		},
-		onError: (error) => {
+		onError: (error: ServerError) => {
 			console.error(error);
-			toast.error(`Failed to install ${providerName} integration`);
+			toast.error(error.error.message || `Failed to install ${providerName} integration. Please try again.`);
 		},
 	});
 

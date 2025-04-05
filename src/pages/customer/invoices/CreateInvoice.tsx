@@ -86,14 +86,12 @@ const CreateInvoicePage: FC = () => {
 				customer_id: customerId!,
 				invoice_type: 'ONE_OFF',
 				currency,
-				price_id: 'usd',
 				amount_due: calculateSubtotal().toString(),
 				period_start: today.toISOString(),
 				line_items: lineItems.map((item) => ({
 					display_name: item.display_name,
 					quantity: item.quantity,
-					amount: parseFloat(item.amount),
-					price_id: 'usd',
+					amount: parseFloat(item.amount || '0') * parseFloat(item.quantity || '0'),
 				})),
 			});
 		},
@@ -210,6 +208,14 @@ const CreateInvoicePage: FC = () => {
 										label={index === 0 ? 'Amount' : ''}
 										value={item.amount}
 										onChange={(value) => handleLineItemChange(index, 'amount', value)}
+										variant='formatted-number'
+										inputPrefix={getCurrencySymbol(currency)}
+										placeholder='0.00'
+									/>
+									<Input
+										label='Total'
+										value={`${(parseFloat(item.amount || '0') * parseFloat(item.quantity || '0')).toFixed(2)}`}
+										disabled
 										variant='formatted-number'
 										inputPrefix={getCurrencySymbol(currency)}
 										placeholder='0.00'

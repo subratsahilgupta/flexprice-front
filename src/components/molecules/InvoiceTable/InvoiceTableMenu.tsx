@@ -9,6 +9,7 @@ import InvoiceStatusModal from './InvoiceStatusModal';
 import InvoicePaymentStatusModal from './InvoicePaymentStatusModal';
 import { useNavigate } from 'react-router-dom';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
+import { ServerError } from '@/core/axios/types';
 interface Props {
 	data: Invoice;
 }
@@ -21,11 +22,11 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 			return await InvoiceApi.attemptPayment(invoice_id);
 		},
 		onSuccess: () => {
-			toast.success('Invoice Paid');
+			toast.success('Invoice paid successfully');
 			refetchQueries();
 		},
-		onError: () => {
-			toast.error('Unable to pay invoice');
+		onError: (error: ServerError) => {
+			toast.error(error.error.message || 'Unable to pay invoice. Please try again.');
 		},
 	});
 
@@ -88,14 +89,14 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 				});
 			},
 		},
-		{
-			label: 'Issue a Credit Note',
-			group: 'Actions',
-			disabled: data?.payment_status === 'PENDING' || data?.payment_status === 'FAILED',
-			onSelect: () => {
-				navigate(`/customer-management/customers/${data?.customer_id}/invoice/${data?.id}/credit-note`);
-			},
-		},
+		// {
+		// 	label: 'Issue a Credit Note',
+		// 	group: 'Actions',
+		// 	disabled: data?.payment_status === 'PENDING' || data?.payment_status === 'FAILED',
+		// 	onSelect: () => {
+		// 		navigate(`/customer-management/customers/${data?.customer_id}/invoice/${data?.id}/credit-note`);
+		// 	},
+		// },
 		{
 			label: 'View Customer',
 			group: 'Connections',

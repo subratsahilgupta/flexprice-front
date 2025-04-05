@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom';
 import InvoiceDetails from '../customers/invoice/InvoiceDetail';
 import { useQuery } from '@tanstack/react-query';
 import PaymentApi from '@/utils/api_requests/PaymentApi';
-import { CustomTabs } from '@/components/molecules';
+import { ApiDocsContent, CustomTabs } from '@/components/molecules';
 import { Loader, Page, ShortPagination } from '@/components/atoms';
 import { InvoicePaymentsTable } from '@/components/molecules';
 import usePagination from '@/hooks/usePagination';
@@ -43,6 +43,7 @@ const CustomerInvoiceDetailsPage = () => {
 
 	return (
 		<Page>
+			<ApiDocsContent tags={['Invoice']} />
 			<div className='!-translate-y-6'>
 				<CustomTabs tabs={tabs} defaultValue='Overview' />
 			</div>

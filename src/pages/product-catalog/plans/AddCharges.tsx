@@ -13,6 +13,7 @@ import { currencyOptions } from '@/core/data/constants';
 import { RecurringChargesForm } from '@/components/organisms';
 import UsagePricingForm from '@/components/organisms/PlanForm/UsagePricingForm';
 import { RouteNames } from '@/core/routes/Routes';
+import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 
 enum ChargeType {
 	FIXED = 'FIXED',
@@ -33,6 +34,16 @@ const AddChargesPage = () => {
 		queryFn: () => PlanApi.getPlanById(planId ?? ''),
 		enabled: !!planId,
 	});
+
+	const { updateBreadcrumb } = useBreadcrumbsStore();
+
+	useEffect(() => {
+		if (planData) {
+			if (planData?.name) {
+				updateBreadcrumb(2, planData.name);
+			}
+		}
+	}, [planData, updateBreadcrumb]);
 
 	useEffect(() => {
 		if (planData) {

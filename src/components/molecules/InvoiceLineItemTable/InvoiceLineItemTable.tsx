@@ -60,7 +60,7 @@ const InvoiceLineItemTable: FC<Props> = ({ data, amount_due, currency, title, re
 							<tr>
 								<th className='py-2 px-2 text-gray-600'>Subscription</th>
 								{invoiceType === InvoiceType.SUBSCRIPTION && <th className='py-2 px-2 text-gray-600'>Description</th>}
-								{invoiceType === InvoiceType.SUBSCRIPTION && <th className='py-2 px-2 text-gray-600'>Interval</th>}
+								{invoiceType === InvoiceType.SUBSCRIPTION && <th className='py-2 px-2 text-center text-gray-600'>Interval</th>}
 								<th className='py-2 px-2 text-gray-600 text-center'>Quantity</th>
 								{/* <th className='py-2 px-2 text-gray-600 text-center'>Unit Price</th> */}
 								<th className='py-2 px-2 text-gray-600 text-right'>Amount</th>
