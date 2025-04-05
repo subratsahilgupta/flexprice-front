@@ -23,6 +23,8 @@ const PosthogProvider: React.FC<Props> = ({ children }) => {
 				name: user.tenant?.name,
 				created_at: user.tenant?.created_at ? new Date(user.tenant.created_at).getTime() : undefined,
 			});
+		} else {
+			posthog.reset();
 		}
 	}, [user]);
 
