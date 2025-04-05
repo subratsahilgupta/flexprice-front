@@ -5,7 +5,7 @@ import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import { useBreadcrumbs } from '@/hooks/useBreadcrumbs';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import ApiDocs from '../ApiDocs';
-import IntercomMessenger from '@/core/intercom/IntercomMessenger';
+import IntercomMessenger from '@/core/services/intercom/IntercomMessenger';
 const BreadCrumbs: FC = () => {
 	useBreadcrumbs();
 	const { breadcrumbs, isLoading } = useBreadcrumbsStore();

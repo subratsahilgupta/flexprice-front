@@ -63,3 +63,9 @@ export interface LineItem {
 export interface Metadata {
 	description: string;
 }
+
+export enum InvoiceType {
+	SUBSCRIPTION = 'SUBSCRIPTION',
+	ONE_OFF = 'ONE_OFF',
+	CREDIT = 'CREDIT',
+}

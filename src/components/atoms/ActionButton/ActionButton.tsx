@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import { Button, Dialog } from '@/components/atoms';
 import { EyeOff, Pencil } from 'lucide-react';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
-
+import { ServerError } from '@/core/axios/types';
 interface ActionProps {
 	id: string;
 	editPath: string;
@@ -40,8 +40,8 @@ const ActionButton: FC<ActionProps> = ({
 			toast.success(`${entityName} archived successfully`);
 			await refetchQueries(refetchQueryKey);
 		},
-		onError: () => {
-			toast.error(`Failed to archive ${entityName}`);
+		onError: (err: ServerError) => {
+			toast.error(err.error.message);
 		},
 	});
 

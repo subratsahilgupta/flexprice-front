@@ -12,6 +12,7 @@ import { Link } from 'react-router-dom';
 import { RouteNames } from '@/core/routes/Routes';
 import { cn } from '@/lib/utils';
 import { getPaymentStatusChip } from '@/components/molecules/InvoiceTable/InvoiceTable';
+import { InvoiceType } from '@/models/Invoice';
 interface Props {
 	invoice_id: string;
 	breadcrumb_index: number;
@@ -77,6 +78,8 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 		toast.error('Something went wrong');
 	}
 
+	const invoiceType = data?.invoice_type as InvoiceType;
+
 	return (
 		<div className='space-y-6'>
 			<InvoiceStatusModal
@@ -103,12 +106,7 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 				<div className='p-4'>
 					<div className='w-full flex justify-between items-center'>
 						<FormHeader
-							title={
-								<span className='flex items-center gap-2'>
-									Invoice Details
-									{getPaymentStatusChip(data?.payment_status ?? '')}
-								</span>
-							}
+							title={<span className='flex items-center gap-2'>Invoice Details</span>}
 							variant='sub-header'
 							titleClassName='font-semibold'
 						/>
@@ -121,15 +119,17 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 						</div>
 					</div>
 					<Spacer className='!my-6' />
-					<div className='w-full grid grid-cols-3 gap-4'>
+					<div className='w-full grid grid-cols-4 gap-4'>
 						<p className='text-[#71717A] text-sm'>Invoice Number</p>
 						<p className='text-[#71717A] text-sm'>Date of Issue</p>
 						<p className='text-[#71717A] text-sm'>Date Due</p>
+						<p className='text-[#71717A] text-sm'>Payment Status</p>
 					</div>
-					<div className='w-full grid grid-cols-3 gap-4'>
+					<div className='w-full grid grid-cols-4 gap-4'>
 						<p className='text-[#09090B] text-sm'>{data?.invoice_number}</p>
 						<p className='text-[#09090B] text-sm'>{formatDate(data?.created_at ?? '')}</p>
-						<p className='text-[#09090B] text-sm'>{formatDate(data?.due_date ?? '')}</p>
+						<p className='text-[#09090B] text-sm'>{data?.due_date ? formatDate(data?.due_date ?? '') : '--'}</p>
+						<p className='text-[#09090B] text-sm'>{getPaymentStatusChip(data?.payment_status ?? '')}</p>
 					</div>
 				</div>
 				<div className='my-3 mx-3'>
@@ -153,7 +153,13 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 						<p className={customerInfoClass}>{customerAddress || '--'}</p>
 					</div>
 				</div>
-				<InvoiceLineItemTable title='Order Details' data={data?.line_items ?? []} amount_due={data?.amount_due} currency={data?.currency} />
+				<InvoiceLineItemTable
+					title='Order Details'
+					data={data?.line_items ?? []}
+					amount_due={data?.amount_due}
+					currency={data?.currency}
+					invoiceType={invoiceType as InvoiceType}
+				/>
 			</div>
 		</div>
 	);

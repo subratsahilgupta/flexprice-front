@@ -43,7 +43,9 @@ const CustomerInvoiceDetailsPage = () => {
 
 	return (
 		<Page>
-			<CustomTabs tabs={tabs} defaultValue='Overview' />
+			<div className='!-translate-y-6'>
+				<CustomTabs tabs={tabs} defaultValue='Overview' />
+			</div>
 		</Page>
 	);
 };

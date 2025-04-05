@@ -39,6 +39,7 @@ import OnboardingPage from '@/pages/onboarding/onboarding';
 import PaymentPage from '@/pages/customer/payments/PaymentPage';
 import BillingPage from '@/pages/settings/Billing';
 import AddChargesPage from '@/pages/product-catalog/plans/AddCharges';
+import CreateInvoicePage from '@/pages/customer/invoices/CreateInvoice';
 export const RouteNames = {
 	home: '/',
 	login: '/login',
@@ -58,6 +59,7 @@ export const RouteNames = {
 	customerManagement: '/customer-management',
 	customers: '/customer-management/customers',
 	invoices: '/customer-management/invoices',
+	createInvoice: '/customer-management/customers/:customerId/invoices/create',
 	payments: '/customer-management/payments',
 
 	// product catalog routes
@@ -164,6 +166,7 @@ export const MainRouter = createBrowserRouter([
 					},
 				],
 			},
+
 			{
 				path: RouteNames.tools,
 				children: [
@@ -226,6 +229,7 @@ export const MainRouter = createBrowserRouter([
 								path: 'invoice',
 								element: <Invoice />,
 							},
+
 							{
 								path: 'invoice/:invoice_id',
 								element: <CustomerInvoiceDetailsPage />,
@@ -239,6 +243,10 @@ export const MainRouter = createBrowserRouter([
 								element: <SubscriptionDetails />,
 							},
 						],
+					},
+					{
+						path: `${RouteNames.customers}/:customerId/invoices/create`,
+						element: <CreateInvoicePage />,
 					},
 					{
 						path: RouteNames.invoices,
