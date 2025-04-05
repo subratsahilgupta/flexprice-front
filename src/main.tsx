@@ -3,6 +3,7 @@ import App from './App.tsx';
 import './index.css';
 import * as Sentry from '@sentry/react';
 import PosthogProvider from './core/services/posthog/PosthogProvider.tsx';
+import ReactQueryProvider from './core/tanstack/ReactQueryProvider.tsx';
 
 const isProd = import.meta.env.VITE_APP_ENVIRONMENT === 'prod';
 
@@ -19,11 +20,13 @@ if (isProd) {
 ReactDOM.createRoot(document.getElementById('root')!).render(
 	<div>
 		{isProd ? (
-			<PosthogProvider>
-				<Sentry.ErrorBoundary fallback={<div>Something went wrong</div>}>
-					<App />
-				</Sentry.ErrorBoundary>
-			</PosthogProvider>
+			<ReactQueryProvider>
+				<PosthogProvider>
+					<Sentry.ErrorBoundary fallback={<div>Something went wrong</div>}>
+						<App />
+					</Sentry.ErrorBoundary>
+				</PosthogProvider>
+			</ReactQueryProvider>
 		) : (
 			<App />
 		)}
