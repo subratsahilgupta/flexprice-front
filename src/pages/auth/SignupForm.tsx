@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Input } from '@/components/atoms';
 import toast from 'react-hot-toast';
 import supabase from '@/core/supbase/config';
@@ -7,7 +7,7 @@ import { useMutation } from '@tanstack/react-query';
 import { EyeOff } from 'lucide-react';
 import { EyeIcon } from 'lucide-react';
 import { RouteNames } from '@/core/routes/Routes';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { NODE_ENV, NodeEnv } from '@/types/env';
 import EnvironmentApi from '@/utils/api_requests/EnvironmentApi';
 interface SignupFormProps {
@@ -23,11 +23,20 @@ interface SignupData {
 const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 	const navigate = useNavigate();
 
+	const [searchParams] = useSearchParams();
+	const queryEmail = searchParams.get('email') || '';
+
 	const [signupData, setSignupData] = useState<SignupData>({
-		email: '',
+		email: queryEmail,
 		password: '',
 		confirmPassword: '',
 	});
+
+	useEffect(() => {
+		if (queryEmail) {
+			setSignupData({ ...signupData, email: queryEmail });
+		}
+	}, [queryEmail]);
 
 	const [showPassword, setShowPassword] = useState(false);
 	const [errors, setErrors] = useState<Partial<SignupData>>({});
