@@ -82,6 +82,7 @@ const FeatureDetails = () => {
 			await EntitlementApi.getAllEntitlements({
 				feature_ids: [featureId!],
 				expand: 'plans,features',
+				status: 'published',
 			}),
 		enabled: !!featureId,
 	});

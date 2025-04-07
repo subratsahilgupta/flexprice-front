@@ -7,7 +7,9 @@ import { Gauge, SquareCheckBig, Wrench } from 'lucide-react';
 import { FC } from 'react';
 
 const fetchFeatures = async () => {
-	return await FeatureApi.getAllFeatures({});
+	return await FeatureApi.getAllFeatures({
+		status: 'published',
+	});
 };
 
 interface Props {
