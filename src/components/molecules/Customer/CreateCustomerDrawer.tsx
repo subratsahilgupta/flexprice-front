@@ -9,7 +9,7 @@ import { Country, State, City, IState } from 'country-state-city';
 import { z } from 'zod';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 import { logger } from '@/utils/common/Logger';
-import { ServerError } from '@/core/axios/types';
+
 interface Props {
 	data?: Customer;
 	open?: boolean;

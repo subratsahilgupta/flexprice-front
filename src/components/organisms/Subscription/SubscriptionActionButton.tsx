@@ -41,8 +41,8 @@ const SubscriptionActionButton: React.FC<Props> = ({ subscription }) => {
 			await refetchQueries(['subscriptionDetails']);
 			await refetchQueries(['subscriptions']);
 		},
-		onError: () => {
-			toast.error('Failed to pause subscription');
+		onError: (error: ServerError) => {
+			toast.error(error.error.message || 'Failed to pause subscription');
 		},
 	});
 

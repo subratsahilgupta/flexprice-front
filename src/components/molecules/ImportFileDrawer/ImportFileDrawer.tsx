@@ -10,7 +10,7 @@ import { ImportTask } from '@/models/ImportTask';
 import { toSentenceCase } from '@/utils/common/helper_functions';
 import toast from 'react-hot-toast';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
-import { ServerError } from '@/core/axios/types';
+
 interface Props {
 	isOpen: boolean;
 	onOpenChange: (value: boolean) => void;

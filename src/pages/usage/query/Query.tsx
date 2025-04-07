@@ -55,7 +55,7 @@ const QueryPage = () => {
 				window_size: payload.window_size,
 			});
 		},
-		onError: () => toast.error('Error fetching data'),
+		onError: (error: ServerError) => toast.error(error.error.message || 'Error fetching data'),
 	});
 
 	useEffect(() => {

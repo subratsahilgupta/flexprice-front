@@ -10,7 +10,7 @@ import AuthApi from '@/utils/api_requests/AuthApi';
 import EnvironmentApi from '@/utils/api_requests/EnvironmentApi';
 import { NODE_ENV, NodeEnv } from '@/types/env';
 import { RouteNames } from '@/core/routes/Routes';
-import { ServerError } from '@/core/axios/types';
+
 interface LoginFormProps {
 	switchTab: (tab: string) => void;
 }

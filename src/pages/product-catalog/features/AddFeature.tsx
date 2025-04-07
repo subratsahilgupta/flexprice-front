@@ -1,6 +1,7 @@
 import { Button, CodePreview, FormHeader, Input, Page, RadioGroup, Select, SelectOption, Spacer, Textarea } from '@/components/atoms';
 import { ApiDocsContent } from '@/components/molecules';
 import EventFilter from '@/components/molecules/EventFilter';
+import { AddChargesButton } from '@/components/organisms/PlanForm/SetupChargesSection';
 import { RouteNames } from '@/core/routes/Routes';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 import { cn } from '@/lib/utils';
@@ -9,7 +10,7 @@ import { Meter } from '@/models/Meter';
 import FeatureApi from '@/utils/api_requests/FeatureApi';
 import { MeterApi } from '@/utils/api_requests/MeterApi';
 import { useMutation } from '@tanstack/react-query';
-import { CirclePlus, Gauge, SquareCheckBig, Wrench } from 'lucide-react';
+import { Gauge, SquareCheckBig, Wrench } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { LuCircleFadingPlus } from 'react-icons/lu';
@@ -184,8 +185,8 @@ const AddFeaturePage = () => {
 				toast.error('Failed to get meter ID from response');
 			}
 		},
-		onError: () => {
-			toast.error('Failed to create meter. Please check the form and try again.');
+		onError: (error: ServerError) => {
+			toast.error(error.error.message || 'Failed to create meter. Please check the form and try again.');
 		},
 		retry: 3,
 	});
@@ -233,8 +234,8 @@ const AddFeaturePage = () => {
 			navigate(RouteNames.features);
 			toast.success('Feature created successfully');
 		},
-		onError: () => {
-			toast.error('An error occurred while creating feature. Please try again.');
+		onError: (error: ServerError) => {
+			toast.error(error.error.message || 'An error occurred while creating feature. Please try again.');
 		},
 	});
 
@@ -375,14 +376,12 @@ const AddFeaturePage = () => {
 						<Spacer height={'16px'} />
 
 						{!state.showDescription ? (
-							<button
+							<AddChargesButton
+								label='Add feature description'
 								onClick={() => {
 									setstate((prev) => ({ ...prev, showDescription: true }));
 								}}
-								className='p-4 h-9 cursor-pointer flex gap-2 items-center bg-[#F4F4F5] rounded-md'>
-								<CirclePlus />
-								<p className='text-[#18181B] text-sm font-medium'>{'Add Feature Description'}</p>
-							</button>
+							/>
 						) : (
 							<Textarea
 								label='Feature Description'

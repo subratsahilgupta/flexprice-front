@@ -5,7 +5,7 @@ import { useMutation } from '@tanstack/react-query';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
 import toast from 'react-hot-toast';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
-import { ServerError } from '@/core/axios/types';
+
 interface Props {
 	data: Plan;
 	open?: boolean;

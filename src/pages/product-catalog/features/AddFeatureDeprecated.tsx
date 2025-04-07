@@ -98,8 +98,8 @@
 // 			navigate(RouteNames.features);
 // 			toast.success('Feature created successfully');
 // 		},
-// 		onError: (error) => {
-// 			toast.error('An error occurred. Please try again later.');
+// 		onError: (error: ServerError) => {
+// 			toast.error(error.error.message || 'An error occurred. Please try again later.');
 // 			console.log(error);
 // 		},
 // 	});

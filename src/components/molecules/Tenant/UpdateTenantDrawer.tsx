@@ -8,7 +8,7 @@ import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 import { logger } from '@/utils/common/Logger';
 import { User } from '@/models/User';
 import { UserApi } from '@/utils/api_requests/UserApi';
-import { ServerError } from '@/core/axios/types';
+
 interface UpdateTenantPayload {
 	billing_details: {
 		address: {
