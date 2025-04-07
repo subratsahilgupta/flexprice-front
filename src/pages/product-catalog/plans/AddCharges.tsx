@@ -82,8 +82,8 @@ const AddChargesPage = () => {
 			toast.success('Plan updated successfully');
 			navigate(`${RouteNames.plan}/${planId}`);
 		},
-		onError: () => {
-			toast.error('Error updating plan');
+		onError: (error: ServerError) => {
+			toast.error(error.error.message || 'Error updating plan');
 		},
 	});
 

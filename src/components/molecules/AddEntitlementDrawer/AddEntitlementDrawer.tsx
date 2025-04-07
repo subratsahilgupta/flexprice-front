@@ -1,7 +1,7 @@
 import { Button, Checkbox, FormHeader, Input, Select, SelectFeature, Sheet, Spacer, Toggle } from '@/components/atoms';
 import { getFeatureIcon } from '@/components/atoms/SelectFeature/SelectFeature';
 import { AddChargesButton } from '@/components/organisms/PlanForm/SetupChargesSection';
-import { ServerError } from '@/core/axios/types';
+
 import { billlingPeriodOptions } from '@/core/data/constants';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 import { Entitlement } from '@/models/Entitlement';

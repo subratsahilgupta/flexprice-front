@@ -20,8 +20,8 @@ const AddMeterPage = () => {
 			toast.success('Meter created successfully');
 			navigate(RouteNames.meter);
 		},
-		onError: () => {
-			toast.error('Error creating meter');
+		onError: (error: ServerError) => {
+			toast.error(error.error.message || 'Error creating meter');
 		},
 	});
 

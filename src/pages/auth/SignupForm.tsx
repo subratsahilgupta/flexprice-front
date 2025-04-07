@@ -66,8 +66,8 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 			}
 		},
 
-		onError: (error: any) => {
-			const errorMessage = error.error || 'An unexpected error occurred during signup';
+		onError: (error: ServerError) => {
+			const errorMessage = error.error.message || 'An unexpected error occurred during signup';
 			toast.error(errorMessage);
 		},
 	});

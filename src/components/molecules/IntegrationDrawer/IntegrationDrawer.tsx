@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import IntegrationsApi from '@/utils/api_requests/IntegrationsApi';
 import { LoaderCircleIcon } from 'lucide-react';
 import { logger } from '@/utils/common/Logger';
-import { ServerError } from '@/core/axios/types';
+
 interface IntegrationDrawerProps {
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;

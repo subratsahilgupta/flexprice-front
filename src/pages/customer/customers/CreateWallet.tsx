@@ -34,8 +34,8 @@ const CreateWallet: FC<Props> = ({ customerId, onClose = () => {} }) => {
 				name: walletName,
 			});
 		},
-		onError: () => {
-			toast.error('An error occurred while creating wallet');
+		onError: (error: ServerError) => {
+			toast.error(error.error.message || 'An error occurred while creating wallet');
 		},
 		onSuccess: () => {
 			toast.success('Wallet created successfully');

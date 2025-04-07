@@ -120,8 +120,8 @@ const CustomerSubscription: React.FC = () => {
 			navigate(`${RouteNames.customers}/${customerId}`);
 			invalidateQueries(['debug-customers', 'debug-subscriptions']);
 		},
-		onError: () => {
-			toast.error('Error creating subscription');
+		onError: (error: ServerError) => {
+			toast.error(error.error.message || 'Error creating subscription');
 		},
 	});
 

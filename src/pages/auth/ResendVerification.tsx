@@ -30,8 +30,8 @@ const ResendVerification = () => {
 			toast.success('Verification email has been resent. Please check your inbox.');
 			setResendSuccess(true);
 		},
-		onError: (error: any) => {
-			const errorMessage = error.error || 'Failed to resend verification email';
+		onError: (error: ServerError) => {
+			const errorMessage = error.error.message || 'Failed to resend verification email';
 			toast.error(errorMessage);
 		},
 	});

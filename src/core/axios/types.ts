@@ -1,4 +1,4 @@
-export interface ServerError {
+declare interface ServerError {
 	success: false;
 	error: {
 		message: string;

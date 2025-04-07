@@ -9,7 +9,7 @@ import InvoiceStatusModal from './InvoiceStatusModal';
 import InvoicePaymentStatusModal from './InvoicePaymentStatusModal';
 import { useNavigate } from 'react-router-dom';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
-import { ServerError } from '@/core/axios/types';
+
 interface Props {
 	data: Invoice;
 }
@@ -37,8 +37,8 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 		onSuccess: () => {
 			toast.success('Invoice downloaded');
 		},
-		onError: () => {
-			toast.error('Unable to download invoice');
+		onError: (error: ServerError) => {
+			toast.error(error.error.message || 'Unable to download invoice');
 		},
 	});
 
