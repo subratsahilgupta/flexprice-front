@@ -18,6 +18,10 @@ interface ActionProps {
 	isArchiveDisabled?: boolean;
 	isEditDisabled?: boolean;
 	onEdit?: () => void;
+	archiveText?: string;
+	editText?: string;
+	archiveIcon?: React.ReactNode;
+	editIcon?: React.ReactNode;
 }
 
 const ActionButton: FC<ActionProps> = ({
