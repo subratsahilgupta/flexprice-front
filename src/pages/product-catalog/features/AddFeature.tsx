@@ -6,7 +6,7 @@ import { RouteNames } from '@/core/routes/Routes';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 import { cn } from '@/lib/utils';
 import Feature from '@/models/Feature';
-import { Meter } from '@/models/Meter';
+import { Meter, MeterResetPeriod } from '@/models/Meter';
 import FeatureApi from '@/utils/api_requests/FeatureApi';
 import { MeterApi } from '@/utils/api_requests/MeterApi';
 import { useMutation } from '@tanstack/react-query';
@@ -42,7 +42,7 @@ const AddFeaturePage = () => {
 			type: 'SUM',
 			field: '',
 		},
-		reset_usage: 'RESET_PERIOD',
+		reset_usage: MeterResetPeriod.BILLING_PERIOD,
 	});
 
 	const [meterErrors, setmeterErrors] = useState<Partial<Record<keyof Meter | 'aggregation_type' | 'aggregation_field', string>>>({});

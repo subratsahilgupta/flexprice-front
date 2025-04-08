@@ -19,5 +19,5 @@ export interface Meter {
 
 export enum MeterResetPeriod {
 	NEVER = 'NEVER',
-	RESET_PERIOD = 'RESET_PERIOD',
+	BILLING_PERIOD = 'BILLING_PERIOD',
 }
