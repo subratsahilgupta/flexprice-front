@@ -72,7 +72,7 @@ const AddFeaturePage = () => {
 		{
 			label: 'Periodic',
 			description: 'Resets aggregation at the start of each billing cycle e.g., monthly API call limits.',
-			value: 'RESET_PERIOD',
+			value: 'BILLING_PERIOD',
 			icon: LuRefreshCw,
 		},
 		{
