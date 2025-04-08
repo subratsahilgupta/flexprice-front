@@ -161,7 +161,7 @@ const PricingPage = () => {
 		isLoading,
 		isError,
 	} = useQuery<GetAllPlansResponse>({
-		queryKey: ['fetchPlans', page],
+		queryKey: ['fetchPlansPricingCard', page],
 		queryFn: fetchPlans,
 	});
 
