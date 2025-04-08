@@ -57,7 +57,7 @@ import { formatAmount } from '@/components/atoms/Input/Input';
 
 const formatUsageReset = (usageReset: string) => {
 	switch (usageReset) {
-		case 'RESET_PERIOD':
+		case 'BILLING_PERIOD':
 			return 'Periodic';
 		case 'NEVER':
 			return 'Cumulative';

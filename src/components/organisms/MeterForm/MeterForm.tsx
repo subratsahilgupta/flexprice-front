@@ -88,7 +88,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit, isLoading }) => {
 		{
 			label: 'Periodic',
 			description: 'Reset values based on the billing cycle, such as monthly or annual usage',
-			value: 'RESET_PERIOD',
+			value: 'BILLING_PERIOD',
 			icon: LuRefreshCw,
 		},
 		{
