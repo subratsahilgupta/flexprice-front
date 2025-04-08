@@ -49,6 +49,7 @@ export const ApiDocsContent = ({ tags }: ApiDocsContentProps) => {
 		queryKey: ['openapi-json'],
 		queryFn: fetchApidocsJson,
 		staleTime: 1000 * 60 * 60 * 24,
+		gcTime: 1000 * 60 * 60 * 24,
 	});
 
 	useEffect(() => {
