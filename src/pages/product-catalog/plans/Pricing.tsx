@@ -150,7 +150,7 @@ const PricingPage = () => {
 	const navigate = useNavigate();
 
 	const fetchPlans = async () => {
-		return await PlanApi.getAllPlans({
+		return await PlanApi.getAllActivePlans({
 			limit,
 			offset,
 		});

@@ -20,8 +20,10 @@ export class PlanApi {
 			`${this.baseUrl}?limit=${limit}&offset=${offset}&expand=entitlements%2Cprices%2Cmeters%2Cfeatures`,
 		);
 	}
-	public static async getAllActivePlans() {
-		return await AxiosClient.get<GetAllPlansResponse>(`${this.baseUrl}?status=published`);
+	public static async getAllActivePlans({ limit, offset }: PaginationType) {
+		return await AxiosClient.get<GetAllPlansResponse>(
+			`${this.baseUrl}?status=published&limit=${limit}&offset=${offset}&expand=entitlements%2Cprices%2Cmeters%2Cfeatures`,
+		);
 	}
 
 	public static async getExpandedPlan() {
