@@ -5,7 +5,7 @@ import {
 	TopupCard,
 	WalletTransactionsTable,
 	ApiDocsContent,
-	WalletTerminalModal,
+	TerminateWalletModal,
 } from '@/components/molecules';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -160,7 +160,7 @@ const WalletTab = () => {
 			</Modal>
 
 			{activeWallet && (
-				<WalletTerminalModal isOpen={showTerminateModal} onOpenChange={() => setshowTerminateModal(false)} wallet={activeWallet} />
+				<TerminateWalletModal isOpen={showTerminateModal} onOpenChange={() => setshowTerminateModal(false)} wallet={activeWallet} />
 			)}
 
 			<FormHeader

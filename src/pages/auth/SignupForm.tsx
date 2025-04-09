@@ -123,7 +123,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 				toast.error(error.message || 'Something went wrong');
 				return;
 			}
-			navigate(RouteNames.login);
+			navigate(`/auth/verify-email?email=${encodeURIComponent(signupData.email)}&new=true`);
 		} else {
 			signup();
 		}
