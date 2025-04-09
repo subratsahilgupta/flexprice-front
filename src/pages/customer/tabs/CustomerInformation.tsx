@@ -3,9 +3,13 @@ import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
 import { Country } from 'country-state-city';
 import { CreateCustomerDrawer, Detail, DetailsCard } from '@/components/molecules';
-import { useParams } from 'react-router-dom';
+import { useParams, useOutletContext } from 'react-router-dom';
 import { Pencil } from 'lucide-react';
 import { useState } from 'react';
+
+type ContextType = {
+	isArchived: boolean;
+};
 
 const fetchCustomer = async (customerId: string) => {
 	return await CustomerApi.getCustomerById(customerId);
@@ -13,6 +17,7 @@ const fetchCustomer = async (customerId: string) => {
 
 const CustomerInformation = () => {
 	const { id: customerId } = useParams();
+	const { isArchived } = useOutletContext<ContextType>();
 
 	const { data: customer, isLoading } = useQuery({
 		queryKey: ['fetchCustomerDetails', customerId],
@@ -28,7 +33,6 @@ const CustomerInformation = () => {
 			value: customer?.name || '--',
 			labelStyle: 'semibold',
 		},
-
 		{
 			label: 'External ID',
 			value: customer?.external_id || '--',
@@ -89,30 +93,21 @@ const CustomerInformation = () => {
 					<Spacer className='!h-4' />
 					<div className='flex justify-between items-center'>
 						<FormHeader title={'Customer Details'} variant='form-component-title' />
-						<CreateCustomerDrawer
-							trigger={
-								<Button variant={'outline'} size={'icon'}>
-									<Pencil />
-								</Button>
-							}
-							open={customerDrawerOpen}
-							onOpenChange={setcustomerDrawerOpen}
-							data={customer}
-						/>
-					</div>
-					<Spacer className='!h-4' />
-					<DetailsCard variant='stacked' data={billingDetails} childrenAtTop cardStyle='borderless'>
-						{/* <div className='flex justify-end items-center mb-4'>
+						{!isArchived && (
 							<CreateCustomerDrawer
 								trigger={
-									<Button className='flex gap-2 mx-0 px-2' variant={'outline'}>
-										<Pencil /> Edit
+									<Button variant={'outline'} size={'icon'}>
+										<Pencil />
 									</Button>
 								}
+								open={customerDrawerOpen}
+								onOpenChange={setcustomerDrawerOpen}
 								data={customer}
 							/>
-						</div> */}
-					</DetailsCard>
+						)}
+					</div>
+					<Spacer className='!h-4' />
+					<DetailsCard variant='stacked' data={billingDetails} childrenAtTop cardStyle='borderless' />
 				</div>
 			)}
 		</div>
