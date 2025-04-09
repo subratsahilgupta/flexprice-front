@@ -28,6 +28,7 @@ import { formatMeterUsageResetPeriodToDisplay } from '@/types/formatters/Feature
 import { formatAggregationType } from './AddFeature';
 import { formatAmount } from '@/components/atoms/Input/Input';
 import { ApiDocsSnippet } from '@/store/useApiDocsStore';
+import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 
 const FeatureDetails = () => {
 	const { id: featureId } = useParams() as { id: string };
@@ -53,6 +54,7 @@ const FeatureDetails = () => {
 	const { mutate: archiveFeature, isPending: isArchiving } = useMutation({
 		mutationFn: async () => await FeatureApi.deleteFeature(featureId!),
 		onSuccess: () => {
+			refetchQueries(['fetchFeatureDetails', featureId]);
 			toast.success('Feature archived successfully');
 		},
 	});
