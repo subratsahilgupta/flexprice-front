@@ -1,11 +1,11 @@
 import { Button } from '@/components/ui/button';
-import { Loader2, Rocket, X } from 'lucide-react';
+import { Loader2, Rocket, X, Plus } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import useEnvironment from '@/hooks/useEnvironment';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Progress } from '@/components/ui/progress';
 import { RouteNames } from '@/core/routes/Routes';
 import EventsApi from '@/utils/api_requests/EventsApi';
@@ -16,11 +16,19 @@ const STREAM_DURATION = TOTAL_EVENTS * 1000; // 1 minute
 
 const DebugMenu = () => {
 	const [isOpen, setIsOpen] = useState(false);
-	const { isDevelopment } = useEnvironment();
+	const { isDevelopment, activeEnvironment } = useEnvironment();
 	const [isStreaming, setIsStreaming] = useState(false);
 	const [progress, setProgress] = useState(0);
 	const [eventsCompleted, setEventsCompleted] = useState(false);
 	const [eventCount, setEventCount] = useState(0);
+	const navigate = useNavigate();
+	const queryClient = useQueryClient();
+
+	// Refetch data when environment changes
+	useEffect(() => {
+		queryClient.invalidateQueries({ queryKey: ['debug-customers'] });
+		queryClient.invalidateQueries({ queryKey: ['debug-subscriptions'] });
+	}, [isDevelopment, queryClient, activeEnvironment?.id]);
 
 	// Fetch first customer
 	const { data: customerData, isLoading: isCustomerLoading } = useQuery({
@@ -28,13 +36,14 @@ const DebugMenu = () => {
 		queryFn: async () => {
 			return await CustomerApi.getAllCustomers({ limit: 1, offset: 0 });
 		},
+		enabled: isDevelopment,
 	});
 
 	// Fetch customer's subscriptions
 	const { data: subscriptions, isLoading: isSubscriptionLoading } = useQuery({
 		queryKey: ['debug-subscriptions', customerData?.items[0]?.id],
 		queryFn: async () => await CustomerApi.getCustomerSubscriptions(customerData?.items[0]?.id || ''),
-		enabled: !!customerData?.items[0]?.id,
+		enabled: !!customerData?.items[0]?.id && isDevelopment,
 	});
 
 	// Handle streaming simulation
@@ -72,18 +81,28 @@ const DebugMenu = () => {
 		setEventsCompleted(false);
 		setEventCount(0);
 		EventsApi.fireEvents({
-			// customer_id: customerData?.items[0]?.id,
-			subscription_id: subscriptions?.items[0]?.id,
+			subscription_id: subscriptions.items[0].id,
 			duration: STREAM_DURATION / 1000,
 		});
 	};
 
 	const handleClose = () => {
 		setIsOpen(false);
-		// Don't reset states when closing, only hide the popover
+	};
+
+	const handleCreateCustomer = () => {
+		navigate(`${RouteNames.customers}/create`);
+	};
+
+	const handleCreateSubscription = () => {
+		if (customerData?.items[0]?.id) {
+			navigate(`${RouteNames.customers}/${customerData.items[0].id}/add-subscription`);
+		}
 	};
 
 	const isLoading = isCustomerLoading || isSubscriptionLoading;
+	const hasCustomer = !!customerData?.items?.length;
+	const hasSubscription = !!subscriptions?.items?.length;
 
 	if (!isDevelopment) {
 		return null;
@@ -113,7 +132,6 @@ const DebugMenu = () => {
 						align='end'
 						sideOffset={8}
 						className='flex flex-col gap-1 bg-black/90 text-white px-4 py-2 rounded-lg max-w-[240px]'>
-						{/* <div className='font-medium text-white'>Flexprice</div> */}
 						<div className='text-[13px] text-white'>Checkout usage based pricing in action</div>
 					</TooltipContent>
 				</Tooltip>
@@ -143,24 +161,52 @@ const DebugMenu = () => {
 						dragMomentum={false}>
 						<div className='p-4'>
 							<div className='flex items-center justify-between mb-3'>
-								<h2 className='text-base font-semibold'>{eventsCompleted ? 'Sample Events Created' : 'Stream Sample Events'}</h2>
+								<h2 className='text-base font-semibold'>
+									{eventsCompleted ? 'Sample Events Created' : isLoading ? 'Loading...' : 'Stream Sample Events'}
+								</h2>
 								<Button variant='ghost' size='sm' className='size-6 p-0 opacity-60 hover:opacity-100' onClick={handleClose}>
 									<X className='size-3' />
 								</Button>
 							</div>
 
-							{eventsCompleted ? (
+							{isLoading ? (
+								<div className='flex items-center justify-center py-4'>
+									<Loader2 className='animate-spin size-5' />
+								</div>
+							) : !hasCustomer ? (
+								<div className='space-y-3'>
+									<p className='text-sm text-muted-foreground'>No customers found. Create one to get started.</p>
+									<Button onClick={handleCreateCustomer} className='w-full' size='sm'>
+										<Plus className='mr-2 size-3.5' />
+										Create Customer
+									</Button>
+								</div>
+							) : !hasSubscription ? (
+								<div className='space-y-3'>
+									<p className='text-sm text-muted-foreground'>
+										Customer{' '}
+										<Link to={`${RouteNames.customers}/${customerData.items[0].id}`} className='text-blue-500'>
+											{customerData.items[0].name}
+										</Link>{' '}
+										has no subscriptions.
+									</p>
+									<Button onClick={handleCreateSubscription} className='w-full' size='sm'>
+										<Plus className='mr-2 size-3.5' />
+										Create Subscription
+									</Button>
+								</div>
+							) : eventsCompleted ? (
 								<>
 									<p className='text-sm text-muted-foreground mb-4'>
 										{eventCount * 5} events have been fired for
-										<Link to={`${RouteNames.customers}/${customerData?.items[0]?.id}`} className='text-blue-500'>
-											{` ${customerData?.items[0]?.name} `}
+										<Link to={`${RouteNames.customers}/${customerData.items[0].id}`} className='text-blue-500'>
+											{` ${customerData.items[0].name} `}
 										</Link>
 										for
 										<Link
-											to={`${RouteNames.customers}/${customerData?.items[0]?.id}/subscription/${subscriptions?.items[0]?.id}`}
+											to={`${RouteNames.customers}/${customerData.items[0].id}/subscription/${subscriptions.items[0].id}`}
 											className='text-blue-500'>
-											{` ${subscriptions?.items[0]?.plan.name} `}
+											{` ${subscriptions.items[0].plan.name} `}
 										</Link>
 										plan.
 									</p>
@@ -179,14 +225,14 @@ const DebugMenu = () => {
 								<>
 									<p className='text-sm text-muted-foreground mb-4'>
 										Experience how metering, billing, and entitlements update in real time. Sample events will be triggered for
-										<Link to={`${RouteNames.customers}/${customerData?.items[0]?.id}`} className='text-blue-500'>
-											{` ${customerData?.items[0]?.name} `}
+										<Link to={`${RouteNames.customers}/${customerData.items[0].id}`} className='text-blue-500'>
+											{` ${customerData.items[0].name} `}
 										</Link>{' '}
 										under the{' '}
 										<Link
-											to={`${RouteNames.customers}/${customerData?.items[0]?.id}/subscription/${subscriptions?.items[0]?.id}`}
+											to={`${RouteNames.customers}/${customerData.items[0].id}/subscription/${subscriptions.items[0].id}`}
 											className='text-blue-500'>
-											{` ${subscriptions?.items[0]?.plan.name} `}
+											{` ${subscriptions.items[0].plan.name} `}
 										</Link>{' '}
 										plan.
 									</p>

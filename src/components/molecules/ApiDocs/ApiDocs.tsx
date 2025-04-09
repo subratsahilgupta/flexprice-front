@@ -12,18 +12,13 @@ const ApiDocs: FC = () => {
 	const [isDocsOpen, setIsDocsOpen] = useState(false);
 	const { snippets } = useApiDocsStore();
 
-	// Don't render an  ything if no documentation is configured
-	// if (snippets.length === 0) {
-	// 	return null;
-	// }
-
 	return (
 		<DocsDrawer
 			isOpen={isDocsOpen}
 			onOpenChange={setIsDocsOpen}
 			snippets={snippets}
 			trigger={
-				<Button variant='outline' className='outline-none text-sm  flex items-center gap-2' size='sm'>
+				<Button variant='outline' className='outline-none text-sm flex items-center gap-2' size='sm'>
 					<Code2 className='w-4 h-4' />
 					Api
 				</Button>
@@ -34,6 +29,7 @@ const ApiDocs: FC = () => {
 
 interface ApiDocsContentProps {
 	tags?: string[];
+	snippets?: ApiDocsSnippet[];
 }
 
 export const fetchApidocsJson = async (): Promise<any> => {
@@ -41,26 +37,30 @@ export const fetchApidocsJson = async (): Promise<any> => {
 	return data;
 };
 
-export const ApiDocsContent = ({ tags }: ApiDocsContentProps) => {
+export const ApiDocsContent = ({ tags, snippets: snippetsProp }: ApiDocsContentProps) => {
 	const { setPageDocs, clearPageDocs } = useDocs();
-	const [snippets, setSnippets] = useState<ApiDocsSnippet[]>([]);
+	const [snippets, setSnippets] = useState<ApiDocsSnippet[]>(snippetsProp || []);
 
 	const { data: docs } = useQuery({
 		queryKey: ['openapi-json'],
 		queryFn: fetchApidocsJson,
 		staleTime: 1000 * 60 * 60 * 24,
 		gcTime: 1000 * 60 * 60 * 24,
+		enabled: !snippetsProp && !!tags,
 	});
 
 	useEffect(() => {
 		const fetchSnippets = async (tags: string[]) => {
-			const snippets = await fetchAndExtractSnippetsByTags(tags, docs);
-			setSnippets(snippets);
+			if (!snippetsProp && tags && docs) {
+				const fetchedSnippets = await fetchAndExtractSnippetsByTags(tags, docs);
+				setSnippets(fetchedSnippets);
+			}
 		};
-		if (tags) {
+
+		if (tags && !snippetsProp) {
 			fetchSnippets(tags);
 		}
-	}, [tags, docs]);
+	}, [tags, docs, snippetsProp]);
 
 	useEffect(() => {
 		setPageDocs(snippets);

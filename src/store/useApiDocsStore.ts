@@ -4,14 +4,14 @@ export interface ApiDocsSnippet {
 	label: string;
 	description: string;
 	curl: string;
-	Python: string;
-	JavaScript: string;
-	PHP: string;
-	Java: string;
-	Go: string;
-	'C#': string;
-	Ruby: string;
-	Swift: string;
+	Python?: string;
+	JavaScript?: string;
+	PHP?: string;
+	Java?: string;
+	Go?: string;
+	'C#'?: string;
+	Ruby?: string;
+	Swift?: string;
 	url?: string;
 }
 
