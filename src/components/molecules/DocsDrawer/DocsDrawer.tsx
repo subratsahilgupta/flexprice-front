@@ -1,10 +1,8 @@
 import { FC, useState } from 'react';
-import { Sheet } from '@/components/atoms';
-import { Copy } from 'lucide-react';
-import toast from 'react-hot-toast';
-import { SupportedLanguage } from '@/utils/curlConverter';
-import { Highlight, themes } from 'prism-react-renderer';
+import { CodeBlock, Sheet } from '@/components/atoms';
 import { ApiDocsSnippet } from '@/store/useApiDocsStore';
+
+export type SupportedLanguage = 'cURL' | 'Python' | 'JavaScript' | 'PHP' | 'Go' | 'Java' | 'Ruby' | 'Swift' | 'C#';
 
 interface Props {
 	isOpen: boolean;
@@ -30,18 +28,19 @@ const languageMap: Record<SupportedLanguage, string> = {
 	'C#': 'csharp',
 };
 
-const SnippetBlock: FC<SnippetBlockProps> = ({ snippet }) => {
-	const [selectedLanguage, setSelectedLanguage] = useState<SupportedLanguage>('cURL');
-	const languages: SupportedLanguage[] = ['cURL', 'Python', 'JavaScript', 'PHP', 'Go', 'Java', 'Ruby', 'Swift', 'C#'];
+export const SnippetBlock: FC<SnippetBlockProps> = ({ snippet }) => {
+	const availableLanguages = Object.entries(snippet)
+		.filter(([key, value]) => {
+			// Filter out non-language properties and empty code snippets
+			if (key === 'label' || key === 'description') return false;
+			return value && value.trim() !== '';
+		})
+		.map(([key]) => (key === 'curl' ? 'cURL' : key)) as SupportedLanguage[];
+
+	const [selectedLanguage, setSelectedLanguage] = useState<SupportedLanguage>(availableLanguages[0] || 'cURL');
 
 	const getCode = () => {
-		return selectedLanguage === 'cURL' ? snippet.curl : snippet[selectedLanguage];
-	};
-
-	const handleCopyCode = () => {
-		const code = getCode();
-		navigator.clipboard.writeText(code);
-		toast.success('Code copied to clipboard!');
+		return selectedLanguage === 'cURL' ? snippet.curl : snippet[selectedLanguage as keyof ApiDocsSnippet] || '';
 	};
 
 	return (
@@ -51,7 +50,7 @@ const SnippetBlock: FC<SnippetBlockProps> = ({ snippet }) => {
 			<div className='rounded-lg overflow-hidden border border-gray-200 mt-3'>
 				{/* Language Tabs */}
 				<div className='flex overflow-x-auto bg-gray-50 border-b border-gray-200'>
-					{languages.map((lang) => (
+					{availableLanguages.map((lang) => (
 						<button
 							key={lang}
 							onClick={() => setSelectedLanguage(lang)}
@@ -66,27 +65,7 @@ const SnippetBlock: FC<SnippetBlockProps> = ({ snippet }) => {
 				</div>
 
 				{/* Code Block */}
-				<div className='relative'>
-					<Highlight theme={themes.nightOwl} code={getCode()} language={languageMap[selectedLanguage]}>
-						{({ className, style, tokens, getLineProps, getTokenProps }) => (
-							<pre className={`${className} p-4 overflow-x-auto`} style={style}>
-								{tokens.map((line, i) => (
-									<div key={i} {...getLineProps({ line })}>
-										{line.map((token, key) => (
-											<span key={key} {...getTokenProps({ token })} className='text-sm font-normal font-fira-code' />
-										))}
-									</div>
-								))}
-							</pre>
-						)}
-					</Highlight>
-					<button
-						onClick={handleCopyCode}
-						className='absolute top-3 right-3 p-2 bg-gray-800/30 hover:bg-gray-800/50 rounded-md text-white transition-colors'
-						title='Copy to clipboard'>
-						<Copy size={16} />
-					</button>
-				</div>
+				<CodeBlock code={getCode()} language={languageMap[selectedLanguage]} />
 			</div>
 		</div>
 	);

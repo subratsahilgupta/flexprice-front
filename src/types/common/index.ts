@@ -1,0 +1,1 @@
+export { BaseEntityStatus } from './BaseEntity';

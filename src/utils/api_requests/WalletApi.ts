@@ -48,6 +48,10 @@ class WalletApi {
 			amount,
 		});
 	}
+
+	static async terminateWallet(walletId: string): Promise<void> {
+		return await AxiosClient.post<void>(`/wallets/${walletId}/terminate`);
+	}
 }
 
 export default WalletApi;

@@ -6,7 +6,7 @@ import { billlingPeriodOptions } from '@/core/data/constants';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 import { Entitlement } from '@/models/Entitlement';
 import Feature, { FeatureType } from '@/models/Feature';
-import { MeterResetPeriod } from '@/models/Meter';
+import { METER_USAGE_RESET_PERIOD } from '@/models/Meter';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
 import { useMutation } from '@tanstack/react-query';
 import { X } from 'lucide-react';
@@ -313,7 +313,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 									/>
 									<Spacer className='!my-4' />
 									<Select
-										disabled={tempEntitlement.usage_limit === null || activeFeature.meter.reset_usage === MeterResetPeriod.NEVER}
+										disabled={tempEntitlement.usage_limit === null || activeFeature.meter.reset_usage === METER_USAGE_RESET_PERIOD.NEVER}
 										error={errors.usage_reset_period}
 										label='Usage reset'
 										placeholder='Select usage reset period'

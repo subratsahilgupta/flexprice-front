@@ -6,6 +6,7 @@ import formatChips from '@/utils/common/format_chips';
 import formatDate from '@/utils/common/format_date';
 import { MeterApi } from '@/utils/api_requests/MeterApi';
 import { formatAggregationType } from '@/components/organisms/MeterForm/MeterForm';
+import { BaseEntityStatus } from '@/types/common';
 
 export interface BillableMetricTableProps {
 	data: Meter[];
@@ -51,8 +52,8 @@ const BillableMetricTable: FC<BillableMetricTableProps> = ({ data }) => {
 			title: '',
 			render: (row) => (
 				<ActionButton
-					isEditDisabled={row.status === 'archived'}
-					isArchiveDisabled={row.status === 'archived'}
+					isEditDisabled={row.status === BaseEntityStatus.ARCHIVED}
+					isArchiveDisabled={row.status === BaseEntityStatus.ARCHIVED}
 					id={row.id}
 					editPath={`/usage-tracking/meter/edit-meter?id=${row.id}`}
 					row={row}
