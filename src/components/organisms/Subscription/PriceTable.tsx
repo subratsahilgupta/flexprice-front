@@ -11,10 +11,7 @@ export type ChargesForBillingPeriodOne = ChargesForBillingPeriod[0];
 export interface Props {
 	data: ChargesForBillingPeriod;
 }
-
 const ChargeTable: FC<Props> = ({ data }) => {
-	console.log(data);
-
 	const mappedData = (data ?? []).map((charge) => ({
 		charge: charge.meter_name ? `${charge.meter_name}` : charge.name,
 		quantity: charge.type === 'FIXED' ? '1' : 'pay as you go',
