@@ -6,18 +6,39 @@ import { DebugMenu } from '@/components/molecules';
 import useUser from '@/hooks/useUser';
 import posthog from 'posthog-js';
 import { useEffect } from 'react';
+import * as Sentry from '@sentry/react';
+import { isProd } from '@/main';
 
 const MainLayout: React.FC = () => {
 	const { user } = useUser();
 
 	useEffect(() => {
+		if (!isProd) return;
+
 		if (user) {
 			posthog.identify(user.email, {
+				id: user.id,
 				email: user.email,
 				name: user.tenant?.name,
-				created_at: user.tenant?.created_at ? new Date(user.tenant.created_at).getTime() : undefined,
+				tenant_id: user.tenant?.id,
+				tenant_name: user.tenant?.name,
+			});
+
+			Sentry.setUser({
+				id: user.id,
+				email: user.email,
+				name: user.tenant?.name,
+				tenant_id: user.tenant?.id,
+				tenant_name: user.tenant?.name,
+			});
+
+			Sentry.setContext('tenant', {
+				created_at: user.tenant?.created_at,
+				tenant_id: user.tenant?.id,
+				tenant_name: user.tenant?.name,
 			});
 		} else {
+			Sentry.setUser(null);
 			posthog.reset();
 		}
 	}, [user]);
