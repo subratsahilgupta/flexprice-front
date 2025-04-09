@@ -3,13 +3,14 @@ import { Loader2, Rocket, X, Plus } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import useEnvironment from '@/hooks/useEnvironment';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { Link, useNavigate } from 'react-router-dom';
 import { Progress } from '@/components/ui/progress';
 import { RouteNames } from '@/core/routes/Routes';
 import EventsApi from '@/utils/api_requests/EventsApi';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { queryClient } from '@/core/tanstack/ReactQueryProvider';
 
 const TOTAL_EVENTS = 60; // Number of events to simulate
 const STREAM_DURATION = TOTAL_EVENTS * 1000; // 1 minute
@@ -22,13 +23,12 @@ const DebugMenu = () => {
 	const [eventsCompleted, setEventsCompleted] = useState(false);
 	const [eventCount, setEventCount] = useState(0);
 	const navigate = useNavigate();
-	const queryClient = useQueryClient();
 
 	// Refetch data when environment changes
 	useEffect(() => {
 		queryClient.invalidateQueries({ queryKey: ['debug-customers'] });
 		queryClient.invalidateQueries({ queryKey: ['debug-subscriptions'] });
-	}, [isDevelopment, queryClient, activeEnvironment?.id]);
+	}, [isDevelopment, activeEnvironment?.id]);
 
 	// Fetch first customer
 	const { data: customerData, isLoading: isCustomerLoading } = useQuery({

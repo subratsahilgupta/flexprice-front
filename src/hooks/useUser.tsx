@@ -16,6 +16,8 @@ const useUser = () => {
 			return await UserApi.me();
 		},
 		enabled: !!tokenStr,
+		retry: 4,
+		retryDelay: 1000,
 		// gcTime: 1000 * 60 * 5,
 		// staleTime: 1000 * 60 * 5,
 	});

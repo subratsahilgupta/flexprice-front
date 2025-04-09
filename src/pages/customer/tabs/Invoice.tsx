@@ -2,7 +2,7 @@ import { AddButton, CardHeader, Loader, NoDataCard } from '@/components/atoms';
 import { ApiDocsContent, CustomerInvoiceTable } from '@/components/molecules';
 import InvoiceApi from '@/utils/api_requests/InvoiceApi';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import { Card } from '@/components/atoms';
 import { Invoice as InvoiceModel } from '@/models/Invoice';
 import { RouteNames } from '@/core/routes/Routes';
@@ -20,6 +20,8 @@ const Invoice = () => {
 		enabled: !!customerId,
 	});
 
+	const { isArchived } = useOutletContext<{ isArchived: boolean }>();
+
 	const handleShowDetails = (invoice: InvoiceModel) => {
 		navigate(`${invoice.id}`);
 	};
@@ -29,9 +31,22 @@ const Invoice = () => {
 	}
 
 	if (data?.items?.length === 0) {
-		return <NoDataCard title='Invoices' subtitle='No invoices found' />;
+		return (
+			<NoDataCard
+				title='Invoices'
+				subtitle='No invoices found'
+				cta={
+					!isArchived && (
+						<AddButton
+							onClick={() => {
+								navigate(`${RouteNames.customers}/${customerId}/invoices/create`);
+							}}
+						/>
+					)
+				}
+			/>
+		);
 	}
-
 	return (
 		<div>
 			<ApiDocsContent tags={['Invoices']} />
@@ -39,11 +54,13 @@ const Invoice = () => {
 				<CardHeader
 					title='Invoices'
 					cta={
-						<AddButton
-							onClick={() => {
-								navigate(`${RouteNames.customers}/${customerId}/invoices/create`);
-							}}
-						/>
+						!isArchived && (
+							<AddButton
+								onClick={() => {
+									navigate(`${RouteNames.customers}/${customerId}/invoices/create`);
+								}}
+							/>
+						)
 					}
 				/>
 				<CustomerInvoiceTable onRowClick={handleShowDetails} customerId={customerId} data={data?.items ?? []} />
