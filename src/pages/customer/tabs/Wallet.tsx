@@ -16,7 +16,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { IoSearch } from 'react-icons/io5';
-import { useParams } from 'react-router-dom';
+import { useParams, useOutletContext } from 'react-router-dom';
 import CreateWallet from '../customers/CreateWallet';
 import { EllipsisVertical, Info, Pencil, SlidersHorizontal, Trash2, Wallet as WalletIcon } from 'lucide-react';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
@@ -47,6 +47,7 @@ const WalletTab = () => {
 	const [isAdd, setisAdd] = useState(false);
 	const [showTopupModal, setshowTopupModal] = useState(false);
 	const [showTerminateModal, setshowTerminateModal] = useState(false);
+	const { isArchived } = useOutletContext<{ isArchived: boolean }>();
 
 	const dropdownOptions: DropdownMenuOption[] = [
 		{
@@ -146,7 +147,13 @@ const WalletTab = () => {
 	}
 
 	if (wallets?.length === 0) {
-		return <NoDataCard title='Wallets' subtitle='No wallets linked to the customer' cta={<AddButton onClick={() => setisAdd(true)} />} />;
+		return (
+			<NoDataCard
+				title='Wallets'
+				subtitle='No wallets linked to the customer'
+				cta={!isArchived && <AddButton onClick={() => setisAdd(true)} />}
+			/>
+		);
 	}
 
 	return (
@@ -186,10 +193,12 @@ const WalletTab = () => {
 					)}
 				</div>
 				<div className='flex items-center space-x-2	'>
-					<Button onClick={() => setshowTopupModal(true)}>
-						<WalletIcon />
-						<span>Topup Wallet</span>
-					</Button>
+					{!isArchived && (
+						<Button onClick={() => setshowTopupModal(true)}>
+							<WalletIcon />
+							<span>Topup Wallet</span>
+						</Button>
+					)}
 
 					<DropdownMenu
 						options={dropdownOptions}

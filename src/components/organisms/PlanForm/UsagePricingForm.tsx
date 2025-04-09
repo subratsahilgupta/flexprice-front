@@ -1,6 +1,6 @@
 import { Price } from '@/models/Price';
 import { FC, useState, useEffect } from 'react';
-import { Button, CheckboxRadioGroup, Input, Select, Spacer } from '@/components/atoms';
+import { Button, CheckboxRadioGroup, Input, Select, SelectOption, Spacer } from '@/components/atoms';
 import SelectMeter from './SelectMeter';
 // import { Pencil, Trash2 } from 'lucide-react';
 import { Meter } from '@/models/Meter';
@@ -32,10 +32,11 @@ interface TieredPrice {
 	flat_amount: string;
 }
 
-const billingModels = [
+// TODO: Remove disabled once the feature is released
+const billingModels: SelectOption[] = [
 	{ value: 'FLAT_FEE', label: 'Flat Fee' },
-	{ value: 'PACKAGE', label: 'Package' },
-	{ value: 'TIERED', label: 'Volume Tiered' },
+	{ value: 'PACKAGE', label: 'Package (Coming Soon)', disabled: true },
+	{ value: 'TIERED', label: 'Volume Tiered (Coming Soon)', disabled: true },
 ];
 
 const UsagePricingForm: FC<Props> = ({ onAdd, onUpdate, onEditClicked, onDeleteClicked, price }) => {
@@ -326,6 +327,7 @@ const UsagePricingForm: FC<Props> = ({ onAdd, onUpdate, onEditClicked, onDeleteC
 			)}
 
 			<Spacer height='16px' />
+			{/* !TODO: Remove disabled once the feature is released */}
 			<CheckboxRadioGroup
 				title='Billing timing'
 				value={invoiceCadence}
@@ -334,6 +336,7 @@ const UsagePricingForm: FC<Props> = ({ onAdd, onUpdate, onEditClicked, onDeleteC
 						label: 'Advance',
 						value: 'ADVANCE',
 						description: 'Charge at the start of each billing cycle.',
+						disabled: true,
 					},
 					{
 						label: 'Arrear',
