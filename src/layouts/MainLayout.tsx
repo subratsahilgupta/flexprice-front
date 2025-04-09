@@ -7,8 +7,8 @@ import useUser from '@/hooks/useUser';
 import posthog from 'posthog-js';
 import { useEffect } from 'react';
 import * as Sentry from '@sentry/react';
-import { isProd } from '@/main';
 
+const isProd = import.meta.env.VITE_APP_ENVIRONMENT === 'prod';
 const MainLayout: React.FC = () => {
 	const { user } = useUser();
 

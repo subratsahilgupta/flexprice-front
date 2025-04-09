@@ -169,15 +169,6 @@ const PricingCard: React.FC<PricingCardProps> = ({
 	const config = PRICE_DISPLAY_CONFIG[price.displayType];
 	const displayAmount = config.text || `${getCurrencySymbol(price.currency || '')}${formatAmount(price.amount || '')}`;
 	const hasUsageCharges = usageCharges.length > 0;
-	console.log({
-		id,
-		name,
-		price,
-		usageCharges,
-		entitlements,
-		className,
-		showUsageCharges,
-	});
 
 	return (
 		<div className={`rounded-3xl border border-gray-200 p-7 bg-white hover:border-gray-300 transition-all shadow-md ${className}`}>
