@@ -132,7 +132,6 @@ const AddChargesPage = () => {
 								<RecurringChargesForm
 									price={charge}
 									onAdd={(charge) => {
-										console.log('onAdd', charge);
 										const newCharges = recurringCharges.map((p, i) => {
 											if (index === i) {
 												return { ...charge, internal_state: 'saved' };
@@ -175,7 +174,6 @@ const AddChargesPage = () => {
 								<UsagePricingForm
 									price={charge}
 									onAdd={(charge) => {
-										console.log('onAdd', charge);
 										const newCharges = usageCharges.map((p, i) => {
 											if (index === i) {
 												return { ...charge, internal_state: 'saved' };
@@ -185,7 +183,6 @@ const AddChargesPage = () => {
 										setUsageCharges(newCharges);
 									}}
 									onUpdate={(charge) => {
-										console.log('onUpdate', charge);
 										const newCharges = usageCharges.map((p, i) => {
 											if (index === i) {
 												return { ...charge, internal_state: 'saved' };
@@ -195,7 +192,6 @@ const AddChargesPage = () => {
 										setUsageCharges(newCharges);
 									}}
 									onEditClicked={() => {
-										console.log('onEditClicked', charge);
 										const newCharges = usageCharges.map((p, i) => {
 											if (index === i) {
 												return { ...p, internal_state: 'edit' };
@@ -205,7 +201,6 @@ const AddChargesPage = () => {
 										setUsageCharges(newCharges);
 									}}
 									onDeleteClicked={() => {
-										console.log('onDeleteClicked', charge);
 										const newCharges = usageCharges.filter((_p, i) => i !== index) as InternalPrice[];
 										setUsageCharges(newCharges);
 									}}

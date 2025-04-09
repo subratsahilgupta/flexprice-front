@@ -203,9 +203,6 @@ const UsagePricingForm: FC<Props> = ({ onAdd, onUpdate, onEditClicked, onDeleteC
 				tier_mode: 'VOLUME',
 			};
 		}
-
-		console.log('finalPrice', finalPrice);
-
 		// If we're editing an existing price, preserve its ID and other important fields
 		if (price.internal_state === 'edit') {
 			const finalPriceWithEdit: InternalPrice = {
