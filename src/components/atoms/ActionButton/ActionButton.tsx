@@ -10,7 +10,7 @@ import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 
 interface ActionProps {
 	id: string;
-	editPath: string;
+	editPath?: string;
 	deleteMutationFn: (id: string) => Promise<void>;
 	refetchQueryKey: string;
 	entityName: string;
@@ -33,6 +33,10 @@ const ActionButton: FC<ActionProps> = ({
 	entityName,
 	isArchiveDisabled,
 	isEditDisabled,
+	archiveText,
+	editText,
+	archiveIcon,
+	editIcon,
 }) => {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [isOpen, setIsOpen] = useState(false);
@@ -41,11 +45,11 @@ const ActionButton: FC<ActionProps> = ({
 	const { mutate: deleteEntity } = useMutation({
 		mutationFn: deleteMutationFn,
 		onSuccess: async () => {
-			toast.success(`${entityName} archived successfully`);
+			toast.success(`${entityName} ${archiveText?.toLowerCase() || 'archived'} successfully`);
 			await refetchQueries(refetchQueryKey);
 		},
 		onError: (err: ServerError) => {
-			toast.error(err.error.message || `Failed to archive ${entityName}. Please try again.`);
+			toast.error(err.error.message || `Failed to ${archiveText?.toLowerCase() || 'archive'} ${entityName}. Please try again.`);
 		},
 	});
 
@@ -73,13 +77,13 @@ const ActionButton: FC<ActionProps> = ({
 								setIsOpen(false);
 								if (onEdit) {
 									onEdit();
-								} else {
+								} else if (editPath) {
 									navigate(editPath);
 								}
 							}}
 							className='flex gap-2 items-center w-full cursor-pointer'>
-							<Pencil />
-							<span>Edit</span>
+							{editIcon || <Pencil />}
+							<span>{editText || 'Edit'}</span>
 						</DropdownMenuItem>
 						<DropdownMenuItem
 							disabled={isArchiveDisabled}
@@ -89,8 +93,8 @@ const ActionButton: FC<ActionProps> = ({
 								setIsDialogOpen(true);
 							}}
 							className='flex gap-2 items-center w-full cursor-pointer'>
-							<EyeOff />
-							<span>Archive</span>
+							{archiveIcon || <EyeOff />}
+							<span>{archiveText || 'Archive'}</span>
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
@@ -98,7 +102,7 @@ const ActionButton: FC<ActionProps> = ({
 
 			<Dialog
 				titleClassName='font-normal'
-				title={`Are you sure you want to archive this ${entityName}?`}
+				title={`Are you sure you want to ${archiveText?.toLowerCase() || 'archive'} this ${entityName}?`}
 				isOpen={isDialogOpen}
 				onOpenChange={setIsDialogOpen}>
 				<div className='flex flex-col mt-4 gap-4 items-end justify-center'>
@@ -111,7 +115,7 @@ const ActionButton: FC<ActionProps> = ({
 								setIsDialogOpen(false);
 								deleteEntity(id);
 							}}>
-							Archive
+							{archiveText || 'Archive'}
 						</Button>
 					</div>
 				</div>

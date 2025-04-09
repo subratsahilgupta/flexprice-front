@@ -1,5 +1,12 @@
 import { AddButton, Button, Chip, FormHeader, Modal, NoDataCard, Select, ShortPagination, Spacer } from '@/components/atoms';
-import { DropdownMenu, DropdownMenuOption, TopupCard, WalletTransactionsTable, ApiDocsContent } from '@/components/molecules';
+import {
+	DropdownMenu,
+	DropdownMenuOption,
+	TopupCard,
+	WalletTransactionsTable,
+	ApiDocsContent,
+	WalletTerminalModal,
+} from '@/components/molecules';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import usePagination from '@/hooks/usePagination';
@@ -39,6 +46,8 @@ const WalletTab = () => {
 
 	const [isAdd, setisAdd] = useState(false);
 	const [showTopupModal, setshowTopupModal] = useState(false);
+	const [showTerminateModal, setshowTerminateModal] = useState(false);
+
 	const dropdownOptions: DropdownMenuOption[] = [
 		{
 			icon: <WalletIcon />,
@@ -58,7 +67,7 @@ const WalletTab = () => {
 		{
 			icon: <Trash2 />,
 			label: 'Delete',
-			disabled: true,
+			onSelect: () => setshowTerminateModal(true),
 		},
 	];
 
@@ -149,6 +158,10 @@ const WalletTab = () => {
 					<TopupCard onSuccess={() => setshowTopupModal(false)} walletId={activeWallet?.id} />
 				</div>
 			</Modal>
+
+			{activeWallet && (
+				<WalletTerminalModal isOpen={showTerminateModal} onOpenChange={() => setshowTerminateModal(false)} wallet={activeWallet} />
+			)}
 
 			<FormHeader
 				className='!my-6'

@@ -10,7 +10,7 @@ import { PlanApi } from '@/utils/api_requests/PlanApi';
 import formatDate from '@/utils/common/format_date';
 import { getPriceTypeLabel } from '@/utils/common/helper_functions';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { EyeOff, Plus, Pencil } from 'lucide-react';
+import { EyeOff, Plus, Pencil, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -19,6 +19,7 @@ import formatChips from '@/utils/common/format_chips';
 import { getFeatureTypeChips } from '@/components/molecules/CustomerUsageTable/CustomerUsageTable';
 import { formatAmount } from '@/components/atoms/Input/Input';
 import ChargeValueCell from './ChargeValueCell';
+import { BaseEntityStatus } from '@/types/common';
 
 const formatBillingPeriod = (billingPeriod: string) => {
 	switch (billingPeriod.toUpperCase()) {
@@ -176,10 +177,11 @@ const PlanDetailsPage = () => {
 						deleteMutationFn={async () => {
 							return await EntitlementApi.deleteEntitlementById(row?.id);
 						}}
+						archiveIcon={<Trash2 />}
+						archiveText='Delete'
 						id={row?.id}
-						editPath={''}
 						isEditDisabled={true}
-						isArchiveDisabled={row?.status === 'archived'}
+						isArchiveDisabled={row?.status === BaseEntityStatus.ARCHIVED}
 						refetchQueryKey={'fetchPlan'}
 						entityName={row?.feature?.name}
 					/>

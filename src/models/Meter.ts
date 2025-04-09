@@ -17,7 +17,7 @@ export interface Meter {
 	created_at: string;
 }
 
-export enum MeterResetPeriod {
+export enum METER_USAGE_RESET_PERIOD {
 	NEVER = 'NEVER',
 	BILLING_PERIOD = 'BILLING_PERIOD',
 }

@@ -4,6 +4,7 @@ import { Plan } from '@/models/Plan';
 import { generateQueryParams } from '../common/api_helper';
 import { PaginationType } from '@/models/Pagination';
 import Feature from '@/models/Feature';
+import { BaseEntityStatus } from '@/types/common';
 interface EntitlementFilters {
 	end_time?: string;
 	expand?: string;
@@ -16,7 +17,7 @@ interface EntitlementFilters {
 	plan_ids?: string[];
 	sort?: string;
 	start_time?: string;
-	status?: 'published' | 'deleted' | 'archived';
+	status?: BaseEntityStatus;
 }
 
 export interface ExtendedEntitlement extends Entitlement {
