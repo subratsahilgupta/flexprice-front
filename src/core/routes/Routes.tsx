@@ -33,6 +33,7 @@ import CustomerInvoiceDetailsPage from '@/pages/customer/customers/CustomerInvoi
 import DeveloperPage from '@/pages/developer/developer';
 import SignupConfirmation from '@/pages/auth/SignupConfirmation';
 import ResendVerification from '@/pages/auth/ResendVerification';
+import EmailVerification from '@/pages/auth/EmailVerification';
 import CustomerInformation from '@/pages/customer/tabs/CustomerInformation';
 import PricingPage from '@/pages/product-catalog/plans/Pricing';
 import OnboardingPage from '@/pages/onboarding/onboarding';
@@ -47,6 +48,7 @@ export const RouteNames = {
 	auth: '/auth',
 	signupConfirmation: '/auth/signup/confirmation',
 	resendVerification: '/auth/resend-verification',
+	verifyEmail: '/auth/verify-email',
 
 	// usage tracking routes
 	usageTracking: '/usage-tracking',
@@ -107,6 +109,10 @@ export const MainRouter = createBrowserRouter([
 	{
 		path: RouteNames.resendVerification,
 		element: <ResendVerification />,
+	},
+	{
+		path: RouteNames.verifyEmail,
+		element: <EmailVerification />,
 	},
 	// private routes
 	{

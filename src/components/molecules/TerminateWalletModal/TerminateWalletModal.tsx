@@ -12,7 +12,7 @@ interface WalletTerminalProps {
 	wallet?: Wallet;
 }
 
-const WalletTerminalModal: FC<WalletTerminalProps> = ({ isOpen, onOpenChange, wallet }) => {
+const TerminateWalletModal: FC<WalletTerminalProps> = ({ isOpen, onOpenChange, wallet }) => {
 	const { isPending, mutate: terminateWallet } = useMutation({
 		mutationFn: async () => {
 			return await WalletApi.terminateWallet(wallet?.id as string);
@@ -56,4 +56,4 @@ const WalletTerminalModal: FC<WalletTerminalProps> = ({ isOpen, onOpenChange, wa
 	);
 };
 
-export default WalletTerminalModal;
+export default TerminateWalletModal;
