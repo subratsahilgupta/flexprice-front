@@ -127,6 +127,9 @@ const DeveloperPage = () => {
 		onSuccess: () => {
 			refetchQueries(['secret-keys']);
 		},
+		onError: (error: ServerError) => {
+			toast.error(error.error.message || 'Failed to delete secret key');
+		},
 	});
 
 	const handleAddSecretKey = () => {

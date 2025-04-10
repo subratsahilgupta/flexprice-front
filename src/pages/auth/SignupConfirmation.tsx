@@ -19,6 +19,7 @@ const SignupConfirmation = () => {
 			} = await supabase.auth.getSession();
 			if (error) {
 				toast.error(error.message);
+				throw error;
 			}
 
 			const user = await supabase.auth.getUser();
@@ -48,9 +49,9 @@ const SignupConfirmation = () => {
 			await supabase.auth.refreshSession();
 			navigate('/');
 		},
-		onError: async (error) => {
+		onError: async (error: ServerError) => {
 			await supabase.auth.signOut();
-			toast.error(error.message);
+			toast.error(error.error.message || 'Failed to signup');
 			navigate('/auth');
 		},
 	});
