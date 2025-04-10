@@ -6,7 +6,7 @@ import { LuCircleFadingPlus, LuRefreshCw } from 'react-icons/lu';
 import { cn } from '@/lib/utils';
 import { Meter } from '@/models/Meter';
 import { v4 as uuidv4 } from 'uuid';
-
+import { BaseEntityStatus } from '@/types/common';
 interface Props {
 	data?: Meter;
 	onSubmit: (data: Meter, mode: 'add' | 'edit') => void;
@@ -46,7 +46,7 @@ const MeterForm: React.FC<Props> = ({ data, onSubmit, isLoading }) => {
 	const labelStyle = 'text-muted-foreground text-sm';
 
 	const isEditMode = Boolean(data);
-	const isArchived = data?.status === 'archived';
+	const isArchived = data?.status === BaseEntityStatus.ARCHIVED;
 
 	const [eventName, setEventName] = useState(data?.event_name || '');
 	const [displayName, setDisplayName] = useState(data?.name || '');

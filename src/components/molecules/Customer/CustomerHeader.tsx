@@ -34,7 +34,6 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ customerId }) => {
 			</div>
 		);
 	}
-
 	return (
 		<div className='items-center justify-center'>
 			<div className='flex place-items-center space-x-3'>

@@ -8,6 +8,7 @@ export interface CheckboxRadioGroupItem {
 }
 
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { cn } from '@/lib/utils';
 
 export interface Props {
 	checkboxItems: CheckboxRadioGroupItem[];
@@ -35,8 +36,14 @@ const CheckboxRadioGroup: FC<Props> = ({ error, checkboxItems, defaultValue, onC
 						<RadioGroupItem id={item.value} value={item.value} className='peer' disabled={item.disabled} />
 
 						<label htmlFor={item.value} className='cursor-pointer font-open-sans'>
-							<p className='font-medium text-sm text-[#18181B] peer-checked:text-black'>{item.label}</p>
-							{item.description && <p className='text-sm text-[#71717A] peer-checked:text-gray-700'>{item.description}</p>}
+							<p className={cn('font-medium text-sm text-[#18181B] peer-checked:text-black', item.disabled && 'text-zinc-400')}>
+								{item.label}
+							</p>
+							{item.description && (
+								<p className={cn('text-sm text-[#71717A] peer-checked:text-gray-700', item.disabled && 'text-zinc-400')}>
+									{item.description}
+								</p>
+							)}
 						</label>
 					</div>
 				))}

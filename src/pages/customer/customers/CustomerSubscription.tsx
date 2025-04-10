@@ -4,7 +4,6 @@ import Preview from '@/components/organisms/Subscription/Preview';
 import ChargeTable from '@/components/organisms/Subscription/PriceTable';
 import UsageTable from '@/components/organisms/Subscription/UsageTable';
 import { cn } from '@/lib/utils';
-import { SubscriptionUsage } from '@/models/Subscription';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import CustomerApi, { CreateCustomerSubscriptionPayload } from '@/utils/api_requests/CustomerApi';
 import { PlanApi } from '@/utils/api_requests/PlanApi';
@@ -18,6 +17,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ApiDocsContent } from '@/components/molecules';
 import { invalidateQueries } from '@/core/tanstack/ReactQueryProvider';
 import { RouteNames } from '@/core/routes/Routes';
+import useEnvironment from '@/hooks/useEnvironment';
 
 type Params = {
 	id: string;
@@ -34,27 +34,53 @@ type SubscriptionState = {
 	endDate: Date | undefined;
 };
 
-const CustomerSubscription: React.FC = () => {
-	const { id: customerId, subscription_id } = useParams<Params>();
+// Custom hook for managing plans
+const usePlans = () => {
+	return useQuery({
+		queryKey: ['plans'],
+		queryFn: async () => {
+			const plansResponse = await PlanApi.getActiveExpandedPlan();
+			return plansResponse.map(normalizePlan);
+		},
+	});
+};
 
-	const [plans, setPlans] = useState<NormalizedPlan[] | null>(null);
-	const [plansLoading, setPlansLoading] = useState(false);
-	const [plansError, setPlansError] = useState(false);
-	const updateBreadcrumb = useBreadcrumbsStore((state) => state.updateBreadcrumb);
-
-	const { data: customerData } = useQuery({
-		queryKey: ['customerSubscription', customerId, subscription_id],
+// Custom hook for managing customer data
+const useCustomerData = (customerId: string | undefined) => {
+	return useQuery({
+		queryKey: ['customerSubscription', customerId],
 		queryFn: () => CustomerApi.getCustomerById(customerId!),
 		enabled: !!customerId,
 	});
+};
 
-	useEffect(() => {
-		if (customerData?.external_id) {
-			updateBreadcrumb(2, customerData.external_id);
-		}
-	}, [customerData, updateBreadcrumb]);
+// Custom hook for managing subscription data
+const useSubscriptionData = (subscription_id: string | undefined) => {
+	return useQuery({
+		queryKey: ['subscription', subscription_id],
+		queryFn: async () => {
+			const [details, usage] = await Promise.all([
+				CustomerApi.getCustomerSubscriptionById(subscription_id!),
+				SubscriptionApi.getSubscriptionUsage(subscription_id!),
+			]);
+			return { details, usage };
+		},
+		enabled: !!subscription_id,
+	});
+};
 
-	const [susbcriptionData, setSubscriptionData] = useState<SubscriptionUsage | null>(null);
+const CustomerSubscription: React.FC = () => {
+	const { id: customerId, subscription_id } = useParams<Params>();
+	const { isDevelopment } = useEnvironment();
+	const navigate = useNavigate();
+	const updateBreadcrumb = useBreadcrumbsStore((state) => state.updateBreadcrumb);
+
+	// Fetch data using React Query
+	const { data: plans, isLoading: plansLoading, isError: plansError } = usePlans();
+	const { data: customerData } = useCustomerData(customerId);
+	const { data: subscriptionData } = useSubscriptionData(subscription_id);
+
+	// Local state
 	const [subscriptionState, setSubscriptionState] = useState<SubscriptionState>({
 		selectedPlan: '',
 		prices: null,
@@ -65,71 +91,58 @@ const CustomerSubscription: React.FC = () => {
 		endDate: undefined,
 	});
 
-	const navigate = useNavigate();
-
-	// Sequential fetching
+	// Update breadcrumb when customer data changes
 	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				setPlansLoading(true);
-				const plansResponse = await PlanApi.getActiveExpandedPlan();
+		if (customerData?.external_id) {
+			updateBreadcrumb(2, customerData.external_id);
+		}
+	}, [customerData, updateBreadcrumb]);
 
-				const normalizedPlans = plansResponse.map((plan) => normalizePlan(plan));
-				setPlans(normalizedPlans);
-
-				// If subscription_id exists, fetch subscription details
-				if (subscription_id) {
-					const subscriptionDetails = await CustomerApi.getCustomerSubscriptionById(subscription_id);
-					const subscriptionUsage = await SubscriptionApi.getSubscriptionUsage(subscription_id);
-					setSubscriptionData(subscriptionUsage);
-					const planDetails = normalizedPlans.find((plan) => plan.id === subscriptionDetails.plan_id);
-					if (planDetails) {
-						setSubscriptionState({
-							selectedPlan: subscriptionDetails.plan_id,
-							prices: planDetails,
-							billingPeriod: subscriptionDetails.billing_period.toLowerCase(),
-							currency: subscriptionDetails.currency,
-							billingPeriodOptions: Object.keys(planDetails.charges).map((period) => ({
-								label: toSentenceCase(period),
-								value: period,
-							})),
-							startDate: new Date(subscriptionDetails.start_date),
-							endDate: subscriptionDetails.end_date ? new Date(subscriptionDetails.end_date) : undefined,
-						});
-					}
-				}
-			} catch (e) {
-				setPlansError(true);
-				toast.error('Failed to load plans or subscription details');
-			} finally {
-				setPlansLoading(false);
+	// Initialize subscription state when subscription data is available
+	useEffect(() => {
+		if (subscriptionData?.details && plans) {
+			const planDetails = plans.find((plan) => plan.id === subscriptionData.details.plan_id);
+			if (planDetails) {
+				setSubscriptionState({
+					selectedPlan: subscriptionData.details.plan_id,
+					prices: planDetails,
+					billingPeriod: subscriptionData.details.billing_period.toLowerCase(),
+					currency: subscriptionData.details.currency,
+					billingPeriodOptions: Object.keys(planDetails.charges).map((period) => ({
+						label: toSentenceCase(period),
+						value: period,
+					})),
+					startDate: new Date(subscriptionData.details.start_date),
+					endDate: subscriptionData.details.end_date ? new Date(subscriptionData.details.end_date) : undefined,
+				});
 			}
-		};
+		}
+	}, [subscriptionData, plans]);
 
-		fetchData();
-	}, [subscription_id]);
-
+	// Create subscription mutation
 	const { mutate: createSubscription, isPending: isCreating } = useMutation({
 		mutationKey: ['createSubscription'],
 		mutationFn: async (data: CreateCustomerSubscriptionPayload) => {
 			return await CustomerApi.createCustomerSubscription(data);
 		},
-
 		onSuccess: async () => {
 			toast.success('Subscription created successfully');
 			navigate(`${RouteNames.customers}/${customerId}`);
-			invalidateQueries(['debug-customers', 'debug-subscriptions']);
+
+			if (isDevelopment) {
+				invalidateQueries(['debug-customers', 'debug-subscriptions']);
+			}
 		},
 		onError: (error: ServerError) => {
 			toast.error(error.error.message || 'Error creating subscription');
 		},
 	});
 
-	// Handle plan change
+	// Event handlers
 	const handlePlanChange = (value: string) => {
 		const filteredPlan = plans?.find((plan) => plan.id === value);
 
-		if (!filteredPlan || !filteredPlan.charges || Object.keys(filteredPlan.charges).length === 0) {
+		if (!filteredPlan?.charges || Object.keys(filteredPlan.charges).length === 0) {
 			toast.error('Invalid plan or no charges available.');
 			return;
 		}
@@ -139,13 +152,8 @@ const CustomerSubscription: React.FC = () => {
 			? subscriptionState.billingPeriod
 			: billingPeriods[0];
 
-		const currencies = defaultBillingPeriod ? Object.keys(filteredPlan.charges[defaultBillingPeriod]) : [];
+		const currencies = Object.keys(filteredPlan.charges[defaultBillingPeriod] || {});
 		const defaultCurrency = currencies.includes(subscriptionState.currency) ? subscriptionState.currency : currencies[0];
-
-		if (!defaultBillingPeriod || !defaultCurrency) {
-			toast.error('Invalid billing period or currency for the selected plan.');
-			return;
-		}
 
 		setSubscriptionState({
 			...subscriptionState,
@@ -160,10 +168,9 @@ const CustomerSubscription: React.FC = () => {
 		});
 	};
 
-	// Handle billing period change
 	const handleBillingPeriodChange = (value: string) => {
 		const filteredPlan = subscriptionState.prices;
-		if (!filteredPlan || !filteredPlan.charges[value]) {
+		if (!filteredPlan?.charges[value]) {
 			toast.error('Invalid billing period.');
 			return;
 		}
@@ -178,12 +185,8 @@ const CustomerSubscription: React.FC = () => {
 		});
 	};
 
-	// Handle currency change
 	const handleCurrencyChange = (value: string) => {
-		setSubscriptionState({
-			...subscriptionState,
-			currency: value,
-		});
+		setSubscriptionState((prev) => ({ ...prev, currency: value }));
 	};
 
 	const handleSubscriptionSubmit = () => {
@@ -210,106 +213,94 @@ const CustomerSubscription: React.FC = () => {
 		});
 	};
 
-	const navigateBack = () => {
-		navigate(`/customer-management/customers/details/${customerId}`);
-	};
+	const navigateBack = () => navigate(`/customer-management/customers/details/${customerId}`);
+
+	// Render functions
+	const renderSubscriptionForm = () => (
+		<div className='p-6 rounded-xl border border-gray-300 space-y-6'>
+			<FormHeader title='Subscription Details' variant='sub-header' />
+
+			{!plansLoading && (
+				<Select
+					value={subscriptionState.selectedPlan}
+					options={plans?.map((plan) => ({ label: plan.name, value: plan.id })) ?? []}
+					onChange={handlePlanChange}
+					label='Plan*'
+					disabled={!!subscription_id}
+					placeholder='Select plan'
+					error={plansError ? 'Failed to load plans' : undefined}
+				/>
+			)}
+
+			{subscriptionState.selectedPlan && subscriptionState.billingPeriodOptions.length > 0 && (
+				<Select
+					key={subscriptionState.billingPeriodOptions.map((opt) => opt.value).join(',')}
+					value={subscriptionState.billingPeriod}
+					options={subscriptionState.billingPeriodOptions}
+					onChange={handleBillingPeriodChange}
+					label='Billing Period*'
+					disabled={!!subscription_id}
+					placeholder='Select billing period'
+				/>
+			)}
+
+			{subscriptionState.selectedPlan && subscriptionState.prices?.charges[subscriptionState.billingPeriod] && (
+				<Select
+					key={Object.keys(subscriptionState.prices.charges[subscriptionState.billingPeriod]).join(',')}
+					value={subscriptionState.currency}
+					options={Object.keys(subscriptionState.prices.charges[subscriptionState.billingPeriod]).map((currency) => ({
+						label: currency.toUpperCase(),
+						value: currency,
+					}))}
+					onChange={handleCurrencyChange}
+					label='Select Currency*'
+					placeholder='Select currency'
+					disabled={!!subscription_id}
+				/>
+			)}
+
+			{subscriptionState.prices && subscriptionState.selectedPlan && (
+				<ChargeTable data={subscriptionState.prices.charges[subscriptionState.billingPeriod][subscriptionState.currency]} />
+			)}
+
+			{subscriptionState.selectedPlan && (
+				<div className='flex items-center space-x-4 relative'>
+					<div className='relative'>
+						<label className='block text-sm font-medium text-gray-700 mb-1'>Subscription Start Date</label>
+						<DatePicker
+							disabled={!!subscription_id}
+							date={subscriptionState.startDate}
+							setDate={(date) => setSubscriptionState((prev) => ({ ...prev, startDate: date }))}
+						/>
+					</div>
+					<div className='relative'>
+						<label className='block text-sm font-medium text-gray-700 mb-1'>Subscription End Date</label>
+						<DatePicker
+							disabled={!!subscription_id}
+							date={subscriptionState.endDate}
+							setDate={(date) => setSubscriptionState((prev) => ({ ...prev, endDate: date }))}
+							placeholder='Forever'
+						/>
+					</div>
+				</div>
+			)}
+		</div>
+	);
 
 	return (
 		<div className={cn('flex gap-8 mt-5 relative mb-12')}>
 			<ApiDocsContent tags={['Subscriptions']} />
 			<div className='flex-[6] space-y-6 mb-12 overflow-y-auto pr-4'>
-				<CustomerCard customerId={customerId!} subscriptionData={susbcriptionData} />
+				<CustomerCard customerId={customerId!} subscriptionData={subscriptionData?.usage} />
 
-				{susbcriptionData && susbcriptionData?.charges?.length > 0 && (
+				{subscriptionData?.usage?.charges && subscriptionData.usage.charges.length > 0 && (
 					<div>
-						<UsageTable data={susbcriptionData!} />
+						<UsageTable data={subscriptionData.usage} />
 					</div>
 				)}
-				<div className='p-6 rounded-xl border border-gray-300 space-y-6'>
-					<FormHeader title='Subscription Details' variant='sub-header' />
 
-					{/* Select Plan */}
-					{!plansLoading && (
-						<Select
-							value={subscriptionState.selectedPlan}
-							options={
-								plans?.map((plan) => ({
-									label: plan.name,
-									value: plan.id,
-								})) ?? []
-							}
-							onChange={(value) => handlePlanChange(value)}
-							label='Plan*'
-							disabled={subscription_id !== undefined}
-							placeholder='Select plan'
-							error={plansError ? 'Failed to load plans' : undefined}
-						/>
-					)}
+				{renderSubscriptionForm()}
 
-					{/* Billing Period */}
-					{/* Billing Period */}
-					{subscriptionState.selectedPlan && subscriptionState.billingPeriodOptions.length > 0 && (
-						<Select
-							key={subscriptionState.billingPeriodOptions.map((opt) => opt.value).join(',')} // Force re-render on options change
-							value={subscriptionState.billingPeriod}
-							options={subscriptionState.billingPeriodOptions}
-							onChange={(value) => handleBillingPeriodChange(value)}
-							label='Billing Period*'
-							disabled={subscription_id !== undefined}
-							placeholder='Select billing period'
-						/>
-					)}
-
-					{/* Currency */}
-					{subscriptionState.selectedPlan &&
-						subscriptionState.prices &&
-						subscriptionState.prices.charges[subscriptionState.billingPeriod] && (
-							<Select
-								key={Object.keys(subscriptionState.prices.charges[subscriptionState.billingPeriod]).join(',')} // Force re-render on options change
-								value={subscriptionState.currency}
-								options={Object.keys(subscriptionState.prices.charges[subscriptionState.billingPeriod]).map((currency) => ({
-									label: currency.toUpperCase(),
-									value: currency,
-								}))}
-								onChange={(value) => handleCurrencyChange(value)}
-								label='Select Currency*'
-								placeholder='Select currency'
-								disabled={subscription_id !== undefined}
-							/>
-						)}
-
-					{/* Charge Table */}
-					{subscriptionState.prices && subscriptionState.selectedPlan && (
-						<ChargeTable data={subscriptionState.prices.charges[subscriptionState.billingPeriod][subscriptionState.currency]} />
-					)}
-
-					{/* Date Pickers */}
-					{subscriptionState.selectedPlan && (
-						<div className='flex items-center space-x-4 relative'>
-							<div className='relative'>
-								<label className='block text-sm font-medium text-gray-700 mb-1'>Subscription Start Date</label>
-								<DatePicker
-									disabled={subscription_id !== undefined}
-									date={subscriptionState.startDate}
-									setDate={(date) => setSubscriptionState((prev) => ({ ...prev, startDate: date }))}
-								/>
-								{/* Overlay to block clicks */}
-							</div>
-							<div className='relative'>
-								<label className='block text-sm font-medium text-gray-700 mb-1'>Subscription End Date</label>
-								<DatePicker
-									disabled={subscription_id !== undefined}
-									date={subscriptionState.endDate}
-									setDate={(date) => setSubscriptionState((prev) => ({ ...prev, endDate: date }))}
-									placeholder='Forever'
-								/>
-								{/* Overlay to block clicks */}
-							</div>
-						</div>
-					)}
-				</div>
-
-				{/* Submit Buttons */}
 				{subscriptionState.selectedPlan && !subscription_id && (
 					<div className='flex items-center justify-start space-x-4'>
 						<Button onClick={navigateBack} className='bg-gray-100 text-black px-4 py-2 rounded-md hover:bg-primary-dark'>
@@ -322,10 +313,9 @@ const CustomerSubscription: React.FC = () => {
 				)}
 			</div>
 
-			{/* Preview */}
-			<div className='flex-[4] '>
+			<div className='flex-[4]'>
 				<div className='sticky top-24'>
-					{subscriptionState.selectedPlan && !susbcriptionData && (
+					{subscriptionState.selectedPlan && !subscriptionData?.usage && (
 						<Preview
 							startDate={subscriptionState.startDate}
 							data={subscriptionState.prices?.charges[subscriptionState.billingPeriod][subscriptionState.currency] ?? []}

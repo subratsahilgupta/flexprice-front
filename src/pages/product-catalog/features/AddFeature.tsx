@@ -6,7 +6,7 @@ import { RouteNames } from '@/core/routes/Routes';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 import { cn } from '@/lib/utils';
 import Feature from '@/models/Feature';
-import { Meter, MeterResetPeriod } from '@/models/Meter';
+import { Meter, METER_USAGE_RESET_PERIOD } from '@/models/Meter';
 import FeatureApi from '@/utils/api_requests/FeatureApi';
 import { MeterApi } from '@/utils/api_requests/MeterApi';
 import { useMutation } from '@tanstack/react-query';
@@ -42,7 +42,7 @@ const AddFeaturePage = () => {
 			type: 'SUM',
 			field: '',
 		},
-		reset_usage: MeterResetPeriod.BILLING_PERIOD,
+		reset_usage: METER_USAGE_RESET_PERIOD.BILLING_PERIOD,
 	});
 
 	const [meterErrors, setmeterErrors] = useState<Partial<Record<keyof Meter | 'aggregation_type' | 'aggregation_field', string>>>({});
@@ -289,7 +289,7 @@ const AddFeaturePage = () => {
 			<ApiDocsContent tags={['Features']} />
 			<FormHeader
 				title={'Create Feature'}
-				subtitle={'Fetaure resprents a funtionality in the product that can be monitized i.e. api calls, storage, etc.'}
+				subtitle={'Feature represents a functionality in the product that can be monetized i.e. api calls, storage, etc.'}
 				variant='form-title'
 			/>
 

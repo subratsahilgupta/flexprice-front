@@ -1,70 +1,34 @@
-import { useQuery } from '@tanstack/react-query';
+// React and third-party libraries
+import { useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import FeatureApi from '@/utils/api_requests/FeatureApi';
-import { Chip, Loader, Page, SectionHeader, Spacer, Divider, Card, CardHeader, NoDataCard } from '@/components/atoms';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { useEffect } from 'react';
-import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
+import { EyeOff } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
+// Core utilities and APIs
 import { RouteNames } from '@/core/routes/Routes';
-import { ApiDocsContent, ColumnData, FlexpriceTable, RedirectCell } from '@/components/molecules';
+import FeatureApi from '@/utils/api_requests/FeatureApi';
 import EntitlementApi, { ExtendedEntitlement } from '@/utils/api_requests/EntitlementApi';
 import formatChips from '@/utils/common/format_chips';
-import { FeatureType } from '@/models/Feature';
+
+// Store
+import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
+
+// Components
+import { Button, Card, CardHeader, Chip, Divider, Loader, NoDataCard, Page, SectionHeader, Spacer } from '@/components/atoms';
+import { ApiDocsContent, ColumnData, FlexpriceTable, RedirectCell } from '@/components/molecules';
 import { getFeatureTypeChips } from '@/components/molecules/FeatureTable/FeatureTable';
+
+// Models and types
+import { FeatureType } from '@/models/Feature';
+import { BaseEntityStatus } from '@/types/common/BaseEntity';
+import { formatMeterUsageResetPeriodToDisplay } from '@/types/formatters/Feature';
+
+// Local utilities
 import { formatAggregationType } from './AddFeature';
 import { formatAmount } from '@/components/atoms/Input/Input';
-
-// const getFeatureType = (type: string) => {
-// 	const className = 'items-center justify-end text-sm font-normal text-gray-800 flex gap-2';
-// 	switch (type) {
-// 		case 'boolean':
-// 			return (
-// 				<span className={className}>
-// 					<SquareCheckBig className='w-4 h-4' />
-// 					Boolean
-// 				</span>
-// 			);
-// 		case 'metered':
-// 			return (
-// 				<span className={className}>
-// 					<Gauge className='w-4 h-4' />
-// 					Metered
-// 				</span>
-// 			);
-// 		case 'static':
-// 			return (
-// 				<span className={className}>
-// 					<Wrench className='w-4 h-4' />
-// 					Static
-// 				</span>
-// 			);
-// 		default:
-// 			return '--';
-// 	}
-// };
-// const getStatusChip = (status: string) => {
-// 	switch (status.toUpperCase()) {
-// 		case 'PUBLISHED':
-// 			return <Chip variant='success' label='Active' />;
-// 		case 'ARCHIVED':
-// 			return <Chip variant='default' label='Archived' />;
-// 		case 'DELETED':
-// 			return <Chip variant='failed' label='Deleted' />;
-// 		default:
-// 			return <Chip variant='default' label='Draft' />;
-// 	}
-// };
-
-const formatUsageReset = (usageReset: string) => {
-	switch (usageReset) {
-		case 'BILLING_PERIOD':
-			return 'Periodic';
-		case 'NEVER':
-			return 'Cumulative';
-		default:
-			return usageReset;
-	}
-};
+import { ApiDocsSnippet } from '@/store/useApiDocsStore';
+import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 
 const FeatureDetails = () => {
 	const { id: featureId } = useParams() as { id: string };
@@ -82,9 +46,20 @@ const FeatureDetails = () => {
 			await EntitlementApi.getAllEntitlements({
 				feature_ids: [featureId!],
 				expand: 'plans,features',
-				status: 'published',
+				status: BaseEntityStatus.PUBLISHED,
 			}),
 		enabled: !!featureId,
+	});
+
+	const { mutate: archiveFeature, isPending: isArchiving } = useMutation({
+		mutationFn: async () => await FeatureApi.deleteFeature(featureId!),
+		onSuccess: () => {
+			refetchQueries(['fetchFeatureDetails', featureId]);
+			toast.success('Feature archived successfully');
+		},
+		onError: (error: ServerError) => {
+			toast.error(error.error.message || 'Failed to archive feature');
+		},
 	});
 
 	useEffect(() => {
@@ -134,8 +109,43 @@ const FeatureDetails = () => {
 						</span>
 					);
 				}
-				return <span className=''>--</span>;
+				return <span className='text-muted-foreground'>--</span>;
 			},
+		},
+	];
+
+	const staticDate = useMemo(() => {
+		const start = new Date(2020, 0, 1);
+		const end = new Date();
+		return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime())).toISOString();
+	}, []);
+
+	const staticEventId = useMemo(() => {
+		return 'event_' + uuidv4().replace(/-/g, '').slice(0, 10);
+	}, []);
+
+	const curlCommand = `curl --request POST \\
+--url https://api.cloud.flexprice.io/v1/events \\
+--header 'Content-Type: application/json' \\
+--header 'x-api-key: <your_api_key>' \\
+--data '{
+	"event_id": "${staticEventId}",
+	"event_name": "${data?.meter?.event_name || '__MUST_BE_DEFINED__'}",
+	"external_customer_id": "__CUSTOMER_ID__",
+	"properties": {${[...(data?.meter?.filters || [])]
+		.filter((filter) => filter.key && filter.key.trim() !== '')
+		.map((filter) => `\n\t\t\t "${filter.key}" : "${filter.values[0] || 'FILTER_VALUE'}"`)
+		.join(',')}${data?.meter?.aggregation?.field ? `,\n\t\t\t "${data?.meter?.aggregation.field}":"__VALUE__"` : ''}
+	},
+	"source": "api",
+	"timestamp": "${staticDate}"
+}'`;
+
+	const snippets: ApiDocsSnippet[] = [
+		{
+			label: 'Ingest an event',
+			description: 'Ingest an event into FlexPrice',
+			curl: curlCommand,
 		},
 	];
 
@@ -156,19 +166,24 @@ const FeatureDetails = () => {
 							<span className='ml-2 text-sm'>{getFeatureTypeChips(data?.type || '', true)}</span>
 						</>
 					}>
-					{/* <div className='flex gap-2'>
-					<Button disabled variant={'outline'} className='flex gap-2'>
-						<EyeOff />
-						Archive
-					</Button>
-					<Button disabled className='flex gap-2'>
-						<Pencil />
-						Edit
-					</Button>
-				</div> */}
+					<div className='flex gap-2'>
+						<Button
+							isLoading={isArchiving}
+							disabled={isArchiving || data?.status === BaseEntityStatus.ARCHIVED}
+							variant={'outline'}
+							onClick={() => archiveFeature()}
+							className='flex gap-2'>
+							<EyeOff className='w-4 h-4' />
+							{isArchiving ? 'Archiving...' : 'Archive'}
+						</Button>
+						{/* <Button disabled className='flex gap-2'>
+							<Pencil />
+							Edit
+						</Button> */}
+					</div>
 				</SectionHeader>
 			}>
-			<ApiDocsContent tags={['Features']} />
+			<ApiDocsContent tags={['Features']} snippets={data?.type === FeatureType.metered ? snippets : undefined} />
 
 			<Spacer className='!h-4' />
 			<div className='space-y-6'>
@@ -238,7 +253,7 @@ const FeatureDetails = () => {
 									</div>
 									<div className='grid grid-cols-[200px_1fr] items-center'>
 										<span className='text-gray-500 text-sm'>Usage Reset </span>
-										<span className='text-gray-800 text-sm'>{formatUsageReset(data?.meter?.reset_usage || '--')}</span>
+										<span className='text-gray-800 text-sm'>{formatMeterUsageResetPeriodToDisplay(data?.meter?.reset_usage || '--')}</span>
 									</div>
 								</div>
 							</div>

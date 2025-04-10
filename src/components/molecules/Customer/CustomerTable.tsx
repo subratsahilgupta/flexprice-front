@@ -7,6 +7,7 @@ import Customer from '@/models/Customer';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { useNavigate } from 'react-router-dom';
 import { RouteNames } from '@/core/routes/Routes';
+import { BaseEntityStatus } from '@/types/common';
 
 export interface Props {
 	data: Customer[];
@@ -40,8 +41,8 @@ const CustomerTable: FC<Props> = ({ data, onEdit }) => {
 			fieldVariant: 'interactive',
 			render: (row) => (
 				<ActionButton
-					isArchiveDisabled={row.status === 'archived'}
-					isEditDisabled={row.status === 'archived'}
+					isArchiveDisabled={row.status === BaseEntityStatus.ARCHIVED}
+					isEditDisabled={row.status === BaseEntityStatus.ARCHIVED}
 					entityName='Customer'
 					refetchQueryKey='fetchCustomers'
 					deleteMutationFn={(id) => CustomerApi.deleteCustomerById(id)}

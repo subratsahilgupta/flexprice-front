@@ -1,5 +1,12 @@
 import { AddButton, Button, Chip, FormHeader, Modal, NoDataCard, Select, ShortPagination, Spacer } from '@/components/atoms';
-import { DropdownMenu, DropdownMenuOption, TopupCard, WalletTransactionsTable, ApiDocsContent } from '@/components/molecules';
+import {
+	DropdownMenu,
+	DropdownMenuOption,
+	TopupCard,
+	WalletTransactionsTable,
+	ApiDocsContent,
+	TerminateWalletModal,
+} from '@/components/molecules';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import usePagination from '@/hooks/usePagination';
@@ -9,12 +16,13 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { IoSearch } from 'react-icons/io5';
-import { useParams } from 'react-router-dom';
+import { useParams, useOutletContext } from 'react-router-dom';
 import CreateWallet from '../customers/CreateWallet';
 import { EllipsisVertical, Info, Pencil, SlidersHorizontal, Trash2, Wallet as WalletIcon } from 'lucide-react';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import useQueryParams from '@/hooks/useQueryParams';
 import { DetailsCard } from '@/components/molecules';
+
 const formatWalletStatus = (status?: string) => {
 	switch (status) {
 		case 'active':
@@ -39,6 +47,9 @@ const WalletTab = () => {
 
 	const [isAdd, setisAdd] = useState(false);
 	const [showTopupModal, setshowTopupModal] = useState(false);
+	const [showTerminateModal, setshowTerminateModal] = useState(false);
+	const { isArchived } = useOutletContext<{ isArchived: boolean }>();
+
 	const dropdownOptions: DropdownMenuOption[] = [
 		{
 			icon: <WalletIcon />,
@@ -57,8 +68,8 @@ const WalletTab = () => {
 		},
 		{
 			icon: <Trash2 />,
-			label: 'Delete',
-			disabled: true,
+			label: 'Terminate',
+			onSelect: () => setshowTerminateModal(true),
 		},
 	];
 
@@ -137,7 +148,13 @@ const WalletTab = () => {
 	}
 
 	if (wallets?.length === 0) {
-		return <NoDataCard title='Wallets' subtitle='No wallets linked to the customer' cta={<AddButton onClick={() => setisAdd(true)} />} />;
+		return (
+			<NoDataCard
+				title='Wallets'
+				subtitle='No wallets linked to the customer'
+				cta={!isArchived && <AddButton onClick={() => setisAdd(true)} />}
+			/>
+		);
 	}
 
 	return (
@@ -149,6 +166,10 @@ const WalletTab = () => {
 					<TopupCard onSuccess={() => setshowTopupModal(false)} walletId={activeWallet?.id} />
 				</div>
 			</Modal>
+
+			{activeWallet && (
+				<TerminateWalletModal isOpen={showTerminateModal} onOpenChange={() => setshowTerminateModal(false)} wallet={activeWallet} />
+			)}
 
 			<FormHeader
 				className='!my-6'
@@ -173,10 +194,12 @@ const WalletTab = () => {
 					)}
 				</div>
 				<div className='flex items-center space-x-2	'>
-					<Button onClick={() => setshowTopupModal(true)}>
-						<WalletIcon />
-						<span>Topup Wallet</span>
-					</Button>
+					{!isArchived && (
+						<Button onClick={() => setshowTopupModal(true)}>
+							<WalletIcon />
+							<span>Topup Wallet</span>
+						</Button>
+					)}
 
 					<DropdownMenu
 						options={dropdownOptions}

@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import { AddButton, Card, CardHeader, NoDataCard } from '@/components/atoms';
 import CustomerApi from '@/utils/api_requests/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
@@ -8,13 +8,19 @@ import Loader from '@/components/atoms/Loader';
 import toast from 'react-hot-toast';
 import CustomerUsageTable from '@/components/molecules/CustomerUsageTable/CustomerUsageTable';
 
+type ContextType = {
+	isArchived: boolean;
+};
+
 const fetchAllSubscriptions = async (customerId: string) => {
 	const subs = await CustomerApi.getCustomerSubscriptions(customerId);
 	return subs.items;
 };
+
 const Overview = () => {
 	const navigate = useNavigate();
 	const { id: customerId } = useParams();
+	const { isArchived } = useOutletContext<ContextType>();
 
 	const handleAddSubscription = () => {
 		navigate(`/customer-management/customers/${customerId}/add-subscription`);
@@ -46,11 +52,11 @@ const Overview = () => {
 		toast.error('Something went wrong');
 	}
 
-	return (
-		<div className='space-y-6'>
-			{(subscriptions?.length || 0) > 0 ? (
+	const renderSubscriptionContent = () => {
+		if ((subscriptions?.length || 0) > 0) {
+			return (
 				<Card variant='notched'>
-					<CardHeader title='Subscriptions' cta={<AddButton onClick={handleAddSubscription} />} />
+					<CardHeader title='Subscriptions' cta={!isArchived && <AddButton onClick={handleAddSubscription} />} />
 					<SubscriptionTable
 						onRowClick={(row) => {
 							navigate(`/customer-management/customers/${customerId}/subscription/${row.id}`);
@@ -58,9 +64,21 @@ const Overview = () => {
 						data={subscriptions as Subscription[]}
 					/>
 				</Card>
-			) : (
-				<NoDataCard title='Subscriptions' subtitle='No active subscriptions' cta={<AddButton onClick={handleAddSubscription} />} />
-			)}
+			);
+		}
+
+		return (
+			<NoDataCard
+				title='Subscriptions'
+				subtitle={isArchived ? 'No subscriptions found' : 'No active subscriptions'}
+				cta={!isArchived && <AddButton onClick={handleAddSubscription} />}
+			/>
+		);
+	};
+
+	return (
+		<div className='space-y-6'>
+			{renderSubscriptionContent()}
 
 			{/* customer entitlements table */}
 			{(usageData?.features?.length || 0) > 0 && (

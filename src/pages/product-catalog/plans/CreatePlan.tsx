@@ -39,8 +39,8 @@ const CreatePlanPage = () => {
 			navigate(RouteNames.plan);
 			await refetchQueries(['fetchPlans']);
 		},
-		onError() {
-			toast.error('Failed to create plan');
+		onError: (error: ServerError) => {
+			toast.error(error.error.message || 'Failed to create plan');
 		},
 	});
 

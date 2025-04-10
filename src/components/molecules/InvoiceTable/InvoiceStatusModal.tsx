@@ -72,8 +72,8 @@ const InvoiceStatusModal: FC<InvoiceStatusProps> = ({ isOpen, onOpenChange, invo
 			await refetchQueries(['fetchInvoices']);
 			await refetchQueries(['fetchInvoice']);
 		},
-		onError: () => {
-			toast.error('Failed to update invoice status');
+		onError: (error: ServerError) => {
+			toast.error(error?.error.message || 'Failed to update invoice status');
 		},
 	});
 

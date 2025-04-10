@@ -1,29 +1,21 @@
 import ReactDOM from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
-import * as Sentry from '@sentry/react';
 import PosthogProvider from './core/services/posthog/PosthogProvider.tsx';
+import SentryProvider from './core/services/sentry/SentryProvider.tsx';
+import VercelSpeedInsights from './core/vercel/vercel.tsx';
 
 const isProd = import.meta.env.VITE_APP_ENVIRONMENT === 'prod';
-
-if (isProd) {
-	Sentry.init({
-		dsn: import.meta.env.VITE_APP_PUBLIC_SENTRY_DSN,
-		integrations: [Sentry.browserTracingIntegration()],
-		tracesSampleRate: 1.0,
-		replaysSessionSampleRate: 0,
-		replaysOnErrorSampleRate: 0,
-	});
-}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
 	<div>
 		{isProd ? (
-			<PosthogProvider>
-				<Sentry.ErrorBoundary fallback={<div>Something went wrong</div>}>
+			<SentryProvider>
+				<PosthogProvider>
 					<App />
-				</Sentry.ErrorBoundary>
-			</PosthogProvider>
+					<VercelSpeedInsights />
+				</PosthogProvider>
+			</SentryProvider>
 		) : (
 			<App />
 		)}
