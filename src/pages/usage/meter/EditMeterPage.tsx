@@ -48,8 +48,8 @@ const EditMeterPage = () => {
 			toast.success('Meter updated successfully');
 			navigate(RouteNames.meter);
 		},
-		onError() {
-			toast.error('Error updating meter');
+		onError: (error: ServerError) => {
+			toast.error(error.error.message || 'Error updating meter');
 		},
 	});
 

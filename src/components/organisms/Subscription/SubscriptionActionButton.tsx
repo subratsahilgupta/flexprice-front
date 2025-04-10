@@ -57,8 +57,8 @@ const SubscriptionActionButton: React.FC<Props> = ({ subscription }) => {
 			await refetchQueries(['subscriptionDetails']);
 			await refetchQueries(['subscriptions']);
 		},
-		onError: () => {
-			toast.error('Failed to resume subscription');
+		onError: (err: ServerError) => {
+			toast.error(err.error.message || 'Failed to resume subscription');
 		},
 	});
 
@@ -70,8 +70,8 @@ const SubscriptionActionButton: React.FC<Props> = ({ subscription }) => {
 			await refetchQueries(['subscriptionDetails']);
 			await refetchQueries(['subscriptions']);
 		},
-		onError: () => {
-			toast.error('Failed to cancel subscription');
+		onError: (err: ServerError) => {
+			toast.error(err.error.message || 'Failed to cancel subscription');
 		},
 	});
 
