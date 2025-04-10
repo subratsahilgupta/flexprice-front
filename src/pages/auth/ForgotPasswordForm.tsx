@@ -24,12 +24,11 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ switchTab }) =>
 
 			return true;
 		},
-		onSuccess: (err: ServerError) => {
-			toast.success(err.error.message || 'Password reset link sent to your email');
+		onSuccess: () => {
+			toast.success('Password reset link sent to your email');
 		},
 		onError: (error: ServerError) => {
 			toast.error(error.error.message || 'An unexpected error occurred');
-			console.error(error);
 		},
 	});
 
