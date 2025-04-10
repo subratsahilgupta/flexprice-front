@@ -56,7 +56,7 @@ const EmailVerification = () => {
 					<div className='mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-blue-50'>
 						{/* Logo */}
 						<div className='flex justify-center'>
-							<img src='/ic_rounded_flexpirce.svg' alt='Flexprice Logo' className='h-12' />
+							<img src='/ic_rounded_flexprice.svg' alt='Flexprice Logo' className='h-12' />
 						</div>
 					</div>
 
