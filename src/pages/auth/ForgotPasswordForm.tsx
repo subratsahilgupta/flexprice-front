@@ -13,7 +13,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ switchTab }) =>
 
 	// Use React Query for forgot password mutation
 	const forgotPasswordMutation = useMutation({
-		mutationFn: async (email: string) => {
+		mutationFn: async (email: string): Promise<any> => {
 			const { error } = await supabase.auth.resetPasswordForEmail(email, {
 				redirectTo: `${window.location.origin}/auth?tab=reset-password`,
 			});
@@ -29,7 +29,6 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ switchTab }) =>
 		},
 		onError: (error: ServerError) => {
 			toast.error(error.error.message || 'An unexpected error occurred');
-			console.error(error);
 		},
 	});
 

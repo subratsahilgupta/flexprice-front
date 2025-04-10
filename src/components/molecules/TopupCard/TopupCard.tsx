@@ -76,6 +76,9 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 			await refetchQueries(['fetchWalletBalances']);
 			await refetchQueries(['fetchWalletsTransactions']);
 		},
+		onError: (err: ServerError) => {
+			toast.error(err.error.message || 'Failed to topup wallet');
+		},
 	});
 	const handleTopup = async () => {
 		// if (!subscriptionType) {
