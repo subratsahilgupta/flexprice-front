@@ -289,7 +289,7 @@ const AddFeaturePage = () => {
 			<ApiDocsContent tags={['Features']} />
 			<FormHeader
 				title={'Create Feature'}
-				subtitle={'Feature resprents a funtionality in the product that can be monitized i.e. api calls, storage, etc.'}
+				subtitle={'Feature represents a functionality in the product that can be monetized i.e. api calls, storage, etc.'}
 				variant='form-title'
 			/>
 
