@@ -75,7 +75,7 @@ const AuthPage: React.FC = () => {
 			<div className='w-1/2 flex justify-center items-center'>
 				<div className='flex flex-col justify-center max-w-xl w-[60%] mx-auto'>
 					<div className='flex justify-center mb-4'>
-						<img src={'/ic_rounded_flexpirce.svg'} alt='Flexprice Logo' className='h-12' />
+						<img src={'/ic_rounded_flexprice.svg'} alt='Flexprice Logo' className='h-12' />
 					</div>
 
 					{currentTab === 'signup' && (

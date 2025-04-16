@@ -22,6 +22,7 @@ import { EllipsisVertical, Info, Pencil, SlidersHorizontal, Trash2, Wallet as Wa
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import useQueryParams from '@/hooks/useQueryParams';
 import { DetailsCard } from '@/components/molecules';
+
 const formatWalletStatus = (status?: string) => {
 	switch (status) {
 		case 'active':
@@ -67,7 +68,7 @@ const WalletTab = () => {
 		},
 		{
 			icon: <Trash2 />,
-			label: 'Delete',
+			label: 'Terminate',
 			onSelect: () => setshowTerminateModal(true),
 		},
 	];
