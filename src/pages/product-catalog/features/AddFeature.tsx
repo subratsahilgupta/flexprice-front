@@ -182,7 +182,7 @@ const AddFeaturePage = () => {
 				...meter,
 				event_name: meter.event_name,
 				aggregation:
-					meter.aggregation?.type === 'COUNT'
+					meter.aggregation?.type === METER_AGGREGATION_TYPE.COUNT
 						? { type: meter.aggregation.type, field: '' } // Empty field for COUNT
 						: {
 								type: meter.aggregation?.type || '',
