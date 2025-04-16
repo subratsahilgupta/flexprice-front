@@ -21,6 +21,13 @@ interface CreateWalletPayload {
 interface TopupWalletPayload {
 	amount?: number;
 	walletId: string;
+	description?: string;
+	expiry_date?: number;
+	generate_invoice?: boolean;
+	metadata?: Record<string, any>;
+	purchased_credits?: boolean;
+	reference_id?: string;
+	reference_type?: string;
 }
 
 class WalletApi {
