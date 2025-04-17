@@ -32,6 +32,8 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 		confirmPassword: '',
 	});
 
+	const [isLoading, setIsLoading] = useState(false);
+
 	useEffect(() => {
 		if (queryEmail) {
 			setSignupData({ ...signupData, email: queryEmail });
@@ -111,6 +113,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 			return;
 		}
 		if (NODE_ENV != NodeEnv.SELF_HOSTED) {
+			setIsLoading(true);
 			const { error } = await supabase.auth.signUp({
 				email: signupData.email,
 				password: signupData.password,
@@ -118,6 +121,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 					emailRedirectTo: `${window.location.origin}${RouteNames.signupConfirmation}`,
 				},
 			});
+			setIsLoading(false);
 
 			if (error) {
 				toast.error(error.message || 'Something went wrong');
@@ -177,7 +181,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 						</span>
 					}
 				/>
-				<Button onClick={handleSignup} className='w-full !mt-6' isLoading={isSignupPending}>
+				<Button onClick={handleSignup} className='w-full !mt-6' isLoading={isSignupPending || isLoading}>
 					Create Account
 				</Button>
 			</div>
