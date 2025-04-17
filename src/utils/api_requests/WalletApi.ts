@@ -1,5 +1,5 @@
 import { AxiosClient } from '@/core/axios/verbs';
-import { Wallet } from '@/models/Wallet';
+import { Wallet, TransactionReason } from '@/models/Wallet';
 import { WalletBalance } from '@/models/WalletBalance';
 import { WalletTransaction } from '@/models/WalletTransaction';
 import { PaginationType } from '@/models/Pagination';
@@ -23,11 +23,9 @@ interface TopupWalletPayload {
 	walletId: string;
 	description?: string;
 	expiry_date?: number;
-	generate_invoice?: boolean;
 	metadata?: Record<string, any>;
-	purchased_credits?: boolean;
-	reference_id?: string;
-	reference_type?: string;
+	idempotency_key: string;
+	transaction_reason: TransactionReason;
 }
 
 class WalletApi {
@@ -50,9 +48,22 @@ class WalletApi {
 		});
 	}
 
-	static async topupWallet({ walletId, amount }: TopupWalletPayload): Promise<Wallet> {
+	static async topupWallet({
+		walletId,
+		amount,
+		idempotency_key,
+		transaction_reason,
+		description,
+		expiry_date,
+		metadata,
+	}: TopupWalletPayload): Promise<Wallet> {
 		return await AxiosClient.post<Wallet>(`/wallets/${walletId}/top-up`, {
 			amount,
+			idempotency_key,
+			transaction_reason,
+			description,
+			expiry_date,
+			metadata,
 		});
 	}
 
