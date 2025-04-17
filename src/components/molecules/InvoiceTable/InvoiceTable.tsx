@@ -55,9 +55,13 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 		},
 		{
 			title: 'Customer Slug',
-			render: (row: Invoice) => (
-				<RedirectCell redirectUrl={`${RouteNames.customers}/${row.customer?.id}`}>{row.customer?.external_id}</RedirectCell>
-			),
+			render: (row: Invoice) => {
+				if (!row.customer?.external_id) {
+					return '--';
+				}
+
+				return <RedirectCell redirectUrl={`${RouteNames.customers}/${row.customer?.id}`}>{row.customer?.external_id}</RedirectCell>;
+			},
 		},
 		// {
 		// 	title: 'Billing Interval',
@@ -69,7 +73,7 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 		},
 		{
 			title: 'Due Date',
-			render: (row: Invoice) => <span>{formatDateShort(row.due_date)}</span>,
+			render: (row: Invoice) => <span>{row.due_date ? formatDateShort(row.due_date) : '--'}</span>,
 		},
 		{
 			fieldVariant: 'interactive',
