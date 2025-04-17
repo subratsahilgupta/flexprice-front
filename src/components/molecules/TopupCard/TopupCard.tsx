@@ -11,7 +11,8 @@ import { Switch } from '@/components/ui/switch';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import PremiumFeature, { PremiumFeatureTag } from '../PremiumFeature';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
-
+import { TransactionReason } from '@/models/Wallet';
+import { v4 as uuidv4 } from 'uuid';
 export interface TopupCardPayload {
 	free_credits?: number;
 }
@@ -56,6 +57,8 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 			return await WalletApi.topupWallet({
 				walletId: walletId,
 				amount: freeCredits!,
+				idempotency_key: uuidv4(),
+				transaction_reason: TransactionReason.FreeCredit,
 			});
 		},
 		onSuccess: async () => {
@@ -126,8 +129,9 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 					<Input
 						variant='number'
 						onChange={(e) => {
-							setfreeCredits(parseFloat(e));
+							setfreeCredits(e as unknown as number);
 						}}
+						value={freeCredits}
 						suffix='credits'
 						label='Free Credits'
 						inputPrefix={currency ? getCurrencySymbol(currency) : undefined}
@@ -172,14 +176,16 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 							</div>
 
 							{autoTopup && (
-								<div className='space-y-4 mt-4'>
+								<div className='sp	ace-y-4 mt-4'>
 									<Input
+										variant='number'
 										suffix='credits'
 										inputPrefix={currency ? getCurrencySymbol(currency) : undefined}
 										label='Enter minimum balance amount below which we top up '
 										placeholder='Enter Minimum Balance'
 									/>
 									<Input
+										variant='number'
 										suffix='credits'
 										inputPrefix={currency ? getCurrencySymbol(currency) : undefined}
 										label='How much should we add?'
