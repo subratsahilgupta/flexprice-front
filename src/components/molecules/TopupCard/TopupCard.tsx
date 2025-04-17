@@ -176,7 +176,7 @@ const TopupCard: FC<Props> = ({ walletId, onSuccess, preFunction, isPrefunctionL
 							</div>
 
 							{autoTopup && (
-								<div className='sp	ace-y-4 mt-4'>
+								<div className='space-y-4 mt-4'>
 									<Input
 										variant='number'
 										suffix='credits'
