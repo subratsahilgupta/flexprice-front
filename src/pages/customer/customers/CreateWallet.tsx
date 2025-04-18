@@ -51,7 +51,6 @@ const CreateWallet: FC<Props> = ({ customerId, onSuccess = () => {} }) => {
 		onSuccess: async (data: Wallet) => {
 			toast.success('Wallet created successfully');
 			onSuccess(data.id);
-			console.log(data);
 			await refetchQueries(['fetchWallets']);
 			await refetchQueries(['fetchWalletBalances']);
 			await refetchQueries(['fetchWalletsTransactions']);
