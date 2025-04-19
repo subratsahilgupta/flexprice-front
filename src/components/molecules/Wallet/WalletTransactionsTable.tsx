@@ -4,9 +4,9 @@ import { WalletTransaction } from '@/models/WalletTransaction';
 import { formatDateShort, getCurrencySymbol } from '@/utils/common/helper_functions';
 import { FC } from 'react';
 
-const formatAmount = (type: string, amount: number, currency?: string) => {
+const formatAmount = ({ type, amount, currency, className }: { type: string; amount: number; currency?: string; className?: string }) => {
 	return (
-		<span className={cn(type === 'credit' ? 'text-[#2A9D90] ' : 'text-[#18181B] ')}>
+		<span className={cn(type === 'credit' ? 'text-[#2A9D90] ' : 'text-[#18181B] ', className)}>
 			{type === 'credit' ? '+' : '-'}
 			{amount}
 			{currency ? ` ${getCurrencySymbol(currency)}` : ' credits'}
@@ -53,12 +53,16 @@ const WalletTransactionsTable: FC<Props> = ({ data, currency }) => {
 			render: (rowData) => <span>{formatDateShort(rowData.created_at)}</span>,
 		},
 		{
-			title: 'Credits',
-			render: (rowData) => formatAmount(rowData.type, rowData.credit_amount),
-		},
-		{
 			title: `Amount(${getCurrencySymbol(currency)})`,
-			render: (rowData) => formatAmount(rowData.type, rowData.amount, currency),
+			align: 'right',
+			render: (rowData) => {
+				return (
+					<span className='flex flex-col justify-center items-end'>
+						{formatAmount({ type: rowData.type, amount: rowData.amount, currency, className: 'text-base font-medium' })}
+						{formatAmount({ type: rowData.type, amount: rowData.credit_amount, className: 'text-sm' })}
+					</span>
+				);
+			},
 		},
 	];
 	return <FlexpriceTable columns={columnData} data={data} />;

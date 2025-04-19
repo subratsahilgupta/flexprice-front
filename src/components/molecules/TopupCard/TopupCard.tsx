@@ -12,6 +12,7 @@ import { TransactionReason } from '@/models/Wallet';
 import { v4 as uuidv4 } from 'uuid';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { getCurrencyAmountFromCredits } from '@/utils/helpers/wallet';
 
 // Enum for credits type with more descriptive names
 enum CreditsType {
@@ -47,10 +48,11 @@ interface TopupCardProps {
 	walletId?: string;
 	className?: string;
 	currency?: string;
+	conversion_rate?: number;
 	onSuccess?: () => void;
 }
 
-const TopupCard: FC<TopupCardProps> = ({ walletId, className, currency, onSuccess }) => {
+const TopupCard: FC<TopupCardProps> = ({ walletId, className, currency, conversion_rate = 1, onSuccess }) => {
 	// State management with more explicit typing
 	const [topupPayload, setTopupPayload] = useState<TopupPayload>({});
 
@@ -167,6 +169,7 @@ const TopupCard: FC<TopupCardProps> = ({ walletId, className, currency, onSucces
 					suffix='credits'
 					label='Free Credits'
 					placeholder='Enter free credits'
+					description={`${getCurrencyAmountFromCredits(conversion_rate, topupPayload.credits_to_add ?? 0)} ${getCurrencySymbol(currency!)} will be credited to the wallet`}
 				/>
 			)}
 
@@ -181,6 +184,7 @@ const TopupCard: FC<TopupCardProps> = ({ walletId, className, currency, onSucces
 						label='Purchased Credits'
 						inputPrefix={currency ? getCurrencySymbol(currency) : undefined}
 						placeholder='Enter purchased credits'
+						description={`${getCurrencyAmountFromCredits(conversion_rate, topupPayload.credits_to_add ?? 0)} ${getCurrencySymbol(currency!)} will be credited to the wallet`}
 					/>
 
 					<div className='flex items-center space-x-4 font-open-sans'>

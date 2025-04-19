@@ -1,4 +1,4 @@
-import { AddButton, Button, Chip, FormHeader, Modal, NoDataCard, Select, ShortPagination, Spacer } from '@/components/atoms';
+import { AddButton, Button, Card, Chip, FormHeader, Modal, NoDataCard, Select, ShortPagination, Spacer } from '@/components/atoms';
 import {
 	DropdownMenu,
 	DropdownMenuOption,
@@ -169,7 +169,12 @@ const WalletTab = () => {
 			{/* Topup Modal */}
 			<Modal isOpen={showTopupModal} onOpenChange={() => setShowTopupModal(false)}>
 				<div className='w-[700px] bg-white rounded-xl'>
-					<TopupCard onSuccess={() => setShowTopupModal(false)} walletId={activeWallet?.id} />
+					<TopupCard
+						onSuccess={() => setShowTopupModal(false)}
+						walletId={activeWallet?.id}
+						conversion_rate={activeWallet?.conversion_rate}
+						currency={activeWallet?.currency ?? ''}
+					/>
 				</div>
 			</Modal>
 
@@ -234,6 +239,10 @@ const WalletTab = () => {
 									/>
 								),
 							},
+							{
+								label: 'Conversion Rate',
+								value: <span>{`1 Credit = ${activeWallet?.conversion_rate}${getCurrencySymbol(activeWallet?.currency ?? '')}`}</span>,
+							},
 						]}
 					/>
 					<Spacer className='!h-4' />
@@ -243,29 +252,45 @@ const WalletTab = () => {
 						<Skeleton className='w-full h-[200px]' />
 					) : (
 						<div className='w-full grid grid-cols-2 gap-4'>
-							{['Current', 'Ongoing'].map((type) => (
-								<div key={type} className='card w-full'>
-									<p className='text-[#71717A] text-sm flex gap-2 items-center'>
-										{type} Balance
-										<TooltipProvider delayDuration={0}>
-											<Tooltip>
-												<TooltipTrigger>
-													<Info className='size-4' />
-												</TooltipTrigger>
-												<TooltipContent>
-													<p>{type === 'Current' ? 'Balance as per latest invoice' : 'Includes real-time usage'}</p>
-												</TooltipContent>
-											</Tooltip>
-										</TooltipProvider>
-									</p>
-									<Spacer className='!my-2' />
-									<p className='text-[#09090B] font-semibold text-3xl'>
-										{getCurrencySymbol(walletBalance?.currency ?? '')}
-										{type === 'Current'
-											? formatAmount(walletBalance?.balance.toString() ?? '0')
-											: formatAmount(walletBalance?.real_time_balance.toString() ?? '0')}
-									</p>
-								</div>
+							{['Current', 'Ongoing'].map((type, index) => (
+								<Card key={index}>
+									<div className='flex justify-between items-center mb-4'>
+										<div className='flex items-center space-x-2'>
+											<span className='text-gray-600 text-sm font-medium'>{type} Balance</span>
+											<TooltipProvider delayDuration={0}>
+												<Tooltip>
+													<TooltipTrigger>
+														<Info className='size-4 text-gray-400 hover:text-gray-600 transition-colors' />
+													</TooltipTrigger>
+													<TooltipContent>
+														<p>{type === 'Current' ? 'Balance as per latest invoice' : 'Includes real-time usage'}</p>
+													</TooltipContent>
+												</Tooltip>
+											</TooltipProvider>
+										</div>
+										<div className='opacity-50 group-hover:opacity-100 transition-opacity'>
+											<WalletIcon className='size-5 text-gray-500' />
+										</div>
+									</div>
+
+									<div className='flex items-baseline space-x-2'>
+										<span className='text-gray-500 text-2xl font-medium'>{getCurrencySymbol(walletBalance?.currency ?? '')}</span>
+										<span className='text-5xl font-bold text-gray-900 leading-tight'>
+											{type === 'Current'
+												? formatAmount(walletBalance?.balance.toString() ?? '0')
+												: formatAmount(walletBalance?.real_time_balance.toString() ?? '0')}
+										</span>
+									</div>
+
+									<div className='flex justify-between items-center'>
+										<span className='text-sm text-gray-500'>
+											{type === 'Current'
+												? formatAmount(walletBalance?.credit_balance.toString() ?? '0')
+												: formatAmount(walletBalance?.real_time_credit_balance.toString() ?? '0')}
+											{'  credits'}
+										</span>
+									</div>
+								</Card>
 							))}
 						</div>
 					)}
