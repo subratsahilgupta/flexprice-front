@@ -1,4 +1,4 @@
-import { Button, FormHeader, Input, Spacer } from '@/components/atoms';
+import { Button, DatePicker, FormHeader, Input, Spacer } from '@/components/atoms';
 import { Gift, Receipt } from 'lucide-react';
 import { FC, useState, useCallback } from 'react';
 import RectangleRadiogroup, { RectangleRadiogroupOption } from '../RectangleRadiogroup';
@@ -19,6 +19,23 @@ enum CreditsType {
 	FreeCredit = 'FreeCredit',
 	PurchasedCredits = 'PurchasedCredits',
 }
+
+// Utility functions for date conversion
+const convertToYYYYMMDD = (date: Date): number => {
+	const year = date.getUTCFullYear();
+	const month = date.getUTCMonth() + 1; // getUTCMonth() is zero-indexed
+	const day = date.getUTCDate();
+
+	return parseInt(`${year}${month.toString().padStart(2, '0')}${day.toString().padStart(2, '0')}`, 10);
+};
+
+const convertFromYYYYMMDD = (yyyymmdd: number): Date => {
+	const year = Math.floor(yyyymmdd / 10000);
+	const month = Math.floor((yyyymmdd % 10000) / 100) - 1; // Subtract 1 for zero-indexed month
+	const day = yyyymmdd % 100;
+
+	return new Date(Date.UTC(year, month, day));
+};
 
 // Centralized credits type options
 const CREDITS_TYPE_OPTIONS: RectangleRadiogroupOption[] = [
@@ -79,6 +96,28 @@ const TopupCard: FC<TopupCardProps> = ({ walletId, className, currency, conversi
 		]);
 	}, []);
 
+	// Validate topup payload
+	const validateTopup = useCallback((): boolean => {
+		const { credits_type, credits_to_add, expiry_date } = topupPayload;
+
+		if (!credits_type) {
+			toast.error('Please select a credits type');
+			return false;
+		}
+
+		if (!credits_to_add || credits_to_add <= 0) {
+			toast.error('Please enter a valid credits amount');
+			return false;
+		}
+
+		if (expiry_date && convertFromYYYYMMDD(expiry_date) < new Date()) {
+			toast.error('Expiry date cannot be in the past');
+			return false;
+		}
+
+		return true;
+	}, [topupPayload]);
+
 	// Wallet topup mutation with improved error handling
 	const { isPending, mutate: topupWallet } = useMutation({
 		mutationKey: ['topupWallet', walletId],
@@ -97,6 +136,7 @@ const TopupCard: FC<TopupCardProps> = ({ walletId, className, currency, conversi
 				credits_to_add: topupPayload.credits_to_add,
 				idempotency_key: uuidv4(),
 				transaction_reason: getTransactionReason(),
+				expiry_date: topupPayload.expiry_date,
 			});
 		},
 		onSuccess: async () => {
@@ -108,23 +148,6 @@ const TopupCard: FC<TopupCardProps> = ({ walletId, className, currency, conversi
 			toast.error(error.error.message || 'Failed to topup wallet');
 		},
 	});
-
-	// Validate topup payload
-	const validateTopup = useCallback((): boolean => {
-		const { credits_type, credits_to_add } = topupPayload;
-
-		if (!credits_type) {
-			toast.error('Please select a credits type');
-			return false;
-		}
-
-		if (!credits_to_add || credits_to_add <= 0) {
-			toast.error('Please enter a valid credits amount');
-			return false;
-		}
-
-		return true;
-	}, [topupPayload]);
 
 	// Handle topup submission
 	const handleTopup = useCallback(() => {
@@ -155,6 +178,7 @@ const TopupCard: FC<TopupCardProps> = ({ walletId, className, currency, conversi
 						credits_type: value as CreditsType,
 						credits_to_add: undefined,
 						generate_invoice: undefined,
+						expiry_date: undefined,
 					});
 				}}
 				description=''
@@ -169,7 +193,15 @@ const TopupCard: FC<TopupCardProps> = ({ walletId, className, currency, conversi
 					suffix='credits'
 					label='Free Credits'
 					placeholder='Enter free credits'
-					description={`${getCurrencyAmountFromCredits(conversion_rate, topupPayload.credits_to_add ?? 0)} ${getCurrencySymbol(currency!)} will be credited to the wallet`}
+					description={
+						<span>
+							<span className='font-medium text-black'>
+								{getCurrencyAmountFromCredits(conversion_rate, topupPayload.credits_to_add ?? 0)}
+								{getCurrencySymbol(currency!)}
+							</span>
+							{` will be credited to the wallet`}
+						</span>
+					}
 				/>
 			)}
 
@@ -184,7 +216,15 @@ const TopupCard: FC<TopupCardProps> = ({ walletId, className, currency, conversi
 						label='Purchased Credits'
 						inputPrefix={currency ? getCurrencySymbol(currency) : undefined}
 						placeholder='Enter purchased credits'
-						description={`${getCurrencyAmountFromCredits(conversion_rate, topupPayload.credits_to_add ?? 0)} ${getCurrencySymbol(currency!)} will be credited to the wallet`}
+						description={
+							<span>
+								<span className='font-medium text-black'>
+									{getCurrencyAmountFromCredits(conversion_rate, topupPayload.credits_to_add ?? 0)}
+									{getCurrencySymbol(currency!)}
+								</span>
+								{` will be credited to the wallet`}
+							</span>
+						}
 					/>
 
 					<div className='flex items-center space-x-4 font-open-sans'>
@@ -200,6 +240,20 @@ const TopupCard: FC<TopupCardProps> = ({ walletId, className, currency, conversi
 						</Label>
 					</div>
 				</>
+			)}
+
+			{topupPayload.credits_type && (
+				<DatePicker
+					minDate={new Date(new Date().setDate(new Date().getDate() + 1))}
+					label='Expiry Date'
+					date={topupPayload.expiry_date ? convertFromYYYYMMDD(topupPayload.expiry_date) : undefined}
+					setDate={(value) =>
+						updateTopupPayload({
+							expiry_date: value ? convertToYYYYMMDD(value) : undefined,
+						})
+					}
+					className='w-full'
+				/>
 			)}
 
 			<Spacer className='!mt-4' />

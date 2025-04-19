@@ -49,8 +49,17 @@ const WalletTransactionsTable: FC<Props> = ({ data, currency }) => {
 			fieldVariant: 'title',
 		},
 		{
-			title: 'Date',
+			title: 'Payment Date',
 			render: (rowData) => <span>{formatDateShort(rowData.created_at)}</span>,
+		},
+		{
+			title: 'Expiry Date',
+			render: (rowData) => {
+				if (rowData.expiry_date) {
+					return <span>{formatDateShort(rowData.expiry_date)}</span>;
+				}
+				return <span>--</span>;
+			},
 		},
 		{
 			title: `Amount(${getCurrencySymbol(currency)})`,
