@@ -255,7 +255,7 @@ const TopupCard: FC<TopupCardProps> = ({ walletId, className, currency, conversi
 			<Spacer className='!mt-4' />
 
 			<div className='w-full justify-end flex'>
-				<Button disabled={isPending || !topupPayload.credits_type} onClick={handleTopup}>
+				<Button isLoading={isPending} onClick={handleTopup} disabled={isPending || !topupPayload.credits_type}>
 					Add Credits
 				</Button>
 			</div>
