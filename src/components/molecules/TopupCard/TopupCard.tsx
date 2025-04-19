@@ -195,10 +195,8 @@ const TopupCard: FC<TopupCardProps> = ({ walletId, className, currency, conversi
 					placeholder='Enter free credits'
 					description={
 						<span>
-							<span className='font-medium text-black'>
-								{getCurrencyAmountFromCredits(conversion_rate, topupPayload.credits_to_add ?? 0)}
-								{getCurrencySymbol(currency!)}
-							</span>
+							{getCurrencyAmountFromCredits(conversion_rate, topupPayload.credits_to_add ?? 0)}
+							{getCurrencySymbol(currency!)}
 							{` will be credited to the wallet`}
 						</span>
 					}
@@ -218,10 +216,8 @@ const TopupCard: FC<TopupCardProps> = ({ walletId, className, currency, conversi
 						placeholder='Enter purchased credits'
 						description={
 							<span>
-								<span className='font-medium text-black'>
-									{getCurrencyAmountFromCredits(conversion_rate, topupPayload.credits_to_add ?? 0)}
-									{getCurrencySymbol(currency!)}
-								</span>
+								{getCurrencyAmountFromCredits(conversion_rate, topupPayload.credits_to_add ?? 0)}
+								{getCurrencySymbol(currency!)}
 								{` will be credited to the wallet`}
 							</span>
 						}
