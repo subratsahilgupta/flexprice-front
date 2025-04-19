@@ -110,7 +110,7 @@ const TopupCard: FC<TopupCardProps> = ({ walletId, className, currency, conversi
 			return false;
 		}
 
-		if (expiry_date && convertFromYYYYMMDD(expiry_date) < new Date()) {
+		if (expiry_date && convertFromYYYYMMDD(expiry_date).getTime() < Date.now()) {
 			toast.error('Expiry date cannot be in the past');
 			return false;
 		}
