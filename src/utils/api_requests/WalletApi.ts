@@ -1,6 +1,6 @@
 import { AxiosClient } from '@/core/axios/verbs';
-import { Wallet } from '@/models/Wallet';
-import { WalletBalance } from '@/models/WalletBalance';
+import { Wallet, TransactionReason } from '@/models/Wallet';
+import { RealtimeWalletBalance } from '@/models/WalletBalance';
 import { WalletTransaction } from '@/models/WalletTransaction';
 import { PaginationType } from '@/models/Pagination';
 
@@ -12,15 +12,23 @@ interface WalletTransactionResponse {
 	pagination: PaginationType;
 }
 
-interface CreateWalletPayload {
+export interface CreateWalletPayload {
 	customerId: string;
 	currency: string;
 	name?: string;
+	metadata?: Record<string, any>;
+	initial_credits_to_load?: number;
+	conversion_rate?: number;
 }
 
-interface TopupWalletPayload {
-	amount?: number;
+export interface TopupWalletPayload {
+	credits_to_add: number;
 	walletId: string;
+	description?: string;
+	expiry_date?: number;
+	metadata?: Record<string, any>;
+	idempotency_key: string;
+	transaction_reason: TransactionReason;
 }
 
 class WalletApi {
@@ -32,20 +40,41 @@ class WalletApi {
 		return await AxiosClient.get<WalletTransactionResponse>(`/wallets/${walletId}/transactions?limit=${limit}&offset=${offset}`);
 	}
 
-	static async getWalletBalance(walletId: string): Promise<WalletBalance> {
-		return await AxiosClient.get<WalletBalance>(`/wallets/${walletId}/balance/real-time`);
+	static async getWalletBalance(walletId: string): Promise<RealtimeWalletBalance> {
+		return await AxiosClient.get<RealtimeWalletBalance>(`/wallets/${walletId}/balance/real-time`);
 	}
-	static async createWallet({ currency, customerId, name }: CreateWalletPayload): Promise<Wallet> {
+	static async createWallet({
+		currency,
+		customerId,
+		name,
+		initial_credits_to_load,
+		conversion_rate,
+	}: CreateWalletPayload): Promise<Wallet> {
 		return await AxiosClient.post<Wallet>(`/wallets`, {
 			currency,
 			customer_id: customerId,
 			name,
+			initial_credits_to_load,
+			conversion_rate,
 		});
 	}
 
-	static async topupWallet({ walletId, amount }: TopupWalletPayload): Promise<Wallet> {
+	static async topupWallet({
+		walletId,
+		credits_to_add,
+		idempotency_key,
+		transaction_reason,
+		description,
+		expiry_date,
+		metadata,
+	}: TopupWalletPayload): Promise<Wallet> {
 		return await AxiosClient.post<Wallet>(`/wallets/${walletId}/top-up`, {
-			amount,
+			credits_to_add,
+			idempotency_key,
+			transaction_reason,
+			description,
+			expiry_date,
+			metadata,
 		});
 	}
 

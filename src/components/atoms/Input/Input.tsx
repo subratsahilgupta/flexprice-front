@@ -69,7 +69,7 @@ const getInputPattern = (variant: InputVariant, options: NumberFormatOptions = D
 
 interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
 	label?: string;
-	description?: string;
+	description?: React.ReactNode;
 	error?: string;
 	type?: React.HTMLInputTypeAttribute;
 	onChange?: (value: string) => void;

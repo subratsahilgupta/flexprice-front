@@ -10,5 +10,17 @@ export type Wallet = {
 	readonly metadata: Record<string, any>;
 	readonly updated_at: string;
 	readonly wallet_status: string;
+	readonly conversion_rate: number;
 	readonly meter: Meter;
 };
+
+export enum TransactionReason {
+	InvoicePayment = 'INVOICE_PAYMENT',
+	FreeCredit = 'FREE_CREDIT_GRANT',
+	SubscriptionCredit = 'SUBSCRIPTION_CREDIT_GRANT',
+	PurchasedCreditInvoiced = 'PURCHASED_CREDIT_INVOICED',
+	PurchasedCreditDirect = 'PURCHASED_CREDIT_DIRECT',
+	InvoiceRefund = 'INVOICE_REFUND',
+	CreditExpired = 'CREDIT_EXPIRED',
+	WalletTermination = 'WALLET_TERMINATION',
+}

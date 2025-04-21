@@ -1,4 +1,4 @@
-import { AddButton, Button, Chip, FormHeader, Modal, NoDataCard, Select, ShortPagination, Spacer } from '@/components/atoms';
+import { AddButton, Button, Card, Chip, FormHeader, Modal, NoDataCard, Select, ShortPagination, Spacer } from '@/components/atoms';
 import {
 	DropdownMenu,
 	DropdownMenuOption,
@@ -13,7 +13,7 @@ import usePagination from '@/hooks/usePagination';
 import { Wallet } from '@/models/Wallet';
 import WalletApi from '@/utils/api_requests/WalletApi';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { IoSearch } from 'react-icons/io5';
 import { useParams, useOutletContext } from 'react-router-dom';
@@ -22,74 +22,46 @@ import { EllipsisVertical, Info, Pencil, SlidersHorizontal, Trash2, Wallet as Wa
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import useQueryParams from '@/hooks/useQueryParams';
 import { DetailsCard } from '@/components/molecules';
+import { formatAmount } from '@/components/atoms/Input/Input';
 
 const formatWalletStatus = (status?: string) => {
-	switch (status) {
-		case 'active':
-			return 'Active';
-		case 'frozen':
-			return 'Frozen';
-		case 'closed':
-			return 'Closed';
-		default:
-			return 'Unknown';
-	}
+	const statusMap: Record<string, string> = {
+		active: 'Active',
+		frozen: 'Frozen',
+		closed: 'Closed',
+	};
+	return status ? statusMap[status.toLowerCase()] || 'Unknown' : 'Unknown';
 };
 
 const WalletTab = () => {
 	const { id: customerId } = useParams();
-	const [activeWallet, setActiveWallet] = useState<Wallet | null>();
 	const { limit, offset } = usePagination();
 	const {
 		queryParams: { activeWalletId },
 		setQueryParam,
 	} = useQueryParams<{ activeWalletId?: string }>({ activeWalletId: '' });
 
-	const [isAdd, setisAdd] = useState(false);
-	const [showTopupModal, setshowTopupModal] = useState(false);
-	const [showTerminateModal, setshowTerminateModal] = useState(false);
+	const [isAdd, setIsAdd] = useState(false);
+	const [showTopupModal, setShowTopupModal] = useState(false);
+	const [showTerminateModal, setShowTerminateModal] = useState(false);
+	const [activeWallet, setActiveWallet] = useState<Wallet | null>();
+
 	const { isArchived } = useOutletContext<{ isArchived: boolean }>();
 
-	const dropdownOptions: DropdownMenuOption[] = [
-		{
-			icon: <WalletIcon />,
-			label: 'Create Wallet',
-			onSelect: () => setisAdd(true),
-		},
-		// {
-		// 	icon: <CircleFadingPlus />,
-		// 	label: 'Topup Wallet',
-		// 	onSelect: () => setshowTopupModal(true),
-		// },
-		{
-			icon: <Pencil />,
-			label: 'Edit',
-			disabled: true,
-		},
-		{
-			icon: <Trash2 />,
-			label: 'Terminate',
-			onSelect: () => setshowTerminateModal(true),
-		},
-	];
-
+	// Wallet Queries
 	const {
 		data: wallets,
 		isLoading,
 		isError,
 	} = useQuery({
 		queryKey: ['fetchWallets', customerId],
-		queryFn: async () => {
-			return await WalletApi.getWallets(customerId!);
-		},
+		queryFn: () => WalletApi.getWallets(customerId!),
 		enabled: !!customerId,
 	});
 
 	const { data: walletBalance, isLoading: isBalanceLoading } = useQuery({
 		queryKey: ['fetchWalletBalances', customerId, activeWallet?.id],
-		queryFn: async () => {
-			return await WalletApi.getWalletBalance(activeWallet ? activeWallet.id : '');
-		},
+		queryFn: () => WalletApi.getWalletBalance(activeWallet ? activeWallet.id : ''),
 		enabled: !!customerId && !!activeWallet,
 	});
 
@@ -99,39 +71,60 @@ const WalletTab = () => {
 		isError: isTransactionError,
 	} = useQuery({
 		queryKey: ['fetchWalletsTransactions', customerId, activeWallet?.id],
-		queryFn: async () => {
-			return await WalletApi.getWalletTransactions({
+		queryFn: () =>
+			WalletApi.getWalletTransactions({
 				walletId: activeWallet ? activeWallet.id : '',
 				limit,
 				offset,
-			});
-		},
+			}),
 		enabled: !!customerId && !!activeWallet,
 	});
 
+	// Memoized and derived data
+	const walletOptions = useMemo(
+		() =>
+			wallets?.map((wallet, index) => ({
+				label: wallet.name || `Wallet ${index + 1}`,
+				value: wallet.id,
+			})) || [],
+		[wallets],
+	);
+
+	const dropdownOptions: DropdownMenuOption[] = useMemo(
+		() => [
+			{
+				icon: <WalletIcon />,
+				label: 'Create Wallet',
+				onSelect: () => setIsAdd(true),
+			},
+			{
+				icon: <Pencil />,
+				label: 'Edit',
+				disabled: true,
+			},
+			{
+				icon: <Trash2 />,
+				label: 'Terminate',
+				onSelect: () => setShowTerminateModal(true),
+			},
+		],
+		[],
+	);
+
+	// Effect to set initial active wallet
 	useEffect(() => {
-		if (!wallets || wallets?.length === 0) {
-			return;
-		}
+		if (!wallets?.length) return;
 
-		if (activeWalletId === '' || !activeWalletId) {
-			setQueryParam('activeWalletId', wallets[0].id);
-			return;
-		}
+		const selectedWallet = wallets.find((wallet) => wallet.id === activeWalletId) || wallets[0];
 
-		const wallet = wallets.find((wallet) => wallet.id === activeWalletId) || wallets[0];
-
-		setActiveWallet(wallet);
+		setActiveWallet(selectedWallet);
+		setQueryParam('activeWalletId', selectedWallet.id);
 	}, [wallets, activeWalletId]);
 
-	const walletOptions = wallets?.map((wallet, index) => ({
-		label: wallet.name || `demo name ${index}`,
-		value: wallet.id,
-	}));
-
+	// Render loading state
 	if (isLoading || isTransactionLoading || isBalanceLoading) {
 		return (
-			<div className=' h-full   space-y-5'>
+			<div className='h-full space-y-5'>
 				<Skeleton className='w-full h-16' />
 				<Skeleton className='w-full h-32' />
 				<Skeleton className='w-full h-32' />
@@ -139,36 +132,55 @@ const WalletTab = () => {
 		);
 	}
 
+	// Handle errors
 	if (isError || isTransactionError) {
 		toast.error('An error occurred while fetching wallet details');
 	}
 
+	// Render create wallet if no wallets exist
 	if (isAdd) {
-		return <CreateWallet isVisible={isAdd} onClose={(value) => setisAdd(value)} customerId={customerId!} />;
-	}
-
-	if (wallets?.length === 0) {
 		return (
-			<NoDataCard
-				title='Wallets'
-				subtitle='No wallets linked to the customer'
-				cta={!isArchived && <AddButton onClick={() => setisAdd(true)} />}
+			<CreateWallet
+				onSuccess={(walletId) => {
+					setIsAdd(false);
+					setActiveWallet(wallets?.find((wallet) => wallet.id === walletId) || null);
+					setQueryParam('activeWalletId', walletId);
+				}}
+				customerId={customerId!}
 			/>
 		);
 	}
 
+	if (!wallets?.length) {
+		return (
+			<NoDataCard
+				title='Wallets'
+				subtitle='No wallets linked to the customer'
+				cta={!isArchived && <AddButton onClick={() => setIsAdd(true)} />}
+			/>
+		);
+	}
+
+	// Render wallet details
 	return (
 		<div className='space-y-6'>
-			{/* topup wallet */}
 			<ApiDocsContent tags={['Wallets', 'Topup']} />
-			<Modal isOpen={showTopupModal} onOpenChange={() => setshowTopupModal(false)}>
+
+			{/* Topup Modal */}
+			<Modal isOpen={showTopupModal} onOpenChange={() => setShowTopupModal(false)}>
 				<div className='w-[700px] bg-white rounded-xl'>
-					<TopupCard onSuccess={() => setshowTopupModal(false)} walletId={activeWallet?.id} />
+					<TopupCard
+						onSuccess={() => setShowTopupModal(false)}
+						walletId={activeWallet?.id}
+						conversion_rate={activeWallet?.conversion_rate}
+						currency={activeWallet?.currency ?? ''}
+					/>
 				</div>
 			</Modal>
 
+			{/* Terminate Wallet Modal */}
 			{activeWallet && (
-				<TerminateWalletModal isOpen={showTerminateModal} onOpenChange={() => setshowTerminateModal(false)} wallet={activeWallet} />
+				<TerminateWalletModal isOpen={showTerminateModal} onOpenChange={() => setShowTerminateModal(false)} wallet={activeWallet} />
 			)}
 
 			<FormHeader
@@ -177,12 +189,14 @@ const WalletTab = () => {
 				subtitle='Manage credits for usage-based billing that can apply to invoices pre-tax'
 				variant='sub-header'
 			/>
+
+			{/* Wallet Selection and Actions */}
 			<div className='w-full flex justify-between items-center mb-3'>
 				<div>
-					{(walletOptions?.length ?? 0) > 1 && (
+					{walletOptions.length > 1 && (
 						<div className='min-w-[250px]'>
 							<Select
-								options={walletOptions || []}
+								options={walletOptions}
 								value={activeWallet?.id}
 								onChange={(value) => {
 									const selectedWallet = wallets?.find((wallet) => wallet.id === value) || null;
@@ -193,9 +207,9 @@ const WalletTab = () => {
 						</div>
 					)}
 				</div>
-				<div className='flex items-center space-x-2	'>
+				<div className='flex items-center space-x-2'>
 					{!isArchived && (
-						<Button onClick={() => setshowTopupModal(true)}>
+						<Button onClick={() => setShowTopupModal(true)}>
 							<WalletIcon />
 							<span>Topup Wallet</span>
 						</Button>
@@ -203,10 +217,12 @@ const WalletTab = () => {
 
 					<DropdownMenu
 						options={dropdownOptions}
-						trigger={<Button variant={'outline'} prefixIcon={<EllipsisVertical />} size={'icon'}></Button>}></DropdownMenu>
+						trigger={<Button variant={'outline'} prefixIcon={<EllipsisVertical />} size={'icon'}></Button>}
+					/>
 				</div>
 			</div>
-			{/* when we have wallets or active wallets */}
+
+			{/* Active Wallet Details */}
 			{activeWallet && !isAdd && (
 				<div>
 					<DetailsCard
@@ -223,59 +239,64 @@ const WalletTab = () => {
 									/>
 								),
 							},
+							{
+								label: 'Conversion Rate',
+								value: <span>{`1 Credit = ${activeWallet?.conversion_rate}${getCurrencySymbol(activeWallet?.currency ?? '')}`}</span>,
+							},
 						]}
 					/>
 					<Spacer className='!h-4' />
 
-					{/* wallet moneyy */}
+					{/* Wallet Balance */}
 					{isBalanceLoading ? (
 						<Skeleton className='w-full h-[200px]' />
 					) : (
 						<div className='w-full grid grid-cols-2 gap-4'>
-							<div className='card w-full'>
-								<p className='text-[#71717A] text-sm flex gap-2 items-center'>
-									Current Balance
-									<TooltipProvider delayDuration={0}>
-										<Tooltip>
-											<TooltipTrigger>
-												<Info className='size-4' />
-											</TooltipTrigger>
-											<TooltipContent>
-												<p>Balance as per latest invoice</p>
-											</TooltipContent>
-										</Tooltip>
-									</TooltipProvider>
-								</p>
-								<Spacer className='!my-2' />
-								<p className='text-[#09090B] font-semibold text-3xl '>
-									{getCurrencySymbol(walletBalance?.currency ?? '')}
-									{walletBalance?.balance}
-								</p>
-							</div>
+							{['Current', 'Ongoing'].map((type, index) => (
+								<Card key={index}>
+									<div className='flex justify-between items-center mb-4'>
+										<div className='flex items-center space-x-2'>
+											<span className='text-gray-600 text-sm font-medium'>{type} Balance</span>
+											<TooltipProvider delayDuration={0}>
+												<Tooltip>
+													<TooltipTrigger>
+														<Info className='size-4 text-gray-400 hover:text-gray-600 transition-colors' />
+													</TooltipTrigger>
+													<TooltipContent>
+														<p>{type === 'Current' ? 'Balance as per latest invoice' : 'Includes real-time usage'}</p>
+													</TooltipContent>
+												</Tooltip>
+											</TooltipProvider>
+										</div>
+										<div className='opacity-50 group-hover:opacity-100 transition-opacity'>
+											<WalletIcon className='size-5 text-gray-500' />
+										</div>
+									</div>
 
-							<div className='card w-full'>
-								<p className='text-[#71717A] text-sm flex gap-2 items-center'>
-									Ongoing Balance
-									<TooltipProvider delayDuration={0}>
-										<Tooltip>
-											<TooltipTrigger>
-												<Info className='size-4' />
-											</TooltipTrigger>
-											<TooltipContent>
-												<p>Includes real-time usage</p>
-											</TooltipContent>
-										</Tooltip>
-									</TooltipProvider>
-								</p>
-								<Spacer className='!my-2' />
-								<p className='text-[#09090B] font-semibold text-3xl '>
-									{getCurrencySymbol(walletBalance?.currency ?? '')}
-									{walletBalance?.real_time_balance}
-								</p>
-							</div>
+									<div className='flex items-baseline space-x-2'>
+										<span className='text-gray-500 text-2xl font-medium'>{getCurrencySymbol(walletBalance?.currency ?? '')}</span>
+										<span className='text-5xl font-bold text-gray-900 leading-tight'>
+											{type === 'Current'
+												? formatAmount(walletBalance?.balance.toString() ?? '0')
+												: formatAmount(walletBalance?.real_time_balance.toString() ?? '0')}
+										</span>
+									</div>
+
+									<div className='flex justify-between items-center'>
+										<span className='text-sm text-gray-500'>
+											{type === 'Current'
+												? formatAmount(walletBalance?.credit_balance.toString() ?? '0')
+												: formatAmount(walletBalance?.real_time_credit_balance.toString() ?? '0')}
+											{'  credits'}
+										</span>
+									</div>
+								</Card>
+							))}
 						</div>
 					)}
 					<Spacer className='!h-4' />
+
+					{/* Transactions */}
 					{transactionsData?.items.length === 0 ? (
 						<div className='card'>
 							<FormHeader title='No transactions found' variant='sub-header' subtitle='No recent transactions' />
@@ -283,20 +304,18 @@ const WalletTab = () => {
 					) : (
 						<div className='card'>
 							<div className='w-full flex justify-between items-center'>
-								<div>
-									<FormHeader title='Transactions' titleClassName='!font-semibold' variant='form-title' />
-								</div>
-								<div className='flex items-center space-x-2	'>
+								<FormHeader title='Transactions' titleClassName='!font-semibold' variant='form-title' />
+								<div className='flex items-center space-x-2'>
 									<button className='px-2 py-1'>
-										<IoSearch className='size-4 text-[#09090B] ' />
+										<IoSearch className='size-4 text-[#09090B]' />
 									</button>
 									<button className='px-2 py-1'>
-										<SlidersHorizontal className='size-4 text-[#09090B] ' />
+										<SlidersHorizontal className='size-4 text-[#09090B]' />
 									</button>
 								</div>
 							</div>
 							<Spacer className='!h-6' />
-							<WalletTransactionsTable data={transactionsData?.items || []} />
+							<WalletTransactionsTable data={transactionsData?.items || []} currency={walletBalance?.currency ?? ''} />
 							<ShortPagination unit='Transactions' totalItems={transactionsData?.pagination.total ?? 0} />
 						</div>
 					)}

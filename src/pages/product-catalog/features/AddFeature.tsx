@@ -5,10 +5,9 @@ import { AddChargesButton } from '@/components/organisms/PlanForm/SetupChargesSe
 import { RouteNames } from '@/core/routes/Routes';
 import { refetchQueries } from '@/core/tanstack/ReactQueryProvider';
 import { cn } from '@/lib/utils';
-import Feature from '@/models/Feature';
-import { Meter, METER_USAGE_RESET_PERIOD } from '@/models/Meter';
+import Feature, { FeatureType } from '@/models/Feature';
+import { Meter, METER_AGGREGATION_TYPE, METER_USAGE_RESET_PERIOD } from '@/models/Meter';
 import FeatureApi from '@/utils/api_requests/FeatureApi';
-import { MeterApi } from '@/utils/api_requests/MeterApi';
 import { useMutation } from '@tanstack/react-query';
 import { Gauge, SquareCheckBig, Wrench } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -39,7 +38,7 @@ const AddFeaturePage = () => {
 
 	const [meter, setmeter] = useState<Partial<Meter>>({
 		aggregation: {
-			type: 'SUM',
+			type: METER_AGGREGATION_TYPE.SUM,
 			field: '',
 		},
 		reset_usage: METER_USAGE_RESET_PERIOD.BILLING_PERIOD,
@@ -132,7 +131,7 @@ const AddFeaturePage = () => {
 		}
 
 		// Only validate field if aggregation type is not COUNT
-		if (meterData.aggregation?.type !== 'COUNT') {
+		if (meterData.aggregation?.type !== METER_AGGREGATION_TYPE.COUNT) {
 			if (!meterData.aggregation?.field || meterData.aggregation.field.trim() === '') {
 				errors.aggregation_field = 'Aggregation field is required for this aggregation type';
 			}
@@ -158,48 +157,6 @@ const AddFeaturePage = () => {
 		defineUnits: false,
 	});
 
-	const { isPending: isUpdating, mutate: createMeter } = useMutation({
-		mutationFn: async () => {
-			const sanitizedMeter: Partial<Meter> = {
-				...meter,
-				event_name: meter.event_name,
-				aggregation:
-					meter.aggregation?.type === 'COUNT'
-						? { type: meter.aggregation.type, field: '' } // Empty field for COUNT
-						: {
-								type: meter.aggregation?.type || '',
-								field: meter.aggregation?.field || '', // Required field for other types
-							},
-				reset_usage: meter.reset_usage || '',
-				filters: meter.filters?.filter((filter) => filter.key !== '' && filter.values.length > 0),
-			};
-			return await MeterApi.createMeter(sanitizedMeter);
-		},
-		onSuccess: async (newMeter) => {
-			if (newMeter?.id) {
-				// Update state for completeness, but don't rely on it for the next action
-				setdata((prev) => ({ ...prev, meter_id: newMeter.id }));
-				// Pass the meter_id directly to createFeature instead of relying on state update
-				createFeatureWithMeterId(newMeter.id);
-			} else {
-				toast.error('Failed to get meter ID from response');
-			}
-		},
-		onError: (error: ServerError) => {
-			toast.error(error.error.message || 'Failed to create meter. Please check the form and try again.');
-		},
-		retry: 3,
-	});
-
-	// New function to create feature with meter ID
-	const createFeatureWithMeterId = (meterId: string) => {
-		const featureData = {
-			...data,
-			meter_id: meterId, // Use the meter ID directly
-		};
-		createFeature(featureData);
-	};
-
 	const aggregationOptions: SelectOption[] = [
 		{
 			label: 'Sum',
@@ -221,9 +178,23 @@ const AddFeaturePage = () => {
 
 	const { isPending, mutate: createFeature } = useMutation({
 		mutationFn: async (featureData: Partial<Feature> = data) => {
+			const sanitizedMeter: Partial<Meter> = {
+				...meter,
+				event_name: meter.event_name,
+				aggregation:
+					meter.aggregation?.type === METER_AGGREGATION_TYPE.COUNT
+						? { type: meter.aggregation.type, field: '' } // Empty field for COUNT
+						: {
+								type: meter.aggregation?.type || '',
+								field: meter.aggregation?.field || '', // Required field for other types
+							},
+				reset_usage: meter.reset_usage || '',
+				filters: meter.filters?.filter((filter) => filter.key !== '' && filter.values.length > 0),
+			};
+
 			const sanitizedData: Partial<Feature> = {
 				...featureData,
-				meter_id: featureData.meter_id || '',
+				meter: featureData.type === FeatureType.metered ? (sanitizedMeter as Meter) : undefined,
 			};
 
 			return await FeatureApi.createFeature(sanitizedData);
@@ -268,20 +239,14 @@ const AddFeaturePage = () => {
 				setmeterErrors(newMeterErrors);
 				return false;
 			}
-
-			// Create meter first, then feature will be created in the onSuccess callback
-			createMeter();
-		} else {
-			// For non-metered features, create feature directly
-			createFeature(data);
 		}
+		createFeature(data);
 	};
 
 	const isCtaDisabled =
 		!data.name ||
 		!data.type ||
 		isPending ||
-		isUpdating ||
 		(data.type === 'metered' &&
 			(!meter.event_name || !meter.aggregation?.type || (meter.aggregation.type !== 'COUNT' && !meter.aggregation?.field)));
 	return (
@@ -508,14 +473,8 @@ const AddFeaturePage = () => {
 						</div>
 					)}
 					<div>
-						<Button isLoading={isPending || isUpdating} disabled={isCtaDisabled} onClick={handleSubmit}>
-							{isPending && data.type !== 'metered'
-								? 'Creating Feature...'
-								: isUpdating
-									? 'Creating Meter...'
-									: isPending && data.type === 'metered'
-										? 'Creating Feature...'
-										: 'Save Feature'}
+						<Button isLoading={isPending} disabled={isCtaDisabled} onClick={handleSubmit}>
+							{isPending ? 'Creating Feature...' : 'Save Feature'}
 						</Button>
 					</div>
 					<Spacer height={'16px'} />

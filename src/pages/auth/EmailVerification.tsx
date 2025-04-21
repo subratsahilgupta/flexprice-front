@@ -73,12 +73,12 @@ const EmailVerification = () => {
 				</div>
 
 				{/* Action Buttons */}
-				<div className='mt-8 space-y-4'>
-					<Button onClick={handleResend} variant='outline' className='w-full' isLoading={isPending}>
+				<div className='mt-8 space-y-6!'>
+					<Button onClick={handleResend} className='w-full' isLoading={isPending}>
 						Resend verification email
 					</Button>
-
-					<Button onClick={handleGoToLogin} variant='ghost' className='w-full'>
+					<div className='h-4' />
+					<Button onClick={handleGoToLogin} variant='outline' className='w-full'>
 						Back to login
 					</Button>
 				</div>

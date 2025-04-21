@@ -11,5 +11,7 @@ export type WalletTransaction = {
 	readonly transaction_status: string;
 	readonly type: string;
 	readonly wallet_id: string;
+	readonly credit_amount: number;
 	readonly transaction_reason: string;
+	readonly expiry_date: string;
 };

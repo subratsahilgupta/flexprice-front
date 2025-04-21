@@ -1,5 +1,5 @@
 import { FC, useEffect, useState, useMemo } from 'react';
-import { Input, Sheet, Spacer, Select, Button, Modal } from '@/components/atoms';
+import { Input, Sheet, Spacer, Select, Button, Modal, SelectOption } from '@/components/atoms';
 import { useMutation } from '@tanstack/react-query';
 import SecretKeysApi from '@/utils/api_requests/SecretKeysApi';
 import { toast } from 'react-hot-toast';
@@ -11,22 +11,28 @@ interface Props {
 	onOpenChange: (value: boolean) => void;
 }
 
+enum PermissionType {
+	READ = 'read',
+	WRITE = 'write',
+	READ_WRITE = 'read_write',
+}
+
 const SecretKeyDrawer: FC<Props> = ({ isOpen, onOpenChange }) => {
 	// Combined state for form fields
 	const [formData, setFormData] = useState({
 		name: '',
-		permissionType: 'read',
+		permissionType: PermissionType.READ_WRITE,
 		expirationType: 'never',
 	});
 
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [showApiKey, setShowApiKey] = useState(false);
 
-	const permissionOptions = useMemo(
+	const permissionOptions: SelectOption[] = useMemo(
 		() => [
-			{ label: 'Read', value: 'read', key_input: ['read'] },
-			{ label: 'Write', value: 'write', key_input: ['read', 'write'] },
-			{ label: 'Read & Write', value: 'read_write', key_input: ['read', 'write'] },
+			{ label: 'Read', value: PermissionType.READ, key_input: ['read'], disabled: true },
+			{ label: 'Write', value: PermissionType.WRITE, key_input: ['read', 'write'], disabled: true },
+			{ label: 'Read & Write', value: PermissionType.READ_WRITE, key_input: ['read', 'write'], disabled: false },
 		],
 		[],
 	);
@@ -45,9 +51,9 @@ const SecretKeyDrawer: FC<Props> = ({ isOpen, onOpenChange }) => {
 	// Use memoized mapper functions to derive values from formData
 	const getPermissions = useMemo(
 		() => ({
-			read: ['read'],
-			write: ['write'],
-			read_write: ['read', 'write'],
+			[PermissionType.READ]: ['read'],
+			[PermissionType.WRITE]: ['write'],
+			[PermissionType.READ_WRITE]: ['read', 'write'],
 		}),
 		[],
 	);
@@ -73,7 +79,7 @@ const SecretKeyDrawer: FC<Props> = ({ isOpen, onOpenChange }) => {
 		if (isOpen) {
 			setFormData({
 				name: '',
-				permissionType: 'read',
+				permissionType: PermissionType.READ_WRITE,
 				expirationType: 'never',
 			});
 		}
