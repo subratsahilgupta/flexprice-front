@@ -10,6 +10,7 @@ export type Wallet = {
 	readonly metadata: Record<string, any>;
 	readonly updated_at: string;
 	readonly wallet_status: string;
+	readonly conversion_rate: number;
 	readonly meter: Meter;
 };
 

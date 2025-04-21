@@ -1,6 +1,6 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import { Wallet, TransactionReason } from '@/models/Wallet';
-import { WalletBalance } from '@/models/WalletBalance';
+import { RealtimeWalletBalance } from '@/models/WalletBalance';
 import { WalletTransaction } from '@/models/WalletTransaction';
 import { PaginationType } from '@/models/Pagination';
 
@@ -40,8 +40,8 @@ class WalletApi {
 		return await AxiosClient.get<WalletTransactionResponse>(`/wallets/${walletId}/transactions?limit=${limit}&offset=${offset}`);
 	}
 
-	static async getWalletBalance(walletId: string): Promise<WalletBalance> {
-		return await AxiosClient.get<WalletBalance>(`/wallets/${walletId}/balance/real-time`);
+	static async getWalletBalance(walletId: string): Promise<RealtimeWalletBalance> {
+		return await AxiosClient.get<RealtimeWalletBalance>(`/wallets/${walletId}/balance/real-time`);
 	}
 	static async createWallet({
 		currency,
