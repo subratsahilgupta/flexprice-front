@@ -1,15 +1,15 @@
 import FlexpriceTable, { ColumnData } from '@/components/molecules/Table';
 import { cn } from '@/lib/utils';
 import { WalletTransaction } from '@/models/WalletTransaction';
-import { formatDateShort } from '@/utils/common/helper_functions';
+import { formatDateShort, getCurrencySymbol } from '@/utils/common/helper_functions';
 import { FC } from 'react';
 
-const formatAmount = (type: string, amount: number) => {
+const formatAmount = (type: string, amount: number, currency?: string) => {
 	return (
 		<span className={cn(type === 'credit' ? 'text-[#2A9D90] ' : 'text-[#18181B] ')}>
 			{type === 'credit' ? '+' : '-'}
 			{amount}
-			{' credits'}
+			{currency ? ` ${getCurrencySymbol(currency)}` : ' credits'}
 		</span>
 	);
 };
@@ -31,33 +31,36 @@ const fomatTransactionTitle = ({ type, reason }: { type: string; reason: string 
 			return 'Credits Expired';
 		case 'WALLET_TERMINATION':
 			return 'Wallet Terminated';
+		default:
+			return type === 'credit' ? 'Credited' : 'Debited';
 	}
-
-	return type === 'credit' ? 'Credited' : 'Debited';
 };
 
 interface Props {
 	data: WalletTransaction[];
+	currency: string;
 }
 
-const columnData: ColumnData<WalletTransaction>[] = [
-	{
-		title: 'Transactions',
-		render: (rowData) => fomatTransactionTitle({ type: rowData.type, reason: rowData.transaction_reason }),
-		fieldVariant: 'title',
-	},
-	{
-		title: 'Date',
-		render: (rowData) => <span>{formatDateShort(rowData.created_at)}</span>,
-	},
-
-	{
-		title: 'Balance',
-		render: (rowData) => formatAmount(rowData.type, rowData.amount),
-	},
-];
-
-const WalletTransactionsTable: FC<Props> = ({ data }) => {
+const WalletTransactionsTable: FC<Props> = ({ data, currency }) => {
+	const columnData: ColumnData<WalletTransaction>[] = [
+		{
+			title: 'Transactions',
+			render: (rowData) => fomatTransactionTitle({ type: rowData.type, reason: rowData.transaction_reason }),
+			fieldVariant: 'title',
+		},
+		{
+			title: 'Date',
+			render: (rowData) => <span>{formatDateShort(rowData.created_at)}</span>,
+		},
+		{
+			title: 'Credits',
+			render: (rowData) => formatAmount(rowData.type, rowData.credit_amount),
+		},
+		{
+			title: `Amount(${getCurrencySymbol(currency)})`,
+			render: (rowData) => formatAmount(rowData.type, rowData.amount, currency),
+		},
+	];
 	return <FlexpriceTable columns={columnData} data={data} />;
 };
 
