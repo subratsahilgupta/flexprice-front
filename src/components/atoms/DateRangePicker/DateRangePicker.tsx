@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -73,16 +73,16 @@ const DateRangePicker = ({ startDate, endDate, onChange, placeholder = 'Select R
 									: placeholder}
 							</span>
 						</Button>
-						{/* {selectedRange?.from && selectedRange?.to && (
+						{selectedRange?.from && selectedRange?.to && (
 							<X
-								className='ml-2 h-4 w-4 absolute right-2 top-[9px] cursor-pointer'
+								className='ml-2 h-4 w-4 absolute right-2 top-[12px] cursor-pointer'
 								onClick={(e) => {
 									e.stopPropagation();
 									setSelectedRange(undefined);
 									onChange({ startDate: undefined, endDate: undefined });
 								}}
 							/>
-						)} */}
+						)}
 					</div>
 				</div>
 			</PopoverTrigger>
