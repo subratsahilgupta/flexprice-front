@@ -231,7 +231,7 @@ const TopupCard: FC<TopupCardProps> = ({ walletId, className, currency, conversi
 
 			{topupPayload.credits_type && (
 				<DatePicker
-					minDate={new Date(new Date().setDate(new Date().getDate() + 1))}
+					minDate={new Date(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate() + 1, 0, 0, 0, 0))}
 					label='Expiry Date'
 					date={topupPayload.expiry_date_utc}
 					setDate={(value) =>
