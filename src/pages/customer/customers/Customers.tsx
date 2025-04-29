@@ -67,7 +67,7 @@ const CustomerPage = () => {
 		<Page
 			heading='Customers'
 			headingCTA={
-				<div className='flex justify-between items-center gap-2 items-center'>
+				<div className='flex justify-between items-center gap-2'>
 					<Input
 						className='min-w-[400px]'
 						suffix={<Search className='size-[14px] text-gray-500' />}
@@ -101,7 +101,7 @@ const CustomerPage = () => {
 					onFilterChange={(filterState) => setfilters(filterState as FilterState)}
 				/> */}
 				{/* Conditional rendering for table or empty search state */}
-				{filters.searchQuery && isFetching ? (
+				{isLoading || (filters.searchQuery && isFetching) ? (
 					<div className='flex justify-center py-4'>
 						<Loader />
 					</div>
