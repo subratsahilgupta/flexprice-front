@@ -49,7 +49,7 @@ const FeaturesPage = () => {
 	}
 
 	// Render empty state when no features and no search query
-	if (!isLoading && featureData?.items.length === 0 && !filters.searchQuery) {
+	if (!isLoading && featureData?.items.length === 0) {
 		return (
 			<EmptyPage
 				heading='Feature'
