@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { Plan } from '@/models/Plan';
 import { useState } from 'react';
 import { Price } from '@/models/Price';
-import { currencyOptions, billlingPeriodOptions } from '@/core/data/constants';
+import { currencyOptions, billlingPeriodOptions } from '@/constants/constants';
 import RecurringChargesForm from './RecurringChargesForm';
 import UsagePricingForm from './UsagePricingForm';
 import { CirclePlus } from 'lucide-react';
@@ -42,7 +42,7 @@ interface AddChargesButtonProps {
 }
 
 export const AddChargesButton = ({ onClick, label }: AddChargesButtonProps) => (
-	<button onClick={onClick} className='p-4 h-9 cursor-pointer flex gap-2 items-center bg-[#F4F4F5] rounded-md'>
+	<button onClick={onClick} className='p-4 h-7 cursor-pointer flex gap-2 items-center bg-[#F4F4F5] rounded-md'>
 		<CirclePlus size={16} />
 		<p className='text-[#18181B] text-sm font-medium'>{label}</p>
 	</button>

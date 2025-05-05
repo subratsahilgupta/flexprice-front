@@ -37,6 +37,7 @@ interface ToolbarProps {
 	onFilterChange: (filterState: Partial<FilterState>) => void;
 }
 
+// TODO: Deprecate this component and use QueryBuilder instead
 const Toolbar = ({ config, filters, onFilterChange }: ToolbarProps) => {
 	const { searchPlaceholder = 'Search', enableSearch = true, sortOptions = [] } = config;
 
@@ -52,17 +53,6 @@ const Toolbar = ({ config, filters, onFilterChange }: ToolbarProps) => {
 	return (
 		<div className='flex justify-between items-center mt-4 mb-2'>
 			<div className='flex items-center gap-2'>
-				{/* Filters Popover */}
-				{/* <Popover>
-					<PopoverTrigger disabled asChild>
-						<Button variant='outline' size='xs' className='text-gray-700 hover:bg-gray-50 border-gray-300'>
-							<ListFilter className='w-4 h-4 mr-2 text-gray-500' />
-							Filter
-						</Button>
-					</PopoverTrigger>
-					<PopoverContent className='p-0 bg-white shadow-2xl rounded-xl border-none' align='start'></PopoverContent>
-				</Popover> */}
-
 				{/* Sort Popover */}
 				{sortOptions.length > 0 && (
 					<Popover>

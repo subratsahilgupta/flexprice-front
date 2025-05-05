@@ -7,12 +7,11 @@ import formatChips from '@/utils/common/format_chips';
 import formatDate from '@/utils/common/format_date';
 import { useNavigate } from 'react-router-dom';
 import { RouteNames } from '@/core/routes/Routes';
-import FeatureApi from '@/utils/api_requests/FeatureApi';
+import FeatureApi from '@/api/FeatureApi';
 import { getFeatureIcon } from '@/components/atoms/SelectFeature/SelectFeature';
 
 interface Props {
 	data: Feature[];
-	showEmptyRow?: boolean;
 }
 
 export const getFeatureTypeChips = (type: string, addIcon: boolean = false) => {
@@ -30,7 +29,7 @@ export const getFeatureTypeChips = (type: string, addIcon: boolean = false) => {
 	}
 };
 
-const FeatureTable: FC<Props> = ({ data, showEmptyRow }) => {
+const FeatureTable: FC<Props> = ({ data }) => {
 	const navigate = useNavigate();
 
 	const columnData: ColumnData<Feature>[] = [
@@ -83,7 +82,7 @@ const FeatureTable: FC<Props> = ({ data, showEmptyRow }) => {
 			<FlexpriceTable
 				data={data}
 				columns={columnData}
-				showEmptyRow={showEmptyRow}
+				showEmptyRow
 				onRowClick={(row) => {
 					navigate(RouteNames.featureDetails + `/${row?.id}`);
 				}}

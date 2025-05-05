@@ -5,8 +5,8 @@ import { getSubscriptionStatus } from '@/components/organisms/Subscription/Subsc
 import { Skeleton } from '@/components/ui/skeleton';
 import { RouteNames } from '@/core/routes/Routes';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
-import CustomerApi from '@/utils/api_requests/CustomerApi';
-import SubscriptionApi from '@/utils/api_requests/SubscriptionApi';
+import CustomerApi from '@/api/CustomerApi';
+import SubscriptionApi from '@/api/SubscriptionApi';
 import { formatDateShort, getCurrencySymbol } from '@/utils/common/helper_functions';
 import { useQuery } from '@tanstack/react-query';
 import { FC, useEffect } from 'react';
@@ -92,6 +92,11 @@ const SubscriptionDetails: FC = () => {
 				</div>
 				<Spacer className='!my-4' />
 
+				<div className='w-full flex justify-between items-center'>
+					<p className='text-[#71717A] text-sm'>Billing cycle</p>
+					<p className='text-[#09090B] text-sm'>{subscriptionDetails?.billing_cycle || '--'}</p>
+				</div>
+				<Spacer className='!my-4' />
 				<div className='w-full flex justify-between items-center'>
 					<p className='text-[#71717A] text-sm'>Start date</p>
 					<p className='text-[#09090B] text-sm'>{formatDateShort(subscriptionDetails?.current_period_start ?? '')}</p>

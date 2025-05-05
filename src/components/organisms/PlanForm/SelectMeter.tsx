@@ -1,7 +1,7 @@
 import { SelectOption, Select } from '@/components/atoms';
 import { cn } from '@/lib/utils';
 import { Meter } from '@/models/Meter';
-import { MeterApi } from '@/utils/api_requests/MeterApi';
+import { MeterApi } from '@/api/MeterApi';
 import { useQuery } from '@tanstack/react-query';
 import { FC } from 'react';
 
@@ -51,8 +51,8 @@ const SelectMeter: FC<Props> = ({
 	}
 
 	const activeMeters: SelectOption[] = metersData!.items
-		.filter((meter) => meter.status === 'published')
-		.map((meter) => {
+		.filter((meter: Meter) => meter.status === 'published')
+		.map((meter: Meter) => {
 			return {
 				label: meter.name,
 				value: meter.id,
@@ -65,7 +65,7 @@ const SelectMeter: FC<Props> = ({
 				className={className}
 				error={error}
 				value={value}
-				onChange={(e) => onChange(metersData.items.find((meter) => meter.id === e) as Meter)}
+				onChange={(e) => onChange(metersData.items.find((meter: Meter) => meter.id === e) as Meter)}
 				options={activeMeters}
 				placeholder={placeholder}
 				label={label}

@@ -1,48 +1,126 @@
-import { AddButton, Input, Loader, Page, ShortPagination, Spacer } from '@/components/atoms';
-import { CreateCustomerDrawer, ApiDocsContent, FilterState } from '@/components/molecules';
+import { AddButton, Loader, Page, ShortPagination, Spacer } from '@/components/atoms';
+import { CreateCustomerDrawer, ApiDocsContent, QueryBuilder } from '@/components/molecules';
 import CustomerTable from '@/components/molecules/Customer/CustomerTable';
 import EmptyPage from '@/components/organisms/EmptyPage/EmptyPage';
-import GUIDES from '@/core/constants/guides';
+import GUIDES from '@/constants/guides';
 import usePagination from '@/hooks/usePagination';
 import Customer from '@/models/Customer';
-import CustomerApi from '@/utils/api_requests/CustomerApi';
+import CustomerApi from '@/api/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
-import { Search } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { useDebounce } from 'use-debounce';
+import useFilterSorting from '@/hooks/useFilterSorting';
+import {
+	FilterField,
+	FilterFieldType,
+	DEFAULT_OPERATORS_PER_DATA_TYPE,
+	DataType,
+	FilterOperator,
+	SortOption,
+	SortDirection,
+} from '@/types/common/QueryBuilder';
+import { BaseEntityStatus } from '@/types/common';
+
+const sortingOptions: SortOption[] = [
+	{
+		field: 'name',
+		label: 'Name',
+		direction: SortDirection.ASC,
+	},
+	{
+		field: 'email',
+		label: 'Email',
+		direction: SortDirection.ASC,
+	},
+	{
+		field: 'created_at',
+		label: 'Created At',
+		direction: SortDirection.DESC,
+	},
+	{
+		field: 'updated_at',
+		label: 'Updated At',
+		direction: SortDirection.DESC,
+	},
+];
+
+const filterOptions: FilterField[] = [
+	{
+		field: 'name',
+		label: 'Name',
+		fieldType: FilterFieldType.INPUT,
+		operators: DEFAULT_OPERATORS_PER_DATA_TYPE[DataType.STRING],
+		dataType: DataType.STRING,
+	},
+	{
+		field: 'email',
+		label: 'Email',
+		fieldType: FilterFieldType.INPUT,
+		operators: DEFAULT_OPERATORS_PER_DATA_TYPE[DataType.STRING],
+		dataType: DataType.STRING,
+	},
+	{
+		field: 'created_at',
+		label: 'Created At',
+		fieldType: FilterFieldType.DATEPICKER,
+		operators: DEFAULT_OPERATORS_PER_DATA_TYPE[DataType.DATE],
+		dataType: DataType.DATE,
+	},
+	{
+		field: 'status',
+		label: 'Status',
+		fieldType: FilterFieldType.MULTI_SELECT,
+		operators: [FilterOperator.IS_ANY_OF, FilterOperator.IS_NOT_ANY_OF],
+		dataType: DataType.ARRAY,
+		options: [
+			{ value: BaseEntityStatus.PUBLISHED, label: 'Active' },
+			{ value: BaseEntityStatus.ARCHIVED, label: 'Inactive' },
+		],
+	},
+];
 
 const CustomerPage = () => {
-	const { limit, offset, page } = usePagination();
+	const { limit, offset, page, reset } = usePagination();
 
-	const [filters, setfilters] = useState<FilterState>({
-		searchQuery: '',
-		sortBy: '',
-		sortDirection: 'asc',
+	const [activeCustomer, setactiveCustomer] = useState<Customer>();
+	const [customerDrawerOpen, setcustomerDrawerOpen] = useState(false);
+
+	const { filters, sorts, setFilters, setSorts, sanitizedFilters, sanitizedSorts } = useFilterSorting({
+		initialFilters: [],
+		initialSorts: [],
+		debounceTime: 300,
 	});
 
-	// Add debounce to search query
-	const [debouncedSearchQuery] = useDebounce(filters.searchQuery, 300);
+	useEffect(() => {
+		reset();
+	}, [sanitizedFilters, sanitizedSorts]);
 
 	const fetchCustomers = async () => {
-		return await CustomerApi.getCustomerByQuery({ limit, offset, external_id: debouncedSearchQuery, name: debouncedSearchQuery });
+		return await CustomerApi.getCustomersByFilters({
+			limit,
+			offset,
+			filters: sanitizedFilters,
+			sort: sanitizedSorts,
+		});
 	};
 
 	const {
 		data: customerData,
 		isLoading,
 		isError,
-		isFetching,
 	} = useQuery({
-		queryKey: ['fetchCustomers', page, debouncedSearchQuery],
+		queryKey: ['fetchCustomers', page, JSON.stringify(sanitizedFilters), JSON.stringify(sanitizedSorts)],
 		queryFn: fetchCustomers,
 	});
 
-	const [activeCustomer, setactiveCustomer] = useState<Customer>();
-	const [customerDrawerOpen, setcustomerDrawerOpen] = useState(false);
+	if (isError) {
+		toast.error('Error fetching customers');
+		return null;
+	}
 
-	// Render empty state when no customers and no search query
-	if (!isLoading && customerData?.items?.length === 0 && !filters.searchQuery) {
+	const showEmptyPage = !isLoading && customerData?.items.length === 0 && filters.length === 0 && sorts.length === 0;
+
+	if (showEmptyPage) {
 		return (
 			<EmptyPage
 				heading='Customer'
@@ -57,25 +135,11 @@ const CustomerPage = () => {
 		);
 	}
 
-	// Handle error state
-	if (isError) {
-		toast.error('Error fetching customers');
-		return null;
-	}
-
 	return (
 		<Page
 			heading='Customers'
 			headingCTA={
-				<div className='flex justify-between items-center gap-2'>
-					<Input
-						className='min-w-[400px]'
-						suffix={<Search className='size-[14px] text-gray-500' />}
-						placeholder='Search by Name or lookup key'
-						value={filters.searchQuery}
-						onChange={(e) => setfilters({ ...filters, searchQuery: e })}
-						size='sm'
-					/>
+				<div className='flex justify-between gap-2 items-center'>
 					<CreateCustomerDrawer
 						trigger={
 							<AddButton
@@ -92,17 +156,16 @@ const CustomerPage = () => {
 			}>
 			<ApiDocsContent tags={['Customers']} />
 			<div>
-				{/* <Toolbar
-					config={{
-						searchPlaceholder: 'Search by Name or lookup key',
-						enableSearch: true,
-					}}
+				<QueryBuilder
+					filterOptions={filterOptions}
 					filters={filters}
-					onFilterChange={(filterState) => setfilters(filterState as FilterState)}
-				/> */}
-				{/* Conditional rendering for table or empty search state */}
-				{isLoading || (filters.searchQuery && isFetching) ? (
-					<div className='flex justify-center py-4'>
+					onFilterChange={setFilters}
+					sortOptions={sortingOptions}
+					onSortChange={setSorts}
+					selectedSorts={sorts}
+				/>
+				{isLoading ? (
+					<div className='flex justify-center items-center min-h-[200px]'>
 						<Loader />
 					</div>
 				) : (
@@ -119,7 +182,6 @@ const CustomerPage = () => {
 					</>
 				)}
 			</div>
-			<CreateCustomerDrawer open={customerDrawerOpen} onOpenChange={setcustomerDrawerOpen} data={activeCustomer} />
 		</Page>
 	);
 };

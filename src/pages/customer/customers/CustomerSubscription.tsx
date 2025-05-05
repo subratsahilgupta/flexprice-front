@@ -5,9 +5,9 @@ import ChargeTable from '@/components/organisms/Subscription/PriceTable';
 import UsageTable from '@/components/organisms/Subscription/UsageTable';
 import { cn } from '@/lib/utils';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
-import CustomerApi, { CreateCustomerSubscriptionPayload } from '@/utils/api_requests/CustomerApi';
-import { PlanApi } from '@/utils/api_requests/PlanApi';
-import SubscriptionApi from '@/utils/api_requests/SubscriptionApi';
+import CustomerApi from '@/api/CustomerApi';
+import { PlanApi } from '@/api/PlanApi';
+import SubscriptionApi from '@/api/SubscriptionApi';
 import { toSentenceCase } from '@/utils/common/helper_functions';
 import { NormalizedPlan, normalizePlan } from '@/utils/models/transformed_plan';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -15,9 +15,10 @@ import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ApiDocsContent } from '@/components/molecules';
-import { invalidateQueries } from '@/core/tanstack/ReactQueryProvider';
 import { RouteNames } from '@/core/routes/Routes';
 import useEnvironment from '@/hooks/useEnvironment';
+import { invalidateQueries } from '@/core/services/tanstack/ReactQueryProvider';
+import { CreateCustomerSubscriptionPayload } from '@/types/dto/Customer';
 
 type Params = {
 	id: string;
@@ -39,7 +40,10 @@ const usePlans = () => {
 	return useQuery({
 		queryKey: ['plans'],
 		queryFn: async () => {
-			const plansResponse = await PlanApi.getActiveExpandedPlan();
+			const plansResponse = await PlanApi.getActiveExpandedPlan({
+				limit: 1000,
+				offset: 0,
+			});
 			return plansResponse.map(normalizePlan);
 		},
 	});
@@ -223,7 +227,7 @@ const CustomerSubscription: React.FC = () => {
 			{!plansLoading && (
 				<Select
 					value={subscriptionState.selectedPlan}
-					options={plans?.map((plan) => ({ label: plan.name, value: plan.id })) ?? []}
+					options={plans?.map((plan: NormalizedPlan) => ({ label: plan.name, value: plan.id })) ?? []}
 					onChange={handlePlanChange}
 					label='Plan*'
 					disabled={!!subscription_id}
@@ -317,7 +321,7 @@ const CustomerSubscription: React.FC = () => {
 				<div className='sticky top-24'>
 					{subscriptionState.selectedPlan && !subscriptionData?.usage && (
 						<Preview
-							startDate={subscriptionState.startDate}
+							startDate={subscriptionState.startDate ?? new Date()}
 							data={subscriptionState.prices?.charges[subscriptionState.billingPeriod][subscriptionState.currency] ?? []}
 						/>
 					)}

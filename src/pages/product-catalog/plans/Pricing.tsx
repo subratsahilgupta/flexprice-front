@@ -1,18 +1,17 @@
 import { Loader, Page, Select } from '@/components/atoms';
 import usePagination from '@/hooks/usePagination';
-import { PlanApi } from '@/utils/api_requests/PlanApi';
+import { PlanApi } from '@/api/PlanApi';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { billlingPeriodOptions } from '@/core/data/constants';
+import { billlingPeriodOptions } from '@/constants/constants';
 import { useState, useMemo } from 'react';
 import { ExpandedPlan } from '@/utils/models/transformed_plan';
-import { GetAllPlansResponse } from '@/utils/api_requests/PlanApi';
+import { GetAllPlansResponse } from '@/api/PlanApi';
 import PricingCard, { PricingCardProps } from '@/components/molecules/PricingCard';
 import { ApiDocsContent } from '@/components/molecules';
-import { RouteNames } from '@/core/routes/Routes';
 import { EmptyPage } from '@/components/organisms';
-import { useNavigate } from 'react-router-dom';
-import GUIDES from '@/core/constants/guides';
+import { PlanDrawer } from '@/components/molecules';
+import GUIDES from '@/constants/guides';
 
 type PriceType = {
 	currency: string;
@@ -146,8 +145,7 @@ const PricingPage = () => {
 	const { limit, offset, page } = usePagination();
 	const [selectedBillingPeriod, setSelectedBillingPeriod] = useState<string>('');
 	const [selectedCurrency, setSelectedCurrency] = useState<string>('');
-
-	const navigate = useNavigate();
+	const [planDrawerOpen, setPlanDrawerOpen] = useState<boolean>(false);
 
 	const fetchPlans = async () => {
 		return await PlanApi.getAllActivePlans({
@@ -324,7 +322,10 @@ const PricingPage = () => {
 
 	if ((plansData?.items ?? []).length === 0) {
 		return (
-			<EmptyPage tutorials={GUIDES.plans.tutorials} heading='Plan' onAddClick={() => navigate(RouteNames.createPlan)} tags={['Plans']} />
+			<div className='space-y-6'>
+				<EmptyPage tutorials={GUIDES.plans.tutorials} heading='Plan' onAddClick={() => setPlanDrawerOpen(true)} tags={['Plans']} />
+				<PlanDrawer open={planDrawerOpen} onOpenChange={setPlanDrawerOpen} refetchQueryKeys={['fetchPlansPricingCard']} />
+			</div>
 		);
 	}
 

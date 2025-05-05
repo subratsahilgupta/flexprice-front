@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
+import Label from '../Label';
 import { sizes, SizeVariant } from '@/lib/sizing';
 
 type InputVariant = 'text' | 'number' | 'formatted-number' | 'integer';
@@ -167,11 +168,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 		return (
 			<div className='space-y-1 w-full flex flex-col'>
 				{/* Label */}
-				{label && (
-					<label className={cn('font-inter block text-sm font-medium', disabled ? 'text-zinc-500' : 'text-zinc-950', labelClassName)}>
-						{label}
-					</label>
-				)}
+				{label && <Label label={label} disabled={disabled} labelClassName={labelClassName} htmlFor={id} />}
 				{/* Input */}
 				<div
 					className={cn(

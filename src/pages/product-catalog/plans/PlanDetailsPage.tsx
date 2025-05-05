@@ -1,12 +1,12 @@
 import { ActionButton, Button, CardHeader, Chip, Loader, Page, Spacer, NoDataCard } from '@/components/atoms';
-import { AddEntitlementDrawer, ApiDocsContent, ColumnData, EditPlanDrawer, FlexpriceTable, RedirectCell } from '@/components/molecules';
+import { AddEntitlementDrawer, ApiDocsContent, ColumnData, FlexpriceTable, RedirectCell, PlanDrawer } from '@/components/molecules';
 import { DetailsCard } from '@/components/molecules';
 import { RouteNames } from '@/core/routes/Routes';
 import { Price } from '@/models/Price';
 import { FeatureType } from '@/models/Feature';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
-import EntitlementApi, { ExtendedEntitlement } from '@/utils/api_requests/EntitlementApi';
-import { PlanApi } from '@/utils/api_requests/PlanApi';
+import EntitlementApi from '@/api/EntitlementApi';
+import { PlanApi } from '@/api/PlanApi';
 import formatDate from '@/utils/common/format_date';
 import { getPriceTypeLabel } from '@/utils/common/helper_functions';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -20,20 +20,22 @@ import { getFeatureTypeChips } from '@/components/molecules/CustomerUsageTable/C
 import { formatAmount } from '@/components/atoms/Input/Input';
 import ChargeValueCell from './ChargeValueCell';
 import { BaseEntityStatus } from '@/types/common';
-
+import { BILLING_PERIOD } from '@/constants/constants';
+import { Entitlement } from '@/models/Entitlement';
+import { ExtendedEntitlement } from '@/types/dto/Entitlement';
 const formatBillingPeriod = (billingPeriod: string) => {
 	switch (billingPeriod.toUpperCase()) {
-		case 'DAILY':
+		case BILLING_PERIOD.DAILY:
 			return 'Daily';
-		case 'WEEKLY':
+		case BILLING_PERIOD.WEEKLY:
 			return 'Weekly';
-		case 'MONTHLY':
+		case BILLING_PERIOD.MONTHLY:
 			return 'Monthly';
-		case 'ANNUAL':
+		case BILLING_PERIOD.ANNUAL:
 			return 'Yearly';
-		case 'QUARTERLY':
+		case BILLING_PERIOD.QUARTERLY:
 			return 'Quarterly';
-		case 'HALF_YEARLY':
+		case BILLING_PERIOD.HALF_YEARLY:
 			return 'Half Yearly';
 		default:
 			return '--';
@@ -89,7 +91,7 @@ const chargeColumns: ColumnData<Price>[] = [
 	},
 ];
 
-const getFeatureValue = (entitlement: ExtendedEntitlement) => {
+const getFeatureValue = (entitlement: Entitlement) => {
 	const value = entitlement.usage_limit?.toFixed() || '';
 
 	switch (entitlement.feature_type) {
@@ -238,7 +240,7 @@ const PlanDetailsPage = () => {
 					</Button>
 				</>
 			}>
-			<EditPlanDrawer data={planData} open={planDrawerOpen} onOpenChange={setPlanDrawerOpen} refetchQueryKeys={['fetchPlan']} />
+			<PlanDrawer data={planData} open={planDrawerOpen} onOpenChange={setPlanDrawerOpen} refetchQueryKeys={['fetchPlan']} />
 			<ApiDocsContent tags={['Plans']} />
 			<AddEntitlementDrawer
 				selectedFeatures={planData.entitlements?.map((v) => v.feature)}
@@ -252,7 +254,7 @@ const PlanDetailsPage = () => {
 				<DetailsCard variant='stacked' title='Plan Details' data={planDetails} />
 
 				{/* plan charges table */}
-				{(planData?.prices?.length ?? 0) > 0 && (
+				{(planData?.prices?.length ?? 0) > 0 ? (
 					<Card variant='notched'>
 						<CardHeader
 							title='Charges'
@@ -264,6 +266,16 @@ const PlanDetailsPage = () => {
 						/>
 						<FlexpriceTable columns={chargeColumns} data={planData?.prices ?? []} />
 					</Card>
+				) : (
+					<NoDataCard
+						title='Charges'
+						subtitle='No charges added to the plan yet'
+						cta={
+							<Button prefixIcon={<Plus />} onClick={() => navigate(`${RouteNames.plan}/${planId}/add-charges`)}>
+								Add
+							</Button>
+						}
+					/>
 				)}
 
 				{planData.entitlements?.length || 0 > 0 ? (
