@@ -20,7 +20,7 @@ export class PlanApi {
 		const payload = {
 			limit,
 			offset,
-			expand: 'entitlements%2Cprices%2Cmeters%2Cfeatures',
+			expand: 'entitlements,prices,meters,features',
 		};
 		const url = generateQueryParams(this.baseUrl, payload);
 		return await AxiosClient.get<GetAllPlansResponse>(url);
@@ -30,7 +30,7 @@ export class PlanApi {
 			status: 'published',
 			limit,
 			offset,
-			expand: 'entitlements%2Cprices%2Cmeters%2Cfeatures',
+			expand: 'entitlements,prices,meters,features',
 		};
 		const url = generateQueryParams(this.baseUrl, payload);
 		return await AxiosClient.get<GetAllPlansResponse>(url);
