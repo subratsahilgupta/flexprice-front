@@ -11,7 +11,7 @@ interface Props {
 	onOpenChange: (value: boolean) => void;
 }
 
-enum PermissionType {
+export enum PermissionType {
 	READ = 'read',
 	WRITE = 'write',
 	READ_WRITE = 'read_write',

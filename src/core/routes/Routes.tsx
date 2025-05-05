@@ -35,11 +35,11 @@ import ResendVerification from '@/pages/auth/ResendVerification';
 import EmailVerification from '@/pages/auth/EmailVerification';
 import CustomerInformation from '@/pages/customer/tabs/CustomerInformation';
 import PricingPage from '@/pages/product-catalog/plans/Pricing';
-import OnboardingPage from '@/pages/onboarding/onboarding';
 import PaymentPage from '@/pages/customer/payments/PaymentPage';
 import BillingPage from '@/pages/settings/Billing';
 import AddChargesPage from '@/pages/product-catalog/plans/AddCharges';
 import CreateInvoicePage from '@/pages/customer/invoices/CreateInvoice';
+import OnboardingTenant from '@/pages/onboarding/OnboardingTenant';
 
 export const RouteNames = {
 	home: '/',
@@ -286,7 +286,7 @@ export const MainRouter = createBrowserRouter([
 			},
 			{
 				path: RouteNames.onboarding,
-				element: <OnboardingPage />,
+				element: <OnboardingTenant />,
 			},
 			{
 				path: RouteNames.billing,
