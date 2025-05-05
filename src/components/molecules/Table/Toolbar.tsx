@@ -54,52 +54,48 @@ const Toolbar = ({ config, filters, onFilterChange }: ToolbarProps) => {
 		<div className='flex justify-between items-center mt-4 mb-2'>
 			<div className='flex items-center gap-2'>
 				{/* Sort Popover */}
-				{
-					sortOptions.length > 0 && (
-						<Popover>
-							<PopoverTrigger disabled asChild>
-								<Button variant='outline' size='xs' className='text-gray-700 hover:bg-gray-50 border-gray-300'>
-									<ArrowUpDown className='w-4 h-4 mr-2 text-gray-500' />
-									Sort
-								</Button>
-							</PopoverTrigger>
-							<PopoverContent className='w-48 bg-white shadow-2xl rounded-xl border-none p-2' align='start'>
-								<div className='space-y-1'>
-									{sortOptions.map((sort) => (
-										<Button
-											size='xs'
-											key={sort.key}
-											variant={filters.sortBy === sort.key ? 'secondary' : 'ghost'}
-											className='w-full justify-start text-gray-700 
+				{sortOptions.length > 0 && (
+					<Popover>
+						<PopoverTrigger disabled asChild>
+							<Button variant='outline' size='xs' className='text-gray-700 hover:bg-gray-50 border-gray-300'>
+								<ArrowUpDown className='w-4 h-4 mr-2 text-gray-500' />
+								Sort
+							</Button>
+						</PopoverTrigger>
+						<PopoverContent className='w-48 bg-white shadow-2xl rounded-xl border-none p-2' align='start'>
+							<div className='space-y-1'>
+								{sortOptions.map((sort) => (
+									<Button
+										size='xs'
+										key={sort.key}
+										variant={filters.sortBy === sort.key ? 'secondary' : 'ghost'}
+										className='w-full justify-start text-gray-700 
                                             hover:bg-gray-100 
                                             data-[state=open]:bg-gray-100'
-											onClick={() => handleSortChange(sort.key)}>
-											{sort.label}
-											{filters.sortBy === sort.key && (filters.sortDirection === 'asc' ? ' ↑' : ' ↓')}
-										</Button>
-									))}
-								</div>
-							</PopoverContent>
-						</Popover>
-					)
-				}
-			</div >
+										onClick={() => handleSortChange(sort.key)}>
+										{sort.label}
+										{filters.sortBy === sort.key && (filters.sortDirection === 'asc' ? ' ↑' : ' ↓')}
+									</Button>
+								))}
+							</div>
+						</PopoverContent>
+					</Popover>
+				)}
+			</div>
 
 			{/* Search on right */}
-			{
-				enableSearch && (
-					<div className='w-1/2'>
-						<Input
-							suffix={<Search className='size-[14px] text-gray-500' />}
-							placeholder={searchPlaceholder}
-							value={filters.searchQuery}
-							onChange={(e) => onFilterChange({ searchQuery: e })}
-							size='xs'
-						/>
-					</div>
-				)
-			}
-		</div >
+			{enableSearch && (
+				<div className='w-1/2'>
+					<Input
+						suffix={<Search className='size-[14px] text-gray-500' />}
+						placeholder={searchPlaceholder}
+						value={filters.searchQuery}
+						onChange={(e) => onFilterChange({ searchQuery: e })}
+						size='xs'
+					/>
+				</div>
+			)}
+		</div>
 	);
 };
 
