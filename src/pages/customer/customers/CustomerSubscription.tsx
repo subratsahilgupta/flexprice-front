@@ -309,7 +309,12 @@ const CustomerSubscription: React.FC = () => {
 								<DatePicker
 									disabled={!!subscription_id}
 									date={subscriptionState.startDate}
-									setDate={(date) => setSubscriptionState((prev) => ({ ...prev, startDate: date }))}
+									setDate={(date) => {
+										if (!date) {
+											return;
+										}
+										setSubscriptionState((prev) => ({ ...prev, startDate: date }));
+									}}
 								/>
 							</div>
 							<div className='relative'>
