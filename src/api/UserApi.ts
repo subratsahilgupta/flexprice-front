@@ -1,6 +1,27 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import { User } from '@/models/User';
-import { CreateUserRequest, UpdateTenantPayload } from '@/types/dto';
+
+interface CreateUserRequest {
+	name: string;
+	email: string;
+	password: string;
+}
+
+interface UpdateTenantPayload {
+	billing_details: {
+		address: {
+			address_line1: string;
+			address_line2: string;
+			address_city: string;
+			address_state: string;
+			address_postal_code: string;
+			address_country: string;
+		};
+		email?: string;
+		help_email?: string;
+		phone?: string;
+	};
+}
 
 export class UserApi {
 	private static baseUrl = '/users';
@@ -22,7 +43,7 @@ export class UserApi {
 
 	// Update an existing user
 	public static async updateUser(data: UpdateTenantPayload): Promise<User> {
-		return await AxiosClient.put<User, UpdateTenantPayload>('/tenants/update', data);
+		return await AxiosClient.put<User, UpdateTenantPayload>(`tenants/update`, data);
 	}
 
 	// Delete a user

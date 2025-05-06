@@ -3,7 +3,7 @@ import { Sortable, SortableContent, SortableItem, SortableItemHandle, SortableOv
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { ArrowUpDown, GripVertical, Trash2, X } from 'lucide-react';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { Combobox, Button, Select } from '@/components/atoms';
 import { SortOption, SortDirection } from '@/types/common/QueryBuilder';
 import { sanitizeSortConditions } from '@/types/formatters/QueryBuilder';
@@ -48,20 +48,6 @@ const SortDropdown: React.FC<Props> = ({ options, value = [], onChange, classNam
 			setIsOpen(true);
 		}
 	};
-
-	useEffect(() => {
-		if (value.length === 0) {
-			const updatedAtSort = options.find((field) => field.field === 'updated_at');
-			if (updatedAtSort) {
-				const newSort: SortOption = {
-					field: updatedAtSort.field,
-					label: updatedAtSort.label,
-					direction: SortDirection.DESC,
-				};
-				onChange([newSort]);
-			}
-		}
-	}, []);
 
 	const handleSortRemove = (index: number) => {
 		const newValue = [...value];
