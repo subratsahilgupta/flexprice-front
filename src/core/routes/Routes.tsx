@@ -39,8 +39,9 @@ import PaymentPage from '@/pages/customer/payments/PaymentPage';
 import BillingPage from '@/pages/settings/Billing';
 import AddChargesPage from '@/pages/product-catalog/plans/AddCharges';
 import CreateInvoicePage from '@/pages/customer/invoices/CreateInvoice';
-import OnboardingPage from '@/pages/onboarding/onboarding';
-
+import OnboardingApi from '@/api/OnboardingApi';
+import { useUser } from '@/hooks/UserContext';
+import OnboardingTenant from '@/pages/onboarding/OnboardingTenant';
 export const RouteNames = {
 	home: '/',
 	login: '/login',
@@ -89,6 +90,12 @@ export const RouteNames = {
 	billing: '/billing',
 };
 
+const DefaultRoute = () => {
+	const { user } = useUser();
+	const isOnboarded = OnboardingApi.IsUserOnboarded(user);
+	return <Navigate to={isOnboarded ? RouteNames.pricing : RouteNames.onboarding} />;
+};
+
 export const MainRouter = createBrowserRouter([
 	// public routes
 	{
@@ -122,7 +129,7 @@ export const MainRouter = createBrowserRouter([
 		children: [
 			{
 				path: RouteNames.home,
-				element: <Navigate to={RouteNames.onboarding} />,
+				element: <DefaultRoute />,
 			},
 
 			{
@@ -286,7 +293,7 @@ export const MainRouter = createBrowserRouter([
 			},
 			{
 				path: RouteNames.onboarding,
-				element: <OnboardingPage />,
+				element: <OnboardingTenant />,
 			},
 			{
 				path: RouteNames.billing,
