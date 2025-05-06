@@ -86,8 +86,29 @@ const CustomerPage = () => {
 	const [customerDrawerOpen, setcustomerDrawerOpen] = useState(false);
 
 	const { filters, sorts, setFilters, setSorts, sanitizedFilters, sanitizedSorts } = useFilterSorting({
-		initialFilters: [],
-		initialSorts: [],
+		initialFilters: [
+			{
+				field: 'name',
+				operator: FilterOperator.CONTAINS,
+				valueString: '',
+				dataType: DataType.STRING,
+				id: 'initial-name',
+			},
+			{
+				field: 'status',
+				operator: FilterOperator.IS_ANY_OF,
+				valueArray: [BaseEntityStatus.PUBLISHED],
+				dataType: DataType.ARRAY,
+				id: 'initial-status',
+			},
+		],
+		initialSorts: [
+			{
+				field: 'updated_at',
+				label: 'Updated At',
+				direction: SortDirection.DESC,
+			},
+		],
 		debounceTime: 300,
 	});
 
