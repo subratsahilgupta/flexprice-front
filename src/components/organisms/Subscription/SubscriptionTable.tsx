@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { Subscription } from '@/models/Subscription';
 import { ColumnData, FlexpriceTable, RedirectCell } from '@/components/molecules';
 import { Chip } from '@/components/atoms';
-import { toSentenceCase } from '@/utils/common/helper_functions';
+import { formatBillingPeriodForDisplay } from '@/utils/common/helper_functions';
 import formatDate from '@/utils/common/format_date';
 import SubscriptionActionButton from './SubscriptionActionButton';
 import { RouteNames } from '@/core/routes/Routes';
@@ -52,7 +52,7 @@ const SubscriptionTable: FC<SubscriptionTableProps> = ({ data, onRowClick, allow
 		},
 		{
 			title: 'Billing Period',
-			render: (row) => <span>{toSentenceCase(row.billing_period)}</span>,
+			render: (row) => <span>{formatBillingPeriodForDisplay(row.billing_period)}</span>,
 		},
 		{
 			title: 'Status',
