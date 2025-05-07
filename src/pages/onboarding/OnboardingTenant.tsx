@@ -244,12 +244,18 @@ const OnboardingTenant = () => {
 											'absolute top-5 w-[2px] h-full transition-colors duration-200',
 											isCompleted ? 'bg-green-600' : 'bg-gray-200',
 											isUpcoming && 'opacity-50',
+											index < steps.length - 1 ? 'bottom-0' : 'bottom-12 h-[95%]',
 										)}></div>
 								)}
 							</div>
 
 							{/* Right side content */}
-							<div className={cn('flex-1 pb-12 transition-opacity duration-200', isUpcoming && 'opacity-50')}>
+							<div
+								className={cn(
+									'flex-1 transition-opacity duration-200',
+									isUpcoming && 'opacity-50',
+									index < steps.length - 1 ? 'pb-12' : 'pb-0',
+								)}>
 								<h1 className={cn('text-base font-medium mb-2')}>{step.label}</h1>
 								<p className='text-sm text-gray-500'>{step.description}</p>
 								{(isActive || step.showAfterComplete) && <div className='mt-2'>{step.component}</div>}
