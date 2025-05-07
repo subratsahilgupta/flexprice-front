@@ -3,6 +3,7 @@ import Feature from '@/models/Feature';
 import { generateQueryParams } from '@/utils/common/api_helper';
 import { PaginationType } from '@/models/Pagination';
 import { TypedBackendSort, TypedBackendFilter } from '@/types/formatters/QueryBuilder';
+import { EventFilterData } from '@/components/molecules/EventFilter/EventFilter';
 
 interface GetFeaturesPayload {
 	end_time?: string;
@@ -28,6 +29,10 @@ interface GetFeatureByFilterPayload extends PaginationType {
 	sort: TypedBackendSort[];
 }
 
+interface UpdateFeaturePayload extends Partial<Feature> {
+	filters: EventFilterData[];
+}
+
 class FeatureApi {
 	private static baseUrl = '/features';
 
@@ -47,8 +52,8 @@ class FeatureApi {
 		return await AxiosClient.post<Feature, Partial<Feature>>(this.baseUrl, data);
 	}
 
-	public static async updateFeature(id: string, data: Partial<Feature>) {
-		return await AxiosClient.put<Feature, Partial<Feature>>(`${this.baseUrl}/${id}`, data);
+	public static async updateFeature(id: string, data: UpdateFeaturePayload) {
+		return await AxiosClient.put<Feature, UpdateFeaturePayload>(`${this.baseUrl}/${id}`, data);
 	}
 
 	public static async deleteFeature(id: string) {

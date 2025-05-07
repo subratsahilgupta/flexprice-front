@@ -393,8 +393,6 @@ const AddFeaturePage = () => {
 
 								<div>
 									<EventFilter
-										isArchived={false}
-										isEditMode={false}
 										eventFilters={meter?.filters || []}
 										setEventFilters={(e) => {
 											setmeter((prev) => {
@@ -403,7 +401,6 @@ const AddFeaturePage = () => {
 											});
 										}}
 										error={meterErrors.filters}
-										permanentFilters={[]}
 									/>
 								</div>
 							</div>
