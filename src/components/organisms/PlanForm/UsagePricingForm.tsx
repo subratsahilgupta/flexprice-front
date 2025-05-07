@@ -9,7 +9,7 @@ import { billlingPeriodOptions, currencyOptions } from '@/constants/constants';
 import VolumeTieredPricingForm from './VolumeTieredPricingForm';
 import { InternalPrice } from './SetupChargesSection';
 import UsageChargePreview from './UsageChargePreview';
-
+import { toast } from 'react-hot-toast';
 interface Props {
 	onAdd: (price: InternalPrice) => void;
 	onUpdate: (price: InternalPrice) => void;
@@ -116,11 +116,17 @@ const UsagePricingForm: FC<Props> = ({ onAdd, onUpdate, onEditClicked, onDeleteC
 		if (billingModel === billingModels[2].value) {
 			for (let i = 0; i < tieredPrices.length; i++) {
 				const upTo = tieredPrices[i].up_to;
-				if (tieredPrices[i].from > (upTo === null ? 999999 : upTo)) {
+
+				if (!upTo) {
+					continue;
+				}
+
+				if (tieredPrices[i].from > upTo) {
 					setInputErrors((prev) => ({
 						...prev,
 						tieredModelError: `From value cannot be smaller than up to in row ${i + 1}`,
 					}));
+					toast.error('From value cannot be smaller than up to in row ' + (i + 1));
 					return false;
 				}
 			}

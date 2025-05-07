@@ -347,7 +347,6 @@ const CustomerSubscription: React.FC = () => {
 												'cursor-pointer',
 											)}
 											onClick={() => {
-												console.log('clicked', option.value);
 												setSubscriptionState((prev) => ({ ...prev, billingCycle: option.value }));
 											}}
 											key={index}>
