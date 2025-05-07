@@ -124,7 +124,7 @@ const UsagePricingForm: FC<Props> = ({ onAdd, onUpdate, onEditClicked, onDeleteC
 				if (tieredPrices[i].from > upTo) {
 					setInputErrors((prev) => ({
 						...prev,
-						tieredModelError: `From value cannot be smaller than up to in row ${i + 1}`,
+						tieredModelError: `From value cannot be greater than up to in row ${i + 1}`,
 					}));
 					toast.error('From value cannot be smaller than up to in row ' + (i + 1));
 					return false;
