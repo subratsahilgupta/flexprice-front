@@ -3,9 +3,6 @@ import Auth from '@/pages/auth/Auth';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import CustomerPage from '@/pages/customer/customers/Customers';
 import AuthMiddleware from '../auth/AuthProvider';
-import MeterPage from '@/pages/usage/meter/MeterPage';
-import AddMeterPage from '@/pages/usage/meter/AddMeter';
-import EditMeterPage from '@/pages/usage/meter/EditMeterPage';
 import PricingPlans from '@/pages/product-catalog/plans/Plans';
 import CustomerSubscription from '@/pages/customer/customers/CustomerSubscription';
 import CustomerDetails from '@/pages/customer/customers/CustomerDetails';
@@ -264,18 +261,6 @@ export const MainRouter = createBrowserRouter([
 			{
 				path: RouteNames.usageTracking,
 				children: [
-					{
-						path: RouteNames.meter,
-						element: <MeterPage />,
-					},
-					{
-						path: RouteNames.addMeter,
-						element: <AddMeterPage />,
-					},
-					{
-						path: RouteNames.editMeter,
-						element: <EditMeterPage />,
-					},
 					{
 						path: RouteNames.events,
 						element: <EventsPage />,

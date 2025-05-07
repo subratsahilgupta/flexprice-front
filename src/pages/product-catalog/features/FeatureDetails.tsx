@@ -1,9 +1,9 @@
 // React and third-party libraries
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { EyeOff } from 'lucide-react';
+import { EyeOff, Plus } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 // Core utilities and APIs
 import { RouteNames } from '@/core/routes/Routes';
@@ -17,8 +17,9 @@ import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 
 // Components
 import { Button, Card, CardHeader, Chip, Divider, Loader, NoDataCard, Page, SectionHeader, Spacer } from '@/components/atoms';
-import { ApiDocsContent, ColumnData, FlexpriceTable, RedirectCell } from '@/components/molecules';
+import { ApiDocsContent, ColumnData, FlexpriceTable, RedirectCell, EventFilterData } from '@/components/molecules';
 import { getFeatureTypeChips } from '@/components/molecules/FeatureTable/FeatureTable';
+import CreateEventFilterDrawer from '@/components/molecules/EventFilter/CreateEventFilterDrawer';
 
 // Models and types
 import { FeatureType } from '@/models/Feature';
@@ -34,6 +35,7 @@ import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 const FeatureDetails = () => {
 	const { id: featureId } = useParams() as { id: string };
 	const { updateBreadcrumb } = useBreadcrumbsStore();
+	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
 	const { data, isLoading, isError } = useQuery({
 		queryKey: ['fetchFeatureDetails', featureId],
@@ -60,6 +62,33 @@ const FeatureDetails = () => {
 		},
 		onError: (error: ServerError) => {
 			toast.error(error.error.message || 'Failed to archive feature');
+		},
+	});
+
+	const { mutate: updateFeature } = useMutation({
+		mutationFn: async (filters: EventFilterData[]) => {
+			if (!data?.meter) {
+				throw new Error('Meter data is required');
+			}
+
+			// Combine existing filters with new valid filters
+			const combinedFilters = [...(data.meter.filters || []), ...filters];
+
+			return await FeatureApi.updateFeature(featureId!, {
+				filters: combinedFilters,
+				meter: {
+					...data.meter,
+					filters: combinedFilters,
+				},
+			});
+		},
+		onSuccess: () => {
+			refetchQueries(['fetchFeatureDetails', featureId]);
+			toast.success('Event filters added successfully');
+			setIsDrawerOpen(false);
+		},
+		onError: (error: ServerError) => {
+			toast.error(error.error.message || 'Failed to add event filters');
 		},
 	});
 
@@ -150,6 +179,43 @@ const FeatureDetails = () => {
 		},
 	];
 
+	const renderEventFilters = () => (
+		<div className='space-y-4'>
+			<div className='flex items-center justify-between'>
+				<span className='text-gray-500 text-sm font-medium block'>Event Filters</span>
+				<CreateEventFilterDrawer
+					open={isDrawerOpen}
+					onOpenChange={setIsDrawerOpen}
+					trigger={
+						<Button variant='outline' size='sm' className='flex gap-2'>
+							<Plus className='w-4 h-4' />
+							Add Filter
+						</Button>
+					}
+					onSave={(filters) => {
+						updateFeature(filters);
+					}}
+				/>
+			</div>
+
+			{/* Display existing filters */}
+			<div className='space-y-3'>
+				{data?.meter?.filters?.map((filter, index) => (
+					<div key={index} className='grid grid-cols-[200px_1fr] items-start'>
+						<span className='text-gray-800 text-sm'>{filter.key}</span>
+						<div className='flex gap-1.5 flex-wrap'>
+							{filter.values.map((value, valueIndex) => (
+								<Chip key={valueIndex} className='text-xs py-0.5' variant='default' label={value} />
+							))}
+						</div>
+					</div>
+				))}
+			</div>
+
+			{!data?.meter?.filters || (data.meter.filters.length === 0 && <span className='text-gray-500 text-sm'>No filters added yet</span>)}
+		</div>
+	);
+
 	if (isLoading) {
 		return <Loader />;
 	}
@@ -209,29 +275,9 @@ const FeatureDetails = () => {
 
 							<Divider />
 
-							{data?.meter?.filters?.length > 0 && (
-								<>
-									<div className='space-y-4'>
-										<span className='text-gray-500 text-sm font-medium block'>Event Filters</span>
-										<div className='space-y-3'>
-											{data?.meter?.filters?.map((filter) => {
-												return (
-													<div className='grid grid-cols-[200px_1fr] items-start'>
-														<span className='text-gray-800 text-sm'>{filter.key}</span>
-														<div className='flex gap-1.5 flex-wrap'>
-															{filter.values.map((value) => {
-																return <Chip className='text-xs py-0.5' variant='default' label={value} />;
-															})}
-														</div>
-													</div>
-												);
-											})}
-										</div>
-									</div>
-									<Divider />
-								</>
-							)}
+							{renderEventFilters()}
 
+							<Divider />
 							<div className='space-y-4'>
 								<span className='text-gray-500 text-sm font-medium block'>Aggregation Details</span>
 								<div className='space-y-3'>
