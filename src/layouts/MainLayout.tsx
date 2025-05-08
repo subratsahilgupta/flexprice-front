@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { Sidebar } from '@/components/molecules/Sidebar';
 import { BreadCrumbs } from '@/components/molecules';
@@ -11,33 +11,36 @@ import * as Sentry from '@sentry/react';
 const isProd = import.meta.env.VITE_APP_ENVIRONMENT === 'prod';
 const MainLayout: React.FC = () => {
 	const { user } = useUser();
+	const navigate = useNavigate();
 
 	useEffect(() => {
-		if (!isProd) return;
+		if (!user || !isProd) return;
 
-		if (user) {
-			posthog.identify(user.email, {
-				id: user.id,
-				email: user.email,
-				name: user.tenant?.name,
-				tenant_id: user.tenant?.id,
-				tenant_name: user.tenant?.name,
-			});
+		posthog.identify(user.email, {
+			id: user.id,
+			email: user.email,
+			name: user.tenant?.name,
+			tenant_id: user.tenant?.id,
+			tenant_name: user.tenant?.name,
+		});
 
-			Sentry.setUser({
-				id: user.id,
-				email: user.email,
-				name: user.tenant?.name,
-				tenant_id: user.tenant?.id,
-				tenant_name: user.tenant?.name,
-			});
+		Sentry.setUser({
+			id: user.id,
+			email: user.email,
+			name: user.tenant?.name,
+			tenant_id: user.tenant?.id,
+			tenant_name: user.tenant?.name,
+		});
 
-			Sentry.setContext('tenant', {
-				created_at: user.tenant?.created_at,
-				tenant_id: user.tenant?.id,
-				tenant_name: user.tenant?.name,
-			});
-		} else {
+		Sentry.setContext('tenant', {
+			created_at: user.tenant?.created_at,
+			tenant_id: user.tenant?.id,
+			tenant_name: user.tenant?.name,
+		});
+	}, [user, navigate]);
+
+	useEffect(() => {
+		if (!user && isProd) {
 			Sentry.setUser(null);
 			posthog.reset();
 		}

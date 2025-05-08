@@ -3,9 +3,6 @@ import Auth from '@/pages/auth/Auth';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import CustomerPage from '@/pages/customer/customers/Customers';
 import AuthMiddleware from '../auth/AuthProvider';
-import MeterPage from '@/pages/usage/meter/MeterPage';
-import AddMeterPage from '@/pages/usage/meter/AddMeter';
-import EditMeterPage from '@/pages/usage/meter/EditMeterPage';
 import PricingPlans from '@/pages/product-catalog/plans/Plans';
 import CustomerSubscription from '@/pages/customer/customers/CustomerSubscription';
 import CustomerDetails from '@/pages/customer/customers/CustomerDetails';
@@ -39,8 +36,9 @@ import PaymentPage from '@/pages/customer/payments/PaymentPage';
 import BillingPage from '@/pages/settings/Billing';
 import AddChargesPage from '@/pages/product-catalog/plans/AddCharges';
 import CreateInvoicePage from '@/pages/customer/invoices/CreateInvoice';
-import OnboardingPage from '@/pages/onboarding/onboarding';
-
+import OnboardingApi from '@/api/OnboardingApi';
+import { useUser } from '@/hooks/UserContext';
+import OnboardingTenant from '@/pages/onboarding/OnboardingTenant';
 export const RouteNames = {
 	home: '/',
 	login: '/login',
@@ -89,6 +87,12 @@ export const RouteNames = {
 	billing: '/billing',
 };
 
+const DefaultRoute = () => {
+	const { user } = useUser();
+	const isOnboarded = OnboardingApi.IsUserOnboarded(user);
+	return <Navigate to={isOnboarded ? RouteNames.pricing : RouteNames.onboarding} />;
+};
+
 export const MainRouter = createBrowserRouter([
 	// public routes
 	{
@@ -122,7 +126,7 @@ export const MainRouter = createBrowserRouter([
 		children: [
 			{
 				path: RouteNames.home,
-				element: <Navigate to={RouteNames.onboarding} />,
+				element: <DefaultRoute />,
 			},
 
 			{
@@ -258,18 +262,6 @@ export const MainRouter = createBrowserRouter([
 				path: RouteNames.usageTracking,
 				children: [
 					{
-						path: RouteNames.meter,
-						element: <MeterPage />,
-					},
-					{
-						path: RouteNames.addMeter,
-						element: <AddMeterPage />,
-					},
-					{
-						path: RouteNames.editMeter,
-						element: <EditMeterPage />,
-					},
-					{
 						path: RouteNames.events,
 						element: <EventsPage />,
 					},
@@ -286,7 +278,7 @@ export const MainRouter = createBrowserRouter([
 			},
 			{
 				path: RouteNames.onboarding,
-				element: <OnboardingPage />,
+				element: <OnboardingTenant />,
 			},
 			{
 				path: RouteNames.billing,
