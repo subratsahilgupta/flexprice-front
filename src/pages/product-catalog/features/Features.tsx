@@ -5,10 +5,9 @@ import { RouteNames } from '@/core/routes/Routes';
 import GUIDES from '@/constants/guides';
 import usePagination from '@/hooks/usePagination';
 import FeatureApi from '@/api/FeatureApi';
-import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import {
 	FilterField,
 	FilterFieldType,
@@ -22,6 +21,7 @@ import { QueryBuilder } from '@/components/molecules';
 import { BaseEntityStatus } from '@/types/common';
 import { FeatureType } from '@/models/Feature';
 import useFilterSorting from '@/hooks/useFilterSorting';
+import { useQueryWithEmptyState } from '@/hooks/useQueryWithEmptyState';
 
 const sortingOptions: SortOption[] = [
 	{
@@ -115,8 +115,8 @@ const FeaturesPage = () => {
 
 	const fetchFeatures = async () => {
 		return await FeatureApi.getFeaturesByFilter({
-			limit,
-			offset,
+			limit: limit,
+			offset: offset,
 			filters: sanitizedFilters,
 			sort: sanitizedSorts,
 		});
@@ -128,23 +128,43 @@ const FeaturesPage = () => {
 	}, [sanitizedFilters, sanitizedSorts]);
 
 	const {
-		data: featureData,
 		isLoading,
 		isError,
-	} = useQuery({
-		queryKey: ['fetchFeatures', page, JSON.stringify(sanitizedFilters), JSON.stringify(sanitizedSorts)],
-		queryFn: fetchFeatures,
+		data: featureData,
+		probeData,
+	} = useQueryWithEmptyState({
+		main: {
+			queryKey: ['fetchFeatures', page, JSON.stringify(sanitizedFilters), JSON.stringify(sanitizedSorts)],
+			queryFn: fetchFeatures,
+		},
+		probe: {
+			queryKey: ['fetchFeatures', 'probe', page, JSON.stringify(sanitizedFilters), JSON.stringify(sanitizedSorts)],
+			queryFn: async () => {
+				return await FeatureApi.getFeaturesByFilter({
+					limit: 1,
+					offset: 0,
+					filters: [],
+					sort: [],
+				});
+			},
+		},
+		shouldProbe: (mainData) => {
+			return mainData?.items.length === 0;
+		},
 	});
+
+	// show empty page when no features and no search query
+	const showEmptyPage = useMemo(() => {
+		return !isLoading && probeData?.items.length === 0 && featureData?.items.length === 0;
+	}, [isLoading, probeData, featureData]);
 
 	// Handle error state
 	if (isError) {
 		toast.error('Error fetching features');
 		return null;
 	}
-	const showEmptyPage = !isLoading && featureData?.items.length === 0 && filters.length === 0 && sorts.length === 0;
 
 	// Render empty state when no features and no search query
-
 	if (showEmptyPage) {
 		return (
 			<EmptyPage

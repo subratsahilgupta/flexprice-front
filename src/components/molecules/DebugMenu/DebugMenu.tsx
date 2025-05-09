@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Loader2, Rocket, X, Plus } from 'lucide-react';
+import { Loader2, Rocket, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import useEnvironment from '@/hooks/useEnvironment';
@@ -10,7 +10,7 @@ import { Progress } from '@/components/ui/progress';
 import { RouteNames } from '@/core/routes/Routes';
 import EventsApi from '@/api/EventsApi';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { queryClient } from '@/core/services/tanstack/ReactQueryProvider';
+import { AddButton } from '@/components/atoms';
 
 const TOTAL_EVENTS = 60; // Number of events to simulate
 const STREAM_DURATION = TOTAL_EVENTS * 1000; // 1 minute
@@ -24,14 +24,12 @@ const DebugMenu = () => {
 	const [eventCount, setEventCount] = useState(0);
 	const navigate = useNavigate();
 
-	// Refetch data when environment changes
-	useEffect(() => {
-		queryClient.invalidateQueries({ queryKey: ['debug-customers'] });
-		queryClient.invalidateQueries({ queryKey: ['debug-subscriptions'] });
-	}, [isDevelopment, activeEnvironment?.id]);
-
 	// Fetch first customer
-	const { data: customerData, isLoading: isCustomerLoading } = useQuery({
+	const {
+		data: customerData,
+		isLoading: isCustomerLoading,
+		refetch: refetchCustomer,
+	} = useQuery({
 		queryKey: ['debug-customers'],
 		queryFn: async () => {
 			return await CustomerApi.getAllCustomers({ limit: 1, offset: 0 });
@@ -40,11 +38,21 @@ const DebugMenu = () => {
 	});
 
 	// Fetch customer's subscriptions
-	const { data: subscriptions, isLoading: isSubscriptionLoading } = useQuery({
+	const {
+		data: subscriptions,
+		isLoading: isSubscriptionLoading,
+		refetch: refetchSubscription,
+	} = useQuery({
 		queryKey: ['debug-subscriptions', customerData?.items[0]?.id],
 		queryFn: async () => await CustomerApi.getCustomerSubscriptions(customerData?.items[0]?.id || ''),
 		enabled: !!customerData?.items[0]?.id && isDevelopment,
 	});
+
+	// Refetch data when environment changes
+	useEffect(() => {
+		refetchCustomer();
+		refetchSubscription();
+	}, [isDevelopment, activeEnvironment?.id]);
 
 	// Handle streaming simulation
 	useEffect(() => {
@@ -91,7 +99,7 @@ const DebugMenu = () => {
 	};
 
 	const handleCreateCustomer = () => {
-		navigate(`${RouteNames.customers}/create`);
+		navigate(`${RouteNames.customers}`);
 	};
 
 	const handleCreateSubscription = () => {
@@ -176,10 +184,7 @@ const DebugMenu = () => {
 							) : !hasCustomer ? (
 								<div className='space-y-3'>
 									<p className='text-sm text-muted-foreground'>No customers found. Create one to get started.</p>
-									<Button onClick={handleCreateCustomer} className='w-full' size='sm'>
-										<Plus className='mr-2 size-3.5' />
-										Create Customer
-									</Button>
+									<AddButton onClick={handleCreateCustomer} className='w-full' />
 								</div>
 							) : !hasSubscription ? (
 								<div className='space-y-3'>
@@ -190,10 +195,7 @@ const DebugMenu = () => {
 										</Link>{' '}
 										has no subscriptions.
 									</p>
-									<Button onClick={handleCreateSubscription} className='w-full' size='sm'>
-										<Plus className='mr-2 size-3.5' />
-										Create Subscription
-									</Button>
+									<AddButton onClick={handleCreateSubscription} className='w-full' />
 								</div>
 							) : eventsCompleted ? (
 								<>
