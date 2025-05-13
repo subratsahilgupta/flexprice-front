@@ -6,8 +6,7 @@ import GUIDES from '@/constants/guides';
 import usePagination from '@/hooks/usePagination';
 import Customer from '@/models/Customer';
 import CustomerApi from '@/api/CustomerApi';
-import { useQuery } from '@tanstack/react-query';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import useFilterSorting from '@/hooks/useFilterSorting';
 import {
@@ -20,6 +19,7 @@ import {
 	SortDirection,
 } from '@/types/common/QueryBuilder';
 import { BaseEntityStatus } from '@/types/common';
+import { useQueryWithEmptyState } from '@/hooks/useQueryWithEmptyState';
 
 const sortingOptions: SortOption[] = [
 	{
@@ -142,18 +142,39 @@ const CustomerPage = () => {
 	const {
 		data: customerData,
 		isLoading,
+		probeData,
 		isError,
-	} = useQuery({
-		queryKey: ['fetchCustomers', page, JSON.stringify(sanitizedFilters), JSON.stringify(sanitizedSorts)],
-		queryFn: fetchCustomers,
+		error,
+	} = useQueryWithEmptyState({
+		main: {
+			queryKey: ['fetchCustomers', page, JSON.stringify(sanitizedFilters), JSON.stringify(sanitizedSorts)],
+			queryFn: fetchCustomers,
+		},
+		probe: {
+			queryKey: ['fetchCustomers', 'probe', page, JSON.stringify(sanitizedFilters), JSON.stringify(sanitizedSorts)],
+			queryFn: async () => {
+				return await CustomerApi.getCustomersByFilters({
+					limit: 1,
+					offset: 0,
+					filters: [],
+					sort: [],
+				});
+			},
+		},
+		shouldProbe: (mainData) => {
+			return mainData?.items.length === 0;
+		},
 	});
 
+	const showEmptyPage = useMemo(() => {
+		return !isLoading && probeData?.items.length === 0 && customerData?.items.length === 0;
+	}, [isLoading, probeData, customerData]);
+
 	if (isError) {
-		toast.error('Error fetching customers');
+		const err = error as ServerError;
+		toast.error(err.error.message || 'Error fetching customers');
 		return null;
 	}
-
-	const showEmptyPage = !isLoading && customerData?.items.length === 0 && filters.length === 0 && sorts.length === 0;
 
 	if (showEmptyPage) {
 		return (

@@ -27,7 +27,6 @@ const PlansTable: FC<PlansTableProps> = ({ data, onEdit }) => {
 		{
 			title: 'Status',
 
-			fieldVariant: 'interactive',
 			render: (row) => {
 				const label = formatChips(row.status);
 				return <Chip variant={label === 'Active' ? 'success' : 'default'} label={label} />;
