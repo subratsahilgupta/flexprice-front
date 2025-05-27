@@ -9,4 +9,11 @@ export default defineConfig({
 			'@': path.resolve(__dirname, './src'),
 		},
 	},
+	server: {
+		cors: {
+			origin: 'http://localhost:3000',
+			methods: ['GET', 'POST'],
+		},
+		host: 'localhost',
+	},
 });
