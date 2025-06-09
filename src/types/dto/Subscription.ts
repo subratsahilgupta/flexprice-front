@@ -1,4 +1,6 @@
 import { LineItem as InvoiceLineItem } from '@/models/Invoice';
+import { BILLING_CYCLE } from '@/models/Subscription';
+import { CreditGrant } from '@/models/CreditGrant';
 
 export interface GetSubscriptionDetailsPayload {
 	subscription_id: string;
@@ -80,3 +82,12 @@ export interface SubscriptionPauseResponse {
 
 // Since both responses have the same structure, we can reuse the interface
 export type SubscriptionResumeResponse = SubscriptionPauseResponse;
+
+export interface AddSubscriptionPhasePayload {
+	billing_cycle: BILLING_CYCLE;
+	start_date: string | Date;
+	end_date?: string | Date;
+	credit_grants?: CreditGrant[];
+	commitment_amount?: number;
+	overage_factor?: number;
+}
