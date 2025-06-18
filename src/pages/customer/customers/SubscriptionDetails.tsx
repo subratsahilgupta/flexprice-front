@@ -177,7 +177,7 @@ const SubscriptionDetails: FC = () => {
 
 				<div className='w-full flex justify-between items-center'>
 					<p className='text-[#71717A] text-sm'>Start date</p>
-					<p className='text-[#09090B] text-sm'>{formatDateShort(subscriptionDetails?.current_period_start ?? '')}</p>
+					<p className='text-[#09090B] text-sm'>{formatDateShort(subscriptionDetails?.start_date ?? '')}</p>
 				</div>
 				<Spacer className='!my-4' />
 
