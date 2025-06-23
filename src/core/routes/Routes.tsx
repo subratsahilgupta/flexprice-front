@@ -16,7 +16,7 @@ import Invoice from '@/pages/customer/tabs/Invoice';
 import Overview from '@/pages/customer/tabs/Overview';
 import WalletTab from '@/pages/customer/tabs/Wallet';
 import SubscriptionDetails from '@/pages/customer/customers/SubscriptionDetails';
-import AddCreditPage from '@/pages/customer/invoices/AddCreditPage';
+import AddCreditPage from '@/pages/customer/invoices/AddCreditNotePage';
 import CreditNote from '@/pages/customer/tabs/CreditNote';
 import AddFeaturePage from '@/pages/product-catalog/features/AddFeature';
 import FeaturesPage from '@/pages/product-catalog/features/Features';

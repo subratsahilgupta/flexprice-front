@@ -51,3 +51,15 @@ export type { GetBillingdetailsResponse } from './Tenant';
 export type { CreateUserRequest, UpdateTenantPayload } from './User';
 
 export type { CreateWalletPayload, TopupWalletPayload, WalletTransactionResponse, WalletTransactionPayload } from './Wallet';
+
+export type {
+	GetAllCreditNotesPayload,
+	CreateCreditNoteParams,
+	CreateCreditNoteLineItemRequest,
+	ProcessDraftCreditNoteParams,
+	VoidCreditNoteParams,
+	ListCreditNotesResponse,
+	CreditNote,
+	CreditNoteLineItem,
+} from './CreditNote';
+export { CreditNoteStatus, CreditNoteReason, CreditNoteType } from './CreditNote';
