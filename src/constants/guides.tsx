@@ -164,6 +164,25 @@ const GUIDES: Record<
 			},
 		],
 	},
+	creditNotes: {
+		tutorials: [
+			{
+				title: 'Overview',
+				description: 'Explore how credit notes work in Flexprice.',
+				onClick: () => openGuide('https://docs.flexprice.io/docs/Credit%20Notes/Overview'),
+			},
+			{
+				title: 'Creating a credit note',
+				description: 'Create a new credit note in Flexprice.',
+				onClick: () => openGuide('https://docs.flexprice.io/docs/Credit%20Notes/Creating%20a%20credit%20note'),
+			},
+			{
+				title: 'Managing credit notes',
+				description: 'Manage credit notes in Flexprice.',
+				onClick: () => openGuide('https://docs.flexprice.io/docs/Credit%20Notes/Managing%20credit%20notes'),
+			},
+		],
+	},
 	importExport: {
 		tutorials: [
 			{

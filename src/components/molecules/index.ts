@@ -49,6 +49,8 @@ export {
 
 export { default as InvoiceCreditLineItemTable } from './InvoiceCreditLineItemTable';
 
+export { CreditNoteTable, CreditNoteLineItemTable } from './CreditNoteTable';
+
 export { default as BreadCrumbs } from './BreadCrumbs';
 
 export { default as FeatureTable } from './FeatureTable';

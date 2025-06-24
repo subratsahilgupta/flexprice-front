@@ -1,4 +1,6 @@
+import Customer from './Customer';
 import { Invoice } from './Invoice';
+import { Subscription } from './Subscription';
 
 // Enums
 export enum CreditNoteStatus {
@@ -57,4 +59,8 @@ export interface CreditNote {
 	created_by: string;
 	updated_by: string;
 	invoice?: Invoice;
+	customer?: Customer;
+	subscription?: Subscription;
+	customer_id?: string;
+	subscription_id?: string;
 }

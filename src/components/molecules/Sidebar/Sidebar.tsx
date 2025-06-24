@@ -4,7 +4,7 @@ import SidebarNav, { NavItem } from './SidebarMenu';
 import FlexpriceSidebarFooter from './SidebarFooter';
 import { RouteNames } from '@/core/routes/Routes';
 import { EnvironmentSelector } from '@/components/molecules';
-import { Star, FileText, Gem, Users, Receipt, CalendarClock, Plug2, CreditCard, FileSearch, FileInput } from 'lucide-react';
+import { Star, FileText, Gem, Users, Receipt, CalendarClock, Plug2, CreditCard, FileSearch, FileInput, FileX } from 'lucide-react';
 
 const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }) => {
 	const navMain: { [key: string]: NavItem[] } = {
@@ -56,6 +56,11 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				title: 'Invoices',
 				url: RouteNames.invoices,
 				icon: Receipt,
+			},
+			{
+				title: 'Credit Notes',
+				url: RouteNames.creditNotes,
+				icon: FileX,
 			},
 			{
 				title: 'Payments',
