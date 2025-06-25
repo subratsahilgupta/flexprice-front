@@ -64,7 +64,7 @@ const SelectMeter: FC<Props> = ({
 				className={className}
 				error={error}
 				value={value}
-				onChange={(e: any) => onChange(metersData.items.find((meter: Meter) => meter.id === e) as Meter)}
+				onChange={(e: string) => onChange(metersData.items.find((meter: Meter) => meter.id === e) as Meter)}
 				options={activeMeters}
 				placeholder={placeholder}
 				label={label}
