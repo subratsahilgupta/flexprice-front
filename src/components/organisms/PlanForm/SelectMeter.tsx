@@ -57,7 +57,6 @@ const SelectMeter: FC<Props> = ({
 		};
 	});
 
-	console.log(activeMeters);
 
 	return (
 		<div className={cn('min-w-[200px]')}>
