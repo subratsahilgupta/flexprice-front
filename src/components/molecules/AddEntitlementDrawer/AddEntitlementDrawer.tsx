@@ -85,7 +85,9 @@ const AddEntitlementDrawer: FC<Props> = ({
 			newErrors.usage_limit = 'Usage limit cannot be negative';
 		}
 
-		if (!tempEntitlement.usage_reset_period && tempEntitlement.usage_reset_period !== null) {
+		const usageDisabled = tempEntitlement.usage_limit === null || tempEntitlement.usage_limit === undefined;
+
+		if (usageDisabled && !tempEntitlement.usage_reset_period && tempEntitlement.usage_reset_period !== null) {
 			newErrors.usage_reset_period = 'Usage reset period is required';
 		}
 
