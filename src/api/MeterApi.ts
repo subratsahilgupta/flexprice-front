@@ -13,7 +13,7 @@ export class MeterApi {
 		return await AxiosClient.get<GetAllMetersResponse>(`${this.baseUrl}?limit=${limit}&offset=${offset}`);
 	}
 	public static async getAllActiveMeters() {
-		return await AxiosClient.get<GetAllMetersResponse>(`${this.baseUrl}?status=published`);
+		return await AxiosClient.get<GetAllMetersResponse>(`${this.baseUrl}?status=published&limit=1000`);
 	}
 
 	public static async getMeterById(id: string) {
