@@ -111,7 +111,7 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
 			onSelect={() => handleSelect(option.value)}
 			disabled={option.disabled}
 			className={cn(
-				'w-full cursor-pointer flex items-center space-x-2 justify-between w-full',
+				'cursor-pointer flex items-center space-x-2 justify-between w-full',
 				option.disabled && 'select-none cursor-not-allowed opacity-50',
 			)}>
 			<div
