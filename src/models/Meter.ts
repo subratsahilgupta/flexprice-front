@@ -1,7 +1,8 @@
 export interface Meter {
 	aggregation: {
 		field: string;
-		type: string;
+		type: METER_AGGREGATION_TYPE;
+		multiplier?: number;
 	};
 	event_name: string;
 	filters: Array<{
@@ -26,4 +27,7 @@ export enum METER_AGGREGATION_TYPE {
 	SUM = 'SUM',
 	COUNT = 'COUNT',
 	COUNT_UNIQUE = 'COUNT_UNIQUE',
+	AVG = 'AVG',
+	LATEST = 'LATEST',
+	SUM_WITH_MULTIPLIER = 'SUM_WITH_MULTIPLIER',
 }

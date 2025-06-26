@@ -14,6 +14,7 @@ export interface CreateWalletPayload {
 	metadata?: Record<string, any>;
 	initial_credits_to_load?: number;
 	conversion_rate?: number;
+	initial_credits_expiry_date_utc?: Date;
 }
 
 export interface TopupWalletPayload {
