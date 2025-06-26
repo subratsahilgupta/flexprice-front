@@ -57,7 +57,6 @@ const SelectMeter: FC<Props> = ({
 		};
 	});
 
-
 	return (
 		<div className={cn('min-w-[200px]')}>
 			<SearchableSelect

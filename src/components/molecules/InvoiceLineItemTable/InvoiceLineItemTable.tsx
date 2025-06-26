@@ -9,6 +9,7 @@ interface Props {
 	amount_due?: number;
 	title?: string;
 	refetch?: () => void;
+	subtitle?: string;
 	invoiceType?: InvoiceType;
 }
 
@@ -33,12 +34,19 @@ const formatPriceType = (value: string): string => {
 	}
 };
 
-const InvoiceLineItemTable: FC<Props> = ({ data, amount_due, currency, title, refetch, invoiceType }) => {
+const InvoiceLineItemTable: FC<Props> = ({ data, amount_due, currency, title, refetch, invoiceType, subtitle }) => {
 	return (
 		<div>
 			<div className='w-full  p-4'>
 				<div className='flex justify-between items-center'>
-					<FormHeader className='!mb-0' title={title} variant='sub-header' titleClassName='font-semibold' />
+					<FormHeader
+						variant='sub-header'
+						className='!mb-0'
+						titleClassName='font-semibold'
+						subtitleClassName='text-sm text-gray-400 !mb-0 !mt-0'
+						title={title}
+						subtitle={subtitle}
+					/>
 					{refetch && (
 						<Button
 							onClick={() => {
