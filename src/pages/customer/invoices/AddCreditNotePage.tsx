@@ -11,6 +11,7 @@ import CreditNoteApi from '@/api/CreditNoteApi';
 import { PaymentStatus, formatCurrency, getCurrencySymbol } from '@/constants';
 import toast from 'react-hot-toast';
 import { RouteNames } from '@/core/routes/Routes';
+import { AddChargesButton } from '@/components/organisms/PlanForm/SetupChargesSection';
 
 interface LineItemForm {
 	id: string;
@@ -45,6 +46,7 @@ const AddCreditNotePage = () => {
 	const [memo, setMemo] = useState('');
 	const [lineItems, setLineItems] = useState<LineItemForm[]>([]);
 	const [showConfirmModal, setShowConfirmModal] = useState(false);
+	const [showMemo, setShowMemo] = useState(false);
 
 	// Business logic: Determine credit note type based on payment status
 	const getCreditNoteType = (paymentStatus: string): CreditNoteType => {
@@ -335,14 +337,17 @@ const AddCreditNotePage = () => {
 
 					{/* Memo */}
 					<div className='p-6'>
-						<Textarea
-							label='Memo (optional)'
-							value={memo}
-							onChange={(value) => setMemo(value)}
-							placeholder='This will appear on the credit note'
-							rows={3}
-							className='resize-none'
-						/>
+						{!showMemo && <AddChargesButton onClick={() => setShowMemo(!showMemo)} label='Add Memo' />}
+						{showMemo && (
+							<Textarea
+								label='Memo (optional)'
+								value={memo}
+								onChange={(value) => setMemo(value)}
+								placeholder='This will appear on the credit note'
+								rows={3}
+								className='resize-none mt-4'
+							/>
+						)}
 					</div>
 				</div>
 

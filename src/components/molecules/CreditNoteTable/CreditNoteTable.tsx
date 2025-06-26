@@ -28,7 +28,7 @@ const getTypeChip = (type: CreditNoteType) => {
 		case CreditNoteType.REFUND:
 			return <Chip variant='default' label='Refund' />;
 		case CreditNoteType.ADJUSTMENT:
-			return <Chip variant='default' label='Adjustment' />;
+			return <Chip variant='info' label='Adjustment' />;
 		default:
 			return <Chip variant='default' label='Unknown' />;
 	}

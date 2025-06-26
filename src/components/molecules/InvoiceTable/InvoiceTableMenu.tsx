@@ -92,7 +92,7 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 		{
 			label: 'Issue a Credit Note',
 			group: 'Actions',
-			disabled: data?.payment_status === 'PENDING' || data?.payment_status === 'FAILED',
+			disabled: data?.invoice_status !== 'FINALIZED' || data?.payment_status === 'REFUNDED',
 			onSelect: () => {
 				navigate(`/customer-management/customers/${data?.customer_id}/invoice/${data?.id}/credit-note`);
 			},

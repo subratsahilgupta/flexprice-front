@@ -8,7 +8,7 @@ const CreditNoteDetailsPage = () => {
 
 	return (
 		<Page>
-			<ApiDocsContent tags={['Credit Notes']} />
+			<ApiDocsContent tags={['Credit Notes', 'Features']} />
 			<CreditNoteDetails breadcrumb_index={2} credit_note_id={creditNoteId!} />
 		</Page>
 	);

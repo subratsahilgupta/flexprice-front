@@ -60,7 +60,11 @@ const CreditNoteDetails: FC<Props> = ({ credit_note_id, breadcrumb_index }) => {
 
 	if (isError) {
 		toast.error('Something went wrong');
-		return null;
+		return (
+			<div className='flex min-h-screen justify-center items-center h-full'>
+				<Loader />
+			</div>
+		);
 	}
 
 	return (
@@ -107,10 +111,7 @@ const CreditNoteDetails: FC<Props> = ({ credit_note_id, breadcrumb_index }) => {
 				{/* Memo Section */}
 				{data?.memo && (
 					<>
-						<div className='my-3 mx-3'>
-							<Divider />
-						</div>
-						<div className='p-4 border-b border-gray-200'>
+						<div className='p-4'>
 							<FormHeader className='!mb-4' title='Memo' variant='sub-header' titleClassName='font-semibold' />
 							<div className='bg-gray-50 rounded-lg p-4 border border-gray-200'>
 								<p className='text-[#09090B] text-sm leading-relaxed'>{data.memo}</p>
