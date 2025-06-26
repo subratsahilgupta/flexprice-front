@@ -21,6 +21,7 @@ class WalletApi {
 		name,
 		initial_credits_to_load,
 		conversion_rate,
+		initial_credits_expiry_date_utc,
 	}: CreateWalletPayload): Promise<Wallet> {
 		return await AxiosClient.post<Wallet>(`/wallets`, {
 			currency,
@@ -28,6 +29,7 @@ class WalletApi {
 			name,
 			initial_credits_to_load,
 			conversion_rate,
+			initial_credits_expiry_date_utc,
 		});
 	}
 
