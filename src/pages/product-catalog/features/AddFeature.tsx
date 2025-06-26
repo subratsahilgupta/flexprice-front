@@ -22,7 +22,6 @@ export const formatAggregationType = (data: string): string => {
 		[METER_AGGREGATION_TYPE.SUM]: 'Sum',
 		[METER_AGGREGATION_TYPE.COUNT]: 'Count',
 		[METER_AGGREGATION_TYPE.COUNT_UNIQUE]: 'Count Unique',
-		[METER_AGGREGATION_TYPE.AVG]: 'Average',
 		[METER_AGGREGATION_TYPE.LATEST]: 'Latest',
 		[METER_AGGREGATION_TYPE.SUM_WITH_MULTIPLIER]: 'Sum with Multiplier',
 	};
@@ -83,11 +82,6 @@ const AGGREGATION_OPTIONS: SelectOption[] = [
 		label: 'Count Unique',
 		value: METER_AGGREGATION_TYPE.COUNT_UNIQUE,
 		description: 'Count the number of unique value of a defined property for incoming events.',
-	},
-	{
-		label: 'Average',
-		value: METER_AGGREGATION_TYPE.AVG,
-		description: 'Average a defined property for incoming events.',
 	},
 	{
 		label: 'Sum with Multiplier',
