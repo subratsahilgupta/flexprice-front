@@ -51,3 +51,5 @@ export type { GetBillingdetailsResponse } from './Tenant';
 export type { CreateUserRequest, UpdateTenantPayload } from './User';
 
 export type { CreateWalletPayload, TopupWalletPayload, WalletTransactionResponse, WalletTransactionPayload } from './Wallet';
+
+export type { SynchronizePlanPricesWithSubscriptionResponse } from './Plan';
