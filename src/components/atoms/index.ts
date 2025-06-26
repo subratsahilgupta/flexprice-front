@@ -2,7 +2,7 @@ export { Button, AddButton } from './Button';
 export { default as Input } from './Input';
 export { default as SectionHeader } from './SectionHeader';
 export { default as Chip } from './Chip';
-export { default as Select } from './Select';
+export { Select, SearchableSelect } from './Select';
 export { default as Spinner } from './Spinner';
 export type { SelectOption } from './Select';
 // radio group
@@ -69,5 +69,3 @@ export { default as CodeBlock } from './CodeBlock';
 export { default as Label } from './Label';
 export { Combobox } from './Combobox';
 export type { ComboboxOption, ComboboxProps } from './Combobox';
-
-export { default as FlexPriceSelect } from './Select';

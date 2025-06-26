@@ -63,3 +63,4 @@ export type {
 	CreditNoteLineItem,
 } from './CreditNote';
 export { CreditNoteStatus, CreditNoteReason, CreditNoteType } from './CreditNote';
+export type { SynchronizePlanPricesWithSubscriptionResponse } from './Plan';

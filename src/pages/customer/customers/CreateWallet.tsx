@@ -1,4 +1,4 @@
-import { Button, FormHeader, Input, Select, Spacer } from '@/components/atoms';
+import { Button, DatePicker, FormHeader, Input, Select, Spacer } from '@/components/atoms';
 import { PremiumFeature, PremiumFeatureTag } from '@/components/molecules';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -30,7 +30,7 @@ const CreateWallet: FC<Props> = ({ customerId, onSuccess = () => {} }) => {
 		currency: '',
 		initial_credits_to_load: 0,
 		conversion_rate: 1,
-		name: 'prepaid-wallet',
+		name: 'Prepaid Wallet',
 	});
 
 	const [autoTopup, setautoTopup] = useState(false);
@@ -44,6 +44,7 @@ const CreateWallet: FC<Props> = ({ customerId, onSuccess = () => {} }) => {
 				name: walletPayload.name,
 				initial_credits_to_load: walletPayload.initial_credits_to_load,
 				conversion_rate: walletPayload.conversion_rate,
+				initial_credits_expiry_date_utc: walletPayload.initial_credits_expiry_date_utc,
 			});
 		},
 		onError: (error: ServerError) => {
@@ -100,6 +101,22 @@ const CreateWallet: FC<Props> = ({ customerId, onSuccess = () => {} }) => {
 					error={errors.currency}
 				/>
 
+				<div className='flex flex-col items-start gap-2 w-full'>
+					<label className={cn('font-inter block text-sm font-medium', 'text-zinc-950')}>Conversion Rate</label>
+					<div className='flex items-center gap-2 w-full'>
+						<Input className='w-full' value={'1'} disabled suffix='credit' />
+						<span>=</span>
+						<Input
+							className='w-full'
+							variant='number'
+							suffix={getCurrencySymbol(walletPayload.currency || '')}
+							value={walletPayload.conversion_rate}
+							onChange={(e) => {
+								setwalletPayload({ ...walletPayload, conversion_rate: e as unknown as number });
+							}}
+						/>
+					</div>
+				</div>
 				<Input
 					label='Free Credits'
 					suffix='credits'
@@ -110,26 +127,16 @@ const CreateWallet: FC<Props> = ({ customerId, onSuccess = () => {} }) => {
 						setwalletPayload({ ...walletPayload, initial_credits_to_load: e as unknown as number });
 					}}
 				/>
-				<div>
-					<label className={cn('font-inter block text-sm font-medium', 'text-zinc-950')}>Conversion Rate</label>
-					<div className='flex items-center gap-2'>
-						<div className='w-[200px]'>
-							<Input className='' value={'1'} disabled suffix='credit' />
-						</div>
-						<span>=</span>
-						<div className='w-[300px]'>
-							<Input
-								className='w-full'
-								variant='number'
-								suffix={getCurrencySymbol(walletPayload.currency || '')}
-								value={walletPayload.conversion_rate}
-								onChange={(e) => {
-									setwalletPayload({ ...walletPayload, conversion_rate: e as unknown as number });
-								}}
-							/>
-						</div>
-					</div>
-				</div>
+				<DatePicker
+					labelClassName='text-foreground'
+					label='Free Credits Expiry Date'
+					minDate={new Date()}
+					placeholder='Select Expiry Date'
+					date={walletPayload.initial_credits_expiry_date_utc}
+					setDate={(e) => {
+						setwalletPayload({ ...walletPayload, initial_credits_expiry_date_utc: e as unknown as Date });
+					}}
+				/>
 			</div>
 			<Spacer className='!mt-4' />
 			<PremiumFeature isPremiumFeature>
