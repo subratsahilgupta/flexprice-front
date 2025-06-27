@@ -1,17 +1,18 @@
-import { PaginationType } from '@/models/Pagination';
-import { TransactionReason } from '@/models/Wallet';
+import { Metadata } from '@/models/base';
+import { Pagination } from '@/models/Pagination';
+import { WALLET_TRANSACTION_REASON } from '@/models/Wallet';
 import { WalletTransaction } from '@/models/WalletTransaction';
 
 export interface WalletTransactionResponse {
 	items: WalletTransaction[];
-	pagination: PaginationType;
+	pagination: Pagination;
 }
 
 export interface CreateWalletPayload {
 	customerId: string;
 	currency: string;
 	name?: string;
-	metadata?: Record<string, any>;
+	metadata?: Metadata;
 	initial_credits_to_load?: number;
 	conversion_rate?: number;
 	initial_credits_expiry_date_utc?: Date;
@@ -26,9 +27,9 @@ export interface TopupWalletPayload {
 	expiry_date_utc?: Date;
 	metadata?: Record<string, any>;
 	idempotency_key: string;
-	transaction_reason: TransactionReason;
+	transaction_reason: WALLET_TRANSACTION_REASON;
 }
 
-export interface WalletTransactionPayload extends PaginationType {
+export interface WalletTransactionPayload extends Pagination {
 	walletId: string;
 }

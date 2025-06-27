@@ -6,7 +6,7 @@ import WalletApi from '@/api/WalletApi';
 import toast from 'react-hot-toast';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
-import { TransactionReason } from '@/models/Wallet';
+import { WALLET_TRANSACTION_REASON } from '@/models/Wallet';
 import { v4 as uuidv4 } from 'uuid';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -63,14 +63,14 @@ const TopupCard: FC<TopupCardProps> = ({ walletId, currency, conversion_rate = 1
 	});
 
 	// Determine transaction reason based on credits type and invoice generation
-	const getTransactionReason = useCallback((): TransactionReason => {
+	const getTransactionReason = useCallback((): WALLET_TRANSACTION_REASON => {
 		const { credits_type, generate_invoice } = topupPayload;
 
 		switch (credits_type) {
 			case CreditsType.FreeCredit:
-				return TransactionReason.FreeCredit;
+				return WALLET_TRANSACTION_REASON.FREE_CREDIT_GRANT;
 			case CreditsType.PurchasedCredits:
-				return generate_invoice ? TransactionReason.PurchasedCreditInvoiced : TransactionReason.PurchasedCreditDirect;
+				return generate_invoice ? WALLET_TRANSACTION_REASON.PURCHASED_CREDIT_INVOICED : WALLET_TRANSACTION_REASON.PURCHASED_CREDIT_DIRECT;
 			default:
 				throw new Error('Invalid credits type');
 		}

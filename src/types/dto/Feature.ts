@@ -1,4 +1,4 @@
-import { PaginationType } from '@/models/Pagination';
+import { Pagination } from '@/models/Pagination';
 import { TypedBackendFilter } from '../formatters/QueryBuilder';
 
 import { TypedBackendSort } from '../formatters/QueryBuilder';
@@ -17,12 +17,12 @@ export interface GetFeaturesPayload {
 	status?: string;
 }
 
-export interface GetFeaturesResponse extends PaginationType {
+export interface GetFeaturesResponse extends Pagination {
 	items: Feature[];
-	pagination: PaginationType;
+	pagination: Pagination;
 }
 
-export interface GetFeatureByFilterPayload extends PaginationType {
+export interface GetFeatureByFilterPayload extends Pagination {
 	filters: TypedBackendFilter[];
 	sort: TypedBackendSort[];
 }

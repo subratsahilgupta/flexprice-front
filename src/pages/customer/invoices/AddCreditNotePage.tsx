@@ -5,10 +5,10 @@ import InvoiceApi from '@/api/InvoiceApi';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { CreditNote, CreditNoteReason, CreditNoteType } from '@/models/CreditNote';
+import { CreditNote, CREDIT_NOTE_REASON, CREDIT_NOTE_TYPE } from '@/models/CreditNote';
 import { CreateCreditNoteLineItemRequest, CreateCreditNoteParams } from '@/types/dto/CreditNote';
 import CreditNoteApi from '@/api/CreditNoteApi';
-import { PaymentStatus, formatCurrency, getCurrencySymbol } from '@/constants';
+import { PAYMENT_STATUS, formatCurrency, getCurrencySymbol } from '@/constants';
 import toast from 'react-hot-toast';
 import { RouteNames } from '@/core/routes/Routes';
 import { AddChargesButton } from '@/components/organisms/PlanForm/SetupChargesSection';
@@ -23,7 +23,7 @@ interface LineItemForm {
 }
 
 interface CreditNotePreview {
-	type: CreditNoteType;
+	type: CREDIT_NOTE_TYPE;
 	totalAmount: number;
 	effectDescription: string;
 	settlementDescription: string;
@@ -42,24 +42,24 @@ const AddCreditNotePage = () => {
 	});
 
 	// Form state
-	const [selectedReason, setSelectedReason] = useState<CreditNoteReason | ''>('');
+	const [selectedReason, setSelectedReason] = useState<CREDIT_NOTE_REASON | ''>('');
 	const [memo, setMemo] = useState('');
 	const [lineItems, setLineItems] = useState<LineItemForm[]>([]);
 	const [showConfirmModal, setShowConfirmModal] = useState(false);
 	const [showMemo, setShowMemo] = useState(false);
 
 	// Business logic: Determine credit note type based on payment status
-	const getCreditNoteType = (paymentStatus: string): CreditNoteType => {
+	const getCreditNoteType = (paymentStatus: string): CREDIT_NOTE_TYPE => {
 		switch (paymentStatus.toUpperCase()) {
-			case PaymentStatus.SUCCEEDED:
-			case PaymentStatus.PARTIALLY_REFUNDED:
-				return CreditNoteType.REFUND;
-			case PaymentStatus.FAILED:
-			case PaymentStatus.PENDING:
-			case PaymentStatus.PROCESSING:
-				return CreditNoteType.ADJUSTMENT;
+			case PAYMENT_STATUS.SUCCEEDED:
+			case PAYMENT_STATUS.PARTIALLY_REFUNDED:
+				return CREDIT_NOTE_TYPE.REFUND;
+			case PAYMENT_STATUS.FAILED:
+			case PAYMENT_STATUS.PENDING:
+			case PAYMENT_STATUS.PROCESSING:
+				return CREDIT_NOTE_TYPE.ADJUSTMENT;
 			default:
-				return CreditNoteType.ADJUSTMENT;
+				return CREDIT_NOTE_TYPE.ADJUSTMENT;
 		}
 	};
 
@@ -95,13 +95,13 @@ const AddCreditNotePage = () => {
 	}, [invoice, updateBreadcrumb, setSegmentLoading]);
 
 	const reasonOptions: SelectOption[] = [
-		{ label: 'Duplicate', value: CreditNoteReason.DUPLICATE },
-		{ label: 'Fraudulent', value: CreditNoteReason.FRAUDULENT },
-		{ label: 'Order Change', value: CreditNoteReason.ORDER_CHANGE },
-		{ label: 'Unsatisfactory', value: CreditNoteReason.UNSATISFACTORY },
-		{ label: 'Service Issue', value: CreditNoteReason.SERVICE_ISSUE },
-		{ label: 'Billing Error', value: CreditNoteReason.BILLING_ERROR },
-		{ label: 'Subscription Cancellation', value: CreditNoteReason.SUBSCRIPTION_CANCELLATION },
+		{ label: 'Duplicate', value: CREDIT_NOTE_REASON.DUPLICATE },
+		{ label: 'Fraudulent', value: CREDIT_NOTE_REASON.FRAUDULENT },
+		{ label: 'Order Change', value: CREDIT_NOTE_REASON.ORDER_CHANGE },
+		{ label: 'Unsatisfactory', value: CREDIT_NOTE_REASON.UNSATISFACTORY },
+		{ label: 'Service Issue', value: CREDIT_NOTE_REASON.SERVICE_ISSUE },
+		{ label: 'Billing Error', value: CREDIT_NOTE_REASON.BILLING_ERROR },
+		{ label: 'Subscription Cancellation', value: CREDIT_NOTE_REASON.SUBSCRIPTION_CANCELLATION },
 	];
 
 	// Create credit note mutation
@@ -124,7 +124,7 @@ const AddCreditNotePage = () => {
 	const getCreditNotePreview = (): CreditNotePreview => {
 		if (!invoice) {
 			return {
-				type: CreditNoteType.ADJUSTMENT,
+				type: CREDIT_NOTE_TYPE.ADJUSTMENT,
 				totalAmount: 0,
 				effectDescription: '',
 				settlementDescription: '',
@@ -136,7 +136,7 @@ const AddCreditNotePage = () => {
 		let effectDescription = '';
 		let settlementDescription = '';
 
-		if (creditNoteType === CreditNoteType.REFUND) {
+		if (creditNoteType === CREDIT_NOTE_TYPE.REFUND) {
 			effectDescription = 'This credit note will process a refund for the paid amount.';
 			settlementDescription = "The refunded amount will be credited to the customer's original payment method or wallet balance.";
 		} else {
@@ -174,7 +174,7 @@ const AddCreditNotePage = () => {
 
 		const params: CreateCreditNoteParams = {
 			invoice_id: invoice_id,
-			reason: selectedReason as CreditNoteReason,
+			reason: selectedReason as CREDIT_NOTE_REASON,
 			memo: memo || undefined,
 			line_items: creditNoteLineItems,
 		};
@@ -209,7 +209,7 @@ const AddCreditNotePage = () => {
 							<span className='text-sm text-gray-600'>Credit Note Type</span>
 							<span
 								className={`text-sm px-2 py-1 rounded ${
-									creditNotePreview.type === CreditNoteType.REFUND ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
+									creditNotePreview.type === CREDIT_NOTE_TYPE.REFUND ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
 								}`}>
 								{creditNotePreview.type}
 							</span>
@@ -317,7 +317,7 @@ const AddCreditNotePage = () => {
 								<span className='font-medium'>{formatCurrency(totalCreditAmount, invoice?.currency || 'USD')}</span>
 							</div>
 							<div className='flex justify-between text-sm font-medium pt-3 border-t'>
-								<span>{creditNotePreview.type === CreditNoteType.REFUND ? 'Amount to be refunded' : 'Amount to be adjusted'}</span>
+								<span>{creditNotePreview.type === CREDIT_NOTE_TYPE.REFUND ? 'Amount to be refunded' : 'Amount to be adjusted'}</span>
 								<span>{formatCurrency(totalCreditAmount, invoice?.currency || 'USD')}</span>
 							</div>
 						</div>
@@ -329,7 +329,7 @@ const AddCreditNotePage = () => {
 						<Select
 							options={reasonOptions}
 							value={selectedReason}
-							onChange={(value) => setSelectedReason(value as CreditNoteReason)}
+							onChange={(value) => setSelectedReason(value as CREDIT_NOTE_REASON)}
 							placeholder='Select a reason'
 							className='max-w-md'
 						/>

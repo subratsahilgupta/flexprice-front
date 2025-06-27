@@ -1,12 +1,12 @@
-import { PaginationType } from '@/models/Pagination';
-import { CreditNote, CreditNoteLineItem, CreditNoteStatus, CreditNoteReason, CreditNoteType } from '@/models/CreditNote';
+import { Pagination } from '@/models/Pagination';
+import { CreditNote, CreditNoteLineItem, CREDIT_NOTE_STATUS, CREDIT_NOTE_REASON, CREDIT_NOTE_TYPE } from '@/models/CreditNote';
 
 // API Payloads
 export interface GetAllCreditNotesPayload {
 	credit_note_ids?: string[];
 	invoice_id?: string;
-	credit_note_status?: CreditNoteStatus[];
-	credit_note_type?: CreditNoteType;
+	credit_note_status?: CREDIT_NOTE_STATUS[];
+	credit_note_type?: CREDIT_NOTE_TYPE;
 	limit?: number;
 	offset?: number;
 	order?: 'asc' | 'desc';
@@ -21,7 +21,7 @@ export interface CreateCreditNoteParams {
 	credit_note_number?: string;
 	invoice_id: string;
 	memo?: string;
-	reason: CreditNoteReason;
+	reason: CREDIT_NOTE_REASON;
 	metadata?: Record<string, any>;
 	line_items: CreateCreditNoteLineItemRequest[];
 	idempotency_key?: string;
@@ -46,9 +46,9 @@ export interface VoidCreditNoteParams {
 // API Responses
 export interface ListCreditNotesResponse {
 	items: CreditNote[];
-	pagination: PaginationType;
+	pagination: Pagination;
 }
 
 // Export model types for convenience
 export type { CreditNote, CreditNoteLineItem };
-export { CreditNoteStatus, CreditNoteReason, CreditNoteType };
+export { CREDIT_NOTE_STATUS as CreditNoteStatus, CREDIT_NOTE_REASON as CreditNoteReason, CREDIT_NOTE_TYPE };

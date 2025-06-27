@@ -1,5 +1,6 @@
 import FlexpriceTable, { ColumnData } from '@/components/molecules/Table';
 import { cn } from '@/lib/utils';
+import { WALLET_TRANSACTION_REASON } from '@/models/Wallet';
 import { WalletTransaction } from '@/models/WalletTransaction';
 import { formatDateShort, getCurrencySymbol } from '@/utils/common/helper_functions';
 import { FC } from 'react';
@@ -16,21 +17,21 @@ const formatAmount = ({ type, amount, currency, className }: { type: string; amo
 
 const fomatTransactionTitle = ({ type, reason }: { type: string; reason: string }) => {
 	switch (reason) {
-		case 'INVOICE_PAYMENT':
+		case WALLET_TRANSACTION_REASON.INVOICE_PAYMENT:
 			return 'Invoice Payment';
-		case 'FREE_CREDIT_GRANT':
+		case WALLET_TRANSACTION_REASON.FREE_CREDIT_GRANT:
 			return 'Free Credits Added';
-		case 'SUBSCRIPTION_CREDIT_GRANT':
+		case WALLET_TRANSACTION_REASON.SUBSCRIPTION_CREDIT_GRANT:
 			return 'Subscription Credits Added';
-		case 'PURCHASED_CREDIT_INVOICED':
+		case WALLET_TRANSACTION_REASON.PURCHASED_CREDIT_INVOICED:
 			return 'Purchased Credits (Invoiced)';
-		case 'PURCHASED_CREDIT_DIRECT':
+		case WALLET_TRANSACTION_REASON.PURCHASED_CREDIT_DIRECT:
 			return 'Purchased Credits';
-		case 'INVOICE_REFUND':
+		case WALLET_TRANSACTION_REASON.INVOICE_REFUND:
 			return 'Invoice Refund';
-		case 'CREDIT_EXPIRED':
+		case WALLET_TRANSACTION_REASON.CREDIT_EXPIRED:
 			return 'Credits Expired';
-		case 'WALLET_TERMINATION':
+		case WALLET_TRANSACTION_REASON.WALLET_TERMINATION:
 			return 'Wallet Terminated';
 		default:
 			return type === 'credit' ? 'Credited' : 'Debited';

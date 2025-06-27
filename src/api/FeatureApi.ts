@@ -1,7 +1,7 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import Feature from '@/models/Feature';
 import { generateQueryParams } from '@/utils/common/api_helper';
-import { PaginationType } from '@/models/Pagination';
+import { Pagination } from '@/models/Pagination';
 import { TypedBackendSort, TypedBackendFilter } from '@/types/formatters/QueryBuilder';
 import { EventFilterData } from '@/components/molecules/EventFilter/EventFilter';
 
@@ -21,10 +21,10 @@ interface GetFeaturesPayload {
 
 interface GetFeaturesResponse {
 	items: Feature[];
-	pagination: PaginationType;
+	pagination: Pagination;
 }
 
-interface GetFeatureByFilterPayload extends PaginationType {
+interface GetFeatureByFilterPayload extends Pagination {
 	filters: TypedBackendFilter[];
 	sort: TypedBackendSort[];
 }

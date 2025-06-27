@@ -1,22 +1,17 @@
+import { BaseModel } from './base';
 import Feature from './Feature';
 import { Plan } from './Plan';
 
-export interface Entitlement {
-	created_at: string;
-	created_by: string;
-	feature: Feature;
-	feature_id: string;
-	feature_type: string;
-	id: string;
-	is_enabled: boolean;
-	is_soft_limit: boolean;
-	plan: Plan;
-	plan_id: string;
-	static_value: string;
-	status: string;
-	tenant_id: string;
-	updated_at: string;
-	updated_by: string;
-	usage_limit: number | null;
-	usage_reset_period: string | null;
+export interface Entitlement extends BaseModel {
+	readonly feature: Feature;
+	readonly feature_id: string;
+	readonly feature_type: string;
+	readonly is_enabled: boolean;
+	readonly is_soft_limit: boolean;
+	readonly plan: Plan;
+	readonly plan_id: string;
+	readonly static_value: string;
+	readonly tenant_id: string;
+	readonly usage_limit: number | null;
+	readonly usage_reset_period: string | null;
 }

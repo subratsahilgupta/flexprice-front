@@ -7,6 +7,7 @@ import { Subscription } from '@/models/Subscription';
 import Loader from '@/components/atoms/Loader';
 import toast from 'react-hot-toast';
 import CustomerUsageTable from '@/components/molecules/CustomerUsageTable/CustomerUsageTable';
+import { RouteNames } from '@/core/routes/Routes';
 
 type ContextType = {
 	isArchived: boolean;
@@ -23,7 +24,7 @@ const Overview = () => {
 	const { isArchived } = useOutletContext<ContextType>();
 
 	const handleAddSubscription = () => {
-		navigate(`/customer-management/customers/${customerId}/add-subscription`);
+		navigate(`${RouteNames.customers}/${customerId}/add-subscription`);
 	};
 
 	const {

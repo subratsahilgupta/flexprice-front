@@ -6,7 +6,7 @@
 // PAYMENT ENUMS
 // =============================================================================
 
-export enum PaymentStatus {
+export enum PAYMENT_STATUS {
 	PENDING = 'PENDING',
 	PROCESSING = 'PROCESSING',
 	SUCCEEDED = 'SUCCEEDED',
@@ -15,14 +15,14 @@ export enum PaymentStatus {
 	PARTIALLY_REFUNDED = 'PARTIALLY_REFUNDED',
 }
 
-export enum PaymentMethodType {
+export enum PAYMENT_METHOD_TYPE {
 	CARD = 'CARD',
 	ACH = 'ACH',
 	OFFLINE = 'OFFLINE',
 	CREDITS = 'CREDITS',
 }
 
-export enum PaymentDestinationType {
+export enum PAYMENT_DESTINATION_TYPE {
 	INVOICE = 'INVOICE',
 }
 
@@ -32,17 +32,17 @@ export enum PaymentDestinationType {
 
 export const formatPaymentStatus = (status: string): string => {
 	switch (status.toUpperCase()) {
-		case PaymentStatus.PENDING:
+		case PAYMENT_STATUS.PENDING:
 			return 'Pending';
-		case PaymentStatus.PROCESSING:
+		case PAYMENT_STATUS.PROCESSING:
 			return 'Processing';
-		case PaymentStatus.SUCCEEDED:
+		case PAYMENT_STATUS.SUCCEEDED:
 			return 'Succeeded';
-		case PaymentStatus.FAILED:
+		case PAYMENT_STATUS.FAILED:
 			return 'Failed';
-		case PaymentStatus.REFUNDED:
+		case PAYMENT_STATUS.REFUNDED:
 			return 'Refunded';
-		case PaymentStatus.PARTIALLY_REFUNDED:
+		case PAYMENT_STATUS.PARTIALLY_REFUNDED:
 			return 'Partially Refunded';
 		default:
 			return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
@@ -51,13 +51,13 @@ export const formatPaymentStatus = (status: string): string => {
 
 export const formatPaymentMethodType = (type: string): string => {
 	switch (type.toUpperCase()) {
-		case PaymentMethodType.CARD:
+		case PAYMENT_METHOD_TYPE.CARD:
 			return 'Credit Card';
-		case PaymentMethodType.ACH:
+		case PAYMENT_METHOD_TYPE.ACH:
 			return 'ACH Transfer';
-		case PaymentMethodType.OFFLINE:
+		case PAYMENT_METHOD_TYPE.OFFLINE:
 			return 'Offline Payment';
-		case PaymentMethodType.CREDITS:
+		case PAYMENT_METHOD_TYPE.CREDITS:
 			return 'Credits';
 		default:
 			return type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();

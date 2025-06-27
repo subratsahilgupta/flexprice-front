@@ -16,7 +16,7 @@ import CreditGrantApi from '@/api/CreditGrantApi';
 import { formatExpirationType } from '@/components/molecules/CreditGrant/CreditGrantTable';
 import { CreditGrant, CREDIT_GRANT_EXPIRATION_TYPE } from '@/models/CreditGrant';
 import FlexpriceTable from '@/components/molecules/Table';
-import { InvoiceType } from '@/models/Invoice';
+import { INVOICE_TYPE } from '@/models/Invoice';
 
 // Enhanced function to format expiration period with duration units
 export const formatExpirationPeriod = (grant: CreditGrant): string => {
@@ -251,7 +251,7 @@ const SubscriptionDetails: FC = () => {
 			{(data?.line_items?.length ?? 0) > 0 && (
 				<div className='card !mt-4'>
 					<InvoiceLineItemTable
-						invoiceType={data?.invoice_type as InvoiceType}
+						invoiceType={data?.invoice_type as INVOICE_TYPE}
 						refetch={refetch}
 						currency={data?.currency}
 						amount_due={data?.amount_due}

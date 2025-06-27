@@ -1,10 +1,11 @@
 import { Button, CheckboxRadioGroupItem, FormHeader, Modal, Select, Spacer } from '@/components/atoms';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
-import { Invoice } from '@/models/Invoice';
+import { Invoice, INVOICE_STATUS } from '@/models/Invoice';
 import InvoiceApi from '@/api/InvoiceApi';
 import { useMutation } from '@tanstack/react-query';
 import { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { PAYMENT_STATUS } from '@/constants/payment';
 interface Props {
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -37,19 +38,19 @@ const InvoicePaymentStatusModal: FC<Props> = ({ isOpen, onOpenChange, invoice })
 			label: 'Sucessful',
 			value: 'SUCCEEDED',
 			description: 'Marks the invoice as successfully paid.',
-			disabled: invoice?.payment_status === 'SUCCEEDED' || invoice?.invoice_status === 'VOIDED',
+			disabled: invoice?.payment_status === PAYMENT_STATUS.SUCCEEDED || invoice?.invoice_status === INVOICE_STATUS.VOIDED,
 		},
 		{
 			label: 'Failed',
 			value: 'FAILED',
 			description: 'Indicates that the payment attempt was unsuccessful.',
-			disabled: invoice?.payment_status === 'SUCCEEDED' || invoice?.invoice_status === 'VOIDED',
+			disabled: invoice?.payment_status === PAYMENT_STATUS.SUCCEEDED || invoice?.invoice_status === INVOICE_STATUS.VOIDED,
 		},
 		{
 			label: 'Pending',
 			value: 'PENDING',
 			description: 'Keeps the invoice in a pending state while awaiting payment.',
-			disabled: invoice?.payment_status === 'SUCCEEDED' || invoice?.invoice_status === 'VOIDED',
+			disabled: invoice?.payment_status === PAYMENT_STATUS.SUCCEEDED || invoice?.invoice_status === INVOICE_STATUS.VOIDED,
 		},
 	];
 

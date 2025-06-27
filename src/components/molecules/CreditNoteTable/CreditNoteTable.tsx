@@ -1,4 +1,4 @@
-import { CreditNote, CreditNoteStatus, CreditNoteType } from '@/models/CreditNote';
+import { CreditNote, CREDIT_NOTE_STATUS, CREDIT_NOTE_TYPE } from '@/models/CreditNote';
 import { FC } from 'react';
 import FlexpriceTable, { ColumnData, RedirectCell } from '../Table';
 import { formatDateShort, getCurrencySymbol } from '@/utils/common/helper_functions';
@@ -10,24 +10,24 @@ export interface Props {
 	data: CreditNote[];
 }
 
-const getStatusChip = (status: CreditNoteStatus) => {
+const getStatusChip = (status: CREDIT_NOTE_STATUS) => {
 	switch (status) {
-		case CreditNoteStatus.VOIDED:
+		case CREDIT_NOTE_STATUS.VOIDED:
 			return <Chip variant='default' label='Voided' />;
-		case CreditNoteStatus.FINALIZED:
+		case CREDIT_NOTE_STATUS.FINALIZED:
 			return <Chip variant='success' label='Finalized' />;
-		case CreditNoteStatus.DRAFT:
+		case CREDIT_NOTE_STATUS.DRAFT:
 			return <Chip variant='default' label='Draft' />;
 		default:
 			return <Chip variant='default' label='Draft' />;
 	}
 };
 
-const getTypeChip = (type: CreditNoteType) => {
+const getTypeChip = (type: CREDIT_NOTE_TYPE) => {
 	switch (type) {
-		case CreditNoteType.REFUND:
+		case CREDIT_NOTE_TYPE.REFUND:
 			return <Chip variant='default' label='Refund' />;
-		case CreditNoteType.ADJUSTMENT:
+		case CREDIT_NOTE_TYPE.ADJUSTMENT:
 			return <Chip variant='info' label='Adjustment' />;
 		default:
 			return <Chip variant='default' label='Unknown' />;

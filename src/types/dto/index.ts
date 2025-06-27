@@ -62,5 +62,5 @@ export type {
 	CreditNote,
 	CreditNoteLineItem,
 } from './CreditNote';
-export { CreditNoteStatus, CreditNoteReason, CreditNoteType } from './CreditNote';
+export { CREDIT_NOTE_STATUS, CREDIT_NOTE_REASON, CREDIT_NOTE_TYPE } from '@/models/CreditNote';
 export type { SynchronizePlanPricesWithSubscriptionResponse } from './Plan';

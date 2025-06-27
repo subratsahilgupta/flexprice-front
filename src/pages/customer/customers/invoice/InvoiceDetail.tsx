@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom';
 import { RouteNames } from '@/core/routes/Routes';
 import { cn } from '@/lib/utils';
 import { getPaymentStatusChip } from '@/components/molecules/InvoiceTable/InvoiceTable';
-import { InvoiceType } from '@/models/Invoice';
+import { INVOICE_TYPE } from '@/models/Invoice';
 interface Props {
 	invoice_id: string;
 	breadcrumb_index: number;
@@ -78,7 +78,7 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 		toast.error('Something went wrong');
 	}
 
-	const invoiceType = data?.invoice_type as InvoiceType;
+	const invoiceType = data?.invoice_type as INVOICE_TYPE;
 
 	return (
 		<div className='space-y-6'>
@@ -158,7 +158,7 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 					data={data?.line_items ?? []}
 					amount_due={data?.amount_due}
 					currency={data?.currency}
-					invoiceType={invoiceType as InvoiceType}
+					invoiceType={invoiceType as INVOICE_TYPE}
 				/>
 			</div>
 		</div>

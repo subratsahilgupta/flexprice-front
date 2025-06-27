@@ -4,11 +4,12 @@ import { FiDatabase } from 'react-icons/fi';
 import { cn } from '@/lib/utils';
 import { Plan } from '@/models/Plan';
 import { useState } from 'react';
-import { Price } from '@/models/Price';
+import { BILLING_MODEL, Price, PRICE_TYPE } from '@/models/Price';
 import { currencyOptions, billlingPeriodOptions } from '@/constants/constants';
 import RecurringChargesForm from './RecurringChargesForm';
 import UsagePricingForm from './UsagePricingForm';
 import { CirclePlus } from 'lucide-react';
+import { BILLING_CADENCE, INVOICE_CADENCE } from '@/models/Invoice';
 
 interface Props {
 	plan: Partial<Plan>;
@@ -57,22 +58,20 @@ export interface InternalPrice extends Partial<Price> {
 const SetupChargesSection: React.FC<Props> = ({ plan, setPlanField }) => {
 	const [subscriptionType, setSubscriptionType] = useState<string>();
 	const [recurringCharges, setRecurringCharges] = useState<InternalPrice[]>(
-		plan.prices?.filter((price) => price.type === SubscriptionType.FIXED) || [],
+		plan.prices?.filter((price) => price.type === PRICE_TYPE.FIXED) || [],
 	);
-	const [usageCharges, setUsageCharges] = useState<InternalPrice[]>(
-		plan.prices?.filter((price) => price.type === SubscriptionType.USAGE) || [],
-	);
+	const [usageCharges, setUsageCharges] = useState<InternalPrice[]>(plan.prices?.filter((price) => price.type === PRICE_TYPE.USAGE) || []);
 
 	const getEmptyPrice = (type: SubscriptionType): InternalPrice => ({
 		amount: '',
 		currency: currencyOptions[0].value,
 		billing_period: billlingPeriodOptions[1].value,
-		type,
+		type: type === SubscriptionType.FIXED ? PRICE_TYPE.FIXED : PRICE_TYPE.USAGE,
 		isEdit: true,
 		billing_period_count: 1,
-		invoice_cadence: 'ARREAR',
-		billing_model: type === SubscriptionType.FIXED ? 'FLAT_FEE' : undefined,
-		billing_cadence: 'RECURRING',
+		invoice_cadence: INVOICE_CADENCE.ARREAR,
+		billing_model: type === SubscriptionType.FIXED ? BILLING_MODEL.FLAT_FEE : undefined,
+		billing_cadence: BILLING_CADENCE.RECURRING,
 		internal_state: 'new',
 	});
 

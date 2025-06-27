@@ -1,24 +1,24 @@
+import { ENTITY_STATUS, Metadata } from './base';
+
 export interface TenantAddress {
-	address_line1: string;
-	address_line2: string;
-	address_city: string;
-	address_state: string;
-	address_postal_code: string;
-	address_country: string;
+	readonly address_line1: string;
+	readonly address_line2: string;
+	readonly address_city: string;
+	readonly address_state: string;
+	readonly address_postal_code: string;
+	readonly address_country: string;
 }
 
 export interface TenantBillingDetails {
-	address: TenantAddress;
-	email: string;
-	help_email: string;
-	phone: string;
+	readonly address: TenantAddress;
+	readonly email: string;
+	readonly help_email: string;
+	readonly phone: string;
 }
 
 export interface Tenant {
-	id: string;
-	name: string;
-	billing_details: TenantBillingDetails;
-	status: string;
-	created_at: string;
-	updated_at: string;
+	readonly name: string;
+	readonly billing_details: TenantBillingDetails;
+	readonly status: ENTITY_STATUS;
+	readonly metadata: Metadata;
 }

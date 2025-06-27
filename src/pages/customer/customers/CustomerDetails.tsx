@@ -7,8 +7,8 @@ import CustomerApi from '@/api/CustomerApi';
 import { Page } from '@/components/atoms';
 import { cn } from '@/lib/utils';
 import { ApiDocsContent } from '@/components/molecules';
-import { BaseEntityStatus } from '@/types/common/BaseEntity';
 import { AlertCircle } from 'lucide-react';
+import { ENTITY_STATUS } from '@/models/base';
 
 const tabs = [
 	{ id: '', label: 'Overview' },
@@ -37,7 +37,7 @@ const CustomerDetails = () => {
 	});
 
 	const { updateBreadcrumb, setSegmentLoading } = useBreadcrumbsStore();
-	const isArchived = customer?.status === BaseEntityStatus.ARCHIVED;
+	const isArchived = customer?.status === ENTITY_STATUS.ARCHIVED;
 
 	// Handle tab changes based on URL
 	useEffect(() => {

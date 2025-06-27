@@ -3,13 +3,13 @@ import { Invoice } from './Invoice';
 import { Subscription } from './Subscription';
 
 // Enums
-export enum CreditNoteStatus {
+export enum CREDIT_NOTE_STATUS {
 	DRAFT = 'DRAFT',
 	FINALIZED = 'FINALIZED',
 	VOIDED = 'VOIDED',
 }
 
-export enum CreditNoteReason {
+export enum CREDIT_NOTE_REASON {
 	DUPLICATE = 'DUPLICATE',
 	FRAUDULENT = 'FRAUDULENT',
 	ORDER_CHANGE = 'ORDER_CHANGE',
@@ -19,7 +19,7 @@ export enum CreditNoteReason {
 	SUBSCRIPTION_CANCELLATION = 'SUBSCRIPTION_CANCELLATION',
 }
 
-export enum CreditNoteType {
+export enum CREDIT_NOTE_TYPE {
 	ADJUSTMENT = 'ADJUSTMENT',
 	REFUND = 'REFUND',
 }
@@ -46,9 +46,9 @@ export interface CreditNote {
 	invoice_id: string;
 	memo?: string;
 	credit_note_number?: string;
-	credit_note_status: CreditNoteStatus;
-	credit_note_type: CreditNoteType;
-	reason: CreditNoteReason;
+	credit_note_status: CREDIT_NOTE_STATUS;
+	credit_note_type: CREDIT_NOTE_TYPE;
+	reason: CREDIT_NOTE_REASON;
 	currency: string;
 	total_amount: number;
 	metadata?: Record<string, any>;

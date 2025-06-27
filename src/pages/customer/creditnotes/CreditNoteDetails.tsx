@@ -8,7 +8,7 @@ import { FC, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import { RouteNames } from '@/core/routes/Routes';
-import { CreditNoteStatus, CreditNoteType } from '@/models/CreditNote';
+import { CREDIT_NOTE_STATUS, CREDIT_NOTE_TYPE } from '@/models/CreditNote';
 import { Chip } from '@/components/atoms';
 
 interface Props {
@@ -16,24 +16,24 @@ interface Props {
 	breadcrumb_index: number;
 }
 
-const getStatusChip = (status: CreditNoteStatus) => {
+const getStatusChip = (status: CREDIT_NOTE_STATUS) => {
 	switch (status) {
-		case CreditNoteStatus.VOIDED:
+		case CREDIT_NOTE_STATUS.VOIDED:
 			return <Chip variant='default' label='Voided' />;
-		case CreditNoteStatus.FINALIZED:
+		case CREDIT_NOTE_STATUS.FINALIZED:
 			return <Chip variant='success' label='Finalized' />;
-		case CreditNoteStatus.DRAFT:
+		case CREDIT_NOTE_STATUS.DRAFT:
 			return <Chip variant='default' label='Draft' />;
 		default:
 			return <Chip variant='default' label='Draft' />;
 	}
 };
 
-const getTypeChip = (type: CreditNoteType) => {
+const getTypeChip = (type: CREDIT_NOTE_TYPE) => {
 	switch (type) {
-		case CreditNoteType.REFUND:
+		case CREDIT_NOTE_TYPE.REFUND:
 			return <Chip variant='default' label='Refund' />;
-		case CreditNoteType.ADJUSTMENT:
+		case CREDIT_NOTE_TYPE.ADJUSTMENT:
 			return <Chip variant='default' label='Adjustment' />;
 		default:
 			return <Chip variant='default' label='Unknown' />;
@@ -85,8 +85,8 @@ const CreditNoteDetails: FC<Props> = ({ credit_note_id, breadcrumb_index }) => {
 					<div className='w-full grid grid-cols-4 gap-4'>
 						<p className='text-[#09090B] text-sm font-medium'>{data?.credit_note_number || data?.id?.slice(0, 8)}</p>
 						<p className='text-[#09090B] text-sm font-medium'>{formatDate(data?.created_at ?? '')}</p>
-						<div className='text-[#09090B] text-sm'>{getStatusChip(data?.credit_note_status ?? CreditNoteStatus.DRAFT)}</div>
-						<div className='text-[#09090B] text-sm'>{getTypeChip(data?.credit_note_type ?? CreditNoteType.ADJUSTMENT)}</div>
+						<div className='text-[#09090B] text-sm'>{getStatusChip(data?.credit_note_status ?? CREDIT_NOTE_STATUS.DRAFT)}</div>
+						<div className='text-[#09090B] text-sm'>{getTypeChip(data?.credit_note_type ?? CREDIT_NOTE_TYPE.ADJUSTMENT)}</div>
 					</div>
 				</div>
 

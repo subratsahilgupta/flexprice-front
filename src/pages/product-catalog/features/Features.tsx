@@ -19,7 +19,7 @@ import {
 } from '@/types/common/QueryBuilder';
 import { QueryBuilder } from '@/components/molecules';
 import { BaseEntityStatus } from '@/types/common';
-import { FeatureType } from '@/models/Feature';
+import { FEATURE_TYPE } from '@/models/Feature';
 import useFilterSorting from '@/hooks/useFilterSorting';
 import { useQueryWithEmptyState } from '@/hooks/useQueryWithEmptyState';
 
@@ -74,9 +74,9 @@ const filterOptions: FilterField[] = [
 		operators: DEFAULT_OPERATORS_PER_DATA_TYPE[DataType.ARRAY],
 		dataType: DataType.ARRAY,
 		options: [
-			{ value: FeatureType.metered, label: 'Metered' },
-			{ value: FeatureType.boolean, label: 'Boolean' },
-			{ value: FeatureType.static, label: 'Static' },
+			{ value: FEATURE_TYPE.METERED, label: 'Metered' },
+			{ value: FEATURE_TYPE.BOOLEAN, label: 'Boolean' },
+			{ value: FEATURE_TYPE.STATIC, label: 'Static' },
 		],
 	},
 ];

@@ -1,5 +1,5 @@
 import { Button, FormHeader } from '@/components/atoms';
-import { LineItem, InvoiceType } from '@/models/Invoice';
+import { LineItem, INVOICE_TYPE } from '@/models/Invoice';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import { FC } from 'react';
 import { RefreshCw } from 'lucide-react';
@@ -10,7 +10,7 @@ interface Props {
 	title?: string;
 	refetch?: () => void;
 	subtitle?: string;
-	invoiceType?: InvoiceType;
+	invoiceType?: INVOICE_TYPE;
 }
 
 const formatToShortDate = (dateString: string): string => {
@@ -67,8 +67,8 @@ const InvoiceLineItemTable: FC<Props> = ({ data, amount_due, currency, title, re
 						<thead className='border-b border-gray-200'>
 							<tr>
 								<th className='py-2 px-2 text-gray-600'>Subscription</th>
-								{invoiceType === InvoiceType.SUBSCRIPTION && <th className='py-2 px-2 text-gray-600'>Description</th>}
-								{invoiceType === InvoiceType.SUBSCRIPTION && <th className='py-2 px-2 text-center text-gray-600'>Interval</th>}
+								{invoiceType === INVOICE_TYPE.SUBSCRIPTION && <th className='py-2 px-2 text-gray-600'>Description</th>}
+								{invoiceType === INVOICE_TYPE.SUBSCRIPTION && <th className='py-2 px-2 text-center text-gray-600'>Interval</th>}
 								<th className='py-2 px-2 text-gray-600 text-center'>Quantity</th>
 								{/* <th className='py-2 px-2 text-gray-600 text-center'>Unit Price</th> */}
 								<th className='py-2 px-2 text-gray-600 text-right'>Amount</th>
@@ -80,10 +80,10 @@ const InvoiceLineItemTable: FC<Props> = ({ data, amount_due, currency, title, re
 									<tr key={index} className='border-b border-gray-200'>
 										<td className='py-3 px-2 text-gray-800'>{item.display_name ?? '--'}</td>
 
-										{invoiceType === InvoiceType.SUBSCRIPTION && (
+										{invoiceType === INVOICE_TYPE.SUBSCRIPTION && (
 											<td className='py-3 px-2 text-gray-800'>{formatPriceType(item.price_type)}</td>
 										)}
-										{invoiceType === InvoiceType.SUBSCRIPTION && (
+										{invoiceType === INVOICE_TYPE.SUBSCRIPTION && (
 											<td className='py-3 px-2 text-center text-gray-800'>{`${formatToShortDate(item.period_start)} - ${formatToShortDate(item.period_end)}`}</td>
 										)}
 										<td className='py-3 px-2 text-center text-gray-800'>{item.quantity ? item.quantity : '--'}</td>
