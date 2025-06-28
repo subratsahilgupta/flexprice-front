@@ -91,7 +91,7 @@ const Preview = ({ data, className, phases }: PreviewProps) => {
 			icon: <Receipt className='h-[22px] w-[22px] text-gray-500 shrink-0' />,
 			subtitle: (
 				<div>
-					<p className='text-sm text-gray-600'>Amount due: {getTotalPayableText(recurringCharges, usageCharges, recurringTotal)}</p>
+					<p className='text-sm text-gray-600'> Net payable: {getTotalPayableText(recurringCharges, usageCharges, recurringTotal)}</p>
 					<p className='text-sm text-gray-600'>{billingDescription}</p>
 				</div>
 			),

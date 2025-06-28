@@ -2,19 +2,15 @@ import { Button, FormHeader } from '@/components/atoms';
 import { LineItem, INVOICE_TYPE } from '@/models/Invoice';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import { FC } from 'react';
-import { RefreshCw, Info } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-
+import { RefreshCw } from 'lucide-react';
 interface Props {
 	data: LineItem[];
 	currency?: string;
-	amount_due?: number;
 	total?: number;
 	subtotal?: number;
 	tax?: number;
 	discount?: number;
-	amount_paid?: number;
-	amount_remaining?: number;
+	amount_due?: number;
 	title?: string;
 	refetch?: () => void;
 	subtitle?: string;
@@ -42,18 +38,15 @@ const formatPriceType = (value: string): string => {
 	}
 };
 
-const InvoiceLineItemTable: FC<Props> = ({
+const SubscriptionPreviewLineItemTable: FC<Props> = ({
 	data,
-	amount_due,
 	currency,
 	title,
 	refetch,
 	invoiceType,
 	subtitle,
 	discount,
-	tax,
-	amount_paid,
-	amount_remaining,
+	amount_due,
 	subtotal,
 }) => {
 	return (
@@ -132,14 +125,6 @@ const InvoiceLineItemTable: FC<Props> = ({
 							</div>
 						)}
 
-						{/* Tax - only show if provided and > 0 */}
-						{tax !== undefined && tax !== null && Number(tax) > 0 && (
-							<div className='flex justify-between items-center py-1'>
-								<span className='text-sm text-gray-600'>Tax</span>
-								<span className='text-sm text-gray-900 font-medium'>{formatAmount(Number(tax), currency ?? '')}</span>
-							</div>
-						)}
-
 						<div className='flex justify-between items-center py-1'>
 							<span className='text-sm text-gray-600'>Tax</span>
 							<span className='text-sm text-gray-900 font-medium'>-</span>
@@ -153,46 +138,11 @@ const InvoiceLineItemTable: FC<Props> = ({
 							</div>
 						)}
 
-						{/* Total - always show if exists */}
-						{/* {total !== undefined && total !== null && Number(total) !== 0 && (
+						{/* Amount Total - show the final outstanding amount */}
+						{amount_due !== undefined && amount_due !== null && Number(amount_due) !== 0 && (
 							<div className='flex justify-between items-center py-3 border-t border-gray-200'>
-								<span className='text-sm font-medium text-gray-900'>Total</span>
-								<span className='text-sm font-semibold text-gray-900'>{formatAmount(Number(total), currency ?? '')}</span>
-							</div>
-						)} */}
-
-						{/* Net payable - always show, default to 0 if not provided */}
-						<div className='flex justify-between border-t border-gray-200 items-center py-3'>
-							<div className='flex items-center gap-2'>
-								<span className='text-sm text-gray-900 font-medium'>Net payable</span>
-								<TooltipProvider delayDuration={0}>
-									<Tooltip>
-										<TooltipTrigger>
-											<Info className='h-4 w-4 text-gray-400 hover:text-gray-600 transition-colors' />
-										</TooltipTrigger>
-										<TooltipContent sideOffset={5} className='bg-gray-900 text-xs text-white px-3 py-1.5 rounded-lg max-w-[200px]'>
-											Final amount due after applying credit notes
-										</TooltipContent>
-									</Tooltip>
-								</TooltipProvider>
-							</div>
-							<span className='text-sm text-gray-900 font-semibold'>{formatAmount(Number(amount_due ?? 0), currency ?? '')}</span>
-						</div>
-
-						{/* Amount paid - always show, default to 0 if not provided */}
-						<div className='flex justify-between items-center py-1'>
-							<span className='text-sm text-gray-600'>Amount paid</span>
-							<span className='text-sm text-gray-900 font-medium'>{formatAmount(Number(amount_paid ?? 0), currency ?? '')}</span>
-						</div>
-
-						{/* Remaining balance - show the final outstanding amount */}
-						{((amount_remaining !== undefined && amount_remaining !== null && Number(amount_remaining) > 0) ||
-							(amount_due !== undefined && amount_due !== null && Number(amount_due) > 0)) && (
-							<div className='flex justify-between items-center py-3 border-t border-gray-200'>
-								<span className='text-base font-medium text-gray-900'>Remaining balance</span>
-								<span className='text-base font-semibold text-gray-900'>
-									{formatAmount(Number(amount_remaining ?? amount_due ?? 0), currency ?? '')}
-								</span>
+								<span className='text-base font-medium text-gray-900'>Net payable</span>
+								<span className='text-base font-semibold text-gray-900'>{formatAmount(Number(amount_due ?? 0), currency ?? '')}</span>
 							</div>
 						)}
 					</div>
@@ -202,4 +152,4 @@ const InvoiceLineItemTable: FC<Props> = ({
 	);
 };
 
-export default InvoiceLineItemTable;
+export default SubscriptionPreviewLineItemTable;

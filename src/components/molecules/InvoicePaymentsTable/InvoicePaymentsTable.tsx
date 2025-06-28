@@ -34,7 +34,7 @@ const getPaymentMethodLabel = (method: string) => {
 		case 'ACH':
 			return 'Bank Transfer';
 		case 'OFFLINE':
-			return 'Cash';
+			return 'Offline';
 		case 'CREDITS':
 			return 'Wallet Credits';
 		default:
