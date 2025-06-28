@@ -7,6 +7,7 @@ import AuthService from '@/core/auth/AuthService';
 import useUser from '@/hooks/useUser';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Skeleton } from '@/components/ui/skeleton';
+import { PiWebhooksLogo } from 'react-icons/pi';
 
 const SidebarFooter = () => {
 	const navigate = useNavigate();
@@ -74,6 +75,21 @@ const SidebarFooter = () => {
 				<span className={cn('flex items-center gap-2')}>
 					<CodeXml className='size-4' />
 					<span className={cn('text-sm select-none font-normal', sidebarOpen ? '' : 'hidden')}>{'Developers'}</span>
+				</span>
+			</SidebarMenuButton>
+			<SidebarMenuButton
+				isActive={true}
+				onClick={() => {
+					navigate(RouteNames.webhooks);
+				}}
+				tooltip={'Webhooks'}
+				className={cn(
+					`flex items-center justify-between gap-2 hover:bg-muted transition-colors `,
+					location.pathname.startsWith(RouteNames.webhooks) ? 'bg-[#F4F4F5] font-medium text-sidebar-text-accent-foreground' : '',
+				)}>
+				<span className={cn('flex items-center gap-2')}>
+					<PiWebhooksLogo className='size-4' />
+					<span className={cn('text-sm select-none font-normal', sidebarOpen ? '' : 'hidden')}>{'Webhooks'}</span>
 				</span>
 			</SidebarMenuButton>
 			<SidebarMenuButton

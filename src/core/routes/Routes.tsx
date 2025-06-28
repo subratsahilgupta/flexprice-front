@@ -41,6 +41,7 @@ import CreateInvoicePage from '@/pages/customer/invoices/CreateInvoice';
 import OnboardingApi from '@/api/OnboardingApi';
 import { useUser } from '@/hooks/UserContext';
 import OnboardingTenant from '@/pages/onboarding/OnboardingTenant';
+import WebhookDashboard from '@/pages/webhooks/WebhookDashboard';
 
 export const RouteNames = {
 	home: '/',
@@ -89,6 +90,7 @@ export const RouteNames = {
 	developers: '/developers',
 	onboarding: '/onboarding',
 	billing: '/billing',
+	webhooks: '/webhooks',
 };
 
 const DefaultRoute = () => {
@@ -287,6 +289,10 @@ export const MainRouter = createBrowserRouter([
 			{
 				path: RouteNames.developers,
 				element: <DeveloperPage />,
+			},
+			{
+				path: RouteNames.webhooks,
+				element: <WebhookDashboard />,
 			},
 			{
 				path: RouteNames.onboarding,
