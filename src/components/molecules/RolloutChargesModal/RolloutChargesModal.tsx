@@ -62,8 +62,6 @@ const RolloutChargesModal: FC<RolloutChargesModalProps> = ({ onCancel, onConfirm
 			</DialogHeader>
 
 			<div className='space-y-6 py-4'>
-				<p className='text-sm text-gray-600'>Decide how you'd like to apply the updated charges:</p>
-
 				<RectangleRadiogroup options={ROLLOUT_OPTIONS} value={selectedOption} onChange={handleOptionChange} />
 
 				{selectedOption === RolloutOption.EXISTING_ALSO && (

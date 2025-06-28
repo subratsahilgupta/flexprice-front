@@ -197,11 +197,7 @@ const AddCreditNotePage = () => {
 	return (
 		<Page>
 			{/* Confirmation Dialog */}
-			<Dialog
-				isOpen={showConfirmModal}
-				onOpenChange={setShowConfirmModal}
-				title='Confirm Credit Note'
-				description='Review the details before proceeding.'>
+			<Dialog isOpen={showConfirmModal} onOpenChange={setShowConfirmModal} title='Confirm Credit Note'>
 				<div className='space-y-6 mt-6'>
 					{/* Summary */}
 					<div className='p-4 bg-gray-50 rounded-lg space-y-3'>
@@ -218,24 +214,13 @@ const AddCreditNotePage = () => {
 							<span className='text-sm text-gray-600'>Total Amount</span>
 							<span className='text-sm font-medium'>{formatCurrency(creditNotePreview.totalAmount, invoice?.currency || 'USD')}</span>
 						</div>
-						<div className='text-sm text-gray-600'>{creditNotePreview.effectDescription}</div>
 					</div>
-
-					{/* Line Items */}
-					<div className='space-y-3'>
-						<h4 className='text-sm font-medium'>Line Items to Credit</h4>
-						<div className='space-y-2'>
-							{validLineItems.map((item) => (
-								<div key={item.id} className='flex justify-between text-sm'>
-									<span className='text-gray-600'>{item.display_name}</span>
-									<span className='font-medium'>{formatCurrency(item.amount, invoice?.currency || 'USD')}</span>
-								</div>
-							))}
-						</div>
+					<div className=' border border-blue-200 rounded-lg p-4'>
+						<p className='text-sm text-blue-800'>{creditNotePreview.effectDescription}</p>
 					</div>
 
 					{/* Actions */}
-					<div className='flex justify-end gap-3 pt-4 border-t'>
+					<div className='flex justify-end gap-3 pt-4'>
 						<Button onClick={() => setShowConfirmModal(false)} variant='outline'>
 							Cancel
 						</Button>
@@ -254,7 +239,15 @@ const AddCreditNotePage = () => {
 			{/* Page Content */}
 			<div className='space-y-6'>
 				{/* Header */}
-				<h1 className='text-xl font-medium'>Issue Credit Note</h1>
+				<div className='flex items-center gap-2'>
+					<h1 className='text-xl font-medium'>Issue Credit Note</h1>
+					<span
+						className={`text-sm px-2 py-1 rounded ${
+							creditNotePreview.type === CREDIT_NOTE_TYPE.REFUND ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
+						}`}>
+						{creditNotePreview.type}
+					</span>
+				</div>
 
 				{/* Invoice Summary */}
 				<div className='bg-white border rounded-lg p-6'>
@@ -274,19 +267,48 @@ const AddCreditNotePage = () => {
 					</div>
 				</div>
 
+				<div className='flex flex-col gap-4 bg-white border rounded-lg p-6'>
+					{/* Reason */}
+					<div className='flex flex-col gap-4'>
+						<h3 className='text-sm font-semibold'>Reason for credit note</h3>
+						<Select
+							options={reasonOptions}
+							value={selectedReason}
+							onChange={(value) => setSelectedReason(value as CREDIT_NOTE_REASON)}
+							placeholder='Select a reason'
+							className='max-w-md'
+						/>
+					</div>
+
+					{/* Memo */}
+					<div className=''>
+						{!showMemo && <AddChargesButton onClick={() => setShowMemo(!showMemo)} label='Add Memo' />}
+						{showMemo && (
+							<Textarea
+								label='Memo (optional)'
+								value={memo}
+								onChange={(value) => setMemo(value)}
+								placeholder='This will appear on the credit note'
+								rows={3}
+								className='resize-none mt-4'
+							/>
+						)}
+					</div>
+				</div>
+
 				{/* Form */}
 				<div className='bg-white border rounded-lg divide-y'>
 					{/* Line Items */}
 					<div className='p-6'>
 						<div className='flex justify-between items-center mb-4'>
-							<h3 className='text-sm font-medium'>Line items to credit</h3>
+							<h3 className='text-sm font-semibold'>Line items to credit</h3>
 							<span className='text-sm text-gray-500'>Credit amount</span>
 						</div>
 						<div className='space-y-4'>
 							{lineItems.map((item) => (
 								<div key={item.id} className='flex items-center justify-between'>
 									<div className='flex-1'>
-										<div className='text-sm font-medium'>{item.display_name}</div>
+										<div className='text-sm font-normal'>{item.display_name}</div>
 										<div className='text-sm text-gray-500'>{formatCurrency(item.unit_price, invoice?.currency || 'USD')}</div>
 									</div>
 									<div className='ml-4'>
@@ -309,43 +331,25 @@ const AddCreditNotePage = () => {
 
 					{/* Totals */}
 					<div className='p-6'>
-						<div className='space-y-3'>
-							<div className='flex justify-between text-sm'>
-								<span className='text-gray-600'>Total amount to credit</span>
-								<span className='font-medium'>{formatCurrency(totalCreditAmount, invoice?.currency || 'USD')}</span>
-							</div>
-							<div className='flex justify-between text-sm font-medium pt-3 border-t'>
-								<span>{creditNotePreview.type === CREDIT_NOTE_TYPE.REFUND ? 'Amount to be refunded' : 'Amount to be adjusted'}</span>
-								<span>{formatCurrency(totalCreditAmount, invoice?.currency || 'USD')}</span>
+						<div className='flex justify-end'>
+							<div className='w-80 space-y-2'>
+								{/* Total amount to credit */}
+								<div className='flex justify-between items-center py-1'>
+									<span className='text-sm text-gray-600'>Total amount to credit</span>
+									<span className='text-sm text-gray-900 font-medium'>{formatCurrency(totalCreditAmount, invoice?.currency || 'USD')}</span>
+								</div>
+
+								{/* Final total with different styling */}
+								<div className='flex justify-between items-center py-3 border-t border-gray-200'>
+									<span className='text-base font-medium text-gray-900'>
+										{creditNotePreview.type === CREDIT_NOTE_TYPE.REFUND ? 'Amount to be refunded' : 'Amount to be adjusted'}
+									</span>
+									<span className='text-base font-semibold text-gray-900'>
+										{formatCurrency(totalCreditAmount, invoice?.currency || 'USD')}
+									</span>
+								</div>
 							</div>
 						</div>
-					</div>
-
-					{/* Reason */}
-					<div className='p-6'>
-						<h3 className='text-sm font-medium mb-4'>Reason for credit note</h3>
-						<Select
-							options={reasonOptions}
-							value={selectedReason}
-							onChange={(value) => setSelectedReason(value as CREDIT_NOTE_REASON)}
-							placeholder='Select a reason'
-							className='max-w-md'
-						/>
-					</div>
-
-					{/* Memo */}
-					<div className='p-6'>
-						{!showMemo && <AddChargesButton onClick={() => setShowMemo(!showMemo)} label='Add Memo' />}
-						{showMemo && (
-							<Textarea
-								label='Memo (optional)'
-								value={memo}
-								onChange={(value) => setMemo(value)}
-								placeholder='This will appear on the credit note'
-								rows={3}
-								className='resize-none mt-4'
-							/>
-						)}
 					</div>
 				</div>
 

@@ -1,5 +1,6 @@
 import { Card, FormHeader, Page, Spacer } from '@/components/atoms';
-import { ColumnData, InvoiceLineItemTable, SubscriptionPauseWarning } from '@/components/molecules';
+import { ColumnData, SubscriptionPauseWarning } from '@/components/molecules';
+import { SubscriptionPreviewLineItemTable } from '@/components/molecules/InvoiceLineItemTable';
 import SubscriptionActionButton from '@/components/organisms/Subscription/SubscriptionActionButton';
 import { getSubscriptionStatus } from '@/components/organisms/Subscription/SubscriptionTable';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -250,11 +251,8 @@ const SubscriptionDetails: FC = () => {
 
 			{(data?.line_items?.length ?? 0) > 0 && (
 				<div className='card !mt-4'>
-					<InvoiceLineItemTable
+					<SubscriptionPreviewLineItemTable
 						subtotal={data?.subtotal}
-						total={data?.total}
-						amount_paid={data?.amount_paid}
-						amount_remaining={Number(data?.amount_remaining)}
 						invoiceType={data?.invoice_type as INVOICE_TYPE}
 						refetch={refetch}
 						currency={data?.currency}

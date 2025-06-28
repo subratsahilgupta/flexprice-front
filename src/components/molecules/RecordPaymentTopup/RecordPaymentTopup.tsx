@@ -1,4 +1,4 @@
-import { Button, Input, Select } from '@/components/atoms';
+import { Button, Input, Select, Textarea } from '@/components/atoms';
 import { FC, useState, useEffect } from 'react';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import { PAYMENT_METHOD_TYPE, PAYMENT_DESTINATION_TYPE, Payment } from '@/models/Payment';
@@ -216,13 +216,12 @@ const RecordPaymentTopup: FC<Props> = ({
 
 	const renderPaymentMethodFields = () => {
 		const commonDescriptionField = (
-			<Input
-				label='Description (Optional)'
+			<Textarea
+				label='Description'
 				placeholder='Add payment description or notes'
 				value={formData.description || ''}
 				onChange={(value) => setFormData({ ...formData, description: value })}
 				error={errors.description}
-				description='Optional description for this payment'
 			/>
 		);
 
