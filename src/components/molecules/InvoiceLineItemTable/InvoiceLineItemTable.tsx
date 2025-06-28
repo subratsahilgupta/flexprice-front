@@ -170,7 +170,7 @@ const InvoiceLineItemTable: FC<Props> = ({
 							</div>
 						)}
 
-						{/* Amount paid - always show, default to 0 if not provided */}
+						{/* Amount due - always show, default to 0 if not provided */}
 						<div className='flex justify-between items-center py-1'>
 							<span className='text-sm text-gray-600'>Amount due</span>
 							<span className='text-sm text-gray-900 font-medium'>{formatAmount(Number(amount_due ?? 0), currency ?? '')}</span>
