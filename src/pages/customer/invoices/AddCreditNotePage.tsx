@@ -268,9 +268,7 @@ const AddCreditNotePage = () => {
 							<div className='text-sm text-gray-500'>Amount Paid</div>
 						</div>
 						<div>
-							<div className='text-sm font-medium'>
-								{formatCurrency(parseFloat(invoice?.amount_remaining || '0'), invoice?.currency || 'USD')}
-							</div>
+							<div className='text-sm font-medium'>{formatCurrency(Number(invoice?.amount_remaining), invoice?.currency || 'USD')}</div>
 							<div className='text-sm text-gray-500'>Amount Remaining</div>
 						</div>
 					</div>

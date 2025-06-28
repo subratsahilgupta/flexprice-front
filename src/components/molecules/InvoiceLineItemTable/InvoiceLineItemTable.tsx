@@ -55,9 +55,21 @@ const InvoiceLineItemTable: FC<Props> = ({
 	subtotal,
 	total,
 }) => {
-	// Calculate total excluding tax for Stripe-style display
-	const totalExcludingTax = subtotal !== undefined ? subtotal : total !== undefined && tax !== undefined ? total - tax : undefined;
+	console.log('amount_remaining', amount_remaining);
 
+	console.log('amount_paid', amount_paid);
+
+	console.log('total', total);
+
+	console.log('subtotal', subtotal);
+
+	console.log('tax', tax);
+
+	console.log('discount', discount);
+
+	console.log('amount_due', amount_due);
+
+	console.log('currency', currency);
 	return (
 		<div className='bg-white'>
 			<div className='w-full p-6'>
@@ -125,67 +137,61 @@ const InvoiceLineItemTable: FC<Props> = ({
 
 				{/* Stripe-style Summary Section */}
 				<div className='flex justify-end'>
-					<div className='w-80 space-y-3'>
-						{/* Subtotal */}
-						{subtotal !== undefined && subtotal !== null && (
-							<div className='flex justify-between items-center py-2'>
+					<div className='w-80 space-y-2'>
+						{/* Subtotal - always show if exists */}
+						{subtotal !== undefined && subtotal !== null && Number(subtotal) !== 0 && (
+							<div className='flex justify-between items-center py-1'>
 								<span className='text-sm text-gray-600'>Subtotal</span>
-								<span className='text-sm text-gray-900 font-medium'>{formatAmount(subtotal, currency ?? '')}</span>
+								<span className='text-sm text-gray-900 font-medium'>{formatAmount(Number(subtotal), currency ?? '')}</span>
 							</div>
 						)}
 
-						{/* Total excluding tax */}
-						{totalExcludingTax !== undefined && totalExcludingTax !== null && (
-							<div className='flex justify-between items-center py-2'>
-								<span className='text-sm text-gray-600'>Total excluding tax</span>
-								<span className='text-sm text-gray-900 font-medium'>{formatAmount(totalExcludingTax, currency ?? '')}</span>
+						{/* Tax - only show if provided and > 0 */}
+						{tax !== undefined && tax !== null && Number(tax) > 0 && (
+							<div className='flex justify-between items-center py-1'>
+								<span className='text-sm text-gray-600'>Tax</span>
+								<span className='text-sm text-gray-900 font-medium'>{formatAmount(Number(tax), currency ?? '')}</span>
 							</div>
 						)}
 
-						{/* Tax */}
-						<div className='flex justify-between items-center py-2'>
-							<span className='text-sm text-gray-600'>Tax</span>
-							<span className='text-sm text-gray-900 font-medium'>
-								{tax !== undefined && tax !== null && tax > 0 ? formatAmount(tax, currency ?? '') : '–'}
-							</span>
-						</div>
-
-						{/* Discount */}
-						{discount !== undefined && discount !== null && discount > 0 && (
-							<div className='flex justify-between items-center py-2'>
+						{/* Discount - only show if provided and > 0 */}
+						{discount !== undefined && discount !== null && Number(discount) > 0 && (
+							<div className='flex justify-between items-center py-1'>
 								<span className='text-sm text-gray-600'>Discount</span>
-								<span className='text-sm text-gray-900 font-medium'>−{formatAmount(discount, currency ?? '')}</span>
+								<span className='text-sm text-gray-900 font-medium'>−{formatAmount(Number(discount), currency ?? '')}</span>
 							</div>
 						)}
 
-						{/* Total */}
-						{total !== undefined && total !== null && (
+						{/* Total - always show if exists */}
+						{total !== undefined && total !== null && Number(total) !== 0 && (
 							<div className='flex justify-between items-center py-3 border-t border-gray-200'>
 								<span className='text-sm font-medium text-gray-900'>Total</span>
-								<span className='text-sm font-semibold text-gray-900'>{formatAmount(total, currency ?? '')}</span>
+								<span className='text-sm font-semibold text-gray-900'>{formatAmount(Number(total), currency ?? '')}</span>
 							</div>
 						)}
 
-						{/* Amount paid */}
-						<div className='flex justify-between items-center py-2'>
-							<span className='text-sm text-gray-600'>Amount paid</span>
-							<span className='text-sm text-gray-900 font-medium'>
-								{amount_paid !== undefined && amount_paid !== null
-									? formatAmount(amount_paid, currency ?? '')
-									: formatAmount(0, currency ?? '')}
-							</span>
+						{/* Amount paid - always show, default to 0 if not provided */}
+						<div className='flex justify-between items-center py-1'>
+							<span className='text-sm text-gray-600'>Amount due</span>
+							<span className='text-sm text-gray-900 font-medium'>{formatAmount(Number(amount_due ?? 0), currency ?? '')}</span>
 						</div>
 
-						{/* Amount remaining */}
-						{(amount_remaining !== undefined && amount_remaining !== null && amount_remaining > 0) ||
-							(amount_due !== undefined && amount_due !== null && amount_due > 0 && (
-								<div className='flex justify-between items-center py-3 border-t border-gray-200'>
-									<span className='text-base font-medium text-gray-900'>Amount remaining</span>
-									<span className='text-base font-semibold text-gray-900'>
-										{formatAmount(amount_remaining ?? amount_due ?? 0, currency ?? '')}
-									</span>
-								</div>
-							))}
+						{/* Amount paid - always show, default to 0 if not provided */}
+						<div className='flex justify-between items-center py-1'>
+							<span className='text-sm text-gray-600'>Amount paid</span>
+							<span className='text-sm text-gray-900 font-medium'>{formatAmount(Number(amount_paid ?? 0), currency ?? '')}</span>
+						</div>
+
+						{/* Amount remaining/due - show the final outstanding amount */}
+						{((amount_remaining !== undefined && amount_remaining !== null && Number(amount_remaining) > 0) ||
+							(amount_due !== undefined && amount_due !== null && Number(amount_due) > 0)) && (
+							<div className='flex justify-between items-center py-3 border-t border-gray-200'>
+								<span className='text-base font-medium text-gray-900'>Amount remaining</span>
+								<span className='text-base font-semibold text-gray-900'>
+									{formatAmount(Number(amount_remaining ?? amount_due ?? 0), currency ?? '')}
+								</span>
+							</div>
+						)}
 					</div>
 				</div>
 			</div>

@@ -70,9 +70,7 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 				attemptPayment(data.id);
 			},
 			disabled:
-				data?.payment_status === PAYMENT_STATUS.SUCCEEDED ||
-				data?.invoice_status === INVOICE_STATUS.VOIDED ||
-				data.amount_remaining === '0',
+				data?.payment_status === PAYMENT_STATUS.SUCCEEDED || data?.invoice_status === INVOICE_STATUS.VOIDED || data.amount_remaining === 0,
 		},
 		{
 			label: 'Record Payment',
@@ -85,9 +83,7 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 				});
 			},
 			disabled:
-				data?.payment_status === PAYMENT_STATUS.SUCCEEDED ||
-				data?.invoice_status === INVOICE_STATUS.VOIDED ||
-				data.amount_remaining === '0',
+				data?.payment_status === PAYMENT_STATUS.SUCCEEDED || data?.invoice_status === INVOICE_STATUS.VOIDED || data.amount_remaining === 0,
 		},
 		{
 			label: 'Update Invoice Status',
@@ -176,7 +172,7 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 				destination_id={data.id}
 				destination_type={PAYMENT_DESTINATION_TYPE.INVOICE}
 				customer_id={data.customer_id}
-				max_amount={parseFloat(data.amount_remaining || '0')}
+				max_amount={Number(data.amount_remaining)}
 				currency={data.currency}
 				onSuccess={handlePaymentSuccess}
 			/>

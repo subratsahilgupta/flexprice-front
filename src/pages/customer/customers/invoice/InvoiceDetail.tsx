@@ -158,7 +158,7 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 					subtotal={data?.subtotal}
 					total={data?.total}
 					amount_paid={data?.amount_paid}
-					amount_remaining={data?.amount_remaining}
+					amount_remaining={Number(data?.amount_remaining)}
 					data={data?.line_items ?? []}
 					amount_due={data?.amount_due}
 					currency={data?.currency}
