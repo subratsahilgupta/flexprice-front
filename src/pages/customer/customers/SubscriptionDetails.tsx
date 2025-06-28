@@ -251,6 +251,10 @@ const SubscriptionDetails: FC = () => {
 			{(data?.line_items?.length ?? 0) > 0 && (
 				<div className='card !mt-4'>
 					<InvoiceLineItemTable
+						subtotal={data?.subtotal ?? 0}
+						total={data?.total ?? 0}
+						amount_paid={data?.amount_paid}
+						amount_remaining={data?.amount_remaining}
 						invoiceType={data?.invoice_type as INVOICE_TYPE}
 						refetch={refetch}
 						currency={data?.currency}

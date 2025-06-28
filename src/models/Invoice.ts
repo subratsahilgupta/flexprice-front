@@ -13,8 +13,10 @@ export interface Invoice extends BaseModel {
 	readonly currency: string;
 	readonly invoice_pdf_url: string;
 	readonly amount_due: number;
+	readonly subtotal: number;
+	readonly total: number;
 	readonly amount_paid: number;
-	readonly amount_remaining: string;
+	readonly amount_remaining: number;
 	readonly invoice_number: string;
 	readonly idempotency_key: string;
 	readonly billing_sequence: number;
