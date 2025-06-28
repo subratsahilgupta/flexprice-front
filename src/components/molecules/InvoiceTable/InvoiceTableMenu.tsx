@@ -19,18 +19,18 @@ interface Props {
 const InvoiceTableMenu: FC<Props> = ({ data }) => {
 	const navigate = useNavigate();
 
-	const { mutate: attemptPayment } = useMutation({
-		mutationFn: async (invoice_id: string) => {
-			return await InvoiceApi.attemptPayment(invoice_id);
-		},
-		onSuccess: () => {
-			toast.success('Invoice paid successfully');
-			refetchQueries();
-		},
-		onError: (error: ServerError) => {
-			toast.error(error.error.message || 'Unable to pay invoice. Please try again.');
-		},
-	});
+	// const { mutate: attemptPayment } = useMutation({
+	// 	mutationFn: async (invoice_id: string) => {
+	// 		return await InvoiceApi.attemptPayment(invoice_id);
+	// 	},
+	// 	onSuccess: () => {
+	// 		toast.success('Invoice paid successfully');
+	// 		refetchQueries();
+	// 	},
+	// 	onError: (error: ServerError) => {
+	// 		toast.error(error.error.message || 'Unable to pay invoice. Please try again.');
+	// 	},
+	// });
 
 	const { mutate: downloadInvoice } = useMutation({
 		mutationFn: async (invoice_id: string, invoice_number?: string) => {
@@ -63,15 +63,15 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 				downloadInvoice(data.id);
 			},
 		},
-		{
-			label: 'Attempt Payment',
-			group: 'Actions',
-			onSelect: () => {
-				attemptPayment(data.id);
-			},
-			disabled:
-				data?.payment_status === PAYMENT_STATUS.SUCCEEDED || data?.invoice_status === INVOICE_STATUS.VOIDED || data.amount_remaining === 0,
-		},
+		// {
+		// 	label: 'Attempt Payment',
+		// 	group: 'Actions',
+		// 	onSelect: () => {
+		// 		attemptPayment(data.id);
+		// 	},
+		// 	disabled:
+		// 		data?.payment_status === PAYMENT_STATUS.SUCCEEDED || data?.invoice_status === INVOICE_STATUS.VOIDED || data.amount_remaining === 0,
+		// },
 		{
 			label: 'Record Payment',
 			group: 'Actions',

@@ -66,27 +66,37 @@ const RecordPaymentTopup: FC<Props> = ({
 	});
 
 	// Filter wallets by currency and create options
-	const walletOptions =
-		wallets
-			?.filter((wallet) => wallet.currency === currency)
-			?.map((wallet) => ({
-				label: `${wallet.name || 'Unnamed Wallet'} (${getCurrencySymbol(wallet.currency)}${wallet.balance || 0})`,
-				value: wallet.id,
-			})) || [];
+	const filteredWallets = wallets?.filter((wallet) => wallet.currency === currency) || [];
+
+	const walletOptions = filteredWallets.map((wallet) => ({
+		label: `${wallet.name || 'Unnamed Wallet'} (${getCurrencySymbol(wallet.currency)}${wallet.balance || 0})`,
+		value: wallet.id,
+	}));
+
+	// Create select options - only include auto-select if there are multiple wallets
+	const selectOptions =
+		filteredWallets.length > 1 ? [{ label: 'From all wallets', value: '__auto_select__' }, ...walletOptions] : walletOptions;
+
+	useEffect(() => {
+		if (formData.payment_method_type === PAYMENT_METHOD_TYPE.CREDITS && filteredWallets.length === 1) {
+			// Auto-set single wallet without showing auto-select option
+			setFormData((prev) => ({ ...prev, wallet_id: filteredWallets[0].id }));
+		}
+	}, [filteredWallets, formData.payment_method_type]);
 
 	const paymentMethodOptions = [
-		{
-			label: 'Card',
-			value: PAYMENT_METHOD_TYPE.CARD,
-			disabled: true,
-			description: 'Card payment processing is not available yet',
-		},
-		{
-			label: 'ACH',
-			value: PAYMENT_METHOD_TYPE.ACH,
-			disabled: true,
-			description: 'ACH payment processing is not available yet',
-		},
+		// {
+		// 	label: 'Card',
+		// 	value: PAYMENT_METHOD_TYPE.CARD,
+		// 	disabled: true,
+		// 	description: 'Card payment processing is not available yet',
+		// },
+		// {
+		// 	label: 'ACH',
+		// 	value: PAYMENT_METHOD_TYPE.ACH,
+		// 	disabled: true,
+		// 	description: 'ACH payment processing is not available yet',
+		// },
 		{
 			label: 'Offline',
 			value: PAYMENT_METHOD_TYPE.OFFLINE,
@@ -131,9 +141,10 @@ const RecordPaymentTopup: FC<Props> = ({
 		// Validate payment method specific fields
 		switch (formData.payment_method_type) {
 			case PAYMENT_METHOD_TYPE.OFFLINE:
-				if (!formData.reference_id?.trim()) {
-					newErrors.reference_id = 'Reference ID is required for offline payments';
-				}
+				// if (!formData.reference_id?.trim()) {
+				// newErrors.reference_id = 'Reference ID is required for offline payments';
+				// }
+				// No need to validate reference_id for offline payments
 				break;
 
 			case PAYMENT_METHOD_TYPE.CARD:
@@ -145,7 +156,7 @@ const RecordPaymentTopup: FC<Props> = ({
 			case PAYMENT_METHOD_TYPE.CREDITS:
 				// Wallet selection is optional - backend will auto-select if not provided
 				// But if no wallets are available, show error
-				if (walletOptions.length === 0) {
+				if (filteredWallets.length === 0) {
 					newErrors.wallet_id = `No ${currency} wallets available. Please create a wallet first.`;
 				}
 				break;
@@ -220,7 +231,7 @@ const RecordPaymentTopup: FC<Props> = ({
 				return (
 					<div className='space-y-3'>
 						<Input
-							label='Reference ID*'
+							label='Reference ID'
 							placeholder='Enter payment reference ID'
 							value={formData.reference_id || ''}
 							onChange={(value) => setFormData({ ...formData, reference_id: value })}
@@ -235,18 +246,20 @@ const RecordPaymentTopup: FC<Props> = ({
 				return (
 					<div className='space-y-3'>
 						<Select
-							label='Select Wallet (Optional)'
-							placeholder={walletOptions.length === 0 ? 'No wallets available with matching currency' : 'Choose a wallet or auto-select'}
-							options={[{ label: 'Auto-select wallet', value: '__auto_select__' }, ...walletOptions]}
-							value={formData.wallet_id || '__auto_select__'}
+							label='Wallet'
+							placeholder={
+								filteredWallets.length === 0
+									? 'No wallets available with matching currency'
+									: filteredWallets.length === 1
+										? 'Wallet auto-selected'
+										: 'Choose a wallet or auto-select'
+							}
+							options={selectOptions}
+							value={formData.wallet_id || (filteredWallets.length > 1 ? '__auto_select__' : '')}
 							onChange={(value) => setFormData({ ...formData, wallet_id: value === '__auto_select__' ? '' : value })}
 							error={errors.wallet_id}
-							description={
-								walletOptions.length === 0
-									? `No ${currency} wallets available. Please create a wallet first.`
-									: `Select a specific ${currency} wallet or let the system auto-select the best one.`
-							}
-							disabled={walletOptions.length === 0}
+							description='Select a specific wallet or let the system choose from all wallets.'
+							disabled={filteredWallets.length === 0}
 						/>
 						{commonDescriptionField}
 					</div>
@@ -285,7 +298,7 @@ const RecordPaymentTopup: FC<Props> = ({
 						value={formData.amount.toString()}
 						onChange={(value) => setFormData({ ...formData, amount: Number(value) || 0 })}
 						error={errors.amount}
-						description={max_amount ? `Maximum amount: ${getCurrencySymbol(currency)}${max_amount}` : undefined}
+						description={max_amount ? `Amount Due:${getCurrencySymbol(currency)}${max_amount}` : undefined}
 					/>
 
 					<Select
@@ -308,15 +321,17 @@ const RecordPaymentTopup: FC<Props> = ({
 
 					{formData.payment_method_type && <div className=''>{renderPaymentMethodFields()}</div>}
 
-					<div className='pt-2'>
-						<Button onClick={handleSubmit} disabled={isPending} isLoading={isPending} className='w-full'>
+					<div className='pt-2 flex justify-end'>
+						<Button variant='outline' onClick={() => onOpenChange(false)} className='mr-2'>
+							Cancel
+						</Button>
+						<Button onClick={handleSubmit} disabled={isPending} isLoading={isPending}>
 							{isPending ? (
 								<>
 									<LoaderCircleIcon className='w-4 h-4 animate-spin mr-2' />
-									Recording Payment...
 								</>
 							) : (
-								'Record Payment'
+								'Record'
 							)}
 						</Button>
 					</div>
