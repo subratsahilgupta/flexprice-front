@@ -4,19 +4,14 @@ import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { AppPortal } from 'svix-react';
 
-interface WebhookDashboardResponse {
-	url: string;
-	token: string;
-}
-
 const WebhookDashboard = () => {
 	const {
 		data: webhookDashboardResponse,
 		isLoading,
 		isError,
-	} = useQuery<WebhookDashboardResponse>({
+	} = useQuery({
 		queryKey: ['webhookDashboardUrl'],
-		queryFn: WebhookApi.getWebhookDashboardUrl,
+		queryFn: async () => await WebhookApi.getWebhookDashboardUrl(),
 	});
 
 	if (isLoading) {
@@ -39,7 +34,7 @@ const WebhookDashboard = () => {
 					border: 'none',
 					backgroundColor: '#000000',
 				}}
-				url={webhookDashboardResponse?.url}
+				url={webhookDashboardResponse?.url ?? ''}
 			/>
 		</Page>
 	);
