@@ -79,16 +79,29 @@ const AddEntitlementDrawer: FC<Props> = ({
 			return newErrors;
 		}
 
-		if (tempEntitlement.usage_limit === undefined && tempEntitlement.usage_limit !== null) {
-			newErrors.usage_limit = 'Usage limit is required';
-		} else if (tempEntitlement.usage_limit !== null && tempEntitlement.usage_limit < 0) {
-			newErrors.usage_limit = 'Usage limit cannot be negative';
+		const isInfinite = tempEntitlement.usage_limit === null;
+		const isResetNever = activeFeature?.meter?.reset_usage === METER_USAGE_RESET_PERIOD.NEVER;
+
+		// If reset period is set to NEVER, usage limit is required (cannot be infinite)
+		if (isResetNever) {
+			if (tempEntitlement.usage_limit !== undefined && tempEntitlement.usage_limit !== null && tempEntitlement.usage_limit < 0) {
+				newErrors.usage_limit = 'Usage limit cannot be negative';
+			}
+		} else {
+			// Normal validation for usage limit when reset is not NEVER
+			if (tempEntitlement.usage_limit === undefined) {
+				newErrors.usage_limit = 'Usage limit is required';
+			} else if (tempEntitlement.usage_limit !== null && tempEntitlement.usage_limit < 0) {
+				newErrors.usage_limit = 'Usage limit cannot be negative';
+			}
 		}
 
-		const usageDisabled = activeFeature?.meter?.reset_usage === METER_USAGE_RESET_PERIOD.NEVER;
-
-		if (!usageDisabled && (!tempEntitlement.usage_reset_period || tempEntitlement.usage_reset_period === '')) {
-			newErrors.usage_reset_period = 'Usage reset period is required';
+		// If user sets to infinite, don't require usage reset period
+		// If reset is NEVER, usage reset period is not applicable
+		if (!isInfinite && !isResetNever) {
+			if (!tempEntitlement.usage_reset_period || tempEntitlement.usage_reset_period === '') {
+				newErrors.usage_reset_period = 'Usage reset period is required';
+			}
 		}
 
 		return newErrors;
