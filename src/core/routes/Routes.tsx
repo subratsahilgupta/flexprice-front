@@ -16,8 +16,10 @@ import Invoice from '@/pages/customer/tabs/Invoice';
 import Overview from '@/pages/customer/tabs/Overview';
 import WalletTab from '@/pages/customer/tabs/Wallet';
 import SubscriptionDetails from '@/pages/customer/customers/SubscriptionDetails';
-import AddCreditPage from '@/pages/customer/invoices/AddCreditPage';
-import CreditNote from '@/pages/customer/tabs/CreditNote';
+import AddCreditPage from '@/pages/customer/invoices/AddCreditNotePage';
+import CreditNote from '@/pages/customer/creditnotes/CreditNote';
+import CreditNotesPage from '@/pages/customer/creditnotes/CreditNotesPage';
+import CreditNoteDetailsPage from '@/pages/customer/creditnotes/CreditNoteDetailsPage';
 import AddFeaturePage from '@/pages/product-catalog/features/AddFeature';
 import FeaturesPage from '@/pages/product-catalog/features/Features';
 import ImportExport from '@/pages/customer/import-export/ImportExport';
@@ -62,6 +64,7 @@ export const RouteNames = {
 	customers: '/customer-management/customers',
 	invoices: '/customer-management/invoices',
 	createInvoice: '/customer-management/customers/:customerId/invoices/create',
+	creditNotes: '/customer-management/credit-notes',
 	payments: '/customer-management/payments',
 
 	// product catalog routes
@@ -258,6 +261,14 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: `${RouteNames.invoices}/:invoiceId`,
 						element: <InvoiceDetailsPage />,
+					},
+					{
+						path: RouteNames.creditNotes,
+						element: <CreditNotesPage />,
+					},
+					{
+						path: `${RouteNames.creditNotes}/:credit_note_id`,
+						element: <CreditNoteDetailsPage />,
 					},
 				],
 			},

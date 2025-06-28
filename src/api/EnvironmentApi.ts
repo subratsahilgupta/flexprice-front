@@ -1,5 +1,5 @@
 import { AxiosClient } from '@/core/axios/verbs';
-import { PaginationType } from '@/models/Pagination';
+import { Pagination } from '@/models/Pagination';
 
 export interface Environment {
 	id: string;
@@ -23,7 +23,7 @@ export interface ExtendedEnvironment extends Environment {
 
 const STORAGE_KEY = 'flex_price_environments';
 
-interface EnvironmentResponse extends PaginationType {
+interface EnvironmentResponse extends Pagination {
 	environments: Environment[];
 }
 
@@ -35,7 +35,6 @@ class EnvironmentApi {
 		try {
 			return await AxiosClient.get<EnvironmentResponse>(this.baseUrl);
 		} catch (error) {
-			console.error('Error fetching environments:', error);
 			// Return empty environments to prevent UI crashes
 			// Explicitly cast to match the expected type
 			return { environments: [], total: 0 } as EnvironmentResponse;
@@ -46,7 +45,6 @@ class EnvironmentApi {
 		try {
 			return await AxiosClient.get<Environment>(`${this.baseUrl}/${id}`);
 		} catch (error) {
-			console.error(`Error fetching environment with ID ${id}:`, error);
 			return null;
 		}
 	}
@@ -55,7 +53,6 @@ class EnvironmentApi {
 		try {
 			return await AxiosClient.post<Environment>(this.baseUrl, payload);
 		} catch (error) {
-			console.error('Error creating environment:', error);
 			return null;
 		}
 	}
@@ -66,7 +63,6 @@ class EnvironmentApi {
 			const stored = localStorage.getItem(STORAGE_KEY);
 			return stored ? JSON.parse(stored) : [];
 		} catch (error) {
-			console.error('Error retrieving stored environments:', error);
 			return [];
 		}
 	}
@@ -89,7 +85,7 @@ class EnvironmentApi {
 			}));
 			localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedEnvironments));
 		} catch (error) {
-			console.error('Error setting active environment:', error);
+			console.log('Error setting active environment:', error);
 		}
 	}
 

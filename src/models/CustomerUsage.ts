@@ -1,22 +1,23 @@
+import { BaseModel } from './base';
 import Feature from './Feature';
 
-interface CustomerUsage {
-	current_usage: number;
-	feature: Feature;
-	is_enabled: boolean;
-	is_soft_limit: boolean;
-	sources: {
-		entitlement_id: string;
-		is_enabled: boolean;
-		plan_id: string;
-		plan_name: string;
-		quantity: number;
-		static_value: string;
-		subscription_id: string;
+interface CustomerUsage extends BaseModel {
+	readonly current_usage: number;
+	readonly feature: Feature;
+	readonly is_enabled: boolean;
+	readonly is_soft_limit: boolean;
+	readonly sources: {
+		readonly entitlement_id: string;
+		readonly is_enabled: boolean;
+		readonly plan_id: string;
+		readonly plan_name: string;
+		readonly quantity: number;
+		readonly static_value: string;
+		readonly subscription_id: string;
 		usage_limit?: number;
 	}[];
-	total_limit: number;
-	usage_percent: number;
+	readonly total_limit: number;
+	readonly usage_percent: number;
 }
 
 export default CustomerUsage;

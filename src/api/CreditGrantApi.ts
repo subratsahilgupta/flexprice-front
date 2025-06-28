@@ -1,14 +1,14 @@
 import { AxiosClient } from '@/core/axios/verbs';
-import { PaginationType } from '@/models/Pagination';
+import { Pagination } from '@/models/Pagination';
 import { generateQueryParams } from '@/utils/common/api_helper';
 import { CreditGrant } from '@/models/CreditGrant';
 
 interface GetGrantCreditResponse {
 	items: CreditGrant[];
-	pagination: PaginationType;
+	pagination: Pagination;
 }
 
-interface GetCreditGrantRequest extends PaginationType {
+interface GetCreditGrantRequest extends Pagination {
 	subscription_ids?: string[];
 	status?: string;
 	sort?: string;

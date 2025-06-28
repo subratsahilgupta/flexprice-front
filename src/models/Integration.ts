@@ -1,13 +1,11 @@
-export interface Integration {
-	created_at: string;
-	display_id: string;
-	expires_at: string;
-	id: string;
-	last_used_at: string;
-	name: string;
-	permissions: string[];
-	provider: string;
-	status: string;
-	type: string;
-	updated_at: string;
+import { BaseModel } from './base';
+
+export interface Integration extends BaseModel {
+	readonly display_id: string;
+	readonly expires_at: string;
+	readonly last_used_at: string;
+	readonly name: string;
+	readonly permissions: string[];
+	readonly provider: string;
+	readonly type: string;
 }

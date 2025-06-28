@@ -1,5 +1,5 @@
 import { AxiosClient } from '@/core/axios/verbs';
-import { PaginationType } from '@/models/Pagination';
+import { Pagination } from '@/models/Pagination';
 import { SecretKey } from '@/models/SecretKey';
 import { generateQueryParams } from '@/utils/common/api_helper';
 import { GetAllSecretKeysResponse, CreateSecretKeyPayload, CreateSecretKeyResponse } from '@/types/dto';
@@ -22,7 +22,7 @@ export const formatPermissionDisplay = (permissions: string[]): string => {
 class SecretKeysApi {
 	private static baseUrl = '/secrets/api/keys';
 
-	public static async getAllSecretKeys(pagination: PaginationType) {
+	public static async getAllSecretKeys(pagination: Pagination) {
 		const url = generateQueryParams(this.baseUrl, pagination);
 		return await AxiosClient.get<GetAllSecretKeysResponse>(url);
 	}

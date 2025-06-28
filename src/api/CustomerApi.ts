@@ -1,6 +1,6 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import Customer from '@/models/Customer';
-import { PaginationType } from '@/models/Pagination';
+import { Pagination } from '@/models/Pagination';
 import { Subscription } from '@/models/Subscription';
 import {
 	GetCustomerResponse,
@@ -19,7 +19,7 @@ class CustomerApi {
 	public static async getCustomerById(id: string): Promise<Customer> {
 		return await AxiosClient.get(`${this.baseUrl}/${id}`);
 	}
-	public static async getAllCustomers({ limit = 10, offset = 0 }: PaginationType): Promise<GetCustomerResponse> {
+	public static async getAllCustomers({ limit = 10, offset = 0 }: Pagination): Promise<GetCustomerResponse> {
 		const url = generateQueryParams(this.baseUrl, { limit, offset });
 		return await AxiosClient.get(url);
 	}

@@ -1,9 +1,8 @@
 import { Button, Input, Label, Select, SelectOption } from '@/components/atoms';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { CREDIT_GRANT_EXPIRATION_TYPE, CREDIT_GRANT_PERIOD, CreditGrant } from '@/models/CreditGrant';
+import { CREDIT_GRANT_CADENCE, CREDIT_GRANT_EXPIRATION_TYPE, CREDIT_GRANT_PERIOD, CreditGrant } from '@/models/CreditGrant';
 import { useCallback, useMemo, useState } from 'react';
 import RectangleRadiogroup, { RectangleRadiogroupOption } from '../RectangleRadiogroup';
-import { BILLING_CADENCE } from '@/models/Invoice';
 import { creditGrantPeriodOptions } from '@/constants/constants';
 
 interface Props {
@@ -69,7 +68,7 @@ const CreditGrantModal: React.FC<Props> = ({ data, isOpen, onOpenChange, onSave,
 		}
 
 		// Remove period if not recurring
-		if (sanitized.cadence !== BILLING_CADENCE.RECURRING) {
+		if (sanitized.cadence !== CREDIT_GRANT_CADENCE.RECURRING) {
 			const { period, ...rest } = sanitized;
 			sanitized = rest as CreditGrant;
 		}
@@ -105,7 +104,7 @@ const CreditGrantModal: React.FC<Props> = ({ data, isOpen, onOpenChange, onSave,
 		}
 
 		// Validate period (only for recurring credits)
-		if (formData.cadence === BILLING_CADENCE.RECURRING && !formData.period) {
+		if (formData.cadence === CREDIT_GRANT_CADENCE.RECURRING && !formData.period) {
 			newErrors.period = 'Grant period is required for recurring credits';
 		}
 
@@ -159,12 +158,12 @@ const CreditGrantModal: React.FC<Props> = ({ data, isOpen, onOpenChange, onSave,
 		return [
 			{
 				label: 'One-time',
-				value: BILLING_CADENCE.ONETIME,
+				value: CREDIT_GRANT_CADENCE.ONETIME,
 				description: 'This credit will be applied to the subscription once.',
 			},
 			{
 				label: 'Recurring',
-				value: BILLING_CADENCE.RECURRING,
+				value: CREDIT_GRANT_CADENCE.RECURRING,
 				description: 'This credit will be applied to the subscription every billing period.',
 			},
 		];
@@ -189,7 +188,7 @@ const CreditGrantModal: React.FC<Props> = ({ data, isOpen, onOpenChange, onSave,
 								description: undefined,
 							}))}
 							value={formData.cadence}
-							onChange={(value) => handleFieldChange('cadence', value as BILLING_CADENCE)}
+							onChange={(value) => handleFieldChange('cadence', value as CREDIT_GRANT_CADENCE)}
 						/>
 						{selectedCadenceDescription && <p className='text-sm text-gray-500'>{selectedCadenceDescription}</p>}
 					</div>
@@ -221,7 +220,7 @@ const CreditGrantModal: React.FC<Props> = ({ data, isOpen, onOpenChange, onSave,
 						/>
 					</div>
 
-					{formData.cadence === BILLING_CADENCE.RECURRING && (
+					{formData.cadence === CREDIT_GRANT_CADENCE.RECURRING && (
 						<div className='space-y-2'>
 							<Label label='Grant Period' />
 							<Select

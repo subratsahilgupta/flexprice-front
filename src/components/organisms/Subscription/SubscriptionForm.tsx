@@ -13,8 +13,8 @@ import {
 	CREDIT_GRANT_PERIOD_UNIT,
 	CREDIT_SCOPE,
 	CreditGrant,
+	CREDIT_GRANT_CADENCE,
 } from '@/models/CreditGrant';
-import { BILLING_CADENCE } from '@/models/Invoice';
 import { BILLING_PERIOD } from '@/constants/constants';
 import { Pencil } from 'lucide-react';
 import { Trash2 } from 'lucide-react';
@@ -114,11 +114,11 @@ const SubscriptionForm = ({
 				label: toSentenceCase(period.replace('_', ' ')),
 				value: period,
 			})),
-			phases: [newPhase],
+			phases: [newPhase as SubscriptionPhase],
 			phaseStates: [SubscriptionPhaseState.EDIT], // Initial phase is in edit state
 			selectedPhase: 0, // Select the only phase
 			isPhaseEditing: true, // Set editing mode
-			originalPhases: [newPhase], // Store original state
+			originalPhases: [newPhase as SubscriptionPhase], // Store original state
 		});
 	};
 
@@ -141,7 +141,7 @@ const SubscriptionForm = ({
 	};
 
 	// Get empty phase with proper billing cycle
-	const getEmptyPhase = (billingCycle = BILLING_CYCLE.ANNIVERSARY): SubscriptionPhase => {
+	const getEmptyPhase = (billingCycle = BILLING_CYCLE.ANNIVERSARY): Partial<SubscriptionPhase> => {
 		return {
 			billing_cycle: billingCycle,
 			start_date: new Date(),
@@ -160,7 +160,7 @@ const SubscriptionForm = ({
 			period: CREDIT_GRANT_PERIOD.MONTHLY,
 			name: 'Free Credits',
 			scope: CREDIT_SCOPE.SUBSCRIPTION,
-			cadence: BILLING_CADENCE.ONETIME,
+			cadence: CREDIT_GRANT_CADENCE.ONETIME,
 			period_count: 1,
 			plan_id: state.selectedPlan,
 			expiration_type: CREDIT_GRANT_EXPIRATION_TYPE.NEVER,

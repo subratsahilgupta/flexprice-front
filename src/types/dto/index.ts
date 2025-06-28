@@ -52,4 +52,15 @@ export type { CreateUserRequest, UpdateTenantPayload } from './User';
 
 export type { CreateWalletPayload, TopupWalletPayload, WalletTransactionResponse, WalletTransactionPayload } from './Wallet';
 
+export type {
+	GetAllCreditNotesPayload,
+	CreateCreditNoteParams,
+	CreateCreditNoteLineItemRequest,
+	ProcessDraftCreditNoteParams,
+	VoidCreditNoteParams,
+	ListCreditNotesResponse,
+	CreditNote,
+	CreditNoteLineItem,
+} from './CreditNote';
+export { CREDIT_NOTE_STATUS, CREDIT_NOTE_REASON, CREDIT_NOTE_TYPE } from '@/models/CreditNote';
 export type { SynchronizePlanPricesWithSubscriptionResponse } from './Plan';

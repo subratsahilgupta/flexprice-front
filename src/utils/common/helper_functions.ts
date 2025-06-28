@@ -1,5 +1,6 @@
 import { ChargesForBillingPeriodOne } from '@/components/organisms/Subscription/PriceTable';
 import { BILLING_PERIOD } from '@/constants/constants';
+import { BILLING_MODEL, PRICE_TYPE } from '@/models/Price';
 import { getAllISOCodes } from 'iso-country-currency';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -30,11 +31,11 @@ export function getCurrencyName(currency: string): string {
 
 export const formatBillingModel = (billingModel: string) => {
 	switch (billingModel.toUpperCase()) {
-		case 'FLAT_FEE':
+		case BILLING_MODEL.FLAT_FEE:
 			return 'Flat Fee';
-		case 'PACKAGE':
+		case BILLING_MODEL.PACKAGE:
 			return 'Package';
-		case 'TIERED':
+		case BILLING_MODEL.TIERED:
 			return 'Tiered';
 		default:
 			return '--';
@@ -91,9 +92,9 @@ export const formatBillingPeriodForDisplay = (billingPeriod: string) => {
 
 export const getPriceTypeLabel = (type: string): string => {
 	switch (type.toUpperCase()) {
-		case 'FIXED':
+		case PRICE_TYPE.FIXED:
 			return 'Recurring';
-		case 'USAGE':
+		case PRICE_TYPE.USAGE:
 			return 'Usage Based';
 		default:
 			return '--';

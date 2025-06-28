@@ -1,9 +1,9 @@
 import { Invoice } from '@/models/Invoice';
-import { PaginationType } from '@/models/Pagination';
+import { Pagination } from '@/models/Pagination';
 
 export interface GetInvoicesResponse {
 	items: Invoice[];
-	pagination: PaginationType;
+	pagination: Pagination;
 }
 
 export interface GetAllInvoicesPayload {

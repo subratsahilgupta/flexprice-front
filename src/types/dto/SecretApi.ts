@@ -1,9 +1,9 @@
-import { PaginationType } from '@/models/Pagination';
+import { Pagination } from '@/models/Pagination';
 import { SecretKey } from '@/models/SecretKey';
 
 export interface GetAllSecretKeysResponse {
 	items: SecretKey[];
-	pagination: PaginationType;
+	pagination: Pagination;
 }
 
 export interface CreateSecretKeyPayload {

@@ -10,6 +10,9 @@ import VolumeTieredPricingForm from './VolumeTieredPricingForm';
 import { InternalPrice } from './SetupChargesSection';
 import UsageChargePreview from './UsageChargePreview';
 import { toast } from 'react-hot-toast';
+import { BILLING_CADENCE, INVOICE_CADENCE } from '@/models/Invoice';
+import { BILLING_MODEL, TIER_MODE } from '@/models/Price';
+import { BILLING_PERIOD, PRICE_TYPE } from '@/models/Price';
 interface Props {
 	onAdd: (price: InternalPrice) => void;
 	onUpdate: (price: InternalPrice) => void;
@@ -84,11 +87,11 @@ const UsagePricingForm: FC<Props> = ({ onAdd, onUpdate, onEditClicked, onDeleteC
 			} else if (price.billing_model === 'PACKAGE') {
 				setPackagedFee({
 					price: price.amount || '',
-					unit: price.transform_quantity?.divide_by?.toString() || '',
+					unit: (price.transform_quantity as any)?.divide_by?.toString() || '',
 				});
 			} else if (price.billing_model === 'TIERED' && Array.isArray(price.tiers)) {
 				setTieredPrices(
-					(price.tiers as TieredPrice[]).map((tier) => ({
+					(price.tiers as unknown as TieredPrice[]).map((tier) => ({
 						from: tier.from,
 						up_to: tier.up_to,
 						unit_amount: tier.unit_amount,
@@ -165,11 +168,11 @@ const UsagePricingForm: FC<Props> = ({ onAdd, onUpdate, onEditClicked, onDeleteC
 			meter: activeMeter || undefined,
 			currency,
 			billing_period: billingPeriod,
-			billing_model: billingModel,
-			type: 'USAGE',
+			billing_model: billingModel as BILLING_MODEL,
+			type: PRICE_TYPE.USAGE,
 			billing_period_count: 1,
-			billing_cadence: 'RECURRING',
-			invoice_cadence: invoiceCadence,
+			billing_cadence: 'RECURRING' as BILLING_CADENCE,
+			invoice_cadence: invoiceCadence as INVOICE_CADENCE,
 		};
 
 		let finalPrice: Partial<Price>;
@@ -207,7 +210,7 @@ const UsagePricingForm: FC<Props> = ({ onAdd, onUpdate, onEditClicked, onDeleteC
 					unit_amount: tier.unit_amount || '0',
 					flat_amount: tier.flat_amount || '0',
 				})) as unknown as NonNullable<Price['tiers']>,
-				tier_mode: 'VOLUME',
+				tier_mode: TIER_MODE.VOLUME,
 			};
 		}
 		// If we're editing an existing price, preserve its ID and other important fields
@@ -215,7 +218,7 @@ const UsagePricingForm: FC<Props> = ({ onAdd, onUpdate, onEditClicked, onDeleteC
 			const finalPriceWithEdit: InternalPrice = {
 				...price,
 				...finalPrice,
-				type: 'USAGE',
+				type: PRICE_TYPE.USAGE,
 				meter_id: meterId,
 				meter: activeMeter || price.meter,
 				internal_state: 'saved',
@@ -262,7 +265,7 @@ const UsagePricingForm: FC<Props> = ({ onAdd, onUpdate, onEditClicked, onDeleteC
 				value={billingPeriod}
 				options={billlingPeriodOptions}
 				onChange={(value) => {
-					setBillingPeriod(value);
+					setBillingPeriod(value as BILLING_PERIOD);
 				}}
 				label='Billing Period'
 				placeholder='Select The Billing Period'

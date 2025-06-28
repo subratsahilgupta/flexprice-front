@@ -38,6 +38,8 @@ export interface GetSubscriptionPreviewResponse {
 	tenant_id: string;
 	updated_at: string;
 	updated_by: string;
+	subtotal: number;
+	total: number;
 	version: number;
 	voided_at: string;
 }

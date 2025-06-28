@@ -1,11 +1,11 @@
 import { SubscriptionPhase, BILLING_CYCLE } from '@/models/Subscription';
 import { Button, Input, Label, DatePicker, Modal, FormHeader, Spacer } from '@/components/atoms';
 import { useState } from 'react';
-import { BILLING_CADENCE } from '@/models/Invoice';
-import { CREDIT_GRANT_EXPIRATION_TYPE, CREDIT_GRANT_PERIOD, CREDIT_SCOPE, CreditGrant } from '@/models/CreditGrant';
+import { CREDIT_GRANT_CADENCE, CREDIT_GRANT_EXPIRATION_TYPE, CREDIT_GRANT_PERIOD, CREDIT_SCOPE, CreditGrant } from '@/models/CreditGrant';
 import { BILLING_PERIOD } from '@/constants/constants';
 import { uniqueId } from 'lodash';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
+import { Metadata } from '@/models/base';
 
 interface Props {
 	isOpen: boolean;
@@ -26,20 +26,25 @@ interface SubscriptionPhaseFormData {
 	overage_factor: number;
 	billing_cycle?: BILLING_CYCLE;
 	prorate_charges?: boolean;
-	credit_grants?: CreditGrant[];
+	credit_grants?: Partial<CreditGrant>[];
 }
 
-const getDefaultCreditGrant = (currency: string, billingPeriod: BILLING_PERIOD, planId: string, subscriptionId: string): CreditGrant => ({
+const getDefaultCreditGrant = (
+	currency: string,
+	billingPeriod: BILLING_PERIOD,
+	planId: string,
+	subscriptionId: string,
+): Partial<CreditGrant> => ({
 	id: uniqueId(),
 	currency: currency,
 	period: billingPeriod as unknown as CREDIT_GRANT_PERIOD,
 	name: 'Free Credits',
 	scope: CREDIT_SCOPE.SUBSCRIPTION,
-	cadence: BILLING_CADENCE.ONETIME,
+	cadence: CREDIT_GRANT_CADENCE.ONETIME,
 	period_count: 1,
 	plan_id: planId,
 	subscription_id: subscriptionId,
-	metadata: {},
+	metadata: {} as Metadata,
 	credits: 0,
 	expiration_duration: 0,
 	expiration_type: CREDIT_GRANT_EXPIRATION_TYPE.NEVER,

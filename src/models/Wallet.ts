@@ -1,26 +1,51 @@
+import { BaseModel } from './base';
 import { Meter } from './Meter';
 
-export type Wallet = {
+export interface Wallet extends BaseModel {
 	readonly balance: number;
 	readonly name: string;
-	readonly created_at: string;
 	readonly currency: string;
 	readonly customer_id: string;
-	readonly id: string;
 	readonly metadata: Record<string, any>;
-	readonly updated_at: string;
-	readonly wallet_status: string;
+	readonly wallet_status: WALLET_STATUS;
 	readonly conversion_rate: number;
 	readonly meter: Meter;
-};
+}
 
-export enum TransactionReason {
-	InvoicePayment = 'INVOICE_PAYMENT',
-	FreeCredit = 'FREE_CREDIT_GRANT',
-	SubscriptionCredit = 'SUBSCRIPTION_CREDIT_GRANT',
-	PurchasedCreditInvoiced = 'PURCHASED_CREDIT_INVOICED',
-	PurchasedCreditDirect = 'PURCHASED_CREDIT_DIRECT',
-	InvoiceRefund = 'INVOICE_REFUND',
-	CreditExpired = 'CREDIT_EXPIRED',
-	WalletTermination = 'WALLET_TERMINATION',
+export enum WALLET_STATUS {
+	ACTIVE = 'active',
+	FROZEN = 'frozen',
+	CLOSED = 'closed',
+}
+
+export enum WALLET_TX_REFERENCE_TYPE {
+	PAYMENT = 'PAYMENT',
+	EXTERNAL = 'EXTERNAL',
+	REQUEST = 'REQUEST',
+}
+
+export enum WALLET_TRANSACTION_REASON {
+	INVOICE_PAYMENT = 'INVOICE_PAYMENT',
+	FREE_CREDIT_GRANT = 'FREE_CREDIT_GRANT',
+	SUBSCRIPTION_CREDIT_GRANT = 'SUBSCRIPTION_CREDIT_GRANT',
+	PURCHASED_CREDIT_INVOICED = 'PURCHASED_CREDIT_INVOICED',
+	PURCHASED_CREDIT_DIRECT = 'PURCHASED_CREDIT_DIRECT',
+	INVOICE_REFUND = 'INVOICE_REFUND',
+	CREDIT_EXPIRED = 'CREDIT_EXPIRED',
+	WALLET_TERMINATION = 'WALLET_TERMINATION',
+}
+
+export enum WALLET_TRANSACTION_TYPE {
+	CREDIT = 'credit',
+	DEBIT = 'debit',
+}
+
+export enum WALLET_TYPE {
+	PROMOTIONAL = 'PROMOTIONAL',
+	PRE_PAID = 'PRE_PAID',
+}
+
+export enum WALLET_AUTO_TOPUP_TRIGGER {
+	DISABLED = 'disabled',
+	BALANCE_BELOW_THRESHOLD = 'balance_below_threshold',
 }

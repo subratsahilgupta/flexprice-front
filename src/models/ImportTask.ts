@@ -1,24 +1,20 @@
-export type ImportTask = Readonly<{
-	id: string;
-	task_type: string;
-	entity_type: string;
-	file_url: string;
-	file_name: string;
-	file_type: string;
-	task_status: string;
-	processed_records: number;
-	successful_records: number;
-	failed_records: number;
-	tenant_id: string;
-	status: string;
-	created_at: string;
-	updated_at: string;
-	created_by: string;
-	updated_by: string;
-	completed_at: string;
-	error_summary: string;
-	failed_at: string;
-	metadata: Record<string, unknown>;
-	started_at: string;
-	total_records: number;
-}>;
+import { BaseModel } from './base';
+
+export interface ImportTask extends BaseModel {
+	readonly task_type: string;
+	readonly entity_type: string;
+	readonly file_url: string;
+	readonly file_name: string;
+	readonly file_type: string;
+	readonly task_status: string;
+	readonly processed_records: number;
+	readonly successful_records: number;
+	readonly failed_records: number;
+	readonly tenant_id: string;
+	readonly completed_at: string;
+	readonly error_summary: string;
+	readonly failed_at: string;
+	readonly metadata: Record<string, unknown>;
+	readonly started_at: string;
+	readonly total_records: number;
+}

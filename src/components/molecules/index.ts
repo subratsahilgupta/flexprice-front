@@ -25,6 +25,8 @@ export { default as WalletTransactionsTable } from './Wallet';
 
 export { default as TopupCard } from './TopupCard';
 
+export { default as RecordPaymentTopup } from './RecordPaymentTopup';
+
 export { default as RolloutChargesModal, RolloutOption } from './RolloutChargesModal';
 
 export { default as RectangleRadiogroup } from './RectangleRadiogroup';
@@ -50,6 +52,8 @@ export {
 } from './InvoiceTable';
 
 export { default as InvoiceCreditLineItemTable } from './InvoiceCreditLineItemTable';
+
+export { CreditNoteTable, CreditNoteLineItemTable } from './CreditNoteTable';
 
 export { default as BreadCrumbs } from './BreadCrumbs';
 
