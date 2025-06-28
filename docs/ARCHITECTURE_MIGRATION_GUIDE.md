@@ -408,17 +408,16 @@ Looking at your `AddCreditNotePage`, you have business logic scattered in the co
 ```typescript
 // Current: Mixed in component (AddCreditNotePage.tsx)
 const getCreditNoteType = (paymentStatus: string): CreditNoteType => {
-  switch (paymentStatus.toUpperCase()) {
-    case PaymentStatus.SUCCEEDED:
-    case PaymentStatus.PARTIALLY_REFUNDED:
-      return CreditNoteType.REFUND;
-    case PaymentStatus.FAILED:
-    case PaymentStatus.PENDING:
-      return CreditNoteType.PROCESSING:
-      return CreditNoteType.ADJUSTMENT;
-    default:
-      return CreditNoteType.ADJUSTMENT;
-  }
+	switch (paymentStatus.toUpperCase()) {
+		case PaymentStatus.SUCCEEDED:
+		case PaymentStatus.PARTIALLY_REFUNDED:
+			return CreditNoteType.REFUND;
+		case PaymentStatus.FAILED:
+		case PaymentStatus.PENDING:
+			return CreditNoteType.ADJUSTMENT;
+		default:
+			return CreditNoteType.ADJUSTMENT;
+	}
 };
 ```
 

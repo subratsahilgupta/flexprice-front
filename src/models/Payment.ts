@@ -1,3 +1,4 @@
+import { PAYMENT_STATUS } from '@/constants';
 import { BaseModel, Metadata } from './base';
 
 export interface Payment extends BaseModel {
@@ -13,7 +14,7 @@ export interface Payment extends BaseModel {
 	readonly metadata: Metadata;
 	readonly payment_method_id: string;
 	readonly payment_method_type: PAYMENT_METHOD_TYPE;
-	readonly payment_status: string;
+	readonly payment_status: PAYMENT_STATUS;
 	readonly refunded_at: string;
 	readonly succeeded_at: string;
 	readonly track_attempts: boolean;

@@ -137,7 +137,7 @@ export interface Schedule extends BaseModel {
 
 export enum SUBSCRIPTION_STATUS {
 	ACTIVE = 'active',
-	Paused = 'paused',
+	PAUSED = 'paused',
 	CANCELLED = 'cancelled',
 	INCOMPLETE = 'incomplete',
 	INCOMPLETE_EXPIRED = 'incomplete_expired',
