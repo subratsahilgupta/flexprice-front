@@ -1,7 +1,4 @@
 import { Button, DatePicker, FormHeader, Input, Select, Spacer } from '@/components/atoms';
-import { PremiumFeature, PremiumFeatureTag } from '@/components/molecules';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import { currencyOptions } from '@/constants/constants';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { cn } from '@/lib/utils';
@@ -33,7 +30,7 @@ const CreateWallet: FC<Props> = ({ customerId, onSuccess = () => {} }) => {
 		name: 'Prepaid Wallet',
 	});
 
-	const [autoTopup, setautoTopup] = useState(false);
+	// const [autoTopup, setautoTopup] = useState(false);
 
 	const { mutateAsync: createWallet, isPending } = useMutation({
 		mutationKey: ['createWallet', customerId],
@@ -138,7 +135,7 @@ const CreateWallet: FC<Props> = ({ customerId, onSuccess = () => {} }) => {
 					}}
 				/>
 			</div>
-			<Spacer className='!mt-4' />
+			{/* <Spacer className='!mt-4' />
 			<PremiumFeature isPremiumFeature>
 				<div className='card relative'>
 					<span className='absolute top-3 right-3'>
@@ -162,9 +159,9 @@ const CreateWallet: FC<Props> = ({ customerId, onSuccess = () => {} }) => {
 						</Label>
 					</div>
 				</div>
-			</PremiumFeature>
+			</PremiumFeature> */}
 
-			{autoTopup && (
+			{/* {autoTopup && (
 				<div className='space-y-4 mt-4'>
 					<Input
 						variant='number'
@@ -187,7 +184,7 @@ const CreateWallet: FC<Props> = ({ customerId, onSuccess = () => {} }) => {
 						))}
 					</div>
 				</div>
-			)}
+			)} */}
 
 			{/* save wallet */}
 			<Button className='!mt-4' disabled={isPending} onClick={handleCreateWallet}>
