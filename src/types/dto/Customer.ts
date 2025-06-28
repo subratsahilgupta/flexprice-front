@@ -1,7 +1,7 @@
 import Customer from '@/models/Customer';
 import { CustomerEntitlement } from '@/models/CustomerEntitlement';
 import CustomerUsage from '@/models/CustomerUsage';
-import { PaginationType } from '@/models/Pagination';
+import { Pagination } from '@/models/Pagination';
 import { Subscription, BILLING_CYCLE, SubscriptionPhase } from '@/models/Subscription';
 import { CreditGrant } from '@/models/CreditGrant';
 import { TypedBackendFilter, TypedBackendSort } from '../formatters/QueryBuilder';
@@ -17,12 +17,12 @@ export interface FilterCondition {
 
 export interface GetCustomerResponse {
 	items: Customer[];
-	pagination: PaginationType;
+	pagination: Pagination;
 }
 
 export interface GetCustomerSubscriptionsResponse {
 	items: Subscription[];
-	pagination: PaginationType;
+	pagination: Pagination;
 }
 
 export interface GetCustomerEntitlementsResponse {
@@ -58,7 +58,7 @@ export interface CreateCustomerSubscriptionPayload {
 export interface GetUsageSummaryResponse {
 	customer_id: string;
 	features: CustomerUsage[];
-	pagination: PaginationType;
+	pagination: Pagination;
 	period: {
 		end_time: string;
 		period: string;
@@ -67,7 +67,7 @@ export interface GetUsageSummaryResponse {
 }
 
 // Subscription
-export interface GetCustomerByFiltersPayload extends PaginationType {
+export interface GetCustomerByFiltersPayload extends Pagination {
 	filters: TypedBackendFilter[];
 	sort: TypedBackendSort[];
 }

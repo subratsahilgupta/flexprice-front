@@ -1,21 +1,18 @@
-export interface Meter {
-	aggregation: {
+import { BaseModel } from './base';
+
+export interface Meter extends BaseModel {
+	readonly aggregation: {
 		field: string;
 		type: METER_AGGREGATION_TYPE;
 		multiplier?: number;
 	};
-	event_name: string;
-	filters: Array<{
+	readonly event_name: string;
+	readonly filters: Array<{
 		key: string;
 		values: string[];
 	}>;
-	name: string;
-	id: string;
-	reset_usage: string;
-	status: string;
-	tenant_id: string;
-	updated_at: string;
-	created_at: string;
+	readonly name: string;
+	readonly reset_usage: METER_USAGE_RESET_PERIOD;
 }
 
 export enum METER_USAGE_RESET_PERIOD {

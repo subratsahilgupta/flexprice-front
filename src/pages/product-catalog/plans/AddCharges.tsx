@@ -14,12 +14,10 @@ import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import { RectangleRadiogroup, RectangleRadiogroupOption, RolloutChargesModal, RolloutOption } from '@/components/molecules';
 import { Dialog } from '@/components/ui/dialog';
 import { Gauge, Repeat } from 'lucide-react';
+import { BILLING_CADENCE, INVOICE_CADENCE } from '@/models/Invoice';
+import { BILLING_MODEL, PRICE_TYPE } from '@/models/Price';
 
 // ===== TYPES & CONSTANTS (moved outside component) =====
-enum ChargeType {
-	FIXED = 'FIXED',
-	USAGE = 'USAGE',
-}
 
 type PriceState = 'new' | 'edit' | 'saved';
 
@@ -27,29 +25,29 @@ type PriceState = 'new' | 'edit' | 'saved';
 const CHARGE_OPTIONS: RectangleRadiogroupOption[] = [
 	{
 		label: 'Recurring Charges',
-		value: ChargeType.FIXED,
+		value: PRICE_TYPE.FIXED,
 		icon: Repeat,
 		description: 'Billed on a fixed schedule (monthly, yearly, etc.)',
 	},
 	{
 		label: 'Usage Charges',
-		value: ChargeType.USAGE,
+		value: PRICE_TYPE.USAGE,
 		icon: Gauge,
 		description: 'Pay only for what customers actually use',
 	},
 ];
 
 // ===== HELPER FUNCTIONS (moved outside component) =====
-const createEmptyPrice = (type: ChargeType): InternalPrice => ({
+const createEmptyPrice = (type: PRICE_TYPE): InternalPrice => ({
 	amount: '',
 	currency: currencyOptions[0].value,
 	billing_period: billlingPeriodOptions[1].value,
-	type,
+	type: type,
 	isEdit: true,
 	billing_period_count: 1,
-	invoice_cadence: 'ARREAR',
-	billing_model: type === ChargeType.FIXED ? 'FLAT_FEE' : undefined,
-	billing_cadence: 'RECURRING',
+	invoice_cadence: INVOICE_CADENCE.ARREAR,
+	billing_model: type === PRICE_TYPE.FIXED ? BILLING_MODEL.FLAT_FEE : undefined,
+	billing_cadence: BILLING_CADENCE.RECURRING,
 	internal_state: 'new' as PriceState,
 });
 
@@ -192,10 +190,10 @@ const AddChargesPage = () => {
 	}, [isPending, isAnyPriceInEditMode, hasAnyCharges]);
 
 	// ===== MEMOIZED CALLBACKS =====
-	const handleAddNewPrice = useCallback((type: ChargeType) => {
+	const handleAddNewPrice = useCallback((type: PRICE_TYPE) => {
 		const newPrice = createEmptyPrice(type);
 
-		if (type === ChargeType.FIXED) {
+		if (type === PRICE_TYPE.FIXED) {
 			dispatch({ type: ChargeActionType.ADD_RECURRING_CHARGE, payload: newPrice });
 		} else {
 			dispatch({ type: ChargeActionType.ADD_USAGE_CHARGE, payload: newPrice });
@@ -216,20 +214,17 @@ const AddChargesPage = () => {
 			setShowRolloutModal(false);
 
 			try {
-				// Update the plan first
+				// Update the plan firxst
 				await updatePlan(updatedPlan as Partial<Plan>);
 				toast.success('Plan updated successfully');
 
 				// If user selected to sync with existing subscriptions
 				if (option === RolloutOption.EXISTING_ALSO) {
 					// Sync charges with existing subscriptions
-					const syncResponse = await syncPlanCharges();
-					toast.success(`Charges synchronized! ${syncResponse.synchronization_summary.subscriptions_processed} subscriptions processed.`);
-					navigate(`${RouteNames.plan}/${planId}`);
-				} else {
-					// If only new subscriptions, navigate immediately after update
-					navigate(`${RouteNames.plan}/${planId}`);
+					await syncPlanCharges();
 				}
+				// If only new subscriptions, navigate immediately after update
+				navigate(`${RouteNames.plan}/${planId}`);
 			} catch (error) {
 				// Error handling is done in the mutation's onError callbacks
 				console.error('Error in rollout process:', error);
@@ -365,19 +360,19 @@ const AddChargesPage = () => {
 							<RectangleRadiogroup
 								title='Select Charge Type'
 								options={CHARGE_OPTIONS}
-								onChange={(value) => handleAddNewPrice(value as ChargeType)}
+								onChange={(value) => handleAddNewPrice(value as PRICE_TYPE)}
 								aria-label='Select charge type for your plan'
 							/>
 						</div>
 					) : (
 						<div className='flex gap-2' role='group' aria-label='Add charge options'>
 							<AddChargesButton
-								onClick={() => handleAddNewPrice(ChargeType.FIXED)}
+								onClick={() => handleAddNewPrice(PRICE_TYPE.FIXED)}
 								label='Add Recurring Charges'
 								aria-label='Add recurring charges to plan'
 							/>
 							<AddChargesButton
-								onClick={() => handleAddNewPrice(ChargeType.USAGE)}
+								onClick={() => handleAddNewPrice(PRICE_TYPE.USAGE)}
 								label='Add Usage Based Charges'
 								aria-label='Add usage-based charges to plan'
 							/>

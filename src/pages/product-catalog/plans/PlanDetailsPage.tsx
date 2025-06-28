@@ -3,7 +3,7 @@ import { AddEntitlementDrawer, ApiDocsContent, ColumnData, FlexpriceTable, Redir
 import { DetailsCard } from '@/components/molecules';
 import { RouteNames } from '@/core/routes/Routes';
 import { Price } from '@/models/Price';
-import { FeatureType } from '@/models/Feature';
+import { FEATURE_TYPE } from '@/models/Feature';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import EntitlementApi from '@/api/EntitlementApi';
 import { PlanApi } from '@/api/PlanApi';
@@ -19,10 +19,10 @@ import formatChips from '@/utils/common/format_chips';
 import { getFeatureTypeChips } from '@/components/molecules/CustomerUsageTable/CustomerUsageTable';
 import { formatAmount } from '@/components/atoms/Input/Input';
 import ChargeValueCell from './ChargeValueCell';
-import { BaseEntityStatus } from '@/types/common';
 import { BILLING_PERIOD } from '@/constants/constants';
 import { Entitlement } from '@/models/Entitlement';
 import { ExtendedEntitlement } from '@/types/dto/Entitlement';
+import { ENTITY_STATUS } from '@/models/base';
 const formatBillingPeriod = (billingPeriod: string) => {
 	switch (billingPeriod.toUpperCase()) {
 		case BILLING_PERIOD.DAILY:
@@ -95,9 +95,9 @@ const getFeatureValue = (entitlement: Entitlement) => {
 	const value = entitlement.usage_limit?.toFixed() || '';
 
 	switch (entitlement.feature_type) {
-		case FeatureType.static:
+		case FEATURE_TYPE.STATIC:
 			return entitlement.static_value;
-		case FeatureType.metered:
+		case FEATURE_TYPE.METERED:
 			return (
 				<span className='flex items-end gap-1'>
 					{formatAmount(value || 'Unlimited')}
@@ -110,7 +110,7 @@ const getFeatureValue = (entitlement: Entitlement) => {
 					</span>
 				</span>
 			);
-		case FeatureType.boolean:
+		case FEATURE_TYPE.BOOLEAN:
 			return entitlement.is_enabled ? 'Yes' : 'No';
 		default:
 			return '--';
@@ -191,7 +191,7 @@ const PlanDetailsPage = () => {
 						archiveText='Delete'
 						id={row?.id}
 						isEditDisabled={true}
-						isArchiveDisabled={row?.status === BaseEntityStatus.ARCHIVED}
+						isArchiveDisabled={row?.status === ENTITY_STATUS.ARCHIVED}
 						refetchQueryKey={'fetchPlan'}
 						entityName={row?.feature?.name}
 					/>

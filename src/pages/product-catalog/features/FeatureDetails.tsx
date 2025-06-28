@@ -21,7 +21,7 @@ import { ApiDocsContent, ColumnData, FlexpriceTable, RedirectCell } from '@/comp
 import { getFeatureTypeChips } from '@/components/molecules/FeatureTable/FeatureTable';
 
 // Models and types
-import { FeatureType } from '@/models/Feature';
+import { FEATURE_TYPE } from '@/models/Feature';
 import { BaseEntityStatus } from '@/types/common/BaseEntity';
 import { formatMeterUsageResetPeriodToDisplay } from '@/types/formatters/Feature';
 
@@ -30,6 +30,7 @@ import { formatAggregationType } from './AddFeature';
 import { formatAmount } from '@/components/atoms/Input/Input';
 import { ApiDocsSnippet } from '@/store/useApiDocsStore';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
+import { ENTITY_STATUS } from '@/models/base';
 
 const FeatureDetails = () => {
 	const { id: featureId } = useParams() as { id: string };
@@ -90,13 +91,13 @@ const FeatureDetails = () => {
 			title: 'Value',
 			align: 'right',
 			render: (rowData: ExtendedEntitlement) => {
-				if (rowData.feature_type === FeatureType.boolean) {
+				if (rowData.feature_type === FEATURE_TYPE.BOOLEAN) {
 					return rowData.is_enabled ? 'Yes' : 'No';
 				}
-				if (rowData.feature_type === FeatureType.static) {
+				if (rowData.feature_type === FEATURE_TYPE.STATIC) {
 					return rowData.static_value || '0';
 				}
-				if (rowData.feature_type === FeatureType.metered) {
+				if (rowData.feature_type === FEATURE_TYPE.METERED) {
 					const usageLimit = rowData.usage_limit ? formatAmount(rowData.usage_limit.toString()) : 'Unlimited';
 					const unit =
 						rowData.usage_limit === null || rowData.usage_limit > 1
@@ -169,7 +170,7 @@ const FeatureDetails = () => {
 					<div className='flex gap-2'>
 						<Button
 							isLoading={isArchiving}
-							disabled={isArchiving || data?.status === BaseEntityStatus.ARCHIVED}
+							disabled={isArchiving || data?.status === ENTITY_STATUS.ARCHIVED}
 							variant={'outline'}
 							onClick={() => archiveFeature()}
 							className='flex gap-2'>
@@ -183,7 +184,7 @@ const FeatureDetails = () => {
 					</div>
 				</SectionHeader>
 			}>
-			<ApiDocsContent tags={['Features']} snippets={data?.type === FeatureType.metered ? snippets : undefined} />
+			<ApiDocsContent tags={['Features']} snippets={data?.type === FEATURE_TYPE.METERED ? snippets : undefined} />
 
 			<Spacer className='!h-4' />
 			<div className='space-y-6'>
@@ -195,7 +196,7 @@ const FeatureDetails = () => {
 				) : (
 					<NoDataCard title='Linked Plans' subtitle='No plans linked to the feature yet' />
 				)}
-				{data?.type === FeatureType.metered && (
+				{data?.type === FEATURE_TYPE.METERED && (
 					<Card variant='notched'>
 						<div className='!space-y-6'>
 							<CardHeader title='Event Details' className='!p-0 !mb-2' />
@@ -208,7 +209,7 @@ const FeatureDetails = () => {
 
 							<Divider />
 
-							{data?.meter?.filters?.length > 0 && (
+							{data?.meter?.filters?.length && (
 								<>
 									<div className='space-y-4'>
 										<span className='text-gray-500 text-sm font-medium block'>Event Filters</span>
@@ -249,7 +250,7 @@ const FeatureDetails = () => {
 
 									<div className='grid grid-cols-[200px_1fr] items-center'>
 										<span className='text-gray-500 text-sm'>Unit Name</span>
-										<span className='text-gray-800 text-sm'>{`${data.unit_singular || 'unit'} / ${data.unit_plural || 'units'}`}</span>
+										<span className='text-gray-800 text-sm'>{`${data?.unit_singular || 'unit'} / ${data?.unit_plural || 'units'}`}</span>
 									</div>
 									<div className='grid grid-cols-[200px_1fr] items-center'>
 										<span className='text-gray-500 text-sm'>Usage Reset </span>

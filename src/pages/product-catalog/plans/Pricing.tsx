@@ -12,6 +12,9 @@ import { ApiDocsContent } from '@/components/molecules';
 import { EmptyPage } from '@/components/organisms';
 import { PlanDrawer } from '@/components/molecules';
 import GUIDES from '@/constants/guides';
+import { Price } from '@/models/Price';
+import { INVOICE_CADENCE } from '@/models/Invoice';
+import { PRICE_TYPE } from '@/models/Price';
 
 type PriceType = {
 	currency: string;
@@ -263,17 +266,19 @@ const PricingPage = () => {
 	}, [plansData, selectedBillingPeriod, selectedCurrency]);
 
 	const transformedPlans: PricingCardProps[] = filteredPlans.map((plan) => {
-		const displayType = getPriceDisplayType(plan.prices || []);
-		const recurringPrice = plan.prices?.find(isRecurringPrice);
+		const prices = plan.prices as Price[];
+		const displayType = getPriceDisplayType(prices || []);
+		const recurringPrice = prices?.find(isRecurringPrice);
 		const usageCharges =
-			plan.prices?.filter(isUsageBasedPrice).map((price) => ({
+			prices?.filter(isUsageBasedPrice).map((price) => ({
 				amount: price.amount,
 				currency: price.currency,
 				billing_model: price.billing_model,
-				tiers: price.tiers,
+				tiers: price.tiers as unknown as { up_to: number | null; unit_amount: string; flat_amount: string }[],
 				meter_name: price.meter?.name || 'Usage',
 				billing_period: price.billing_period,
-				type: price.type,
+				type: price.type as PRICE_TYPE,
+				invoice_cadence: price.invoice_cadence as INVOICE_CADENCE,
 			})) || [];
 
 		// For display purposes, we prioritize showing the recurring price if it exists

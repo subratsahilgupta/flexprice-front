@@ -1,6 +1,6 @@
 import { ImportTask } from '@/models/ImportTask';
 
-import { PaginationType } from '@/models/Pagination';
+import { Pagination } from '@/models/Pagination';
 
 export interface AddTaskPayload {
 	entity_type: string;
@@ -27,5 +27,5 @@ export interface GetTasksPayload {
 
 export interface GetTasksResponse {
 	items: ImportTask[];
-	pagination: PaginationType;
+	pagination: Pagination;
 }

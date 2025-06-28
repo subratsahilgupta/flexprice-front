@@ -5,7 +5,7 @@ import { AddChargesButton } from '@/components/organisms/PlanForm/SetupChargesSe
 import { RouteNames } from '@/core/routes/Routes';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { cn } from '@/lib/utils';
-import Feature, { FeatureType } from '@/models/Feature';
+import Feature, { FEATURE_TYPE } from '@/models/Feature';
 import { Meter, METER_AGGREGATION_TYPE, METER_USAGE_RESET_PERIOD } from '@/models/Meter';
 import FeatureApi from '@/api/FeatureApi';
 import { useMutation } from '@tanstack/react-query';
@@ -34,19 +34,19 @@ const FEATURE_TYPE_OPTIONS: SelectOption[] = [
 		label: 'Boolean',
 		description: 'Functionality that customers can either have access to or not i.e. SSO, CRM Integration, etc.',
 		suffixIcon: <SquareCheckBig className='size-4' />,
-		value: FeatureType.boolean,
+		value: FEATURE_TYPE.BOOLEAN,
 	},
 	{
 		label: 'Metered',
 		description: 'Functionality with varying usage that needs to be measured i.e. API calls, llm tokens, etc.',
 		suffixIcon: <Gauge className='size-4' />,
-		value: FeatureType.metered,
+		value: FEATURE_TYPE.METERED,
 	},
 	{
 		label: 'Static',
 		description: 'Functionality that can be configured for a customer i.e. log retention period, support tier, etc.',
 		suffixIcon: <Wrench className='size-4' />,
-		value: FeatureType.static,
+		value: FEATURE_TYPE.STATIC,
 	},
 ];
 
@@ -99,7 +99,7 @@ const AGGREGATION_OPTIONS: SelectOption[] = [
 const FEATURE_SCHEMA = z.object({
 	name: z.string().nonempty('Feature name is required'),
 	description: z.string().optional(),
-	type: z.enum([FeatureType.boolean, FeatureType.metered, FeatureType.static]).optional(),
+	type: z.enum([FEATURE_TYPE.BOOLEAN, FEATURE_TYPE.METERED, FEATURE_TYPE.STATIC]).optional(),
 	meter_id: z.string().optional(),
 	unit_singular: z.string().optional(),
 	unit_plural: z.string().optional(),
@@ -247,10 +247,10 @@ const FeatureDetailsSection = ({
 
 	const handleTypeChange = useCallback(
 		(type: string) => {
-			onUpdateFeature({ type });
+			onUpdateFeature({ type: type as FEATURE_TYPE });
 
 			// Initialize meter with default values when type is metered
-			if (type === FeatureType.metered) {
+			if (type === FEATURE_TYPE.METERED) {
 				onUpdateMeter((prev) => ({
 					...prev,
 					aggregation: {
@@ -273,7 +273,7 @@ const FeatureDetailsSection = ({
 		[onUpdateFeature],
 	);
 
-	const isMeteredType = data.type === FeatureType.metered;
+	const isMeteredType = data.type === FEATURE_TYPE.METERED;
 
 	return (
 		<div className='p-6 rounded-xl border border-[#E4E4E7]'>
@@ -402,7 +402,7 @@ const AggregationSection = ({
 			onUpdateMeter((prev) => ({
 				...prev,
 				aggregation: {
-					type: type as METER_AGGREGATION_TYPE,
+					type: type as unknown as METER_AGGREGATION_TYPE,
 					field: prev.aggregation?.field || '',
 				},
 			}));
@@ -439,7 +439,7 @@ const AggregationSection = ({
 
 	const handleResetUsageChange = useCallback(
 		(value: { value?: string }) => {
-			onUpdateMeter((prev) => ({ ...prev, reset_usage: value.value! }));
+			onUpdateMeter((prev) => ({ ...prev, reset_usage: value.value! as METER_USAGE_RESET_PERIOD }));
 		},
 		[onUpdateMeter],
 	);
@@ -562,13 +562,13 @@ const AddFeaturePage = () => {
 					field: meter.aggregation?.field || '',
 					multiplier: meter.aggregation?.multiplier || 1,
 				},
-				reset_usage: meter.reset_usage || '',
+				reset_usage: meter.reset_usage || METER_USAGE_RESET_PERIOD.BILLING_PERIOD,
 				filters: meter.filters?.filter((filter) => filter.key !== '' && filter.values.length > 0),
 			};
 
 			const sanitizedData: Partial<Feature> = {
 				...featureData,
-				meter: featureData.type === FeatureType.metered ? (sanitizedMeter as Meter) : undefined,
+				meter: featureData.type === FEATURE_TYPE.METERED ? (sanitizedMeter as Meter) : undefined,
 			};
 
 			return await FeatureApi.createFeature(sanitizedData);
@@ -590,7 +590,7 @@ const AddFeaturePage = () => {
 		}
 
 		// If type is metered, validate meter data
-		if (data.type === FeatureType.metered) {
+		if (data.type === FEATURE_TYPE.METERED) {
 			if (!validateMeter(meter)) {
 				return;
 			}
@@ -604,15 +604,14 @@ const AddFeaturePage = () => {
 			!data.name ||
 			!data.type ||
 			isPending ||
-			(data.type === FeatureType.metered &&
+			(data.type === FEATURE_TYPE.METERED &&
 				(!meter.event_name ||
 					!meter.aggregation?.type ||
 					(meter.aggregation.type !== METER_AGGREGATION_TYPE.COUNT && !meter.aggregation?.field)))
 		);
 	}, [data.name, data.type, isPending, meter.event_name, meter.aggregation]);
 
-	const isMeteredType = data.type === FeatureType.metered;
-
+	const isMeteredType = data.type === FEATURE_TYPE.METERED;
 	return (
 		<Page type='left-aligned'>
 			<ApiDocsContent tags={['Features']} />

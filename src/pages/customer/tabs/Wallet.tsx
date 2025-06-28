@@ -56,7 +56,7 @@ const WalletTab = () => {
 		isError,
 	} = useQuery({
 		queryKey: ['fetchWallets', customerId],
-		queryFn: () => WalletApi.getWallets(customerId!),
+		queryFn: () => WalletApi.getCustomerWallets({ id: customerId! }),
 		enabled: !!customerId,
 	});
 

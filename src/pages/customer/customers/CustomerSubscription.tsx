@@ -21,7 +21,7 @@ import { CreateCustomerSubscriptionPayload } from '@/types/dto';
 import { BILLING_CADENCE, INVOICE_CADENCE } from '@/models/Invoice';
 import { BILLING_PERIOD } from '@/constants/constants';
 import { uniqueId } from 'lodash';
-import { SubscriptionForm } from '@/components/organisms';
+import SubscriptionForm from '@/components/organisms/Subscription/SubscriptionForm';
 
 type Params = {
 	id: string;
@@ -55,8 +55,28 @@ const usePlans = () => {
 		queryKey: ['plans'],
 		queryFn: async () => {
 			const plansResponse = await PlanApi.getActiveExpandedPlan({ limit: 1000, offset: 0 });
-			const normalizedPlans = plansResponse.map(normalizePlan);
-			return normalizedPlans.filter((plan) => Object.keys(plan.charges).length > 0);
+
+			try {
+				const normalizedPlans = plansResponse.map((plan) => {
+					try {
+						const normalized = normalizePlan(plan);
+						return normalized;
+					} catch (planError) {
+						const error = planError as Error;
+						throw error;
+					}
+				});
+
+				const filteredPlans = normalizedPlans.filter((plan) => {
+					const hasCharges = Object.keys(plan.charges).length > 0;
+					return hasCharges;
+				});
+
+				return filteredPlans;
+			} catch (error) {
+				toast.error('Error processing plans data');
+				throw error;
+			}
 		},
 	});
 };
@@ -121,7 +141,7 @@ const CustomerSubscription: React.FC = () => {
 			const planDetails = plans.find((plan) => plan.id === subscriptionData.details.plan_id);
 			if (planDetails) {
 				// Create initial phase
-				const initialPhase: SubscriptionPhase = {
+				const initialPhase: Partial<SubscriptionPhase> = {
 					billing_cycle: subscriptionData.details.billing_cycle as BILLING_CYCLE,
 					start_date: new Date(subscriptionData.details.start_date),
 					end_date: subscriptionData.details.end_date ? new Date(subscriptionData.details.end_date) : null,
@@ -139,11 +159,11 @@ const CustomerSubscription: React.FC = () => {
 						label: toSentenceCase(period.replace('_', ' ')),
 						value: period,
 					})),
-					phases: [initialPhase],
+					phases: [initialPhase as SubscriptionPhase],
 					selectedPhase: 0,
 					phaseStates: [SubscriptionPhaseState.SAVED],
 					isPhaseEditing: false,
-					originalPhases: [initialPhase],
+					originalPhases: [initialPhase as SubscriptionPhase],
 				});
 			}
 		}
@@ -240,8 +260,6 @@ const CustomerSubscription: React.FC = () => {
 			// TODO: remove this once the feature is released
 			overage_factor: firstPhase.overage_factor ?? 1,
 		};
-
-		console.log('payload', payload);
 
 		createSubscription(payload);
 	};

@@ -5,7 +5,7 @@ import { AddChargesButton } from '@/components/organisms/PlanForm/SetupChargesSe
 import { billlingPeriodOptions } from '@/constants/constants';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { Entitlement } from '@/models/Entitlement';
-import Feature, { FeatureType } from '@/models/Feature';
+import Feature, { FEATURE_TYPE } from '@/models/Feature';
 import { METER_USAGE_RESET_PERIOD } from '@/models/Meter';
 import { PlanApi } from '@/api/PlanApi';
 import { useMutation } from '@tanstack/react-query';
@@ -137,13 +137,13 @@ const AddEntitlementDrawer: FC<Props> = ({
 		let validationErrors: ValidationErrors = {};
 
 		switch (activeFeature.type) {
-			case FeatureType.metered:
+			case FEATURE_TYPE.METERED:
 				validationErrors = validateMeteredFeature();
 				break;
-			case FeatureType.static:
+			case FEATURE_TYPE.STATIC:
 				validationErrors = validateStaticFeature();
 				break;
-			case FeatureType.boolean:
+			case FEATURE_TYPE.BOOLEAN:
 				// TODO: Add validation for boolean features if needed
 				// validationErrors = validateBooleanFeature();
 				break;
@@ -201,7 +201,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 				feature: activeFeature,
 				feature_id: activeFeature.id,
 				feature_type: activeFeature.type,
-				is_enabled: activeFeature.type === FeatureType.boolean ? true : undefined,
+				is_enabled: activeFeature.type === FEATURE_TYPE.BOOLEAN ? true : undefined,
 			},
 		]);
 		setEntitlement({});
@@ -252,7 +252,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 						<SelectFeature
 							disabledFeatures={selectedFeatures.map((feature) => feature.id)}
 							onChange={(feature) => {
-								if (feature.type === FeatureType.boolean) {
+								if (feature.type === FEATURE_TYPE.BOOLEAN) {
 									// Automatically add boolean features
 									setEntitlements([
 										...entitlements,
@@ -288,7 +288,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 							</div>
 
 							{/* metered feature */}
-							{activeFeature.type === FeatureType.metered && (
+							{activeFeature.type === FEATURE_TYPE.METERED && (
 								<div>
 									{/* {activeFeature.type === FeatureType.metered && activeFeature.meter_id && (
 										<div className='w-full flex justify-between items-center'>
@@ -358,7 +358,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 							)}
 
 							{/* static features */}
-							{activeFeature.type === FeatureType.static && (
+							{activeFeature.type === FEATURE_TYPE.STATIC && (
 								<div>
 									<Input
 										error={errors.static_value}
