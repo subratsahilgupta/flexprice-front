@@ -1,5 +1,6 @@
+import { Metadata } from '@/models/base';
 import { Pagination } from '@/models/Pagination';
-import { Payment } from '@/models/Payment';
+import { Payment, PAYMENT_DESTINATION_TYPE, PAYMENT_METHOD_TYPE } from '@/models/Payment';
 
 export interface GetAllPaymentsPayload {
 	currency?: string;
@@ -24,14 +25,14 @@ export interface GetAllPaymentsResponse {
 	pagination: Pagination;
 }
 
-export interface CreatePaymentPayload {
+export interface RecordPaymentPayload {
 	amount: number;
 	currency: string;
 	destination_id: string;
-	destination_type: string;
-	idempotency_key: string;
-	metadata: Record<string, unknown>;
-	payment_method_id: string;
-	payment_method_type: string;
-	process_payment: boolean;
+	destination_type: PAYMENT_DESTINATION_TYPE;
+	idempotency_key?: string;
+	metadata?: Metadata;
+	payment_method_id?: string;
+	payment_method_type: PAYMENT_METHOD_TYPE;
+	process_payment?: boolean;
 }

@@ -25,6 +25,8 @@ export { default as WalletTransactionsTable } from './Wallet';
 
 export { default as TopupCard } from './TopupCard';
 
+export { default as RecordPaymentTopup } from './RecordPaymentTopup';
+
 export { default as RolloutChargesModal, RolloutOption } from './RolloutChargesModal';
 
 export { default as RectangleRadiogroup } from './RectangleRadiogroup';

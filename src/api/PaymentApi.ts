@@ -1,12 +1,12 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import { Payment } from '@/models/Payment';
 import { generateQueryParams } from '@/utils/common/api_helper';
-import { GetAllPaymentsPayload, GetAllPaymentsResponse } from '@/types/dto';
+import { GetAllPaymentsPayload, GetAllPaymentsResponse, RecordPaymentPayload } from '@/types/dto/Payment';
 
 class PaymentApi {
 	private static baseUrl = '/payments';
 
-	public static async createPayment(data: Partial<Payment>) {
+	public static async createPayment(data: RecordPaymentPayload) {
 		return await AxiosClient.post<Payment>(this.baseUrl, data);
 	}
 
