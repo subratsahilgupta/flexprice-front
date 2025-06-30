@@ -2,15 +2,17 @@ import { useParams } from 'react-router-dom';
 import InvoiceDetails from '../customers/invoice/InvoiceDetail';
 import { useQuery } from '@tanstack/react-query';
 import PaymentApi from '@/api/PaymentApi';
+import CreditNoteApi from '@/api/CreditNoteApi';
 import { ApiDocsContent, CustomTabs } from '@/components/molecules';
-import { Loader, Page, ShortPagination } from '@/components/atoms';
-import { InvoicePaymentsTable } from '@/components/molecules';
+import { Loader, NoDataCard, Page, ShortPagination } from '@/components/atoms';
+import { InvoicePaymentsTable, CreditNoteTable } from '@/components/molecules';
 import usePagination from '@/hooks/usePagination';
 
 const CustomerInvoiceDetailsPage = () => {
 	const { invoice_id } = useParams();
 	const { limit, offset } = usePagination();
-	const { data: payments, isLoading } = useQuery({
+
+	const { data: payments, isLoading: paymentsLoading } = useQuery({
 		queryKey: ['payments', invoice_id],
 		queryFn: () =>
 			PaymentApi.getAllPayments({
@@ -18,6 +20,17 @@ const CustomerInvoiceDetailsPage = () => {
 				offset,
 				destination_id: invoice_id!,
 				destination_type: 'INVOICE',
+			}),
+	});
+
+	const { data: creditNotes, isLoading: creditNotesLoading } = useQuery({
+		queryKey: ['creditNotes', invoice_id],
+		queryFn: () =>
+			CreditNoteApi.getCreditNotes({
+				limit,
+				offset,
+				invoice_id: invoice_id!,
+				expand: 'invoice,customer',
 			}),
 	});
 
@@ -30,12 +43,32 @@ const CustomerInvoiceDetailsPage = () => {
 		{
 			value: 'payments',
 			label: 'Payments',
-			content: isLoading ? (
+			content: paymentsLoading ? (
 				<Loader />
 			) : (
 				<div>
 					<InvoicePaymentsTable data={payments?.items ?? []} />
 					<ShortPagination unit='Payments' totalItems={payments?.pagination.total ?? 0} />
+				</div>
+			),
+		},
+		{
+			value: 'creditNotes',
+			label: 'Credit Notes',
+			content: creditNotesLoading ? (
+				<Loader />
+			) : (
+				<div>
+					{creditNotes?.items?.length === 0 ? (
+						<div className='my-6'>
+							<NoDataCard title='Credit Notes' subtitle='No credit notes found' />
+						</div>
+					) : (
+						<>
+							<CreditNoteTable data={creditNotes?.items ?? []} />
+							<ShortPagination unit='Credit Notes' totalItems={creditNotes?.pagination.total ?? 0} />
+						</>
+					)}
 				</div>
 			),
 		},

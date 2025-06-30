@@ -177,6 +177,7 @@ const AddCreditNotePage = () => {
 			reason: selectedReason as CREDIT_NOTE_REASON,
 			memo: memo || undefined,
 			line_items: creditNoteLineItems,
+			process_credit_note: true,
 		};
 
 		createCreditNoteMutation.mutate(params);

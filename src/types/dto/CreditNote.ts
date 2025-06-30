@@ -25,6 +25,7 @@ export interface CreateCreditNoteParams {
 	metadata?: Record<string, any>;
 	line_items: CreateCreditNoteLineItemRequest[];
 	idempotency_key?: string;
+	process_credit_note?: boolean;
 }
 
 export interface CreateCreditNoteLineItemRequest {
