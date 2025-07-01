@@ -7,6 +7,7 @@ import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import { CreditCard, Banknote, Receipt, CircleDollarSign } from 'lucide-react';
 import { RouteNames } from '@/core/routes/Routes';
 import { RedirectCell } from '../Table';
+import { PAYMENT_METHOD_TYPE } from '@/constants';
 
 interface Props {
 	data: Payment[];
@@ -14,13 +15,13 @@ interface Props {
 
 const getPaymentMethodIcon = (method: string) => {
 	switch (method.toUpperCase()) {
-		case 'CARD':
+		case PAYMENT_METHOD_TYPE.CARD:
 			return <CreditCard className='w-4 h-4' />;
-		case 'ACH':
+		case PAYMENT_METHOD_TYPE.ACH:
 			return <Banknote className='w-4 h-4' />;
-		case 'OFFLINE':
+		case PAYMENT_METHOD_TYPE.OFFLINE:
 			return <Receipt className='w-4 h-4' />;
-		case 'CREDITS':
+		case PAYMENT_METHOD_TYPE.CREDITS:
 			return <CircleDollarSign className='w-4 h-4' />;
 		default:
 			return <CreditCard className='w-4 h-4' />;
@@ -29,13 +30,13 @@ const getPaymentMethodIcon = (method: string) => {
 
 const getPaymentMethodLabel = (method: string) => {
 	switch (method.toUpperCase()) {
-		case 'CARD':
+		case PAYMENT_METHOD_TYPE.CARD:
 			return 'Card';
-		case 'ACH':
+		case PAYMENT_METHOD_TYPE.ACH:
 			return 'Bank Transfer';
-		case 'OFFLINE':
+		case PAYMENT_METHOD_TYPE.OFFLINE:
 			return 'Offline';
-		case 'CREDITS':
+		case PAYMENT_METHOD_TYPE.CREDITS:
 			return 'Wallet Credits';
 		default:
 			return method;

@@ -27,7 +27,7 @@ export type {
 	GetAllInvoicesPayload,
 	UpdateInvoiceStatusPayload,
 	GetInvoicePreviewPayload,
-	CreateOneOffInvoicePayload,
+	CreateInvoicePayload as CreateOneOffInvoicePayload,
 	GetInvoicePdfPayload,
 } from './InvoiceApi';
 
