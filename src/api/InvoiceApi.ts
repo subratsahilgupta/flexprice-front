@@ -54,7 +54,7 @@ class InvoiceApi {
 		return await AxiosClient.get(url);
 	}
 
-	public static async createOneOffInvoice(payload: CreateOneOffInvoicePayload): Promise<Invoice> {
+	public static async createInvoice(payload: CreateOneOffInvoicePayload): Promise<Invoice> {
 		return await AxiosClient.post<Invoice>(`${this.baseurl}`, payload);
 	}
 
