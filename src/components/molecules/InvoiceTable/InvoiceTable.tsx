@@ -1,4 +1,4 @@
-import { Invoice } from '@/models/Invoice';
+import { Invoice, INVOICE_STATUS } from '@/models/Invoice';
 import { FC } from 'react';
 import FlexpriceTable, { ColumnData, RedirectCell } from '../Table';
 import { formatDateShort, getCurrencySymbol } from '@/utils/common/helper_functions';
@@ -6,17 +6,18 @@ import { Chip } from '@/components/atoms';
 import { useNavigate } from 'react-router-dom';
 import InvoiceTableMenu from './InvoiceTableMenu';
 import { RouteNames } from '@/core/routes/Routes';
+import { PAYMENT_STATUS } from '@/constants';
 export interface Props {
 	data: Invoice[];
 }
 
 const getStatusChip = (status: string) => {
 	switch (status.toUpperCase()) {
-		case 'VOIDED':
+		case INVOICE_STATUS.VOIDED:
 			return <Chip variant='default' label='Void' />;
-		case 'FINALIZED':
+		case INVOICE_STATUS.FINALIZED:
 			return <Chip variant='success' label='Finalized' />;
-		case 'DRAFT':
+		case INVOICE_STATUS.DRAFT:
 			return <Chip variant='default' label='Draft' />;
 		default:
 			return <Chip variant='default' label='Draft' />;
@@ -25,12 +26,14 @@ const getStatusChip = (status: string) => {
 
 export const getPaymentStatusChip = (status: string) => {
 	switch (status.toUpperCase()) {
-		case 'PENDING':
+		case PAYMENT_STATUS.PENDING:
 			return <Chip variant='default' label='Pending' />;
-		case 'SUCCEEDED':
+		case PAYMENT_STATUS.SUCCEEDED:
 			return <Chip variant='success' label='Succeeded' />;
-		case 'FAILED':
+		case PAYMENT_STATUS.FAILED:
 			return <Chip variant='failed' label='Failed' />;
+		case PAYMENT_STATUS.REFUNDED:
+			return <Chip variant='default' label='Refunded' />;
 		default:
 			return <Chip variant='default' label='Unknown' />;
 	}

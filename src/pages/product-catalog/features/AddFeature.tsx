@@ -403,7 +403,7 @@ const AggregationSection = ({
 				...prev,
 				aggregation: {
 					type: type as unknown as METER_AGGREGATION_TYPE,
-					field: prev.aggregation?.field || '',
+					field: prev.aggregation?.field ?? '',
 				},
 			}));
 		},
@@ -430,7 +430,7 @@ const AggregationSection = ({
 				...prev,
 				aggregation: {
 					...prev.aggregation!,
-					multiplier: parseFloat(multiplierStr) || 1,
+					multiplier: multiplierStr ? Number(multiplierStr) : undefined,
 				},
 			}));
 		},
@@ -486,7 +486,7 @@ const AggregationSection = ({
 						onChange={handleMultiplierChange}
 						label='Multiplier'
 						placeholder='1'
-						description='Specify the multiplier for the aggregation. e.g. 1000 for 1000 tokens.'
+						description='Specify the multiplier for the aggregation. e.g. 1.5, 0.25, or 1000.'
 						error={meterErrors.aggregation_multiplier}
 					/>
 				)}
@@ -578,7 +578,7 @@ const AddFeaturePage = () => {
 			navigate(RouteNames.features);
 			toast.success('Feature created successfully');
 		},
-		onError: (error: any) => {
+		onError: (error: ServerError) => {
 			toast.error(error.error?.message || 'An error occurred while creating feature. Please try again.');
 		},
 	});
