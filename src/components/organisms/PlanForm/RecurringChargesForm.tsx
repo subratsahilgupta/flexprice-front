@@ -6,6 +6,8 @@ import { CheckboxRadioGroup, FormHeader, Input, Spacer, Button, Select } from '@
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import RecurringChargePreview from './RecurringChargePreview';
+import { BILLING_CADENCE, INVOICE_CADENCE } from '@/models/Invoice';
+import { BILLING_PERIOD } from '@/models/Price';
 
 interface Props {
 	price: Partial<InternalPrice>;
@@ -77,7 +79,7 @@ const RecurringChargesForm = ({ price, onAdd, onUpdate, onEditClicked, onDeleteC
 			<Select
 				value={localPrice.billing_period}
 				options={billlingPeriodOptions}
-				onChange={(value) => setLocalPrice({ ...localPrice, billing_period: value })}
+				onChange={(value) => setLocalPrice({ ...localPrice, billing_period: value as BILLING_PERIOD })}
 				label='Billing Period'
 				error={errors.billing_period}
 			/>
@@ -112,7 +114,10 @@ const RecurringChargesForm = ({ price, onAdd, onUpdate, onEditClicked, onDeleteC
 					},
 				]}
 				onChange={(value) => {
-					setLocalPrice({ ...localPrice, invoice_cadence: value });
+					setLocalPrice({ ...localPrice, invoice_cadence: value as INVOICE_CADENCE });
+					if (value === BILLING_CADENCE.ONETIME) {
+						setLocalPrice({ ...localPrice, isTrialPeriod: false, trial_period: 0 });
+					}
 				}}
 				error={errors.invoice_cadence}
 			/>

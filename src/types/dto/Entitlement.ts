@@ -2,7 +2,7 @@ import { Plan } from '@/models/Plan';
 import { BaseEntityStatus } from '../common';
 import Feature from '@/models/Feature';
 import { Entitlement } from '@/models/Entitlement';
-import { PaginationType } from '@/models/Pagination';
+import { Pagination } from '@/models/Pagination';
 
 export interface EntitlementFilters {
 	end_time?: string;
@@ -26,5 +26,5 @@ export interface ExtendedEntitlement extends Entitlement {
 
 export interface EntitlementResponse {
 	items: ExtendedEntitlement[] | Entitlement[];
-	pagination: PaginationType;
+	pagination: Pagination;
 }

@@ -2,10 +2,15 @@ import { AxiosClient } from '@/core/axios/verbs';
 import { Wallet } from '@/models/Wallet';
 import { RealtimeWalletBalance } from '@/models/WalletBalance';
 import { CreateWalletPayload, TopupWalletPayload, WalletTransactionResponse, WalletTransactionPayload } from '@/types/dto';
+import { GetCustomerWalletsPayload } from '@/types/dto/Wallet';
+import { generateQueryParams } from '@/utils/common/api_helper';
 
 class WalletApi {
-	static async getWallets(customerId: string): Promise<Wallet[]> {
-		return await AxiosClient.get<Wallet[]>(`/customers/${customerId}/wallets`);
+	private static baseUrl = '/wallets';
+
+	static async getCustomerWallets(data: GetCustomerWalletsPayload): Promise<Wallet[]> {
+		const url = generateQueryParams(`/customers${this.baseUrl}`, data);
+		return await AxiosClient.get<Wallet[]>(url);
 	}
 
 	static async getWalletTransactions({ walletId, limit = 10, offset = 0 }: WalletTransactionPayload): Promise<WalletTransactionResponse> {
@@ -21,6 +26,7 @@ class WalletApi {
 		name,
 		initial_credits_to_load,
 		conversion_rate,
+		initial_credits_expiry_date_utc,
 	}: CreateWalletPayload): Promise<Wallet> {
 		return await AxiosClient.post<Wallet>(`/wallets`, {
 			currency,
@@ -28,6 +34,7 @@ class WalletApi {
 			name,
 			initial_credits_to_load,
 			conversion_rate,
+			initial_credits_expiry_date_utc,
 		});
 	}
 

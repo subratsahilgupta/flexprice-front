@@ -1,5 +1,6 @@
 import { Card, FormHeader, Page, Spacer } from '@/components/atoms';
-import { ColumnData, InvoiceLineItemTable, SubscriptionPauseWarning } from '@/components/molecules';
+import { ColumnData, SubscriptionPauseWarning } from '@/components/molecules';
+import { SubscriptionPreviewLineItemTable } from '@/components/molecules/InvoiceLineItemTable';
 import SubscriptionActionButton from '@/components/organisms/Subscription/SubscriptionActionButton';
 import { getSubscriptionStatus } from '@/components/organisms/Subscription/SubscriptionTable';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -16,6 +17,7 @@ import CreditGrantApi from '@/api/CreditGrantApi';
 import { formatExpirationType } from '@/components/molecules/CreditGrant/CreditGrantTable';
 import { CreditGrant, CREDIT_GRANT_EXPIRATION_TYPE } from '@/models/CreditGrant';
 import FlexpriceTable from '@/components/molecules/Table';
+import { INVOICE_TYPE } from '@/models/Invoice';
 
 // Enhanced function to format expiration period with duration units
 export const formatExpirationPeriod = (grant: CreditGrant): string => {
@@ -161,30 +163,27 @@ const SubscriptionDetails: FC = () => {
 				</div>
 				<Spacer className='!my-4' />
 
-				<div className='w-full flex justify-between items-center'>
-					<p className='text-[#71717A] text-sm'>Commitment Amount</p>
-					<p className='text-[#09090B] text-sm'>
-						{getCurrencySymbol(subscriptionDetails?.currency || '')} {subscriptionDetails?.commitment_amount || '0'}
-					</p>
-				</div>
-				<Spacer className='!my-4' />
+				{subscriptionDetails?.commitment_amount && (
+					<div className='w-full flex justify-between items-center'>
+						<p className='text-[#71717A] text-sm'>Commitment Amount</p>
+						<p className='text-[#09090B] text-sm'>
+							{getCurrencySymbol(subscriptionDetails?.currency || '')} {subscriptionDetails?.commitment_amount || '0'}
+						</p>
+					</div>
+				)}
 
-				<div className='w-full flex justify-between items-center'>
-					<p className='text-[#71717A] text-sm'>Overage Factor</p>
-					<p className='text-[#09090B] text-sm'>{subscriptionDetails?.overage_factor || '--'}</p>
-				</div>
-				<Spacer className='!my-4' />
+				{subscriptionDetails?.overage_factor && subscriptionDetails?.overage_factor > 1 && (
+					<div className='w-full flex justify-between items-center'>
+						<p className='text-[#71717A] text-sm'>Overage Factor</p>
+						<p className='text-[#09090B] text-sm'>{subscriptionDetails?.overage_factor}</p>
+					</div>
+				)}
 
 				<div className='w-full flex justify-between items-center'>
 					<p className='text-[#71717A] text-sm'>Start date</p>
 					<p className='text-[#09090B] text-sm'>{formatDateShort(subscriptionDetails?.start_date ?? '')}</p>
 				</div>
 				<Spacer className='!my-4' />
-
-				<div className='w-full flex justify-between items-center'>
-					<p className='text-[#71717A] text-sm'>Upcoming Invoice</p>
-					<p className='text-[#09090B] text-sm'>{`${getCurrencySymbol(data?.currency ?? '')}${data?.amount_due} on ${formatDateShort(subscriptionDetails?.current_period_end ?? '')}`}</p>
-				</div>
 			</Card>
 
 			{/* Credit Grants Section */}
@@ -252,11 +251,14 @@ const SubscriptionDetails: FC = () => {
 
 			{(data?.line_items?.length ?? 0) > 0 && (
 				<div className='card !mt-4'>
-					<InvoiceLineItemTable
+					<SubscriptionPreviewLineItemTable
+						subtotal={data?.subtotal}
+						invoiceType={data?.invoice_type as INVOICE_TYPE}
 						refetch={refetch}
 						currency={data?.currency}
 						amount_due={data?.amount_due}
 						title='Upcoming Invoices'
+						subtitle={`This is a preview of the invoice that will be billed on ${formatDateShort(subscriptionDetails?.current_period_end ?? '')}. It may change if subscription is updated.`}
 						data={data?.line_items ?? []}
 					/>
 				</div>

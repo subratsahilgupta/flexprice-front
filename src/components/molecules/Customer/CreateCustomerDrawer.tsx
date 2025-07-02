@@ -216,8 +216,6 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 					: undefined,
 			};
 
-			console.log('Customer payload with connection:', payload);
-
 			// Keep the original API calls for now
 			if (data) {
 				return await CustomerApi.updateCustomer(payload.customer as Customer, data.id);

@@ -5,7 +5,7 @@ import { AddChargesButton } from '@/components/organisms/PlanForm/SetupChargesSe
 import { billlingPeriodOptions } from '@/constants/constants';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { Entitlement } from '@/models/Entitlement';
-import Feature, { FeatureType } from '@/models/Feature';
+import Feature, { FEATURE_TYPE } from '@/models/Feature';
 import { METER_USAGE_RESET_PERIOD } from '@/models/Meter';
 import { PlanApi } from '@/api/PlanApi';
 import { useMutation } from '@tanstack/react-query';
@@ -79,14 +79,29 @@ const AddEntitlementDrawer: FC<Props> = ({
 			return newErrors;
 		}
 
-		if (tempEntitlement.usage_limit === undefined && tempEntitlement.usage_limit !== null) {
-			newErrors.usage_limit = 'Usage limit is required';
-		} else if (tempEntitlement.usage_limit !== null && tempEntitlement.usage_limit < 0) {
-			newErrors.usage_limit = 'Usage limit cannot be negative';
+		const isInfinite = tempEntitlement.usage_limit === null;
+		const isResetNever = activeFeature?.meter?.reset_usage === METER_USAGE_RESET_PERIOD.NEVER;
+
+		// If reset period is set to NEVER, usage limit is required (cannot be infinite)
+		if (isResetNever) {
+			if (tempEntitlement.usage_limit !== undefined && tempEntitlement.usage_limit !== null && tempEntitlement.usage_limit < 0) {
+				newErrors.usage_limit = 'Usage limit cannot be negative';
+			}
+		} else {
+			// Normal validation for usage limit when reset is not NEVER
+			if (tempEntitlement.usage_limit === undefined) {
+				newErrors.usage_limit = 'Usage limit is required';
+			} else if (tempEntitlement.usage_limit !== null && tempEntitlement.usage_limit < 0) {
+				newErrors.usage_limit = 'Usage limit cannot be negative';
+			}
 		}
 
-		if (!tempEntitlement.usage_reset_period && tempEntitlement.usage_reset_period !== null) {
-			newErrors.usage_reset_period = 'Usage reset period is required';
+		// If user sets to infinite, don't require usage reset period
+		// If reset is NEVER, usage reset period is not applicable
+		if (!isInfinite && !isResetNever) {
+			if (!tempEntitlement.usage_reset_period || tempEntitlement.usage_reset_period === '') {
+				newErrors.usage_reset_period = 'Usage reset period is required';
+			}
 		}
 
 		return newErrors;
@@ -122,13 +137,13 @@ const AddEntitlementDrawer: FC<Props> = ({
 		let validationErrors: ValidationErrors = {};
 
 		switch (activeFeature.type) {
-			case FeatureType.metered:
+			case FEATURE_TYPE.METERED:
 				validationErrors = validateMeteredFeature();
 				break;
-			case FeatureType.static:
+			case FEATURE_TYPE.STATIC:
 				validationErrors = validateStaticFeature();
 				break;
-			case FeatureType.boolean:
+			case FEATURE_TYPE.BOOLEAN:
 				// TODO: Add validation for boolean features if needed
 				// validationErrors = validateBooleanFeature();
 				break;
@@ -186,7 +201,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 				feature: activeFeature,
 				feature_id: activeFeature.id,
 				feature_type: activeFeature.type,
-				is_enabled: activeFeature.type === FeatureType.boolean ? true : undefined,
+				is_enabled: activeFeature.type === FEATURE_TYPE.BOOLEAN ? true : undefined,
 			},
 		]);
 		setEntitlement({});
@@ -237,7 +252,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 						<SelectFeature
 							disabledFeatures={selectedFeatures.map((feature) => feature.id)}
 							onChange={(feature) => {
-								if (feature.type === FeatureType.boolean) {
+								if (feature.type === FEATURE_TYPE.BOOLEAN) {
 									// Automatically add boolean features
 									setEntitlements([
 										...entitlements,
@@ -273,7 +288,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 							</div>
 
 							{/* metered feature */}
-							{activeFeature.type === FeatureType.metered && (
+							{activeFeature.type === FEATURE_TYPE.METERED && (
 								<div>
 									{/* {activeFeature.type === FeatureType.metered && activeFeature.meter_id && (
 										<div className='w-full flex justify-between items-center'>
@@ -343,7 +358,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 							)}
 
 							{/* static features */}
-							{activeFeature.type === FeatureType.static && (
+							{activeFeature.type === FEATURE_TYPE.STATIC && (
 								<div>
 									<Input
 										error={errors.static_value}

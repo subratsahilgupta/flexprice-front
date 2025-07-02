@@ -1,12 +1,13 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import { Plan } from '@/models/Plan';
-import { PaginationType } from '@/models/Pagination';
+import { Pagination } from '@/models/Pagination';
 import { ExpandedPlan } from '@/utils/models/transformed_plan';
 import { generateQueryParams } from '@/utils/common/api_helper';
+import { SynchronizePlanPricesWithSubscriptionResponse } from '@/types/dto';
 
 export interface GetAllPlansResponse {
 	items: Plan[] | ExpandedPlan[];
-	pagination: PaginationType;
+	pagination: Pagination;
 }
 
 export class PlanApi {
@@ -16,7 +17,7 @@ export class PlanApi {
 		return await AxiosClient.post<Plan, Partial<Plan>>(this.baseUrl, data);
 	}
 
-	public static async getAllPlans({ limit, offset }: PaginationType) {
+	public static async getAllPlans({ limit, offset }: Pagination) {
 		const payload = {
 			limit,
 			offset,
@@ -25,7 +26,7 @@ export class PlanApi {
 		const url = generateQueryParams(this.baseUrl, payload);
 		return await AxiosClient.get<GetAllPlansResponse>(url);
 	}
-	public static async getAllActivePlans({ limit, offset }: PaginationType) {
+	public static async getAllActivePlans({ limit, offset }: Pagination) {
 		const payload = {
 			status: 'published',
 			limit,
@@ -44,7 +45,7 @@ export class PlanApi {
 		const response = await AxiosClient.get<GetAllPlansResponse>(url);
 		return response.items as ExpandedPlan[];
 	}
-	public static async getActiveExpandedPlan(query?: PaginationType) {
+	public static async getActiveExpandedPlan(query?: Pagination) {
 		const payload = {
 			expand: 'prices,meters',
 			status: 'published',
@@ -58,21 +59,21 @@ export class PlanApi {
 
 	public static async getPlanById(id: string) {
 		const payload = {
-			expand: 'meters%2Centitlements%2Cprices%2Cfeatures',
+			expand: 'meters,entitlements,prices,features',
 		};
 		const url = generateQueryParams(`${this.baseUrl}/${id}`, payload);
 		return await AxiosClient.get<Plan>(url);
 	}
 
 	public static async updatePlan(id: string, data: Partial<Plan>) {
-		const payload = {
-			expand: 'meters%2Centitlements%2Cprices%2Cfeatures',
-		};
-		const url = generateQueryParams(`${this.baseUrl}/${id}`, payload);
-		return await AxiosClient.put<Plan, Partial<Plan>>(url, data);
+		return await AxiosClient.put<Plan, Partial<Plan>>(`${this.baseUrl}/${id}`, data);
 	}
 
 	public static async deletePlan(id: string) {
 		return await AxiosClient.delete<void>(`${this.baseUrl}/${id}`);
+	}
+
+	public static async synchronizePlanPricesWithSubscription(id: string) {
+		return await AxiosClient.post<SynchronizePlanPricesWithSubscriptionResponse>(`${this.baseUrl}/${id}/sync/subscriptions`);
 	}
 }

@@ -12,6 +12,7 @@ import toast from 'react-hot-toast';
 import { RouteNames } from '@/core/routes/Routes';
 import { Trash2 } from 'lucide-react';
 import { AddChargesButton } from '@/components/organisms/PlanForm/SetupChargesSection';
+import { InvoiceType, PAYMENT_STATUS } from '@/constants';
 
 interface LineItem {
 	display_name: string;
@@ -82,17 +83,21 @@ const CreateInvoicePage: FC = () => {
 
 	const { mutate: createInvoice, isPending } = useMutation({
 		mutationFn: async () => {
-			return await InvoiceApi.createOneOffInvoice({
+			return await InvoiceApi.createInvoice({
 				customer_id: customerId!,
-				invoice_type: 'ONE_OFF',
+				invoice_type: InvoiceType.ONE_OFF,
 				currency,
-				amount_due: calculateSubtotal().toString(),
+				payment_status: PAYMENT_STATUS.PENDING,
+				amount_due: calculateSubtotal(),
 				period_start: today.toISOString(),
 				line_items: lineItems.map((item) => ({
 					display_name: item.display_name,
 					quantity: item.quantity,
 					amount: parseFloat(item.amount || '0') * parseFloat(item.quantity || '0'),
 				})),
+				total: calculateSubtotal(),
+				subtotal: calculateSubtotal(),
+				billing_reason: 'manual',
 			});
 		},
 		onSuccess: (data) => {

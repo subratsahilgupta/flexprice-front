@@ -1,7 +1,7 @@
 import { Chip, Progress } from '@/components/atoms';
 import { ColumnData, FlexpriceTable, RedirectCell } from '@/components/molecules';
 import { RouteNames } from '@/core/routes/Routes';
-import { FeatureType } from '@/models/Feature';
+import { FEATURE_TYPE } from '@/models/Feature';
 import { FC } from 'react';
 import { getFeatureIcon } from '@/components/atoms/SelectFeature/SelectFeature';
 import CustomerUsage from '@/models/CustomerUsage';
@@ -23,12 +23,12 @@ export const getFeatureTypeChips = ({
 }) => {
 	const icon = getFeatureIcon(type);
 	switch (type.toLocaleLowerCase()) {
-		case 'static': {
+		case FEATURE_TYPE.STATIC: {
 			return <Chip variant='default' icon={showIcon && icon} label={showLabel && 'Static'} />;
 		}
-		case 'metered':
+		case FEATURE_TYPE.METERED:
 			return <Chip textColor='#1E3A8A' bgColor='#F0F9FF' icon={showIcon && icon} label={showLabel && 'Metered'} />;
-		case 'boolean':
+		case FEATURE_TYPE.BOOLEAN:
 			return <Chip textColor='#075985' bgColor='#F0F9FF' icon={showIcon && icon} label={showLabel && 'Boolean'} />;
 		default:
 			return <Chip textColor='#075985' bgColor='#F0F9FF' icon={showIcon && icon} label={showLabel && '--'} />;
@@ -37,16 +37,16 @@ export const getFeatureTypeChips = ({
 
 const getFeatureValue = (data: CustomerUsage) => {
 	switch (data.feature.type) {
-		case FeatureType.static:
+		case FEATURE_TYPE.STATIC:
 			return data.sources[0].static_value;
-		case FeatureType.metered:
+		case FEATURE_TYPE.METERED:
 			return (
 				<span className='flex items-end gap-1'>
 					{data.total_limit ? formatAmount(data.total_limit?.toString()) : 'Unlimited'}
 					<span className='text-[#64748B] text-sm font-normal font-sans'>units</span>
 				</span>
 			);
-		case FeatureType.boolean:
+		case FEATURE_TYPE.BOOLEAN:
 			return data.is_enabled ? 'True' : 'False';
 		default:
 			return '--';
@@ -89,7 +89,7 @@ const CustomerUsageTable: FC<Props> = ({ data, allowRedirect = true }) => {
 		{
 			title: 'Usage',
 			render(row) {
-				if (row?.feature?.type != FeatureType.metered) {
+				if (row?.feature?.type != FEATURE_TYPE.METERED) {
 					return '--';
 				}
 				const usage = Number(row?.current_usage);

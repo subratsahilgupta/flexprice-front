@@ -1,6 +1,6 @@
 import { SelectOption, Select } from '@/components/atoms';
 import { cn } from '@/lib/utils';
-import Feature, { FeatureType } from '@/models/Feature';
+import Feature, { FEATURE_TYPE } from '@/models/Feature';
 import FeatureApi from '@/api/FeatureApi';
 import { useQuery } from '@tanstack/react-query';
 import { Gauge, SquareCheckBig, Wrench } from 'lucide-react';
@@ -25,11 +25,11 @@ interface Props {
 
 export const getFeatureIcon = (featureType: string) => {
 	const className = 'size-4 opacity-80 text-muted-foreground';
-	if (featureType === FeatureType.boolean) {
+	if (featureType === FEATURE_TYPE.BOOLEAN) {
 		return <SquareCheckBig className={className} />;
-	} else if (featureType === FeatureType.metered) {
+	} else if (featureType === FEATURE_TYPE.METERED) {
 		return <Gauge className={className} />;
-	} else if (featureType === FeatureType.static) {
+	} else if (featureType === FEATURE_TYPE.STATIC) {
 		return <Wrench className={className} />;
 	}
 };

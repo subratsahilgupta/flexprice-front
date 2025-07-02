@@ -1,6 +1,6 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import { Meter } from '@/models/Meter';
-import { PaginationType } from '@/models/Pagination';
+import { Pagination } from '@/models/Pagination';
 import { GetAllMetersResponse } from '@/types/dto';
 
 export class MeterApi {
@@ -9,11 +9,11 @@ export class MeterApi {
 	public static async createMeter(data: Partial<Meter>) {
 		return await AxiosClient.post<Meter, Partial<Meter>>(this.baseUrl, data);
 	}
-	public static async getAllMeters({ limit, offset }: PaginationType) {
+	public static async getAllMeters({ limit, offset }: Pagination) {
 		return await AxiosClient.get<GetAllMetersResponse>(`${this.baseUrl}?limit=${limit}&offset=${offset}`);
 	}
 	public static async getAllActiveMeters() {
-		return await AxiosClient.get<GetAllMetersResponse>(`${this.baseUrl}?status=published`);
+		return await AxiosClient.get<GetAllMetersResponse>(`${this.baseUrl}?status=published&limit=1000`);
 	}
 
 	public static async getMeterById(id: string) {

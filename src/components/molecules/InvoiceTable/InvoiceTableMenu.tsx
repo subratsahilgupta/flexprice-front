@@ -1,6 +1,6 @@
-import { Invoice } from '@/models/Invoice';
+import { Invoice, INVOICE_STATUS } from '@/models/Invoice';
 import { FC, useState } from 'react';
-import { DropdownMenu } from '..';
+import { DropdownMenu, RecordPaymentTopup } from '..';
 import { DropdownMenuOption } from '../DropdownMenu/DropdownMenu';
 import { useMutation } from '@tanstack/react-query';
 import InvoiceApi from '@/api/InvoiceApi';
@@ -9,6 +9,8 @@ import InvoiceStatusModal from './InvoiceStatusModal';
 import InvoicePaymentStatusModal from './InvoicePaymentStatusModal';
 import { useNavigate } from 'react-router-dom';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
+import { PAYMENT_DESTINATION_TYPE, Payment } from '@/models/Payment';
+import { PAYMENT_STATUS } from '@/constants';
 
 interface Props {
 	data: Invoice;
@@ -17,18 +19,18 @@ interface Props {
 const InvoiceTableMenu: FC<Props> = ({ data }) => {
 	const navigate = useNavigate();
 
-	const { mutate: attemptPayment } = useMutation({
-		mutationFn: async (invoice_id: string) => {
-			return await InvoiceApi.attemptPayment(invoice_id);
-		},
-		onSuccess: () => {
-			toast.success('Invoice paid successfully');
-			refetchQueries();
-		},
-		onError: (error: ServerError) => {
-			toast.error(error.error.message || 'Unable to pay invoice. Please try again.');
-		},
-	});
+	// const { mutate: attemptPayment } = useMutation({
+	// 	mutationFn: async (invoice_id: string) => {
+	// 		return await InvoiceApi.attemptPayment(invoice_id);
+	// 	},
+	// 	onSuccess: () => {
+	// 		toast.success('Invoice paid successfully');
+	// 		refetchQueries();
+	// 	},
+	// 	onError: (error: ServerError) => {
+	// 		toast.error(error.error.message || 'Unable to pay invoice. Please try again.');
+	// 	},
+	// });
 
 	const { mutate: downloadInvoice } = useMutation({
 		mutationFn: async (invoice_id: string, invoice_number?: string) => {
@@ -45,10 +47,12 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 	const [state, setState] = useState<{
 		isPaymentModalOpen: boolean;
 		isStatusModalOpen: boolean;
+		isRecordPaymentDrawerOpen: boolean;
 		activeInvoice?: Invoice;
 	}>({
 		isPaymentModalOpen: false,
 		isStatusModalOpen: false,
+		isRecordPaymentDrawerOpen: false,
 	});
 
 	const menuOptions: DropdownMenuOption[] = [
@@ -59,13 +63,27 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 				downloadInvoice(data.id);
 			},
 		},
+		// {
+		// 	label: 'Attempt Payment',
+		// 	group: 'Actions',
+		// 	onSelect: () => {
+		// 		attemptPayment(data.id);
+		// 	},
+		// 	disabled:
+		// 		data?.payment_status === PAYMENT_STATUS.SUCCEEDED || data?.invoice_status === INVOICE_STATUS.VOIDED || data.amount_remaining === 0,
+		// },
 		{
-			label: 'Attempt Payment',
+			label: 'Record Payment',
 			group: 'Actions',
 			onSelect: () => {
-				attemptPayment(data.id);
+				setState({
+					...state,
+					isRecordPaymentDrawerOpen: true,
+					activeInvoice: data,
+				});
 			},
-			disabled: data?.payment_status === 'SUCCEEDED' || data?.invoice_status === 'VOIDED' || data.amount_remaining === '0',
+			disabled:
+				data?.payment_status === PAYMENT_STATUS.SUCCEEDED || data?.invoice_status === INVOICE_STATUS.VOIDED || data.amount_remaining === 0,
 		},
 		{
 			label: 'Update Invoice Status',
@@ -89,14 +107,14 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 				});
 			},
 		},
-		// {
-		// 	label: 'Issue a Credit Note',
-		// 	group: 'Actions',
-		// 	disabled: data?.payment_status === 'PENDING' || data?.payment_status === 'FAILED',
-		// 	onSelect: () => {
-		// 		navigate(`/customer-management/customers/${data?.customer_id}/invoice/${data?.id}/credit-note`);
-		// 	},
-		// },
+		{
+			label: 'Issue a Credit Note',
+			group: 'Actions',
+			disabled: data?.invoice_status !== 'FINALIZED' || data?.payment_status === 'REFUNDED',
+			onSelect: () => {
+				navigate(`/customer-management/customers/${data?.customer_id}/invoice/${data?.id}/credit-note`);
+			},
+		},
 		{
 			label: 'View Customer',
 			group: 'Connections',
@@ -112,6 +130,15 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 			},
 		},
 	];
+	const handlePaymentSuccess = (payment: Payment) => {
+		console.log('Payment recorded successfully:', payment);
+
+		// Refetch invoice and payment data
+		refetchQueries(['fetchInvoice', data.id]);
+		refetchQueries(['payments', data.id]);
+		refetchQueries(['fetchInvoices']);
+	};
+
 	return (
 		<div>
 			<InvoiceStatusModal
@@ -133,6 +160,21 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 						isPaymentModalOpen: open,
 					});
 				}}
+			/>
+			<RecordPaymentTopup
+				isOpen={state.isRecordPaymentDrawerOpen}
+				onOpenChange={(open: boolean) => {
+					setState({
+						...state,
+						isRecordPaymentDrawerOpen: open,
+					});
+				}}
+				destination_id={data.id}
+				destination_type={PAYMENT_DESTINATION_TYPE.INVOICE}
+				customer_id={data.customer_id}
+				max_amount={Number(data.amount_remaining)}
+				currency={data.currency}
+				onSuccess={handlePaymentSuccess}
 			/>
 			<DropdownMenu options={menuOptions} />
 		</div>

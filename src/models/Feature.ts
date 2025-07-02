@@ -1,27 +1,22 @@
+import { BaseModel } from './base';
 import { Meter } from './Meter';
 
-interface Feature {
-	id: string;
-	name: string;
-	description: string;
-	meter_id: string;
-	metadata: Record<string, any>;
-	type: string;
-	tenant_id: string;
-	status: string;
-	created_at: string;
-	updated_at: string;
-	created_by: string;
-	updated_by: string;
-	unit_plural: string;
-	unit_singular: string;
-	meter: Meter;
+interface Feature extends BaseModel {
+	readonly name: string;
+	readonly description: string;
+	readonly meter_id: string;
+	readonly metadata: Record<string, any>;
+	readonly type: FEATURE_TYPE;
+	readonly tenant_id: string;
+	readonly unit_plural: string;
+	readonly unit_singular: string;
+	readonly meter: Meter;
 }
 
-export enum FeatureType {
-	metered = 'metered',
-	static = 'static',
-	boolean = 'boolean',
+export enum FEATURE_TYPE {
+	METERED = 'metered',
+	STATIC = 'static',
+	BOOLEAN = 'boolean',
 }
 
 export default Feature;

@@ -1,4 +1,4 @@
-import { SelectOption, Select } from '@/components/atoms';
+import { SelectOption, SearchableSelect } from '@/components/atoms';
 import { cn } from '@/lib/utils';
 import { Meter } from '@/models/Meter';
 import { MeterApi } from '@/api/MeterApi';
@@ -50,22 +50,20 @@ const SelectMeter: FC<Props> = ({
 		return <div>No meters found</div>;
 	}
 
-	const activeMeters: SelectOption[] = metersData!.items
-		.filter((meter: Meter) => meter.status === 'published')
-		.map((meter: Meter) => {
-			return {
-				label: meter.name,
-				value: meter.id,
-			};
-		});
+	const activeMeters: SelectOption[] = metersData.items.map((meter: Meter) => {
+		return {
+			label: meter.name,
+			value: meter.id,
+		};
+	});
 
 	return (
 		<div className={cn('min-w-[200px]')}>
-			<Select
+			<SearchableSelect
 				className={className}
 				error={error}
 				value={value}
-				onChange={(e) => onChange(metersData.items.find((meter: Meter) => meter.id === e) as Meter)}
+				onChange={(e: string) => onChange(metersData.items.find((meter: Meter) => meter.id === e) as Meter)}
 				options={activeMeters}
 				placeholder={placeholder}
 				label={label}
