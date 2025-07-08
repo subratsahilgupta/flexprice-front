@@ -13,7 +13,6 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				title: 'Features',
 				url: RouteNames.features,
 				icon: Star,
-				// disabled: true,
 			},
 			{
 				title: 'Plans',
@@ -25,24 +24,6 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				url: RouteNames.pricing,
 				icon: Gem,
 			},
-			// {
-			// 	title: 'Add On',
-			// 	url: RouteNames.addOn,
-			// 	icon: Puzzle,
-			// 	disabled: true,
-			// },
-			// {
-			// 	title: 'Discounts',
-			// 	url: RouteNames.addOn,
-			// 	icon: TicketPercent,
-			// 	disabled: true,
-			// },
-			// {
-			// 	title: 'Taxes',
-			// 	url: RouteNames.addOn,
-			// 	icon: Percent,
-			// 	disabled: true,
-			// },
 		],
 		'Customer Management': [
 			{
@@ -65,12 +46,6 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				url: RouteNames.payments,
 				icon: CreditCard,
 			},
-			// {
-			// 	title: 'Quotation',
-			// 	url: '/roles',
-			// 	icon: Receipt,
-			// 	disabled: true,
-			// },
 		],
 		'Usage Tracking': [
 			{
@@ -110,7 +85,6 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				title: 'Bulk Imports',
 				url: RouteNames.bulkImports,
 				icon: FileInput,
-				// disabled: true,
 			},
 		],
 	};

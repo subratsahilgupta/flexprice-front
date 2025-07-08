@@ -19,12 +19,19 @@ const Integrations = () => {
 		linkedinIntegration?.providers?.some((provider) => provider.toLowerCase() === integration.name.toLowerCase()),
 	);
 
-	const available = integrations.filter(
+	const availableNonPremium = integrations.filter(
 		(integration) =>
 			!linkedinIntegration?.providers?.some((provider) => provider.toLowerCase() === integration.name.toLowerCase()) &&
-			integration.type === 'available',
+			integration.type === 'available' &&
+			!integration.premium,
 	);
 
+	const availablePremium = integrations.filter(
+		(integration) =>
+			!linkedinIntegration?.providers?.some((provider) => provider.toLowerCase() === integration.name.toLowerCase()) &&
+			integration.type === 'available' &&
+			integration.premium,
+	);
 	if (isLoading) {
 		return <Loader />;
 	}
@@ -45,7 +52,15 @@ const Integrations = () => {
 			<div className='mt-6'>
 				<FormHeader title='Available' variant='sub-header' />
 				<div className='grid grid-cols-2 gap-4 '>
-					{available.map((integration, index) => (
+					{availableNonPremium.map((integration, index) => (
+						<IntegrationCard key={index} integration={integration} />
+					))}
+				</div>
+			</div>
+			<div className='mt-6'>
+				<FormHeader title='Premium' variant='sub-header' />
+				<div className='grid grid-cols-2 gap-4 '>
+					{availablePremium.map((integration, index) => (
 						<IntegrationCard key={index} integration={integration} />
 					))}
 				</div>
