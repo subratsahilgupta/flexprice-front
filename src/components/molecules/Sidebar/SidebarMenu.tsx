@@ -1,7 +1,7 @@
 'use client';
 
 import { FC } from 'react';
-import { SidebarGroup, SidebarGroupLabel, SidebarMenu } from '@/components/ui/sidebar';
+import { SidebarGroup, SidebarMenu } from '@/components/ui/sidebar';
 import SidebarItem from './SidebarItem';
 import { useLocation } from 'react-router-dom';
 import { LucideIcon } from 'lucide-react';
@@ -18,15 +18,18 @@ export type NavItem = {
 	}[];
 };
 
-const SidebarNav: FC<{ items: NavItem[]; title: string }> = ({ items, title }) => {
+const SidebarNav: FC<{ items: NavItem[] }> = ({ items }) => {
 	const location = useLocation();
 
 	return (
 		<SidebarGroup className='mb-0'>
-			<SidebarGroupLabel className='text-xs mt-0 text-[#334155B2] font-medium '>{title}</SidebarGroupLabel>
-			<SidebarMenu>
+			<SidebarMenu className='gap-3'>
 				{items.map((item) => {
-					const isActive = location.pathname.startsWith(item.url);
+					// Check if current path matches the main item URL or any of its sub-items
+					const isMainItemActive = location.pathname.startsWith(item.url) && item.url !== '#';
+					const isSubItemActive = item.items?.some((subItem) => location.pathname.startsWith(subItem.url));
+					const isActive = isMainItemActive || isSubItemActive;
+
 					item.isActive = isActive;
 					return <SidebarItem key={item.title} {...item} />;
 				})}

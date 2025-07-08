@@ -517,23 +517,39 @@ const SidebarMenuSkeleton = React.forwardRef<
 });
 SidebarMenuSkeleton.displayName = 'SidebarMenuSkeleton';
 
-const SidebarMenuSub = React.forwardRef<HTMLUListElement, React.ComponentProps<'ul'>>(({ className, ...props }, ref) => (
+const SidebarMenuSub = React.forwardRef<HTMLUListElement, React.ComponentProps<'ul'>>(({ className, children, ...props }, ref) => (
 	<ul
 		ref={ref}
 		data-sidebar='menu-sub'
-		className={cn(
-			'mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5',
-			'group-data-[collapsible=icon]:hidden',
-			className,
-		)}
-		{...props}
-	/>
+		className={cn('relative mx-3.5 flex min-w-0 flex-col gap-1 px-2.5 py-0.5', 'group-data-[collapsible=icon]:hidden', className)}
+		{...props}>
+		{/* Vertical line, centered with the icon */}
+		<div
+			className='absolute left-0 top-0 bottom-0 flex items-center'
+			aria-hidden='true'
+			style={{ width: '1.25rem' }} // matches icon area
+		>
+			<div className='mx-auto h-full w-px bg-gray-300' style={{ minHeight: '32px' }} />
+		</div>
+		{/* Sub-menu items */}
+		{children}
+	</ul>
 ));
 SidebarMenuSub.displayName = 'SidebarMenuSub';
 
 const SidebarMenuSubItem = React.forwardRef<HTMLLIElement, React.ComponentProps<'li'>>(({ ...props }, ref) => <li ref={ref} {...props} />);
 SidebarMenuSubItem.displayName = 'SidebarMenuSubItem';
 
+/**
+ * SidebarMenuSubButton - Fixed version with proper hover behavior and vertical centering
+ *
+ * Issues fixed:
+ * 1. Vertical centering: Now uses proper height variants (h-8 for sm, h-10 for md)
+ * 2. Hover behavior: Consistent hover states using the same colors as reference UI (#F4F4F5)
+ * 3. Content alignment: Proper flex layout with items-center and justify-start
+ * 4. Active state: Uses data-[active=true] attribute for consistent styling
+ * 5. Transition: Smooth color transitions for better UX
+ */
 const SidebarMenuSubButton = React.forwardRef<
 	HTMLAnchorElement,
 	React.ComponentProps<'a'> & {
@@ -551,11 +567,28 @@ const SidebarMenuSubButton = React.forwardRef<
 			data-size={size}
 			data-active={isActive}
 			className={cn(
-				'flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sidebar-foreground outline-none ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-accent-foreground',
-				'data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground',
-				size === 'sm' && 'text-xs',
-				size === 'md' && 'text-sm',
+				// Base styles with proper vertical centering and consistent sizing
+				'flex min-w-0 -translate-x-px items-center justify-start gap-2 overflow-hidden rounded-[6px] ml-2 px-3 text-[14px] font-normal outline-none transition-colors duration-200',
+				// Interactive states with consistent hover behavior using the same colors as reference UI
+				'hover:bg-[#F4F4F5] hover:text-[#18181B]',
+				'focus-visible:ring-2 focus-visible:ring-[#3C87D2]',
+				'active:bg-[#F4F4F5] active:text-[#18181B]',
+				// Disabled states
+				'disabled:pointer-events-none disabled:opacity-50',
+				'aria-disabled:pointer-events-none aria-disabled:opacity-50',
+				// Active state matching the reference UI
+				'data-[active=true]:bg-[#F4F4F5] data-[active=true]:text-[#18181B]',
+				// Content styling
+				'[&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0',
+				// Size variants with proper heights
+				size === 'sm' && 'h-8 text-xs',
+				size === 'md' && 'h-10 text-[14px]',
+				// Hide when sidebar is collapsed to icon mode
 				'group-data-[collapsible=icon]:hidden',
+				// Cursor pointer for better UX
+				'cursor-pointer',
+				// Ensure proper text color
+				'text-[#18181B]',
 				className,
 			)}
 			{...props}
