@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { SectionHeader } from '@/components/atoms';
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 
 interface Props {
 	children?: React.ReactNode;
@@ -17,13 +17,19 @@ const Page: FC<Props> = ({ children, className, type = 'default', header, headin
 		throw new Error('You cannot pass both heading and header props');
 	}
 
+	useEffect(() => {
+		if (heading) {
+			document.title = `${heading} | Flexprice`;
+		}
+	}, [heading]);
+
 	return (
 		<div className='min-h-screen flex flex-col'>
 			<div
 				className={cn('flex-1 page w-full', type === 'left-aligned' && 'px-6', type === 'default' && 'mx-auto max-w-screen-lg', className)}>
 				{header && header}
 				{heading && (
-					<SectionHeader title={heading} titleClassName={headingClassName}>
+					<SectionHeader title={heading} titleClassName={cn(headingClassName, 'text-2xl font-medium')}>
 						{headingCTA}
 					</SectionHeader>
 				)}

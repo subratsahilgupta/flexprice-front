@@ -22,7 +22,7 @@ export interface Props {
 const CheckboxRadioGroup: FC<Props> = ({ error, checkboxItems, defaultValue, onChange, title, value }) => {
 	return (
 		<div>
-			{title && <p className='text-sm text-zinc-950 font-medium font-inter mb-2'>{title}</p>}
+			{title && <p className='text-sm text-zinc-950 font-medium font-geist mb-2'>{title}</p>}
 			<RadioGroup defaultValue={defaultValue} value={value}>
 				{checkboxItems.map((item) => (
 					<div

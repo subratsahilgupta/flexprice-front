@@ -19,7 +19,7 @@ interface Props {
 	learnMoreUrl?: string;
 }
 
-const EmptyPage: FC<Props> = ({
+const EmptyPage2: FC<Props> = ({
 	children,
 	title = 'Welcome to Flexprice!',
 	description,
@@ -276,4 +276,4 @@ const EmptyPage: FC<Props> = ({
 	);
 };
 
-export default EmptyPage;
+export default EmptyPage2;

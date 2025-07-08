@@ -19,7 +19,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, InputProps>(
 			<div className='space-y-1 w-full flex flex-col'>
 				{/* Label */}
 				{label && (
-					<label className={cn('font-inter block text-sm font-medium', disabled ? 'text-zinc-500' : 'text-zinc-950')}>{label}</label>
+					<label className={cn('font-geist block text-sm font-medium', disabled ? 'text-zinc-500' : 'text-zinc-950')}>{label}</label>
 				)}
 
 				{/* Input */}

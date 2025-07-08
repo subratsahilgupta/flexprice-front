@@ -20,7 +20,7 @@ interface RadioMenuItem {
 const RadioGroup: FC<Props> = ({ items, onChange, selected, title, disabled }) => {
 	return (
 		<div>
-			{title && <p className='font-inter block text-sm font-medium text-zinc mb-2'>{title}</p>}
+			{title && <p className='font-geist block text-sm font-medium text-zinc mb-2'>{title}</p>}
 			<div className='space-y-2'>
 				{items.map((item) => {
 					const isSelected = selected?.value === item.value;
@@ -42,8 +42,8 @@ const RadioGroup: FC<Props> = ({ items, onChange, selected, title, disabled }) =
 							{item.icon && <item.icon className={'size-5'} />}
 
 							<div>
-								<p className='font-medium font-inter text-sm'>{item.label}</p>
-								<p className='font-normal font-inter text-sm text-zinc-500 '>{item.description}</p>
+								<p className='font-medium font-geist text-sm'>{item.label}</p>
+								<p className='font-normal font-geist text-sm text-zinc-500 '>{item.description}</p>
 							</div>
 						</div>
 					);

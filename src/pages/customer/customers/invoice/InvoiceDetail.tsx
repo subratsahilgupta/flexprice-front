@@ -119,17 +119,17 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 						</div>
 					</div>
 					<Spacer className='!my-6' />
-					<div className='w-full grid grid-cols-4 gap-4'>
-						<p className='text-[#71717A] text-sm'>Invoice Number</p>
-						<p className='text-[#71717A] text-sm'>Date of Issue</p>
-						<p className='text-[#71717A] text-sm'>Date Due</p>
-						<p className='text-[#71717A] text-sm'>Payment Status</p>
+					<div className='w-full grid grid-cols-4 gap-4 text-[#09090B] text-sm font-medium'>
+						<p>Invoice Number</p>
+						<p>Date of Issue</p>
+						<p>Date Due</p>
+						<p>Payment Status</p>
 					</div>
-					<div className='w-full grid grid-cols-4 gap-4'>
-						<p className='text-[#09090B] text-sm'>{data?.invoice_number}</p>
-						<p className='text-[#09090B] text-sm'>{formatDate(data?.created_at ?? '')}</p>
-						<p className='text-[#09090B] text-sm'>{data?.due_date ? formatDate(data?.due_date ?? '') : '--'}</p>
-						<p className='text-[#09090B] text-sm'>{getPaymentStatusChip(data?.payment_status ?? '')}</p>
+					<div className='w-full grid grid-cols-4 gap-4 text-[#71717A] text-sm'>
+						<p>{data?.invoice_number}</p>
+						<p>{formatDate(data?.created_at ?? '')}</p>
+						<p>{data?.due_date ? formatDate(data?.due_date ?? '') : '--'}</p>
+						<p>{getPaymentStatusChip(data?.payment_status ?? '')}</p>
 					</div>
 				</div>
 				<div className='my-3 mx-3'>

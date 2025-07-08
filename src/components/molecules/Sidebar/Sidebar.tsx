@@ -15,13 +15,11 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				icon: Star,
 				// disabled: true,
 			},
-
 			{
 				title: 'Plans',
 				url: RouteNames.plan,
 				icon: FileText,
 			},
-
 			{
 				title: 'Pricing Widget',
 				url: RouteNames.pricing,
@@ -80,20 +78,20 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				url: RouteNames.events,
 				icon: CalendarClock,
 				isActive: false,
-				// items: [
-				// 	{
-				// 		title: 'Features',
-				// 		url: '/metering/a',
-				// 	},
-				// 	{
-				// 		title: 'Query',
-				// 		url: '/metering/b',
-				// 	},
-				// 	{
-				// 		title: 'Events',
-				// 		url: '/metering/c',
-				// 	},
-				// ],
+				items: [
+					{
+						title: 'Features',
+						url: '/metering/a',
+					},
+					{
+						title: 'Query',
+						url: '/metering/b',
+					},
+					{
+						title: 'Events',
+						url: '/metering/c',
+					},
+				],
 			},
 			{
 				title: 'Query',

@@ -20,7 +20,7 @@ const MultichipField = React.forwardRef<HTMLInputElement, InputProps>(
 		return (
 			<div className='space-y-1 w-full'>
 				{label && (
-					<label htmlFor={props.id} className='font-inter block text-sm font-medium text-zinc'>
+					<label htmlFor={props.id} className='font-geist block text-sm font-medium text-zinc'>
 						{label}
 					</label>
 				)}

@@ -342,7 +342,7 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 											<div onClick={launch} className='cursor-pointer'>
 												<div className='space-y-1 w-full flex flex-col'>
 													{/* Label */}
-													<label className={cn('font-inter block text-sm font-medium', 'text-zinc-950')}>Import file</label>
+													<label className={cn('font-geist block text-sm font-medium', 'text-zinc-950')}>Import file</label>
 													<div aria-disabled={isLoading} className={cn(isLoading && 'text-zinc-500')}>
 														<button className={'p-2 border border-[#E4E4E7] rounded-lg py-2 px-4 w-full'}>
 															<p className='font-medium text-sm flex gap-2 items-center justify-start'>Choose File to Upload</p>
