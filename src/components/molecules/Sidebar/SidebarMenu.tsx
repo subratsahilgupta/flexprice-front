@@ -1,6 +1,7 @@
 'use client';
 
-import { FC } from 'react';
+import { FC, useState } from 'react';
+import React from 'react';
 import { SidebarGroup, SidebarMenu } from '@/components/ui/sidebar';
 import SidebarItem from './SidebarItem';
 import { useLocation } from 'react-router-dom';
@@ -16,10 +17,30 @@ export type NavItem = {
 		title: string;
 		url: string;
 	}[];
+	isOpen?: boolean;
+	onToggle?: () => void;
 };
 
 const SidebarNav: FC<{ items: NavItem[] }> = ({ items }) => {
 	const location = useLocation();
+	const [openItem, setOpenItem] = useState<string | null>(null);
+
+	// Initialize openItem based on active item on mount
+	React.useEffect(() => {
+		const activeItem = items.find((item) => {
+			const isMainItemActive = location.pathname.startsWith(item.url) && item.url !== '#';
+			const isSubItemActive = item.items?.some((subItem) => location.pathname.startsWith(subItem.url));
+			return isMainItemActive || isSubItemActive;
+		});
+
+		if (activeItem && activeItem.items && activeItem.items.length > 0) {
+			setOpenItem(activeItem.title);
+		}
+	}, [location.pathname, items]);
+
+	const handleItemToggle = (itemTitle: string) => {
+		setOpenItem(openItem === itemTitle ? null : itemTitle);
+	};
 
 	return (
 		<SidebarGroup className='mb-0'>
@@ -29,9 +50,9 @@ const SidebarNav: FC<{ items: NavItem[] }> = ({ items }) => {
 					const isMainItemActive = location.pathname.startsWith(item.url) && item.url !== '#';
 					const isSubItemActive = item.items?.some((subItem) => location.pathname.startsWith(subItem.url));
 					const isActive = isMainItemActive || isSubItemActive;
-
 					item.isActive = isActive;
-					return <SidebarItem key={item.title} {...item} />;
+
+					return <SidebarItem key={item.title} {...item} isOpen={openItem === item.title} onToggle={() => handleItemToggle(item.title)} />;
 				})}
 			</SidebarMenu>
 		</SidebarGroup>

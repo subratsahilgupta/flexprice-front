@@ -83,7 +83,7 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 	];
 
 	return (
-		<Sidebar collapsible='icon' {...props} className='font-open-sans border-none shadow-md max-w-[280px] bg-[#F8FAFC]'>
+		<Sidebar collapsible='icon' {...props} className='border-none px-3 py-1 shadow-md  bg-[#f9f9f9]'>
 			<SidebarHeader>
 				<EnvironmentSelector />
 			</SidebarHeader>

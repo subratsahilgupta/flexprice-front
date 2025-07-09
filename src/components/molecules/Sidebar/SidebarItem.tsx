@@ -6,15 +6,14 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
-const SidebarItem: FC<NavItem> = (item) => {
+interface SidebarItemProps extends NavItem {
+	isOpen?: boolean;
+	onToggle?: () => void;
+}
+
+const SidebarItem: FC<SidebarItemProps> = (item) => {
 	const navigate = useNavigate();
 	const location = useLocation();
-
-	const handleNavigation = (url: string, hasChildren: boolean) => {
-		if (url && !hasChildren) {
-			navigate(url);
-		}
-	};
 
 	const hasChildren = item.items && item.items.length > 0;
 	const Icon = item.icon;
@@ -22,17 +21,41 @@ const SidebarItem: FC<NavItem> = (item) => {
 	const isMainItemActive = item.isActive;
 	const iconActive = isMainItemActive;
 
+	const handleNavigation = (url: string, hasChildren: boolean) => {
+		if (url && !hasChildren) {
+			navigate(url);
+		}
+		if (hasChildren) {
+			navigate(item.items?.[0].url || '#');
+		}
+	};
+
+	const handleClick = () => {
+		if (hasChildren) {
+			// If item is collapsed, open it and navigate to first child
+			if (!item.isOpen) {
+				item.onToggle?.();
+				navigate(item.items?.[0].url || '#');
+			} else {
+				// If already open, just toggle (close it)
+				item.onToggle?.();
+			}
+		} else {
+			handleNavigation(item.url, !!hasChildren);
+		}
+	};
+
 	return (
-		<Collapsible key={item.title} asChild defaultOpen={item.isActive} className='group/collapsible'>
+		<Collapsible key={item.title} asChild open={item.isOpen} className='group/collapsible'>
 			<SidebarMenuItem>
 				<CollapsibleTrigger asChild>
 					<SidebarMenuButton
 						disabled={item.disabled}
-						onClick={() => handleNavigation(item.url, !!hasChildren)}
+						onClick={handleClick}
 						tooltip={item.title}
 						className={cn(
-							'flex items-center gap-2 h-12 px-4 rounded-[6px] text-[14px] cursor-pointer',
-							isMainItemActive ? 'bg-[#F4F4F5] font-medium' : 'font-normal',
+							'flex items-center gap-2 h-10 px-4 rounded-[6px] text-[14px] cursor-pointer',
+							isMainItemActive ? 'bg-white shadow-sm font-medium' : 'font-normal',
 							item.disabled && 'cursor-not-allowed opacity-50',
 						)}>
 						{Icon && (
@@ -45,7 +68,7 @@ const SidebarItem: FC<NavItem> = (item) => {
 					</SidebarMenuButton>
 				</CollapsibleTrigger>
 				{hasChildren && (
-					<CollapsibleContent>
+					<CollapsibleContent className='my-3'>
 						<SidebarMenuSub className='gap-0'>
 							{item.items?.map((subItem) => {
 								const subActive = location.pathname.startsWith(subItem.url);
