@@ -31,17 +31,14 @@ const CustomerInformation = () => {
 		{
 			label: 'Name',
 			value: customer?.name || '--',
-			labelStyle: 'semibold',
 		},
 		{
 			label: 'External ID',
 			value: customer?.external_id || '--',
-			labelStyle: 'semibold',
 		},
 		{
 			label: 'Email',
 			value: customer?.email || '--',
-			labelStyle: 'semibold',
 		},
 		{
 			variant: 'divider',
@@ -49,32 +46,26 @@ const CustomerInformation = () => {
 		{
 			variant: 'heading',
 			label: 'Billing Details',
-			labelStyle: 'semibold',
 		},
 		{
 			label: 'Address Line 1',
 			value: customer?.address_line1 || '--',
-			labelStyle: 'semibold',
 		},
 		{
 			label: 'Country',
 			value: customer?.address_country ? Country.getCountryByCode(customer.address_country)?.name : '--',
-			labelStyle: 'semibold',
 		},
 		{
 			label: 'Address Line 2',
 			value: customer?.address_line2 || '--',
-			labelStyle: 'semibold',
 		},
 		{
 			label: 'State',
 			value: customer?.address_state || '--',
-			labelStyle: 'semibold',
 		},
 		{
 			label: 'City',
 			value: customer?.address_city || '--',
-			labelStyle: 'semibold',
 		},
 	];
 

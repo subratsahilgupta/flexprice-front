@@ -11,15 +11,17 @@ interface Props {
 	heading?: string;
 	children?: ReactNode;
 	tutorials?: TutorialItem[];
+	addButtonLabel?: string;
 }
 
-const EmptyPage: FC<Props> = ({ onAddClick, tags, heading, children, tutorials = [] }) => {
+const EmptyPage: FC<Props> = ({ onAddClick, tags, heading, children, tutorials = [], addButtonLabel }) => {
 	return (
 		<Page
 			heading={heading}
 			headingCTA={
 				onAddClick && (
 					<AddButton
+						label={addButtonLabel}
 						onClick={() => {
 							if (onAddClick) {
 								onAddClick();

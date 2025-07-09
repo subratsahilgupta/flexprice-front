@@ -199,6 +199,7 @@ const CustomerPage = () => {
 					<CreateCustomerDrawer
 						trigger={
 							<AddButton
+								label='Add Customer'
 								onClick={() => {
 									setactiveCustomer(undefined);
 								}}

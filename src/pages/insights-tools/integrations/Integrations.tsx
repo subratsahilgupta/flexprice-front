@@ -58,7 +58,7 @@ const Integrations = () => {
 				</div>
 			</div>
 			<div className='mt-6'>
-				<FormHeader title='Premium' variant='sub-header' />
+				<FormHeader title='Premium Add-ons' variant='sub-header' />
 				<div className='grid grid-cols-2 gap-4 '>
 					{availablePremium.map((integration, index) => (
 						<IntegrationCard key={index} integration={integration} />
@@ -79,7 +79,7 @@ const IntegrationCard = ({ integration }: { integration: Integration; installed?
 	};
 
 	return (
-		<PremiumFeature isPremiumFeature={integration.premium}>
+		<PremiumFeature isPremiumFeature={integration.premium} showPremiumFeatureTag={false}>
 			<div className='relative'>
 				<div onClick={handleCardClick} className={cn('border rounded-xl p-4 flex items-center shadow-sm relative', 'cursor-pointer')}>
 					<div className='w-16 h-16 flex items-center justify-center bg-gray-100 rounded-lg'>

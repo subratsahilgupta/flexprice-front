@@ -55,7 +55,7 @@ const PricingPlan = () => {
 
 	return (
 		<div>
-			<Page heading='Plans' headingCTA={<AddButton onClick={handleOnAdd} />}>
+			<Page heading='Plans' headingCTA={<AddButton label='Add Plan' onClick={handleOnAdd} />}>
 				<PlanDrawer data={activePlan} open={planDrawerOpen} onOpenChange={setPlanDrawerOpen} refetchQueryKeys={['fetchPlans']} />
 				<ApiDocsContent tags={['Plans']} />
 				<div className='space-y-6'>

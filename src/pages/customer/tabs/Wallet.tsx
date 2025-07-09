@@ -180,7 +180,7 @@ const WalletTab = () => {
 				<NoDataCard
 					title='Wallets'
 					subtitle='No wallets linked to the customer'
-					cta={!isArchived && <AddButton onClick={() => setShowCreateWalletModal(true)} />}
+					cta={!isArchived && <AddButton label='Add Wallet' onClick={() => setShowCreateWalletModal(true)} />}
 				/>
 			) : (
 				<>

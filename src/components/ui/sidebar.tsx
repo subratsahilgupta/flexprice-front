@@ -525,7 +525,7 @@ const SidebarMenuSub = React.forwardRef<HTMLUListElement, React.ComponentProps<'
 		{...props}>
 		{/* Vertical line, centered with the icon */}
 		<div
-			className='absolute left-0 top-0 bottom-0 flex items-center'
+			className='absolute -left-1.5 top-0 bottom-0 flex items-center'
 			aria-hidden='true'
 			style={{ width: '1.25rem' }} // matches icon area
 		>

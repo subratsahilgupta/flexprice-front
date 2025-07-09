@@ -13,6 +13,7 @@ import { RouteNames } from '@/core/routes/Routes';
 import { cn } from '@/lib/utils';
 import { getPaymentStatusChip } from '@/components/molecules/InvoiceTable/InvoiceTable';
 import { INVOICE_TYPE } from '@/models/Invoice';
+import { getTypographyClass } from '@/lib/typography';
 interface Props {
 	invoice_id: string;
 	breadcrumb_index: number;
@@ -105,11 +106,7 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 			<div ref={invoiceref} className=' rounded-xl border border-gray-300 p-6'>
 				<div className='p-4'>
 					<div className='w-full flex justify-between items-center'>
-						<FormHeader
-							title={<span className='flex items-center gap-2'>Invoice Details</span>}
-							variant='sub-header'
-							titleClassName='font-semibold'
-						/>
+						<p className={cn(getTypographyClass('section-title'), 'text-xl mb-0')}>Invoice Details</p>
 						<div className='flex gap-4 items-center'>
 							<Button data-html2canvas-ignore='true' onClick={handleDownlaod}>
 								<Download />
@@ -118,7 +115,7 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 							<InvoiceTableMenu data={data!} />
 						</div>
 					</div>
-					<Spacer className='!my-6' />
+					<Spacer className='!my-10' />
 					<div className='w-full grid grid-cols-4 gap-4 text-[#09090B] text-sm font-medium'>
 						<p>Invoice Number</p>
 						<p>Date of Issue</p>
