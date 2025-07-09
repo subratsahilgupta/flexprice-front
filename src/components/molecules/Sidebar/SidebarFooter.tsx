@@ -24,21 +24,6 @@ const SidebarFooter = () => {
 	if (loading) return <Skeleton className='w-full h-10' />;
 
 	const dropdownItems = [
-		// {
-		// 	label: 'Query Usage',
-		// 	onClick: () => {
-		// 		navigate(RouteNames.queryPage);
-		// 	},
-		// 	icon: FileSearch,
-		// },
-		// {
-		// 	label: 'Bulk Imports',
-		// 	onClick: () => {
-		// 		navigate(RouteNames.importExport);
-		// 	},
-		// 	icon: FileInput,
-		// 	// disabled: true,
-		// },
 		{
 			label: 'Onboarding',
 			icon: ListChecks,
@@ -73,7 +58,7 @@ const SidebarFooter = () => {
 					location.pathname.startsWith(RouteNames.developers) ? 'bg-[#F4F4F5] font-medium text-sidebar-text-accent-foreground' : '',
 				)}>
 				<span className={cn('flex items-center gap-2')}>
-					<CodeXml className='size-4' />
+					<CodeXml className='size-5 mr-1 !stroke-[1.5px]' />
 					<span className={cn('text-sm select-none font-normal', sidebarOpen ? '' : 'hidden')}>{'Developers'}</span>
 				</span>
 			</SidebarMenuButton>
@@ -88,7 +73,7 @@ const SidebarFooter = () => {
 					location.pathname.startsWith(RouteNames.webhooks) ? 'bg-[#F4F4F5] font-medium text-sidebar-text-accent-foreground' : '',
 				)}>
 				<span className={cn('flex items-center gap-2')}>
-					<PiWebhooksLogo className='size-4' />
+					<PiWebhooksLogo className='size-5 mr-1 !stroke-[1.5px]' />
 					<span className={cn('text-sm select-none font-normal', sidebarOpen ? '' : 'hidden')}>{'Webhooks'}</span>
 				</span>
 			</SidebarMenuButton>
@@ -99,7 +84,7 @@ const SidebarFooter = () => {
 				tooltip={'Documentation'}
 				className={cn(`flex items-center justify-between gap-2 hover:bg-muted transition-colors my-0 py-1 `)}>
 				<span className='flex items-center gap-2'>
-					<BookOpen className='size-4' />
+					<BookOpen className='size-5 mr-1 !stroke-[1.5px]' />
 					<span className='text-sm select-none'>{'Documentation'}</span>
 				</span>
 				<ExternalLink />
@@ -114,7 +99,6 @@ const SidebarFooter = () => {
 								{user?.email ? user.email.charAt(0).toUpperCase() : 'F'}
 							</div>
 							<div className={cn('min-w-0 flex-1 text-left', sidebarOpen ? '' : 'hidden')}>
-								{/* <p className='text-sm font-medium truncate'>{user?.email?.split('@')[0]}</p> */}
 								<p className='text-xs text-muted-foreground truncate'>{user?.email}</p>
 							</div>
 						</div>
