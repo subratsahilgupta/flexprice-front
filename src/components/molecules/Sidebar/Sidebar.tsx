@@ -4,14 +4,14 @@ import SidebarNav, { NavItem } from './SidebarMenu';
 import FlexpriceSidebarFooter from './SidebarFooter';
 import { RouteNames } from '@/core/routes/Routes';
 import { EnvironmentSelector } from '@/components/molecules';
-import { Brain, Users, TrendingUp, Settings } from 'lucide-react';
+import { Users, TrendingUp, Settings, Boxes } from 'lucide-react';
 
 const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }) => {
 	const navMain: NavItem[] = [
 		{
 			title: 'Product Catalog',
 			url: '#',
-			icon: Brain,
+			icon: Boxes,
 			items: [
 				{
 					title: 'Features',

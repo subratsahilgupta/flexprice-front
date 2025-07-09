@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { NavItem } from './SidebarMenu';
 import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from '@/components/ui/sidebar';
-import { ChevronRight } from 'lucide-react';
+// import { ChevronRight } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -35,11 +35,13 @@ const SidebarItem: FC<NavItem> = (item) => {
 							isMainItemActive ? 'bg-[#F4F4F5] font-medium' : 'font-normal',
 							item.disabled && 'cursor-not-allowed opacity-50',
 						)}>
-						{Icon && <Icon className={cn('!size-5 mr-1', iconActive ? 'text-[#3C87D2]' : 'text-[#3F3F46]')} />}
-						<span className='text-[14px] select-none'>{item.title}</span>
-						{hasChildren && (
-							<ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+						{Icon && (
+							<Icon absoluteStrokeWidth className={cn('!size-5 !stroke-[1.5px] mr-1', iconActive ? 'text-[#3C87D2]' : 'text-[#3F3F46]')} />
 						)}
+						<span className='text-[14px] select-none'>{item.title}</span>
+						{/* {hasChildren && (
+							<ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+						)} */}
 					</SidebarMenuButton>
 				</CollapsibleTrigger>
 				{hasChildren && (
