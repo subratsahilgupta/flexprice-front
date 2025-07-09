@@ -150,7 +150,7 @@ const FlexpriceTable: FC<FlexpriceTableProps<any>> = ({ onRowClick, columns, dat
 								style={{ flex: width ? undefined : flex }}
 								width={width}
 								align={align}
-								className={cn(color ? `text-[${color}]` : 'text-muted-foreground', 'font-sans font-medium px-3', className)}>
+								className={cn(color ? `text-[${color}] !text-black` : 'text-black', 'font-sans font-regular px-3', className)}>
 								{children ? children : title}
 							</TableHead>
 						))}
@@ -168,6 +168,7 @@ const FlexpriceTable: FC<FlexpriceTableProps<any>> = ({ onRowClick, columns, dat
 										!lastRow && 'border-b border-[#E2E8F0]',
 										onRowClick && 'cursor-pointer hover:bg-muted/50',
 										lastRow && hideBottomBorder && 'border-b-0',
+										'!py-1',
 									)}
 									key={rowIndex}>
 									{columns.map(
@@ -193,9 +194,9 @@ const FlexpriceTable: FC<FlexpriceTableProps<any>> = ({ onRowClick, columns, dat
 													className={cn(
 														textColor ? `text-[${textColor}]` : 'text-muted-foreground',
 														'font-normal',
-														'!max-h-8 px-3 py-2 text-[14px]',
+														'!max-h-8 px-3 py-3 text-[14px]',
 														onCLick && 'cursor-pointer hover:bg-muted/50',
-														fieldVariant === 'title' ? 'font-medium text-foreground' : '!font-normal text-muted-foreground',
+														fieldVariant === 'title' ? 'font-regular text-foreground' : '!font-normal text-muted-foreground',
 														fieldVariant === 'link' && 'cursor-pointer text-primary hover:underline',
 														fieldVariant === 'icon' && 'w-10',
 														fieldVariant === 'interactive' && 'cursor-default',

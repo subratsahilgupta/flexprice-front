@@ -47,7 +47,7 @@ const MainLayout: React.FC = () => {
 	}, [user]);
 
 	return (
-		<SidebarProvider className='flex h-screen bg-gray-100 relative'>
+		<SidebarProvider className='flex h-screen bg-gray-100 relative font-open-sans'>
 			{/* Sidebar */}
 			<Sidebar />
 			{/* Right Layout */}

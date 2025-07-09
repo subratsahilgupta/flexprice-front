@@ -338,7 +338,7 @@ const PricingPage = () => {
 		<Page headingClassName='items-center' heading='Pricing Widget'>
 			<ApiDocsContent tags={['Plans', 'Pricing']} />
 			{/* filters */}
-			<div className='w-full flex justify-end gap-4 mb-8'>
+			<div className='w-full flex justify-start gap-4 mb-16'>
 				<Select
 					className='w-40'
 					value={selectedBillingPeriod}

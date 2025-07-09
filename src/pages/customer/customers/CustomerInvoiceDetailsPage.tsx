@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import PaymentApi from '@/api/PaymentApi';
 import CreditNoteApi from '@/api/CreditNoteApi';
 import { ApiDocsContent, CustomTabs } from '@/components/molecules';
-import { Loader, NoDataCard, Page, ShortPagination } from '@/components/atoms';
+import { Loader, NoDataCard, ShortPagination } from '@/components/atoms';
 import { InvoicePaymentsTable, CreditNoteTable } from '@/components/molecules';
 import usePagination from '@/hooks/usePagination';
 
@@ -75,12 +75,12 @@ const CustomerInvoiceDetailsPage = () => {
 	];
 
 	return (
-		<Page>
+		<div className='flex gap-8 mt-5 relative mb-12'>
 			<ApiDocsContent tags={['Invoice']} />
-			<div className='!-translate-y-6'>
+			<div className=''>
 				<CustomTabs tabs={tabs} defaultValue='Overview' />
 			</div>
-		</Page>
+		</div>
 	);
 };
 

@@ -29,11 +29,11 @@ const Page: FC<Props> = ({ children, className, type = 'default', header, headin
 				className={cn('flex-1 page w-full', type === 'left-aligned' && 'px-6', type === 'default' && 'mx-auto max-w-screen-lg', className)}>
 				{header && header}
 				{heading && (
-					<SectionHeader title={heading} titleClassName={cn(headingClassName, 'text-2xl font-medium')}>
+					<SectionHeader title={heading} titleClassName={cn(headingClassName, 'text-3xl font-normal')}>
 						{headingCTA}
 					</SectionHeader>
 				)}
-				<div className='pb-12'>{children}</div>
+				<div className='pb-12 mt-6'>{children}</div>
 			</div>
 		</div>
 	);
