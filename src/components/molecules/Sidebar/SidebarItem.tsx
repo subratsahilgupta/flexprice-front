@@ -54,14 +54,14 @@ const SidebarItem: FC<SidebarItemProps> = (item) => {
 						onClick={handleClick}
 						tooltip={item.title}
 						className={cn(
-							'flex items-center gap-2 h-10 px-2  py-[10px] rounded-[6px] text-[14px] cursor-pointer',
-							isMainItemActive ? 'bg-white shadow-sm font-medium' : 'font-normal',
+							'flex items-center gap-2 h-10 px-2  py-[10px] rounded-[6px] text-[14px] cursor-pointer font-normal',
+							isMainItemActive ? 'bg-white shadow-sm font-medium' : 'font-thin',
 							item.disabled && 'cursor-not-allowed opacity-50',
 						)}>
 						{Icon && (
 							<Icon absoluteStrokeWidth className={cn('!size-5 !stroke-[1.5px] mr-1', iconActive ? 'text-[#3C87D2]' : 'text-[#3F3F46]')} />
 						)}
-						<span className='text-[14px] select-none'>{item.title}</span>
+						<span className='text-[14px] select-none font-normal'>{item.title}</span>
 						{/* {hasChildren && (
 							<ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
 						)} */}
@@ -74,7 +74,11 @@ const SidebarItem: FC<SidebarItemProps> = (item) => {
 								const subActive = location.pathname.startsWith(subItem.url);
 								return (
 									<SidebarMenuSubItem key={subItem.title}>
-										<SidebarMenuSubButton asChild={false} isActive={subActive} className='w-full' onClick={() => navigate(subItem.url)}>
+										<SidebarMenuSubButton
+											asChild={false}
+											isActive={subActive}
+											className={cn('w-full font-light text-black')}
+											onClick={() => navigate(subItem.url)}>
 											{subItem.title}
 										</SidebarMenuSubButton>
 									</SidebarMenuSubItem>

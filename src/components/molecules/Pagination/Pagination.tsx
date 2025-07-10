@@ -88,7 +88,10 @@ const FLexpricePagination = ({ totalPages, maxPagesBeforeTruncate = 10, siblingC
 					<PaginationItem>
 						<PaginationPrevious
 							onClick={() => handlePageChange(currentPage - 1)}
-							className={cn(currentPage === 1 && 'text-zinc-500 select-none cursor-not-allowed hover:bg-white hover:text-zinc-500')}
+							className={cn(
+								currentPage === 1 && 'text-gray-500 select-none cursor-not-allowed hover:bg-white hover:text-gray-500',
+								'!font-normal !text-gray-500',
+							)}
 							disabled={currentPage === 1}
 						/>
 					</PaginationItem>
@@ -108,7 +111,10 @@ const FLexpricePagination = ({ totalPages, maxPagesBeforeTruncate = 10, siblingC
 
 						return (
 							<PaginationItem className={cn('cursor-pointer')} key={pageNumber}>
-								<PaginationLink isActive={currentPage === pageNumber} onClick={() => handlePageChange(pageNumber)}>
+								<PaginationLink
+									isActive={currentPage === pageNumber}
+									onClick={() => handlePageChange(pageNumber)}
+									className={cn(currentPage === pageNumber && 'text-gray-500')}>
 									{pageNumber}
 								</PaginationLink>
 							</PaginationItem>
@@ -120,7 +126,8 @@ const FLexpricePagination = ({ totalPages, maxPagesBeforeTruncate = 10, siblingC
 						<PaginationNext
 							onClick={() => handlePageChange(currentPage + 1)}
 							className={cn(
-								currentPage === totalPages && 'text-zinc-500 select-none cursor-not-allowed hover:bg-white hover:text-zinc-500',
+								currentPage === totalPages && 'text-gray-500 select-none cursor-not-allowed hover:bg-white hover:text-gray-500',
+								'!font-normal !text-gray-500',
 							)}
 							disabled={currentPage === totalPages}
 						/>

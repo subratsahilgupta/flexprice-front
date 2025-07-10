@@ -8,12 +8,12 @@ import { useQuery } from '@tanstack/react-query';
 import { Download } from 'lucide-react';
 import { FC, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import { Link } from 'react-router-dom';
 import { RouteNames } from '@/core/routes/Routes';
 import { cn } from '@/lib/utils';
 import { getPaymentStatusChip } from '@/components/molecules/InvoiceTable/InvoiceTable';
 import { INVOICE_TYPE } from '@/models/Invoice';
 import { getTypographyClass } from '@/lib/typography';
+import RedirectCell from '@/components/molecules/Table/RedirectCell';
 interface Props {
 	invoice_id: string;
 	breadcrumb_index: number;
@@ -143,9 +143,9 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 
 					<div>
 						<FormHeader className='!mb-2' title='Bill to' variant='sub-header' titleClassName='font-semibold' />
-						<Link to={`${RouteNames.customers}/${data?.customer?.id}`} className={cn(customerInfoClass, 'hover:underline')}>
-							{data?.customer?.name || '--'}
-						</Link>
+						<RedirectCell redirectUrl={`${RouteNames.customers}/${data?.customer?.id}`}>
+							<p className={customerInfoClass}>{data?.customer?.name || '--'}</p>
+						</RedirectCell>
 						<p className={customerInfoClass}>{data?.customer?.email || '--'}</p>
 						<p className={customerInfoClass}>{customerAddress || '--'}</p>
 					</div>

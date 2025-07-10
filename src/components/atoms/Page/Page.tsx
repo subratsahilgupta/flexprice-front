@@ -7,7 +7,7 @@ interface Props {
 	className?: string;
 	type?: 'left-aligned' | 'default';
 	header?: React.ReactNode;
-	heading?: string;
+	heading?: string | React.ReactNode;
 	headingClassName?: string;
 	headingCTA?: React.ReactNode;
 }
