@@ -7,7 +7,7 @@ import { LoaderCircleIcon } from 'lucide-react';
 import { ReactNode } from 'react';
 
 const buttonVariants = cva(
-	'inline-flex !py-0 !my-0 items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+	'inline-flex !py-0 !my-0 items-center justify-center gap-2 whitespace-nowrap rounded-[10px] text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
 	{
 		variants: {
 			variant: {
@@ -21,10 +21,10 @@ const buttonVariants = cva(
 			},
 			size: {
 				default: 'h-8 p-[10px] !py-[15px] !px-[10px] border  rounded-[10px]',
-				sm: 'h-8 rounded-md px-2 text-xs',
-				lg: 'h-10 rounded-md px-6',
+				sm: 'h-8 rounded-[10px] px-2 text-xs',
+				lg: 'h-10 rounded-[10px] px-6',
 				icon: 'h-9 w-9',
-				xs: 'h-6 rounded-md px-2 text-xs',
+				xs: 'h-6 rounded-[10px] px-2 text-xs',
 			},
 		},
 		defaultVariants: {

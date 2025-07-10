@@ -79,7 +79,7 @@ interface HeaderProps {
 export const CardHeader = ({ title, subtitle, cta, className }: HeaderProps) => {
 	return (
 		<div>
-			<div className={cn('flex items-center justify-between', className)}>
+			<div className={cn('flex items-center justify-between mb-4', className)}>
 				<div>
 					<h3 className={getTypographyClass('card-header')}>{title}</h3>
 				</div>

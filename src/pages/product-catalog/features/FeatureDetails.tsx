@@ -183,7 +183,7 @@ const FeatureDetails = () => {
 				{(linkedEntitlements?.items?.length || 0) > 0 ? (
 					<Card variant='notched'>
 						<CardHeader title='Linked Plans' />
-						<FlexpriceTable showEmptyRow columns={columns} data={linkedEntitlements?.items ?? []} />
+						<FlexpriceTable showEmptyRow columns={columns} data={linkedEntitlements?.items ?? []} variant='no-bordered' />
 					</Card>
 				) : (
 					<NoDataCard title='Linked Plans' subtitle='No plans linked to the feature yet' />

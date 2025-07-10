@@ -129,7 +129,7 @@ const CustomerUsageTable: FC<Props> = ({ data, allowRedirect = true }) => {
 
 	return (
 		<div>
-			<FlexpriceTable showEmptyRow data={data} columns={columnData} />
+			<FlexpriceTable showEmptyRow data={data} columns={columnData} variant='no-bordered' />
 		</div>
 	);
 };

@@ -114,13 +114,11 @@ const CreditGrantTable: React.FC<Props> = ({ data, onChange, disabled, getEmptyC
 				<div className='flex items-center justify-between'>
 					<FormHeader className='mb-0' title='Credit Grants' variant='sub-header' />
 					<AddButton
-						size='sm'
 						onClick={() => {
 							setSelectedCreditGrant(null);
 							setIsOpen(true);
 						}}
 						disabled={disabled}
-						className='text-sm py-1.5'
 					/>
 				</div>
 				<div className='rounded-xl border border-gray-300 space-y-6 mt-2 '>

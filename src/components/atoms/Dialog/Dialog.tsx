@@ -27,7 +27,7 @@ const Dialog: FC<Props> = ({
 }) => {
 	return (
 		<ShadcnDialog open={isOpen} onOpenChange={onOpenChange}>
-			<DialogContent className={cn('bg-white !rounded-xl', className)} showCloseButton={showCloseButton}>
+			<DialogContent className={cn('bg-white !rounded-2xl', className)} showCloseButton={showCloseButton}>
 				<DialogHeader className=''>
 					<DialogTitle className={cn('font-medium text-xl', titleClassName)}>{title}</DialogTitle>
 					{description && <DialogDescription className={cn('mt-6', descriptionClassName)}>{description}</DialogDescription>}
