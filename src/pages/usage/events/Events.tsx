@@ -148,8 +148,8 @@ const EventsPage: React.FC = () => {
 		endTime: new Date().toISOString(),
 	});
 
-	const { filters, sorts, setFilters, setSorts, sanitizedFilters, sanitizedSorts } = useFilterSorting({
-		initialFilters: [
+	const initialFilters = useMemo(() => {
+		return [
 			{
 				field: 'event_id',
 				operator: FilterOperator.CONTAINS,
@@ -185,7 +185,18 @@ const EventsPage: React.FC = () => {
 				dataType: DataType.DATE,
 				id: 'initial-end-time',
 			},
-		],
+			{
+				field: 'source',
+				operator: FilterOperator.CONTAINS,
+				valueString: '',
+				dataType: DataType.STRING,
+				id: 'initial-source',
+			},
+		];
+	}, []);
+
+	const { filters, sorts, setFilters, setSorts, sanitizedFilters, sanitizedSorts } = useFilterSorting({
+		initialFilters: initialFilters,
 		initialSorts: [
 			{
 				field: 'updated_at',
@@ -260,43 +271,7 @@ const EventsPage: React.FC = () => {
 	};
 
 	const resetFilters = () => {
-		setFilters([
-			{
-				field: 'event_id',
-				operator: FilterOperator.CONTAINS,
-				valueString: '',
-				dataType: DataType.STRING,
-				id: 'reset-event-id',
-			},
-			{
-				field: 'event_name',
-				operator: FilterOperator.CONTAINS,
-				valueString: '',
-				dataType: DataType.STRING,
-				id: 'reset-event-name',
-			},
-			{
-				field: 'external_customer_id',
-				operator: FilterOperator.CONTAINS,
-				valueString: '',
-				dataType: DataType.STRING,
-				id: 'reset-customer-id',
-			},
-			{
-				field: 'start_time',
-				operator: FilterOperator.AFTER,
-				valueDate: new Date(new Date().setDate(new Date().getDate() - 7)),
-				dataType: DataType.DATE,
-				id: 'reset-start-time',
-			},
-			{
-				field: 'end_time',
-				operator: FilterOperator.BEFORE,
-				valueDate: new Date(),
-				dataType: DataType.DATE,
-				id: 'reset-end-time',
-			},
-		]);
+		setFilters(initialFilters);
 		// Reset queryData as well
 		setQueryData({
 			startTime: new Date(new Date().setDate(new Date().getDate() - 7)).toISOString(),
@@ -337,11 +312,11 @@ const EventsPage: React.FC = () => {
 					onSortChange={setSorts}
 					selectedSorts={sorts}
 				/>
-				<Button onClick={resetFilters}>
+				<Button variant='outline' onClick={resetFilters}>
 					<RefreshCw />
 				</Button>
 			</div>
-			<div className='bg-white p-4 rounded-md '>
+			<div className='bg-white rounded-md '>
 				<EventsTable data={events} />
 				<div ref={lastElementRef} />
 				{loading && (

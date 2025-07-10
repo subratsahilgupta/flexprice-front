@@ -1,12 +1,14 @@
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/components/ui/sidebar';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, useSidebar } from '@/components/ui/sidebar';
 import React from 'react';
 import SidebarNav, { NavItem } from './SidebarMenu';
 import FlexpriceSidebarFooter from './SidebarFooter';
 import { RouteNames } from '@/core/routes/Routes';
 import { EnvironmentSelector } from '@/components/molecules';
 import { Users, TrendingUp, Settings, Boxes } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }) => {
+	const { open: sidebarOpen } = useSidebar();
 	const navMain: NavItem[] = [
 		{
 			title: 'Product Catalog',
@@ -83,7 +85,10 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 	];
 
 	return (
-		<Sidebar collapsible='icon' {...props} className='border-none px-3 py-1 shadow-md  bg-[#f9f9f9]'>
+		<Sidebar
+			collapsible='icon'
+			{...props}
+			className={cn('border-none px-3 py-1 shadow-md  bg-[#f9f9f9]', sidebarOpen ? 'px-3' : 'pr-0 pl-2')}>
 			<SidebarHeader>
 				<EnvironmentSelector />
 			</SidebarHeader>

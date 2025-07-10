@@ -1,4 +1,4 @@
-import { FormHeader, Spacer, Button } from '@/components/atoms';
+import { Spacer, Button } from '@/components/atoms';
 import CustomerApi from '@/api/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
 import { Country } from 'country-state-city';
@@ -6,6 +6,7 @@ import { CreateCustomerDrawer, Detail, DetailsCard } from '@/components/molecule
 import { useParams, useOutletContext } from 'react-router-dom';
 import { Pencil } from 'lucide-react';
 import { useState } from 'react';
+import { getTypographyClass } from '@/lib/typography';
 
 type ContextType = {
 	isArchived: boolean;
@@ -46,6 +47,7 @@ const CustomerInformation = () => {
 		{
 			variant: 'heading',
 			label: 'Billing Details',
+			className: getTypographyClass('card-header') + '!text-[16px]',
 		},
 		{
 			label: 'Address Line 1',
@@ -83,7 +85,7 @@ const CustomerInformation = () => {
 				<div>
 					<Spacer className='!h-4' />
 					<div className='flex justify-between items-center'>
-						<FormHeader title={'Customer Details'} variant='form-component-title' />
+						<h3 className={getTypographyClass('card-header') + '!text-[16px]'}>Customer Details</h3>
 						{!isArchived && (
 							<CreateCustomerDrawer
 								trigger={

@@ -184,29 +184,20 @@ const WalletTab = () => {
 				/>
 			) : (
 				<>
-					<FormHeader
-						className='!my-6'
-						title='Wallets'
-						subtitle='Manage credits for usage-based billing that can apply to invoices pre-tax'
-						variant='sub-header'
-					/>
-
 					{/* Wallet Selection and Actions */}
 					<div className='w-full flex justify-between items-center mb-3'>
 						<div>
-							{walletOptions.length > 1 && (
-								<div className='min-w-[250px]'>
-									<Select
-										options={walletOptions}
-										value={activeWallet?.id}
-										onChange={(value) => {
-											const selectedWallet = wallets?.find((wallet) => wallet.id === value) || null;
-											setActiveWallet(selectedWallet);
-											setQueryParam('activeWalletId', value);
-										}}
-									/>
-								</div>
-							)}
+							<div className='min-w-[250px]'>
+								<Select
+									options={walletOptions}
+									value={activeWallet?.id}
+									onChange={(value) => {
+										const selectedWallet = wallets?.find((wallet) => wallet.id === value) || null;
+										setActiveWallet(selectedWallet);
+										setQueryParam('activeWalletId', value);
+									}}
+								/>
+							</div>
 						</div>
 						<div className='flex items-center space-x-2'>
 							{!isArchived && (
@@ -280,7 +271,7 @@ const WalletTab = () => {
 
 											<div className='flex items-baseline space-x-2'>
 												<span className='text-gray-500 text-2xl font-medium'>{getCurrencySymbol(walletBalance?.currency ?? '')}</span>
-												<span className='text-5xl font-bold text-gray-900 leading-tight'>
+												<span className='text-4xl font-medium text-gray-900 leading-tight'>
 													{type === 'Current'
 														? formatAmount(walletBalance?.balance.toString() ?? '0')
 														: formatAmount(walletBalance?.real_time_balance.toString() ?? '0')}
