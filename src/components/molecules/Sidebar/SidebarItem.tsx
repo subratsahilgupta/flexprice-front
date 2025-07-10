@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 
 interface SidebarItemProps extends NavItem {
 	isOpen?: boolean;
-	onToggle?: () => void;
+	defaultOpen?: boolean;
 }
 
 const SidebarItem: FC<SidebarItemProps> = (item) => {
@@ -46,7 +46,7 @@ const SidebarItem: FC<SidebarItemProps> = (item) => {
 	};
 
 	return (
-		<Collapsible key={item.title} asChild open={item.isOpen} className='group/collapsible'>
+		<Collapsible key={item.title} defaultOpen={item.defaultOpen} asChild className='group/collapsible'>
 			<SidebarMenuItem>
 				<CollapsibleTrigger asChild>
 					<SidebarMenuButton

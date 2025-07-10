@@ -75,7 +75,7 @@ const CustomerInvoiceDetailsPage = () => {
 	];
 
 	return (
-		<div className='flex gap-8 mt-5 relative mb-12'>
+		<div className='mt-5 '>
 			<ApiDocsContent tags={['Invoice']} />
 			<div className=''>
 				<CustomTabs tabs={tabs} defaultValue='Overview' />
