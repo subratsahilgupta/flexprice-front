@@ -9,6 +9,7 @@ export interface GetEventsPayload {
 	iter_last_key?: string;
 	page_size?: number;
 	event_id?: string;
+	source?: string;
 }
 
 export interface GetEventsResponse {
