@@ -79,7 +79,7 @@ const IntegrationCard = ({ integration }: { integration: Integration; installed?
 	};
 
 	return (
-		<PremiumFeature isPremiumFeature={integration.premium} showPremiumFeatureTag={false}>
+		<PremiumFeature isPremiumFeature={integration.premium}>
 			<div className='relative'>
 				<div onClick={handleCardClick} className={cn('border rounded-2xl p-4 flex shadow-sm relative', 'cursor-pointer')}>
 					<div className='w-16 h-16 flex items-center justify-center bg-gray-100 rounded-lg'>

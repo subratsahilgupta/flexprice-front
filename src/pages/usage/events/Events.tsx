@@ -50,6 +50,11 @@ const convertFiltersToEventParams = (filters: TypedBackendFilter[]): Partial<Get
 					params.end_time = filter.value.date;
 				}
 				break;
+			case 'source':
+				if (filter.value.string) {
+					params.source = filter.value.string;
+				}
+				break;
 		}
 	});
 
@@ -137,6 +142,7 @@ const EventsPage: React.FC = () => {
 		externalCustomerId?: string;
 		eventName?: string;
 		eventId?: string;
+		source?: string;
 	}>({
 		startTime: new Date(new Date().setDate(new Date().getDate() - 7)).toISOString(),
 		endTime: new Date().toISOString(),
@@ -216,6 +222,7 @@ const EventsPage: React.FC = () => {
 			external_customer_id: filterParams.external_customer_id || queryData?.externalCustomerId,
 			event_name: filterParams.event_name || queryData?.eventName,
 			event_id: filterParams.event_id || queryData?.eventId,
+			source: filterParams.source || queryData?.source,
 		};
 	}, [sanitizedFilters, queryData]);
 
@@ -321,20 +328,18 @@ const EventsPage: React.FC = () => {
 	return (
 		<Page heading='Events'>
 			<ApiDocsContent tags={['Events']} />
-			<div className='bg-white my-6 rounded-md mb-6'>
-				<div className='w-full flex items-end gap-4'>
-					<QueryBuilder
-						filterOptions={filterOptions}
-						filters={filters}
-						onFilterChange={setFilters}
-						sortOptions={sortingOptions}
-						onSortChange={setSorts}
-						selectedSorts={sorts}
-					/>
-					<Button onClick={resetFilters}>
-						<RefreshCw />
-					</Button>
-				</div>
+			<div className='bg-white rounded-md flex items-start gap-4'>
+				<QueryBuilder
+					filterOptions={filterOptions}
+					filters={filters}
+					onFilterChange={setFilters}
+					sortOptions={sortingOptions}
+					onSortChange={setSorts}
+					selectedSorts={sorts}
+				/>
+				<Button onClick={resetFilters}>
+					<RefreshCw />
+				</Button>
 			</div>
 			<div className='bg-white p-4 rounded-md '>
 				<EventsTable data={events} />

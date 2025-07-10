@@ -14,9 +14,8 @@ export const PremiumFeatureTag = () => {
 interface Props {
 	children?: React.ReactNode;
 	isPremiumFeature?: boolean;
-	showPremiumFeatureTag?: boolean;
 }
-const PremiumFeature: React.FC<Props> = ({ children, isPremiumFeature = false, showPremiumFeatureTag = true }) => {
+const PremiumFeature: React.FC<Props> = ({ children, isPremiumFeature = false }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	return (
 		<div>
@@ -24,15 +23,15 @@ const PremiumFeature: React.FC<Props> = ({ children, isPremiumFeature = false, s
 				isOpen={isOpen}
 				onOpenChange={setIsOpen}
 				title='Premium Feature'
-				titleClassName='font-bold'
-				description='This is a premium feature. You need to upgrade to a premium plan to use this feature.'>
-				<div className='flex gap-2 justify-end items-center'>
+				description='This is a premium feature. You need to upgrade to a premium plan to use this feature.'
+				descriptionClassName='text-sm w-[90%]'>
+				<div className='flex gap-2  justify-end items-center'>
 					<Button>
 						<a href='mailto:manish@flexprice.com'>Contact Us</a>
 					</Button>
 				</div>
 			</Dialog>
-			{isPremiumFeature && showPremiumFeatureTag ? (
+			{isPremiumFeature ? (
 				<div
 					onClick={(e) => {
 						if (isPremiumFeature) {

@@ -201,7 +201,7 @@ const FeatureDetails = () => {
 
 							<Divider />
 
-							{data?.meter?.filters?.length && (
+							{data?.meter?.filters?.length > 0 && (
 								<>
 									<div className='space-y-4'>
 										<span className='text-gray-500 text-sm font-medium block'>Event Filters</span>

@@ -335,27 +335,29 @@ const PricingPage = () => {
 	}
 
 	return (
-		<Page headingClassName='items-center' heading='Pricing Widget'>
+		<Page
+			headingClassName='items-center'
+			heading='Pricing Widget'
+			headingCTA={
+				<div className='w-full flex justify-start gap-4'>
+					<Select
+						className='w-40 !rounded-xl'
+						value={selectedBillingPeriod}
+						options={uniqueBillingPeriods}
+						onChange={setSelectedBillingPeriod}
+						placeholder='Select billing period'
+					/>
+					<Select
+						className='w-40 !rounded-xl'
+						value={selectedCurrency}
+						options={uniqueCurrencies}
+						onChange={setSelectedCurrency}
+						placeholder='Select currency'
+					/>
+				</div>
+			}>
 			<ApiDocsContent tags={['Plans', 'Pricing']} />
 			{/* filters */}
-			<div className='w-full flex justify-start gap-4 mb-16'>
-				<Select
-					className='w-40'
-					value={selectedBillingPeriod}
-					options={uniqueBillingPeriods}
-					onChange={setSelectedBillingPeriod}
-					label='Billing Period'
-					placeholder='Select billing period'
-				/>
-				<Select
-					className='w-40'
-					value={selectedCurrency}
-					options={uniqueCurrencies}
-					onChange={setSelectedCurrency}
-					label='Currency'
-					placeholder='Select currency'
-				/>
-			</div>
 
 			<div className='flex flex-col'>
 				<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>

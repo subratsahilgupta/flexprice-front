@@ -86,8 +86,8 @@ const SortDropdown: React.FC<Props> = ({ options, value = [], onChange, classNam
 	return (
 		<Popover open={isOpen} onOpenChange={handleOpenChange}>
 			<PopoverTrigger disabled={disabled} asChild>
-				<Button variant='outline' size='sm' className={cn('flex items-center gap-2 text-xs', className)}>
-					<ArrowUpDown className='h-3.5 w-3.5' />
+				<Button variant='outline' size='default' className={cn('flex items-center gap-2 text-xs', className)}>
+					<ArrowUpDown className='size-5' />
 					<span>Sort</span>
 					{appliedSorts > 0 && (
 						<Badge variant='secondary' className='ml-1 h-5 rounded px-1.5 font-mono text-xs'>

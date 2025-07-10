@@ -213,8 +213,8 @@ const FilterPopover: React.FC<Props> = ({ fields, value = [], onChange, classNam
 	return (
 		<Popover open={isOpen} onOpenChange={setIsOpen}>
 			<PopoverTrigger asChild>
-				<Button variant='outline' size='sm' className={cn('flex items-center gap-2', className)}>
-					<ListFilter className='h-4 w-4' />
+				<Button variant='outline' size='default' className={cn('flex items-center gap-2', className)}>
+					<ListFilter className='size-5' />
 					<span>Filter</span>
 					{appliedFilters > 0 && (
 						<Badge variant='secondary' className='ml-1 h-5 rounded px-1.5 font-mono text-xs'>

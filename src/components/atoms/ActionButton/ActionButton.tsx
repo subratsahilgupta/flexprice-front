@@ -101,11 +101,12 @@ const ActionButton: FC<ActionProps> = ({
 			</div>
 
 			<Dialog
-				titleClassName='font-normal'
 				title={`Are you sure you want to ${archiveText?.toLowerCase() || 'archive'} this ${entityName}?`}
+				titleClassName='text-lg font-normal text-gray-800 w-[90%]'
 				isOpen={isDialogOpen}
-				onOpenChange={setIsDialogOpen}>
-				<div className='flex flex-col mt-4 gap-4 items-end justify-center'>
+				onOpenChange={setIsDialogOpen}
+				showCloseButton={false}>
+				<div className='flex flex-col gap-4 items-end justify-center'>
 					<div className='flex gap-4'>
 						<Button variant='outline' onClick={() => setIsDialogOpen(false)}>
 							Cancel

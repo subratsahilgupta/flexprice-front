@@ -196,7 +196,6 @@ const FeaturesPage = () => {
 					onSortChange={setSorts}
 					selectedSorts={sorts}
 				/>
-				<Spacer className='!h-4' />
 				<FeatureTable data={featureData?.items || []} />
 				<Spacer className='!h-4' />
 				<ShortPagination unit='Features' totalItems={featureData?.pagination.total ?? 0} />

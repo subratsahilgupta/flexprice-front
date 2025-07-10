@@ -71,7 +71,7 @@ const FlexPriceSelect: React.FC<Props> = ({
 	trigger,
 }) => {
 	return (
-		<div className={cn('space-y-1 ')}>
+		<div className={cn('space-y-1 ', className)}>
 			{/* Label */}
 			{label && (
 				<label className={cn(' block text-sm font-medium text-zinc break-words', disabled ? 'text-zinc-500' : 'text-zinc-950')}>

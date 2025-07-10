@@ -18,7 +18,7 @@ const Sheet: FC<Props> = ({ children, trigger, description, title, isOpen, onOpe
 		<ShadcnSheet open={isOpen} onOpenChange={onOpenChange}>
 			{trigger && <SheetTrigger asChild>{trigger}</SheetTrigger>}
 			<SheetContent
-				className={cn('h-screen overflow-y-auto', className, {
+				className={cn('h-screen overflow-y-auto !rounded-xl', className, {
 					'sm:max-w-sm': size === 'sm',
 					'sm:max-w-md': size === 'md',
 					'sm:max-w-lg': size === 'lg',

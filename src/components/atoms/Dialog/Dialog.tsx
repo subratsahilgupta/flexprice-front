@@ -10,17 +10,29 @@ interface Props {
 	children?: ReactNode;
 	className?: string;
 	titleClassName?: string;
+	descriptionClassName?: string;
+	showCloseButton?: boolean;
 }
 
-const Dialog: FC<Props> = ({ className, isOpen, onOpenChange, title, description, children, titleClassName }) => {
+const Dialog: FC<Props> = ({
+	className,
+	isOpen,
+	onOpenChange,
+	title,
+	description,
+	children,
+	titleClassName,
+	descriptionClassName,
+	showCloseButton = true,
+}) => {
 	return (
 		<ShadcnDialog open={isOpen} onOpenChange={onOpenChange}>
-			<DialogContent className={cn('bg-white', className)}>
-				<DialogHeader>
-					<DialogTitle className={cn('font-medium', titleClassName)}>{title}</DialogTitle>
-					{description && <DialogDescription>{description}</DialogDescription>}
+			<DialogContent className={cn('bg-white !rounded-xl', className)} showCloseButton={showCloseButton}>
+				<DialogHeader className=''>
+					<DialogTitle className={cn('font-medium text-xl', titleClassName)}>{title}</DialogTitle>
+					{description && <DialogDescription className={cn('mt-6', descriptionClassName)}>{description}</DialogDescription>}
 				</DialogHeader>
-				{children}
+				<div className='mt-4'>{children}</div>
 			</DialogContent>
 		</ShadcnDialog>
 	);
