@@ -169,9 +169,15 @@ const FeaturesPage = () => {
 		return (
 			<EmptyPage
 				heading='Feature'
-				onAddClick={() => navigate(RouteNames.createFeature)}
 				tags={['Features']}
 				tutorials={GUIDES.features.tutorials}
+				emptyStateCard={{
+					heading: 'No Features Found',
+					description: 'Create your first feature that customers can access, use or be billed for.',
+					buttonLabel: 'Create Feature',
+					buttonAction: () => navigate(RouteNames.createFeature),
+				}}
+				onAddClick={() => navigate(RouteNames.createFeature)}
 			/>
 		);
 	}

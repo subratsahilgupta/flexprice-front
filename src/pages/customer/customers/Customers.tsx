@@ -181,6 +181,15 @@ const CustomerPage = () => {
 			<EmptyPage
 				heading='Customer'
 				tags={['Customers']}
+				emptyStateCard={{
+					heading: 'No Customers Found',
+					description: 'Create your first customer that can access, use or be billed for.',
+					buttonLabel: 'Create Customer',
+					buttonAction: () => {
+						setactiveCustomer(undefined);
+						setcustomerDrawerOpen(true);
+					},
+				}}
 				tutorials={GUIDES.customers.tutorials}
 				onAddClick={() => {
 					setactiveCustomer(undefined);

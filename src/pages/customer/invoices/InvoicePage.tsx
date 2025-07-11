@@ -35,7 +35,17 @@ const InvoicesPage = () => {
 	}
 
 	if ((invoiceData?.items ?? []).length === 0) {
-		return <EmptyPage tutorials={GUIDES.invoices.tutorials} heading='Invoices' tags={['Invoices']} />;
+		return (
+			<EmptyPage
+				emptyStateCard={{
+					heading: 'No Invoices Found',
+					description: 'Create your first invoice that customers can access, use or be billed for.',
+				}}
+				tutorials={GUIDES.invoices.tutorials}
+				heading='Invoices'
+				tags={['Invoices']}
+			/>
+		);
 	}
 
 	return (

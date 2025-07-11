@@ -183,7 +183,18 @@ const DeveloperPage = () => {
 			<ApiDocsContent tags={['secrets']} />
 			<SecretKeyDrawer isOpen={isSecretKeyDrawerOpen} onOpenChange={setIsSecretKeyDrawerOpen} />
 			{secretKeys?.items.length === 0 && (
-				<EmptyPage tutorials={GUIDES.secrets.tutorials} heading='Secret Keys' tags={['secrets']} onAddClick={handleAddSecretKey} />
+				<EmptyPage
+					onAddClick={handleAddSecretKey}
+					emptyStateCard={{
+						heading: 'No Secret Keys Found',
+						description: 'Create your first secret key that customers can access, use or be billed for.',
+						buttonLabel: 'Create Secret Key',
+						buttonAction: handleAddSecretKey,
+					}}
+					tutorials={GUIDES.secrets.tutorials}
+					heading='Secret Keys'
+					tags={['secrets']}
+				/>
 			)}
 			{(secretKeys?.items.length || 0) > 0 && (
 				<Page

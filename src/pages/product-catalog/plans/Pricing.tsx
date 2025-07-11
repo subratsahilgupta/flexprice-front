@@ -328,7 +328,18 @@ const PricingPage = () => {
 	if ((plansData?.items ?? []).length === 0) {
 		return (
 			<div className='space-y-6'>
-				<EmptyPage tutorials={GUIDES.plans.tutorials} heading='Plan' onAddClick={() => setPlanDrawerOpen(true)} tags={['Plans']} />
+				<EmptyPage
+					onAddClick={() => setPlanDrawerOpen(true)}
+					emptyStateCard={{
+						heading: 'No Plans Found',
+						description: 'Create your first plan that customers can access, use or be billed for.',
+						buttonLabel: 'Create Plan',
+						buttonAction: () => setPlanDrawerOpen(true),
+					}}
+					heading='Pricing Widget'
+					tags={['Plans']}
+					tutorials={GUIDES.plans.tutorials}
+				/>
 				<PlanDrawer open={planDrawerOpen} onOpenChange={setPlanDrawerOpen} refetchQueryKeys={['fetchPlansPricingCard']} />
 			</div>
 		);

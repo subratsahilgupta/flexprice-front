@@ -1,6 +1,6 @@
 import { Page, AddButton, Button, Card } from '@/components/atoms';
 import { FC, ReactNode } from 'react';
-import { ArrowRight, Boxes } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { ApiDocsContent } from '@/components/molecules/ApiDocs/ApiDocs';
 import { motion } from 'framer-motion';
 import { TutorialItem } from '@/pages/onboarding/onboarding';
@@ -31,16 +31,8 @@ interface Props {
 	tutorials?: TutorialItem[];
 }
 
-const defaultEmptyStateCard: EmptyStateCardItem = {
-	icon: <Boxes className='stroke-[#E9E9E9] size-16 stroke-1' />,
-	heading: 'No Features Found',
-	description: 'Create your first feature that customers can access, use or be billed for.',
-	buttonLabel: 'Create Feature',
-	buttonAction: undefined,
-};
-
 const EmptyPage: FC<Props> = ({ onAddClick, tags, heading, children, addButtonLabel, emptyStateCard, tutorials }) => {
-	const card = emptyStateCard || defaultEmptyStateCard;
+	const card = emptyStateCard;
 	return (
 		<Page
 			heading={heading}
@@ -57,14 +49,18 @@ const EmptyPage: FC<Props> = ({ onAddClick, tags, heading, children, addButtonLa
 				)
 			}>
 			<div className='bg-[#fafafa] border border-[#E9E9E9] rounded-xl w-[1008px] h-[360px] flex flex-col items-center justify-center mx-auto '>
-				<div className='mb-8'>{card.icon}</div>
-				<div className=' font-medium text-[20px] leading-normal text-gray-700 mb-4 text-center'>{card.heading}</div>
-				<div className=' font-normal bg-[#F9F9F9] text-[16px] leading-normal text-gray-400 mb-8 text-center max-w-[350px]'>
-					{card.description}
-				</div>
-				<Button variant={'outline'} onClick={card.buttonAction} className='!p-5 !bg-[#fbfbfb] !border-[#CFCFCF]'>
-					{card.buttonLabel}
-				</Button>
+				{card?.icon && <div className='mb-8'>{card?.icon}</div>}
+				{card?.heading && <div className=' font-medium text-[20px] leading-normal text-gray-700 mb-4 text-center'>{card?.heading}</div>}
+				{card?.description && (
+					<div className=' font-normal bg-[#F9F9F9] text-[16px] leading-normal text-gray-400 mb-8 text-center max-w-[350px]'>
+						{card?.description}
+					</div>
+				)}
+				{card?.buttonAction && card?.buttonLabel && (
+					<Button variant={'outline'} onClick={card?.buttonAction} className='!p-5 !bg-[#fbfbfb] !border-[#CFCFCF]'>
+						{card?.buttonLabel}
+					</Button>
+				)}
 			</div>
 			{/* Quick Start Section */}
 			<ApiDocsContent tags={tags} />
