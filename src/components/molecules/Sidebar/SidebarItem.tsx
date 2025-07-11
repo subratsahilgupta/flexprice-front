@@ -38,14 +38,8 @@ const SidebarItem: FC<SidebarItemProps> = (item) => {
 
 	const handleClick = () => {
 		if (hasChildren) {
-			// If item is collapsed, open it and navigate to first child
-			if (!isOpen) {
-				setIsOpen(true);
-				navigate(item.items?.[0].url || '#');
-			} else {
-				// If already open, just toggle (close it)
-				setIsOpen(false);
-			}
+			// Just toggle the open/close state without automatic navigation
+			setIsOpen(!isOpen);
 		} else {
 			handleNavigation(item.url, !!hasChildren);
 		}
