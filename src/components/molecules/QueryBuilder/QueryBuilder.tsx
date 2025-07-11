@@ -110,7 +110,7 @@ const QueryBuilder = ({
 	}, [localSorts]);
 
 	return (
-		<div className='flex flex-wrap items-center gap-3'>
+		<div className='flex flex-wrap items-center gap-3 mb-5'>
 			{/* Filter options */}
 			{fields.length > 0 && <FilterPopover fields={fields} value={filter} onChange={handleFilterChange} />}
 

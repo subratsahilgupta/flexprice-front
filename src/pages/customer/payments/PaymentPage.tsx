@@ -29,7 +29,17 @@ const PaymentPage = () => {
 	}
 
 	if ((payments?.items ?? []).length === 0) {
-		return <EmptyPage tutorials={GUIDES.payments.tutorials} heading='Payments' tags={['Payments']} />;
+		return (
+			<EmptyPage
+				emptyStateCard={{
+					heading: 'No Payments Found',
+					description: 'Create your first payment that customers can access, use or be billed for.',
+				}}
+				tutorials={GUIDES.payments.tutorials}
+				heading='Payments'
+				tags={['Payments']}
+			/>
+		);
 	}
 
 	return (

@@ -1,5 +1,5 @@
-import { FormHeader, Spacer, Divider, Loader, Card, Page } from '@/components/atoms';
-import { CreditNoteLineItemTable } from '@/components/molecules';
+import { Spacer, Divider, Loader, Card, Page } from '@/components/atoms';
+import { ApiDocsContent, CreditNoteLineItemTable } from '@/components/molecules';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import CreditNoteApi from '@/api/CreditNoteApi';
 import formatDate from '@/utils/common/format_date';
@@ -11,6 +11,7 @@ import { RouteNames } from '@/core/routes/Routes';
 import { CREDIT_NOTE_STATUS, CREDIT_NOTE_TYPE } from '@/models/CreditNote';
 import { Chip } from '@/components/atoms';
 import { AlertCircle } from 'lucide-react';
+import { getTypographyClass } from '@/lib/typography';
 
 interface Props {
 	credit_note_id: string;
@@ -69,13 +70,14 @@ const CreditNoteDetails: FC<Props> = ({ credit_note_id, breadcrumb_index }) => {
 	}
 
 	return (
-		<Page heading='Credit Note Details' className='space-y-6'>
+		<Page className='space-y-6 '>
+			<ApiDocsContent tags={['Credit Notes', 'Features']} />
 			{/* Main Credit Note Card */}
-			<div ref={creditNoteRef} className='rounded-xl border border-gray-300 p-6'>
+			<div ref={creditNoteRef} className='rounded-xl border border-gray-300'>
 				<div className='p-4'>
 					<div className='flex items-center gap-2'>
-						<FormHeader title='Credit Note Details' variant='form-component-title' titleClassName='font-semibold mb-0' className='mb-0' />
-						{getStatusChip(data?.credit_note_status ?? CREDIT_NOTE_STATUS.DRAFT)}
+						<h3 className={getTypographyClass('card-header') + '!text-[16px]'}>Credit Note Details</h3>
+						<div className='text-[#09090B] text-sm'>{getStatusChip(data?.credit_note_status ?? CREDIT_NOTE_STATUS.DRAFT)}</div>
 					</div>
 					<Spacer className='!my-8' />
 

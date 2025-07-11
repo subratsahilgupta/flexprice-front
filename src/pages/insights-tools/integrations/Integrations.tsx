@@ -2,7 +2,7 @@ import { FormHeader, Loader, Page } from '@/components/atoms';
 import { Integration, integrations } from './integrationsData';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { PremiumFeature, PremiumFeatureTag, ApiDocsContent } from '@/components/molecules';
+import { PremiumFeature, ApiDocsContent } from '@/components/molecules';
 import { useQuery } from '@tanstack/react-query';
 import IntegrationsApi from '@/api/IntegrationsApi';
 
@@ -19,12 +19,19 @@ const Integrations = () => {
 		linkedinIntegration?.providers?.some((provider) => provider.toLowerCase() === integration.name.toLowerCase()),
 	);
 
-	const available = integrations.filter(
+	const availableNonPremium = integrations.filter(
 		(integration) =>
 			!linkedinIntegration?.providers?.some((provider) => provider.toLowerCase() === integration.name.toLowerCase()) &&
-			integration.type === 'available',
+			integration.type === 'available' &&
+			!integration.premium,
 	);
 
+	const availablePremium = integrations.filter(
+		(integration) =>
+			!linkedinIntegration?.providers?.some((provider) => provider.toLowerCase() === integration.name.toLowerCase()) &&
+			integration.type === 'available' &&
+			integration.premium,
+	);
 	if (isLoading) {
 		return <Loader />;
 	}
@@ -43,9 +50,17 @@ const Integrations = () => {
 				</div>
 			)}
 			<div className='mt-6'>
-				<FormHeader title='Available' variant='sub-header' />
+				<h2 className='mb-4 font-medium text-xl'>Available</h2>
 				<div className='grid grid-cols-2 gap-4 '>
-					{available.map((integration, index) => (
+					{availableNonPremium.map((integration, index) => (
+						<IntegrationCard key={index} integration={integration} />
+					))}
+				</div>
+			</div>
+			<div className='mt-10'>
+				<p className='mb-4 font-medium text-xl'>Premium add-ons</p>
+				<div className='grid grid-cols-2 gap-4 '>
+					{availablePremium.map((integration, index) => (
 						<IntegrationCard key={index} integration={integration} />
 					))}
 				</div>
@@ -66,19 +81,19 @@ const IntegrationCard = ({ integration }: { integration: Integration; installed?
 	return (
 		<PremiumFeature isPremiumFeature={integration.premium}>
 			<div className='relative'>
-				<div onClick={handleCardClick} className={cn('border rounded-xl p-4 flex items-center shadow-sm relative', 'cursor-pointer')}>
+				<div onClick={handleCardClick} className={cn('border rounded-2xl p-4 flex shadow-sm relative', 'cursor-pointer')}>
 					<div className='w-16 h-16 flex items-center justify-center bg-gray-100 rounded-lg'>
 						<img src={integration.logo} alt={integration.name} className='w-12 h-12 object-contain' />
 					</div>
 					<div className='ml-4 flex-1'>
-						<div className='flex items-center justify-between w-full mb-2'>
+						<div className='w-full mb-4'>
 							<h3 className='font-semibold text-lg'>{integration.name}</h3>
-							{integration.premium && <PremiumFeatureTag />}
+							{integration.premium && <span className='text-[#c58e20]'>Premium</span>}
 						</div>
 						<p className='text-gray-500 text-sm'>{integration.description}</p>
-						<div className='mt-2 flex items-center gap-2 mb-2'>
+						<div className='mt-2 flex items-center gap-2 '>
 							{integration.tags.map((tag, idx) => (
-								<span key={idx} className='text-xs bg-gray-200 px-2 py-1 rounded-md mb-1'>
+								<span key={idx} className='text-xs bg-[#f4f4f4] text-[#5e5e5e] px-2 py-1 rounded-md mb-1'>
 									{tag}
 								</span>
 							))}

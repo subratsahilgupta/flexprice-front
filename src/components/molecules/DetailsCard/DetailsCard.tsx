@@ -109,9 +109,9 @@ const DetailsCard: FC<Props> = ({
 
 					if (variant === 'stacked') {
 						return (
-							<div key={index} className={cn('flex flex-col space-y-1', colSpanClass, detail.className)}>
-								<div className={cn(labelClasses, 'text-muted-foreground')}>{detail.label}</div>
-								<div className={getValueClasses(detail)}>
+							<div key={index} className={cn('flex flex-col space-y-0', colSpanClass, detail.className)}>
+								<div className={cn(getValueClasses(detail), 'text-[#09090B] text-sm font-medium')}>{detail.label}</div>
+								<div className={cn(labelClasses, 'text-muted-foreground text-sm')}>
 									<span>{detail.value || '--'}</span>
 									{detail.tag && <Tag tag={detail.tag} />}
 								</div>

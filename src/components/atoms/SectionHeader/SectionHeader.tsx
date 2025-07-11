@@ -41,7 +41,7 @@ const SectionHeader: FC<Props> = ({
 	titleClassName,
 }) => {
 	return (
-		<div className={cn('w-full py-3  flex items-center justify-between', className)}>
+		<div className={cn('w-full py-6  flex items-center justify-between', className)}>
 			<p className={cn(getTypographyClass('form-title'), titleClassName)}>{title}</p>
 			<div className={cn('flex gap-2 items-center', optionsClassName)}>
 				{showSearch && (

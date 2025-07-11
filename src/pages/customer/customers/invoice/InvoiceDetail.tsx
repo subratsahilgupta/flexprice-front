@@ -8,11 +8,12 @@ import { useQuery } from '@tanstack/react-query';
 import { Download } from 'lucide-react';
 import { FC, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import { Link } from 'react-router-dom';
 import { RouteNames } from '@/core/routes/Routes';
 import { cn } from '@/lib/utils';
 import { getPaymentStatusChip } from '@/components/molecules/InvoiceTable/InvoiceTable';
 import { INVOICE_TYPE } from '@/models/Invoice';
+import { getTypographyClass } from '@/lib/typography';
+import RedirectCell from '@/components/molecules/Table/RedirectCell';
 interface Props {
 	invoice_id: string;
 	breadcrumb_index: number;
@@ -105,11 +106,7 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 			<div ref={invoiceref} className=' rounded-xl border border-gray-300 p-6'>
 				<div className='p-4'>
 					<div className='w-full flex justify-between items-center'>
-						<FormHeader
-							title={<span className='flex items-center gap-2'>Invoice Details</span>}
-							variant='sub-header'
-							titleClassName='font-semibold'
-						/>
+						<p className={cn(getTypographyClass('section-title'), 'text-xl mb-0')}>Invoice Details</p>
 						<div className='flex gap-4 items-center'>
 							<Button data-html2canvas-ignore='true' onClick={handleDownlaod}>
 								<Download />
@@ -118,18 +115,18 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 							<InvoiceTableMenu data={data!} />
 						</div>
 					</div>
-					<Spacer className='!my-6' />
-					<div className='w-full grid grid-cols-4 gap-4'>
-						<p className='text-[#71717A] text-sm'>Invoice Number</p>
-						<p className='text-[#71717A] text-sm'>Date of Issue</p>
-						<p className='text-[#71717A] text-sm'>Date Due</p>
-						<p className='text-[#71717A] text-sm'>Payment Status</p>
+					<Spacer className='!my-10' />
+					<div className='w-full grid grid-cols-4 gap-4 text-[#09090B] text-sm font-medium'>
+						<p>Invoice Number</p>
+						<p>Date of Issue</p>
+						<p>Date Due</p>
+						<p>Payment Status</p>
 					</div>
-					<div className='w-full grid grid-cols-4 gap-4'>
-						<p className='text-[#09090B] text-sm'>{data?.invoice_number}</p>
-						<p className='text-[#09090B] text-sm'>{formatDate(data?.created_at ?? '')}</p>
-						<p className='text-[#09090B] text-sm'>{data?.due_date ? formatDate(data?.due_date ?? '') : '--'}</p>
-						<p className='text-[#09090B] text-sm'>{getPaymentStatusChip(data?.payment_status ?? '')}</p>
+					<div className='w-full grid grid-cols-4 gap-4 text-[#71717A] text-sm'>
+						<p>{data?.invoice_number}</p>
+						<p>{formatDate(data?.created_at ?? '')}</p>
+						<p>{data?.due_date ? formatDate(data?.due_date ?? '') : '--'}</p>
+						<p>{getPaymentStatusChip(data?.payment_status ?? '')}</p>
 					</div>
 				</div>
 				<div className='my-3 mx-3'>
@@ -146,9 +143,9 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 
 					<div>
 						<FormHeader className='!mb-2' title='Bill to' variant='sub-header' titleClassName='font-semibold' />
-						<Link to={`${RouteNames.customers}/${data?.customer?.id}`} className={cn(customerInfoClass, 'hover:underline')}>
-							{data?.customer?.name || '--'}
-						</Link>
+						<RedirectCell redirectUrl={`${RouteNames.customers}/${data?.customer?.id}`}>
+							<p className={customerInfoClass}>{data?.customer?.name || '--'}</p>
+						</RedirectCell>
 						<p className={customerInfoClass}>{data?.customer?.email || '--'}</p>
 						<p className={customerInfoClass}>{customerAddress || '--'}</p>
 					</div>

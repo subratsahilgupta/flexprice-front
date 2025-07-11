@@ -100,7 +100,7 @@ const CreateWallet: FC<Props> = ({ customerId, onSuccess = () => {}, open, onOpe
 					/>
 
 					<div className='flex flex-col items-start gap-2 w-full'>
-						<label className={cn('font-inter block text-sm font-medium', 'text-zinc-950')}>Conversion Rate</label>
+						<label className={cn(' block text-sm font-medium', 'text-zinc-950')}>Conversion Rate</label>
 						<div className='flex items-center gap-2 w-full'>
 							<Input className='w-full' value={'1'} disabled suffix='credit' />
 							<span>=</span>

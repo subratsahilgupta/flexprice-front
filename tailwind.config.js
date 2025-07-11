@@ -10,6 +10,7 @@ export default {
 				sm: '14px',
 			},
 			fontFamily: {
+				geist: ['Geist', 'sans-serif'],
 				inter: ['Inter', 'sans-serif'],
 				'open-sans': ['Open Sans', 'sans-serif'],
 				'fira-code': ['Fira Code', 'monospace'],

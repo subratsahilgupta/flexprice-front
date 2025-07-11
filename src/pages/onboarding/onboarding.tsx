@@ -8,6 +8,7 @@ export interface TutorialItem {
 	title: string;
 	description: string;
 	onClick: () => void;
+	imageUrl?: string;
 }
 
 const tutorials: TutorialItem[] = [

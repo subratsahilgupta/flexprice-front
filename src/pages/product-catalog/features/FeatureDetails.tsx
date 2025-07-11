@@ -16,9 +16,8 @@ import formatChips from '@/utils/common/format_chips';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 
 // Components
-import { Button, Card, CardHeader, Chip, Divider, Loader, NoDataCard, Page, SectionHeader, Spacer } from '@/components/atoms';
+import { Button, Card, CardHeader, Chip, Divider, Loader, NoDataCard, Page, Spacer } from '@/components/atoms';
 import { ApiDocsContent, ColumnData, FlexpriceTable, RedirectCell } from '@/components/molecules';
-import { getFeatureTypeChips } from '@/components/molecules/FeatureTable/FeatureTable';
 
 // Models and types
 import { FEATURE_TYPE } from '@/models/Feature';
@@ -159,31 +158,24 @@ const FeatureDetails = () => {
 	}
 	return (
 		<Page
-			header={
-				<SectionHeader
-					title={
-						<>
-							{data?.name}
-							<span className='ml-2 text-sm'>{getFeatureTypeChips(data?.type || '', true)}</span>
-						</>
-					}>
-					<div className='flex gap-2'>
-						<Button
-							isLoading={isArchiving}
-							disabled={isArchiving || data?.status === ENTITY_STATUS.ARCHIVED}
-							variant={'outline'}
-							onClick={() => archiveFeature()}
-							className='flex gap-2'>
-							<EyeOff className='w-4 h-4' />
-							{isArchiving ? 'Archiving...' : 'Archive'}
-						</Button>
-						{/* <Button disabled className='flex gap-2'>
-							<Pencil />
-							Edit
-						</Button> */}
-					</div>
-				</SectionHeader>
-			}>
+			headingCTA={
+				<div className='flex gap-2'>
+					<Button
+						isLoading={isArchiving}
+						disabled={isArchiving || data?.status === ENTITY_STATUS.ARCHIVED}
+						variant={'outline'}
+						onClick={() => archiveFeature()}
+						className='flex gap-2'>
+						<EyeOff className='w-4 h-4' />
+						{isArchiving ? 'Archiving...' : 'Archive'}
+					</Button>
+					{/* <Button disabled className='flex gap-2'>
+				<Pencil />
+				Edit
+			</Button> */}
+				</div>
+			}
+			heading={data?.name}>
 			<ApiDocsContent tags={['Features']} snippets={data?.type === FEATURE_TYPE.METERED ? snippets : undefined} />
 
 			<Spacer className='!h-4' />
@@ -191,7 +183,7 @@ const FeatureDetails = () => {
 				{(linkedEntitlements?.items?.length || 0) > 0 ? (
 					<Card variant='notched'>
 						<CardHeader title='Linked Plans' />
-						<FlexpriceTable showEmptyRow columns={columns} data={linkedEntitlements?.items ?? []} />
+						<FlexpriceTable showEmptyRow columns={columns} data={linkedEntitlements?.items ?? []} variant='no-bordered' />
 					</Card>
 				) : (
 					<NoDataCard title='Linked Plans' subtitle='No plans linked to the feature yet' />
@@ -209,7 +201,7 @@ const FeatureDetails = () => {
 
 							<Divider />
 
-							{data?.meter?.filters?.length && (
+							{data?.meter?.filters?.length > 0 && (
 								<>
 									<div className='space-y-4'>
 										<span className='text-gray-500 text-sm font-medium block'>Event Filters</span>

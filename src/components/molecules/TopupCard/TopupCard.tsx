@@ -254,7 +254,7 @@ const TopupCard: FC<TopupCardProps> = ({ walletId, currency, conversion_rate = 1
 				/>
 			)}
 			{topupPayload.credits_type === CreditsType.PurchasedCredits && (
-				<div className='flex items-center space-x-4 font-open-sans'>
+				<div className='flex items-center space-x-4 s'>
 					<Switch
 						id='generate-invoice'
 						checked={topupPayload.generate_invoice || false}

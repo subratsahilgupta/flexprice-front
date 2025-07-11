@@ -97,13 +97,14 @@ const CustomerDetails = () => {
 
 			<div className='border-b border-border mt-4 mb-6'>
 				<nav className='flex space-x-4' aria-label='Tabs'>
-					{tabs.map((tab) => {
+					{tabs.map((tab, index) => {
 						return (
 							<button
 								key={tab.id}
 								onClick={() => onTabChange(tab.id)}
 								className={cn(
-									'px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none',
+									'px-4 py-2 text-sm font-normal transition-colors focus-visible:outline-none',
+									index === 0 && 'px-0',
 									activeTab === tab.id ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
 									// isDisabled && 'opacity-50 cursor-not-allowed hover:text-muted-foreground',
 								)}

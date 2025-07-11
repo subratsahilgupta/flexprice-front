@@ -16,12 +16,12 @@ interface Props {
 	disabled?: boolean;
 }
 
-const MIN_POPOVER_WIDTH = 320;
-const MIN_FIELD_WIDTH = 140;
-const MIN_DIRECTION_WIDTH = 80;
+const MIN_POPOVER_WIDTH = 400;
+const MIN_FIELD_WIDTH = 160;
+const MIN_DIRECTION_WIDTH = 100;
 const POPOVER_PADDING = 'px-3 py-2';
-const GRID_GAP = 'gap-1';
-const ITEM_PADDING = 'py-1 px-1.5';
+const GRID_GAP = 'gap-2';
+const ITEM_PADDING = 'py-2 px-2';
 
 const SortDropdown: React.FC<Props> = ({ options, value = [], onChange, className, disabled = false, maxSorts = 10 }) => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -86,8 +86,8 @@ const SortDropdown: React.FC<Props> = ({ options, value = [], onChange, classNam
 	return (
 		<Popover open={isOpen} onOpenChange={handleOpenChange}>
 			<PopoverTrigger disabled={disabled} asChild>
-				<Button variant='outline' size='sm' className={cn('flex items-center gap-2 text-xs', className)}>
-					<ArrowUpDown className='h-3.5 w-3.5' />
+				<Button variant='outline' size='default' className={cn('flex items-center gap-2 text-xs', className)}>
+					<ArrowUpDown className='size-5' />
 					<span>Sort</span>
 					{appliedSorts > 0 && (
 						<Badge variant='secondary' className='ml-1 h-5 rounded px-1.5 font-mono text-xs'>
@@ -96,22 +96,24 @@ const SortDropdown: React.FC<Props> = ({ options, value = [], onChange, classNam
 					)}
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent align='start' className={cn('border-border/40', POPOVER_PADDING)} style={{ width: MIN_POPOVER_WIDTH }}>
+			<PopoverContent
+				align='start'
+				className={cn('w-screen border-border/70 shadow-lg bg-[#fbfbfb]', 'border-border/40', POPOVER_PADDING)}
+				style={{ width: MIN_POPOVER_WIDTH }}>
 				<div className='flex flex-col gap-1.5'>
 					{value.length === 0 ? (
-						<div className='flex flex-col space-y-2'>
+						<div className='flex flex-col gap-2 p-2'>
 							<div className='flex justify-between items-start'>
-								<div className='flex flex-col gap-0.5'>
-									<h4 className='text-sm font-medium leading-none'>No sorting applied</h4>
-									<p className='text-muted-foreground text-xs'>Add sorting to organize your data.</p>
+								<div className='flex flex-col gap-1'>
+									<h4 className='text-base font-medium leading-none'>No sorting applied</h4>
+									<p className='text-muted-foreground text-sm'>Add sorting to organize your data.</p>
 								</div>
-								<Button variant='ghost' size='icon' className='h-6 w-6 -mr-1' onClick={() => setIsOpen(false)}>
+								<Button variant='ghost' size='icon' className='h-7 w-7 -mr-1' onClick={() => setIsOpen(false)}>
 									<X className='h-3.5 w-3.5' />
 								</Button>
 							</div>
-
-							<div>
-								<Button size='sm' onClick={handleSortAdd} className='w-fit h-7 text-xs px-2'>
+							<div className='mt-2'>
+								<Button size='sm' onClick={handleSortAdd} className='w-fit h-9 text-sm px-2.5'>
 									Add sort
 								</Button>
 							</div>
@@ -126,7 +128,7 @@ const SortDropdown: React.FC<Props> = ({ options, value = [], onChange, classNam
 							</div>
 
 							<Sortable value={value} onValueChange={handleReorder} getItemValue={(item) => item.field}>
-								<SortableContent className='flex flex-col gap-1.5'>
+								<SortableContent className='flex flex-col gap-2'>
 									{value.map((sort, index) => (
 										<SortableItem key={sort.field} value={sort.field}>
 											<div
@@ -146,7 +148,7 @@ const SortDropdown: React.FC<Props> = ({ options, value = [], onChange, classNam
 													onChange={(value) => handleSortUpdate(index, { field: value })}
 													placeholder='Select field'
 													width='100%'
-													triggerClassName='h-6 text-xs'
+													triggerClassName='h-9 text-sm'
 													searchPlaceholder='Search fields...'
 												/>
 
@@ -163,21 +165,21 @@ const SortDropdown: React.FC<Props> = ({ options, value = [], onChange, classNam
 													]}
 													value={sort.direction}
 													onChange={(value) => handleSortUpdate(index, { direction: value as SortDirection })}
-													className='h-6 text-xs'
+													className='h-9 text-sm'
 													placeholder='Select direction'
 												/>
 
-												<div className='flex items-center gap-0.5 justify-end'>
+												<div className='flex items-center gap-1 justify-end'>
 													<Button
 														variant='ghost'
 														size='icon'
-														className='h-6 w-6 shrink-0 hover:bg-destructive/10 hover:text-destructive'
+														className='h-7 w-7 shrink-0 hover:bg-destructive/10 hover:text-destructive'
 														onClick={() => handleSortRemove(index)}>
 														<Trash2 className='h-3.5 w-3.5' />
 													</Button>
 
 													<SortableItemHandle asChild>
-														<Button variant='ghost' size='icon' className='h-6 w-6 shrink-0'>
+														<Button variant='ghost' size='icon' className='h-7 w-7 shrink-0'>
 															<GripVertical className='h-3.5 w-3.5' />
 														</Button>
 													</SortableItemHandle>
@@ -188,25 +190,25 @@ const SortDropdown: React.FC<Props> = ({ options, value = [], onChange, classNam
 								</SortableContent>
 								<SortableOverlay>
 									<div className={cn('grid', GRID_GAP, ITEM_PADDING, 'w-full bg-accent/40 rounded-[4px]')} style={gridTemplateColumns}>
-										<div className='h-6 rounded-[4px] border-border/40 bg-background' />
-										<div className='h-6 rounded-[4px] border-border/40 bg-background' />
-										<div className='flex gap-0.5 justify-end'>
-											<div className='h-6 w-6 rounded-[4px] border-border/40 bg-background' />
-											<div className='h-6 w-6 rounded-[4px] border-border/40 bg-background' />
+										<div className='h-9 rounded-[4px] border-border/40 bg-background' />
+										<div className='h-9 rounded-[4px] border-border/40 bg-background' />
+										<div className='flex gap-1 justify-end'>
+											<div className='h-7 w-7 rounded-[4px] border-border/40 bg-background' />
+											<div className='h-7 w-7 rounded-[4px] border-border/40 bg-background' />
 										</div>
 									</div>
 								</SortableOverlay>
 							</Sortable>
 
-							<div className='flex items-center gap-1.5 pt-2'>
+							<div className='flex items-center gap-2 pt-1.5 px-2'>
 								<Button
 									size='sm'
 									onClick={handleSortAdd}
-									className='h-7 text-xs px-2'
-									disabled={value.length >= maxSorts || allFieldsAdded}>
+									disabled={value.length >= maxSorts || allFieldsAdded}
+									className='h-9 text-sm px-2.5 flex items-center gap-1'>
 									Add sort
 								</Button>
-								<Button variant='outline' size='sm' onClick={handleSortingReset} className='h-7 text-xs px-2'>
+								<Button variant='outline' size='sm' onClick={handleSortingReset} className='h-9 text-sm px-2.5'>
 									Reset sorting
 								</Button>
 							</div>

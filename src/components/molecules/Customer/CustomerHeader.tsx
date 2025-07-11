@@ -45,8 +45,7 @@ const CustomerHeader: React.FC<CustomerHeaderProps> = ({ customerId }) => {
 						.slice(0, 2)}
 				</span>
 				<div className='flex flex-col'>
-					<div className='text-base font-semibold text-gray-800'>{customer?.name}</div>
-					<div className='text-sm font-normal text-gray-600'>{customer?.email}</div>
+					<div className='text-xl font-normal text-gray-800'>{customer?.name}</div>
 				</div>
 			</div>
 		</div>

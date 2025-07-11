@@ -110,7 +110,8 @@ const CustomerUsageTable: FC<Props> = ({ data, allowRedirect = true }) => {
 
 				// Handle case with limit
 				const value = Math.ceil((usage / limit) * 100);
-				const indicatorColor = value >= 100 ? 'bg-red-600' : 'bg-blue-600';
+				const indicatorColor = value >= 100 ? 'bg-gradient-to-r from-red-600 to-red-400' : 'bg-gradient-to-r from-[#6167d9] to-[#2563eb]';
+
 				const backgroundColor = value >= 100 ? 'bg-red-50' : 'bg-blue-200';
 
 				return (
@@ -128,7 +129,7 @@ const CustomerUsageTable: FC<Props> = ({ data, allowRedirect = true }) => {
 
 	return (
 		<div>
-			<FlexpriceTable showEmptyRow data={data} columns={columnData} />
+			<FlexpriceTable showEmptyRow data={data} columns={columnData} variant='no-bordered' />
 		</div>
 	);
 };

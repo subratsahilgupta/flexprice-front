@@ -60,7 +60,7 @@ const Overview = () => {
 					<CardHeader title='Subscriptions' cta={!isArchived && <AddButton onClick={handleAddSubscription} />} />
 					<SubscriptionTable
 						onRowClick={(row) => {
-							navigate(`/customer-management/customers/${customerId}/subscription/${row.id}`);
+							navigate(`${RouteNames.customers}/${customerId}/subscription/${row.id}`);
 						}}
 						data={subscriptions as Subscription[]}
 					/>

@@ -1,5 +1,5 @@
 import { Button, Input, Label, Select, SelectOption } from '@/components/atoms';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import Dialog from '@/components/atoms/Dialog';
 import { CREDIT_GRANT_CADENCE, CREDIT_GRANT_EXPIRATION_TYPE, CREDIT_GRANT_PERIOD, CreditGrant } from '@/models/CreditGrant';
 import { useCallback, useMemo, useState } from 'react';
 import RectangleRadiogroup, { RectangleRadiogroupOption } from '../RectangleRadiogroup';
@@ -174,99 +174,81 @@ const CreditGrantModal: React.FC<Props> = ({ data, isOpen, onOpenChange, onSave,
 	}, [billingCadenceOptions, formData.cadence]);
 
 	return (
-		<Dialog open={isOpen} onOpenChange={onOpenChange}>
-			<DialogContent className='bg-white sm:max-w-[600px]'>
-				<DialogHeader>
-					<DialogTitle>{isEdit ? 'Edit Credit Grant' : 'Add Credit Grant'}</DialogTitle>
-				</DialogHeader>
-				<div className='grid gap-4 py-4'>
-					<div className='space-y-2'>
-						<Label label='Credit Type' />
-						<RectangleRadiogroup
-							options={billingCadenceOptions.map((option) => ({
-								...option,
-								description: undefined,
-							}))}
-							value={formData.cadence}
-							onChange={(value) => handleFieldChange('cadence', value as CREDIT_GRANT_CADENCE)}
-						/>
-						{selectedCadenceDescription && <p className='text-sm text-gray-500'>{selectedCadenceDescription}</p>}
-					</div>
+		<Dialog
+			isOpen={isOpen}
+			showCloseButton={false}
+			onOpenChange={onOpenChange}
+			title={isEdit ? 'Edit Credit Grant' : 'Add Credit Grant'}
+			className='sm:max-w-[600px]'>
+			<div className='grid gap-4 mt-3'>
+				<div className='space-y-2 !mb-6'>
+					<Label label='Credit Type' />
+					<RectangleRadiogroup
+						options={billingCadenceOptions.map((option) => ({
+							...option,
+							description: undefined,
+						}))}
+						value={formData.cadence}
+						onChange={(value) => handleFieldChange('cadence', value as CREDIT_GRANT_CADENCE)}
+					/>
+					{selectedCadenceDescription && <p className='text-sm text-gray-500'>{selectedCadenceDescription}</p>}
+				</div>
 
-					<div className='space-y-2'>
-						<Label label='Credit Name' />
-						<Input
-							placeholder='e.g. Welcome Credits'
-							value={formData.name || ''}
-							onChange={(value) => handleFieldChange('name', value)}
-							error={errors.name}
-						/>
-					</div>
+				<div className='space-y-2'>
+					<Label label='Credit Name' />
+					<Input
+						placeholder='e.g. Welcome Credits'
+						value={formData.name || ''}
+						onChange={(value) => handleFieldChange('name', value)}
+						error={errors.name}
+					/>
+				</div>
 
-					<div className='space-y-2'>
-						<Label label='Credits' />
-						<Input
-							error={errors.credits}
-							placeholder='e.g. 1000'
-							variant='formatted-number'
-							formatOptions={{
-								allowDecimals: true,
-								allowNegative: false,
-								decimalSeparator: '.',
-								thousandSeparator: ',',
-							}}
-							value={formData.credits?.toString() || ''}
-							onChange={(value) => handleFieldChange('credits', value)}
-						/>
-					</div>
+				<div className='space-y-2'>
+					<Label label='Credits' />
+					<Input
+						error={errors.credits}
+						placeholder='e.g. 1000'
+						variant='formatted-number'
+						formatOptions={{
+							allowDecimals: true,
+							allowNegative: false,
+							decimalSeparator: '.',
+							thousandSeparator: ',',
+						}}
+						value={formData.credits?.toString() || ''}
+						onChange={(value) => handleFieldChange('credits', value)}
+					/>
+				</div>
 
-					{formData.cadence === CREDIT_GRANT_CADENCE.RECURRING && (
-						<div className='space-y-2'>
-							<Label label='Grant Period' />
-							<Select
-								error={errors.period}
-								options={creditGrantPeriodOptions}
-								value={formData.period}
-								onChange={(value) => handleFieldChange('period', value as CREDIT_GRANT_PERIOD)}
-							/>
-						</div>
-					)}
-
+				{formData.cadence === CREDIT_GRANT_CADENCE.RECURRING && (
 					<div className='space-y-2'>
-						<Label label='Expiry Type' />
+						<Label label='Grant Period' />
 						<Select
-							error={errors.expiration_type}
-							options={expirationTypeOptions}
-							value={formData.expiration_type}
-							onChange={(value) => handleFieldChange('expiration_type', value as CREDIT_GRANT_EXPIRATION_TYPE)}
+							error={errors.period}
+							options={creditGrantPeriodOptions}
+							value={formData.period}
+							onChange={(value) => handleFieldChange('period', value as CREDIT_GRANT_PERIOD)}
 						/>
 					</div>
+				)}
 
-					{formData.expiration_type === CREDIT_GRANT_EXPIRATION_TYPE.DURATION && (
-						<div className='space-y-2'>
-							<Label label='Expiry (days)' />
-							<Input
-								error={errors.expiration_duration}
-								placeholder='e.g. 30'
-								variant='formatted-number'
-								formatOptions={{
-									allowDecimals: false,
-									allowNegative: false,
-									decimalSeparator: '.',
-									thousandSeparator: ',',
-								}}
-								suffix='days'
-								value={formData.expiration_duration?.toString() || ''}
-								onChange={(value) => handleFieldChange('expiration_duration', parseInt(value) || undefined)}
-							/>
-						</div>
-					)}
+				<div className='space-y-2'>
+					<Label label='Expiry Type' />
+					<Select
+						error={errors.expiration_type}
+						options={expirationTypeOptions}
+						value={formData.expiration_type}
+						onChange={(value) => handleFieldChange('expiration_type', value as CREDIT_GRANT_EXPIRATION_TYPE)}
+					/>
+				</div>
 
+				{formData.expiration_type === CREDIT_GRANT_EXPIRATION_TYPE.DURATION && (
 					<div className='space-y-2'>
-						<Label label='Priority' />
+						<Label label='Expiry (days)' />
 						<Input
-							error={errors.priority}
-							placeholder='e.g. 0'
+							error={errors.expiration_duration}
+							placeholder='e.g. 30'
 							variant='formatted-number'
 							formatOptions={{
 								allowDecimals: false,
@@ -274,19 +256,37 @@ const CreditGrantModal: React.FC<Props> = ({ data, isOpen, onOpenChange, onSave,
 								decimalSeparator: '.',
 								thousandSeparator: ',',
 							}}
-							value={formData.priority?.toString() || ''}
-							onChange={(value) => handleFieldChange('priority', parseInt(value) || 0)}
+							suffix='days'
+							value={formData.expiration_duration?.toString() || ''}
+							onChange={(value) => handleFieldChange('expiration_duration', parseInt(value) || undefined)}
 						/>
 					</div>
-				</div>
+				)}
 
-				<DialogFooter>
-					<Button variant='outline' onClick={handleCancel}>
-						Cancel
-					</Button>
-					<Button onClick={handleSave}>{isEdit ? 'Save Changes' : 'Add Credit'}</Button>
-				</DialogFooter>
-			</DialogContent>
+				<div className='space-y-2'>
+					<Label label='Priority' />
+					<Input
+						error={errors.priority}
+						placeholder='e.g. 0'
+						variant='formatted-number'
+						formatOptions={{
+							allowDecimals: false,
+							allowNegative: false,
+							decimalSeparator: '.',
+							thousandSeparator: ',',
+						}}
+						value={formData.priority?.toString() || ''}
+						onChange={(value) => handleFieldChange('priority', parseInt(value) || 0)}
+					/>
+				</div>
+			</div>
+
+			<div className='flex justify-end gap-2 mt-6'>
+				<Button variant='outline' onClick={handleCancel}>
+					Cancel
+				</Button>
+				<Button onClick={handleSave}>{isEdit ? 'Save Changes' : 'Add Credit'}</Button>
+			</div>
 		</Dialog>
 	);
 };

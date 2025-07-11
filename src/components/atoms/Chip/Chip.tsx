@@ -6,6 +6,7 @@ type ChipVariant = 'default' | 'success' | 'warning' | 'failed' | 'info';
 interface ChipColorScheme {
 	textColor: string;
 	bgColor: string;
+	borderColor: string;
 }
 
 interface ChipProps {
@@ -27,14 +28,15 @@ interface ChipProps {
 	className?: string;
 	/** Whether the chip is disabled */
 	disabled?: boolean;
+	borderColor?: string;
 }
 
 const CHIP_COLORS: Record<ChipVariant, ChipColorScheme> = {
-	success: { bgColor: '#ECFBE4', textColor: '#377E6A' },
-	default: { bgColor: '#F0F2F5', textColor: '#57646E' },
-	failed: { bgColor: '#FEE2E2', textColor: '#DC2626' },
-	info: { bgColor: '#EFF8FF', textColor: '#2F6FE2' },
-	warning: { bgColor: '#FFF7ED', textColor: '#C2410C' },
+	success: { bgColor: '#ECFBE4', textColor: '#377E6A', borderColor: '#d1e9ca' },
+	default: { bgColor: '#F0F2F5', textColor: '#57646E', borderColor: '#F0F2F5' },
+	failed: { bgColor: '#FEE2E2', textColor: '#DC2626', borderColor: '#FEE2E2' },
+	info: { bgColor: '#EFF8FF', textColor: '#2F6FE2', borderColor: '#d1e9ca' },
+	warning: { bgColor: '#FFF7ED', textColor: '#C2410C', borderColor: '#d1e9ca' },
 };
 
 const Chip: FC<ChipProps> = ({
@@ -47,8 +49,9 @@ const Chip: FC<ChipProps> = ({
 	childrenAfter,
 	className,
 	disabled = false,
+	borderColor,
 }) => {
-	const { bgColor: defaultBgColor, textColor: defaultTextColor } = CHIP_COLORS[variant];
+	const { bgColor: defaultBgColor, textColor: defaultTextColor, borderColor: defaultBorderColor } = CHIP_COLORS[variant];
 
 	return (
 		<span
@@ -65,11 +68,13 @@ const Chip: FC<ChipProps> = ({
 				'inline-flex items-center justify-center  px-2 py- rounded-md select-none font-normal transition-all',
 				onClick && !disabled && 'cursor-pointer hover:opacity-90 active:scale-95',
 				disabled && 'opacity-50 cursor-not-allowed',
+
 				className,
 			)}
 			style={{
 				backgroundColor: bgColor ?? defaultBgColor,
 				color: textColor ?? defaultTextColor,
+				border: `1px solid ${borderColor ?? defaultBorderColor}`,
 			}}
 			aria-disabled={disabled}>
 			{icon && <span className='flex items-center text-[16px] leading-none'>{icon}</span>}

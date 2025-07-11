@@ -81,6 +81,7 @@ const SubscriptionTable: FC<SubscriptionTableProps> = ({ data, onRowClick, allow
 			}}
 			columns={columns}
 			data={data}
+			variant='no-bordered'
 		/>
 	);
 };

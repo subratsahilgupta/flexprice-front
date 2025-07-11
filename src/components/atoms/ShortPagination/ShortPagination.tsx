@@ -37,9 +37,9 @@ const ShortPagination = ({
 
 	return (
 		<div className='flex items-center justify-between py-4'>
-			<div className='text-sm text-muted-foreground'>
-				Showing <span className='font-semibold'>{startItem}</span> to <span className='font-semibold'>{endItem}</span> of{' '}
-				<span className='font-semibold'>{totalItems}</span> {unit}
+			<div className='text-sm text-gray-500 font-light'>
+				Showing <span className='font-normal'>{startItem}</span> to <span className='font-normal'>{endItem}</span> of{' '}
+				<span className='font-normal'>{totalItems}</span> {unit}
 			</div>
 			<div className='flex items-center space-x-2'>
 				<Button
@@ -47,11 +47,11 @@ const ShortPagination = ({
 					size='icon'
 					onClick={() => handlePageChange(currentPage - 1)}
 					disabled={currentPage === 1}
-					className={cn('h-8 w-8', currentPage === 1 && 'text-gray-300 cursor-not-allowed')}>
+					className={cn('size-8', currentPage === 1 && 'text-gray-300 cursor-not-allowed')}>
 					<ChevronLeft className='h-4 w-4' />
 				</Button>
 				{showPages && (
-					<div className='text-sm font-medium'>
+					<div className='text-sm font-light text-gray-500'>
 						Page {currentPage} of {totalPages}
 					</div>
 				)}
@@ -60,7 +60,7 @@ const ShortPagination = ({
 					size='icon'
 					onClick={() => handlePageChange(currentPage + 1)}
 					disabled={currentPage === totalPages}
-					className={cn('h-8 w-8', currentPage === totalPages && 'text-gray-300 cursor-not-allowed')}>
+					className={cn('size-8', currentPage === totalPages && 'text-gray-300 cursor-not-allowed')}>
 					<ChevronRight className='h-4 w-4' />
 				</Button>
 			</div>
