@@ -29,14 +29,8 @@ interface SubscriptionPhaseFormData {
 	credit_grants?: Partial<CreditGrant>[];
 }
 
-const getDefaultCreditGrant = (
-	currency: string,
-	billingPeriod: BILLING_PERIOD,
-	planId: string,
-	subscriptionId: string,
-): Partial<CreditGrant> => ({
+const getDefaultCreditGrant = (billingPeriod: BILLING_PERIOD, planId: string, subscriptionId: string): Partial<CreditGrant> => ({
 	id: uniqueId(),
-	currency: currency,
 	period: billingPeriod as unknown as CREDIT_GRANT_PERIOD,
 	name: 'Free Credits',
 	scope: CREDIT_SCOPE.SUBSCRIPTION,
@@ -79,7 +73,7 @@ const AddSubscriptionPhase = ({
 					overage_factor: data.overage_factor || 1,
 					billing_cycle: data.billing_cycle,
 					prorate_charges: data.prorate_charges,
-					credit_grants: data.credit_grants || [getDefaultCreditGrant(currency, billingPeriod, planId, subscriptionId || '')],
+					credit_grants: data.credit_grants || [getDefaultCreditGrant(billingPeriod, planId, subscriptionId || '')],
 				}
 			: {
 					start_date: new Date(),
@@ -88,7 +82,7 @@ const AddSubscriptionPhase = ({
 					overage_factor: 1,
 					billing_cycle: BILLING_CYCLE.ANNIVERSARY,
 					prorate_charges: false,
-					credit_grants: [getDefaultCreditGrant(currency, billingPeriod, planId, subscriptionId || '')],
+					credit_grants: [getDefaultCreditGrant(billingPeriod, planId, subscriptionId || '')],
 				},
 	);
 

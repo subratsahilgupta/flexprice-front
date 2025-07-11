@@ -158,7 +158,6 @@ const SubscriptionForm = ({
 		return {
 			id: uniqueId(),
 			credits: 0,
-			currency: state.currency,
 			period: CREDIT_GRANT_PERIOD.MONTHLY,
 			name: 'Free Credits',
 			scope: CREDIT_SCOPE.SUBSCRIPTION,
