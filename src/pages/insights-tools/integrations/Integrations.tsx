@@ -50,7 +50,7 @@ const Integrations = () => {
 				</div>
 			)}
 			<div className='mt-6'>
-				<p className='mb-4 font-medium text-xl'>Available</p>
+				<h2 className='mb-4 font-medium text-xl'>Available</h2>
 				<div className='grid grid-cols-2 gap-4 '>
 					{availableNonPremium.map((integration, index) => (
 						<IntegrationCard key={index} integration={integration} />
