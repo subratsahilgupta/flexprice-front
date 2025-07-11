@@ -1,6 +1,7 @@
 import { BaseModel } from './base';
 import { Entitlement } from './Entitlement';
 import { Price } from './Price';
+import { CreditGrant } from './CreditGrant';
 
 export interface Plan extends BaseModel {
 	readonly description: string;
@@ -8,4 +9,5 @@ export interface Plan extends BaseModel {
 	readonly name: string;
 	readonly entitlements: Entitlement[];
 	readonly prices: Price[];
+	readonly credit_grants: CreditGrant[];
 }

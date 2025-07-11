@@ -59,7 +59,7 @@ export class PlanApi {
 
 	public static async getPlanById(id: string) {
 		const payload = {
-			expand: 'meters,entitlements,prices,features',
+			expand: 'meters,entitlements,prices,features,credit_grant',
 		};
 		const url = generateQueryParams(`${this.baseUrl}/${id}`, payload);
 		return await AxiosClient.get<Plan>(url);
