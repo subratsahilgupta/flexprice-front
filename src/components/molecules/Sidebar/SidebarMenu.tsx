@@ -5,6 +5,7 @@ import { SidebarGroup, SidebarMenu } from '@/components/ui/sidebar';
 import SidebarItem from './SidebarItem';
 import { useLocation } from 'react-router-dom';
 import { LucideIcon } from 'lucide-react';
+import { RouteNames } from '@/core/routes/Routes';
 
 export type NavItem = {
 	title: string;
@@ -31,9 +32,16 @@ const SidebarNav: FC<{ items: NavItem[] }> = ({ items }) => {
 					const isMainItemActive = location.pathname.startsWith(item.url) && item.url !== '#';
 					const isSubItemActive = item.items?.some((subItem) => location.pathname.startsWith(subItem.url));
 					const isActive = isMainItemActive || isSubItemActive;
+
+					// Special case: If we're on the pricing route (default route) or any product catalog route, open Product Catalog section
+					const isPricingRoute = location.pathname === RouteNames.pricing;
+					const isProductCatalogRoute = location.pathname.startsWith('/product-catalog');
+					const isProductCatalog = item.title === 'Product Catalog';
+					const shouldOpenByDefault = isActive || ((isPricingRoute || isProductCatalogRoute) && isProductCatalog);
+
 					item.isActive = isActive;
 
-					return <SidebarItem key={item.title} {...item} defaultOpen={isActive} />;
+					return <SidebarItem key={item.title} {...item} defaultOpen={shouldOpenByDefault} />;
 				})}
 			</SidebarMenu>
 		</SidebarGroup>

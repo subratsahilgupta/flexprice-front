@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState, useEffect } from 'react';
 import { NavItem } from './SidebarMenu';
 import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from '@/components/ui/sidebar';
 // import { ChevronRight } from 'lucide-react';
@@ -14,12 +14,18 @@ interface SidebarItemProps extends NavItem {
 const SidebarItem: FC<SidebarItemProps> = (item) => {
 	const navigate = useNavigate();
 	const location = useLocation();
+	const [isOpen, setIsOpen] = useState(item.defaultOpen || false);
 
 	const hasChildren = item.items && item.items.length > 0;
 	const Icon = item.icon;
 
 	const isMainItemActive = item.isActive;
 	const iconActive = isMainItemActive;
+
+	// Update open state when route changes
+	useEffect(() => {
+		setIsOpen(item.defaultOpen || false);
+	}, [item.defaultOpen, location.pathname]);
 
 	const handleNavigation = (url: string, hasChildren: boolean) => {
 		if (url && !hasChildren) {
@@ -33,12 +39,12 @@ const SidebarItem: FC<SidebarItemProps> = (item) => {
 	const handleClick = () => {
 		if (hasChildren) {
 			// If item is collapsed, open it and navigate to first child
-			if (!item.isOpen) {
-				item.onToggle?.();
+			if (!isOpen) {
+				setIsOpen(true);
 				navigate(item.items?.[0].url || '#');
 			} else {
 				// If already open, just toggle (close it)
-				item.onToggle?.();
+				setIsOpen(false);
 			}
 		} else {
 			handleNavigation(item.url, !!hasChildren);
@@ -46,7 +52,7 @@ const SidebarItem: FC<SidebarItemProps> = (item) => {
 	};
 
 	return (
-		<Collapsible key={item.title} defaultOpen={item.defaultOpen} asChild className='group/collapsible'>
+		<Collapsible key={item.title} open={isOpen} onOpenChange={setIsOpen} asChild className='group/collapsible'>
 			<SidebarMenuItem>
 				<CollapsibleTrigger asChild>
 					<SidebarMenuButton
