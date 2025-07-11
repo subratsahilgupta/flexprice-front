@@ -2,18 +2,16 @@ import { AxiosClient } from '@/core/axios/verbs';
 import { Pagination } from '@/models/Pagination';
 import { generateQueryParams } from '@/utils/common/api_helper';
 import { CreditGrant } from '@/models/CreditGrant';
+import { QueryFilter, TimeRangeFilter } from '@/types/dto/base';
 
 interface GetGrantCreditResponse {
 	items: CreditGrant[];
 	pagination: Pagination;
 }
 
-interface GetCreditGrantRequest extends Pagination {
+interface GetCreditGrantRequest extends QueryFilter, TimeRangeFilter {
 	subscription_ids?: string[];
-	status?: string;
-	sort?: string;
-	expand?: string;
-	order?: string;
+	plan_ids?: string[];
 }
 
 class CreditGrantApi {
@@ -23,7 +21,7 @@ class CreditGrantApi {
 		return AxiosClient.post<CreditGrant, Partial<CreditGrant>>(this.baseUrl, data);
 	}
 
-	public static async getGrantCredit(data: GetCreditGrantRequest) {
+	public static async getGrantCredits(data: GetCreditGrantRequest) {
 		const url = generateQueryParams(this.baseUrl, data);
 		return await AxiosClient.get<GetGrantCreditResponse>(url);
 	}
@@ -34,6 +32,11 @@ class CreditGrantApi {
 
 	public static async deleteCreditGrant(subscription_id: string) {
 		return await AxiosClient.delete<CreditGrant>(`${this.baseUrl}/${subscription_id}`);
+	}
+
+	public static async getCreditGrants(data: GetCreditGrantRequest) {
+		const url = generateQueryParams(this.baseUrl, data);
+		return await AxiosClient.get<GetGrantCreditResponse>(url);
 	}
 }
 

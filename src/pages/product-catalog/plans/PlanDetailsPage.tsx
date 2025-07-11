@@ -1,5 +1,13 @@
 import { ActionButton, Button, CardHeader, Chip, Loader, Page, Spacer, NoDataCard } from '@/components/atoms';
-import { AddEntitlementDrawer, ApiDocsContent, ColumnData, FlexpriceTable, RedirectCell, PlanDrawer } from '@/components/molecules';
+import {
+	AddEntitlementDrawer,
+	ApiDocsContent,
+	ColumnData,
+	FlexpriceTable,
+	RedirectCell,
+	PlanDrawer,
+	CreditGrantModal,
+} from '@/components/molecules';
 import { DetailsCard } from '@/components/molecules';
 import { RouteNames } from '@/core/routes/Routes';
 import { Price } from '@/models/Price';
@@ -9,7 +17,7 @@ import EntitlementApi from '@/api/EntitlementApi';
 import { PlanApi } from '@/api/PlanApi';
 import formatDate from '@/utils/common/format_date';
 import { getPriceTypeLabel } from '@/utils/common/helper_functions';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { EyeOff, Plus, Pencil, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -23,6 +31,38 @@ import { BILLING_PERIOD } from '@/constants/constants';
 import { Entitlement } from '@/models/Entitlement';
 import { ExtendedEntitlement } from '@/types/dto/Entitlement';
 import { ENTITY_STATUS } from '@/models/base';
+import {
+	CREDIT_GRANT_PERIOD_UNIT,
+	CREDIT_GRANT_EXPIRATION_TYPE,
+	CreditGrant,
+	CREDIT_SCOPE,
+	CREDIT_GRANT_CADENCE,
+	CREDIT_GRANT_PERIOD,
+} from '@/models/CreditGrant';
+import { uniqueId } from 'lodash';
+import { formatExpirationPeriod } from '@/pages/customer/customers/SubscriptionDetails';
+
+const creditGrantColumns: ColumnData<CreditGrant>[] = [
+	{
+		title: 'Name',
+		render: (row) => {
+			return <span>{row.name}</span>;
+		},
+	},
+	{
+		title: 'Credits',
+		render: (row) => {
+			return <span>{formatAmount(row.credits.toString())}</span>;
+		},
+	},
+	{
+		title: 'Expiration Type',
+		render: (row) => {
+			return <span>{formatExpirationPeriod(row as CreditGrant)}</span>;
+		},
+	},
+];
+
 const formatBillingPeriod = (billingPeriod: string) => {
 	switch (billingPeriod.toUpperCase()) {
 		case BILLING_PERIOD.DAILY:
@@ -122,6 +162,9 @@ const PlanDetailsPage = () => {
 	const { planId } = useParams<Params>();
 	const [drawerOpen, setdrawerOpen] = useState(false);
 	const [planDrawerOpen, setPlanDrawerOpen] = useState(false);
+	const [creditGrantModalOpen, setCreditGrantModalOpen] = useState(false);
+	const [newCreditGrants, setNewCreditGrants] = useState<CreditGrant[]>([]);
+	const queryClient = useQueryClient();
 
 	const {
 		data: planData,
@@ -145,6 +188,54 @@ const PlanDetailsPage = () => {
 		},
 		onError: (error: ServerError) => {
 			toast.error(error.error.message || 'Failed to archive plan');
+		},
+	});
+
+	const { mutate: updatePlanWithCreditGrant, isPending: isCreatingCreditGrant } = useMutation({
+		mutationFn: async (data: CreditGrant) => {
+			// Add the new credit grant to local state first
+			const newGrant = {
+				...data,
+				id: uniqueId(), // Temporary ID for UI
+				plan_id: planId!,
+			};
+
+			// Update local state to show the new grant immediately
+			setNewCreditGrants((prev) => [...prev, newGrant]);
+
+			// Prepare existing grants (remove IDs for backend)
+			const existingGrants =
+				planData?.credit_grants?.map((grant) => ({
+					...grant,
+					id: undefined,
+					plan_id: planId!,
+				})) || [];
+
+			// Prepare new grants (remove temporary IDs for backend)
+			const allNewGrants = [...newCreditGrants, newGrant].map((grant) => ({
+				...grant,
+				id: undefined,
+				plan_id: planId!,
+			}));
+
+			const updatedCreditGrants = [...existingGrants, ...allNewGrants] as any[];
+
+			return await PlanApi.updatePlan(planId!, {
+				credit_grants: updatedCreditGrants,
+			});
+		},
+		onSuccess: () => {
+			toast.success('Credit grant added successfully');
+			setCreditGrantModalOpen(false);
+			// Clear local new credit grants since they're now saved
+			setNewCreditGrants([]);
+			// Refetch the plan details to show the new credit grant
+			queryClient.invalidateQueries({ queryKey: ['fetchPlan', planId] });
+		},
+		onError: (error: ServerError) => {
+			toast.error(error.error.message || 'Failed to add credit grant');
+			// Remove the failed grant from local state
+			setNewCreditGrants((prev) => prev.slice(0, -1));
 		},
 	});
 
@@ -224,6 +315,52 @@ const PlanDetailsPage = () => {
 		},
 	];
 
+	const getEmptyCreditGrant = (): Partial<CreditGrant> => {
+		return {
+			id: uniqueId(),
+			credits: 0,
+			currency: 'usd',
+			period: CREDIT_GRANT_PERIOD.MONTHLY,
+			name: 'Free Credits',
+			scope: CREDIT_SCOPE.PLAN,
+			cadence: CREDIT_GRANT_CADENCE.ONETIME,
+			period_count: 1,
+			plan_id: planData?.id || '',
+			expiration_type: CREDIT_GRANT_EXPIRATION_TYPE.NEVER,
+			expiration_duration_unit: CREDIT_GRANT_PERIOD_UNIT.DAYS,
+			priority: 0,
+		};
+	};
+
+	const getEmptyCreditGrantForModal = (): CreditGrant => {
+		const emptyData = getEmptyCreditGrant();
+		return {
+			id: uniqueId(),
+			credits: emptyData.credits || 0,
+			currency: emptyData.currency || 'usd',
+			period: emptyData.period || CREDIT_GRANT_PERIOD.MONTHLY,
+			name: emptyData.name || 'Free Credits',
+			scope: emptyData.scope || CREDIT_SCOPE.SUBSCRIPTION,
+			cadence: emptyData.cadence || CREDIT_GRANT_CADENCE.ONETIME,
+			period_count: emptyData.period_count || 1,
+			plan_id: emptyData.plan_id || '',
+			expiration_type: emptyData.expiration_type || CREDIT_GRANT_EXPIRATION_TYPE.NEVER,
+			expiration_duration_unit: emptyData.expiration_duration_unit || CREDIT_GRANT_PERIOD_UNIT.DAYS,
+			priority: 0,
+		} as CreditGrant;
+	};
+
+	const handleSaveCreditGrant = (data: CreditGrant) => {
+		updatePlanWithCreditGrant(data);
+	};
+
+	const handleCancelCreditGrant = () => {
+		setCreditGrantModalOpen(false);
+	};
+
+	// Combine existing and new credit grants for display
+	const allCreditGrants = [...(planData?.credit_grants || []), ...newCreditGrants];
+
 	return (
 		<Page
 			heading={planData?.name}
@@ -240,6 +377,14 @@ const PlanDetailsPage = () => {
 					</Button>
 				</>
 			}>
+			<CreditGrantModal
+				data={getEmptyCreditGrantForModal()}
+				isOpen={creditGrantModalOpen}
+				onOpenChange={setCreditGrantModalOpen}
+				onSave={handleSaveCreditGrant}
+				onCancel={handleCancelCreditGrant}
+				getEmptyCreditGrant={getEmptyCreditGrant}
+			/>
 			<PlanDrawer data={planData} open={planDrawerOpen} onOpenChange={setPlanDrawerOpen} refetchQueryKeys={['fetchPlan']} />
 			<ApiDocsContent tags={['Plans']} />
 			<AddEntitlementDrawer
@@ -301,6 +446,31 @@ const PlanDetailsPage = () => {
 						}
 					/>
 				)}
+
+				{allCreditGrants.length > 0 ? (
+					<Card variant='notched'>
+						<CardHeader
+							title='Credit Grants'
+							cta={
+								<Button prefixIcon={<Plus />} onClick={() => setCreditGrantModalOpen(true)} disabled={isCreatingCreditGrant}>
+									{isCreatingCreditGrant ? 'Adding...' : 'Add'}
+								</Button>
+							}
+						/>
+						<FlexpriceTable showEmptyRow data={allCreditGrants} columns={creditGrantColumns} />
+					</Card>
+				) : (
+					<NoDataCard
+						title='Credit Grants'
+						subtitle='No credit grants added to the plan yet'
+						cta={
+							<Button prefixIcon={<Plus />} onClick={() => setCreditGrantModalOpen(true)} disabled={isCreatingCreditGrant}>
+								{isCreatingCreditGrant ? 'Adding...' : 'Add'}
+							</Button>
+						}
+					/>
+				)}
+				<Spacer className='!h-10' />
 				<Spacer className='!h-10' />
 			</div>
 		</Page>
