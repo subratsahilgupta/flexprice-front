@@ -22,6 +22,8 @@ import { BILLING_CADENCE, INVOICE_CADENCE } from '@/models/Invoice';
 import { BILLING_PERIOD } from '@/constants/constants';
 import { uniqueId } from 'lodash';
 import SubscriptionForm from '@/components/organisms/Subscription/SubscriptionForm';
+import CreditGrantApi from '@/api/CreditGrantApi';
+import { CreditGrant, CREDIT_SCOPE } from '@/models/CreditGrant';
 
 type Params = {
 	id: string;
@@ -128,6 +130,65 @@ const CustomerSubscription: React.FC = () => {
 		originalPhases: [],
 	});
 
+	// Track original plan credit grants for comparison
+	const [originalPlanCreditGrants, setOriginalPlanCreditGrants] = useState<CreditGrant[]>([]);
+
+	// Fetch plan credit grants when plan changes
+	const { data: planCreditGrants } = useQuery({
+		queryKey: ['planCreditGrants', subscriptionState.selectedPlan],
+		queryFn: async () => {
+			if (!subscriptionState.selectedPlan) return { items: [] };
+			const response = await CreditGrantApi.getCreditGrants({ plan_ids: [subscriptionState.selectedPlan] });
+			return response;
+		},
+		enabled: !!subscriptionState.selectedPlan,
+	});
+
+	// Update original plan credit grants when they change
+	useEffect(() => {
+		if (planCreditGrants?.items) {
+			setOriginalPlanCreditGrants(planCreditGrants.items);
+		}
+	}, [planCreditGrants]);
+
+	// Helper function to check if credit grants have been modified
+	const hasCreditGrantsChanged = (currentCreditGrants: CreditGrant[] = []) => {
+		// If no plan credit grants and no current credit grants, no changes
+		if (originalPlanCreditGrants.length === 0 && currentCreditGrants.length === 0) {
+			return false;
+		}
+
+		// If plan has credit grants but current doesn't, or vice versa
+		if (originalPlanCreditGrants.length !== currentCreditGrants.length) {
+			return true;
+		}
+
+		// Compare each credit grant
+		const sortedOriginal = [...originalPlanCreditGrants].sort((a, b) => a.name.localeCompare(b.name));
+		const sortedCurrent = [...currentCreditGrants].sort((a, b) => a.name.localeCompare(b.name));
+
+		for (let i = 0; i < sortedOriginal.length; i++) {
+			const original = sortedOriginal[i];
+			const current = sortedCurrent[i];
+
+			// Compare relevant fields (including scope)
+			if (
+				original.name !== current.name ||
+				original.credits !== current.credits ||
+				original.cadence !== current.cadence ||
+				original.period !== current.period ||
+				original.priority !== current.priority ||
+				original.expiration_type !== current.expiration_type ||
+				original.expiration_duration !== current.expiration_duration ||
+				original.scope !== current.scope
+			) {
+				return true;
+			}
+		}
+
+		return false;
+	};
+
 	// Update breadcrumb when customer data changes
 	useEffect(() => {
 		if (customerData?.external_id) {
@@ -227,6 +288,7 @@ const CustomerSubscription: React.FC = () => {
 				id: undefined as any,
 				subscription_id: tempSubscriptionId,
 				period: grant.period,
+				scope: CREDIT_SCOPE.SUBSCRIPTION, // Ensure all credit grants have subscription scope
 			}));
 			return {
 				...phase,
@@ -238,6 +300,10 @@ const CustomerSubscription: React.FC = () => {
 			};
 		});
 		const firstPhase = sanitizedPhases[0];
+
+		// Check if credit grants have been modified
+		const currentCreditGrants = firstPhase.credit_grants || [];
+		const creditGrantsChanged = hasCreditGrantsChanged(currentCreditGrants);
 
 		const payload: CreateCustomerSubscriptionPayload = {
 			billing_cadence: BILLING_CADENCE.RECURRING,
@@ -256,7 +322,8 @@ const CustomerSubscription: React.FC = () => {
 			trial_start: null,
 			billing_cycle: firstPhase.billing_cycle,
 			phases: sanitizedPhases.length > 1 ? sanitizedPhases : undefined,
-			credit_grants: firstPhase.credit_grants,
+			// Only include credit grants if they've been modified
+			credit_grants: creditGrantsChanged ? firstPhase.credit_grants : undefined,
 			commitment_amount: firstPhase.commitment_amount,
 
 			// TODO: remove this once the feature is released

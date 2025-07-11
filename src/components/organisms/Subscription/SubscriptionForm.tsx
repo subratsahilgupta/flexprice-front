@@ -178,6 +178,13 @@ const SubscriptionForm = ({
 		},
 	});
 
+	// Track original plan credit grants for comparison
+	const originalPlanCreditGrants = useMemo(() => {
+		return selectedPlanCreditGrants?.items || [];
+	}, [selectedPlanCreditGrants]);
+
+	// Check if credit grants have been modified compared to plan credit grants
+
 	// Phase selection - only allow if no phase is currently being edited
 	const handlePhaseChange = (index: number) => {
 		if (state.isPhaseEditing && state.selectedPhase !== index) {
@@ -402,17 +409,30 @@ const SubscriptionForm = ({
 		});
 	};
 
+	// Remove the disabled logic - allow editing credit grants even when plan has them
 	const isCreditGrantDisabled = useMemo(() => {
-		return isLoadingCreditGrants || (selectedPlanCreditGrants?.items.length ?? 0) > 0;
-	}, [isLoadingCreditGrants, selectedPlanCreditGrants]);
+		return isLoadingCreditGrants;
+	}, [isLoadingCreditGrants]);
 
-	// in case plan has credit grants show them else show the normal ones
+	// Combine plan credit grants with local credit grants for display
 	const relevantCreditGrants = useMemo(() => {
-		if (state.selectedPlan && (selectedPlanCreditGrants?.items.length ?? 0) > 0) {
-			return selectedPlanCreditGrants?.items as CreditGrant[];
+		const currentPhase = state.phases[state.selectedPhase];
+		const localCreditGrants = currentPhase?.credit_grants || [];
+
+		// If there are local credit grants, use them (user has made changes)
+		if (localCreditGrants.length > 0) {
+			return localCreditGrants;
 		}
-		return [];
-	}, [selectedPlanCreditGrants, state.selectedPlan]);
+
+		// Otherwise, show plan credit grants as starting point
+		// This allows users to see and modify plan credit grants
+		return originalPlanCreditGrants;
+	}, [originalPlanCreditGrants, state.phases, state.selectedPhase]);
+
+	// Helper function to handle credit grant changes
+	const handleCreditGrantChange = (index: number, newCreditGrants: CreditGrant[]) => {
+		updatePhase(index, { credit_grants: newCreditGrants });
+	};
 
 	return (
 		<div className='p-4 rounded-lg border border-gray-300 space-y-4'>
@@ -487,9 +507,9 @@ const SubscriptionForm = ({
 									{/* credit grants */}
 									<CreditGrantTable
 										getEmptyCreditGrant={getEmptyCreditGrant}
-										data={relevantCreditGrants.length > 0 ? relevantCreditGrants : phase.credit_grants || []}
+										data={relevantCreditGrants}
 										onChange={(data) => {
-											updatePhase(index, { credit_grants: data });
+											handleCreditGrantChange(index, data);
 										}}
 										disabled={isDisabled || isCreditGrantDisabled}
 									/>
