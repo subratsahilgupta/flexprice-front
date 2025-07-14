@@ -54,7 +54,7 @@ const SidebarItem: FC<SidebarItemProps> = (item) => {
 						onClick={handleClick}
 						tooltip={item.title}
 						className={cn(
-							'flex items-center gap-2 h-10 px-2  py-[10px] rounded-[6px] text-[14px] cursor-pointer font-normal',
+							'flex items-center gap-2 h-10 px-2  py-[10px] rounded-[10px] text-[14px] cursor-pointer font-normal',
 							isMainItemActive ? 'bg-white shadow-sm font-medium' : 'font-thin',
 							item.disabled && 'cursor-not-allowed opacity-50',
 						)}>

@@ -10,6 +10,7 @@ import AuthApi from '@/api/AuthApi';
 import EnvironmentApi from '@/api/EnvironmentApi';
 import { NODE_ENV, NodeEnv } from '@/types/env';
 import { RouteNames } from '@/core/routes/Routes';
+import GoogleSignin from './GoogleSignin';
 
 interface LoginFormProps {
 	switchTab: (tab: string) => void;
@@ -112,10 +113,22 @@ const LoginForm: React.FC<LoginFormProps> = ({ switchTab }) => {
 						value={password}
 					/>
 				</div>
-				<Button onClick={handleLogin} className='w-full !mt-6' isLoading={loading}>
+				<Button onClick={handleLogin} className='w-full !mt-6 h-11' isLoading={loading}>
 					Login
 				</Button>
 			</form>
+
+			{/* Google Sign-in Button - Only show on login and signup tabs */}
+			{NODE_ENV != NodeEnv.SELF_HOSTED && (
+				<>
+					<div className='flex items-center justify-center my-6'>
+						<div className='flex-1 h-px bg-gray-200'></div>
+						<span className='mx-4 text-sm text-gray-500'>or</span>
+						<div className='flex-1 h-px bg-gray-200'></div>
+					</div>
+					<GoogleSignin />
+				</>
+			)}
 
 			<p className='mt-6 text-center text-sm text-gray-600'>
 				Don't have an account?{' '}
