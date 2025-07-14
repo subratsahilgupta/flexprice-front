@@ -201,8 +201,8 @@ const FlexpriceTable: FC<FlexpriceTableProps<any>> = ({
 						className={cn(
 							color ? `text-[${color}] !text-black` : 'text-black',
 							'font-sans font-medium px-3',
-							variant === 'default' && index === 0 ? 'rounded-l-xl' : '',
-							variant === 'default' && index === columns.length - 1 ? 'rounded-r-xl' : '',
+							variant === 'default' && index === 0 ? 'rounded-tl-xl' : '',
+							variant === 'default' && index === columns.length - 1 ? 'rounded-tr-xl' : '',
 							variant === 'no-bordered' && 'border-b-0',
 							className,
 						)}>

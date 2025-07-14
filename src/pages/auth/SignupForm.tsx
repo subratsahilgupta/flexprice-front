@@ -10,6 +10,7 @@ import { RouteNames } from '@/core/routes/Routes';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { NODE_ENV, NodeEnv } from '@/types/env';
 import EnvironmentApi from '@/api/EnvironmentApi';
+import GoogleSignin from './GoogleSignin';
 interface SignupFormProps {
 	switchTab: (tab: string) => void;
 }
@@ -181,10 +182,22 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 						</span>
 					}
 				/>
-				<Button onClick={handleSignup} className='w-full !mt-6' isLoading={isSignupPending || isLoading}>
+				<Button onClick={handleSignup} className='w-full !mt-6 h-11' isLoading={isSignupPending || isLoading}>
 					Create Account
 				</Button>
 			</div>
+
+			{/* Google Sign-in Button - Only show on login and signup tabs */}
+			{NODE_ENV != NodeEnv.SELF_HOSTED && (
+				<>
+					<div className='flex items-center justify-center my-6'>
+						<div className='flex-1 h-px bg-gray-200'></div>
+						<span className='mx-4 text-sm text-gray-500'>or</span>
+						<div className='flex-1 h-px bg-gray-200'></div>
+					</div>
+					<GoogleSignin />
+				</>
+			)}
 
 			<p className='mt-6 text-center text-sm text-gray-600'>
 				Already have an account?{' '}

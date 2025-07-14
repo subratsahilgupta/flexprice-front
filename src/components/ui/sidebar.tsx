@@ -454,7 +454,7 @@ const SidebarMenuAction = React.forwardRef<
 			ref={ref}
 			data-sidebar='menu-action'
 			className={cn(
-				'absolute right-1 top-1.5 flex aspect-square w-5 items-center justify-center rounded-md p-0 text-sidebar-foreground outline-none ring-sidebar-ring transition-transform hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 peer-hover/menu-button:text-sidebar-accent-foreground [&>svg]:size-4 [&>svg]:shrink-0',
+				'absolute right-1 top-1.5 flex aspect-square w-5 items-center justify-center rounded-[10px] p-0 text-sidebar-foreground outline-none ring-sidebar-ring transition-transform hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 peer-hover/menu-button:text-sidebar-accent-foreground [&>svg]:size-4 [&>svg]:shrink-0',
 				// Increases the hit area of the button on mobile.
 				'after:absolute after:-inset-2 after:md:hidden',
 				'peer-data-[size=sm]/menu-button:top-1',
@@ -568,7 +568,7 @@ const SidebarMenuSubButton = React.forwardRef<
 			data-active={isActive}
 			className={cn(
 				// Base styles with proper vertical centering and consistent sizing
-				'flex min-w-0 -translate-x-px items-center justify-start gap-2 overflow-hidden rounded-[6px] ml-2 px-3 text-[14px] font-normal outline-none transition-colors duration-200',
+				'flex min-w-0 -translate-x-px items-center justify-start gap-2 overflow-hidden rounded-[10px] ml-2 px-3 text-[14px] font-normal outline-none transition-colors duration-200',
 				// Interactive states with consistent hover behavior using the same colors as reference UI
 				'hover:bg-[#F4F4F5] hover:text-[#18181B]',
 				'focus-visible:ring-2 focus-visible:ring-[#3C87D2]',

@@ -77,7 +77,6 @@ const FeatureDetails = () => {
 				return <RedirectCell redirectUrl={`${RouteNames.plan}/${rowData?.plan?.id}`}>{rowData?.plan?.name}</RedirectCell>;
 			},
 			fieldVariant: 'title',
-			width: '40%',
 		},
 		{
 			title: 'Status',
