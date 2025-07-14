@@ -147,7 +147,6 @@ const CustomerInformation = () => {
 								setMetadata(filterStringMetadata(updated.metadata));
 								setShowMetadataModal(false);
 							} catch (e) {
-								// Optionally show error toast
 								console.error('Failed to update metadata', e);
 							}
 						}}
