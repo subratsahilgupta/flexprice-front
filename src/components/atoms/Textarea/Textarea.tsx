@@ -10,11 +10,12 @@ interface InputProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaEleme
 	suffix?: React.ReactNode;
 	className?: string;
 	placeholder?: string;
+	textAreaClassName?: string;
 	id?: string;
 }
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, InputProps>(
-	({ className, label, description, error, value, onChange, disabled, placeholder, suffix, id }, ref) => {
+	({ className, label, description, error, value, onChange, disabled, placeholder, suffix, id, textAreaClassName }, ref) => {
 		return (
 			<div className='space-y-1 w-full flex flex-col'>
 				{/* Label */}
@@ -37,6 +38,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, InputProps>(
 						className={cn(
 							'peer text-start m-0 px-0  flex-1 bg-transparent outline-none ring-0 focus:outline-none w-full',
 							'min-h-[100px] w-full text-base focus-visible:outline-none focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+							textAreaClassName,
 						)}
 						onChange={(e) => {
 							if (onChange) {

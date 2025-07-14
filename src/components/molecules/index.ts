@@ -98,3 +98,5 @@ export type { FilterCondition, FilterField, FilterFieldType, FilterOperator, Dat
 export { sanitizeFilterConditions, sanitizeSortConditions } from '@/types/formatters/QueryBuilder';
 
 export { CreditGrantTable, CreditGrantModal } from './CreditGrant';
+
+export { MetadataModal } from './MetadataModal';

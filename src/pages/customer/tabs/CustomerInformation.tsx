@@ -2,10 +2,10 @@ import { Spacer, Button } from '@/components/atoms';
 import CustomerApi from '@/api/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
 import { Country } from 'country-state-city';
-import { CreateCustomerDrawer, Detail, DetailsCard } from '@/components/molecules';
+import { CreateCustomerDrawer, Detail, DetailsCard, MetadataModal } from '@/components/molecules';
 import { useParams, useOutletContext } from 'react-router-dom';
 import { Pencil } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { getTypographyClass } from '@/lib/typography';
 
 type ContextType = {
@@ -14,6 +14,11 @@ type ContextType = {
 
 const fetchCustomer = async (customerId: string) => {
 	return await CustomerApi.getCustomerById(customerId);
+};
+
+const filterStringMetadata = (meta: Record<string, unknown> | undefined): Record<string, string> => {
+	if (!meta) return {};
+	return Object.fromEntries(Object.entries(meta).filter(([_, v]) => typeof v === 'string') as [string, string][]);
 };
 
 const CustomerInformation = () => {
@@ -26,7 +31,14 @@ const CustomerInformation = () => {
 		enabled: !!customerId,
 	});
 
+	const [showMetadataModal, setShowMetadataModal] = useState(false);
 	const [customerDrawerOpen, setcustomerDrawerOpen] = useState(false);
+	const [metadata, setMetadata] = useState<Record<string, string>>(filterStringMetadata(customer?.metadata));
+
+	// Update metadata state when customer changes
+	useEffect(() => {
+		setMetadata(filterStringMetadata(customer?.metadata));
+	}, [customer]);
 
 	const billingDetails: Detail[] = [
 		{
@@ -101,6 +113,46 @@ const CustomerInformation = () => {
 					</div>
 					<Spacer className='!h-4' />
 					<DetailsCard variant='stacked' data={billingDetails} childrenAtTop cardStyle='borderless' />
+
+					{/* Metadata Section Below Address Details */}
+					<div className='mt-8'>
+						<div className='flex justify-between items-center mb-2'>
+							<h3 className={getTypographyClass('card-header') + '!text-[16px]'}>Metadata</h3>
+							{!isArchived && (
+								<Button variant='outline' size='icon' onClick={() => setShowMetadataModal(true)}>
+									<Pencil className='size-5' />
+								</Button>
+							)}
+						</div>
+						<DetailsCard
+							variant='stacked'
+							data={
+								metadata && Object.keys(metadata).length > 0
+									? Object.entries(metadata).map(([key, value]) => ({ label: key, value }))
+									: [{ label: 'No metadata available.', value: '' }]
+							}
+							cardStyle='borderless'
+						/>
+					</div>
+
+					{/* Metadata Modal for Editing */}
+					<MetadataModal
+						open={showMetadataModal}
+						data={metadata}
+						onChange={() => {}}
+						onSave={async (newMetadata) => {
+							if (!customerId) return;
+							try {
+								const updated = await CustomerApi.updateCustomer({ metadata: newMetadata }, customerId);
+								setMetadata(filterStringMetadata(updated.metadata));
+								setShowMetadataModal(false);
+							} catch (e) {
+								// Optionally show error toast
+								console.error('Failed to update metadata', e);
+							}
+						}}
+						onClose={() => setShowMetadataModal(false)}
+					/>
 				</div>
 			)}
 		</div>
