@@ -35,7 +35,6 @@ const ChargeTable: FC<Props> = ({ data }) => {
 		{
 			fieldName: 'charge',
 			title: 'Charge',
-			fieldVariant: 'title',
 		},
 		{
 			title: 'Billing Period',

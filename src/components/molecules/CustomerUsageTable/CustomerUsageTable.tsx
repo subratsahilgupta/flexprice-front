@@ -57,7 +57,7 @@ const CustomerUsageTable: FC<Props> = ({ data, allowRedirect = true }) => {
 	const columnData: ColumnData<CustomerUsage>[] = [
 		{
 			title: 'Feature',
-			fieldVariant: 'title',
+
 			render(row) {
 				return (
 					<RedirectCell allowRedirect={allowRedirect} redirectUrl={`${RouteNames.featureDetails}/${row?.feature?.id}`}>

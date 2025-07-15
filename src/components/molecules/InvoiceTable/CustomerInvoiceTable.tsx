@@ -17,7 +17,6 @@ const CustomerInvoiceTable: FC<Props> = ({ data, onRowClick }) => {
 		{
 			title: 'Invoice Number',
 			render: (row) => <>{row.invoice_number || '--'}</>,
-			fieldVariant: 'title',
 		},
 		{
 			title: 'Status',

@@ -103,7 +103,6 @@ const chargeColumns: ColumnData<Price>[] = [
 		render: (row) => {
 			return <span>{getPriceTypeLabel(row.type)}</span>;
 		},
-		fieldVariant: 'title',
 	},
 	{
 		title: 'Feature',
@@ -250,7 +249,7 @@ const PlanDetailsPage = () => {
 	const columnData: ColumnData<ExtendedEntitlement>[] = [
 		{
 			title: 'Feature Name',
-			fieldVariant: 'title',
+
 			render(row) {
 				return <RedirectCell redirectUrl={`${RouteNames.featureDetails}/${row?.feature?.id}`}>{row?.feature?.name}</RedirectCell>;
 			},

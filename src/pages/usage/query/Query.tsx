@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Button, Page } from '@/components/atoms';
+import { Button, Page, Select } from '@/components/atoms';
 import { ApiDocsContent, QueryBuilder } from '@/components/molecules';
 import EventsApi from '@/api/EventsApi';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -115,19 +115,12 @@ const filterOptions: FilterField[] = [
 		operators: DEFAULT_OPERATORS_PER_DATA_TYPE[DataType.DATE],
 		dataType: DataType.DATE,
 	},
-	{
-		field: 'window_size',
-		label: 'Window Size',
-		fieldType: FilterFieldType.SELECT,
-		operators: DEFAULT_OPERATORS_PER_DATA_TYPE[DataType.STRING],
-		dataType: DataType.STRING,
-		options: windowSizeOptions.map((option) => ({ label: option.label, value: option.value })),
-	},
 ];
 
 const QueryPage: React.FC = () => {
 	const [usageData, setUsageData] = useState<any>(null);
 	const [selectedMeter, setSelectedMeter] = useState<string | undefined>(undefined);
+	const [windowSize, setWindowSize] = useState(windowSizeOptions[0].value);
 
 	// Move useMemo here
 	const initialFilters = useMemo(() => {
@@ -153,13 +146,6 @@ const QueryPage: React.FC = () => {
 				dataType: DataType.DATE,
 				id: 'initial-end-time',
 			},
-			{
-				field: 'window_size',
-				operator: FilterOperator.EQUAL,
-				valueString: 'DAY',
-				dataType: DataType.STRING,
-				id: 'initial-window-size',
-			},
 		];
 	}, []);
 
@@ -181,8 +167,9 @@ const QueryPage: React.FC = () => {
 		return {
 			...filterParams,
 			meter_id: filterParams.meter_id || selectedMeter,
+			window_size: windowSize,
 		};
-	}, [sanitizedFilters, selectedMeter]);
+	}, [sanitizedFilters, selectedMeter, windowSize]);
 
 	const { mutate: fetchUsage, isPending } = useMutation({
 		mutationKey: ['fetchUsage', apiParams],
@@ -247,7 +234,20 @@ const QueryPage: React.FC = () => {
 				/>
 				{/* Move SelectMeter here, after QueryBuilder and before Refresh button */}
 				<div className='flex flex-col justify-end min-w-[250px]'>
-					<SelectMeter label='' className='w-full rounded-xl' onChange={(value) => setSelectedMeter(value.id)} value={selectedMeter} />
+					<SelectMeter
+						label=''
+						className='w-full rounded-xl max-h-9'
+						onChange={(value) => setSelectedMeter(value.id)}
+						value={selectedMeter}
+					/>
+				</div>
+				<div className='flex flex-col justify-end min-w-24'>
+					<Select
+						className='w-full rounded-xl max-h-9'
+						onChange={(value) => setWindowSize(value)}
+						value={windowSize}
+						options={windowSizeOptions.map((option) => ({ label: option.label, value: option.value }))}
+					/>
 				</div>
 				<Button variant='outline' onClick={resetFilters}>
 					<RefreshCw />

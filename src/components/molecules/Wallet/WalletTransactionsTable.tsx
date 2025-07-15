@@ -50,7 +50,6 @@ const WalletTransactionsTable: FC<Props> = ({ data, currency }) => {
 		{
 			title: 'Transactions',
 			render: (rowData) => fomatTransactionTitle({ type: rowData.type, reason: rowData.transaction_reason }),
-			fieldVariant: 'title',
 		},
 		{
 			title: 'Payment Date',
