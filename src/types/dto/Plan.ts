@@ -1,3 +1,6 @@
+import { CreditGrant } from '@/models/CreditGrant';
+import { Pagination } from '@/models/Pagination';
+
 export interface SynchronizePlanPricesWithSubscriptionResponse {
 	message: string;
 	plan_id: string;
@@ -8,4 +11,8 @@ export interface SynchronizePlanPricesWithSubscriptionResponse {
 		prices_skipped: number;
 		subscriptions_processed: number;
 	};
+}
+
+export interface GetPlanCreditGrantsResponse extends Pagination {
+	items: CreditGrant[];
 }
