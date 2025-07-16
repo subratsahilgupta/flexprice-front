@@ -131,14 +131,11 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 		},
 	];
 	const handlePaymentSuccess = (payment: Payment) => {
-		console.log('Payment recorded successfully:', payment);
-
 		// Refetch invoice and payment data
 		refetchQueries(['fetchInvoice', data.id]);
 		refetchQueries(['payments', data.id]);
 		refetchQueries(['fetchInvoices']);
 	};
-
 	return (
 		<div>
 			<InvoiceStatusModal

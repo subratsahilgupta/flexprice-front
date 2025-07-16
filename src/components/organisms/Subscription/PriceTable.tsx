@@ -22,16 +22,12 @@ type ChargeTableData = {
 };
 
 const ChargeTable: FC<Props> = ({ data }) => {
-	console.log('raw xdata', data);
 	const mappedData: ChargeTableData[] = (data ?? []).map((charge) => ({
 		charge: charge.meter_name ? `${charge.meter_name}` : charge.name,
 		quantity: charge.type === 'FIXED' ? '1' : 'pay as you go',
 		price: <ChargeValueCell data={{ ...charge, currency: charge.currency } as any} />,
 		invoice_cadence: charge.invoice_cadence,
 	}));
-
-	console.log('mappedData', mappedData);
-
 	const [showAllRows, setShowAllRows] = useState(false);
 
 	const columns: ColumnData<ChargeTableData>[] = [

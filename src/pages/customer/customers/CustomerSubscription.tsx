@@ -264,9 +264,6 @@ const CustomerSubscription: React.FC = () => {
 			overage_factor: firstPhase.overage_factor ?? 1,
 		};
 
-		console.log(payload);
-		console.log('credit_grants', firstPhase.credit_grants);
-
 		createSubscription(payload);
 	};
 

@@ -413,9 +413,6 @@ const SubscriptionForm = ({
 		}
 		return [];
 	}, [selectedPlanCreditGrants, state.selectedPlan]);
-
-	console.log('charges before ', state.prices?.charges[state.billingPeriod]);
-
 	return (
 		<div className='p-4 rounded-lg border border-gray-300 space-y-4'>
 			<FormHeader title='Subscription Details' variant='sub-header' />
