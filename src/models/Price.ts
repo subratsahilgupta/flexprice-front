@@ -26,9 +26,9 @@ export interface Price extends BaseModel {
 }
 
 export interface Tier {
-	readonly amount: string;
-	readonly currency: string;
-	readonly quantity: number;
+	readonly flat_amount: string;
+	readonly unit_amount: string;
+	readonly up_to: number;
 }
 
 export enum BILLING_MODEL {

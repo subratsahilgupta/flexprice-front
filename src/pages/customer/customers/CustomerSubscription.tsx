@@ -221,20 +221,23 @@ const CustomerSubscription: React.FC = () => {
 
 		// TODO: Remove this once the feature is released
 		const tempSubscriptionId = uniqueId('tempsubscription_');
-		const sanitizedPhases = phases.map((phase) => ({
-			...phase,
-			start_date: phase.start_date,
-			end_date: phase.end_date,
-			commitment_amount: phase.commitment_amount,
-			overage_factor: phase.overage_factor ?? 1,
-			credit_grants: phase.credit_grants?.map((grant) => ({
+		const sanitizedPhases = phases.map((phase) => {
+			const phaseCreditGrants = phase.credit_grants?.map((grant) => ({
 				...grant,
 				id: undefined as any,
 				currency: currency.toLowerCase(),
 				subscription_id: tempSubscriptionId,
 				period: grant.period,
-			})),
-		}));
+			}));
+			return {
+				...phase,
+				start_date: phase.start_date,
+				end_date: phase.end_date,
+				commitment_amount: phase.commitment_amount,
+				overage_factor: phase.overage_factor ?? 1,
+				credit_grants: Array.isArray(phaseCreditGrants) && phaseCreditGrants.length > 0 ? phaseCreditGrants : undefined,
+			};
+		});
 		const firstPhase = sanitizedPhases[0];
 
 		const payload: CreateCustomerSubscriptionPayload = {
@@ -254,12 +257,15 @@ const CustomerSubscription: React.FC = () => {
 			trial_start: null,
 			billing_cycle: firstPhase.billing_cycle,
 			phases: sanitizedPhases.length > 1 ? sanitizedPhases : undefined,
-			credit_grants: firstPhase.credit_grants,
+			credit_grants: (firstPhase.credit_grants?.length ?? 0 > 0) ? firstPhase.credit_grants : undefined,
 			commitment_amount: firstPhase.commitment_amount,
 
 			// TODO: remove this once the feature is released
 			overage_factor: firstPhase.overage_factor ?? 1,
 		};
+
+		console.log(payload);
+		console.log('credit_grants', firstPhase.credit_grants);
 
 		createSubscription(payload);
 	};

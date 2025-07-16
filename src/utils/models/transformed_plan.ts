@@ -61,9 +61,9 @@ const transformTiers = (tiers: Tier[] | null): PriceTier[] => {
 	}
 
 	return tiers.map((tier) => ({
-		flat_amount: parseFloat(tier.amount || '0'),
-		unit_amount: parseFloat(tier.amount || '0'),
-		up_to: tier.quantity || 0,
+		flat_amount: (tier.flat_amount || '0') as unknown as number,
+		unit_amount: (tier.unit_amount || '0') as unknown as number,
+		up_to: tier.up_to || 0,
 	}));
 };
 
