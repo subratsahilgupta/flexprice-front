@@ -1,4 +1,4 @@
-import { Spacer, Button } from '@/components/atoms';
+import { Spacer, Button, Divider } from '@/components/atoms';
 import CustomerApi from '@/api/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
 import { Country } from 'country-state-city';
@@ -7,6 +7,7 @@ import { useParams, useOutletContext } from 'react-router-dom';
 import { Pencil } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getTypographyClass } from '@/lib/typography';
+import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 
 type ContextType = {
 	isArchived: boolean;
@@ -115,6 +116,7 @@ const CustomerInformation = () => {
 					<DetailsCard variant='stacked' data={billingDetails} childrenAtTop cardStyle='borderless' />
 
 					{/* Metadata Section Below Address Details */}
+					<Divider className='my-4' />
 					<div className='mt-8'>
 						<div className='flex justify-between items-center mb-2'>
 							<h3 className={getTypographyClass('card-header') + '!text-[16px]'}>Metadata</h3>
@@ -146,6 +148,7 @@ const CustomerInformation = () => {
 								const updated = await CustomerApi.updateCustomer({ metadata: newMetadata }, customerId);
 								setMetadata(filterStringMetadata(updated.metadata));
 								setShowMetadataModal(false);
+								refetchQueries(['fetchCustomerDetails', customerId]);
 							} catch (e) {
 								console.error('Failed to update metadata', e);
 							}

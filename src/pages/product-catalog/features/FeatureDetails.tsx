@@ -76,7 +76,6 @@ const FeatureDetails = () => {
 			render: (rowData: ExtendedEntitlement) => {
 				return <RedirectCell redirectUrl={`${RouteNames.plan}/${rowData?.plan?.id}`}>{rowData?.plan?.name}</RedirectCell>;
 			},
-			fieldVariant: 'title',
 		},
 		{
 			title: 'Status',

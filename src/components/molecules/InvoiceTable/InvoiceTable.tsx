@@ -46,7 +46,6 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 		{
 			fieldName: 'invoice_number',
 			title: 'Invoice ID',
-			fieldVariant: 'title',
 		},
 		{
 			title: 'Amount',

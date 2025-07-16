@@ -41,7 +41,6 @@ const columns: ColumnData<CreditGrant>[] = [
 	{
 		title: 'Name',
 		fieldName: 'name',
-		fieldVariant: 'title',
 	},
 	{
 		title: 'Credits',

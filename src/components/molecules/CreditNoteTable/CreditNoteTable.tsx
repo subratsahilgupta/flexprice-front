@@ -40,7 +40,7 @@ const CreditNoteTable: FC<Props> = ({ data }) => {
 	const columns: ColumnData<CreditNote>[] = [
 		{
 			title: 'Credit Note ID',
-			fieldVariant: 'title',
+
 			render: (row: CreditNote) => row.credit_note_number || row.id.slice(0, 8),
 		},
 		{

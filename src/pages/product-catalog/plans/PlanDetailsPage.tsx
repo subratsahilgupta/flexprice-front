@@ -56,7 +56,13 @@ const creditGrantColumns: ColumnData<CreditGrant>[] = [
 		},
 	},
 	{
-		title: 'Expiration Type',
+		title: 'Priority',
+		render: (row) => {
+			return <span>{row.priority ?? '--'}</span>;
+		},
+	},
+	{
+		title: 'Expiration Config',
 		render: (row) => {
 			return <span>{formatExpirationPeriod(row as CreditGrant)}</span>;
 		},
@@ -103,7 +109,6 @@ const chargeColumns: ColumnData<Price>[] = [
 		render: (row) => {
 			return <span>{getPriceTypeLabel(row.type)}</span>;
 		},
-		fieldVariant: 'title',
 	},
 	{
 		title: 'Feature',
@@ -250,7 +255,7 @@ const PlanDetailsPage = () => {
 	const columnData: ColumnData<ExtendedEntitlement>[] = [
 		{
 			title: 'Feature Name',
-			fieldVariant: 'title',
+
 			render(row) {
 				return <RedirectCell redirectUrl={`${RouteNames.featureDetails}/${row?.feature?.id}`}>{row?.feature?.name}</RedirectCell>;
 			},
@@ -470,8 +475,7 @@ const PlanDetailsPage = () => {
 						}
 					/>
 				)}
-				<Spacer className='!h-10' />
-				<Spacer className='!h-10' />
+				<Spacer className='!h-20' />
 			</div>
 		</Page>
 	);

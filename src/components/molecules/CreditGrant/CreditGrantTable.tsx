@@ -54,7 +54,6 @@ const CreditGrantTable: React.FC<Props> = ({ data, onChange, disabled, getEmptyC
 		{
 			title: 'Name',
 			fieldName: 'name',
-			fieldVariant: 'title',
 		},
 		{
 			title: 'Credits',
