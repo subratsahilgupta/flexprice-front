@@ -9,7 +9,7 @@ import InvoiceStatusModal from './InvoiceStatusModal';
 import InvoicePaymentStatusModal from './InvoicePaymentStatusModal';
 import { useNavigate } from 'react-router-dom';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
-import { PAYMENT_DESTINATION_TYPE, Payment } from '@/models/Payment';
+import { PAYMENT_DESTINATION_TYPE } from '@/models/Payment';
 import { PAYMENT_STATUS } from '@/constants';
 
 interface Props {
@@ -130,8 +130,7 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 			},
 		},
 	];
-	const handlePaymentSuccess = (payment: Payment) => {
-		// Refetch invoice and payment data
+	const handlePaymentSuccess = () => {
 		refetchQueries(['fetchInvoice', data.id]);
 		refetchQueries(['payments', data.id]);
 		refetchQueries(['fetchInvoices']);
