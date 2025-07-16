@@ -21,7 +21,7 @@ import { Trash2 } from 'lucide-react';
 import { uniqueId } from 'lodash';
 import { SubscriptionFormState, SubscriptionPhaseState } from '@/pages/customer/customers/CustomerSubscription';
 import { useQuery } from '@tanstack/react-query';
-import { PlanApi } from '@/api/PlanApi';
+import CreditGrantApi from '@/api/CreditGrantApi';
 
 // Helper components
 const BillingCycleSelector = ({
@@ -173,17 +173,10 @@ const SubscriptionForm = ({
 	const { data: selectedPlanCreditGrants, isLoading: isLoadingCreditGrants } = useQuery({
 		queryKey: ['creditGrants', state.selectedPlan],
 		queryFn: async () => {
-			const response = await PlanApi.getPlanCreditGrants(state.selectedPlan);
+			const response = await CreditGrantApi.getCreditGrants({ plan_ids: [state.selectedPlan] });
 			return response;
 		},
 	});
-
-	// Track original plan credit grants for comparison
-	const originalPlanCreditGrants = useMemo(() => {
-		return selectedPlanCreditGrants?.items || [];
-	}, [selectedPlanCreditGrants]);
-
-	// Check if credit grants have been modified compared to plan credit grants
 
 	// Phase selection - only allow if no phase is currently being edited
 	const handlePhaseChange = (index: number) => {
@@ -409,30 +402,17 @@ const SubscriptionForm = ({
 		});
 	};
 
-	// Remove the disabled logic - allow editing credit grants even when plan has them
 	const isCreditGrantDisabled = useMemo(() => {
-		return isLoadingCreditGrants;
-	}, [isLoadingCreditGrants]);
+		return isLoadingCreditGrants || (selectedPlanCreditGrants?.items.length ?? 0) > 0;
+	}, [isLoadingCreditGrants, selectedPlanCreditGrants]);
 
-	// Combine plan credit grants with local credit grants for display
+	// in case plan has credit grants show them else show the normal ones
 	const relevantCreditGrants = useMemo(() => {
-		const currentPhase = state.phases[state.selectedPhase];
-		const localCreditGrants = currentPhase?.credit_grants || [];
-
-		// If there are local credit grants, use them (user has made changes)
-		if (localCreditGrants.length > 0) {
-			return localCreditGrants;
+		if (state.selectedPlan && (selectedPlanCreditGrants?.items.length ?? 0) > 0) {
+			return selectedPlanCreditGrants?.items as CreditGrant[];
 		}
-
-		// Otherwise, show plan credit grants as starting point
-		// This allows users to see and modify plan credit grants
-		return originalPlanCreditGrants;
-	}, [originalPlanCreditGrants, state.phases, state.selectedPhase]);
-
-	// Helper function to handle credit grant changes
-	const handleCreditGrantChange = (index: number, newCreditGrants: CreditGrant[]) => {
-		updatePhase(index, { credit_grants: newCreditGrants });
-	};
+		return [];
+	}, [selectedPlanCreditGrants, state.selectedPlan]);
 
 	return (
 		<div className='p-4 rounded-lg border border-gray-300 space-y-4'>
@@ -507,9 +487,9 @@ const SubscriptionForm = ({
 									{/* credit grants */}
 									<CreditGrantTable
 										getEmptyCreditGrant={getEmptyCreditGrant}
-										data={relevantCreditGrants}
+										data={relevantCreditGrants.length > 0 ? relevantCreditGrants : phase.credit_grants || []}
 										onChange={(data) => {
-											handleCreditGrantChange(index, data);
+											updatePhase(index, { credit_grants: data });
 										}}
 										disabled={isDisabled || isCreditGrantDisabled}
 									/>

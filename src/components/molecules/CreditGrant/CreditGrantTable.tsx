@@ -54,7 +54,6 @@ const CreditGrantTable: React.FC<Props> = ({ data, onChange, disabled, getEmptyC
 		{
 			title: 'Name',
 			fieldName: 'name',
-			fieldVariant: 'title',
 		},
 		{
 			title: 'Credits',
@@ -113,17 +112,13 @@ const CreditGrantTable: React.FC<Props> = ({ data, onChange, disabled, getEmptyC
 			<div className='space-y-4'>
 				<div className='flex items-center justify-between'>
 					<FormHeader className='mb-0' title='Credit Grants' variant='sub-header' />
-					<div className='flex items-center gap-2'>
-						<AddButton
-							size='sm'
-							onClick={() => {
-								setSelectedCreditGrant(null);
-								setIsOpen(true);
-							}}
-							disabled={disabled}
-							className='text-sm py-1.5'
-						/>
-					</div>
+					<AddButton
+						onClick={() => {
+							setSelectedCreditGrant(null);
+							setIsOpen(true);
+						}}
+						disabled={disabled}
+					/>
 				</div>
 				<div className='rounded-xl border border-gray-300 space-y-6 mt-2 '>
 					<FlexpriceTable data={data} columns={columns} showEmptyRow />
