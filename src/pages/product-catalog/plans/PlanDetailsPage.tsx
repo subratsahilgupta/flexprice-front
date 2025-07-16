@@ -41,6 +41,7 @@ import {
 } from '@/models/CreditGrant';
 import { uniqueId } from 'lodash';
 import { formatExpirationPeriod } from '@/pages/customer/customers/SubscriptionDetails';
+import CreditGrantApi from '@/api/CreditGrantApi';
 
 const creditGrantColumns: ColumnData<CreditGrant>[] = [
 	{
@@ -201,45 +202,21 @@ const PlanDetailsPage = () => {
 			// Add the new credit grant to local state first
 			const newGrant = {
 				...data,
-				id: uniqueId(), // Temporary ID for UI
+				id: uniqueId(),
 				plan_id: planId!,
 			};
 
-			// Update local state to show the new grant immediately
 			setNewCreditGrants((prev) => [...prev, newGrant]);
-
-			// Prepare existing grants (remove IDs for backend)
-			const existingGrants =
-				planData?.credit_grants?.map((grant) => ({
-					...grant,
-					id: undefined,
-					plan_id: planId!,
-				})) || [];
-
-			// Prepare new grants (remove temporary IDs for backend)
-			const allNewGrants = [...newCreditGrants, newGrant].map((grant) => ({
-				...grant,
-				id: undefined,
-				plan_id: planId!,
-			}));
-
-			const updatedCreditGrants = [...existingGrants, ...allNewGrants] as any[];
-
-			return await PlanApi.updatePlan(planId!, {
-				credit_grants: updatedCreditGrants,
-			});
+			return await CreditGrantApi.createCreditGrant(newGrant);
 		},
 		onSuccess: () => {
 			toast.success('Credit grant added successfully');
 			setCreditGrantModalOpen(false);
-			// Clear local new credit grants since they're now saved
 			setNewCreditGrants([]);
-			// Refetch the plan details to show the new credit grant
 			queryClient.invalidateQueries({ queryKey: ['fetchPlan', planId] });
 		},
 		onError: (error: ServerError) => {
 			toast.error(error.error.message || 'Failed to add credit grant');
-			// Remove the failed grant from local state
 			setNewCreditGrants((prev) => prev.slice(0, -1));
 		},
 	});
@@ -324,7 +301,6 @@ const PlanDetailsPage = () => {
 		return {
 			id: uniqueId(),
 			credits: 0,
-			currency: 'usd',
 			period: CREDIT_GRANT_PERIOD.MONTHLY,
 			name: 'Free Credits',
 			scope: CREDIT_SCOPE.PLAN,
@@ -342,7 +318,6 @@ const PlanDetailsPage = () => {
 		return {
 			id: uniqueId(),
 			credits: emptyData.credits || 0,
-			currency: emptyData.currency || 'usd',
 			period: emptyData.period || CREDIT_GRANT_PERIOD.MONTHLY,
 			name: emptyData.name || 'Free Credits',
 			scope: emptyData.scope || CREDIT_SCOPE.SUBSCRIPTION,

@@ -9,7 +9,6 @@ export interface CreditGrant extends BaseModel {
 	// this is the amount of the credit grant in the currency of the subscription
 	readonly credits: number;
 	readonly cadence: CREDIT_GRANT_CADENCE;
-	readonly currency: string;
 	readonly metadata: Metadata;
 	readonly name: string;
 	readonly period?: CREDIT_GRANT_PERIOD;
