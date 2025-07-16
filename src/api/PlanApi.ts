@@ -3,7 +3,7 @@ import { Plan } from '@/models/Plan';
 import { Pagination } from '@/models/Pagination';
 import { ExpandedPlan } from '@/utils/models/transformed_plan';
 import { generateQueryParams } from '@/utils/common/api_helper';
-import { SynchronizePlanPricesWithSubscriptionResponse } from '@/types/dto';
+import { GetPlanCreditGrantsResponse, SynchronizePlanPricesWithSubscriptionResponse } from '@/types/dto/Plan';
 
 export interface GetAllPlansResponse {
 	items: Plan[] | ExpandedPlan[];
@@ -59,7 +59,7 @@ export class PlanApi {
 
 	public static async getPlanById(id: string) {
 		const payload = {
-			expand: 'meters,entitlements,prices,features',
+			expand: 'meters,entitlements,prices,features,credit_grant',
 		};
 		const url = generateQueryParams(`${this.baseUrl}/${id}`, payload);
 		return await AxiosClient.get<Plan>(url);
@@ -75,5 +75,9 @@ export class PlanApi {
 
 	public static async synchronizePlanPricesWithSubscription(id: string) {
 		return await AxiosClient.post<SynchronizePlanPricesWithSubscriptionResponse>(`${this.baseUrl}/${id}/sync/subscriptions`);
+	}
+
+	public static async getPlanCreditGrants(id: string) {
+		return await AxiosClient.get<GetPlanCreditGrantsResponse>(`${this.baseUrl}/${id}/creditgrants`);
 	}
 }

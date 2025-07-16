@@ -1,20 +1,13 @@
 import { Pagination } from '@/models/Pagination';
 import { CreditNote, CreditNoteLineItem, CREDIT_NOTE_STATUS, CREDIT_NOTE_REASON, CREDIT_NOTE_TYPE } from '@/models/CreditNote';
+import { QueryFilter, TimeRangeFilter } from './base';
 
 // API Payloads
-export interface GetAllCreditNotesPayload {
+export interface GetAllCreditNotesPayload extends QueryFilter, TimeRangeFilter {
 	credit_note_ids?: string[];
 	invoice_id?: string;
 	credit_note_status?: CREDIT_NOTE_STATUS[];
 	credit_note_type?: CREDIT_NOTE_TYPE;
-	limit?: number;
-	offset?: number;
-	order?: 'asc' | 'desc';
-	sort?: string;
-	start_time?: string;
-	end_time?: string;
-	status?: string;
-	expand?: string;
 }
 
 export interface CreateCreditNoteParams {

@@ -38,6 +38,7 @@ const Invoice = () => {
 				cta={
 					!isArchived && (
 						<AddButton
+							label='Add Invoice'
 							onClick={() => {
 								navigate(`${RouteNames.customers}/${customerId}/invoices/create`);
 							}}
@@ -56,6 +57,7 @@ const Invoice = () => {
 					cta={
 						!isArchived && (
 							<AddButton
+								label='Add Invoice'
 								onClick={() => {
 									navigate(`${RouteNames.customers}/${customerId}/invoices/create`);
 								}}

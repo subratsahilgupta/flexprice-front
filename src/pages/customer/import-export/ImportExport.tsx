@@ -28,7 +28,6 @@ const columns: ColumnData<ImportTask>[] = [
 		render(rowData) {
 			return <div>{rowData.file_name || '--'}</div>;
 		},
-		fieldVariant: 'title',
 	},
 	{
 		title: 'Entity Type',
@@ -92,6 +91,14 @@ const ImportExport = () => {
 		return (
 			<EmptyPage
 				onAddClick={() => setdrawerOpen(true)}
+				emptyStateCard={{
+					heading: 'No Import Tasks Found',
+					description: 'Create your first import task that customers can access, use or be billed for.',
+					buttonLabel: 'Create Import Task',
+					buttonAction: () => {
+						setdrawerOpen(true);
+					},
+				}}
 				tutorials={GUIDES.importExport.tutorials}
 				heading='Import Tasks'
 				tags={['Import Export', 'Tasks']}>

@@ -52,7 +52,7 @@ const GoogleSignin = () => {
 			<Button
 				onClick={handleGoogleAuth}
 				variant='outline'
-				className='w-full mb-6 flex items-center justify-center gap-2'
+				className='w-full mb-6 flex items-center justify-center gap-2 h-11'
 				isLoading={googleAuthMutation.isPending}>
 				<svg className='h-5 w-5' viewBox='0 0 24 24'>
 					<path

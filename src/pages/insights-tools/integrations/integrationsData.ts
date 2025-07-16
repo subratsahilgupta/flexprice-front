@@ -96,7 +96,7 @@ export const integrations: Integration[] = [
 		name: 'Salesforce',
 		description: 'Salesforce is a customer relationship management (CRM) platform.',
 		logo: 'https://upload.wikimedia.org/wikipedia/commons/f/f9/Salesforce.com_logo.svg',
-		tags: ['CRM'],
+		tags: ['CRM', 'Accounting'],
 		premium: true,
 		type: 'available',
 	},
@@ -111,7 +111,7 @@ export const integrations: Integration[] = [
 	{
 		name: 'Zoho',
 		logo: 'https://www.zohowebstatic.com/sites/zweb/images/commonroot/zoho-logo-web.svg',
-		tags: ['CRM'],
+		tags: ['CRM', 'Accounting'],
 		premium: true,
 		type: 'available',
 		description: 'The Zoho Books integration lets you manage critical accounting tasks directly from Flexprice. ',

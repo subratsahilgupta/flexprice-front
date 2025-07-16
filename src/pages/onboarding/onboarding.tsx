@@ -3,11 +3,13 @@ import { AlignJustify, ArrowRight, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ApiDocsContent } from '@/components/molecules';
 import { useState } from 'react';
+import { logger } from '@/utils/common/Logger';
 
 export interface TutorialItem {
 	title: string;
 	description: string;
 	onClick: () => void;
+	imageUrl?: string;
 }
 
 const tutorials: TutorialItem[] = [
@@ -52,7 +54,7 @@ const OnboardingPage = () => {
 			const onboardingCompleted = localStorage.getItem(ONBOARDING_STORAGE_KEY);
 			return onboardingCompleted !== 'true';
 		} catch (error) {
-			console.error('Error accessing localStorage:', error);
+			logger.error('Error accessing localStorage:', error);
 			return true; // Show modal if localStorage is unavailable
 		}
 	});
@@ -63,7 +65,7 @@ const OnboardingPage = () => {
 			localStorage.setItem(ONBOARDING_STORAGE_KEY, 'true');
 			setShowVideoModal(false);
 		} catch (error) {
-			console.error('Error setting localStorage:', error);
+			logger.error('Error setting localStorage:', error);
 		}
 	};
 	return (

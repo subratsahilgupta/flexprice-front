@@ -37,7 +37,17 @@ const CreditNotesPage = () => {
 	}
 
 	if ((creditNoteData?.items ?? []).length === 0) {
-		return <EmptyPage heading='Credit Notes' tags={['Credit Notes']} tutorials={GUIDES.creditNotes?.tutorials || []} />;
+		return (
+			<EmptyPage
+				heading='Credit Notes'
+				tags={['Credit Notes']}
+				tutorials={GUIDES.creditNotes?.tutorials || []}
+				emptyStateCard={{
+					heading: 'No Credit Notes Found',
+					description: 'Create your first credit note that customers can access, use or be billed for.',
+				}}
+			/>
+		);
 	}
 
 	return (

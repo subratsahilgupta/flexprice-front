@@ -5,7 +5,6 @@ import FlexpriceTable, { ColumnData } from '../Table';
 import CreditGrantModal from './CreditGrantModal';
 import { formatBillingPeriodForPrice } from '@/utils/common/helper_functions';
 import { formatExpirationPeriod } from '@/pages/customer/customers/SubscriptionDetails';
-
 interface Props {
 	data: CreditGrant[];
 	onChange: (data: CreditGrant[]) => void;
@@ -29,7 +28,6 @@ export const formatExpirationType = (expirationType: CREDIT_GRANT_EXPIRATION_TYP
 const CreditGrantTable: React.FC<Props> = ({ data, onChange, disabled, getEmptyCreditGrant }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [selectedCreditGrant, setSelectedCreditGrant] = useState<CreditGrant | null>(null);
-
 	const handleSave = (newCreditGrant: CreditGrant) => {
 		if (selectedCreditGrant) {
 			// Edit existing credit
@@ -50,11 +48,12 @@ const CreditGrantTable: React.FC<Props> = ({ data, onChange, disabled, getEmptyC
 		setIsOpen(true);
 	};
 
+	// check if this plan already has a credit grant this us just a temp fix
+
 	const columns: ColumnData<CreditGrant>[] = [
 		{
 			title: 'Name',
 			fieldName: 'name',
-			fieldVariant: 'title',
 		},
 		{
 			title: 'Credits',
@@ -114,13 +113,11 @@ const CreditGrantTable: React.FC<Props> = ({ data, onChange, disabled, getEmptyC
 				<div className='flex items-center justify-between'>
 					<FormHeader className='mb-0' title='Credit Grants' variant='sub-header' />
 					<AddButton
-						size='sm'
 						onClick={() => {
 							setSelectedCreditGrant(null);
 							setIsOpen(true);
 						}}
 						disabled={disabled}
-						className='text-sm py-1.5'
 					/>
 				</div>
 				<div className='rounded-xl border border-gray-300 space-y-6 mt-2 '>

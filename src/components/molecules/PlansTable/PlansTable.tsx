@@ -22,7 +22,6 @@ const PlansTable: FC<PlansTableProps> = ({ data, onEdit }) => {
 		{
 			fieldName: 'name',
 			title: 'Name',
-			fieldVariant: 'title',
 		},
 		{
 			title: 'Status',

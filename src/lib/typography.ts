@@ -41,7 +41,7 @@ export const typography = {
 	breadcrumb: 'text-sm text-zinc-600',
 
 	// card styles
-	'card-header': 'text-lg font-semibold text-zinc-950',
+	'card-header': 'text-[20px] font-medium text-zinc-950',
 	'card-subtitle': 'text-sm text-zinc-500',
 
 	// modal styles

@@ -48,14 +48,25 @@ const PricingPlan = () => {
 		return (
 			<div className='space-y-6'>
 				<PlanDrawer data={activePlan} open={planDrawerOpen} onOpenChange={setPlanDrawerOpen} refetchQueryKeys={['fetchPlans']} />
-				<EmptyPage tutorials={GUIDES.plans.tutorials} heading='Pricing Plan' tags={['Plans']} onAddClick={handleOnAdd} />
+				<EmptyPage
+					onAddClick={handleOnAdd}
+					emptyStateCard={{
+						heading: 'No Plans Found',
+						description: 'Create your first plan that customers can access, use or be billed for.',
+						buttonLabel: 'Create Plan',
+						buttonAction: handleOnAdd,
+					}}
+					tutorials={GUIDES.plans.tutorials}
+					heading='Pricing Plan'
+					tags={['Plans']}
+				/>
 			</div>
 		);
 	}
 
 	return (
 		<div>
-			<Page heading='Plans' headingCTA={<AddButton onClick={handleOnAdd} />}>
+			<Page heading='Plans' headingCTA={<AddButton label='Add Plan' onClick={handleOnAdd} />}>
 				<PlanDrawer data={activePlan} open={planDrawerOpen} onOpenChange={setPlanDrawerOpen} refetchQueryKeys={['fetchPlans']} />
 				<ApiDocsContent tags={['Plans']} />
 				<div className='space-y-6'>

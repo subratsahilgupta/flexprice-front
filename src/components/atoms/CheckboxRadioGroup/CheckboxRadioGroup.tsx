@@ -22,7 +22,7 @@ export interface Props {
 const CheckboxRadioGroup: FC<Props> = ({ error, checkboxItems, defaultValue, onChange, title, value }) => {
 	return (
 		<div>
-			{title && <p className='text-sm text-zinc-950 font-medium font-inter mb-2'>{title}</p>}
+			{title && <p className='text-sm text-zinc-950 font-medium  mb-2'>{title}</p>}
 			<RadioGroup defaultValue={defaultValue} value={value}>
 				{checkboxItems.map((item) => (
 					<div
@@ -35,7 +35,7 @@ const CheckboxRadioGroup: FC<Props> = ({ error, checkboxItems, defaultValue, onC
 						className='flex items-center gap-2'>
 						<RadioGroupItem id={item.value} value={item.value} className='peer' disabled={item.disabled} />
 
-						<label htmlFor={item.value} className='cursor-pointer font-open-sans'>
+						<label htmlFor={item.value} className='cursor-pointer s'>
 							<p className={cn('font-medium text-sm text-[#18181B] peer-checked:text-black', item.disabled && 'text-zinc-400')}>
 								{item.label}
 							</p>

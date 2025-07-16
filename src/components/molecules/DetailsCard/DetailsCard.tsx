@@ -48,7 +48,6 @@ const Tag: FC<{ tag: NonNullable<Detail['tag']> }> = ({ tag }) => {
 
 const DetailsCard: FC<Props> = ({
 	title,
-	description,
 	data,
 	variant = 'default',
 	cardStyle = 'default',
@@ -88,7 +87,7 @@ const DetailsCard: FC<Props> = ({
 		<div className={cn(cardClasses[cardStyle], className)}>
 			{children && childrenAtTop && <div className='w-full'>{children}</div>}
 
-			{title && <FormHeader subtitle={description} title={title} variant='sub-header' titleClassName={titleClassName} />}
+			{title && <p className={cn('text-xl font-medium mb-5', titleClassName)}>{title}</p>}
 
 			<div className={cn('grid gap-y-4 gap-x-4', gridColsClass[gridCols])}>
 				{data.map((detail, index) => {
@@ -109,9 +108,9 @@ const DetailsCard: FC<Props> = ({
 
 					if (variant === 'stacked') {
 						return (
-							<div key={index} className={cn('flex flex-col space-y-1', colSpanClass, detail.className)}>
-								<div className={cn(labelClasses, 'text-muted-foreground')}>{detail.label}</div>
-								<div className={getValueClasses(detail)}>
+							<div key={index} className={cn('flex flex-col space-y-0', colSpanClass, detail.className)}>
+								<div className={cn(getValueClasses(detail), 'text-[#09090B] text-sm font-medium')}>{detail.label}</div>
+								<div className={cn(labelClasses, 'text-muted-foreground text-sm')}>
 									<span>{detail.value || '--'}</span>
 									{detail.tag && <Tag tag={detail.tag} />}
 								</div>

@@ -58,7 +58,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ switchTab }) =>
 						value={email}
 					/>
 				</div>
-				<Button onClick={handleForgotPassword} className='w-full !mt-6' isLoading={forgotPasswordMutation.isPending}>
+				<Button onClick={handleForgotPassword} className='w-full !mt-6 h-11' isLoading={forgotPasswordMutation.isPending}>
 					Send Reset Link
 				</Button>
 			</form>

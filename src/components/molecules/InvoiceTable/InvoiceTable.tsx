@@ -34,6 +34,8 @@ export const getPaymentStatusChip = (status: string) => {
 			return <Chip variant='failed' label='Failed' />;
 		case PAYMENT_STATUS.REFUNDED:
 			return <Chip variant='default' label='Refunded' />;
+		case PAYMENT_STATUS.PARTIALLY_REFUNDED:
+			return <Chip variant='default' label='Partially Refunded' />;
 		default:
 			return <Chip variant='default' label='Unknown' />;
 	}
@@ -46,7 +48,6 @@ const InvoiceTable: FC<Props> = ({ data }) => {
 		{
 			fieldName: 'invoice_number',
 			title: 'Invoice ID',
-			fieldVariant: 'title',
 		},
 		{
 			title: 'Amount',

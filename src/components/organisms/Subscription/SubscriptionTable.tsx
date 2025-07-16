@@ -43,7 +43,7 @@ const SubscriptionTable: FC<SubscriptionTableProps> = ({ data, onRowClick, allow
 	const columns: ColumnData<Subscription>[] = [
 		{
 			title: 'Plan Name',
-			fieldVariant: 'title',
+
 			render: (row) => (
 				<RedirectCell allowRedirect={allowRedirect} redirectUrl={`${RouteNames.plan}/${row.plan?.id}`}>
 					{row.plan?.name}
@@ -81,6 +81,7 @@ const SubscriptionTable: FC<SubscriptionTableProps> = ({ data, onRowClick, allow
 			}}
 			columns={columns}
 			data={data}
+			variant='no-bordered'
 		/>
 	);
 };

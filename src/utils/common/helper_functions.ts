@@ -74,17 +74,17 @@ export const formatBillingPeriodForPrice = (billingPeriod: string) => {
 export const formatBillingPeriodForDisplay = (billingPeriod: string) => {
 	switch (billingPeriod.toUpperCase()) {
 		case BILLING_PERIOD.DAILY:
-			return 'daily';
+			return 'Daily';
 		case BILLING_PERIOD.WEEKLY:
-			return 'weekly';
+			return 'Weekly';
 		case BILLING_PERIOD.MONTHLY:
-			return 'monthly';
+			return 'Monthly';
 		case BILLING_PERIOD.ANNUAL:
-			return 'annually';
+			return 'Annually';
 		case BILLING_PERIOD.QUARTERLY:
-			return 'quarterly';
+			return 'Quarterly';
 		case BILLING_PERIOD.HALF_YEARLY:
-			return 'half-yearly';
+			return 'Half Yearly';
 		default:
 			return '--';
 	}

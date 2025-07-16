@@ -24,7 +24,7 @@ interface Props {
 const RectangleRadiogroup: FC<Props> = ({ onChange, options, value, description, title }) => {
 	return (
 		<div>
-			<FormHeader title={title} variant='form-component-title' />
+			{title && <FormHeader title={title} variant='form-component-title' />}
 			<div className='w-full grid grid-cols-2 gap-4'>
 				{options.map((option, index) => {
 					return (
@@ -40,7 +40,7 @@ const RectangleRadiogroup: FC<Props> = ({ onChange, options, value, description,
 									}
 								}}
 								className={cn(
-									'relative p-3 py-6 rounded-md border-2 w-full flex flex-col justify-center items-center',
+									'relative p-3 py-6 border-2 w-full flex flex-col justify-center items-center rounded-xl',
 									option.value === value ? 'border-[#0F172A]' : 'border-[#E2E8F0]',
 									option.disabled && !option.premium ? 'cursor-default text-zinc-500 ' : 'cursor-pointer',
 								)}>

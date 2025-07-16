@@ -28,14 +28,12 @@ const ChargeTable: FC<Props> = ({ data }) => {
 		price: <ChargeValueCell data={{ ...charge, currency: charge.currency } as any} />,
 		invoice_cadence: charge.invoice_cadence,
 	}));
-
 	const [showAllRows, setShowAllRows] = useState(false);
 
 	const columns: ColumnData<ChargeTableData>[] = [
 		{
 			fieldName: 'charge',
 			title: 'Charge',
-			fieldVariant: 'title',
 		},
 		{
 			title: 'Billing Period',

@@ -1,8 +1,8 @@
 import useUser from '@/hooks/useUser';
 import Intercom from '@intercom/messenger-js-sdk';
 import './index.css';
-import { Button } from '@/components/ui/button';
-import { MessageCircleQuestion } from 'lucide-react';
+import { BotMessageSquare } from 'lucide-react';
+import { Button } from '@/components/atoms';
 const IntercomMessenger = () => {
 	const { user } = useUser();
 
@@ -20,8 +20,8 @@ const IntercomMessenger = () => {
 	});
 
 	return (
-		<Button size='sm' variant='outline' onClick={openIntercom} className='outline-none text-sm  flex items-center gap-2'>
-			<MessageCircleQuestion />
+		<Button size='sm' variant='outline' onClick={openIntercom}>
+			<BotMessageSquare absoluteStrokeWidth />
 			Help
 		</Button>
 	);

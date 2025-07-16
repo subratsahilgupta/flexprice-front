@@ -44,6 +44,7 @@ const CreditNote = () => {
 				cta={
 					!isArchived && (
 						<AddButton
+							label='Add Credit Note'
 							onClick={() => {
 								// Navigate to invoices tab to create credit note from invoice
 								navigate(`${RouteNames.customers}/${customerId}/invoice`);

@@ -328,34 +328,47 @@ const PricingPage = () => {
 	if ((plansData?.items ?? []).length === 0) {
 		return (
 			<div className='space-y-6'>
-				<EmptyPage tutorials={GUIDES.plans.tutorials} heading='Plan' onAddClick={() => setPlanDrawerOpen(true)} tags={['Plans']} />
+				<EmptyPage
+					onAddClick={() => setPlanDrawerOpen(true)}
+					emptyStateCard={{
+						heading: 'No Plans Found',
+						description: 'Create your first plan that customers can access, use or be billed for.',
+						buttonLabel: 'Create Plan',
+						buttonAction: () => setPlanDrawerOpen(true),
+					}}
+					heading='Pricing Widget'
+					tags={['Plans']}
+					tutorials={GUIDES.plans.tutorials}
+				/>
 				<PlanDrawer open={planDrawerOpen} onOpenChange={setPlanDrawerOpen} refetchQueryKeys={['fetchPlansPricingCard']} />
 			</div>
 		);
 	}
 
 	return (
-		<Page headingClassName='items-center' heading='Pricing Widget'>
+		<Page
+			headingClassName='items-center'
+			heading='Pricing Widget'
+			headingCTA={
+				<div className='w-full flex justify-start gap-4'>
+					<Select
+						className='w-40 !rounded-xl'
+						value={selectedBillingPeriod}
+						options={uniqueBillingPeriods}
+						onChange={setSelectedBillingPeriod}
+						placeholder='Select billing period'
+					/>
+					<Select
+						className='w-40 !rounded-xl'
+						value={selectedCurrency}
+						options={uniqueCurrencies}
+						onChange={setSelectedCurrency}
+						placeholder='Select currency'
+					/>
+				</div>
+			}>
 			<ApiDocsContent tags={['Plans', 'Pricing']} />
 			{/* filters */}
-			<div className='w-full flex justify-end gap-4 mb-8'>
-				<Select
-					className='w-40'
-					value={selectedBillingPeriod}
-					options={uniqueBillingPeriods}
-					onChange={setSelectedBillingPeriod}
-					label='Billing Period'
-					placeholder='Select billing period'
-				/>
-				<Select
-					className='w-40'
-					value={selectedCurrency}
-					options={uniqueCurrencies}
-					onChange={setSelectedCurrency}
-					label='Currency'
-					placeholder='Select currency'
-				/>
-			</div>
 
 			<div className='flex flex-col'>
 				<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>

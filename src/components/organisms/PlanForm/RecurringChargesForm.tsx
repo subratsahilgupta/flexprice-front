@@ -124,7 +124,7 @@ const RecurringChargesForm = ({ price, onAdd, onUpdate, onEditClicked, onDeleteC
 			<Spacer height={'16px'} />
 			<div>
 				<FormHeader title='Trial Period' variant='form-component-title' />
-				<div className='flex items-center space-x-4 font-open-sans'>
+				<div className='flex items-center space-x-4 s'>
 					<Switch
 						id='airplane-mode'
 						checked={localPrice.isTrialPeriod}
