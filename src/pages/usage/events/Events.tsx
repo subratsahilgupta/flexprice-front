@@ -18,6 +18,7 @@ import useFilterSorting from '@/hooks/useFilterSorting';
 import usePagination from '@/hooks/usePagination';
 import { TypedBackendFilter } from '@/types/formatters/QueryBuilder';
 import { GetEventsPayload } from '@/types/dto/Events';
+import { logger } from '@/utils/common/Logger';
 
 // Helper function to convert sanitized filters to Events API parameters
 const convertFiltersToEventParams = (filters: TypedBackendFilter[]): Partial<GetEventsPayload> => {
@@ -255,7 +256,7 @@ const EventsPage: React.FC = () => {
 					setHasMore(response.has_more);
 				}
 			} catch (error) {
-				console.error('Error fetching events:', error);
+				logger.error('Error fetching events:', error);
 			} finally {
 				setLoading(false);
 			}

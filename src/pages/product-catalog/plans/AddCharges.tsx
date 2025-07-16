@@ -16,6 +16,7 @@ import { Dialog } from '@/components/ui/dialog';
 import { Gauge, Repeat } from 'lucide-react';
 import { BILLING_CADENCE, INVOICE_CADENCE } from '@/models/Invoice';
 import { BILLING_MODEL, PRICE_TYPE } from '@/models/Price';
+import { logger } from '@/utils/common/Logger';
 
 // ===== TYPES & CONSTANTS (moved outside component) =====
 
@@ -227,7 +228,7 @@ const AddChargesPage = () => {
 				navigate(`${RouteNames.plan}/${planId}`);
 			} catch (error) {
 				// Error handling is done in the mutation's onError callbacks
-				console.error('Error in rollout process:', error);
+				logger.error('Error in rollout process:', error);
 			}
 		},
 		[state.tempPlan, state.recurringCharges, state.usageCharges, planData?.prices, updatePlan, syncPlanCharges, navigate, planId],

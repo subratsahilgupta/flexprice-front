@@ -5,6 +5,7 @@ import SecretKeysApi from '@/api/SecretKeysApi';
 import { toast } from 'react-hot-toast';
 import { Copy, AlertTriangle, Eye, EyeOff } from 'lucide-react';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
+import { logger } from '@/utils/common/Logger';
 
 interface Props {
 	isOpen: boolean;
@@ -109,7 +110,7 @@ const SecretKeyDrawer: FC<Props> = ({ isOpen, onOpenChange }) => {
 			onOpenChange(false);
 		},
 		onError: (error: ServerError) => {
-			console.error(error);
+			logger.error(error);
 			toast.error(error.error.message || 'Failed to create API key. Please try again.');
 		},
 	});

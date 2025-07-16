@@ -8,6 +8,7 @@ import { Pencil } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getTypographyClass } from '@/lib/typography';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
+import { logger } from '@/utils/common/Logger';
 
 type ContextType = {
 	isArchived: boolean;
@@ -150,7 +151,7 @@ const CustomerInformation = () => {
 								setShowMetadataModal(false);
 								refetchQueries(['fetchCustomerDetails', customerId]);
 							} catch (e) {
-								console.error('Failed to update metadata', e);
+								logger.error('Failed to update metadata', e);
 							}
 						}}
 						onClose={() => setShowMetadataModal(false)}

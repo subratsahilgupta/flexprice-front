@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import AuthService from '@/core/auth/AuthService';
+import { logger } from '@/utils/common/Logger';
 
 interface UserProviderProps {
 	children: ReactNode;
@@ -20,7 +21,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 			const user = JSON.parse(localStorage.getItem('user')!);
 			setUser(user);
 		} catch (error) {
-			console.error(error);
+			logger.error(error);
 
 			// logout user
 			AuthService.logout();

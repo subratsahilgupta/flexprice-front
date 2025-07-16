@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useRef } from 'react';
+import { logger } from '@/utils/common/Logger';
 
 interface InfiniteScrollProps<T> {
 	fetchData: (pageKey: string | undefined) => Promise<{
@@ -41,7 +42,7 @@ const InfiniteScroll = <T,>({ fetchData, children }: InfiniteScrollProps<T>): JS
 			setHasMore(response.hasMore);
 			setPageKey(response.nextPageKey);
 		} catch (error) {
-			console.error('Error fetching data:', error);
+			logger.error('Error fetching data:', error);
 		} finally {
 			setLoading(false);
 		}

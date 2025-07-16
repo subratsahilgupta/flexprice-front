@@ -69,9 +69,7 @@ class Logger {
 	}
 
 	public error(...args: unknown[]): void {
-		if (this.isEnabled) {
-			console.error(this.formatMessage(LogLevel.ERROR, ...args));
-		}
+		console.error(this.formatMessage(LogLevel.ERROR, ...args));
 	}
 
 	public debug(...args: unknown[]): void {
