@@ -21,7 +21,7 @@ import { Trash2 } from 'lucide-react';
 import { uniqueId } from 'lodash';
 import { SubscriptionFormState, SubscriptionPhaseState } from '@/pages/customer/customers/CustomerSubscription';
 import { useQuery } from '@tanstack/react-query';
-import CreditGrantApi from '@/api/CreditGrantApi';
+import { PlanApi } from '@/api/PlanApi';
 
 // Helper components
 const BillingCycleSelector = ({
@@ -173,7 +173,7 @@ const SubscriptionForm = ({
 	const { data: selectedPlanCreditGrants, isLoading: isLoadingCreditGrants } = useQuery({
 		queryKey: ['creditGrants', state.selectedPlan],
 		queryFn: async () => {
-			const response = await CreditGrantApi.getCreditGrants({ plan_ids: [state.selectedPlan] });
+			const response = await PlanApi.getPlanCreditGrants(state.selectedPlan);
 			return response;
 		},
 	});
@@ -413,6 +413,8 @@ const SubscriptionForm = ({
 		}
 		return [];
 	}, [selectedPlanCreditGrants, state.selectedPlan]);
+
+	console.log('charges before ', state.prices?.charges[state.billingPeriod]);
 
 	return (
 		<div className='p-4 rounded-lg border border-gray-300 space-y-4'>
