@@ -56,7 +56,13 @@ const creditGrantColumns: ColumnData<CreditGrant>[] = [
 		},
 	},
 	{
-		title: 'Expiration Type',
+		title: 'Priority',
+		render: (row) => {
+			return <span>{row.priority ?? '--'}</span>;
+		},
+	},
+	{
+		title: 'Expiration Config',
 		render: (row) => {
 			return <span>{formatExpirationPeriod(row as CreditGrant)}</span>;
 		},
@@ -469,8 +475,7 @@ const PlanDetailsPage = () => {
 						}
 					/>
 				)}
-				<Spacer className='!h-10' />
-				<Spacer className='!h-10' />
+				<Spacer className='!h-20' />
 			</div>
 		</Page>
 	);

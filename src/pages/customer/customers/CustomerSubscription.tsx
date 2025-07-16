@@ -289,7 +289,7 @@ const CustomerSubscription: React.FC = () => {
 
 				{subscriptionState.selectedPlan && !subscription_id && (
 					<div className='flex items-center justify-start space-x-4'>
-						<Button onClick={navigateBack} className='bg-gray-100 text-black px-4 py-2 rounded-md hover:bg-primary-dark'>
+						<Button onClick={navigateBack} variant={'outline'}>
 							Cancel
 						</Button>
 						<Button onClick={handleSubscriptionSubmit} isLoading={isCreating}>

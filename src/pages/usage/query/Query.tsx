@@ -69,9 +69,9 @@ const getNext24HoursDate = (date: Date): Date => {
 };
 
 const windowSizeOptions = [
-	{ label: 'Min', value: 'MINUTE' },
-	{ label: '15 Min', value: '15MIN' },
-	{ label: '30 Min', value: '30MIN' },
+	{ label: 'Minute', value: 'MINUTE' },
+	{ label: '15 Minute', value: '15MIN' },
+	{ label: '30 Minute', value: '30MIN' },
 	{ label: 'Hour', value: 'HOUR' },
 	{ label: '3 Hour', value: '3HOUR' },
 	{ label: '6 Hour', value: '6HOUR' },
@@ -241,7 +241,7 @@ const QueryPage: React.FC = () => {
 						value={selectedMeter}
 					/>
 				</div>
-				<div className='flex flex-col justify-end min-w-24'>
+				<div className='flex flex-col justify-end min-w-32'>
 					<Select
 						className='w-full rounded-xl max-h-9'
 						onChange={(value) => setWindowSize(value)}
