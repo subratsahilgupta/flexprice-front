@@ -16,7 +16,9 @@ const MetadataModal: React.FC<MetadataModalProps> = ({ open, data, onChange, onS
 
 	// Sync local state with prop
 	useEffect(() => {
-		setLocalData(Object.entries(data).map(([key, value]) => ({ key, value })));
+		const entries = Object.entries(data);
+		const keys = entries.length > 0 ? entries.map(([key]) => key) : [''];
+		setLocalData(keys.map((key) => ({ key, value: data[key] })));
 	}, [data, open]);
 
 	// Call onChange whenever localData changes

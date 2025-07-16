@@ -321,7 +321,7 @@ const AddCreditNotePage = () => {
 											inputPrefix={getCurrencySymbol(invoice?.currency || 'USD')}
 											max={item.max_amount}
 											step={0.01}
-											className='w-32 text-right'
+											className='max-w-40'
 											placeholder='0.00'
 										/>
 									</div>
