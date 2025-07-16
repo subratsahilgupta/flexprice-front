@@ -1,7 +1,14 @@
-type LogLevel = 'info' | 'warn' | 'error' | 'debug';
+import { NODE_ENV, NodeEnv } from '@/types/env';
+
+export enum LogLevel {
+	INFO = 'info',
+	WARN = 'warn',
+	ERROR = 'error',
+	DEBUG = 'debug',
+}
 
 interface LoggerConfig {
-	enabledEnvironments: string[];
+	enabledEnvironments: NodeEnv[];
 	showTimestamp?: boolean;
 	showLogLevel?: boolean;
 }
@@ -13,7 +20,7 @@ class Logger {
 
 	private constructor(
 		config: LoggerConfig = {
-			enabledEnvironments: ['development'],
+			enabledEnvironments: [NodeEnv.LOCAL, NodeEnv.DEV],
 			showTimestamp: true,
 			showLogLevel: true,
 		},
@@ -30,11 +37,10 @@ class Logger {
 	}
 
 	private checkIfEnabled(): boolean {
-		const currentEnv = process.env.NODE_ENV || 'development';
-		return this.config.enabledEnvironments.includes(currentEnv);
+		return this.config.enabledEnvironments.includes(NODE_ENV);
 	}
 
-	private formatMessage(level: LogLevel, ...args: any[]): string {
+	private formatMessage(level: LogLevel, ...args: unknown[]): string {
 		const parts: string[] = [];
 
 		if (this.config.showTimestamp) {
@@ -50,27 +56,27 @@ class Logger {
 		return parts.join(' ');
 	}
 
-	public info(...args: any[]): void {
+	public info(...args: unknown[]): void {
 		if (this.isEnabled) {
-			console.info(this.formatMessage('info', ...args));
+			console.info(this.formatMessage(LogLevel.INFO, ...args));
 		}
 	}
 
-	public warn(...args: any[]): void {
+	public warn(...args: unknown[]): void {
 		if (this.isEnabled) {
-			console.warn(this.formatMessage('warn', ...args));
+			console.warn(this.formatMessage(LogLevel.WARN, ...args));
 		}
 	}
 
-	public error(...args: any[]): void {
+	public error(...args: unknown[]): void {
 		if (this.isEnabled) {
-			console.error(this.formatMessage('error', ...args));
+			console.error(this.formatMessage(LogLevel.ERROR, ...args));
 		}
 	}
 
-	public debug(...args: any[]): void {
+	public debug(...args: unknown[]): void {
 		if (this.isEnabled) {
-			console.debug(this.formatMessage('debug', ...args));
+			console.debug(this.formatMessage(LogLevel.DEBUG, ...args));
 		}
 	}
 
@@ -80,8 +86,8 @@ class Logger {
 	}
 }
 
-// Export a singleton instance with default configuration
+// Singleton export
 export const logger = Logger.getInstance();
 
-// Export the Logger class for custom instances if needed
+// Export class for custom use
 export { Logger };
