@@ -39,6 +39,10 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 					url: RouteNames.customers,
 				},
 				{
+					title: 'Taxes',
+					url: RouteNames.taxes,
+				},
+				{
 					title: 'Invoices',
 					url: RouteNames.invoices,
 				},

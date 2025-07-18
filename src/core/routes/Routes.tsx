@@ -42,6 +42,7 @@ import OnboardingApi from '@/api/OnboardingApi';
 import { useUser } from '@/hooks/UserContext';
 import OnboardingTenant from '@/pages/onboarding/OnboardingTenant';
 import WebhookDashboard from '@/pages/webhooks/WebhookDashboard';
+import TaxPage from '@/pages/customer/taxes/TaxPage';
 
 export const RouteNames = {
 	home: '/',
@@ -62,6 +63,7 @@ export const RouteNames = {
 	// customer management routes
 	customerManagement: '/customer-management',
 	customers: '/customer-management/customers',
+	taxes: '/customer-management/taxes',
 	invoices: '/customer-management/invoices',
 	createInvoice: '/customer-management/customers/:customerId/invoices/create',
 	creditNotes: '/customer-management/credit-notes',
@@ -257,6 +259,10 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: RouteNames.invoices,
 						element: <InvoicePage />,
+					},
+					{
+						path: RouteNames.taxes,
+						element: <TaxPage />,
 					},
 					{
 						path: `${RouteNames.invoices}/:invoiceId`,

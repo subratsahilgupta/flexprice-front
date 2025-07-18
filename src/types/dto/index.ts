@@ -64,3 +64,23 @@ export type {
 } from './CreditNote';
 export { CREDIT_NOTE_STATUS, CREDIT_NOTE_REASON, CREDIT_NOTE_TYPE } from '@/models/CreditNote';
 export type { SynchronizePlanPricesWithSubscriptionResponse } from './Plan';
+
+export type {
+	CreateTaxRateRequest,
+	UpdateTaxRateRequest,
+	TaxRateResponse,
+	ListTaxRatesResponse,
+	CreateTaxAssociationRequest,
+	TaxAssociationUpdateRequest,
+	TaxAssociationResponse,
+	TaxRateOverride,
+	CreateTaxAppliedRequest,
+	TaxAppliedResponse,
+	ListTaxAppliedResponse,
+	TaxAppliedFilter,
+	TaxAssociationFilter,
+	ListTaxAssociationsResponse,
+	LinkTaxRateToEntityRequest,
+	CreateInvoiceRequest,
+	TaxCalculationResult,
+} from './tax';
