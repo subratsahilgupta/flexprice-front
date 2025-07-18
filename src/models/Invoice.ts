@@ -28,6 +28,7 @@ export interface Invoice extends BaseModel {
 	readonly finalized_at: string;
 	readonly billing_reason: INVOICE_BILLING_REASON;
 	readonly line_items: LineItem[];
+	readonly total_tax: number;
 	readonly version: number;
 	readonly tenant_id: string;
 	readonly subscription: Subscription;

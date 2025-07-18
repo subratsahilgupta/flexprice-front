@@ -82,85 +82,99 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 	const invoiceType = data?.invoice_type as INVOICE_TYPE;
 
 	return (
-		<div className='space-y-6'>
-			<InvoiceStatusModal
-				invoice={data}
-				isOpen={state.isStatusModalOpen}
-				onOpenChange={(open) => {
-					setState({
-						...state,
-						isStatusModalOpen: open,
-					});
-				}}
-			/>
-			<InvoicePaymentStatusModal
-				invoice={data}
-				isOpen={state.isPaymentModalOpen}
-				onOpenChange={(open) => {
-					setState({
-						...state,
-						isPaymentModalOpen: open,
-					});
-				}}
-			/>
-			<div ref={invoiceref} className=' rounded-xl border border-gray-300 p-6'>
-				<div className='p-4'>
-					<div className='w-full flex justify-between items-center'>
-						<p className={cn(getTypographyClass('section-title'), 'text-xl mb-0')}>Invoice Details</p>
-						<div className='flex gap-4 items-center'>
-							<Button data-html2canvas-ignore='true' onClick={handleDownlaod}>
-								<Download />
-								<span>Download</span>
-							</Button>
-							<InvoiceTableMenu data={data!} />
+		<div>
+			{/* invoice details */}
+			<div className='space-y-6'>
+				<InvoiceStatusModal
+					invoice={data}
+					isOpen={state.isStatusModalOpen}
+					onOpenChange={(open) => {
+						setState({
+							...state,
+							isStatusModalOpen: open,
+						});
+					}}
+				/>
+				<InvoicePaymentStatusModal
+					invoice={data}
+					isOpen={state.isPaymentModalOpen}
+					onOpenChange={(open) => {
+						setState({
+							...state,
+							isPaymentModalOpen: open,
+						});
+					}}
+				/>
+				<div ref={invoiceref} className=' rounded-xl border border-gray-300 p-6'>
+					<div className='p-4'>
+						<div className='w-full flex justify-between items-center'>
+							<p className={cn(getTypographyClass('section-title'), 'text-xl mb-0')}>Invoice Details</p>
+							<div className='flex gap-4 items-center'>
+								<Button data-html2canvas-ignore='true' onClick={handleDownlaod}>
+									<Download />
+									<span>Download</span>
+								</Button>
+								<InvoiceTableMenu data={data!} />
+							</div>
+						</div>
+						<Spacer className='!my-10' />
+						<div className='w-full grid grid-cols-4 gap-4 text-[#09090B] text-sm font-medium'>
+							<p>Invoice Number</p>
+							<p>Date of Issue</p>
+							<p>Date Due</p>
+							<p>Payment Status</p>
+						</div>
+						<div className='w-full grid grid-cols-4 gap-4 text-[#71717A] text-sm'>
+							<p>{data?.invoice_number}</p>
+							<p>{formatDate(data?.created_at ?? '')}</p>
+							<p>{data?.due_date ? formatDate(data?.due_date ?? '') : '--'}</p>
+							<p>{getPaymentStatusChip(data?.payment_status ?? '')}</p>
 						</div>
 					</div>
-					<Spacer className='!my-10' />
-					<div className='w-full grid grid-cols-4 gap-4 text-[#09090B] text-sm font-medium'>
-						<p>Invoice Number</p>
-						<p>Date of Issue</p>
-						<p>Date Due</p>
-						<p>Payment Status</p>
-					</div>
-					<div className='w-full grid grid-cols-4 gap-4 text-[#71717A] text-sm'>
-						<p>{data?.invoice_number}</p>
-						<p>{formatDate(data?.created_at ?? '')}</p>
-						<p>{data?.due_date ? formatDate(data?.due_date ?? '') : '--'}</p>
-						<p>{getPaymentStatusChip(data?.payment_status ?? '')}</p>
-					</div>
-				</div>
-				<div className='my-3 mx-3'>
-					<Divider />
-				</div>
-
-				<div className='grid grid-cols-2  p-4 border-b border-gray-200'>
-					<div className='text-left'>
-						<FormHeader className='!mb-2' title={user?.tenant.name} variant='sub-header' titleClassName='font-semibold' />
-						<p className={customerInfoClass}>{user?.tenant.name}</p>
-						<p className={customerInfoClass}>{user?.email}</p>
-						<p className={customerInfoClass}>{tenantAddress || '--'}</p>
+					<div className='my-3 mx-3'>
+						<Divider />
 					</div>
 
-					<div>
-						<FormHeader className='!mb-2' title='Bill to' variant='sub-header' titleClassName='font-semibold' />
-						<RedirectCell redirectUrl={`${RouteNames.customers}/${data?.customer?.id}`}>
-							<p className={customerInfoClass}>{data?.customer?.name || '--'}</p>
-						</RedirectCell>
-						<p className={customerInfoClass}>{data?.customer?.email || '--'}</p>
-						<p className={customerInfoClass}>{customerAddress || '--'}</p>
+					<div className='grid grid-cols-2  p-4 border-b border-gray-200'>
+						<div className='text-left'>
+							<FormHeader className='!mb-2' title={user?.tenant.name} variant='sub-header' titleClassName='font-semibold' />
+							<p className={customerInfoClass}>{user?.tenant.name}</p>
+							<p className={customerInfoClass}>{user?.email}</p>
+							<p className={customerInfoClass}>{tenantAddress || '--'}</p>
+						</div>
+
+						<div>
+							<FormHeader className='!mb-2' title='Bill to' variant='sub-header' titleClassName='font-semibold' />
+							<RedirectCell redirectUrl={`${RouteNames.customers}/${data?.customer?.id}`}>
+								<p className={customerInfoClass}>{data?.customer?.name || '--'}</p>
+							</RedirectCell>
+							<p className={customerInfoClass}>{data?.customer?.email || '--'}</p>
+							<p className={customerInfoClass}>{customerAddress || '--'}</p>
+						</div>
+					</div>
+					<InvoiceLineItemTable
+						title='Order Details'
+						subtotal={data?.subtotal}
+						total={data?.total}
+						total_tax={data?.total_tax}
+						amount_paid={data?.amount_paid}
+						amount_remaining={Number(data?.amount_remaining)}
+						data={data?.line_items ?? []}
+						amount_due={data?.amount_due}
+						currency={data?.currency}
+						invoiceType={invoiceType as INVOICE_TYPE}
+					/>
+				</div>
+			</div>
+
+			{/* applied taxes if exists */}
+			<div className='space-y-6'>
+				<p className={cn(getTypographyClass('section-title'), 'text-xl mb-0')}>Applied Taxes</p>
+				<div className='rounded-xl border border-gray-300 p-6'>
+					<div className='p-4'>
+						<p>Taxes</p>
 					</div>
 				</div>
-				<InvoiceLineItemTable
-					title='Order Details'
-					subtotal={data?.subtotal}
-					total={data?.total}
-					amount_paid={data?.amount_paid}
-					amount_remaining={Number(data?.amount_remaining)}
-					data={data?.line_items ?? []}
-					amount_due={data?.amount_due}
-					currency={data?.currency}
-					invoiceType={invoiceType as INVOICE_TYPE}
-				/>
 			</div>
 		</div>
 	);
