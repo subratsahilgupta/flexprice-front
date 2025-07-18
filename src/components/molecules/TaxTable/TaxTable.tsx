@@ -3,9 +3,11 @@ import FlexpriceTable, { ColumnData, TooltipCell } from '../Table';
 import { TaxRateResponse } from '@/types/dto/tax';
 import { Chip, ActionButton } from '@/components/atoms';
 import { formatDateShort } from '@/utils/common/helper_functions';
-import { TAX_RATE_TYPE, TAX_RATE_STATUS, TAX_RATE_SCOPE, Tax } from '@/models/Tax';
+import { TAX_RATE_TYPE, TAX_RATE_STATUS, TAX_RATE_SCOPE, TaxRate } from '@/models/Tax';
 import TaxApi from '@/api/TaxApi';
 import formatChips from '@/utils/common/format_chips';
+import { RouteNames } from '@/core/routes/Routes';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
 	data: TaxRateResponse[];
@@ -58,14 +60,11 @@ const formatTaxValue = (tax: TaxRateResponse) => {
 };
 
 const TaxTable: FC<Props> = ({ data, onEdit }) => {
-	const columns: ColumnData<Tax>[] = [
+	const navigate = useNavigate();
+	const columns: ColumnData<TaxRate>[] = [
 		{
 			title: 'Name',
-			render: (row) => (
-				<div className='flex items-center gap-2'>
-					<span className='font-medium'>{row.name}</span>
-				</div>
-			),
+			fieldName: 'name',
 		},
 		{
 			title: 'Code',
@@ -117,7 +116,7 @@ const TaxTable: FC<Props> = ({ data, onEdit }) => {
 
 	return (
 		<div>
-			<FlexpriceTable showEmptyRow={true} columns={columns} data={data} />
+			<FlexpriceTable onRowClick={(row) => navigate(`${RouteNames.taxes}/${row.id}`)} showEmptyRow={true} columns={columns} data={data} />
 		</div>
 	);
 };

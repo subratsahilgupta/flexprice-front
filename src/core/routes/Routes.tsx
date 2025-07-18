@@ -42,8 +42,9 @@ import OnboardingApi from '@/api/OnboardingApi';
 import { useUser } from '@/hooks/UserContext';
 import OnboardingTenant from '@/pages/onboarding/OnboardingTenant';
 import WebhookDashboard from '@/pages/webhooks/WebhookDashboard';
-import TaxPage from '@/pages/customer/taxes/TaxPage';
+import TaxPage from '@/pages/customer/taxes/TaxRatesPage';
 import TaxAssociation from '@/pages/customer/tabs/TaxAssociation';
+import TaxrateDetailsPage from '@/pages/customer/taxes/TaxrateDetailsPage';
 
 export const RouteNames = {
 	home: '/',
@@ -268,6 +269,10 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: RouteNames.taxes,
 						element: <TaxPage />,
+					},
+					{
+						path: `${RouteNames.taxes}/:taxrateId`,
+						element: <TaxrateDetailsPage />,
 					},
 					{
 						path: `${RouteNames.invoices}/:invoiceId`,

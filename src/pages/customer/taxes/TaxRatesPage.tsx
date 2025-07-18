@@ -11,7 +11,7 @@ import TaxTable from '@/components/molecules/TaxTable/TaxTable';
 import TaxDrawer from '@/components/molecules/TaxDrawer/TaxDrawer';
 import { TaxRateResponse } from '@/types/dto/tax';
 import { Calculator } from 'lucide-react';
-import { Tax } from '@/models/Tax';
+import { TaxRate } from '@/models/Tax';
 
 const TaxPage = () => {
 	const { limit, offset, page } = usePagination();
@@ -67,7 +67,7 @@ const TaxPage = () => {
 				tutorials={GUIDES.taxes.tutorials}
 				onAddClick={handleCreateNew}>
 				<TaxDrawer
-					data={activeTax as Tax | null}
+					data={activeTax as TaxRate | null}
 					open={taxDrawerOpen}
 					onOpenChange={setTaxDrawerOpen}
 					refetchQueryKeys={['fetchTaxRates']}
@@ -84,7 +84,12 @@ const TaxPage = () => {
 				<Spacer className='!h-4' />
 				<ShortPagination unit='Tax Rates' totalItems={taxData?.pagination.total ?? 0} />
 			</div>
-			<TaxDrawer data={activeTax as Tax | null} open={taxDrawerOpen} onOpenChange={setTaxDrawerOpen} refetchQueryKeys={['fetchTaxRates']} />
+			<TaxDrawer
+				data={activeTax as TaxRate | null}
+				open={taxDrawerOpen}
+				onOpenChange={setTaxDrawerOpen}
+				refetchQueryKeys={['fetchTaxRates']}
+			/>
 		</Page>
 	);
 };

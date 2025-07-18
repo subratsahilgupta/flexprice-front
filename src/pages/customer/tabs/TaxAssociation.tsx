@@ -10,6 +10,7 @@ import TaxAssociationTable from '@/components/molecules/TaxAssociationTable/TaxA
 import TaxAssociationDialog from '@/components/molecules/TaxAssociationDialog';
 import { CreateTaxAssociationRequest } from '@/types/dto/tax';
 import { useState } from 'react';
+import { EXPAND } from '@/models/expand';
 
 type ContextType = {
 	isArchived: boolean;
@@ -27,6 +28,7 @@ const TaxAssociation = () => {
 			entity_id: customerId!,
 			limit,
 			offset,
+			expand: EXPAND.TAX_RATE,
 		});
 	};
 

@@ -4,11 +4,11 @@ import { useMutation } from '@tanstack/react-query';
 import TaxApi from '@/api/TaxApi';
 import toast from 'react-hot-toast';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
-import { TAX_RATE_TYPE, TAX_RATE_SCOPE, Tax } from '@/models/Tax';
+import { TAX_RATE_TYPE, TAX_RATE_SCOPE, TaxRate } from '@/models/Tax';
 import { CreateTaxRateRequest, UpdateTaxRateRequest } from '@/types/dto/tax';
 
 interface Props {
-	data?: Tax | null;
+	data?: TaxRate | null;
 	open?: boolean;
 	onOpenChange?: (open: boolean) => void;
 	trigger?: React.ReactNode;

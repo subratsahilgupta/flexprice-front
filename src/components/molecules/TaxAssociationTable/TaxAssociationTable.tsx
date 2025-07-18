@@ -1,10 +1,11 @@
 import { FC } from 'react';
-import FlexpriceTable, { ColumnData, TooltipCell } from '../Table';
+import FlexpriceTable, { ColumnData, RedirectCell } from '../Table';
 import { TaxAssociationResponse } from '@/types/dto/tax';
 import { Chip, ActionButton } from '@/components/atoms';
 import { formatDateShort } from '@/utils/common/helper_functions';
 import TaxApi from '@/api/TaxApi';
 import formatChips from '@/utils/common/format_chips';
+import { RouteNames } from '@/core/routes/Routes';
 
 interface Props {
 	data: TaxAssociationResponse[];
@@ -14,12 +15,10 @@ interface Props {
 const TaxAssociationTable: FC<Props> = ({ data, onEdit }) => {
 	const columns: ColumnData<TaxAssociationResponse>[] = [
 		{
-			title: 'Entity Type',
-			render: (row) => <TooltipCell tooltipContent={row.entity_type} tooltipText={row.entity_type} />,
-		},
-		{
-			title: 'Entity ID',
-			render: (row) => row.entity_id,
+			title: 'Tax ID',
+			render: (row) => (
+				<RedirectCell redirectUrl={`${RouteNames.taxes}/${row.tax_rate_id}`}>{row.tax_rate?.name || row.tax_rate_id}</RedirectCell>
+			),
 		},
 		{
 			title: 'Priority',

@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import FlexpriceTable, { ColumnData, TooltipCell } from '../Table';
+import FlexpriceTable, { ColumnData, RedirectCell, TooltipCell } from '../Table';
 import { TaxApplied } from '@/models/Tax';
 import { formatDateShort } from '@/utils/common/helper_functions';
 import { TAX_RATE_TYPE } from '@/models/Tax';
@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import TaxApi from '@/api/TaxApi';
 import { TaxRateResponse } from '@/types/dto/tax';
 import { formatAmount } from '@/constants/common';
+import { RouteNames } from '@/core/routes/Routes';
 
 interface Props {
 	data: TaxApplied[];
@@ -67,11 +68,7 @@ const AppliedTaxesTable: FC<Props> = ({ data }) => {
 			title: 'Tax Name',
 			render: (row) => {
 				const taxRate = taxRatesMap.get(row.tax_rate_id);
-				return (
-					<div className='flex items-center gap-2'>
-						<span>{taxRate?.name || '--'}</span>
-					</div>
-				);
+				return <RedirectCell redirectUrl={`${RouteNames.taxes}/${row.tax_rate_id}`}>{taxRate?.name || row.tax_rate_id}</RedirectCell>;
 			},
 		},
 		{

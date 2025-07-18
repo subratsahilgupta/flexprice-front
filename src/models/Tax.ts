@@ -24,7 +24,7 @@ export enum TAXRATE_ENTITY_TYPE {
 	TENANT = 'tenant',
 }
 
-export interface Tax extends BaseModel {
+export interface TaxRate extends BaseModel {
 	readonly name: string;
 	readonly description: string;
 	readonly code: string;
