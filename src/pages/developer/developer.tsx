@@ -185,8 +185,8 @@ const DeveloperPage = () => {
 				<EmptyPage
 					onAddClick={handleAddSecretKey}
 					emptyStateCard={{
-						heading: 'No Secret Keys Found',
-						description: 'Create your first secret key that customers can access, use or be billed for.',
+						heading: 'Generate a secret key',
+						description: 'Generate a secret key to authenticate API requests and secure access..',
 						buttonLabel: 'Create Secret Key',
 						buttonAction: handleAddSecretKey,
 					}}

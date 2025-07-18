@@ -35,8 +35,8 @@ const CHIP_COLORS: Record<ChipVariant, ChipColorScheme> = {
 	success: { bgColor: '#ECFBE4', textColor: '#377E6A', borderColor: '#d1e9ca' },
 	default: { bgColor: '#F0F2F5', textColor: '#57646E', borderColor: '#F0F2F5' },
 	failed: { bgColor: '#FEE2E2', textColor: '#DC2626', borderColor: '#FEE2E2' },
-	info: { bgColor: '#EFF8FF', textColor: '#2F6FE2', borderColor: '#d1e9ca' },
-	warning: { bgColor: '#FFF7ED', textColor: '#C2410C', borderColor: '#d1e9ca' },
+	info: { bgColor: '#EFF8FF', textColor: '#2F6FE2', borderColor: '#EFF8FF' },
+	warning: { bgColor: '#FFF7ED', textColor: '#C2410C', borderColor: '#FFF7ED' },
 };
 
 const Chip: FC<ChipProps> = ({

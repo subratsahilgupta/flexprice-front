@@ -32,8 +32,8 @@ const PaymentPage = () => {
 		return (
 			<EmptyPage
 				emptyStateCard={{
-					heading: 'No Payments Found',
-					description: 'Create your first payment that customers can access, use or be billed for.',
+					heading: 'Record your first payment',
+					description: 'Add a payment record to manage customer charges and settlements.',
 				}}
 				tutorials={GUIDES.payments.tutorials}
 				heading='Payments'

@@ -15,17 +15,20 @@ const GUIDES: Record<
 			{
 				title: 'How to create a feature?',
 				description: 'Explore how features work in Flexprice.',
-				onClick: () => openGuide('https://docs.flexprice.io/docs/Product%20catalogue/Features/Overview'),
+				onClick: () => openGuide('https://docs.flexprice.io/docs/Product%20catalogue/Features/Creating%20a%20feature'),
 			},
 			{
 				title: 'How to link features to plans?',
 				description: 'Link features to plans in Flexprice.',
-				onClick: () => openGuide('https://docs.flexprice.io/docs/Product%20catalogue/Features/Creating%20a%20feature'),
+				onClick: () => openGuide('https://docs.flexprice.io/docs/Product%20catalogue/Features/Link%20features%20to%20plans'),
 			},
 			{
 				title: 'How to clone open ai pricing?',
 				description: 'Clone open ai / cursor style pricing in Flexprice.',
-				onClick: () => openGuide('https://docs.flexprice.io/docs/Product%20catalogue/Features/Link%20features%20to%20plans'),
+				onClick: () =>
+					openGuide(
+						'https://docs.flexprice.io/docs/Product%20catalogue/Plans/Use%20cases/Clone%20Open%20AI%20pricing#clone-open-ai-pricing',
+					),
 			},
 		],
 	},
@@ -42,9 +45,9 @@ const GUIDES: Record<
 				onClick: () => openGuide('https://docs.flexprice.io/docs/Product%20catalogue/Plans/Creating%20a%20plan'),
 			},
 			{
-				title: 'How to use billing models in plans',
+				title: 'How to choose between advance and arrear billing?',
 				description: 'Understand billing models used in plans.',
-				onClick: () => openGuide('https://docs.flexprice.io/docs/Product%20catalogue/Plans/Charges%20in%20plans/Flat%20fee'),
+				onClick: () => openGuide('https://docs.flexprice.io/docs/Product%20catalogue/Plans/Charges%20in%20plans/Advancevsarrear'),
 			},
 		],
 	},
@@ -72,12 +75,12 @@ const GUIDES: Record<
 			{
 				title: 'How to create an invoice',
 				description: 'Explore how invoices work in Flexprice.',
-				onClick: () => openGuide('https://docs.flexprice.io/docs/Invoices/Overview'),
+				onClick: () => openGuide('https://docs.flexprice.io/api-reference/invoices/create-a-new-invoice#create-a-new-invoice'),
 			},
 			{
 				title: 'How to manage invoices',
 				description: 'Manage invoices in Flexprice.',
-				onClick: () => openGuide('https://docs.flexprice.io/docs/Invoices/Managing%20Invoices'),
+				onClick: () => openGuide('https://docs.flexprice.io/docs/Invoices/ManagingInvoice'),
 			},
 			{
 				title: 'How to handle partial payments',
@@ -91,17 +94,17 @@ const GUIDES: Record<
 			{
 				title: 'How to create a payment',
 				description: 'Explore how payments work in Flexprice.',
-				onClick: () => openGuide('https://docs.flexprice.io/api-reference/payments/list-payments'),
+				onClick: () => openGuide('https://docs.flexprice.io/api-reference/payments/create-a-new-payment'),
 			},
 			{
 				title: 'How to update a payment',
 				description: 'Create a payment in Flexprice.',
-				onClick: () => openGuide('https://docs.flexprice.io/api-reference/payments/create-a-new-payment'),
+				onClick: () => openGuide('https://docs.flexprice.io/api-reference/payments/update-a-payment'),
 			},
 			{
 				title: 'Update a payment',
 				description: 'Update an existing payment in Flexprice.',
-				onClick: () => openGuide('https://docs.flexprice.io/api-reference/payments/update-a-payment'),
+				onClick: () => openGuide('https://docs.flexprice.io/api-reference/payments/delete-a-payment'),
 			},
 		],
 	},
@@ -127,19 +130,19 @@ const GUIDES: Record<
 	creditNotes: {
 		tutorials: [
 			{
-				title: 'Overview of Credit Notes',
+				title: 'Create a new credit note',
 				description: 'Explore how credit notes work in Flexprice.',
-				onClick: () => openGuide('https://docs.flexprice.io/docs/Credit%20Notes/Overview'),
+				onClick: () => openGuide('https://docs.flexprice.io/api-reference/credit-notes/create-a-new-credit-note'),
 			},
 			{
-				title: 'Creating a Credit Note',
+				title: 'Process a draft credit note',
 				description: 'Create a new credit note in Flexprice.',
-				onClick: () => openGuide('https://docs.flexprice.io/docs/Credit%20Notes/Creating%20a%20credit%20note'),
+				onClick: () => openGuide('https://docs.flexprice.io/api-reference/credit-notes/process-a-draft-credit-note'),
 			},
 			{
-				title: 'Managing Credit Notes',
+				title: 'Void a credit note',
 				description: 'Manage credit notes in Flexprice.',
-				onClick: () => openGuide('https://docs.flexprice.io/docs/Credit%20Notes/Managing%20credit%20notes'),
+				onClick: () => openGuide('https://docs.flexprice.io/api-reference/credit-notes/void-a-credit-note'),
 			},
 		],
 	},

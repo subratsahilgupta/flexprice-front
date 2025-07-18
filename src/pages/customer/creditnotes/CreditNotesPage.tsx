@@ -43,8 +43,8 @@ const CreditNotesPage = () => {
 				tags={['Credit Notes']}
 				tutorials={GUIDES.creditNotes?.tutorials || []}
 				emptyStateCard={{
-					heading: 'No Credit Notes Found',
-					description: 'Create your first credit note that customers can access, use or be billed for.',
+					heading: 'Issue a credit note',
+					description: 'Add a credit note to adjust or refund customer invoices.',
 				}}
 			/>
 		);
