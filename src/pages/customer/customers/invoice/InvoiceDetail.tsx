@@ -1,5 +1,11 @@
-import { FormHeader, Spacer, Button, Divider, Loader } from '@/components/atoms';
-import { InvoiceTableMenu, InvoicePaymentStatusModal, InvoiceStatusModal, InvoiceLineItemTable } from '@/components/molecules';
+import { FormHeader, Spacer, Button, Divider, Loader, Card, CardHeader } from '@/components/atoms';
+import {
+	InvoiceTableMenu,
+	InvoicePaymentStatusModal,
+	InvoiceStatusModal,
+	InvoiceLineItemTable,
+	AppliedTaxesTable,
+} from '@/components/molecules';
 import useUser from '@/hooks/useUser';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import InvoiceApi from '@/api/InvoiceApi';
@@ -82,7 +88,7 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 	const invoiceType = data?.invoice_type as INVOICE_TYPE;
 
 	return (
-		<div>
+		<div className='space-y-6'>
 			{/* invoice details */}
 			<div className='space-y-6'>
 				<InvoiceStatusModal
@@ -168,14 +174,14 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 			</div>
 
 			{/* applied taxes if exists */}
-			<div className='space-y-6'>
-				<p className={cn(getTypographyClass('section-title'), 'text-xl mb-0')}>Applied Taxes</p>
-				<div className='rounded-xl border border-gray-300 p-6'>
+			{data?.taxes?.length && data?.taxes?.length > 0 && (
+				<Card>
+					<CardHeader title='Applied Taxes' />
 					<div className='p-4'>
-						<p>Taxes</p>
+						<AppliedTaxesTable data={data.taxes} />
 					</div>
-				</div>
-			</div>
+				</Card>
+			)}
 		</div>
 	);
 };

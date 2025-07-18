@@ -35,3 +35,30 @@ export interface Tax extends BaseModel {
 	readonly fixed_value?: number;
 	readonly metadata?: Record<string, string>;
 }
+
+export interface TaxAssociation extends BaseModel {
+	readonly id: string;
+	readonly tax_rate_id: string;
+	readonly entity_type: TAXRATE_ENTITY_TYPE;
+	readonly entity_id: string;
+	readonly priority: number;
+	readonly auto_apply: boolean;
+	readonly currency: string;
+	readonly metadata?: Record<string, string>;
+	readonly environment_id: string;
+}
+
+export interface TaxApplied extends BaseModel {
+	readonly id: string;
+	readonly tax_rate_id: string;
+	readonly entity_type: TAXRATE_ENTITY_TYPE;
+	readonly entity_id: string;
+	readonly tax_association_id?: string;
+	readonly taxable_amount: string; // decimal.Decimal represented as string
+	readonly tax_amount: string; // decimal.Decimal represented as string
+	readonly currency: string;
+	readonly applied_at: string; // time.Time represented as ISO string
+	readonly environment_id: string;
+	readonly metadata?: Record<string, string>;
+	readonly idempotency_key?: string;
+}

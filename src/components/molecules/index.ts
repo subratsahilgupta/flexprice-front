@@ -106,3 +106,5 @@ export { default as TaxTable } from './TaxTable/TaxTable';
 export { default as TaxDrawer } from './TaxDrawer/TaxDrawer';
 
 export { default as TaxAssociationDialog } from './TaxAssociationDialog';
+
+export { default as AppliedTaxesTable } from './AppliedTaxesTable';
