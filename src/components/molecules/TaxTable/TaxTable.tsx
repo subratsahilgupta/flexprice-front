@@ -1,13 +1,15 @@
 import { FC } from 'react';
-import FlexpriceTable, { ColumnData } from '../Table';
+import FlexpriceTable, { ColumnData, TooltipCell } from '../Table';
 import { TaxRateResponse } from '@/types/dto/tax';
-import { Chip } from '@/components/atoms';
+import { Chip, ActionButton } from '@/components/atoms';
 import { formatDateShort } from '@/utils/common/helper_functions';
-import { TAX_RATE_TYPE, TAX_RATE_STATUS, TAX_RATE_SCOPE } from '@/models/Tax';
+import { TAX_RATE_TYPE, TAX_RATE_STATUS, TAX_RATE_SCOPE, Tax } from '@/models/Tax';
+import TaxApi from '@/api/TaxApi';
+import formatChips from '@/utils/common/format_chips';
 
 interface Props {
 	data: TaxRateResponse[];
-	onRowClick?: (tax: TaxRateResponse) => void;
+	onEdit?: (tax: TaxRateResponse) => void;
 }
 
 const getTaxTypeLabel = (type: TAX_RATE_TYPE) => {
@@ -21,16 +23,16 @@ const getTaxTypeLabel = (type: TAX_RATE_TYPE) => {
 	}
 };
 
-const getStatusChip = (status: TAX_RATE_STATUS) => {
-	const statusConfig = {
-		[TAX_RATE_STATUS.ACTIVE]: { label: 'Active', variant: 'success' as const },
-		[TAX_RATE_STATUS.INACTIVE]: { label: 'Inactive', variant: 'default' as const },
-		[TAX_RATE_STATUS.DELETED]: { label: 'Deleted', variant: 'failed' as const },
-	};
-	console.log(status);
-	const config = statusConfig[status] || { label: 'Unknown', variant: 'default' as const };
-	return <Chip label={config.label} variant={config.variant} />;
-};
+// const getStatusChip = (status: TAX_RATE_STATUS) => {
+// 	const statusConfig = {
+// 		[TAX_RATE_STATUS.ACTIVE]: { label: 'Active', variant: 'success' as const },
+// 		[TAX_RATE_STATUS.INACTIVE]: { label: 'Inactive', variant: 'default' as const },
+// 		[TAX_RATE_STATUS.DELETED]: { label: 'Deleted', variant: 'failed' as const },
+// 	};
+// 	console.log(status);
+// 	const config = statusConfig[status] || { label: 'Unknown', variant: 'default' as const };
+// 	return <Chip label={config.label} variant={config.variant} />;
+// };
 
 const getScopeLabel = (scope: TAX_RATE_SCOPE) => {
 	switch (scope) {
@@ -55,8 +57,8 @@ const formatTaxValue = (tax: TaxRateResponse) => {
 	return '--';
 };
 
-const TaxTable: FC<Props> = ({ data, onRowClick }) => {
-	const columns: ColumnData<TaxRateResponse>[] = [
+const TaxTable: FC<Props> = ({ data, onEdit }) => {
+	const columns: ColumnData<Tax>[] = [
 		{
 			title: 'Name',
 			render: (row) => (
@@ -67,7 +69,7 @@ const TaxTable: FC<Props> = ({ data, onRowClick }) => {
 		},
 		{
 			title: 'Code',
-			render: (row) => <span className='font-mono text-sm bg-gray-100 px-2 py-1 rounded'>{row.code}</span>,
+			render: (row) => <TooltipCell tooltipContent={row.code} tooltipText={row.code} />,
 		},
 		{
 			title: 'Type',
@@ -83,17 +85,39 @@ const TaxTable: FC<Props> = ({ data, onRowClick }) => {
 		},
 		{
 			title: 'Status',
-			render: (row) => getStatusChip(row.tax_rate_status),
+			render: (row) => {
+				const label = formatChips(row?.status);
+				return <Chip variant={label === 'Active' ? 'success' : 'default'} label={label} />;
+			},
 		},
 		{
 			title: 'Created',
 			render: (row) => formatDateShort(row.created_at),
 		},
+		{
+			fieldVariant: 'interactive',
+			render(row) {
+				return (
+					<ActionButton
+						deleteMutationFn={async () => {
+							return await TaxApi.deleteTaxRate(row?.id);
+						}}
+						id={row?.id}
+						editPath={''}
+						isEditDisabled={false}
+						isArchiveDisabled={row?.tax_rate_status === TAX_RATE_STATUS.DELETED}
+						refetchQueryKey={'fetchTaxRates'}
+						entityName={row?.name}
+						onEdit={() => onEdit?.(row)}
+					/>
+				);
+			},
+		},
 	];
 
 	return (
 		<div>
-			<FlexpriceTable showEmptyRow={true} onRowClick={onRowClick} columns={columns} data={data} />
+			<FlexpriceTable showEmptyRow={true} columns={columns} data={data} />
 		</div>
 	);
 };

@@ -34,7 +34,7 @@ const TaxPage = () => {
 		queryFn: fetchTaxRates,
 	});
 
-	const handleRowClick = (tax: TaxRateResponse) => {
+	const handleEdit = (tax: TaxRateResponse) => {
 		setActiveTax(tax);
 		setTaxDrawerOpen(true);
 	};
@@ -80,7 +80,7 @@ const TaxPage = () => {
 		<Page heading='Tax Rates' headingCTA={<AddButton label='Add Taxrate' onClick={handleCreateNew} />}>
 			<ApiDocsContent tags={['Taxes']} />
 			<div className='px-0'>
-				<TaxTable data={taxData?.items || []} onRowClick={handleRowClick} />
+				<TaxTable data={taxData?.items || []} onEdit={handleEdit} />
 				<Spacer className='!h-4' />
 				<ShortPagination unit='Tax Rates' totalItems={taxData?.pagination.total ?? 0} />
 			</div>
