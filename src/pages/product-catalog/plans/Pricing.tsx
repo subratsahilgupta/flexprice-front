@@ -331,8 +331,8 @@ const PricingPage = () => {
 				<EmptyPage
 					onAddClick={() => setPlanDrawerOpen(true)}
 					emptyStateCard={{
-						heading: 'No Plans Found',
-						description: 'Create your first plan that customers can access, use or be billed for.',
+						heading: 'Set Up Your Pricing Widget',
+						description: 'Add a plan to manage customer billing, credits, and usage.',
 						buttonLabel: 'Create Plan',
 						buttonAction: () => setPlanDrawerOpen(true),
 					}}

@@ -172,8 +172,8 @@ const FeaturesPage = () => {
 				tags={['Features']}
 				tutorials={GUIDES.features.tutorials}
 				emptyStateCard={{
-					heading: 'No Features Found',
-					description: 'Create your first feature that customers can access, use or be billed for.',
+					heading: 'Add your first feature',
+					description: 'Create your first feature to define what customers pay for.',
 					buttonLabel: 'Create Feature',
 					buttonAction: () => navigate(RouteNames.createFeature),
 				}}

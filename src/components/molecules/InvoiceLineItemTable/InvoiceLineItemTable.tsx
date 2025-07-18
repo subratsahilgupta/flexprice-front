@@ -1,7 +1,7 @@
-import { Button, FormHeader } from '@/components/atoms';
+import { Button, FormHeader, Toggle } from '@/components/atoms';
 import { LineItem, INVOICE_TYPE } from '@/models/Invoice';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { RefreshCw, Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -56,6 +56,10 @@ const InvoiceLineItemTable: FC<Props> = ({
 	amount_remaining,
 	subtotal,
 }) => {
+	const [showZeroCharges, setShowZeroCharges] = useState(false);
+	const filteredData = data.filter((item) => showZeroCharges || Number(item.amount) !== 0);
+	console.log(filteredData);
+
 	return (
 		<div className='bg-white'>
 			<div className='w-full p-6'>
@@ -68,19 +72,22 @@ const InvoiceLineItemTable: FC<Props> = ({
 						title={title}
 						subtitle={subtitle}
 					/>
-					{refetch && (
-						<Button
-							onClick={() => {
-								const icon = document.querySelector('.refresh-icon');
-								icon?.classList.add('animate-spin');
-								refetch();
-								icon?.classList.remove('animate-spin');
-							}}
-							variant='outline'
-							size='sm'>
-							<RefreshCw className='refresh-icon h-4 w-4' />
-						</Button>
-					)}
+					<div className='flex items-center gap-4'>
+						{refetch && (
+							<Button
+								onClick={() => {
+									const icon = document.querySelector('.refresh-icon');
+									icon?.classList.add('animate-spin');
+									refetch();
+									icon?.classList.remove('animate-spin');
+								}}
+								variant='outline'
+								size='sm'>
+								<RefreshCw className='refresh-icon h-4 w-4' />
+							</Button>
+						)}
+						<Toggle checked={showZeroCharges} onChange={() => setShowZeroCharges(!showZeroCharges)} label='Show Zero Charges' />
+					</div>
 				</div>
 
 				{/* Line Items Table */}
@@ -100,7 +107,7 @@ const InvoiceLineItemTable: FC<Props> = ({
 							</tr>
 						</thead>
 						<tbody>
-							{data?.map((item, index) => {
+							{filteredData?.map((item, index) => {
 								return (
 									<tr key={index} className='border-b border-gray-100'>
 										<td className='py-4 px-0 text-sm  text-gray-900'>{item.display_name ?? '--'}</td>

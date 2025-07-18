@@ -182,8 +182,8 @@ const CustomerPage = () => {
 				heading='Customer'
 				tags={['Customers']}
 				emptyStateCard={{
-					heading: 'No Customers Found',
-					description: 'Create your first customer that can access, use or be billed for.',
+					heading: 'Create your first customer',
+					description: 'Create a plan to display pricing and start billing customers.',
 					buttonLabel: 'Create Customer',
 					buttonAction: () => {
 						setactiveCustomer(undefined);

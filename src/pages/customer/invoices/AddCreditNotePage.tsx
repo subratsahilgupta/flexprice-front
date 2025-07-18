@@ -1,4 +1,4 @@
-import { Button, Dialog, Input, Page, Select, SelectOption, Textarea } from '@/components/atoms';
+import { Button, Chip, Dialog, Input, Page, Select, SelectOption, Textarea } from '@/components/atoms';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import InvoiceApi from '@/api/InvoiceApi';
@@ -8,7 +8,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { CreditNote, CREDIT_NOTE_REASON, CREDIT_NOTE_TYPE } from '@/models/CreditNote';
 import { CreateCreditNoteLineItemRequest, CreateCreditNoteParams } from '@/types/dto/CreditNote';
 import CreditNoteApi from '@/api/CreditNoteApi';
-import { PAYMENT_STATUS, formatCurrency, getCurrencySymbol } from '@/constants';
+import { PAYMENT_STATUS, formatCurrency, getCurrencySymbol, toSentenceCase } from '@/constants';
 import toast from 'react-hot-toast';
 import { RouteNames } from '@/core/routes/Routes';
 import { AddChargesButton } from '@/components/organisms/PlanForm/SetupChargesSection';
@@ -204,12 +204,10 @@ const AddCreditNotePage = () => {
 					<div className='p-4 bg-gray-50 rounded-lg space-y-3'>
 						<div className='flex justify-between items-center'>
 							<span className='text-sm text-gray-600'>Credit Note Type</span>
-							<span
-								className={`text-sm px-2 py-1 rounded ${
-									creditNotePreview.type === CREDIT_NOTE_TYPE.REFUND ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
-								}`}>
-								{creditNotePreview.type}
-							</span>
+							<Chip
+								label={toSentenceCase(creditNotePreview.type)}
+								variant={creditNotePreview.type === CREDIT_NOTE_TYPE.REFUND ? 'success' : 'info'}
+							/>
 						</div>
 						<div className='flex justify-between items-center'>
 							<span className='text-sm text-gray-600'>Total Amount</span>
@@ -242,12 +240,10 @@ const AddCreditNotePage = () => {
 				{/* Header */}
 				<div className='flex items-center gap-2'>
 					<h1 className='text-xl font-medium'>Issue Credit Note</h1>
-					<span
-						className={`text-sm px-2 py-1 rounded ${
-							creditNotePreview.type === CREDIT_NOTE_TYPE.REFUND ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
-						}`}>
-						{creditNotePreview.type}
-					</span>
+					<Chip
+						label={toSentenceCase(creditNotePreview.type)}
+						variant={creditNotePreview.type === CREDIT_NOTE_TYPE.REFUND ? 'success' : 'info'}
+					/>
 				</div>
 
 				{/* Invoice Summary */}
