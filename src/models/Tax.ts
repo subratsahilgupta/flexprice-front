@@ -17,6 +17,13 @@ export enum TAX_RATE_SCOPE {
 	ONETIME = 'ONETIME',
 }
 
+export enum TAXRATE_ENTITY_TYPE {
+	CUSTOMER = 'customer',
+	SUBSCRIPTION = 'subscription',
+	INVOICE = 'invoice',
+	TENANT = 'tenant',
+}
+
 export interface Tax extends BaseModel {
 	readonly name: string;
 	readonly description: string;

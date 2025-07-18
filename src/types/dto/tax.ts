@@ -1,7 +1,7 @@
 import { FilterCondition } from '@/components/molecules/QueryBuilder';
 import { SortOption } from '@/components/molecules/Table/Toolbar';
 import { Pagination } from '@/models/Pagination';
-import { TAX_RATE_TYPE, TAX_RATE_STATUS, TAX_RATE_SCOPE } from '@/models/Tax';
+import { TAX_RATE_TYPE, TAX_RATE_STATUS, TAX_RATE_SCOPE, TAXRATE_ENTITY_TYPE } from '@/models/Tax';
 import { QueryFilter } from './base';
 
 // CreateTaxRateRequest represents the request to create a tax rate
@@ -81,7 +81,7 @@ export interface CreateTaxAssociationRequest {
 	tax_rate_code: string;
 
 	// entity_type is the type of entity to associate the tax rate with
-	entity_type: string;
+	entity_type: TAXRATE_ENTITY_TYPE;
 
 	// entity_id is the ID of the entity to associate the tax rate with
 	entity_id: string;
@@ -115,7 +115,7 @@ export interface TaxAssociationUpdateRequest {
 export interface TaxAssociationResponse {
 	id: string;
 	tax_rate_id: string;
-	entity_type: string;
+	entity_type: TAXRATE_ENTITY_TYPE;
 	entity_id: string;
 	priority: number;
 	auto_apply: boolean;
@@ -171,7 +171,7 @@ export interface CreateTaxAppliedRequest {
 	tax_rate_id: string;
 
 	// entity_type is the type of entity the tax is applied to
-	entity_type: string;
+	entity_type: TAXRATE_ENTITY_TYPE;
 
 	// entity_id is the ID of the entity the tax is applied to
 	entity_id: string;
@@ -196,7 +196,7 @@ export interface CreateTaxAppliedRequest {
 export interface TaxAppliedResponse {
 	id: string;
 	tax_rate_id: string;
-	entity_type: string;
+	entity_type: TAXRATE_ENTITY_TYPE;
 	entity_id: string;
 	tax_association_id?: string;
 	taxable_amount: number;
@@ -230,7 +230,7 @@ export interface TaxAppliedFilter {
 	tax_rate_ids?: string[];
 
 	// entity_type is the type of entity to filter by
-	entity_type?: string;
+	entity_type?: TAXRATE_ENTITY_TYPE;
 
 	// entity_id is the ID of the entity to filter by
 	entity_id?: string;
@@ -240,18 +240,18 @@ export interface TaxAppliedFilter {
 }
 
 // TaxAssociationFilter represents the filter for querying tax associations
-export interface TaxAssociationFilter {
+export interface TaxAssociationFilter extends QueryFilter {
 	// filters contains filter conditions for the query
 	filters?: FilterCondition[];
 
 	// sort contains sort conditions for the query
-	sort?: SortOption[];
+	// sort?: SortOption[];
 
 	// tax_rate_ids is an array of tax rate IDs to filter by
 	tax_rate_ids?: string[];
 
 	// entity_type is the type of entity to filter by
-	entity_type?: string;
+	entity_type?: TAXRATE_ENTITY_TYPE;
 
 	// entity_id is the ID of the entity to filter by
 	entity_id?: string;
@@ -269,7 +269,7 @@ export interface ListTaxAssociationsResponse {
 // LinkTaxRateToEntityRequest represents the request to link tax rates to an entity
 export interface LinkTaxRateToEntityRequest {
 	// entity_type is the type of entity to link tax rates to
-	entity_type: string;
+	entity_type: TAXRATE_ENTITY_TYPE;
 
 	// entity_id is the ID of the entity to link tax rates to
 	entity_id: string;

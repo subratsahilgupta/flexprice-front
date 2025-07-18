@@ -104,3 +104,5 @@ export { MetadataModal } from './MetadataModal';
 export { default as TaxTable } from './TaxTable/TaxTable';
 
 export { default as TaxDrawer } from './TaxDrawer/TaxDrawer';
+
+export { default as TaxAssociationDialog } from './TaxAssociationDialog';

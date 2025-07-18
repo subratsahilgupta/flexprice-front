@@ -43,6 +43,7 @@ import { useUser } from '@/hooks/UserContext';
 import OnboardingTenant from '@/pages/onboarding/OnboardingTenant';
 import WebhookDashboard from '@/pages/webhooks/WebhookDashboard';
 import TaxPage from '@/pages/customer/taxes/TaxPage';
+import TaxAssociation from '@/pages/customer/tabs/TaxAssociation';
 
 export const RouteNames = {
 	home: '/',
@@ -236,6 +237,10 @@ export const MainRouter = createBrowserRouter([
 							{
 								path: 'invoice',
 								element: <Invoice />,
+							},
+							{
+								path: 'tax-association',
+								element: <TaxAssociation />,
 							},
 
 							{
