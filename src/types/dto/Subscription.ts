@@ -1,6 +1,7 @@
-import { LineItem as InvoiceLineItem } from '@/models/Invoice';
-import { BILLING_CYCLE } from '@/models/Subscription';
+import { BILLING_CADENCE, INVOICE_CADENCE, LineItem as InvoiceLineItem } from '@/models/Invoice';
+import { BILLING_CYCLE, SubscriptionPhase } from '@/models/Subscription';
 import { CreditGrant } from '@/models/CreditGrant';
+import { BILLING_PERIOD } from '@/models/Price';
 
 export interface GetSubscriptionDetailsPayload {
 	subscription_id: string;
@@ -89,6 +90,26 @@ export interface AddSubscriptionPhasePayload {
 	billing_cycle: BILLING_CYCLE;
 	start_date: string | Date;
 	end_date?: string | Date;
+	credit_grants?: CreditGrant[];
+	commitment_amount?: number;
+	overage_factor?: number;
+}
+
+export interface CreateSubscriptionPayload {
+	customer_id: string;
+	billing_cadence: BILLING_CADENCE;
+	billing_period: BILLING_PERIOD;
+	billing_period_count: number;
+	currency: string;
+	invoice_cadence: INVOICE_CADENCE;
+	plan_id: string;
+	start_date: string;
+	end_date: string | null;
+	lookup_key: string;
+	trial_end: string | null;
+	trial_start: string | null;
+	billing_cycle?: BILLING_CYCLE;
+	phases?: SubscriptionPhase[];
 	credit_grants?: CreditGrant[];
 	commitment_amount?: number;
 	overage_factor?: number;

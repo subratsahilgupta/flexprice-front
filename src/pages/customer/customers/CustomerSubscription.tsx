@@ -17,7 +17,7 @@ import { invalidateQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { RouteNames } from '@/core/routes/Routes';
 import useEnvironment from '@/hooks/useEnvironment';
 import { BILLING_CYCLE, SubscriptionPhase } from '@/models/Subscription';
-import { CreateCustomerSubscriptionPayload } from '@/types/dto';
+import { CreateSubscriptionPayload } from '@/types/dto';
 import { BILLING_CADENCE, INVOICE_CADENCE } from '@/models/Invoice';
 import { BILLING_PERIOD } from '@/constants/constants';
 import { uniqueId } from 'lodash';
@@ -172,8 +172,8 @@ const CustomerSubscription: React.FC = () => {
 	// Create subscription mutation
 	const { mutate: createSubscription, isPending: isCreating } = useMutation({
 		mutationKey: ['createSubscription'],
-		mutationFn: async (data: CreateCustomerSubscriptionPayload) => {
-			return await CustomerApi.createCustomerSubscription(data);
+		mutationFn: async (data: CreateSubscriptionPayload) => {
+			return await SubscriptionApi.createSubscription(data);
 		},
 		onSuccess: async () => {
 			toast.success('Subscription created successfully');
@@ -240,7 +240,7 @@ const CustomerSubscription: React.FC = () => {
 		});
 		const firstPhase = sanitizedPhases[0];
 
-		const payload: CreateCustomerSubscriptionPayload = {
+		const payload: CreateSubscriptionPayload = {
 			billing_cadence: BILLING_CADENCE.RECURRING,
 			billing_period: billingPeriod.toUpperCase() as BILLING_PERIOD,
 			billing_period_count: 1,

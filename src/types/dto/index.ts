@@ -13,7 +13,6 @@ export type {
 	GetCustomerSubscriptionsResponse,
 	GetCustomerEntitlementsResponse,
 	GetCustomerEntitlementPayload,
-	CreateCustomerSubscriptionPayload,
 	GetUsageSummaryResponse,
 	GetCustomerByFiltersPayload as GetCustomerByQueryPayload,
 } from './Customer';
@@ -44,6 +43,7 @@ export type {
 	ResumeSubscriptionPayload,
 	SubscriptionPauseResponse,
 	SubscriptionResumeResponse,
+	CreateSubscriptionPayload,
 } from './Subscription';
 
 export type { GetBillingdetailsResponse } from './Tenant';

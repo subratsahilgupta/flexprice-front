@@ -1,6 +1,6 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import { Subscription, SubscriptionPhase, SubscriptionUsage } from '@/models/Subscription';
-import { AddSubscriptionPhasePayload, GetSubscriptionPreviewResponse } from '@/types/dto/Subscription';
+import { AddSubscriptionPhasePayload, CreateSubscriptionPayload, GetSubscriptionPreviewResponse } from '@/types/dto/Subscription';
 import {
 	GetSubscriptionDetailsPayload,
 	PauseSubscriptionPayload,
@@ -48,6 +48,10 @@ class SubscriptionApi {
 		return await AxiosClient.post(`${this.baseUrl}/${id}/phases`, {
 			phase: payload,
 		});
+	}
+
+	public static async createSubscription(payload: CreateSubscriptionPayload): Promise<void> {
+		return await AxiosClient.post(`/subscriptions`, payload);
 	}
 }
 
