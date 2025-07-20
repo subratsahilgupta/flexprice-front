@@ -10,9 +10,10 @@ import { RouteNames } from '@/core/routes/Routes';
 interface Props {
 	data: TaxAssociationResponse[];
 	onEdit?: (taxAssociation: TaxAssociationResponse) => void;
+	showDelete?: boolean;
 }
 
-const TaxAssociationTable: FC<Props> = ({ data, onEdit }) => {
+const TaxAssociationTable: FC<Props> = ({ data, onEdit, showDelete = true }) => {
 	const columns: ColumnData<TaxAssociationResponse>[] = [
 		{
 			title: 'Tax ID',
@@ -54,7 +55,7 @@ const TaxAssociationTable: FC<Props> = ({ data, onEdit }) => {
 						id={row?.id}
 						editPath={''}
 						isEditDisabled={false}
-						isArchiveDisabled={false}
+						isArchiveDisabled={showDelete}
 						refetchQueryKey={'fetchTaxAssociations'}
 						entityName={`Tax Association ${row?.id}`}
 						onEdit={() => onEdit?.(row)}

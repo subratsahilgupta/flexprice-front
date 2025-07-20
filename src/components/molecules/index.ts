@@ -99,6 +99,8 @@ export { sanitizeFilterConditions, sanitizeSortConditions } from '@/types/format
 
 export { CreditGrantTable, CreditGrantModal } from './CreditGrant';
 
+export { default as SubscriptionTaxAssociationTable } from './SubscriptionTaxAssociationTable';
+
 export { MetadataModal } from './MetadataModal';
 
 export { default as TaxTable } from './TaxTable/TaxTable';

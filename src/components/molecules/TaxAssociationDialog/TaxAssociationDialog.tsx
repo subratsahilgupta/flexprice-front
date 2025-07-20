@@ -14,6 +14,8 @@ interface TaxAssociationDialogProps {
 	entityId: string;
 	onSave: (data: CreateTaxAssociationRequest) => void;
 	onCancel: () => void;
+	data?: CreateTaxAssociationRequest;
+	alreadyLinkedTaxRateCodes?: string[];
 }
 
 interface FormData {
@@ -29,12 +31,23 @@ interface FormErrors {
 	currency?: string;
 }
 
-const TaxAssociationDialog: FC<TaxAssociationDialogProps> = ({ open, onOpenChange, entityType, entityId, onSave, onCancel }) => {
+const TaxAssociationDialog: FC<TaxAssociationDialogProps> = ({
+	open,
+	onOpenChange,
+	entityType,
+	entityId,
+	onSave,
+	onCancel,
+	data,
+	alreadyLinkedTaxRateCodes,
+}) => {
+	console.log('data', data);
+
 	const [formData, setFormData] = useState<FormData>({
-		tax_rate_code: '',
-		priority: 1,
-		currency: 'USD',
-		auto_apply: true,
+		tax_rate_code: data?.tax_rate_code || '',
+		priority: data?.priority || 1,
+		currency: data?.currency || 'usd',
+		auto_apply: data?.auto_apply || true,
 	});
 
 	const [errors, setErrors] = useState<FormErrors>({});
@@ -48,7 +61,6 @@ const TaxAssociationDialog: FC<TaxAssociationDialogProps> = ({ open, onOpenChang
 		enabled: open,
 	});
 
-	// Validate form data
 	const validateForm = useCallback((): { isValid: boolean; errors: FormErrors } => {
 		const newErrors: FormErrors = {};
 
@@ -127,6 +139,7 @@ const TaxAssociationDialog: FC<TaxAssociationDialogProps> = ({ open, onOpenChang
 		label: `${taxRate.name} (${taxRate.code})`,
 		value: taxRate.code,
 		description: taxRate.description,
+		disabled: alreadyLinkedTaxRateCodes?.includes(taxRate.code),
 	}));
 
 	return (

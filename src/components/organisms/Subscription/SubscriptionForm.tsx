@@ -16,12 +16,12 @@ import {
 	CREDIT_GRANT_CADENCE,
 } from '@/models/CreditGrant';
 import { BILLING_PERIOD } from '@/constants/constants';
-import { Pencil } from 'lucide-react';
-import { Trash2 } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { uniqueId } from 'lodash';
 import { SubscriptionFormState, SubscriptionPhaseState } from '@/pages/customer/customers/CustomerSubscription';
 import { useQuery } from '@tanstack/react-query';
 import { PlanApi } from '@/api/PlanApi';
+import SubscriptionTaxAssociationTable from '@/components/molecules/SubscriptionTaxAssociationTable';
 
 // Helper components
 const BillingCycleSelector = ({
@@ -628,6 +628,13 @@ const SubscriptionForm = ({
 							/>
 						</div>
 					)} */}
+
+					{/* Tax Rate Overrides */}
+					<SubscriptionTaxAssociationTable
+						data={state.tax_rate_overrides || []}
+						onChange={(data) => setState((prev) => ({ ...prev, tax_rate_overrides: data }))}
+						disabled={isDisabled}
+					/>
 				</div>
 			)}
 		</div>

@@ -2,6 +2,7 @@ import { BILLING_CADENCE, INVOICE_CADENCE, LineItem as InvoiceLineItem } from '@
 import { BILLING_CYCLE, SubscriptionPhase } from '@/models/Subscription';
 import { CreditGrant } from '@/models/CreditGrant';
 import { BILLING_PERIOD } from '@/models/Price';
+import { TaxRateOverride } from './tax';
 
 export interface GetSubscriptionDetailsPayload {
 	subscription_id: string;
@@ -113,4 +114,5 @@ export interface CreateSubscriptionPayload {
 	credit_grants?: CreditGrant[];
 	commitment_amount?: number;
 	overage_factor?: number;
+	tax_rate_overrides?: TaxRateOverride[];
 }
