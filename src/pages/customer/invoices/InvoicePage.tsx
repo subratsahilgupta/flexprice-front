@@ -39,7 +39,7 @@ const InvoicesPage = () => {
 			<EmptyPage
 				emptyStateCard={{
 					heading: 'Create your first invoice',
-					description: 'Generate an invoice to initiate billing and manage customer paymentsxpg.',
+					description: 'Generate an invoice to initiate billing and manage customer payments.',
 				}}
 				tutorials={GUIDES.invoices.tutorials}
 				heading='Invoices'
