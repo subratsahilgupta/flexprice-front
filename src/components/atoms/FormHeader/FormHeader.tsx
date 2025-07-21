@@ -43,7 +43,7 @@ const FormTitle: FC<Props> = ({ variant, subtitle, title, className, subtitleCla
 		return (
 			<div className={cn('mb-2', className)}>
 				{title && <p className={cn(getTypographyClass('subsection-title'), titleClassName)}>{title}</p>}
-				{subtitle && <p className={cn(getTypographyClass('helper-text'), subtitleClassName)}>{subtitle}</p>}
+				{subtitle && <p className={cn('text-muted-foreground text-sm', subtitleClassName)}>{subtitle}</p>}
 			</div>
 		);
 	}
