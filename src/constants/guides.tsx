@@ -35,7 +35,7 @@ const GUIDES: Record<
 	plans: {
 		tutorials: [
 			{
-				title: 'How to create a plan',
+				title: 'Explore how plans work in Flexprice.',
 				description: 'Explore how plans work in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/docs/Product%20catalogue/Plans/Overview'),
 			},
