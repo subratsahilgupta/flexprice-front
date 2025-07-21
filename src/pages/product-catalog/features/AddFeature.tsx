@@ -1,4 +1,17 @@
-import { Button, CodePreview, FormHeader, Input, Page, RadioGroup, Select, SelectOption, Spacer, Textarea } from '@/components/atoms';
+import {
+	Button,
+	Card,
+	CodePreview,
+	FormHeader,
+	Input,
+	Page,
+	RadioGroup,
+	SectionHeader,
+	Select,
+	SelectOption,
+	Spacer,
+	Textarea,
+} from '@/components/atoms';
 import { ApiDocsContent } from '@/components/molecules';
 import EventFilter, { EventFilterData } from '@/components/molecules/EventFilter';
 import { AddChargesButton } from '@/components/organisms/PlanForm/SetupChargesSection';
@@ -276,9 +289,7 @@ const FeatureDetailsSection = ({
 	const isMeteredType = data.type === FEATURE_TYPE.METERED;
 
 	return (
-		<div className='p-6 rounded-xl border border-[#E4E4E7]'>
-			<FormHeader title='Details' subtitle='Assign a name to your feature to easily identify and track it.' variant='sub-header' />
-
+		<Card className='p-6 rounded-xl border border-[#E4E4E7]'>
 			<Input
 				label='Name*'
 				placeholder='Enter a name for the feature'
@@ -308,7 +319,7 @@ const FeatureDetailsSection = ({
 						<Input placeholder='plural' value={data.unit_plural || ''} onChange={(unit_plural) => onUpdateFeature({ unit_plural })} />
 					</div>
 					<FormHeader
-						variant='subtitle'
+						variant='form-component-title'
 						subtitle='If the unit name changes when the value is plural, please provide the names of the units'
 					/>
 				</>
@@ -328,7 +339,7 @@ const FeatureDetailsSection = ({
 					onChange={(description) => onUpdateFeature({ description })}
 				/>
 			)}
-		</div>
+		</Card>
 	);
 };
 
@@ -360,14 +371,11 @@ const EventDetailsSection = ({
 	);
 
 	return (
-		<div className='card'>
-			<FormHeader title='Event Details' subtitle='Assign a name to your event to easily identify and track it.' variant='sub-header' />
-			<Spacer height='16px' />
-
+		<Card className='card'>
 			<Input
 				value={meter?.event_name || ''}
 				placeholder='tokens_total'
-				label='Name'
+				label='Event Name'
 				description='A unique identifier for the event used to filter and measure usage e.g. user_signup, api_calls, etc.'
 				error={meterErrors.event_name}
 				onChange={handleEventNameChange}
@@ -375,7 +383,7 @@ const EventDetailsSection = ({
 			<Spacer height='20px' />
 
 			<FormHeader
-				title='Filters'
+				title='Event Filters'
 				subtitle='Filter events based on specific properties e.g., region, user type or custom attributes to refine tracking.'
 				variant='form-component-title'
 			/>
@@ -383,7 +391,7 @@ const EventDetailsSection = ({
 			<div>
 				<EventFilter eventFilters={meter?.filters || []} setEventFilters={handleFiltersChange} error={meterErrors.filters} />
 			</div>
-		</div>
+		</Card>
 	);
 };
 
@@ -449,20 +457,13 @@ const AggregationSection = ({
 
 	return (
 		<div className='card'>
-			<FormHeader
-				title='Define Aggregation'
-				subtitle='Aggregation helps determine how event values are computed over time.'
-				variant='sub-header'
-			/>
-			<Spacer height='16px' />
-
-			<div className='flex flex-col gap-4'>
+			<Card className='flex flex-col gap-4'>
 				<Select
 					options={AGGREGATION_OPTIONS}
 					value={meter.aggregation?.type || AGGREGATION_OPTIONS[0].value}
 					onChange={handleAggregationTypeChange}
 					description='Choose how values are aggregated.'
-					label='Function'
+					label='Aggregation Function'
 					placeholder='SUM'
 					error={meterErrors.aggregation_type}
 					hideSelectedTick={true}
@@ -473,7 +474,7 @@ const AggregationSection = ({
 						value={meter.aggregation?.field || ''}
 						disabled={meter.aggregation?.type === METER_AGGREGATION_TYPE.COUNT}
 						onChange={handleAggregationFieldChange}
-						label='Field'
+						label='Aggregation Field'
 						placeholder='tokens'
 						description='Specify the property in the event data that will be aggregated. e.g. tokens, messages_sent, storage_used.'
 						error={meterErrors.aggregation_field}
@@ -484,13 +485,13 @@ const AggregationSection = ({
 					<Input
 						value={meter.aggregation?.multiplier?.toString() || ''}
 						onChange={handleMultiplierChange}
-						label='Multiplier'
+						label='Aggregation Multiplier'
 						placeholder='1'
 						description='Specify the multiplier for the aggregation. e.g. 1.5, 0.25, or 1000.'
 						error={meterErrors.aggregation_multiplier}
 					/>
 				)}
-			</div>
+			</Card>
 
 			<div className='!mt-6'>
 				<RadioGroup
@@ -615,11 +616,7 @@ const AddFeaturePage = () => {
 	return (
 		<Page type='left-aligned'>
 			<ApiDocsContent tags={['Features']} />
-			<FormHeader
-				title='Create Feature'
-				subtitle='Feature represents a functionality in the product that can be monetized i.e. api calls, storage, etc.'
-				variant='form-title'
-			/>
+			<p className='text-2xl font-medium'>Create Feature</p>
 
 			<Spacer height='16px' />
 
