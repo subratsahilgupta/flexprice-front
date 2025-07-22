@@ -105,16 +105,19 @@ const GUIDES: Record<
 		tutorials: [
 			{
 				title: 'How to create a payment',
+				imageUrl: 'https://res.cloudinary.com/daospvham/image/upload/v1753182361/PAYMENTS_1_dgx00f.svg',
 				description: 'Explore how payments work in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/api-reference/payments/create-a-new-payment'),
 			},
 			{
 				title: 'How to update a payment',
+				imageUrl: 'https://res.cloudinary.com/daospvham/image/upload/v1753182361/PAYMENTS_2_ugsdxt.svg',
 				description: 'Create a payment in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/api-reference/payments/update-a-payment'),
 			},
 			{
 				title: 'Update a payment',
+				imageUrl: 'https://res.cloudinary.com/daospvham/image/upload/v1753182361/PAYMENTS_3_spwmie.svg',
 				description: 'Update an existing payment in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/api-reference/payments/delete-a-payment'),
 			},
@@ -124,16 +127,19 @@ const GUIDES: Record<
 		tutorials: [
 			{
 				title: 'List API Keys',
+				imageUrl: 'https://res.cloudinary.com/daospvham/image/upload/v1753180987/Customer_1_kf0ena.svg',
 				description: 'View all API keys in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/api-reference/secrets/list-api-keys'),
 			},
 			{
 				title: 'Create a new API Key',
+				imageUrl: 'https://res.cloudinary.com/daospvham/image/upload/v1753184051/api2_vygnpm.svg',
 				description: 'Generate a new API key in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/api-reference/secrets/create-a-new-api-key'),
 			},
 			{
 				title: 'Delete an API Key',
+				imageUrl: 'https://res.cloudinary.com/daospvham/image/upload/v1753184051/api3_ahcbx8.svg',
 				description: 'Delete an API key in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/api-reference/secrets/delete-an-api-key'),
 			},
@@ -165,16 +171,19 @@ const GUIDES: Record<
 		tutorials: [
 			{
 				title: 'Overview',
+				imageUrl: 'https://res.cloudinary.com/daospvham/image/upload/v1753180987/Customer_1_kf0ena.svg',
 				description: 'Explore import and export options in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/api-reference/tasks/list-tasks'),
 			},
 			{
 				title: 'Import a file',
+				imageUrl: 'https://res.cloudinary.com/daospvham/image/upload/v1753182361/TASKS_2_emkpmn.svg',
 				description: 'Import a file into Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/api-reference/tasks/create-a-new-task'),
 			},
 			{
 				title: 'Process import task',
+				imageUrl: 'https://res.cloudinary.com/daospvham/image/upload/v1753182361/TASKS_3_ybbdtz.svg',
 				description: 'Process an import task in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/api-reference/tasks/process-a-task'),
 			},
