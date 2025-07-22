@@ -117,7 +117,7 @@ const GUIDES: Record<
 			},
 			{
 				title: 'Update a payment',
-				imageUrl: 'https://res.cloudinary.com/daospvham/image/upload/v1753182361/PAYMENTS_3_spwmie.svg',
+				imageUrl: 'https://res.cloudinary.com/daospvham/image/upload/v1753203616/PAYMENTS_3_erwdgn_gxkrxv.svg',
 				description: 'Update an existing payment in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/api-reference/payments/delete-a-payment'),
 			},
@@ -127,13 +127,13 @@ const GUIDES: Record<
 		tutorials: [
 			{
 				title: 'List API Keys',
-				imageUrl: 'https://res.cloudinary.com/daospvham/image/upload/v1753180987/Customer_1_kf0ena.svg',
+				imageUrl: 'https://res.cloudinary.com/daospvham/image/upload/v1753189165/api1_egeb4f.svg',
 				description: 'View all API keys in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/api-reference/secrets/list-api-keys'),
 			},
 			{
 				title: 'Create a new API Key',
-				imageUrl: 'https://res.cloudinary.com/daospvham/image/upload/v1753184051/api2_vygnpm.svg',
+				imageUrl: 'https://res.cloudinary.com/daospvham/image/upload/v1753204234/api2_gxkyqw.svg',
 				description: 'Generate a new API key in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/api-reference/secrets/create-a-new-api-key'),
 			},
@@ -171,7 +171,7 @@ const GUIDES: Record<
 		tutorials: [
 			{
 				title: 'Overview',
-				imageUrl: 'https://res.cloudinary.com/daospvham/image/upload/v1753180987/Customer_1_kf0ena.svg',
+				imageUrl: 'https://res.cloudinary.com/daospvham/image/upload/v1753189165/TASK1_cpgjla.svg',
 				description: 'Explore import and export options in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/api-reference/tasks/list-tasks'),
 			},
@@ -183,7 +183,7 @@ const GUIDES: Record<
 			},
 			{
 				title: 'Process import task',
-				imageUrl: 'https://res.cloudinary.com/daospvham/image/upload/v1753182361/TASKS_3_ybbdtz.svg',
+				imageUrl: 'https://res.cloudinary.com/daospvham/image/upload/v1753189166/TASKS_3_k2nkyu.svg',
 				description: 'Process an import task in Flexprice.',
 				onClick: () => openGuide('https://docs.flexprice.io/api-reference/tasks/process-a-task'),
 			},

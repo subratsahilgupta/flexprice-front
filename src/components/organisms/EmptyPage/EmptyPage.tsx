@@ -83,7 +83,7 @@ const EmptyPage: FC<Props> = ({ onAddClick, tags, heading, children, addButtonLa
 								onClick={item.onClick}>
 								{/* Image at the top */}
 								<div className='w-full h-[80px] aspect-video rounded-t-lg overflow-hidden bg-[#f5f5f5] flex items-center justify-center'>
-									<img src={imageUrl} alt={item.title || 'Tutorial'} className='object-cover w-full h-full' />
+									<img src={imageUrl} loading='lazy' className='object-cover bg-gray-100 w-full h-full' alt={' '} />
 								</div>
 								{/* Content below image */}
 								<div className='flex-1 flex flex-col justify-between mt-4'>
