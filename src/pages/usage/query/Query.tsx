@@ -236,14 +236,14 @@ const QueryPage: React.FC = () => {
 				<div className='flex flex-col justify-end min-w-[250px]'>
 					<SelectMeter
 						label=''
-						className='w-full rounded-xl max-h-8'
+						className='w-full rounded-xl max-h-9'
 						onChange={(value) => setSelectedMeter(value.id)}
 						value={selectedMeter}
 					/>
 				</div>
 				<div className='flex flex-col justify-end min-w-32'>
 					<Select
-						className='w-full rounded-xl max-h-8'
+						className='w-full rounded-xl max-h-9'
 						onChange={(value) => setWindowSize(value)}
 						value={windowSize}
 						options={windowSizeOptions.map((option) => ({ label: option.label, value: option.value }))}
