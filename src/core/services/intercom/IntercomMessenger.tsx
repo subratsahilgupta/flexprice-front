@@ -4,6 +4,9 @@ import './index.css';
 import { BotMessageSquare } from 'lucide-react';
 import { Button } from '@/components/atoms';
 import useUser from '@/hooks/useUser';
+import { useQuery } from '@tanstack/react-query';
+import TenantApi from '@/api/TenantApi';
+import { TenantMetadataKey } from '@/models/Tenant';
 
 const INACTIVITY_TIMEOUT = 300_000; // 5 minutes
 
@@ -15,6 +18,14 @@ const IntercomMessenger = () => {
 		// @ts-expect-error - Intercom types don't include messenger
 		window.Intercom('show');
 	};
+
+	const { data: tenant } = useQuery({
+		queryKey: ['tenant'],
+		queryFn: async () => {
+			return await TenantApi.getTenantById(user?.tenant?.id ?? '');
+		},
+		enabled: !!user?.tenant?.id,
+	});
 
 	// Initialize Intercom with user data
 	useEffect(() => {
@@ -32,6 +43,8 @@ const IntercomMessenger = () => {
 
 	// Handle inactivity
 	useEffect(() => {
+		if (tenant?.metadata?.get(TenantMetadataKey.ONBOARDING_COMPLETED)) return;
+
 		const resetTimer = () => {
 			if (inactivityTimer.current) clearTimeout(inactivityTimer.current);
 			inactivityTimer.current = setTimeout(() => {

@@ -90,6 +90,11 @@ class InvoiceApi {
 		// Clean up the URL object
 		window.URL.revokeObjectURL(url);
 	}
+
+	public static async getInvoicePdfUrl(invoiceId: string) {
+		const url = generateQueryParams(`${this.baseurl}/${invoiceId}/pdf`, { url: true });
+		return await AxiosClient.get<{ presigned_url: string }>(url);
+	}
 }
 
 export default InvoiceApi;

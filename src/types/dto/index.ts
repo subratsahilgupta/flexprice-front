@@ -46,7 +46,7 @@ export type {
 	SubscriptionResumeResponse,
 } from './Subscription';
 
-export type { GetBillingdetailsResponse } from './Tenant';
+export type { GetBillingdetailsResponse, UpdateTenantRequest } from './Tenant';
 
 export type { CreateUserRequest, UpdateTenantPayload } from './User';
 
