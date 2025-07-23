@@ -70,7 +70,7 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 		user?.tenant.billing_details.address.address_country;
 
 	const handleDownlaod = () => {
-		InvoiceApi.getInvoicePdfUrl(invoice_id);
+		InvoiceApi.downloadInvoicePdf(invoice_id);
 	};
 
 	if (isLoading) return <Loader />;

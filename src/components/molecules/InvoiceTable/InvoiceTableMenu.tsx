@@ -34,7 +34,7 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 
 	const { mutate: downloadInvoice } = useMutation({
 		mutationFn: async (invoice_id: string) => {
-			return await InvoiceApi.getInvoicePdfUrl(invoice_id);
+			return await InvoiceApi.downloadInvoicePdf(invoice_id);
 		},
 		onSuccess: () => {
 			toast.success('Invoice downloaded');

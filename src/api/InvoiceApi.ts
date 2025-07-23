@@ -91,35 +91,13 @@ class InvoiceApi {
 		window.URL.revokeObjectURL(url);
 	}
 
-	public static async getInvoicePdfUrl(invoiceId: string, invoiceNo?: string) {
-		const downloadFileName = invoiceNo ? `invoice-${invoiceNo}.pdf` : `invoice-${invoiceId}.pdf`;
-
-		// Step 1: Get presigned URL from API
+	public static async downloadInvoicePdf(invoiceId: string) {
 		const params = { url: true };
 		const url = generateQueryParams(`${this.baseurl}/${invoiceId}/pdf`, params);
 		const response = await AxiosClient.get<{ presigned_url: string }>(url);
 		const presignedUrl = response.presigned_url;
 
-		// Step 2: Fetch the PDF using the presigned URL
-		const fileResponse = await fetch(presignedUrl);
-		if (!fileResponse.ok) throw new Error('Failed to fetch the invoice PDF');
-
-		const arrayBuffer = await fileResponse.arrayBuffer();
-		const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
-		const blobUrl = window.URL.createObjectURL(blob);
-
-		// Create a temporary link element
-		const link = document.createElement('a');
-		link.href = blobUrl;
-		link.download = downloadFileName;
-
-		// Append to body, click and remove
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-
-		// Clean up the URL object
-		window.URL.revokeObjectURL(blobUrl);
+		window.open(presignedUrl, '_blank');
 	}
 }
 
