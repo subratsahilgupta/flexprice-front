@@ -214,7 +214,7 @@ const AddChargesPage = () => {
 	}, []);
 
 	// TODO: Add save logic
-	const handleSave = useCallback(() => {
+	const handleSave = () => {
 		console.log('existingSubscriptions', existingSubscriptions);
 		if (existingSubscriptions?.items?.length && existingSubscriptions.items.length > 0) {
 			// this means that the plan has existing subscriptions
@@ -225,7 +225,7 @@ const AddChargesPage = () => {
 			// So we will update the plan and sync the charges with the existing subscriptions
 			handleRolloutConfirm(RolloutOption.NEW_ONLY);
 		}
-	}, [existingSubscriptions?.items?.length]);
+	};
 
 	const handleRolloutConfirm = useCallback(
 		async (option: RolloutOption) => {
