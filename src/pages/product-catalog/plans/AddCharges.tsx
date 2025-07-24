@@ -17,6 +17,7 @@ import { Gauge, Repeat } from 'lucide-react';
 import { BILLING_CADENCE, INVOICE_CADENCE } from '@/models/Invoice';
 import { BILLING_MODEL, PRICE_TYPE } from '@/models/Price';
 import { logger } from '@/utils/common/Logger';
+import SubscriptionApi from '@/api/SubscriptionApi';
 
 // ===== TYPES & CONSTANTS (moved outside component) =====
 
@@ -157,6 +158,17 @@ const AddChargesPage = () => {
 		staleTime: 5 * 60 * 1000, // 5 minutes
 	});
 
+	// ===== EXISTING SUBSCRIPTIONS =====
+	const { data: existingSubscriptions } = useQuery({
+		queryKey: ['subscriptions', planId],
+		queryFn: () =>
+			SubscriptionApi.listSubscriptions({
+				plan_id: planId ?? '',
+				limit: 10,
+			}),
+		enabled: !!planId,
+	});
+
 	// ===== MUTATIONS =====
 	const { mutateAsync: updatePlan, isPending: isUpdating } = useMutation({
 		mutationFn: (plan: Partial<Plan>) => PlanApi.updatePlan(planId ?? '', plan),
@@ -201,9 +213,19 @@ const AddChargesPage = () => {
 		}
 	}, []);
 
+	// TODO: Add save logic
 	const handleSave = useCallback(() => {
-		setShowRolloutModal(true);
-	}, []);
+		console.log('existingSubscriptions', existingSubscriptions);
+		if (existingSubscriptions?.items?.length && existingSubscriptions.items.length > 0) {
+			// this means that the plan has existing subscriptions
+			// So we will show a modal to the user to confirm if they want to add the charges to the existing subscriptions
+			setShowRolloutModal(true);
+		} else if (existingSubscriptions?.items?.length === 0) {
+			// this means that the plan does not have existing subscriptions
+			// So we will update the plan and sync the charges with the existing subscriptions
+			handleRolloutConfirm(RolloutOption.NEW_ONLY);
+		}
+	}, [existingSubscriptions?.items?.length]);
 
 	const handleRolloutConfirm = useCallback(
 		async (option: RolloutOption) => {
