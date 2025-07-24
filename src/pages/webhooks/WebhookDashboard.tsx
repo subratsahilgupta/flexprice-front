@@ -1,15 +1,13 @@
 import { Loader, Page } from '@/components/atoms';
+import { ApiDocsContent } from '@/components/molecules';
 import WebhookApi from '@/api/WebhookApi';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { AppPortal } from 'svix-react';
+import { EmptyPage } from '@/components/organisms';
 
 const WebhookDashboard = () => {
-	const {
-		data: webhookDashboardResponse,
-		isLoading,
-		isError,
-	} = useQuery({
+	const { data, isLoading, isError } = useQuery({
 		queryKey: ['webhookDashboardUrl'],
 		queryFn: async () => await WebhookApi.getWebhookDashboardUrl(),
 	});
@@ -23,8 +21,21 @@ const WebhookDashboard = () => {
 		return null;
 	}
 
+	if (!data?.svix_enabled) {
+		return (
+			<EmptyPage
+				heading='Webhooks'
+				emptyStateCard={{
+					heading: 'Webhooks',
+					description: 'Webhooks are not enabled. Please contact support to enable webhooks.',
+				}}
+			/>
+		);
+	}
+
 	return (
 		<Page className='h-full w-full' heading='Webhooks'>
+			<ApiDocsContent tags={['Webhooks']} />
 			<AppPortal
 				primaryColor='#000000'
 				style={{
@@ -34,7 +45,7 @@ const WebhookDashboard = () => {
 					border: 'none',
 					backgroundColor: '#000000',
 				}}
-				url={webhookDashboardResponse?.url ?? ''}
+				url={data?.url ?? ''}
 			/>
 		</Page>
 	);
