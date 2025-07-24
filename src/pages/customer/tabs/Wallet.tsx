@@ -1,4 +1,4 @@
-import { AddButton, Button, Card, Chip, FormHeader, NoDataCard, Select, ShortPagination, Spacer } from '@/components/atoms';
+import { AddButton, Button, Card, CardHeader, Chip, FormHeader, NoDataCard, Select, ShortPagination, Spacer } from '@/components/atoms';
 import {
 	DropdownMenu,
 	DropdownMenuOption,
@@ -6,6 +6,7 @@ import {
 	WalletTransactionsTable,
 	ApiDocsContent,
 	TerminateWalletModal,
+	MetadataModal,
 } from '@/components/molecules';
 import { Dialog } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -24,6 +25,8 @@ import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import useQueryParams from '@/hooks/useQueryParams';
 import { DetailsCard } from '@/components/molecules';
 import { formatAmount } from '@/components/atoms/Input/Input';
+import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
+import { logger } from '@/utils/common/Logger';
 
 const formatWalletStatus = (status?: string) => {
 	const statusMap: Record<string, string> = {
@@ -32,6 +35,11 @@ const formatWalletStatus = (status?: string) => {
 		closed: 'Closed',
 	};
 	return status ? statusMap[status.toLowerCase()] || 'Unknown' : 'Unknown';
+};
+
+const filterStringMetadata = (meta: Record<string, unknown> | undefined): Record<string, string> => {
+	if (!meta) return {};
+	return Object.fromEntries(Object.entries(meta).filter(([_, v]) => typeof v === 'string') as [string, string][]);
 };
 
 const WalletTab = () => {
@@ -45,7 +53,9 @@ const WalletTab = () => {
 	const [showCreateWalletModal, setShowCreateWalletModal] = useState(false);
 	const [showTopupModal, setShowTopupModal] = useState(false);
 	const [showTerminateModal, setShowTerminateModal] = useState(false);
+	const [showMetadataModal, setShowMetadataModal] = useState(false);
 	const [activeWallet, setActiveWallet] = useState<Wallet | null>();
+	const [metadata, setMetadata] = useState<Record<string, string>>({});
 
 	const { isArchived } = useOutletContext<{ isArchived: boolean }>();
 
@@ -126,6 +136,11 @@ const WalletTab = () => {
 		setQueryParam('activeWalletId', selectedWallet.id);
 	}, [wallets, activeWalletId]);
 
+	// Update metadata state when active wallet changes
+	useEffect(() => {
+		setMetadata(filterStringMetadata(activeWallet?.metadata));
+	}, [activeWallet]);
+
 	// Render loading state
 	if (isLoading || isTransactionLoading || isBalanceLoading) {
 		return (
@@ -176,6 +191,25 @@ const WalletTab = () => {
 				<TerminateWalletModal isOpen={showTerminateModal} onOpenChange={() => setShowTerminateModal(false)} wallet={activeWallet} />
 			)}
 
+			{/* Metadata Modal for Editing */}
+			<MetadataModal
+				open={showMetadataModal}
+				data={metadata}
+				onChange={() => {}}
+				onSave={async (newMetadata) => {
+					if (!activeWallet?.id) return;
+					try {
+						const updated = await WalletApi.updateWallet(activeWallet.id!, { metadata: newMetadata });
+						setMetadata(filterStringMetadata(updated.metadata));
+						setShowMetadataModal(false);
+						refetchQueries(['fetchWallets', customerId!]);
+					} catch (e) {
+						logger.error('Failed to update metadata', e);
+					}
+				}}
+				onClose={() => setShowMetadataModal(false)}
+			/>
+
 			{!wallets?.length ? (
 				<NoDataCard
 					title='Wallets'
@@ -194,7 +228,7 @@ const WalletTab = () => {
 									onChange={(value) => {
 										const selectedWallet = wallets?.find((wallet) => wallet.id === value) || null;
 										setActiveWallet(selectedWallet);
-										setQueryParam('activeWalletId', value);
+										setQueryParam('activeWalletId', value || '');
 									}}
 								/>
 							</div>
@@ -241,6 +275,7 @@ const WalletTab = () => {
 									},
 								]}
 							/>
+
 							<Spacer className='!h-4' />
 
 							{/* Wallet Balance */}
@@ -290,6 +325,7 @@ const WalletTab = () => {
 									))}
 								</div>
 							)}
+
 							<Spacer className='!h-4' />
 
 							{/* Transactions */}
@@ -315,6 +351,37 @@ const WalletTab = () => {
 									<ShortPagination unit='Transactions' totalItems={transactionsData?.pagination.total ?? 0} />
 								</div>
 							)}
+
+							<Spacer className='!h-4' />
+
+							<Card>
+								<CardHeader
+									title='Metadata'
+									cta={
+										!isArchived && (
+											<Button variant='outline' size='icon' onClick={() => setShowMetadataModal(true)}>
+												<Pencil className='size-5' />
+											</Button>
+										)
+									}
+								/>
+								{metadata && Object.keys(metadata).length > 0 ? (
+									<DetailsCard
+										variant='stacked'
+										data={
+											metadata && Object.keys(metadata).length > 0
+												? Object.entries(metadata).map(([key, value]) => ({ label: key, value }))
+												: [{ label: 'No metadata available.', value: '' }]
+										}
+										cardStyle='borderless'
+									/>
+								) : (
+									<div className='text-center py-8'>
+										<h3 className='text-lg font-medium text-gray-900 mb-1'>No metadata</h3>
+										<p className='text-sm text-gray-500 mb-4'>Add custom metadata to store additional information about this wallet.</p>
+									</div>
+								)}
+							</Card>
 						</div>
 					)}
 				</>
