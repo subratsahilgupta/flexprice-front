@@ -15,9 +15,9 @@ axiosClient.interceptors.request.use(
 	async (config: InternalAxiosRequestConfig) => {
 		const token = await AuthService.getAcessToken();
 		// add active environment to the request
-		const activeEnv = EnvironmentApi.getActiveEnvironment();
-		if (activeEnv) {
-			config.headers['X-Environment-ID'] = activeEnv.id;
+		const activeEnvId = EnvironmentApi.getActiveEnvironmentId();
+		if (activeEnvId) {
+			config.headers['X-Environment-ID'] = activeEnvId;
 		}
 
 		if (token) {

@@ -9,7 +9,6 @@ import { EyeIcon } from 'lucide-react';
 import { RouteNames } from '@/core/routes/Routes';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { NODE_ENV, NodeEnv } from '@/types/env';
-import EnvironmentApi from '@/api/EnvironmentApi';
 import GoogleSignin from './GoogleSignin';
 interface SignupFormProps {
 	switchTab: (tab: string) => void;
@@ -64,7 +63,6 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 					tenant_id: data.tenant_id,
 				};
 				localStorage.setItem('token', JSON.stringify(tokenData));
-				EnvironmentApi.initializeEnvironments();
 				navigate(RouteNames.home);
 			}
 		},
