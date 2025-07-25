@@ -64,7 +64,7 @@ class InvoiceApi {
 		const response = await fetch(`${import.meta.env.VITE_API_URL}${this.baseurl}/${invoiceId}/pdf`, {
 			headers: {
 				Authorization: `Bearer ${await AuthService.getAcessToken()}`,
-				'X-Environment-ID': EnvironmentApi.getActiveEnvironment()?.id || '',
+				'X-Environment-ID': EnvironmentApi.getActiveEnvironmentId() || '',
 				Accept: 'application/pdf',
 			},
 		});

@@ -1,103 +1,88 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { ExtendedEnvironment } from '@/api/EnvironmentApi';
+import { useState, useEffect, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import Environment, { ENVIRONMENT_TYPE } from '@/models/Environment';
+import EnvironmentApi from '@/api/EnvironmentApi';
 
-const STORAGE_KEY = 'flex_price_environments';
-const POLL_INTERVAL = 1000; // Check every second
+export const ACTIVE_ENVIRONMENT_ID_KEY = 'active_environment_id';
 
-export const useEnvironment = () => {
-	const [environments, setEnvironments] = useState<ExtendedEnvironment[]>([]);
-	const [activeEnvironment, setActiveEnvironment] = useState<ExtendedEnvironment | null>(null);
-	const lastStoredValue = useRef<string | null>(null);
+export interface ExtendedEnvironment extends Environment {
+	isActive: boolean;
+}
 
-	// Load environments from localStorage with change detection
-	const loadEnvironments = useCallback(() => {
-		try {
-			const stored = localStorage.getItem(STORAGE_KEY);
+interface UseEnvironment {
+	environments: ExtendedEnvironment[];
+	activeEnvironment: ExtendedEnvironment | null;
+	changeActiveEnvironment: (environmentId: string) => void;
+	isDevelopment: boolean;
+	isProduction: boolean;
+	isLoading: boolean;
+	isError: boolean;
+	refetchEnvironments: () => void;
+}
 
-			// Only update if the value has changed
-			if (stored !== lastStoredValue.current) {
-				lastStoredValue.current = stored;
-				const envs: ExtendedEnvironment[] = stored ? JSON.parse(stored) : [];
-				setEnvironments(envs);
-				const active = envs.find((env) => env.isActive) || null;
-				setActiveEnvironment(active);
+export const useEnvironment = (): UseEnvironment => {
+	// Fetch environments from API
+	const { data, isLoading, isError, refetch } = useQuery({
+		queryKey: ['environments'],
+		queryFn: async () => {
+			const res = await EnvironmentApi.getAllEnvironments();
+			return res.environments;
+		},
+		staleTime: 5 * 60 * 1000, // 5 minutes
+	});
+
+	// Get/set active environment ID from localStorage
+	const getActiveEnvId = () => localStorage.getItem(ACTIVE_ENVIRONMENT_ID_KEY);
+	const setActiveEnvId = (id: string) => localStorage.setItem(ACTIVE_ENVIRONMENT_ID_KEY, id);
+
+	// State for active environment ID
+	const [activeEnvId, setActiveEnvIdState] = useState<string | null>(getActiveEnvId());
+
+	// Sync state with localStorage changes (cross-tab)
+	useEffect(() => {
+		const handler = (e: StorageEvent) => {
+			if (e.key === ACTIVE_ENVIRONMENT_ID_KEY) {
+				setActiveEnvIdState(e.newValue);
 			}
-		} catch (error) {
-			console.error('Error loading environments:', error);
-			setEnvironments([]);
-			setActiveEnvironment(null);
-		}
+		};
+		window.addEventListener('storage', handler);
+		return () => window.removeEventListener('storage', handler);
 	}, []);
 
-	// Initialize on mount and set up polling
+	// When environments load, ensure activeEnvId is valid
 	useEffect(() => {
-		// Initial load
-		loadEnvironments();
+		if (!data || data.length === 0) return;
+		if (!activeEnvId || !data.some((env) => env.id === activeEnvId)) {
+			// Default to first environment
+			const firstId = data[0].id;
+			setActiveEnvId(firstId);
+			setActiveEnvIdState(firstId);
+		}
+	}, [data, activeEnvId]);
 
-		// Set up polling interval
-		const pollInterval = setInterval(loadEnvironments, POLL_INTERVAL);
+	// Compose extended environments with isActive
+	const environments: ExtendedEnvironment[] = (data || []).map((env) => ({
+		...env,
+		isActive: env.id === activeEnvId,
+	}));
 
-		// Set up storage event listener for cross-tab synchronization
-		const handleStorageChange = (e: StorageEvent) => {
-			if (e.key === STORAGE_KEY) {
-				loadEnvironments();
-			}
-		};
-		window.addEventListener('storage', handleStorageChange);
-
-		// Cleanup
-		return () => {
-			clearInterval(pollInterval);
-			window.removeEventListener('storage', handleStorageChange);
-		};
-	}, [loadEnvironments]);
+	const activeEnvironment = environments.find((env) => env.isActive) || null;
 
 	// Change active environment
-	const changeEnvironment = useCallback(
-		(environmentId: string) => {
-			try {
-				const updatedEnvironments = environments.map((env) => ({
-					...env,
-					isActive: env.id === environmentId,
-				}));
-				const updatedJson = JSON.stringify(updatedEnvironments);
-				localStorage.setItem(STORAGE_KEY, updatedJson);
-				lastStoredValue.current = updatedJson;
-				setEnvironments(updatedEnvironments);
-				setActiveEnvironment(updatedEnvironments.find((env) => env.isActive) || null);
-			} catch (error) {
-				console.error('Error changing environment:', error);
-			}
-		},
-		[environments],
-	);
-
-	// Save environments
-	const saveEnvironments = useCallback((newEnvironments: ExtendedEnvironment[]) => {
-		try {
-			// Ensure at least one environment is active
-			const hasActiveEnv = newEnvironments.some((env) => env.isActive);
-			const envsToSave = hasActiveEnv ? newEnvironments : [{ ...newEnvironments[0], isActive: true }, ...newEnvironments.slice(1)];
-
-			const savedJson = JSON.stringify(envsToSave);
-			localStorage.setItem(STORAGE_KEY, savedJson);
-			lastStoredValue.current = savedJson;
-			setEnvironments(envsToSave);
-			setActiveEnvironment(envsToSave.find((env) => env.isActive) || null);
-		} catch (error) {
-			console.error('Error saving environments:', error);
-		}
+	const changeActiveEnvironment = useCallback((environmentId: string) => {
+		setActiveEnvId(environmentId);
+		setActiveEnvIdState(environmentId);
 	}, []);
 
 	return {
 		environments,
 		activeEnvironment,
-		changeEnvironment,
-		saveEnvironments,
-		// Helper methods
-		isDevelopment: activeEnvironment?.type === 'development',
-		isProduction: activeEnvironment?.type === 'production',
-		isStaging: activeEnvironment?.type === 'staging',
+		changeActiveEnvironment,
+		refetchEnvironments: refetch,
+		isDevelopment: activeEnvironment?.type === ENVIRONMENT_TYPE.DEVELOPMENT,
+		isProduction: activeEnvironment?.type === ENVIRONMENT_TYPE.PRODUCTION,
+		isLoading,
+		isError,
 	};
 };
 
