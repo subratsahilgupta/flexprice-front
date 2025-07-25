@@ -226,19 +226,16 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 
 		onSuccess: async () => {
 			if (data) {
-				refetchQueries(['debug-customers', 'debug-subscriptions']);
 				await refetchQueries(['fetchCustomerDetails', formData?.id || '']);
+				toast.success('Customer updated successfully');
 			} else {
 				await refetchQueries(['fetchCustomers']);
+				toast.success('Customer added successfully');
 				setFormData({});
 			}
 
-			if (data) {
-				toast.success('Customer updated successfully');
-			} else {
-				toast.success('Customer added successfully');
-			}
-
+			refetchQueries(['debug-customers']);
+			refetchQueries(['debug-subscriptions']);
 			toggleOpen();
 		},
 		onError: (error: ServerError) => {
