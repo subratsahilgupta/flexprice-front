@@ -17,11 +17,12 @@ interface UseEnvironment {
 	isProduction: boolean;
 	isLoading: boolean;
 	isError: boolean;
+	refetchEnvironments: () => void;
 }
 
 export const useEnvironment = (): UseEnvironment => {
 	// Fetch environments from API
-	const { data, isLoading, isError } = useQuery({
+	const { data, isLoading, isError, refetch } = useQuery({
 		queryKey: ['environments'],
 		queryFn: async () => {
 			const res = await EnvironmentApi.getAllEnvironments();
@@ -77,6 +78,7 @@ export const useEnvironment = (): UseEnvironment => {
 		environments,
 		activeEnvironment,
 		changeActiveEnvironment,
+		refetchEnvironments: refetch,
 		isDevelopment: activeEnvironment?.type === ENVIRONMENT_TYPE.DEVELOPMENT,
 		isProduction: activeEnvironment?.type === ENVIRONMENT_TYPE.PRODUCTION,
 		isLoading,

@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import React, { useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Blocks, Rocket, Server, ChevronsUpDown } from 'lucide-react';
+import { Blocks, Rocket, Server, ChevronsUpDown, Plus } from 'lucide-react';
 import { useGlobalLoading } from '@/core/services/tanstack/ReactQueryProvider';
 import useUser from '@/hooks/useUser';
 import { Select, SelectContent } from '@/components/ui/select';
@@ -11,6 +11,8 @@ import { useSidebar } from '@/components/ui/sidebar';
 import { useNavigate } from 'react-router-dom';
 import { RouteNames } from '@/core/routes/Routes';
 import { useEnvironment } from '@/hooks/useEnvironment';
+import { Button } from '@/components/atoms';
+import EnvironmentCreator from '../EnvironmentCreator/EnvironmentCreator';
 
 interface Props {
 	disabled?: boolean;
@@ -48,9 +50,10 @@ const EnvironmentSelector: React.FC<Props> = ({ disabled = false, className }) =
 	const { setLoading } = useGlobalLoading();
 
 	// Use the new useEnvironment hook
-	const { environments, activeEnvironment, changeActiveEnvironment } = useEnvironment();
+	const { environments, activeEnvironment, changeActiveEnvironment, refetchEnvironments } = useEnvironment();
 
 	const [isOpen, setIsOpen] = useState(false);
+	const [isCreatorOpen, setIsCreatorOpen] = useState(false);
 
 	if (loading)
 		return (
@@ -127,8 +130,28 @@ const EnvironmentSelector: React.FC<Props> = ({ disabled = false, className }) =
 							</div>
 						</SelectItem>
 					))}
+					<div className='flex items-center gap-2 m-2 text-muted-foreground'>
+						<Button
+							onClick={() => setIsCreatorOpen(true)}
+							key='create'
+							value='create'
+							size='sm'
+							className='w-full text-center rounded-md justify-center items-center'>
+							<Plus className='h-4 w-4' />
+							Add Environment
+						</Button>
+					</div>
 				</SelectContent>
 			</Select>
+
+			{/* Environment Creator Dialog */}
+			<EnvironmentCreator
+				isOpen={isCreatorOpen}
+				onOpenChange={setIsCreatorOpen}
+				onEnvironmentCreated={() => {
+					refetchEnvironments();
+				}}
+			/>
 		</div>
 	);
 };
