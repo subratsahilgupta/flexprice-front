@@ -52,6 +52,7 @@ const DebugMenu = () => {
 	useEffect(() => {
 		refetchCustomer();
 		refetchSubscription();
+		console.log('refetching', isDevelopment, activeEnvironment?.id);
 	}, [isDevelopment, activeEnvironment?.id]);
 
 	// Handle streaming simulation
