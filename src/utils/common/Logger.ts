@@ -20,7 +20,7 @@ class Logger {
 
 	private constructor(
 		config: LoggerConfig = {
-			enabledEnvironments: [NodeEnv.LOCAL, NodeEnv.DEV],
+			enabledEnvironments: [NodeEnv.LOCAL, NodeEnv.DEV, NodeEnv.PROD],
 			showTimestamp: true,
 			showLogLevel: true,
 		},

@@ -1,6 +1,11 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import { Subscription, SubscriptionPhase, SubscriptionUsage } from '@/models/Subscription';
-import { AddSubscriptionPhasePayload, GetSubscriptionPreviewResponse } from '@/types/dto/Subscription';
+import {
+	AddSubscriptionPhasePayload,
+	GetSubscriptionPreviewResponse,
+	ListSubscriptionsPayload,
+	ListSubscriptionsResponse,
+} from '@/types/dto/Subscription';
 import {
 	GetSubscriptionDetailsPayload,
 	PauseSubscriptionPayload,
@@ -8,6 +13,7 @@ import {
 	SubscriptionPauseResponse,
 	SubscriptionResumeResponse,
 } from '@/types/dto';
+import { generateQueryParams } from '@/utils/common/api_helper';
 
 class SubscriptionApi {
 	private static baseUrl = '/subscriptions';
@@ -48,6 +54,11 @@ class SubscriptionApi {
 		return await AxiosClient.post(`${this.baseUrl}/${id}/phases`, {
 			phase: payload,
 		});
+	}
+
+	static async listSubscriptions(payload: ListSubscriptionsPayload) {
+		const url = generateQueryParams(this.baseUrl, payload);
+		return await AxiosClient.get<ListSubscriptionsResponse>(url);
 	}
 }
 

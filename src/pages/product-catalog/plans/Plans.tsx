@@ -51,8 +51,8 @@ const PricingPlan = () => {
 				<EmptyPage
 					onAddClick={handleOnAdd}
 					emptyStateCard={{
-						heading: 'No Plans Found',
-						description: 'Create your first plan that customers can access, use or be billed for.',
+						heading: 'Set Up Your First Plan',
+						description: 'Create a plan to display pricing and start billing customers.',
 						buttonLabel: 'Create Plan',
 						buttonAction: handleOnAdd,
 					}}

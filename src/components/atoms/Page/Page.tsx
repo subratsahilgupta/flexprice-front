@@ -26,7 +26,12 @@ const Page: FC<Props> = ({ children, className, type = 'default', header, headin
 	return (
 		<div className='min-h-screen flex flex-col'>
 			<div
-				className={cn('flex-1 page w-full', type === 'left-aligned' && 'px-6', type === 'default' && 'mx-auto max-w-screen-lg', className)}>
+				className={cn(
+					'flex-1 page w-full',
+					type === 'left-aligned' && '!px-12',
+					type === 'default' && 'mx-auto max-w-screen-lg',
+					className,
+				)}>
 				{header && header}
 				{heading && (
 					<SectionHeader title={heading} titleClassName={cn(headingClassName, 'text-3xl font-medium')}>

@@ -46,11 +46,18 @@ export type {
 	SubscriptionResumeResponse,
 } from './Subscription';
 
-export type { GetBillingdetailsResponse } from './Tenant';
+export type { GetBillingdetailsResponse, UpdateTenantRequest } from './Tenant';
 
 export type { CreateUserRequest, UpdateTenantPayload } from './User';
 
-export type { CreateWalletPayload, TopupWalletPayload, WalletTransactionResponse, WalletTransactionPayload } from './Wallet';
+export type {
+	CreateWalletPayload,
+	TopupWalletPayload,
+	WalletTransactionResponse,
+	WalletTransactionPayload,
+	UpdateWalletRequest,
+	WalletResponse,
+} from './Wallet';
 
 export type {
 	GetAllCreditNotesPayload,

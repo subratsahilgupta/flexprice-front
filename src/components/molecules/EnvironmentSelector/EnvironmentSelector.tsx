@@ -1,9 +1,7 @@
 import { cn } from '@/lib/utils';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useQuery } from '@tanstack/react-query';
-import EnvironmentApi from '@/api/EnvironmentApi';
-import { Blocks, Rocket, Server, ChevronsUpDown } from 'lucide-react';
+import { Blocks, Rocket, Server, ChevronsUpDown, Plus } from 'lucide-react';
 import { useGlobalLoading } from '@/core/services/tanstack/ReactQueryProvider';
 import useUser from '@/hooks/useUser';
 import { Select, SelectContent } from '@/components/ui/select';
@@ -12,6 +10,9 @@ import { SelectOption } from '@/components/atoms/Select/Select';
 import { useSidebar } from '@/components/ui/sidebar';
 import { useNavigate } from 'react-router-dom';
 import { RouteNames } from '@/core/routes/Routes';
+import { useEnvironment } from '@/hooks/useEnvironment';
+import { Button } from '@/components/atoms';
+import EnvironmentCreator from '../EnvironmentCreator/EnvironmentCreator';
 
 interface Props {
 	disabled?: boolean;
@@ -48,28 +49,13 @@ const EnvironmentSelector: React.FC<Props> = ({ disabled = false, className }) =
 	const navigate = useNavigate();
 	const { setLoading } = useGlobalLoading();
 
-	const {
-		data: environments = [],
-		isLoading,
-		error,
-	} = useQuery({
-		queryKey: ['environments'],
-		queryFn: () => EnvironmentApi.getLocalEnvironments(),
-		// Handle potential API errors
-		staleTime: 5 * 60 * 1000, // 5 minutes
-	});
+	// Use the new useEnvironment hook
+	const { environments, activeEnvironment, changeActiveEnvironment, refetchEnvironments } = useEnvironment();
 
 	const [isOpen, setIsOpen] = useState(false);
-	// Initialize with null to avoid potential race conditions
-	const [activeEnvironment, setActiveEnvironment] = useState<(typeof environments)[0] | null>(null);
+	const [isCreatorOpen, setIsCreatorOpen] = useState(false);
 
-	useEffect(() => {
-		if (environments && environments.length > 0) {
-			setActiveEnvironment(environments.find((env) => env.isActive) || environments[0]);
-		}
-	}, [environments]);
-
-	if (isLoading || loading)
+	if (loading)
 		return (
 			<div>
 				<Skeleton className='h-10 w-full' />
@@ -77,13 +63,8 @@ const EnvironmentSelector: React.FC<Props> = ({ disabled = false, className }) =
 		);
 
 	// Handle the case where there are no environments
-	if (environments.length === 0) {
+	if (!environments || environments.length === 0) {
 		return <div className='p-2 text-sm text-muted-foreground'>No environments available</div>;
-	}
-
-	// Handle errors
-	if (error) {
-		return <div className='p-2 text-sm text-red-500'>Error loading environments</div>;
 	}
 
 	const getEnvironmentIcon = (type: string) => {
@@ -98,19 +79,16 @@ const EnvironmentSelector: React.FC<Props> = ({ disabled = false, className }) =
 	};
 
 	const options: SelectOption[] =
-		environments?.map((env) => ({
+		environments.map((env) => ({
 			value: env.id,
 			label: env.name,
 			prefixIcon: getEnvironmentIcon(env.type),
 			onSelect: () => handleChange(env.id),
-			// description: env.type === 'production' ? 'Live Environment' : 'Testing Environment',
 		})) || [];
 
 	const handleChange = async (newValue: string) => {
 		setLoading(true); // Start loading state
-		EnvironmentApi.setActiveEnvironment(newValue);
-		setActiveEnvironment(environments?.find((env) => env.id === newValue) || environments?.[0]);
-		// await refetchQueries(); // Refetch all queries
+		changeActiveEnvironment(newValue);
 		setLoading(false); // End loading state
 		navigate(RouteNames.home);
 	};
@@ -138,9 +116,9 @@ const EnvironmentSelector: React.FC<Props> = ({ disabled = false, className }) =
 								<p className='text-xs text-muted-foreground'>{currentEnvironment?.name || 'No environment'}</p>
 							</div>
 						</div>
-						<button type='button' className={cn(sidebarOpen ? '' : 'hidden')}>
+						<div className={cn(sidebarOpen ? '' : 'hidden')}>
 							<ChevronsUpDown className='h-4 w-4 opacity-50' />
-						</button>
+						</div>
 					</div>
 				</SelectTrigger>
 				<SelectContent className='w-full mt-2'>
@@ -152,8 +130,28 @@ const EnvironmentSelector: React.FC<Props> = ({ disabled = false, className }) =
 							</div>
 						</SelectItem>
 					))}
+					<div className='flex items-center gap-2 m-2 text-muted-foreground'>
+						<Button
+							onClick={() => setIsCreatorOpen(true)}
+							key='create'
+							value='create'
+							size='sm'
+							className='w-full text-center rounded-md justify-center items-center'>
+							<Plus className='h-4 w-4' />
+							Add Environment
+						</Button>
+					</div>
 				</SelectContent>
 			</Select>
+
+			{/* Environment Creator Dialog */}
+			<EnvironmentCreator
+				isOpen={isCreatorOpen}
+				onOpenChange={setIsCreatorOpen}
+				onEnvironmentCreated={() => {
+					refetchEnvironments();
+				}}
+			/>
 		</div>
 	);
 };

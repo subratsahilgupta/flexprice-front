@@ -7,7 +7,6 @@ import { Button, Input } from '@/components/atoms';
 import { EyeIcon, EyeOff } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import AuthApi from '@/api/AuthApi';
-import EnvironmentApi from '@/api/EnvironmentApi';
 import { NODE_ENV, NodeEnv } from '@/types/env';
 import { RouteNames } from '@/core/routes/Routes';
 import GoogleSignin from './GoogleSignin';
@@ -36,7 +35,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ switchTab }) => {
 				tenant_id: data.tenant_id,
 			};
 			localStorage.setItem('token', JSON.stringify(tokenData));
-			EnvironmentApi.initializeEnvironments();
 			navigate(RouteNames.home);
 		},
 		onError: (error: ServerError) => {
@@ -57,8 +55,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ switchTab }) => {
 				email,
 				password,
 			});
-
-			await EnvironmentApi.initializeEnvironments();
 
 			setLoading(false);
 

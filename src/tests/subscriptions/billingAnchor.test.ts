@@ -83,7 +83,6 @@ describe('Billing Anchor Calculations', () => {
 		const startDate = new Date('2024-01-15T12:30:45Z');
 		const unsupportedPeriod = 999 as unknown as BILLING_PERIOD;
 		const result = calculateCalendarBillingAnchor(startDate, unsupportedPeriod);
-		console.log('Default Case - Unsupported Billing Period result:', result);
 		expect(result).toEqual(startDate);
 	});
 });

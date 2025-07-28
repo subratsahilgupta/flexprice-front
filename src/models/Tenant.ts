@@ -22,3 +22,7 @@ export interface Tenant {
 	readonly status: ENTITY_STATUS;
 	readonly metadata: Metadata;
 }
+
+export enum TenantMetadataKey {
+	ONBOARDING_COMPLETED = 'onboarding_completed',
+}

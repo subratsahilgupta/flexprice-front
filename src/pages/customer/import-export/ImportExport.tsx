@@ -92,8 +92,8 @@ const ImportExport = () => {
 			<EmptyPage
 				onAddClick={() => setdrawerOpen(true)}
 				emptyStateCard={{
-					heading: 'No Import Tasks Found',
-					description: 'Create your first import task that customers can access, use or be billed for.',
+					heading: 'Ready to Import Data?',
+					description: 'Upload your first import file to bring in customer or events data.',
 					buttonLabel: 'Create Import Task',
 					buttonAction: () => {
 						setdrawerOpen(true);

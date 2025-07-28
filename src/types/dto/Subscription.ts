@@ -1,6 +1,28 @@
 import { LineItem as InvoiceLineItem } from '@/models/Invoice';
-import { BILLING_CYCLE } from '@/models/Subscription';
+import { BILLING_CYCLE, SUBSCRIPTION_STATUS } from '@/models/Subscription';
 import { CreditGrant } from '@/models/CreditGrant';
+import { BILLING_PERIOD } from '@/constants/constants';
+import { BILLING_CADENCE } from '@/models/Invoice';
+import { QueryFilter, TimeRangeFilter } from './base';
+import { Subscription } from '@/models/Subscription';
+import { Pagination } from '@/models/Pagination';
+
+// Re-export existing enums for convenience
+export { BILLING_PERIOD } from '@/constants/constants';
+export { BILLING_CADENCE } from '@/models/Invoice';
+
+// SubscriptionFilter interface for listing subscriptions
+export interface ListSubscriptionsPayload extends QueryFilter, TimeRangeFilter {
+	subscription_ids?: string[];
+	customer_id?: string;
+	plan_id?: string;
+	subscription_status?: SUBSCRIPTION_STATUS[];
+	billing_cadence?: BILLING_CADENCE[];
+	billing_period?: BILLING_PERIOD[];
+	subscription_status_not_in?: SUBSCRIPTION_STATUS[];
+	active_at?: string;
+	with_line_items?: boolean;
+}
 
 export interface GetSubscriptionDetailsPayload {
 	subscription_id: string;
@@ -92,4 +114,8 @@ export interface AddSubscriptionPhasePayload {
 	credit_grants?: CreditGrant[];
 	commitment_amount?: number;
 	overage_factor?: number;
+}
+
+export interface ListSubscriptionsResponse extends Pagination {
+	items: Subscription[];
 }

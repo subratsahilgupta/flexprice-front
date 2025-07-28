@@ -1,7 +1,14 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import { Wallet } from '@/models/Wallet';
 import { RealtimeWalletBalance } from '@/models/WalletBalance';
-import { CreateWalletPayload, TopupWalletPayload, WalletTransactionResponse, WalletTransactionPayload } from '@/types/dto';
+import {
+	CreateWalletPayload,
+	TopupWalletPayload,
+	WalletTransactionResponse,
+	WalletTransactionPayload,
+	UpdateWalletRequest,
+	WalletResponse,
+} from '@/types/dto';
 import { GetCustomerWalletsPayload } from '@/types/dto/Wallet';
 import { generateQueryParams } from '@/utils/common/api_helper';
 
@@ -14,11 +21,11 @@ class WalletApi {
 	}
 
 	static async getWalletTransactions({ walletId, limit = 10, offset = 0 }: WalletTransactionPayload): Promise<WalletTransactionResponse> {
-		return await AxiosClient.get<WalletTransactionResponse>(`/wallets/${walletId}/transactions?limit=${limit}&offset=${offset}`);
+		return await AxiosClient.get<WalletTransactionResponse>(`${this.baseUrl}/${walletId}/transactions?limit=${limit}&offset=${offset}`);
 	}
 
 	static async getWalletBalance(walletId: string): Promise<RealtimeWalletBalance> {
-		return await AxiosClient.get<RealtimeWalletBalance>(`/wallets/${walletId}/balance/real-time`);
+		return await AxiosClient.get<RealtimeWalletBalance>(`${this.baseUrl}/${walletId}/balance/real-time`);
 	}
 	static async createWallet({
 		currency,
@@ -28,7 +35,7 @@ class WalletApi {
 		conversion_rate,
 		initial_credits_expiry_date_utc,
 	}: CreateWalletPayload): Promise<Wallet> {
-		return await AxiosClient.post<Wallet>(`/wallets`, {
+		return await AxiosClient.post<Wallet>(`${this.baseUrl}`, {
 			currency,
 			customer_id: customerId,
 			name,
@@ -39,13 +46,17 @@ class WalletApi {
 	}
 
 	static async topupWallet(data: TopupWalletPayload): Promise<Wallet> {
-		return await AxiosClient.post<Wallet>(`/wallets/${data.walletId}/top-up`, {
+		return await AxiosClient.post<Wallet>(`${this.baseUrl}/${data.walletId}/top-up`, {
 			...data,
 		});
 	}
 
 	static async terminateWallet(walletId: string): Promise<void> {
-		return await AxiosClient.post<void>(`/wallets/${walletId}/terminate`);
+		return await AxiosClient.post<void>(`${this.baseUrl}/${walletId}/terminate`);
+	}
+
+	static async updateWallet(walletId: string, data: UpdateWalletRequest): Promise<WalletResponse> {
+		return await AxiosClient.put<WalletResponse>(`${this.baseUrl}/${walletId}`, data);
 	}
 }
 

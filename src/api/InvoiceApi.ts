@@ -64,7 +64,7 @@ class InvoiceApi {
 		const response = await fetch(`${import.meta.env.VITE_API_URL}${this.baseurl}/${invoiceId}/pdf`, {
 			headers: {
 				Authorization: `Bearer ${await AuthService.getAcessToken()}`,
-				'X-Environment-ID': EnvironmentApi.getActiveEnvironment()?.id || '',
+				'X-Environment-ID': EnvironmentApi.getActiveEnvironmentId() || '',
 				Accept: 'application/pdf',
 			},
 		});
@@ -89,6 +89,15 @@ class InvoiceApi {
 
 		// Clean up the URL object
 		window.URL.revokeObjectURL(url);
+	}
+
+	public static async downloadInvoicePdf(invoiceId: string) {
+		const params = { url: true };
+		const url = generateQueryParams(`${this.baseurl}/${invoiceId}/pdf`, params);
+		const response = await AxiosClient.get<{ presigned_url: string }>(url);
+		const presignedUrl = response.presigned_url;
+
+		window.open(presignedUrl, '_blank');
 	}
 }
 
