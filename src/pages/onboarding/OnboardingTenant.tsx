@@ -11,6 +11,8 @@ import { CreateSecretKeyResponse } from '@/types/dto';
 import { PermissionType } from '@/components/molecules/SecretKeyDrawer/SecretKeyDrawer';
 import OnboardingApi from '@/api/OnboardingApi';
 import { TenantMetadataKey } from '@/models/Tenant';
+import useUser from '@/hooks/useUser';
+import { useQuery } from '@tanstack/react-query';
 interface TutorialItem {
 	title: string;
 	description: string;
@@ -40,6 +42,7 @@ const exploreTutorials: TutorialItem[] = [
 ];
 
 const OnboardingTenant = () => {
+	const { user } = useUser();
 	const [orgName, setOrgName] = useState<string>('');
 	const [secretKeyData, setSecretKeyData] = useState<string>('');
 	const [isCopied, setIsCopied] = useState<boolean>(false);
@@ -48,6 +51,14 @@ const OnboardingTenant = () => {
 	const [completedSteps, setCompletedSteps] = useState<number[]>([]);
 	const [errors, setErrors] = useState<{ orgName: string }>({
 		orgName: '',
+	});
+
+	const { data: tenant } = useQuery({
+		queryKey: ['tenant'],
+		queryFn: async () => {
+			return await TenantApi.getTenantById(user?.tenant?.id ?? '');
+		},
+		enabled: !!user?.tenant?.id,
 	});
 
 	const {
@@ -59,6 +70,7 @@ const OnboardingTenant = () => {
 			TenantApi.updateTenant({
 				name: orgName,
 				metadata: {
+					...tenant?.metadata,
 					[TenantMetadataKey.ONBOARDING_COMPLETED]: 'true',
 				},
 			}),
