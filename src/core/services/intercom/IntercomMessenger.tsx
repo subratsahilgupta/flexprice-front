@@ -32,7 +32,7 @@ const IntercomMessenger = () => {
 		if (!user) return;
 
 		Intercom({
-			app_id: import.meta.env.VITE_INTERCOM_APP_ID,
+			app_id: 'yprjoygg',
 			user_id: user.id,
 			name: user.tenant?.name,
 			email: user.email,
@@ -43,11 +43,17 @@ const IntercomMessenger = () => {
 
 	// Handle inactivity
 	useEffect(() => {
-		if (tenant?.metadata?.get(TenantMetadataKey.ONBOARDING_COMPLETED)) return;
+		const onboardingCompleted = tenant?.metadata[TenantMetadataKey.ONBOARDING_COMPLETED] === 'true';
+		console.log('tenant', tenant);
+		console.log('onboardingCompleted', onboardingCompleted);
+
+		if (onboardingCompleted) return;
 
 		const resetTimer = () => {
+			console.log('resetting timer');
 			if (inactivityTimer.current) clearTimeout(inactivityTimer.current);
 			inactivityTimer.current = setTimeout(() => {
+				console.log('opening intercom');
 				openIntercom();
 			}, INACTIVITY_TIMEOUT);
 		};
@@ -55,6 +61,7 @@ const IntercomMessenger = () => {
 		const activityEvents = ['mousemove', 'keydown', 'scroll', 'touchstart'];
 
 		activityEvents.forEach((event) => {
+			console.log('adding event listener', event);
 			window.addEventListener(event, resetTimer);
 		});
 
@@ -62,12 +69,14 @@ const IntercomMessenger = () => {
 		resetTimer();
 
 		return () => {
+			if (onboardingCompleted) return;
+
 			if (inactivityTimer.current) clearTimeout(inactivityTimer.current);
 			activityEvents.forEach((event) => {
 				window.removeEventListener(event, resetTimer);
 			});
 		};
-	}, []);
+	}, [tenant?.metadata]);
 
 	return (
 		<Button size='sm' variant='outline' onClick={openIntercom}>

@@ -10,6 +10,7 @@ import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { CreateSecretKeyResponse } from '@/types/dto';
 import { PermissionType } from '@/components/molecules/SecretKeyDrawer/SecretKeyDrawer';
 import OnboardingApi from '@/api/OnboardingApi';
+import { TenantMetadataKey } from '@/models/Tenant';
 interface TutorialItem {
 	title: string;
 	description: string;
@@ -57,6 +58,9 @@ const OnboardingTenant = () => {
 		mutationFn: () =>
 			TenantApi.updateTenant({
 				name: orgName,
+				metadata: {
+					[TenantMetadataKey.ONBOARDING_COMPLETED]: 'true',
+				},
 			}),
 		onSuccess: async () => {
 			await refetchQueries(['user']);

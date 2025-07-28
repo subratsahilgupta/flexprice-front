@@ -16,5 +16,5 @@ export enum ENTITY_STATUS {
 }
 
 export interface Metadata {
-	[key: string]: any;
+	[key: string]: string;
 }
