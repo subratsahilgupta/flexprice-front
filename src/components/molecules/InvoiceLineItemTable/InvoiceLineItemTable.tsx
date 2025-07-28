@@ -58,7 +58,6 @@ const InvoiceLineItemTable: FC<Props> = ({
 }) => {
 	const [showZeroCharges, setShowZeroCharges] = useState(false);
 	const filteredData = data.filter((item) => showZeroCharges || Number(item.amount) !== 0);
-	console.log(filteredData);
 
 	return (
 		<div className='bg-white'>

@@ -44,16 +44,12 @@ const IntercomMessenger = () => {
 	// Handle inactivity
 	useEffect(() => {
 		const onboardingCompleted = tenant?.metadata[TenantMetadataKey.ONBOARDING_COMPLETED] === 'true';
-		console.log('tenant', tenant);
-		console.log('onboardingCompleted', onboardingCompleted);
 
 		if (onboardingCompleted) return;
 
 		const resetTimer = () => {
-			console.log('resetting timer');
 			if (inactivityTimer.current) clearTimeout(inactivityTimer.current);
 			inactivityTimer.current = setTimeout(() => {
-				console.log('opening intercom');
 				openIntercom();
 			}, INACTIVITY_TIMEOUT);
 		};
@@ -61,7 +57,6 @@ const IntercomMessenger = () => {
 		const activityEvents = ['mousemove', 'keydown', 'scroll', 'touchstart'];
 
 		activityEvents.forEach((event) => {
-			console.log('adding event listener', event);
 			window.addEventListener(event, resetTimer);
 		});
 

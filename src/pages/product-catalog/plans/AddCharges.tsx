@@ -215,7 +215,6 @@ const AddChargesPage = () => {
 
 	// TODO: Add save logic
 	const handleSave = () => {
-		console.log('existingSubscriptions', existingSubscriptions);
 		if (existingSubscriptions?.items?.length && existingSubscriptions.items.length > 0) {
 			// this means that the plan has existing subscriptions
 			// So we will show a modal to the user to confirm if they want to add the charges to the existing subscriptions
