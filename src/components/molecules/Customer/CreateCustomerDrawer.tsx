@@ -7,7 +7,7 @@ import Customer from '@/models/Customer';
 import { Plus, LinkIcon } from 'lucide-react';
 import { Country, State, City, IState } from 'country-state-city';
 import { z } from 'zod';
-import { invalidateQueries, refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
+import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { logger } from '@/utils/common/Logger';
 import { useUser } from '@/hooks/UserContext';
 import { Switch } from '@/components/ui/switch';
@@ -226,19 +226,16 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 
 		onSuccess: async () => {
 			if (data) {
-				invalidateQueries(['debug-customers', 'debug-subscriptions']);
 				await refetchQueries(['fetchCustomerDetails', formData?.id || '']);
+				toast.success('Customer updated successfully');
 			} else {
 				await refetchQueries(['fetchCustomers']);
+				toast.success('Customer added successfully');
 				setFormData({});
 			}
 
-			if (data) {
-				toast.success('Customer updated successfully');
-			} else {
-				toast.success('Customer added successfully');
-			}
-
+			refetchQueries(['debug-customers']);
+			refetchQueries(['debug-subscriptions']);
 			toggleOpen();
 		},
 		onError: (error: ServerError) => {

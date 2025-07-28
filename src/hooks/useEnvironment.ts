@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Environment, { ENVIRONMENT_TYPE } from '@/models/Environment';
 import EnvironmentApi from '@/api/EnvironmentApi';
@@ -20,7 +20,7 @@ interface UseEnvironment {
 	refetchEnvironments: () => void;
 }
 
-export const useEnvironment = (): UseEnvironment => {
+export const useEnvironment = (pollingInterval: number = 1000): UseEnvironment => {
 	// Fetch environments from API
 	const { data, isLoading, isError, refetch } = useQuery({
 		queryKey: ['environments'],
@@ -38,10 +38,52 @@ export const useEnvironment = (): UseEnvironment => {
 	// State for active environment ID
 	const [activeEnvId, setActiveEnvIdState] = useState<string | null>(getActiveEnvId());
 
-	// Sync state with localStorage changes (cross-tab)
+	// Ref to track the last known localStorage value for polling
+	const lastKnownEnvId = useRef<string | null>(getActiveEnvId());
+
+	// Ref to store the polling interval ID
+	const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+	// Polling function to check localStorage changes
+	const checkLocalStorageChanges = useCallback(() => {
+		const currentEnvId = getActiveEnvId();
+
+		// If the environment ID has changed in localStorage
+		if (currentEnvId !== lastKnownEnvId.current) {
+			lastKnownEnvId.current = currentEnvId;
+			setActiveEnvIdState(currentEnvId);
+
+			// Optionally refetch environments if needed
+			if (data && currentEnvId && !data.some((env) => env.id === currentEnvId)) {
+				refetch();
+			}
+		}
+	}, [data, refetch]);
+
+	// Set up polling interval
+	useEffect(() => {
+		// Clear any existing interval
+		if (pollingIntervalRef.current) {
+			clearInterval(pollingIntervalRef.current);
+		}
+
+		// Set up new polling interval
+		pollingIntervalRef.current = setInterval(checkLocalStorageChanges, pollingInterval);
+
+		// Cleanup function
+		return () => {
+			if (pollingIntervalRef.current) {
+				clearInterval(pollingIntervalRef.current);
+				pollingIntervalRef.current = null;
+			}
+		};
+	}, [checkLocalStorageChanges, pollingInterval]);
+
+	// Sync state with localStorage changes (cross-tab) - keep this for immediate response
 	useEffect(() => {
 		const handler = (e: StorageEvent) => {
 			if (e.key === ACTIVE_ENVIRONMENT_ID_KEY) {
+				lastKnownEnvId.current = e.newValue;
 				setActiveEnvIdState(e.newValue);
 			}
 		};
@@ -57,6 +99,7 @@ export const useEnvironment = (): UseEnvironment => {
 			const firstId = data[0].id;
 			setActiveEnvId(firstId);
 			setActiveEnvIdState(firstId);
+			lastKnownEnvId.current = firstId;
 		}
 	}, [data, activeEnvId]);
 
@@ -72,6 +115,7 @@ export const useEnvironment = (): UseEnvironment => {
 	const changeActiveEnvironment = useCallback((environmentId: string) => {
 		setActiveEnvId(environmentId);
 		setActiveEnvIdState(environmentId);
+		lastKnownEnvId.current = environmentId;
 	}, []);
 
 	return {

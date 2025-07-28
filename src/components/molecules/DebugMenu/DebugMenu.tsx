@@ -30,7 +30,7 @@ const DebugMenu = () => {
 		isLoading: isCustomerLoading,
 		refetch: refetchCustomer,
 	} = useQuery({
-		queryKey: ['debug-customers'],
+		queryKey: ['debug-customers', activeEnvironment?.id],
 		queryFn: async () => {
 			return await CustomerApi.getAllCustomers({ limit: 1, offset: 0 });
 		},
@@ -43,7 +43,7 @@ const DebugMenu = () => {
 		isLoading: isSubscriptionLoading,
 		refetch: refetchSubscription,
 	} = useQuery({
-		queryKey: ['debug-subscriptions', customerData?.items[0]?.id],
+		queryKey: ['debug-subscriptions', customerData?.items[0]?.id, activeEnvironment?.id],
 		queryFn: async () => await CustomerApi.getCustomerSubscriptions(customerData?.items[0]?.id || ''),
 		enabled: !!customerData?.items[0]?.id && isDevelopment,
 	});

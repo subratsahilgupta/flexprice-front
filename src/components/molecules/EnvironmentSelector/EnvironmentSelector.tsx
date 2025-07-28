@@ -116,9 +116,9 @@ const EnvironmentSelector: React.FC<Props> = ({ disabled = false, className }) =
 								<p className='text-xs text-muted-foreground'>{currentEnvironment?.name || 'No environment'}</p>
 							</div>
 						</div>
-						<button type='button' className={cn(sidebarOpen ? '' : 'hidden')}>
+						<div className={cn(sidebarOpen ? '' : 'hidden')}>
 							<ChevronsUpDown className='h-4 w-4 opacity-50' />
-						</button>
+						</div>
 					</div>
 				</SelectTrigger>
 				<SelectContent className='w-full mt-2'>

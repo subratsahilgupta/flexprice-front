@@ -13,9 +13,8 @@ import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ApiDocsContent } from '@/components/molecules';
-import { invalidateQueries } from '@/core/services/tanstack/ReactQueryProvider';
+import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { RouteNames } from '@/core/routes/Routes';
-import useEnvironment from '@/hooks/useEnvironment';
 import { BILLING_CYCLE, SubscriptionPhase } from '@/models/Subscription';
 import { CreateCustomerSubscriptionPayload } from '@/types/dto';
 import { BILLING_CADENCE, INVOICE_CADENCE } from '@/models/Invoice';
@@ -105,7 +104,6 @@ const useSubscriptionData = (subscription_id: string | undefined) => {
 
 const CustomerSubscription: React.FC = () => {
 	const { id: customerId, subscription_id } = useParams<Params>();
-	const { isDevelopment } = useEnvironment();
 	const navigate = useNavigate();
 	const updateBreadcrumb = useBreadcrumbsStore((state) => state.updateBreadcrumb);
 
@@ -177,11 +175,11 @@ const CustomerSubscription: React.FC = () => {
 		},
 		onSuccess: async () => {
 			toast.success('Subscription created successfully');
-			navigate(`${RouteNames.customers}/${customerId}`);
 
-			if (isDevelopment) {
-				invalidateQueries(['debug-customers', 'debug-subscriptions']);
-			}
+			refetchQueries(['debug-customers']);
+			refetchQueries(['debug-subscriptions']);
+
+			navigate(`${RouteNames.customers}/${customerId}`);
 		},
 		onError: (error: ServerError) => {
 			toast.error(error.error.message || 'Error creating subscription');
