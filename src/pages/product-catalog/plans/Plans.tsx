@@ -78,7 +78,6 @@ const PlansPage = () => {
 	const [activePlan, setActivePlan] = useState<Plan | null>(null);
 	const [planDrawerOpen, setPlanDrawerOpen] = useState(false);
 
-
 	const { filters, sorts, setFilters, setSorts, sanitizedFilters, sanitizedSorts } = useFilterSorting({
 		initialFilters: [
 			{
@@ -118,7 +117,6 @@ const PlansPage = () => {
 	}, [sanitizedFilters, sanitizedSorts]);
 
 	const fetchPlans = async () => {
-
 		return await PlanApi.getPlansByFilter({
 			limit,
 			offset,
@@ -162,8 +160,6 @@ const PlansPage = () => {
 		setActivePlan(null);
 		setPlanDrawerOpen(true);
 	};
-
-
 
 	if (isError) {
 		const err = error as any;
