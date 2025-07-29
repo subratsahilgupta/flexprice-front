@@ -29,7 +29,7 @@ const FilterMultiSelect: React.FC<FilterMultiSelectProps> = ({
 	return (
 		<Popover open={isOpen} onOpenChange={setIsOpen}>
 			<PopoverTrigger asChild>
-				<Button variant='outline' size='sm' className={cn(className, 'h-7 text-xs w-full justify-start font-normal')}>
+				<Button variant='outline' size='sm' className={cn(className, 'h-9 rounded-sm text-xs w-full justify-start font-normal')}>
 					{value.length === 0 ? (
 						<span className='truncate text-sm'>{placeholder}</span>
 					) : (
