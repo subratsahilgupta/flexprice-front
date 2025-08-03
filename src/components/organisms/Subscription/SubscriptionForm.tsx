@@ -3,10 +3,13 @@ import PriceTable from '@/components/organisms/Subscription/PriceTable';
 import { cn } from '@/lib/utils';
 import { toSentenceCase } from '@/utils/common/helper_functions';
 import { ExpandedPlan } from '@/types/plan';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import CreditGrantTable from '@/components/molecules/CreditGrant/CreditGrantTable';
 import { BILLING_CYCLE, SubscriptionPhase } from '@/models/Subscription';
+import { usePriceOverrides } from '@/hooks/usePriceOverrides';
+import { getLineItemOverrides } from '@/utils/common/price_override_helpers';
+import PriceOverrideSummary from './PriceOverrideSummary';
 import {
 	CREDIT_GRANT_EXPIRATION_TYPE,
 	CREDIT_GRANT_PERIOD,
@@ -78,6 +81,23 @@ const SubscriptionForm = ({
 	plansError: boolean;
 	isDisabled: boolean;
 }) => {
+	// Price overrides functionality
+	const currentPrices =
+		state.prices?.prices?.filter(
+			(price) =>
+				price.billing_period.toLowerCase() === state.billingPeriod.toLowerCase() &&
+				price.currency.toLowerCase() === state.currency.toLowerCase(),
+		) || [];
+
+	const { overriddenPrices, overridePrice, resetOverride } = usePriceOverrides(currentPrices);
+
+	// Sync price overrides with state
+	useEffect(() => {
+		setState((prev) => ({
+			...prev,
+			priceOverrides: overriddenPrices,
+		}));
+	}, [overriddenPrices, setState]);
 	const plansWithCharges = useMemo(() => {
 		return (
 			plans?.map((plan) => ({
@@ -513,7 +533,20 @@ const SubscriptionForm = ({
 									{/* charges */}
 									{state.prices && state.selectedPlan && state.billingPeriod && state.currency && (
 										<div className='mb-2'>
-											<PriceTable data={state.prices.prices || []} billingPeriod={state.billingPeriod} currency={state.currency} />
+											<PriceTable
+												data={state.prices.prices || []}
+												billingPeriod={state.billingPeriod}
+												currency={state.currency}
+												onPriceOverride={overridePrice}
+												onResetOverride={resetOverride}
+												overriddenPrices={overriddenPrices}
+											/>
+
+											{/* Price Override Summary */}
+											{(() => {
+												const overrideLineItems = getLineItemOverrides(currentPrices, overriddenPrices);
+												return <PriceOverrideSummary overrides={overrideLineItems} prices={currentPrices} className='mt-4' />;
+											})()}
 										</div>
 									)}
 

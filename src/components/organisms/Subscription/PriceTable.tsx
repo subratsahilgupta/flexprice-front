@@ -1,8 +1,8 @@
 import { FC, useState, useMemo } from 'react';
-import { ColumnData, FlexpriceTable } from '@/components/molecules';
-import { Price } from '@/models/Price';
-import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
-import { FormHeader } from '@/components/atoms';
+import { ColumnData, FlexpriceTable, PriceOverrideDialog } from '@/components/molecules';
+import { Price, BILLING_MODEL } from '@/models/Price';
+import { ChevronDownIcon, ChevronUpIcon, Edit3 } from 'lucide-react';
+import { FormHeader, Button } from '@/components/atoms';
 import { motion } from 'framer-motion';
 import ChargeValueCell from '@/pages/product-catalog/plans/ChargeValueCell';
 import { capitalize } from 'es-toolkit';
@@ -11,6 +11,9 @@ export interface Props {
 	data: Price[];
 	billingPeriod?: string;
 	currency?: string;
+	onPriceOverride?: (priceId: string, newAmount: string) => void;
+	onResetOverride?: (priceId: string) => void;
+	overriddenPrices?: Record<string, string>;
 }
 
 type ChargeTableData = {
@@ -20,8 +23,10 @@ type ChargeTableData = {
 	invoice_cadence: string;
 };
 
-const PriceTable: FC<Props> = ({ data, billingPeriod, currency }) => {
+const PriceTable: FC<Props> = ({ data, billingPeriod, currency, onPriceOverride, onResetOverride, overriddenPrices = {} }) => {
 	const [showAllRows, setShowAllRows] = useState(false);
+	const [selectedPrice, setSelectedPrice] = useState<Price | null>(null);
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
 	// Filter prices based on billing period and currency if provided
 	const filteredPrices = useMemo(() => {
@@ -38,12 +43,35 @@ const PriceTable: FC<Props> = ({ data, billingPeriod, currency }) => {
 		return filtered;
 	}, [data, billingPeriod, currency]);
 
-	const mappedData: ChargeTableData[] = (filteredPrices ?? []).map((price) => ({
-		charge: price.meter?.name ? `${price.meter.name}` : price.description || 'Charge',
-		quantity: price.type === 'FIXED' ? '1' : 'pay as you go',
-		price: <ChargeValueCell data={{ ...price, currency: price.currency } as any} />,
-		invoice_cadence: price.invoice_cadence,
-	}));
+	const mappedData: ChargeTableData[] = (filteredPrices ?? []).map((price) => {
+		const isOverridable = price.billing_model === BILLING_MODEL.FLAT_FEE || price.billing_model === BILLING_MODEL.PACKAGE;
+		const isOverridden = overriddenPrices[price.id] !== undefined;
+
+		return {
+			charge: price.meter?.name ? `${price.meter.name}` : price.description || 'Charge',
+			quantity: price.type === 'FIXED' ? '1' : 'pay as you go',
+			price: (
+				<ChargeValueCell
+					data={{ ...price, currency: price.currency } as any}
+					overriddenAmount={isOverridden ? overriddenPrices[price.id] : undefined}>
+					{isOverridable && (
+						<Button
+							variant='ghost'
+							size='sm'
+							onClick={() => {
+								setSelectedPrice(price);
+								setIsDialogOpen(true);
+							}}
+							className='ml-2 p-1 h-auto text-xs'>
+							<Edit3 className='w-3 h-3' />
+						</Button>
+					)}
+					{isOverridden && <span className='ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded'>Override</span>}
+				</ChargeValueCell>
+			),
+			invoice_cadence: price.invoice_cadence,
+		};
+	});
 
 	const columns: ColumnData<ChargeTableData>[] = [
 		{
@@ -96,6 +124,18 @@ const PriceTable: FC<Props> = ({ data, billingPeriod, currency }) => {
 						)}
 					</span>
 				</div>
+			)}
+
+			{/* Price Override Dialog */}
+			{selectedPrice && (
+				<PriceOverrideDialog
+					isOpen={isDialogOpen}
+					onOpenChange={setIsDialogOpen}
+					price={selectedPrice}
+					onPriceOverride={onPriceOverride || (() => {})}
+					onResetOverride={onResetOverride || (() => {})}
+					overriddenPrices={overriddenPrices}
+				/>
 			)}
 		</div>
 	);

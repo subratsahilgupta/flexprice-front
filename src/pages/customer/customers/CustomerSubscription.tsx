@@ -21,6 +21,7 @@ import { BILLING_CADENCE, INVOICE_CADENCE } from '@/models/Invoice';
 import { BILLING_PERIOD } from '@/constants/constants';
 import { uniqueId } from 'lodash';
 import SubscriptionForm from '@/components/organisms/Subscription/SubscriptionForm';
+import { getLineItemOverrides } from '@/utils/common/price_override_helpers';
 
 type Params = {
 	id: string;
@@ -46,6 +47,9 @@ export type SubscriptionFormState = {
 	phaseStates: SubscriptionPhaseState[];
 	isPhaseEditing: boolean;
 	originalPhases: SubscriptionPhase[];
+
+	// Price Overrides
+	priceOverrides: Record<string, string>;
 };
 
 // Data Fetching Hooks
@@ -114,6 +118,7 @@ const CustomerSubscription: React.FC = () => {
 		phaseStates: [],
 		isPhaseEditing: false,
 		originalPhases: [],
+		priceOverrides: {},
 	});
 
 	// Update breadcrumb when customer data changes
@@ -155,6 +160,7 @@ const CustomerSubscription: React.FC = () => {
 					phaseStates: [SubscriptionPhaseState.SAVED],
 					isPhaseEditing: false,
 					originalPhases: [initialPhase as SubscriptionPhase],
+					priceOverrides: {},
 				});
 			}
 		}
@@ -180,7 +186,7 @@ const CustomerSubscription: React.FC = () => {
 	});
 
 	const handleSubscriptionSubmit = () => {
-		const { billingPeriod, selectedPlan, currency, phases } = subscriptionState;
+		const { billingPeriod, selectedPlan, currency, phases, priceOverrides, prices } = subscriptionState;
 
 		if (!billingPeriod || !selectedPlan) {
 			toast.error('Please select a plan and billing period.');
@@ -209,6 +215,14 @@ const CustomerSubscription: React.FC = () => {
 			toast.error('Please save your changes before submitting.');
 			return;
 		}
+
+		// Get price overrides for backend
+		const currentPrices =
+			prices?.prices?.filter(
+				(price) =>
+					price.billing_period.toLowerCase() === billingPeriod.toLowerCase() && price.currency.toLowerCase() === currency.toLowerCase(),
+			) || [];
+		const overrideLineItems = getLineItemOverrides(currentPrices, priceOverrides);
 
 		// TODO: Remove this once the feature is released
 		const tempSubscriptionId = uniqueId('tempsubscription_');
@@ -250,6 +264,7 @@ const CustomerSubscription: React.FC = () => {
 			phases: sanitizedPhases.length > 1 ? sanitizedPhases : undefined,
 			credit_grants: (firstPhase.credit_grants?.length ?? 0 > 0) ? firstPhase.credit_grants : undefined,
 			commitment_amount: firstPhase.commitment_amount,
+			override_line_items: overrideLineItems.length > 0 ? overrideLineItems : undefined,
 
 			// TODO: remove this once the feature is released
 			overage_factor: firstPhase.overage_factor ?? 1,

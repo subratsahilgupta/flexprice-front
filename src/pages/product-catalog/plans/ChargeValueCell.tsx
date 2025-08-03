@@ -1,18 +1,26 @@
-import { Price } from '@/models/Price';
+import { BILLING_MODEL, Price } from '@/models/Price';
 import { getPriceTableCharge } from '@/utils/common/price_helpers';
 import { Info } from 'lucide-react';
 import { formatAmount } from '@/components/atoms/Input/Input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 
-const ChargeValueCell = ({ data }: { data: Price }) => {
-	const price = getPriceTableCharge(data as any, false);
+interface Props {
+	data: Price;
+	children?: React.ReactNode;
+	overriddenAmount?: string;
+}
+
+const ChargeValueCell = ({ data, children, overriddenAmount }: Props) => {
+	// Use overridden amount if provided, otherwise use original price
+	const priceData = overriddenAmount ? { ...data, amount: overriddenAmount } : data;
+	const price = getPriceTableCharge(priceData as any, false);
 	const tiers = data.tiers as unknown as Array<{
 		up_to: number | null;
 		unit_amount: string;
 		flat_amount: string;
 	}> | null;
-	const isTiered = data.billing_model === 'TIERED' && Array.isArray(tiers) && tiers.length > 0;
+	const isTiered = data.billing_model === BILLING_MODEL.TIERED && Array.isArray(tiers) && tiers.length > 0;
 
 	const formatRange = (tier: any, index: number, allTiers: any[]) => {
 		// Calculate 'from' based on previous tier's up_to
@@ -27,7 +35,7 @@ const ChargeValueCell = ({ data }: { data: Price }) => {
 
 	return (
 		<div className='flex items-center gap-2'>
-			<div>{price}</div>
+			<div className={overriddenAmount ? 'text-blue-600 font-medium' : ''}>{price}</div>
 			{isTiered && (
 				<TooltipProvider delayDuration={0}>
 					<Tooltip>
@@ -66,6 +74,7 @@ const ChargeValueCell = ({ data }: { data: Price }) => {
 					</Tooltip>
 				</TooltipProvider>
 			)}
+			{children && <span>{children}</span>}
 		</div>
 	);
 };
