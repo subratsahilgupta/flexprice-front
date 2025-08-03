@@ -7,11 +7,10 @@ import { getCurrencySymbol } from '@/utils/common/helper_functions';
 
 interface Props {
 	data: Price;
-	children?: React.ReactNode;
 	overriddenAmount?: string;
 }
 
-const ChargeValueCell = ({ data, children, overriddenAmount }: Props) => {
+const ChargeValueCell = ({ data, overriddenAmount }: Props) => {
 	// Use overridden amount if provided, otherwise use original price
 	const priceData = overriddenAmount ? { ...data, amount: overriddenAmount } : data;
 	const price = getPriceTableCharge(priceData as any, false);
@@ -35,7 +34,7 @@ const ChargeValueCell = ({ data, children, overriddenAmount }: Props) => {
 
 	return (
 		<div className='flex items-center gap-2'>
-			<div className={overriddenAmount ? 'text-blue-600 font-medium' : ''}>{price}</div>
+			<div className={overriddenAmount ? '' : ''}>{price}</div>
 			{isTiered && (
 				<TooltipProvider delayDuration={0}>
 					<Tooltip>
@@ -74,7 +73,6 @@ const ChargeValueCell = ({ data, children, overriddenAmount }: Props) => {
 					</Tooltip>
 				</TooltipProvider>
 			)}
-			{children && <span>{children}</span>}
 		</div>
 	);
 };

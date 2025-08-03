@@ -1,8 +1,8 @@
 import { FC, useState, useMemo } from 'react';
 import { ColumnData, FlexpriceTable, PriceOverrideDialog } from '@/components/molecules';
 import { Price, BILLING_MODEL } from '@/models/Price';
-import { ChevronDownIcon, ChevronUpIcon, Edit3 } from 'lucide-react';
-import { FormHeader, Button } from '@/components/atoms';
+import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
+import { FormHeader, ActionButton } from '@/components/atoms';
 import { motion } from 'framer-motion';
 import ChargeValueCell from '@/pages/product-catalog/plans/ChargeValueCell';
 import { capitalize } from 'es-toolkit';
@@ -21,6 +21,7 @@ type ChargeTableData = {
 	quantity: string;
 	price: JSX.Element;
 	invoice_cadence: string;
+	actions?: JSX.Element;
 };
 
 const PriceTable: FC<Props> = ({ data, billingPeriod, currency, onPriceOverride, onResetOverride, overriddenPrices = {} }) => {
@@ -43,6 +44,11 @@ const PriceTable: FC<Props> = ({ data, billingPeriod, currency, onPriceOverride,
 		return filtered;
 	}, [data, billingPeriod, currency]);
 
+	const handleOverride = (price: Price) => {
+		setSelectedPrice(price);
+		setIsDialogOpen(true);
+	};
+
 	const mappedData: ChargeTableData[] = (filteredPrices ?? []).map((price) => {
 		const isOverridable = price.billing_model === BILLING_MODEL.FLAT_FEE || price.billing_model === BILLING_MODEL.PACKAGE;
 		const isOverridden = overriddenPrices[price.id] !== undefined;
@@ -53,23 +59,22 @@ const PriceTable: FC<Props> = ({ data, billingPeriod, currency, onPriceOverride,
 			price: (
 				<ChargeValueCell
 					data={{ ...price, currency: price.currency } as any}
-					overriddenAmount={isOverridden ? overriddenPrices[price.id] : undefined}>
-					{isOverridable && (
-						<Button
-							variant='ghost'
-							size='sm'
-							onClick={() => {
-								setSelectedPrice(price);
-								setIsDialogOpen(true);
-							}}
-							className='ml-2 p-1 h-auto text-xs'>
-							<Edit3 className='w-3 h-3' />
-						</Button>
-					)}
-					{isOverridden && <span className='ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded'>Override</span>}
-				</ChargeValueCell>
+					overriddenAmount={isOverridden ? overriddenPrices[price.id] : undefined}
+				/>
 			),
 			invoice_cadence: price.invoice_cadence,
+			actions: isOverridable ? (
+				<ActionButton
+					editText={'Override Price'}
+					id={price.id}
+					deleteMutationFn={() => Promise.resolve()}
+					refetchQueryKey='prices'
+					entityName={price.meter?.name || price.description || 'Charge'}
+					isEditDisabled={false}
+					isArchiveDisabled={true}
+					onEdit={() => handleOverride(price)}
+				/>
+			) : undefined,
 		};
 	});
 
@@ -91,6 +96,14 @@ const PriceTable: FC<Props> = ({ data, billingPeriod, currency, onPriceOverride,
 		{
 			fieldName: 'price',
 			title: 'Price',
+		},
+		{
+			fieldName: 'actions',
+			title: '',
+			width: 50,
+			align: 'center',
+			fieldVariant: 'interactive',
+			hideOnEmpty: true,
 		},
 	];
 
