@@ -10,6 +10,7 @@ import { Calendar, Receipt } from 'lucide-react';
 import TimelinePreview, { PreviewTimelineItem } from './TimelinePreview';
 import { ExpandedPlan } from '@/types/plan';
 import { Coupon } from '@/models/Coupon';
+import { getCurrentPriceAmount } from '@/utils/common/price_override_helpers';
 
 const PERIOD_DURATION: Record<BILLING_PERIOD, string> = {
 	[BILLING_PERIOD.DAILY]: '1 day',
@@ -26,6 +27,7 @@ interface PreviewProps {
 	selectedPlan?: ExpandedPlan | null;
 	phases: SubscriptionPhase[];
 	coupons?: Coupon[];
+	priceOverrides?: Record<string, string>;
 }
 
 /**
@@ -57,7 +59,7 @@ const calculateFirstInvoiceDate = (startDate: Date, billingPeriod: BILLING_PERIO
 /**
  * Component that displays subscription preview information including start date and first invoice details
  */
-const Preview = ({ data, className, phases, coupons = [] }: PreviewProps) => {
+const Preview = ({ data, className, phases, coupons = [], priceOverrides = {} }: PreviewProps) => {
 	const firstPhase = phases.at(0);
 	const startDate = firstPhase?.start_date;
 	const billingCycle = firstPhase?.billing_cycle || BILLING_CYCLE.ANNIVERSARY;
@@ -66,7 +68,12 @@ const Preview = ({ data, className, phases, coupons = [] }: PreviewProps) => {
 
 	const usageCharges = useMemo(() => data.filter((charge) => charge.type === 'USAGE'), [data]);
 
-	const recurringTotal = useMemo(() => recurringCharges.reduce((acc, charge) => acc + parseFloat(charge.amount), 0), [recurringCharges]);
+	const recurringTotal = useMemo(() => {
+		return recurringCharges.reduce((acc, charge) => {
+			const currentAmount = getCurrentPriceAmount(charge, priceOverrides);
+			return acc + parseFloat(currentAmount);
+		}, 0);
+	}, [recurringCharges, priceOverrides]);
 
 	const billingPeriod = useMemo(() => data[0]?.billing_period.toUpperCase() as BILLING_PERIOD, [data]);
 
