@@ -400,6 +400,7 @@ const CustomerSubscription: React.FC = () => {
 							selectedPlan={subscriptionState.prices}
 							phases={subscriptionState.phases}
 							coupons={subscriptionState.linkedCoupon ? [subscriptionState.linkedCoupon] : []}
+							priceOverrides={subscriptionState.priceOverrides}
 						/>
 					)}
 				</div>
