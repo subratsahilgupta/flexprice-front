@@ -2,6 +2,7 @@ import { AxiosClient } from '@/core/axios/verbs';
 import { Subscription, SubscriptionPhase, SubscriptionUsage } from '@/models/Subscription';
 import {
 	AddSubscriptionPhasePayload,
+	CreateSubscriptionPayload,
 	GetSubscriptionPreviewResponse,
 	ListSubscriptionsPayload,
 	ListSubscriptionsResponse,
@@ -59,6 +60,10 @@ class SubscriptionApi {
 	static async listSubscriptions(payload: ListSubscriptionsPayload) {
 		const url = generateQueryParams(this.baseUrl, payload);
 		return await AxiosClient.get<ListSubscriptionsResponse>(url);
+	}
+
+	static async createSubscription(payload: CreateSubscriptionPayload): Promise<Subscription> {
+		return await AxiosClient.post(this.baseUrl, payload);
 	}
 }
 

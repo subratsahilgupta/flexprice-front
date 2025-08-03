@@ -6,7 +6,7 @@ export type { GetTasksPayload, GetTasksResponse, AddTaskPayload } from './Task';
 
 export type { SignupData, LoginData, LocalUser } from './Auth';
 
-export type { GetAllPricesResponse } from './Price';
+export type { GetAllPricesResponse, CreatePriceRequest, UpdatePriceRequest, CreatePriceTier, TransformQuantity } from './Price';
 
 export type {
 	GetCustomerResponse,

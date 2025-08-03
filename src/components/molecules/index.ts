@@ -104,3 +104,5 @@ export { sanitizeFilterConditions, sanitizeSortConditions } from '@/types/format
 export { CreditGrantTable, CreditGrantModal } from './CreditGrant';
 
 export { MetadataModal } from './MetadataModal';
+
+export { default as PriceOverrideDialog } from './PriceOverrideDialog';

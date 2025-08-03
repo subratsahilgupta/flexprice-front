@@ -1,5 +1,7 @@
 import { getAllISOCodes } from 'iso-country-currency';
 import { CREDIT_GRANT_PERIOD } from '@/models/CreditGrant';
+import { BILLING_MODEL, PRICE_TYPE, PRICE_UNIT_TYPE, TIER_MODE } from '@/models/Price';
+import { BILLING_CADENCE, INVOICE_CADENCE } from '@/models/Invoice';
 
 export enum BILLING_PERIOD {
 	DAILY = 'DAILY',
@@ -68,4 +70,36 @@ export const creditGrantPeriodOptions = [
 	{ label: 'Yearly', value: CREDIT_GRANT_PERIOD.ANNUAL },
 	{ label: 'Quarterly', value: CREDIT_GRANT_PERIOD.QUARTERLY },
 	{ label: 'Half-Yearly', value: CREDIT_GRANT_PERIOD.HALF_YEARLY },
+];
+
+// Price-related options
+export const billingModelOptions = [
+	{ label: 'Flat Fee', value: BILLING_MODEL.FLAT_FEE },
+	{ label: 'Package', value: BILLING_MODEL.PACKAGE },
+	{ label: 'Tiered', value: BILLING_MODEL.TIERED },
+];
+
+export const priceTypeOptions = [
+	{ label: 'Usage', value: PRICE_TYPE.USAGE },
+	{ label: 'Fixed', value: PRICE_TYPE.FIXED },
+];
+
+export const priceUnitTypeOptions = [
+	{ label: 'Fiat', value: PRICE_UNIT_TYPE.FIAT },
+	{ label: 'Custom', value: PRICE_UNIT_TYPE.CUSTOM },
+];
+
+export const tierModeOptions = [
+	{ label: 'Volume', value: TIER_MODE.VOLUME },
+	{ label: 'Slab', value: TIER_MODE.SLAB },
+];
+
+export const billingCadenceOptions = [
+	{ label: 'Recurring', value: BILLING_CADENCE.RECURRING },
+	{ label: 'One Time', value: BILLING_CADENCE.ONETIME },
+];
+
+export const invoiceCadenceOptions = [
+	{ label: 'Arrear', value: INVOICE_CADENCE.ARREAR },
+	{ label: 'Advance', value: INVOICE_CADENCE.ADVANCE },
 ];
