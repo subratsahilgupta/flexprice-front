@@ -8,6 +8,7 @@ import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { useNavigate } from 'react-router-dom';
 import { COUPON_TYPE, COUPON_CADENCE } from '@/types/common/Coupon';
 import { CreateCouponRequest, UpdateCouponRequest } from '@/types/dto/Coupon';
+import { RouteNames } from '@/core/routes/Routes';
 
 interface Props {
 	data?: Coupon | null;
@@ -46,7 +47,7 @@ const CouponDrawer: FC<Props> = ({ data, open, onOpenChange, trigger, refetchQue
 			toast.success(isEdit ? 'Coupon updated successfully' : 'Coupon created successfully');
 			onOpenChange?.(false);
 			refetchQueries(refetchQueryKeys);
-			navigate(`/coupons/${data.id}`);
+			navigate(`${RouteNames.coupons}/${data.id}`);
 		},
 		onError: (error: ServerError) => {
 			toast.error(error.error.message || `Failed to ${isEdit ? 'update' : 'create'} coupon. Please try again.`);
