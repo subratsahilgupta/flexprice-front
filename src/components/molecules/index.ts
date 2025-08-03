@@ -108,3 +108,5 @@ export { CreditGrantTable, CreditGrantModal } from './CreditGrant';
 export { MetadataModal } from './MetadataModal';
 
 export { default as PriceOverrideDialog } from './PriceOverrideDialog';
+
+export { default as WalletAlertDialog } from './WalletAlertDialog';
