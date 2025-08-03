@@ -49,10 +49,6 @@ const PriceTable: FC<Props> = ({ data, billingPeriod, currency, onPriceOverride,
 		setIsDialogOpen(true);
 	};
 
-	const handleDelete = async (priceId: string) => {
-		// This is not used for price overrides, but ActionButton requires it
-	};
-
 	const mappedData: ChargeTableData[] = (filteredPrices ?? []).map((price) => {
 		const isOverridable = price.billing_model === BILLING_MODEL.FLAT_FEE || price.billing_model === BILLING_MODEL.PACKAGE;
 		const isOverridden = overriddenPrices[price.id] !== undefined;
@@ -71,7 +67,7 @@ const PriceTable: FC<Props> = ({ data, billingPeriod, currency, onPriceOverride,
 				<ActionButton
 					editText={'Override Price'}
 					id={price.id}
-					deleteMutationFn={() => handleDelete(price.id)}
+					deleteMutationFn={() => Promise.resolve()}
 					refetchQueryKey='prices'
 					entityName={price.meter?.name || price.description || 'Charge'}
 					isEditDisabled={false}
