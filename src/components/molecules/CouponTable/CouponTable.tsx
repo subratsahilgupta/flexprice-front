@@ -9,6 +9,7 @@ import CouponApi from '@/api/CouponApi';
 import { useNavigate } from 'react-router-dom';
 import CouponDrawer from '../CouponDrawer';
 import { RouteNames } from '@/core/routes/Routes';
+import { getCurrencySymbol } from '@/utils/common/helper_functions';
 
 export interface CouponTableProps {
 	data: Coupon[];
@@ -46,7 +47,7 @@ const CouponTable: FC<CouponTableProps> = ({ data, onEdit }) => {
 			title: 'Discount',
 			render: (row) => {
 				if (row.type === COUPON_TYPE.FIXED) {
-					return row.amount_off ? `${row.currency} ${row.amount_off}` : '-';
+					return row.amount_off ? `${getCurrencySymbol(row.currency)} ${row.amount_off}` : '-';
 				} else {
 					return row.percentage_off ? `${row.percentage_off}%` : '-';
 				}

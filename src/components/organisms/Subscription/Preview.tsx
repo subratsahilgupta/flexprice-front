@@ -96,7 +96,7 @@ const Preview = ({ data, className, phases, coupons = [] }: PreviewProps) => {
 					</p>
 					{coupons.length > 0 && (
 						<>
-							<p className='text-sm text-green-600 font-medium'>
+							<p className='text-sm text-blue-600 font-medium'>
 								{coupons.length} coupon{coupons.length > 1 ? 's' : ''} applied
 							</p>
 							<p className='text-xs text-gray-500'>{getCouponBreakdownText(coupons, recurringTotal, recurringCharges[0]?.currency)}</p>
