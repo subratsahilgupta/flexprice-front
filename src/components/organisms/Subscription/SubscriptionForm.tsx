@@ -22,6 +22,8 @@ import { uniqueId } from 'lodash';
 import { SubscriptionFormState, SubscriptionPhaseState } from '@/pages/customer/customers/CustomerSubscription';
 import { useQuery } from '@tanstack/react-query';
 import { PlanApi } from '@/api/PlanApi';
+import CouponApi from '@/api/CouponApi';
+import { BaseEntityStatus } from '@/types/common/BaseEntity';
 
 // Helper components
 const BillingCycleSelector = ({
