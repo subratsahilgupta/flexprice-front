@@ -29,7 +29,7 @@ const CouponDrawer: FC<Props> = ({ data, open, onOpenChange, trigger, refetchQue
 			name: '',
 			type: COUPON_TYPE.FIXED,
 			cadence: COUPON_CADENCE.ONCE,
-			currency: 'USD',
+			currency: 'usd',
 		},
 	);
 	const [errors, setErrors] = useState<Partial<Record<keyof CreateCouponRequest, string>>>({});
@@ -61,7 +61,7 @@ const CouponDrawer: FC<Props> = ({ data, open, onOpenChange, trigger, refetchQue
 				name: '',
 				type: COUPON_TYPE.FIXED,
 				cadence: COUPON_CADENCE.ONCE,
-				currency: 'USD',
+				currency: 'usd',
 			});
 		}
 	}, [data]);
@@ -122,7 +122,7 @@ const CouponDrawer: FC<Props> = ({ data, open, onOpenChange, trigger, refetchQue
 		{ label: 'Forever', value: COUPON_CADENCE.FOREVER },
 	];
 
-	const currencyOptions: SelectOption[] = [{ label: 'USD', value: 'USD' }];
+	const currencyOptions: SelectOption[] = [{ label: 'USD', value: 'usd' }];
 
 	return (
 		<Sheet

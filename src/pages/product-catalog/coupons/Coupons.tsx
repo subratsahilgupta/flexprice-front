@@ -160,11 +160,6 @@ const CouponsPage = () => {
 		setIsDrawerOpen(true);
 	};
 
-	const handleEditCoupon = (coupon: Coupon) => {
-		setSelectedCoupon(coupon);
-		setIsDrawerOpen(true);
-	};
-
 	// Handle error state
 	if (isError) {
 		toast.error('Error fetching coupons');
@@ -209,7 +204,7 @@ const CouponsPage = () => {
 						onSortChange={setSorts}
 						selectedSorts={sorts}
 					/>
-					<CouponTable data={couponData?.items || []} onEdit={handleEditCoupon} />
+					<CouponTable data={couponData?.items || []} />
 					<Spacer className='!h-4' />
 					<ShortPagination unit='Coupons' totalItems={couponData?.pagination.total ?? 0} />
 				</div>

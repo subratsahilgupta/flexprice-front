@@ -151,6 +151,7 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 					</div>
 				</div>
 				<InvoiceLineItemTable
+					discount={data?.total_discount}
 					title='Order Details'
 					subtotal={data?.subtotal}
 					total={data?.total}
