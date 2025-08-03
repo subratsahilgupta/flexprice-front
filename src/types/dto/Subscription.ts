@@ -1,5 +1,5 @@
-import { LineItem as InvoiceLineItem } from '@/models/Invoice';
-import { BILLING_CYCLE, SUBSCRIPTION_STATUS } from '@/models/Subscription';
+import { INVOICE_CADENCE, LineItem as InvoiceLineItem } from '@/models/Invoice';
+import { BILLING_CYCLE, SUBSCRIPTION_STATUS, SubscriptionPhase } from '@/models/Subscription';
 import { CreditGrant } from '@/models/CreditGrant';
 import { BILLING_PERIOD } from '@/constants/constants';
 import { BILLING_CADENCE } from '@/models/Invoice';
@@ -118,4 +118,31 @@ export interface AddSubscriptionPhasePayload {
 
 export interface ListSubscriptionsResponse extends Pagination {
 	items: Subscription[];
+}
+
+export interface CreateSubscriptionPayload {
+	customer_id: string;
+	billing_cadence: BILLING_CADENCE;
+	billing_period: BILLING_PERIOD;
+	billing_period_count: number;
+	currency: string;
+	invoice_cadence: INVOICE_CADENCE;
+	plan_id: string;
+	start_date: string;
+	end_date: string | null;
+	lookup_key: string;
+	trial_end: string | null;
+	trial_start: string | null;
+	billing_cycle?: BILLING_CYCLE;
+	phases?: SubscriptionPhase[];
+	credit_grants?: CreditGrant[];
+	commitment_amount?: number;
+	overage_factor?: number;
+	override_line_items?: SubscriptionLineItemOverrideRequest[];
+}
+
+export interface SubscriptionLineItemOverrideRequest {
+	price_id: string;
+	quantity?: number;
+	amount?: number;
 }

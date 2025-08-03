@@ -1,17 +1,16 @@
-import { FC, useState } from 'react';
+import { FC, useState, useMemo } from 'react';
 import { ColumnData, FlexpriceTable } from '@/components/molecules';
-import { NormalizedPlan } from '@/utils/models/transformed_plan';
+import { Price } from '@/models/Price';
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 import { FormHeader } from '@/components/atoms';
 import { motion } from 'framer-motion';
 import ChargeValueCell from '@/pages/product-catalog/plans/ChargeValueCell';
 import { capitalize } from 'es-toolkit';
 
-export type ChargesForBillingPeriod = NormalizedPlan['charges'][string][string];
-export type ChargesForBillingPeriodOne = ChargesForBillingPeriod[0];
-
 export interface Props {
-	data: ChargesForBillingPeriod;
+	data: Price[];
+	billingPeriod?: string;
+	currency?: string;
 }
 
 type ChargeTableData = {
@@ -21,14 +20,30 @@ type ChargeTableData = {
 	invoice_cadence: string;
 };
 
-const ChargeTable: FC<Props> = ({ data }) => {
-	const mappedData: ChargeTableData[] = (data ?? []).map((charge) => ({
-		charge: charge.meter_name ? `${charge.meter_name}` : charge.name,
-		quantity: charge.type === 'FIXED' ? '1' : 'pay as you go',
-		price: <ChargeValueCell data={{ ...charge, currency: charge.currency } as any} />,
-		invoice_cadence: charge.invoice_cadence,
-	}));
+const PriceTable: FC<Props> = ({ data, billingPeriod, currency }) => {
 	const [showAllRows, setShowAllRows] = useState(false);
+
+	// Filter prices based on billing period and currency if provided
+	const filteredPrices = useMemo(() => {
+		let filtered = data;
+
+		if (billingPeriod) {
+			filtered = filtered.filter((price) => price.billing_period.toLowerCase() === billingPeriod.toLowerCase());
+		}
+
+		if (currency) {
+			filtered = filtered.filter((price) => price.currency.toLowerCase() === currency.toLowerCase());
+		}
+
+		return filtered;
+	}, [data, billingPeriod, currency]);
+
+	const mappedData: ChargeTableData[] = (filteredPrices ?? []).map((price) => ({
+		charge: price.meter?.name ? `${price.meter.name}` : price.description || 'Charge',
+		quantity: price.type === 'FIXED' ? '1' : 'pay as you go',
+		price: <ChargeValueCell data={{ ...price, currency: price.currency } as any} />,
+		invoice_cadence: price.invoice_cadence,
+	}));
 
 	const columns: ColumnData<ChargeTableData>[] = [
 		{
@@ -86,4 +101,4 @@ const ChargeTable: FC<Props> = ({ data }) => {
 	);
 };
 
-export default ChargeTable;
+export default PriceTable;

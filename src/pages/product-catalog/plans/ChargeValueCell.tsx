@@ -1,5 +1,5 @@
 import { Price } from '@/models/Price';
-import { getPriceTableCharge } from '@/utils/models/transformed_plan';
+import { getPriceTableCharge } from '@/utils/common/price_helpers';
 import { Info } from 'lucide-react';
 import { formatAmount } from '@/components/atoms/Input/Input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';

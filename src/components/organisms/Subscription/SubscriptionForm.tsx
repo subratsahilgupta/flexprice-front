@@ -1,8 +1,8 @@
 import { Select, DatePicker, FormHeader, Label, Toggle } from '@/components/atoms';
-import ChargeTable from '@/components/organisms/Subscription/PriceTable';
+import PriceTable from '@/components/organisms/Subscription/PriceTable';
 import { cn } from '@/lib/utils';
 import { toSentenceCase } from '@/utils/common/helper_functions';
-import { NormalizedPlan } from '@/utils/models/transformed_plan';
+import { ExpandedPlan } from '@/types/plan';
 import { useMemo } from 'react';
 import toast from 'react-hot-toast';
 import CreditGrantTable from '@/components/molecules/CreditGrant/CreditGrantTable';
@@ -73,7 +73,7 @@ const SubscriptionForm = ({
 }: {
 	state: SubscriptionFormState;
 	setState: React.Dispatch<React.SetStateAction<SubscriptionFormState>>;
-	plans: NormalizedPlan[] | undefined;
+	plans: ExpandedPlan[] | undefined;
 	plansLoading: boolean;
 	plansError: boolean;
 	isDisabled: boolean;
@@ -87,19 +87,56 @@ const SubscriptionForm = ({
 		);
 	}, [plans]);
 
+	// Get available billing periods and currencies for the selected plan
+	const selectedPlanData = useMemo(() => {
+		if (!state.selectedPlan || !plans) return null;
+		return plans.find((plan) => plan.id === state.selectedPlan);
+	}, [state.selectedPlan, plans]);
+
+	const availableBillingPeriods = useMemo(() => {
+		if (!selectedPlanData?.prices) return [];
+		const periods = [...new Set(selectedPlanData.prices.map((price) => price.billing_period))];
+		return periods.map((period) => ({
+			label: toSentenceCase(period.replace('_', ' ')),
+			value: period,
+		}));
+	}, [selectedPlanData]);
+
+	const availableCurrencies = useMemo(() => {
+		if (!selectedPlanData?.prices || !state.billingPeriod) return [];
+		const currencies = [
+			...new Set(
+				selectedPlanData.prices
+					.filter((price) => price.billing_period.toLowerCase() === state.billingPeriod.toLowerCase())
+					.map((price) => price.currency),
+			),
+		];
+		return currencies.map((currency) => ({
+			label: currency.toUpperCase(),
+			value: currency,
+		}));
+	}, [selectedPlanData, state.billingPeriod]);
+
 	const handlePlanChange = (value: string) => {
 		const selectedPlan = plans?.find((plan) => plan.id === value);
 
-		if (!selectedPlan?.charges || Object.keys(selectedPlan.charges).length === 0) {
-			toast.error('Invalid plan or no charges available.');
+		if (!selectedPlan?.prices || selectedPlan.prices.length === 0) {
+			toast.error('Invalid plan or no prices available.');
 			return;
 		}
 
-		// reset phases
-		const billingPeriods = Object.keys(selectedPlan.charges);
+		// Get available billing periods
+		const billingPeriods = [...new Set(selectedPlan.prices.map((price) => price.billing_period))];
 		const defaultBillingPeriod = billingPeriods.includes(state.billingPeriod) ? state.billingPeriod : billingPeriods[0];
 
-		const currencies = Object.keys(selectedPlan.charges[defaultBillingPeriod] || {});
+		// Get available currencies for the default billing period
+		const currencies = [
+			...new Set(
+				selectedPlan.prices
+					.filter((price) => price.billing_period.toLowerCase() === defaultBillingPeriod.toLowerCase())
+					.map((price) => price.currency),
+			),
+		];
 		const defaultCurrency = currencies.includes(state.currency) ? state.currency : currencies[0];
 
 		// Create a new phase with the default values
@@ -126,12 +163,17 @@ const SubscriptionForm = ({
 
 	const handleBillingPeriodChange = (value: string) => {
 		const selectedPlan = state.prices;
-		if (!selectedPlan?.charges[value]) {
+		if (!selectedPlan?.prices) {
 			toast.error('Invalid billing period.');
 			return;
 		}
 
-		const currencies = Object.keys(selectedPlan.charges[value]);
+		// Get available currencies for the new billing period
+		const currencies = [
+			...new Set(
+				selectedPlan.prices.filter((price) => price.billing_period.toLowerCase() === value.toLowerCase()).map((price) => price.currency),
+			),
+		];
 		const defaultCurrency = currencies.includes(state.currency) ? state.currency : currencies[0];
 
 		// reset phases
@@ -413,6 +455,7 @@ const SubscriptionForm = ({
 		}
 		return [];
 	}, [selectedPlanCreditGrants, state.selectedPlan]);
+
 	return (
 		<div className='p-4 rounded-lg border border-gray-300 space-y-4'>
 			<FormHeader title='Subscription Details' variant='sub-header' />
@@ -429,11 +472,11 @@ const SubscriptionForm = ({
 				/>
 			)}
 
-			{state.selectedPlan && state.billingPeriodOptions.length > 0 && (
+			{state.selectedPlan && availableBillingPeriods.length > 0 && (
 				<Select
-					key={state.billingPeriodOptions.map((opt) => opt.value).join(',')}
+					key={availableBillingPeriods.map((opt) => opt.value).join(',')}
 					value={state.billingPeriod}
-					options={state.billingPeriodOptions}
+					options={availableBillingPeriods}
 					onChange={handleBillingPeriodChange}
 					label='Billing Period*'
 					disabled={isDisabled}
@@ -441,14 +484,11 @@ const SubscriptionForm = ({
 				/>
 			)}
 
-			{state.selectedPlan && state.prices?.charges[state.billingPeriod] && (
+			{state.selectedPlan && availableCurrencies.length > 0 && (
 				<Select
-					key={Object.keys(state.prices.charges[state.billingPeriod]).join(',')}
+					key={availableCurrencies.map((opt) => opt.value).join(',')}
 					value={state.currency}
-					options={Object.keys(state.prices.charges[state.billingPeriod]).map((currency) => ({
-						label: currency.toUpperCase(),
-						value: currency,
-					}))}
+					options={availableCurrencies}
 					onChange={(value) => setState((prev) => ({ ...prev, currency: value }))}
 					label='Select Currency*'
 					placeholder='Select currency'
@@ -459,12 +499,6 @@ const SubscriptionForm = ({
 			{/* Subscription Phases Section */}
 			{state.selectedPlan && (
 				<div className='space-y-3 mt-4 pt-3 border-t border-gray-200'>
-					{/* {state.phases.length > 0 && (
-						<div className='flex items-center justify-between mb-2'>
-							<Label label='Subscription Phases' />
-						</div>
-					)} */}
-
 					{/* Map through phases and conditionally render edit or preview */}
 					{state.phases.map((phase, index) => {
 						const isSelected = index === state.selectedPhase;
@@ -479,7 +513,7 @@ const SubscriptionForm = ({
 									{/* charges */}
 									{state.prices && state.selectedPlan && state.billingPeriod && state.currency && (
 										<div className='mb-2'>
-											<ChargeTable data={state.prices.charges[state.billingPeriod][state.currency]} />
+											<PriceTable data={state.prices.prices || []} billingPeriod={state.billingPeriod} currency={state.currency} />
 										</div>
 									)}
 
@@ -540,48 +574,6 @@ const SubscriptionForm = ({
 											onChange={(value) => setState((prev) => ({ ...prev, prorate_charges: value }))}
 										/>
 									</div>
-
-									{/* <div className='mt-4 flex items-center gap-2'>
-										<span>
-											<Input
-												placeholder='1200'
-												value={phase.commitment_amount?.toString() ?? ''}
-												variant='formatted-number'
-												label='Commitment Amount'
-												inputPrefix={getCurrencySymbol(state.currency)}
-												onChange={(e) => {
-													updatePhase(index, {
-														commitment_amount: e as any,
-													});
-												}}
-											/>
-										</span>
-										<span>
-											<Input
-												placeholder='1.3'
-												value={phase.overage_factor?.toString() ?? ''}
-												variant='number'
-												label='Overage Factor'
-												onChange={(e) => {
-													updatePhase(index, {
-														overage_factor: e as any,
-													});
-												}}
-											/>
-										</span>
-									</div> */}
-
-									{/* Save/Cancel Buttons - only show when editing and there's more than one phase */}
-									{/* {!isDisabled && state.phases.length > 1 && (
-										<div className='flex items-center justify-end space-x-3 mt-3 pt-3'>
-											<Button variant='outline' onClick={cancelPhaseEditing} className='min-w-[80px] text-sm py-1 px-3'>
-												Cancel
-											</Button>
-											<Button onClick={savePhaseChanges} className='min-w-[80px] text-sm py-1 px-3'>
-												Save
-											</Button>
-										</div>
-									)} */}
 								</div>
 							);
 						}
@@ -614,20 +606,6 @@ const SubscriptionForm = ({
 							</div>
 						);
 					})}
-
-					{/* Add Phase Button - always show but disable when editing except if only 1 phase*/}
-					{/* {!isDisabled && (
-						<div className='flex justify-center mt-6'>
-							<AddButton
-								size='sm'
-								label='Add Phase'
-								variant='outline'
-								onClick={addPhase}
-								disabled={state.isPhaseEditing && state.phases.length > 1}
-								className='w-full text-sm py-1.5'
-							/>
-						</div>
-					)} */}
 				</div>
 			)}
 		</div>
