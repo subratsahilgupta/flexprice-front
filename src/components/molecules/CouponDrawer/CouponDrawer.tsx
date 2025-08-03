@@ -1,4 +1,4 @@
-import { Button, Input, Sheet, Spacer, Textarea, Select, SelectOption } from '@/components/atoms';
+import { Button, Input, Sheet, Spacer, Textarea, Select, SelectOption, DatePicker } from '@/components/atoms';
 import { Coupon } from '@/models/Coupon';
 import { FC, useEffect, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
@@ -97,6 +97,16 @@ const CouponDrawer: FC<Props> = ({ data, open, onOpenChange, trigger, refetchQue
 		// Validate duration_in_periods for repeated cadence
 		if (formData.cadence === COUPON_CADENCE.REPEATED && !formData.duration_in_periods) {
 			newErrors.duration_in_periods = 'Duration in periods is required for repeated cadence';
+		}
+
+		// Validate date fields
+		if (formData.redeem_after && formData.redeem_before) {
+			const redeemAfter = new Date(formData.redeem_after);
+			const redeemBefore = new Date(formData.redeem_before);
+
+			if (redeemAfter >= redeemBefore) {
+				newErrors.redeem_before = 'Redeem before date must be after redeem after date';
+			}
 		}
 
 		setErrors(newErrors);
@@ -204,6 +214,30 @@ const CouponDrawer: FC<Props> = ({ data, open, onOpenChange, trigger, refetchQue
 				error={errors.cadence}
 				description='How often this coupon can be used'
 			/>
+
+			<Spacer height={'20px'} />
+			<div>
+				<DatePicker
+					label='Redeem After (Optional)'
+					date={formData.redeem_after ? new Date(formData.redeem_after) : undefined}
+					setDate={(date) => setFormData({ ...formData, redeem_after: date?.toISOString() })}
+					placeholder='Select start date'
+				/>
+				<p className='text-xs text-muted-foreground mt-1'>When the coupon becomes valid</p>
+				{errors.redeem_after && <p className='text-xs text-red-500 mt-1'>{errors.redeem_after}</p>}
+			</div>
+
+			<Spacer height={'20px'} />
+			<div>
+				<DatePicker
+					label='Redeem Before (Optional)'
+					date={formData.redeem_before ? new Date(formData.redeem_before) : undefined}
+					setDate={(date) => setFormData({ ...formData, redeem_before: date?.toISOString() })}
+					placeholder='Select expiry date'
+				/>
+				<p className='text-xs text-muted-foreground mt-1'>When the coupon expires</p>
+				{errors.redeem_before && <p className='text-xs text-red-500 mt-1'>{errors.redeem_before}</p>}
+			</div>
 
 			<Spacer height={'20px'} />
 			<Input

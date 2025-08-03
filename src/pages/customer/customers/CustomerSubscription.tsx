@@ -14,6 +14,7 @@ import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ApiDocsContent, CouponModal } from '@/components/molecules';
+import { Trash2 } from 'lucide-react';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { RouteNames } from '@/core/routes/Routes';
 import { BILLING_CYCLE, SubscriptionPhase } from '@/models/Subscription';
@@ -24,6 +25,8 @@ import { uniqueId } from 'lodash';
 import SubscriptionForm from '@/components/organisms/Subscription/SubscriptionForm';
 import { getLineItemOverrides } from '@/utils/common/price_override_helpers';
 import { Coupon } from '@/models/Coupon';
+import formatCouponName from '@/utils/common/format_coupon_name';
+import filterValidCoupons from '@/utils/helpers/coupons';
 
 type Params = {
 	id: string;
@@ -54,7 +57,7 @@ export type SubscriptionFormState = {
 	priceOverrides: Record<string, string>;
 
 	// Coupons
-	linkedCoupons: Coupon[];
+	linkedCoupon: Coupon | null;
 };
 
 // Data Fetching Hooks
@@ -106,7 +109,7 @@ const useAvailableCoupons = () => {
 		queryKey: ['availableCoupons'],
 		queryFn: async () => {
 			const response = await CouponApi.getAllCoupons({ limit: 1000, offset: 0 });
-			return response.items;
+			return filterValidCoupons(response.items);
 		},
 	});
 };
@@ -135,15 +138,15 @@ const CustomerSubscription: React.FC = () => {
 		isPhaseEditing: false,
 		originalPhases: [],
 		priceOverrides: {},
-		linkedCoupons: [],
+		linkedCoupon: null,
 	});
 
 	const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
 
 	const handleCouponSelect = (couponId: string) => {
 		const coupon = availableCoupons.find((c) => c.id === couponId);
-		if (coupon && !subscriptionState.linkedCoupons.some((c) => c.id === couponId)) {
-			setSubscriptionState((prev) => ({ ...prev, linkedCoupons: [...prev.linkedCoupons, coupon] }));
+		if (coupon) {
+			setSubscriptionState((prev) => ({ ...prev, linkedCoupon: coupon }));
 		}
 		setIsCouponModalOpen(false);
 	};
@@ -188,7 +191,7 @@ const CustomerSubscription: React.FC = () => {
 					isPhaseEditing: false,
 					originalPhases: [initialPhase as SubscriptionPhase],
 					priceOverrides: {},
-					linkedCoupons: [],
+					linkedCoupon: null,
 				});
 			}
 		}
@@ -214,7 +217,7 @@ const CustomerSubscription: React.FC = () => {
 	});
 
 	const handleSubscriptionSubmit = () => {
-		const { billingPeriod, selectedPlan, currency, phases, priceOverrides, prices, linkedCoupons } = subscriptionState;
+		const { billingPeriod, selectedPlan, currency, phases, priceOverrides, prices, linkedCoupon } = subscriptionState;
 
 		if (!billingPeriod || !selectedPlan) {
 			toast.error('Please select a plan and billing period.');
@@ -293,7 +296,7 @@ const CustomerSubscription: React.FC = () => {
 			credit_grants: (firstPhase.credit_grants?.length ?? 0 > 0) ? firstPhase.credit_grants : undefined,
 			commitment_amount: firstPhase.commitment_amount,
 			override_line_items: overrideLineItems.length > 0 ? overrideLineItems : undefined,
-			subscription_coupons: linkedCoupons.length > 0 ? linkedCoupons.map((coupon) => coupon.id) : undefined,
+			subscription_coupons: linkedCoupon ? [linkedCoupon.id] : undefined,
 
 			// TODO: remove this once the feature is released
 			overage_factor: firstPhase.overage_factor ?? 1,
@@ -328,37 +331,37 @@ const CustomerSubscription: React.FC = () => {
 				{subscriptionState.selectedPlan && (
 					<div className='space-y-4'>
 						<div className='flex items-center justify-between'>
-							<h3 className='text-lg font-medium'>Linked Coupons</h3>
-							<Button onClick={() => setIsCouponModalOpen(true)} variant='outline' size='sm'>
-								Add Coupon
-							</Button>
+							<h3 className='text-lg font-medium'>Add Coupon</h3>
+							{!subscriptionState.linkedCoupon && (
+								<Button onClick={() => setIsCouponModalOpen(true)} variant='outline' size='sm'>
+									Add Coupon
+								</Button>
+							)}
 						</div>
-						{subscriptionState.linkedCoupons.length > 0 ? (
-							<div className='space-y-2'>
-								{subscriptionState.linkedCoupons.map((coupon) => (
-									<div key={coupon.id} className='flex items-center justify-between p-3 border rounded-lg'>
-										<div>
-											<p className='font-medium'>{coupon.name}</p>
-											<p className='text-sm text-gray-500'>
-												{coupon.type === 'fixed' ? `$${coupon.amount_off}` : `${coupon.percentage_off}%`} off
-											</p>
-										</div>
-										<Button
-											onClick={() => {
-												setSubscriptionState((prev) => ({
-													...prev,
-													linkedCoupons: prev.linkedCoupons.filter((c) => c.id !== coupon.id),
-												}));
-											}}
-											variant='ghost'
-											size='sm'>
-											Remove
-										</Button>
-									</div>
-								))}
+						{subscriptionState.linkedCoupon ? (
+							<div className='flex items-center gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg'>
+								<div className='w-2 h-2 bg-blue-500 rounded-full'></div>
+								<div className='flex-1'>
+									<p className='text-sm text-[#09090B]'>
+										<span className='font-semibold'>{subscriptionState.linkedCoupon.name}</span>
+										<span className='text-[#71717A] font-medium'> - {formatCouponName(subscriptionState.linkedCoupon)}</span>
+									</p>
+								</div>
+								<Button
+									onClick={() => {
+										setSubscriptionState((prev) => ({
+											...prev,
+											linkedCoupon: null,
+										}));
+									}}
+									variant='ghost'
+									size='sm'
+									className='h-8 w-8 p-0 hover:bg-blue-200 hover:text-blue-600'>
+									<Trash2 className='h-4 w-4' />
+								</Button>
 							</div>
 						) : (
-							<p className='text-sm text-gray-500'>No coupons linked</p>
+							<p className='text-sm text-[#71717A]'>No coupon linked</p>
 						)}
 					</div>
 				)}
@@ -396,7 +399,7 @@ const CustomerSubscription: React.FC = () => {
 							}
 							selectedPlan={subscriptionState.prices}
 							phases={subscriptionState.phases}
-							coupons={subscriptionState.linkedCoupons}
+							coupons={subscriptionState.linkedCoupon ? [subscriptionState.linkedCoupon] : []}
 						/>
 					)}
 				</div>

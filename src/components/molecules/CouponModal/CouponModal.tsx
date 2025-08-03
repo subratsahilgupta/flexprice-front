@@ -1,7 +1,7 @@
 import { Button, Select, SelectOption } from '@/components/atoms';
 import Dialog from '@/components/atoms/Dialog';
 import { Coupon } from '@/models/Coupon';
-import { COUPON_TYPE } from '@/types/common/Coupon';
+import formatCouponName from '@/utils/common/format_coupon_name';
 import { useState, useCallback } from 'react';
 
 interface Props {
@@ -67,7 +67,7 @@ const CouponModal: React.FC<Props> = ({ isOpen, onOpenChange, onSave, onCancel, 
 	const couponOptions: SelectOption[] = coupons.map((coupon) => ({
 		label: coupon.name,
 		value: coupon.id,
-		description: `${coupon.type === COUPON_TYPE.FIXED ? `$${coupon.amount_off}` : `${coupon.percentage_off}%`} off`,
+		description: formatCouponName(coupon),
 	}));
 
 	return (

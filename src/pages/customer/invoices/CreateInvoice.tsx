@@ -11,11 +11,12 @@ import { formatDateShort, getCurrencySymbol, calculateCouponDiscount } from '@/u
 import InvoiceApi from '@/api/InvoiceApi';
 import toast from 'react-hot-toast';
 import { RouteNames } from '@/core/routes/Routes';
-import { Trash2, X } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { AddChargesButton } from '@/components/organisms/PlanForm/SetupChargesSection';
 import { InvoiceType, PAYMENT_STATUS } from '@/constants';
 import { Coupon } from '@/models/Coupon';
-import { COUPON_TYPE } from '@/types/common/Coupon';
+import formatCouponName from '@/utils/common/format_coupon_name';
+import filterValidCoupons from '@/utils/helpers/coupons';
 
 interface LineItem {
 	display_name: string;
@@ -36,7 +37,7 @@ const CreateInvoicePage: FC = () => {
 		queryKey: ['availableCoupons'],
 		queryFn: async () => {
 			const response = await CouponApi.getAllCoupons({ limit: 1000, offset: 0 });
-			return response.items;
+			return filterValidCoupons(response.items);
 		},
 	});
 
@@ -50,8 +51,7 @@ const CreateInvoicePage: FC = () => {
 			amount: '0',
 		},
 	]);
-	const [selectedCoupons, setSelectedCoupons] = useState<Coupon[]>([]);
-	const [selectedCouponId, setSelectedCouponId] = useState<string>('');
+	const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null);
 	const [calculatedDiscount, setCalculatedDiscount] = useState<number>(0);
 	const [finalTotal, setFinalTotal] = useState<number>(0);
 
@@ -65,14 +65,14 @@ const CreateInvoicePage: FC = () => {
 		}
 	}, [customer, updateBreadcrumb]);
 
-	// Recalculate discounts whenever line items or coupons change
+	// Recalculate discounts whenever line items or coupon change
 	useEffect(() => {
 		const subtotal = calculateSubtotal();
-		const totalDiscount = calculateTotalDiscount();
+		const discount = selectedCoupon ? calculateCouponDiscount(selectedCoupon, subtotal) : 0;
 
-		setCalculatedDiscount(totalDiscount);
-		setFinalTotal(subtotal);
-	}, [lineItems, selectedCoupons]);
+		setCalculatedDiscount(discount);
+		setFinalTotal(Math.max(0, subtotal - discount));
+	}, [lineItems, selectedCoupon]);
 
 	const handleAddLineItem = () => {
 		setLineItems([
@@ -105,30 +105,20 @@ const CreateInvoicePage: FC = () => {
 		}, 0);
 	};
 
-	const calculateTotalDiscount = () => {
-		const subtotal = calculateSubtotal();
-		return selectedCoupons.reduce((total, coupon) => {
-			return total + calculateCouponDiscount(coupon, subtotal);
-		}, 0);
-	};
+	const handleCouponSelect = (couponId: string) => {
+		if (!couponId) {
+			setSelectedCoupon(null);
+			return;
+		}
 
-	// Memoize individual coupon discounts for display optimization
-	const getCouponDiscount = (coupon: Coupon) => {
-		return calculateCouponDiscount(coupon, calculateSubtotal());
-	};
-
-	const handleAddCoupon = () => {
-		if (!selectedCouponId) return;
-
-		const coupon = availableCoupons.find((c) => c.id === selectedCouponId);
-		if (coupon && !selectedCoupons.some((c) => c.id === selectedCouponId)) {
-			setSelectedCoupons([...selectedCoupons, coupon]);
-			setSelectedCouponId('');
+		const coupon = availableCoupons.find((c) => c.id === couponId);
+		if (coupon) {
+			setSelectedCoupon(coupon);
 		}
 	};
 
-	const handleRemoveCoupon = (couponId: string) => {
-		setSelectedCoupons(selectedCoupons.filter((c) => c.id !== couponId));
+	const handleRemoveCoupon = () => {
+		setSelectedCoupon(null);
 	};
 
 	const { mutate: createInvoice, isPending } = useMutation({
@@ -153,7 +143,7 @@ const CreateInvoicePage: FC = () => {
 				total: finalTotal,
 				subtotal: calculateSubtotal(),
 				billing_reason: 'manual',
-				coupons: selectedCoupons.map((c) => c.id),
+				coupons: selectedCoupon ? [selectedCoupon.id] : [],
 				metadata: {},
 			});
 		},
@@ -299,59 +289,47 @@ const CreateInvoicePage: FC = () => {
 						<FormHeader title='Coupons' variant='sub-header' titleClassName='font-semibold' />
 
 						<div className='mt-6'>
-							{/* Applied Coupons Display */}
-							{selectedCoupons.map((coupon) => (
-								<div key={coupon.id} className='flex gap-4 mb-4 items-center'>
-									<div className='flex-1 flex items-center gap-3 py-2'>
-										<div className='w-2 h-2 bg-green-500 rounded-full'></div>
-										<div className='flex-1'>
-											<p className='text-sm font-medium text-[#09090B]'>{coupon.name}</p>
-											<p className='text-xs text-[#71717A]'>
-												{coupon.type === COUPON_TYPE.FIXED
-													? `${getCurrencySymbol(currency)}${coupon.amount_off} discount`
-													: `${coupon.percentage_off}% discount`}
-											</p>
-										</div>
+							{/* Selected Coupon Display */}
+							{selectedCoupon ? (
+								<div className='flex items-center gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg'>
+									<div className='w-2 h-2 bg-blue-500 rounded-full'></div>
+									<div className='flex-1'>
+										<p className='text-sm text-[#09090B]'>
+											<span className='font-semibold'>{selectedCoupon.name}</span>
+											<span className='text-[#71717A] font-medium'> - {formatCouponName(selectedCoupon)}</span>
+										</p>
 									</div>
 									<div className='min-w-[100px] text-right'>
-										<span className='text-sm font-medium text-green-600'>
+										<span className='text-sm font-medium text-blue-600'>
 											-{getCurrencySymbol(currency)}
-											{getCouponDiscount(coupon).toFixed(2)}
+											{calculatedDiscount.toFixed(2)}
 										</span>
 									</div>
-									<Button onClick={() => handleRemoveCoupon(coupon.id)} variant='outline' className='size-[42px]'>
-										<X className='w-4 h-4' />
+									<Button
+										onClick={handleRemoveCoupon}
+										variant='ghost'
+										size='sm'
+										className='h-8 w-8 p-0 hover:bg-blue-200 hover:text-blue-600'>
+										<Trash2 className='h-4 w-4' />
 									</Button>
 								</div>
-							))}
-
-							{/* Add Coupon Row */}
-							{availableCoupons.filter((coupon) => !selectedCoupons.some((selected) => selected.id === coupon.id)).length > 0 && (
+							) : (
 								<div className='flex gap-4 mb-4 items-end'>
 									<Select
-										label={selectedCoupons.length === 0 ? 'Select Coupon' : ''}
-										value={selectedCouponId}
-										onChange={setSelectedCouponId}
-										options={availableCoupons
-											.filter((coupon) => !selectedCoupons.some((selected) => selected.id === coupon.id))
-											.map((coupon) => ({
-												value: coupon.id,
-												label: coupon.name,
-												description: `${coupon.type === COUPON_TYPE.FIXED ? `${getCurrencySymbol(currency)}${coupon.amount_off}` : `${coupon.percentage_off}%`} off`,
-											}))}
-										placeholder={selectedCoupons.length === 0 ? 'Choose a coupon' : 'Add another coupon'}
+										label=''
+										value=''
+										onChange={handleCouponSelect}
+										options={availableCoupons.map((coupon) => ({
+											value: coupon.id,
+											label: coupon.name,
+											description: formatCouponName(coupon),
+										}))}
+										placeholder='Choose a coupon'
 									/>
 									<div className='min-w-[100px]'></div>
-									<Button onClick={handleAddCoupon} disabled={!selectedCouponId} variant='outline' className='size-[42px]'>
-										{selectedCoupons.length === 0 ? 'Add' : '+'}
-									</Button>
+									<div className='size-[42px]'></div>
 								</div>
 							)}
-
-							{availableCoupons.filter((coupon) => !selectedCoupons.some((selected) => selected.id === coupon.id)).length === 0 &&
-								selectedCoupons.length > 0 && (
-									<p className='text-xs text-[#71717A] text-center py-4'>All available coupons have been applied</p>
-								)}
 						</div>
 
 						<div className='flex justify-end mt-8'>
@@ -373,7 +351,7 @@ const CreateInvoicePage: FC = () => {
 								<div className='border-t'></div>
 								<div className='flex justify-between font-bold'>
 									<span>Total Amount</span>
-									<span>{`${getCurrencySymbol(currency)}${(calculateSubtotal() - calculatedDiscount).toFixed(2)}`}</span>
+									<span>{`${getCurrencySymbol(currency)}${finalTotal.toFixed(2)}`}</span>
 								</div>
 							</div>
 						</div>

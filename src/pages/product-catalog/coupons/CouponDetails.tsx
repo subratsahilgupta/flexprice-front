@@ -1,18 +1,17 @@
-import { Page, Spacer, Button, Chip, Card, CardHeader, Loader } from '@/components/atoms';
+import { Page, Spacer, Chip, Card, CardHeader, Loader } from '@/components/atoms';
 import { Detail, ApiDocsContent } from '@/components/molecules';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import CouponApi from '@/api/CouponApi';
 import { COUPON_TYPE } from '@/types/common/Coupon';
 import formatChips from '@/utils/common/format_chips';
 import formatDate from '@/utils/common/format_date';
 import toast from 'react-hot-toast';
-import { ArrowLeft } from 'lucide-react';
-import { ENTITY_STATUS } from '@/models/base';
+import formatCadenceChip from '@/utils/common/format_cadence_chip';
+import { getCurrencySymbol } from '@/utils/common/helper_functions';
 
 const CouponDetails = () => {
 	const { id } = useParams<{ id: string }>();
-	const navigate = useNavigate();
 
 	const {
 		data: coupon,
@@ -46,11 +45,14 @@ const CouponDetails = () => {
 		},
 		{
 			label: 'Discount',
-			value: coupon.type === COUPON_TYPE.FIXED ? `${coupon.currency} ${coupon.amount_off || '0.00'}` : `${coupon.percentage_off || '0'}%`,
+			value:
+				coupon.type === COUPON_TYPE.FIXED
+					? `${getCurrencySymbol(coupon.currency)} ${coupon.amount_off || '0.00'}`
+					: `${coupon.percentage_off || '0'}%`,
 		},
 		{
 			label: 'Cadence',
-			value: coupon.cadence ? <Chip variant='default' label={formatChips(coupon.cadence)} /> : 'Not set',
+			value: coupon.cadence ? <Chip variant='default' label={formatCadenceChip(coupon.cadence)} /> : 'Not set',
 		},
 		{
 			label: 'Status',
@@ -80,14 +82,6 @@ const CouponDetails = () => {
 			label: 'Updated At',
 			value: formatDate(coupon.updated_at),
 		},
-		{
-			label: 'Created By',
-			value: coupon.created_by,
-		},
-		{
-			label: 'Updated By',
-			value: coupon.updated_by,
-		},
 	];
 
 	if (coupon.metadata && Object.keys(coupon.metadata).length > 0) {
@@ -98,22 +92,7 @@ const CouponDetails = () => {
 	}
 
 	return (
-		<Page
-			heading={coupon.name}
-			headingCTA={
-				<div className='flex items-center gap-2'>
-					<Button variant='outline' onClick={() => navigate('/coupons')} className='flex gap-2'>
-						<ArrowLeft className='h-4 w-4' />
-						Back to Coupons
-					</Button>
-					<Button
-						disabled={coupon.status === ENTITY_STATUS.ARCHIVED}
-						onClick={() => navigate(`/coupons/edit/${id}`)}
-						className='flex gap-2'>
-						Edit Coupon
-					</Button>
-				</div>
-			}>
+		<Page heading={coupon.name}>
 			<ApiDocsContent tags={['Coupons']} />
 
 			<Spacer className='!h-6' />
