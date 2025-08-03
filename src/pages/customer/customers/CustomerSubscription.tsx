@@ -7,7 +7,7 @@ import CustomerApi from '@/api/CustomerApi';
 import { PlanApi } from '@/api/PlanApi';
 import SubscriptionApi from '@/api/SubscriptionApi';
 import { toSentenceCase } from '@/utils/common/helper_functions';
-import { NormalizedPlan, normalizePlan } from '@/utils/models/transformed_plan';
+import { ExpandedPlan } from '@/types/plan';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
@@ -16,11 +16,12 @@ import { ApiDocsContent } from '@/components/molecules';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { RouteNames } from '@/core/routes/Routes';
 import { BILLING_CYCLE, SubscriptionPhase } from '@/models/Subscription';
-import { CreateCustomerSubscriptionPayload } from '@/types/dto';
+import { CreateSubscriptionPayload } from '@/types/dto/Subscription';
 import { BILLING_CADENCE, INVOICE_CADENCE } from '@/models/Invoice';
 import { BILLING_PERIOD } from '@/constants/constants';
 import { uniqueId } from 'lodash';
 import SubscriptionForm from '@/components/organisms/Subscription/SubscriptionForm';
+import { getLineItemOverrides } from '@/utils/common/price_override_helpers';
 
 type Params = {
 	id: string;
@@ -35,7 +36,7 @@ export enum SubscriptionPhaseState {
 
 export type SubscriptionFormState = {
 	selectedPlan: string;
-	prices: NormalizedPlan | null;
+	prices: ExpandedPlan | null;
 	billingPeriod: BILLING_PERIOD;
 	currency: string;
 	billingPeriodOptions: SelectOption[];
@@ -46,6 +47,9 @@ export type SubscriptionFormState = {
 	phaseStates: SubscriptionPhaseState[];
 	isPhaseEditing: boolean;
 	originalPhases: SubscriptionPhase[];
+
+	// Price Overrides
+	priceOverrides: Record<string, string>;
 };
 
 // Data Fetching Hooks
@@ -56,19 +60,9 @@ const usePlans = () => {
 			const plansResponse = await PlanApi.getActiveExpandedPlan({ limit: 1000, offset: 0 });
 
 			try {
-				const normalizedPlans = plansResponse.map((plan) => {
-					try {
-						const normalized = normalizePlan(plan);
-						return normalized;
-					} catch (planError) {
-						const error = planError as Error;
-						throw error;
-					}
-				});
-
-				const filteredPlans = normalizedPlans.filter((plan) => {
-					const hasCharges = Object.keys(plan.charges).length > 0;
-					return hasCharges;
+				const filteredPlans = plansResponse.filter((plan) => {
+					const hasPrices = plan.prices && plan.prices.length > 0;
+					return hasPrices;
 				});
 
 				return filteredPlans;
@@ -124,6 +118,7 @@ const CustomerSubscription: React.FC = () => {
 		phaseStates: [],
 		isPhaseEditing: false,
 		originalPhases: [],
+		priceOverrides: {},
 	});
 
 	// Update breadcrumb when customer data changes
@@ -148,12 +143,15 @@ const CustomerSubscription: React.FC = () => {
 					prorate_charges: false,
 				};
 
+				// Get available billing periods and currencies
+				const billingPeriods = [...new Set(planDetails.prices?.map((price) => price.billing_period) || [])];
+
 				setSubscriptionState({
 					selectedPlan: subscriptionData.details.plan_id,
 					prices: planDetails,
 					billingPeriod: subscriptionData.details.billing_period.toLowerCase() as BILLING_PERIOD,
 					currency: subscriptionData.details.currency,
-					billingPeriodOptions: Object.keys(planDetails.charges).map((period) => ({
+					billingPeriodOptions: billingPeriods.map((period) => ({
 						label: toSentenceCase(period.replace('_', ' ')),
 						value: period,
 					})),
@@ -162,6 +160,7 @@ const CustomerSubscription: React.FC = () => {
 					phaseStates: [SubscriptionPhaseState.SAVED],
 					isPhaseEditing: false,
 					originalPhases: [initialPhase as SubscriptionPhase],
+					priceOverrides: {},
 				});
 			}
 		}
@@ -170,8 +169,8 @@ const CustomerSubscription: React.FC = () => {
 	// Create subscription mutation
 	const { mutate: createSubscription, isPending: isCreating } = useMutation({
 		mutationKey: ['createSubscription'],
-		mutationFn: async (data: CreateCustomerSubscriptionPayload) => {
-			return await CustomerApi.createCustomerSubscription(data);
+		mutationFn: async (data: CreateSubscriptionPayload) => {
+			return await SubscriptionApi.createSubscription(data);
 		},
 		onSuccess: async () => {
 			toast.success('Subscription created successfully');
@@ -187,7 +186,7 @@ const CustomerSubscription: React.FC = () => {
 	});
 
 	const handleSubscriptionSubmit = () => {
-		const { billingPeriod, selectedPlan, currency, phases } = subscriptionState;
+		const { billingPeriod, selectedPlan, currency, phases, priceOverrides, prices } = subscriptionState;
 
 		if (!billingPeriod || !selectedPlan) {
 			toast.error('Please select a plan and billing period.');
@@ -217,6 +216,14 @@ const CustomerSubscription: React.FC = () => {
 			return;
 		}
 
+		// Get price overrides for backend
+		const currentPrices =
+			prices?.prices?.filter(
+				(price) =>
+					price.billing_period.toLowerCase() === billingPeriod.toLowerCase() && price.currency.toLowerCase() === currency.toLowerCase(),
+			) || [];
+		const overrideLineItems = getLineItemOverrides(currentPrices, priceOverrides);
+
 		// TODO: Remove this once the feature is released
 		const tempSubscriptionId = uniqueId('tempsubscription_');
 		const sanitizedPhases = phases.map((phase) => {
@@ -238,7 +245,7 @@ const CustomerSubscription: React.FC = () => {
 		});
 		const firstPhase = sanitizedPhases[0];
 
-		const payload: CreateCustomerSubscriptionPayload = {
+		const payload: CreateSubscriptionPayload = {
 			billing_cadence: BILLING_CADENCE.RECURRING,
 			billing_period: billingPeriod.toUpperCase() as BILLING_PERIOD,
 			billing_period_count: 1,
@@ -257,6 +264,7 @@ const CustomerSubscription: React.FC = () => {
 			phases: sanitizedPhases.length > 1 ? sanitizedPhases : undefined,
 			credit_grants: (firstPhase.credit_grants?.length ?? 0 > 0) ? firstPhase.credit_grants : undefined,
 			commitment_amount: firstPhase.commitment_amount,
+			override_line_items: overrideLineItems.length > 0 ? overrideLineItems : undefined,
 
 			// TODO: remove this once the feature is released
 			overage_factor: firstPhase.overage_factor ?? 1,
@@ -304,7 +312,13 @@ const CustomerSubscription: React.FC = () => {
 				<div className='sticky top-6'>
 					{showPreview && (
 						<Preview
-							data={subscriptionState.prices?.charges[subscriptionState.billingPeriod][subscriptionState.currency] ?? []}
+							data={
+								subscriptionState.prices?.prices?.filter(
+									(price) =>
+										price.billing_period.toLowerCase() === subscriptionState.billingPeriod.toLowerCase() &&
+										price.currency.toLowerCase() === subscriptionState.currency.toLowerCase(),
+								) || []
+							}
 							selectedPlan={subscriptionState.prices}
 							phases={subscriptionState.phases}
 						/>

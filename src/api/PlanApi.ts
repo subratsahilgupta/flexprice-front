@@ -1,7 +1,7 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import { Plan } from '@/models/Plan';
 import { Pagination } from '@/models/Pagination';
-import { ExpandedPlan } from '@/utils/models/transformed_plan';
+import { ExpandedPlan } from '@/types/plan';
 import { generateQueryParams } from '@/utils/common/api_helper';
 import { GetPlanCreditGrantsResponse, SynchronizePlanPricesWithSubscriptionResponse } from '@/types/dto/Plan';
 import { TypedBackendFilter, TypedBackendSort } from '@/types/formatters/QueryBuilder';

@@ -1,4 +1,4 @@
-import { ChargesForBillingPeriodOne } from './PriceTable';
+import { Price } from '@/models/Price';
 import { useMemo } from 'react';
 import { formatBillingPeriodForDisplay, getTotalPayableText } from '@/utils/common/helper_functions';
 import { BILLING_PERIOD } from '@/constants/constants';
@@ -8,6 +8,7 @@ import { calculateAnniversaryBillingAnchor, calculateCalendarBillingAnchor } fro
 import { cn } from '@/lib/utils';
 import { Calendar, Receipt } from 'lucide-react';
 import TimelinePreview, { PreviewTimelineItem } from './TimelinePreview';
+import { ExpandedPlan } from '@/types/plan';
 
 const PERIOD_DURATION: Record<BILLING_PERIOD, string> = {
 	[BILLING_PERIOD.DAILY]: '1 day',
@@ -19,13 +20,9 @@ const PERIOD_DURATION: Record<BILLING_PERIOD, string> = {
 } as const;
 
 interface PreviewProps {
-	data: ChargesForBillingPeriodOne[];
+	data: Price[];
 	className?: string;
-	selectedPlan?: {
-		charges: Record<string, Record<string, Array<ChargesForBillingPeriodOne & { invoice_cadence?: string }>>>;
-		id: string;
-		name: string;
-	} | null;
+	selectedPlan?: ExpandedPlan | null;
 	phases: SubscriptionPhase[];
 }
 
@@ -34,14 +31,14 @@ interface PreviewProps {
  */
 // TODO: This is a temporary function to check if any charge has ADVANCE invoice cadence
 // TODO: This should be removed once the invoice cadence is implemented
-const hasAdvanceCharge = (charges: ChargesForBillingPeriodOne[]): boolean => {
+const hasAdvanceCharge = (charges: Price[]): boolean => {
 	return charges?.some((charge) => charge.invoice_cadence === 'ADVANCE') ?? false;
 };
 
 /**
  * Generates billing description based on charges and billing period
  */
-const getBillingDescription = (charges: ChargesForBillingPeriodOne[], billingPeriod: BILLING_PERIOD, date: Date): string => {
+const getBillingDescription = (charges: Price[], billingPeriod: BILLING_PERIOD, date: Date): string => {
 	const period = PERIOD_DURATION[billingPeriod] || formatBillingPeriodForDisplay(billingPeriod).toLowerCase();
 	return hasAdvanceCharge(charges) ? `Bills immediately for ${period}` : `Bills on ${formatDate(date)} for ${period}`;
 };

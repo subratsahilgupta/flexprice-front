@@ -1,6 +1,5 @@
-import { ChargesForBillingPeriodOne } from '@/components/organisms/Subscription/PriceTable';
 import { BILLING_PERIOD } from '@/constants/constants';
-import { BILLING_MODEL, PRICE_TYPE } from '@/models/Price';
+import { BILLING_MODEL, Price, PRICE_TYPE } from '@/models/Price';
 import { getAllISOCodes } from 'iso-country-currency';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -106,15 +105,11 @@ export const toSentenceCase = (str: string): string => {
 	return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 };
 
-export const getTotalPayableText = (
-	recurringCharges: ChargesForBillingPeriodOne[],
-	usageCharges: ChargesForBillingPeriodOne[],
-	recurringTotal: number,
-) => {
+export const getTotalPayableText = (recurringCharges: Price[], usageCharges: Price[], recurringTotal: number) => {
 	let text = '';
 
 	if (recurringCharges.length > 0) {
-		text += `${recurringCharges[0].currency}${recurringTotal}`;
+		text += `${getCurrencySymbol(recurringCharges[0].currency)}${recurringTotal}`;
 	}
 
 	if (usageCharges.length > 0) {
@@ -128,15 +123,11 @@ export const getTotalPayableText = (
 	return text;
 };
 
-export const getTotalPayableInfo = (
-	recurringCharges: ChargesForBillingPeriodOne[],
-	usageCharges: ChargesForBillingPeriodOne[],
-	recurringTotal: number,
-) => {
+export const getTotalPayableInfo = (recurringCharges: Price[], usageCharges: Price[], recurringTotal: number) => {
 	let text = '';
 
 	if (recurringCharges.length > 0) {
-		text += `${recurringCharges[0].currency}${recurringTotal}`;
+		text += `${getCurrencySymbol(recurringCharges[0].currency)}${recurringTotal}`;
 	}
 
 	if (usageCharges.length > 0) {
