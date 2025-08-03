@@ -94,7 +94,7 @@ const SubscriptionWithOverrides: FC<Props> = ({ prices, onCreateSubscription, cl
 			{/* Action buttons */}
 			<div className='flex gap-3 pt-4'>
 				<Button variant='outline' onClick={resetAllOverrides} disabled={!hasAnyOverrides()}>
-					Reset All Overrides
+					Reset
 				</Button>
 				<Button onClick={handleCreateSubscription} disabled={isSubmitting} className='flex-1'>
 					{isSubmitting ? 'Creating Subscription...' : 'Create Subscription'}
