@@ -1,13 +1,13 @@
 import { Page, Spacer, Button, Chip, Card, CardHeader, Loader } from '@/components/atoms';
-import { Detail, DetailsCard, ApiDocsContent } from '@/components/molecules';
+import { Detail, ApiDocsContent } from '@/components/molecules';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import CouponApi from '@/api/CouponApi';
-import { COUPON_TYPE, COUPON_CADENCE } from '@/types/common/Coupon';
+import { COUPON_TYPE } from '@/types/common/Coupon';
 import formatChips from '@/utils/common/format_chips';
 import formatDate from '@/utils/common/format_date';
 import toast from 'react-hot-toast';
-import { ArrowLeft, EyeOff } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { ENTITY_STATUS } from '@/models/base';
 
 const CouponDetails = () => {

@@ -5,7 +5,6 @@ import GUIDES from '@/constants/guides';
 import usePagination from '@/hooks/usePagination';
 import CouponApi from '@/api/CouponApi';
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import {
 	FilterField,
@@ -18,7 +17,7 @@ import {
 } from '@/types/common/QueryBuilder';
 import { QueryBuilder } from '@/components/molecules';
 import { BaseEntityStatus } from '@/types/common';
-import { COUPON_TYPE, COUPON_CADENCE } from '@/types/common/Coupon';
+import { COUPON_TYPE } from '@/types/common/Coupon';
 import useFilterSorting from '@/hooks/useFilterSorting';
 import { useQueryWithEmptyState } from '@/hooks/useQueryWithEmptyState';
 import { Coupon } from '@/models/Coupon';
@@ -120,7 +119,6 @@ const CouponsPage = () => {
 			sort: sanitizedSorts,
 		});
 	};
-	const navigate = useNavigate();
 
 	useEffect(() => {
 		reset();
