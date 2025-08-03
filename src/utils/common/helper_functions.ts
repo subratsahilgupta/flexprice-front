@@ -148,6 +148,106 @@ export const formatDateShort = (dateString: string): string => {
 };
 
 /**
+ * Calculates the discount amount based on coupon type and value
+ * @param coupon - The coupon object
+ * @param originalAmount - The original amount to apply discount to
+ * @returns The discount amount
+ */
+export const calculateCouponDiscount = (
+	coupon: { type: string; amount_off?: string; percentage_off?: string },
+	originalAmount: number,
+): number => {
+	if (coupon.type === 'fixed' && coupon.amount_off) {
+		return Math.min(parseFloat(coupon.amount_off), originalAmount);
+	} else if (coupon.type === 'percentage' && coupon.percentage_off) {
+		return (originalAmount * parseFloat(coupon.percentage_off)) / 100;
+	}
+	return 0;
+};
+
+/**
+ * Calculates total discount from multiple coupons
+ * @param coupons - Array of coupons to apply
+ * @param originalAmount - The original amount to apply discounts to
+ * @returns The total discount amount
+ */
+export const calculateTotalCouponDiscount = (
+	coupons: { type: string; amount_off?: string; percentage_off?: string }[],
+	originalAmount: number,
+): number => {
+	return coupons.reduce((totalDiscount, coupon) => {
+		return totalDiscount + calculateCouponDiscount(coupon, originalAmount);
+	}, 0);
+};
+
+/**
+ * Gets the total payable text including coupon discounts
+ * @param recurringCharges - Array of recurring charges
+ * @param usageCharges - Array of usage charges
+ * @param recurringTotal - Total recurring amount
+ * @param coupons - Array of coupons to apply
+ * @returns Formatted text showing total with discounts
+ */
+export const getTotalPayableTextWithCoupons = (
+	recurringCharges: Price[],
+	usageCharges: Price[],
+	recurringTotal: number,
+	coupons: { type: string; amount_off?: string; percentage_off?: string }[] = [],
+) => {
+	let text = '';
+
+	if (recurringCharges.length > 0) {
+		const currency = recurringCharges[0].currency;
+		const totalDiscount = calculateTotalCouponDiscount(coupons, recurringTotal);
+		const finalAmount = Math.max(0, recurringTotal - totalDiscount);
+
+		text += `${getCurrencySymbol(currency)}${finalAmount.toFixed(2)}`;
+
+		// Show discount information if there are coupons
+		if (coupons.length > 0 && totalDiscount > 0) {
+			text += ` (${getCurrencySymbol(currency)}${recurringTotal.toFixed(2)} - ${getCurrencySymbol(currency)}${totalDiscount.toFixed(2)} discount)`;
+		}
+	}
+
+	if (usageCharges.length > 0) {
+		if (recurringCharges.length > 0) {
+			text += ' + Usage';
+		} else {
+			text += 'Depends on usage';
+		}
+	}
+
+	return text;
+};
+
+/**
+ * Gets coupon discount breakdown text
+ * @param coupons - Array of coupons
+ * @param originalAmount - Original amount before discounts
+ * @param currency - Currency symbol
+ * @returns Formatted text showing coupon breakdown
+ */
+export const getCouponBreakdownText = (
+	coupons: { type: string; amount_off?: string; percentage_off?: string; name?: string }[],
+	originalAmount: number,
+	currency: string = 'USD',
+) => {
+	if (coupons.length === 0) return '';
+
+	let breakdown = '';
+
+	coupons.forEach((coupon, index) => {
+		const discount = calculateCouponDiscount(coupon, originalAmount);
+		if (discount > 0) {
+			if (index > 0) breakdown += ', ';
+			breakdown += `${coupon.name || 'Coupon'}: -${getCurrencySymbol(currency)}${discount.toFixed(2)}`;
+		}
+	});
+
+	return breakdown;
+};
+
+/**
  * Generates a unique ID using Math.random()
  * @returns A unique ID
  */

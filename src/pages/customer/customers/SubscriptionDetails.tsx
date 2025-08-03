@@ -251,6 +251,7 @@ const SubscriptionDetails: FC = () => {
 			{(data?.line_items?.length ?? 0) > 0 && (
 				<div className='card !mt-4'>
 					<SubscriptionPreviewLineItemTable
+						discount={data?.total_discount}
 						subtotal={data?.subtotal}
 						invoiceType={data?.invoice_type as INVOICE_TYPE}
 						refetch={refetch}

@@ -108,6 +108,9 @@ export interface CreateInvoicePayload {
 
 	// Optional: unique identifier of the environment this invoice belongs to
 	environment_id?: string;
+
+	// Optional: unique identifier of the coupons applied to this invoice
+	coupons?: string[];
 }
 
 export interface GetInvoicePdfPayload {
