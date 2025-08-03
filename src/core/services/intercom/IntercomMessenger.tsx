@@ -43,7 +43,7 @@ const IntercomMessenger = () => {
 
 	// Handle inactivity
 	useEffect(() => {
-		const onboardingCompleted = tenant?.metadata[TenantMetadataKey.ONBOARDING_COMPLETED] === 'true';
+		const onboardingCompleted = tenant?.metadata?.[TenantMetadataKey.ONBOARDING_COMPLETED] === 'true';
 
 		if (onboardingCompleted) return;
 
