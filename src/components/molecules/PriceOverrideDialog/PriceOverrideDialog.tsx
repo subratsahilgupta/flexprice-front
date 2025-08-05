@@ -102,7 +102,7 @@ const PriceOverrideDialog: FC<Props> = ({ isOpen, onOpenChange, price, onPriceOv
 							Reset
 						</Button>
 					)}
-					<Button onClick={handleOverride} className='flex-1' disabled={!overrideAmount || overrideAmount === originalFormatted}>
+					<Button onClick={handleOverride} className='flex-1' disabled={!overrideAmount || removeFormatting(overrideAmount) === price.amount}>
 						{isOverridden ? 'Update Override' : 'Override Price'}
 					</Button>
 				</div>
