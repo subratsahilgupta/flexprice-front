@@ -47,7 +47,7 @@ const filterOptions: FilterField[] = [
 		dataType: DataType.STRING,
 	},
 	{
-		field: 'external_id',
+		field: 'lookup_key',
 		label: 'Lookup Key',
 		fieldType: FilterFieldType.INPUT,
 		operators: DEFAULT_OPERATORS_PER_DATA_TYPE[DataType.STRING],
@@ -88,11 +88,11 @@ const PlansPage = () => {
 				id: 'initial-name',
 			},
 			{
-				field: 'external_id',
+				field: 'lookup_key',
 				operator: FilterOperator.CONTAINS,
 				valueString: '',
 				dataType: DataType.STRING,
-				id: 'initial-external-id',
+				id: 'initial-lookup_key',
 			},
 			{
 				field: 'status',
