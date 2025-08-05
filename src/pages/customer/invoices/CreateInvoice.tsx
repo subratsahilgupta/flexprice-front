@@ -79,7 +79,7 @@ const CreateInvoicePage: FC = () => {
 		const discount = selectedCoupon ? calculateCouponDiscount(selectedCoupon, subtotal) : 0;
 
 		setCalculatedDiscount(discount);
-		setFinalTotal(Math.max(0, subtotal - discount));
+		setFinalTotal(subtotal);
 	}, [lineItems, selectedCoupon]);
 
 	const handleAddLineItem = () => {
@@ -359,7 +359,7 @@ const CreateInvoicePage: FC = () => {
 								<div className='border-t'></div>
 								<div className='flex justify-between font-bold'>
 									<span>Total Amount</span>
-									<span>{`${getCurrencySymbol(currency)}${finalTotal.toFixed(2)}`}</span>
+									<span>{`${getCurrencySymbol(currency)}${(finalTotal - calculatedDiscount).toFixed(2)}`}</span>
 								</div>
 							</div>
 						</div>
