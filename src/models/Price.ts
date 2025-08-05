@@ -8,6 +8,7 @@ export interface Price extends BaseModel {
 	readonly currency: string;
 	readonly plan_id: string;
 	readonly type: PRICE_TYPE;
+	readonly price_unit_type: PRICE_UNIT_TYPE;
 	readonly billing_period: BILLING_PERIOD;
 	readonly billing_period_count: number;
 	readonly billing_model: BILLING_MODEL;
@@ -15,20 +16,25 @@ export interface Price extends BaseModel {
 	readonly tier_mode: TIER_MODE;
 	readonly tiers: Tier[] | null;
 	readonly meter_id: string;
+	readonly filter_values: Record<string, string[]> | null;
 	readonly lookup_key: string;
 	readonly description: string;
-	readonly transform_quantity: {
-		divide_by: number;
-	};
+	readonly transform_quantity: TransformQuantity | null;
 	readonly meter: Meter;
 	readonly invoice_cadence: INVOICE_CADENCE;
 	readonly trial_period: number;
+	readonly metadata: Record<string, string> | null;
 }
 
 export interface Tier {
 	readonly flat_amount: string;
 	readonly unit_amount: string;
 	readonly up_to: number;
+}
+
+export interface TransformQuantity {
+	readonly divide_by: number;
+	readonly round?: 'up' | 'down';
 }
 
 export enum BILLING_MODEL {
@@ -40,6 +46,11 @@ export enum BILLING_MODEL {
 export enum PRICE_TYPE {
 	USAGE = 'USAGE',
 	FIXED = 'FIXED',
+}
+
+export enum PRICE_UNIT_TYPE {
+	FIAT = 'FIAT',
+	CUSTOM = 'CUSTOM',
 }
 
 export enum TIER_MODE {

@@ -1,13 +1,19 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import { Plan } from '@/models/Plan';
 import { Pagination } from '@/models/Pagination';
-import { ExpandedPlan } from '@/utils/models/transformed_plan';
+import { ExpandedPlan } from '@/types/plan';
 import { generateQueryParams } from '@/utils/common/api_helper';
 import { GetPlanCreditGrantsResponse, SynchronizePlanPricesWithSubscriptionResponse } from '@/types/dto/Plan';
+import { TypedBackendFilter, TypedBackendSort } from '@/types/formatters/QueryBuilder';
 
 export interface GetAllPlansResponse {
 	items: Plan[] | ExpandedPlan[];
 	pagination: Pagination;
+}
+
+export interface GetPlansByFilterPayload extends Pagination {
+	filters: TypedBackendFilter[];
+	sort: TypedBackendSort[];
 }
 
 export class PlanApi {
@@ -35,6 +41,20 @@ export class PlanApi {
 		};
 		const url = generateQueryParams(this.baseUrl, payload);
 		return await AxiosClient.get<GetAllPlansResponse>(url);
+	}
+
+	public static async getPlansByFilter(payload: GetPlansByFilterPayload) {
+		return await AxiosClient.post<GetAllPlansResponse>(`${this.baseUrl}/search`, payload);
+	}
+
+	public static async searchPlans(query: string, { limit, offset }: Pagination) {
+		const payload = {
+			limit,
+			offset,
+			query,
+			expand: 'entitlements,prices,meters,features',
+		};
+		return await AxiosClient.post<GetAllPlansResponse>(`${this.baseUrl}/search`, payload);
 	}
 
 	public static async getExpandedPlan() {

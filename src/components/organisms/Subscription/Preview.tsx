@@ -1,6 +1,6 @@
-import { ChargesForBillingPeriodOne } from './PriceTable';
+import { Price } from '@/models/Price';
 import { useMemo } from 'react';
-import { formatBillingPeriodForDisplay, getTotalPayableText } from '@/utils/common/helper_functions';
+import { formatBillingPeriodForDisplay, getTotalPayableTextWithCoupons, getCouponBreakdownText } from '@/utils/common/helper_functions';
 import { BILLING_PERIOD } from '@/constants/constants';
 import { BILLING_CYCLE, SubscriptionPhase } from '@/models/Subscription';
 import formatDate from '@/utils/common/format_date';
@@ -8,6 +8,9 @@ import { calculateAnniversaryBillingAnchor, calculateCalendarBillingAnchor } fro
 import { cn } from '@/lib/utils';
 import { Calendar, Receipt } from 'lucide-react';
 import TimelinePreview, { PreviewTimelineItem } from './TimelinePreview';
+import { ExpandedPlan } from '@/types/plan';
+import { Coupon } from '@/models/Coupon';
+import { getCurrentPriceAmount } from '@/utils/common/price_override_helpers';
 
 const PERIOD_DURATION: Record<BILLING_PERIOD, string> = {
 	[BILLING_PERIOD.DAILY]: '1 day',
@@ -19,14 +22,12 @@ const PERIOD_DURATION: Record<BILLING_PERIOD, string> = {
 } as const;
 
 interface PreviewProps {
-	data: ChargesForBillingPeriodOne[];
+	data: Price[];
 	className?: string;
-	selectedPlan?: {
-		charges: Record<string, Record<string, Array<ChargesForBillingPeriodOne & { invoice_cadence?: string }>>>;
-		id: string;
-		name: string;
-	} | null;
+	selectedPlan?: ExpandedPlan | null;
 	phases: SubscriptionPhase[];
+	coupons?: Coupon[];
+	priceOverrides?: Record<string, string>;
 }
 
 /**
@@ -34,14 +35,14 @@ interface PreviewProps {
  */
 // TODO: This is a temporary function to check if any charge has ADVANCE invoice cadence
 // TODO: This should be removed once the invoice cadence is implemented
-const hasAdvanceCharge = (charges: ChargesForBillingPeriodOne[]): boolean => {
+const hasAdvanceCharge = (charges: Price[]): boolean => {
 	return charges?.some((charge) => charge.invoice_cadence === 'ADVANCE') ?? false;
 };
 
 /**
  * Generates billing description based on charges and billing period
  */
-const getBillingDescription = (charges: ChargesForBillingPeriodOne[], billingPeriod: BILLING_PERIOD, date: Date): string => {
+const getBillingDescription = (charges: Price[], billingPeriod: BILLING_PERIOD, date: Date): string => {
 	const period = PERIOD_DURATION[billingPeriod] || formatBillingPeriodForDisplay(billingPeriod).toLowerCase();
 	return hasAdvanceCharge(charges) ? `Bills immediately for ${period}` : `Bills on ${formatDate(date)} for ${period}`;
 };
@@ -58,7 +59,7 @@ const calculateFirstInvoiceDate = (startDate: Date, billingPeriod: BILLING_PERIO
 /**
  * Component that displays subscription preview information including start date and first invoice details
  */
-const Preview = ({ data, className, phases }: PreviewProps) => {
+const Preview = ({ data, className, phases, coupons = [], priceOverrides = {} }: PreviewProps) => {
 	const firstPhase = phases.at(0);
 	const startDate = firstPhase?.start_date;
 	const billingCycle = firstPhase?.billing_cycle || BILLING_CYCLE.ANNIVERSARY;
@@ -67,7 +68,12 @@ const Preview = ({ data, className, phases }: PreviewProps) => {
 
 	const usageCharges = useMemo(() => data.filter((charge) => charge.type === 'USAGE'), [data]);
 
-	const recurringTotal = useMemo(() => recurringCharges.reduce((acc, charge) => acc + parseFloat(charge.amount), 0), [recurringCharges]);
+	const recurringTotal = useMemo(() => {
+		return recurringCharges.reduce((acc, charge) => {
+			const currentAmount = getCurrentPriceAmount(charge, priceOverrides);
+			return acc + parseFloat(currentAmount);
+		}, 0);
+	}, [recurringCharges, priceOverrides]);
 
 	const billingPeriod = useMemo(() => data[0]?.billing_period.toUpperCase() as BILLING_PERIOD, [data]);
 
@@ -91,7 +97,18 @@ const Preview = ({ data, className, phases }: PreviewProps) => {
 			icon: <Receipt className='h-[22px] w-[22px] text-gray-500 shrink-0' />,
 			subtitle: (
 				<div>
-					<p className='text-sm text-gray-600'> Net payable: {getTotalPayableText(recurringCharges, usageCharges, recurringTotal)}</p>
+					<p className='text-sm text-gray-600'>
+						{' '}
+						Net payable: {getTotalPayableTextWithCoupons(recurringCharges, usageCharges, recurringTotal, coupons)}
+					</p>
+					{coupons.length > 0 && (
+						<>
+							<p className='text-sm text-blue-600 font-medium'>
+								{coupons.length} coupon{coupons.length > 1 ? 's' : ''} applied
+							</p>
+							<p className='text-xs text-gray-500'>{getCouponBreakdownText(coupons, recurringTotal, recurringCharges[0]?.currency)}</p>
+						</>
+					)}
 					<p className='text-sm text-gray-600'>{billingDescription}</p>
 				</div>
 			),
@@ -111,7 +128,7 @@ const Preview = ({ data, className, phases }: PreviewProps) => {
 		}
 
 		return updatedItems;
-	}, [phases, firstInvoiceDate, recurringCharges, usageCharges, recurringTotal, billingDescription]);
+	}, [phases, firstInvoiceDate, recurringCharges, usageCharges, recurringTotal, billingDescription, coupons]);
 
 	return (
 		<div className={cn('w-full', className)}>

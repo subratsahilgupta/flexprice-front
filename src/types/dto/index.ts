@@ -6,7 +6,7 @@ export type { GetTasksPayload, GetTasksResponse, AddTaskPayload } from './Task';
 
 export type { SignupData, LoginData, LocalUser } from './Auth';
 
-export type { GetAllPricesResponse } from './Price';
+export type { GetAllPricesResponse, CreatePriceRequest, UpdatePriceRequest, CreatePriceTier, TransformQuantity } from './Price';
 
 export type {
 	GetCustomerResponse,
@@ -29,6 +29,7 @@ export type {
 	GetInvoicePreviewPayload,
 	CreateInvoicePayload as CreateOneOffInvoicePayload,
 	GetInvoicePdfPayload,
+	GetInvoicesByFiltersPayload,
 } from './InvoiceApi';
 
 export type { GetAllMetersResponse } from './Meter';
@@ -71,3 +72,5 @@ export type {
 } from './CreditNote';
 export { CREDIT_NOTE_STATUS, CREDIT_NOTE_REASON, CREDIT_NOTE_TYPE } from '@/models/CreditNote';
 export type { SynchronizePlanPricesWithSubscriptionResponse } from './Plan';
+
+export type { CreateCouponRequest, UpdateCouponRequest, GetCouponResponse, ListCouponsResponse, CouponFilter } from './Coupon';

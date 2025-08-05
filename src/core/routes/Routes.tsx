@@ -42,6 +42,8 @@ import OnboardingApi from '@/api/OnboardingApi';
 import { useUser } from '@/hooks/UserContext';
 import OnboardingTenant from '@/pages/onboarding/OnboardingTenant';
 import WebhookDashboard from '@/pages/webhooks/WebhookDashboard';
+import CouponsPage from '@/pages/product-catalog/coupons/Coupons';
+import CouponDetails from '@/pages/product-catalog/coupons/CouponDetails';
 
 export const RouteNames = {
 	home: '/',
@@ -76,6 +78,10 @@ export const RouteNames = {
 	features: '/product-catalog/features',
 	createFeature: '/product-catalog/features/create-feature',
 	featureDetails: '/product-catalog/features',
+
+	// coupon routes
+	coupons: '/product-catalog/coupons',
+	couponDetails: '/product-catalog/coupons',
 
 	// add on routes
 	addOn: '/product-catalog/add-on',
@@ -169,6 +175,14 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: RouteNames.addCharges,
 						element: <AddChargesPage />,
+					},
+					{
+						path: RouteNames.coupons,
+						element: <CouponsPage />,
+					},
+					{
+						path: `${RouteNames.couponDetails}/:id`,
+						element: <CouponDetails />,
 					},
 				],
 			},

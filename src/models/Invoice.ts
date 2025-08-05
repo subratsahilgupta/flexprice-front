@@ -32,6 +32,7 @@ export interface Invoice extends BaseModel {
 	readonly tenant_id: string;
 	readonly subscription: Subscription;
 	readonly customer?: Customer;
+	readonly total_discount?: number;
 }
 
 export interface LineItem extends BaseModel {

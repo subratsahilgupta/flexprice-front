@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { billlingPeriodOptions } from '@/constants/constants';
 import { useState, useMemo } from 'react';
-import { ExpandedPlan } from '@/utils/models/transformed_plan';
+import { ExpandedPlan } from '@/types/plan';
 import { GetAllPlansResponse } from '@/api/PlanApi';
 import PricingCard, { PricingCardProps } from '@/components/molecules/PricingCard';
 import { ApiDocsContent } from '@/components/molecules';

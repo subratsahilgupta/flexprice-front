@@ -1,5 +1,6 @@
 import { Invoice } from '@/models/Invoice';
 import { Pagination } from '@/models/Pagination';
+import { TypedBackendFilter, TypedBackendSort } from '@/types/formatters/QueryBuilder';
 
 export interface GetInvoicesResponse {
 	items: Invoice[];
@@ -19,6 +20,11 @@ export interface GetAllInvoicesPayload {
 	sort?: string;
 	status?: string;
 	subscription_id?: string;
+}
+
+export interface GetInvoicesByFiltersPayload extends Pagination {
+	filters: TypedBackendFilter[];
+	sort: TypedBackendSort[];
 }
 
 export interface UpdateInvoiceStatusPayload {
@@ -102,6 +108,9 @@ export interface CreateInvoicePayload {
 
 	// Optional: unique identifier of the environment this invoice belongs to
 	environment_id?: string;
+
+	// Optional: unique identifier of the coupons applied to this invoice
+	coupons?: string[];
 }
 
 export interface GetInvoicePdfPayload {

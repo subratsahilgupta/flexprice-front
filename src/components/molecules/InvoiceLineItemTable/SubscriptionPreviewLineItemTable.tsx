@@ -129,7 +129,7 @@ const SubscriptionPreviewLineItemTable: FC<Props> = ({
 						</div>
 
 						{/* Discount - only show if provided and > 0 */}
-						{discount !== undefined && discount !== null && Number(discount) > 0 && (
+						{discount && Number(discount) > 0 && (
 							<div className='flex flex-row justify-end items-center py-1'>
 								<div className='w-40 text-right text-base font-medium text-gray-900'>Discount</div>
 								<div className='flex-1 text-right text-sm text-gray-900 font-medium'>−{formatAmount(Number(discount), currency ?? '')}</div>
