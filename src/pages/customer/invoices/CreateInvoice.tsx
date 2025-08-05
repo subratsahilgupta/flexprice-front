@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState, useMemo } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Button, FormHeader, Input, Loader, Page, Select, Spacer, Divider } from '@/components/atoms';
 import CustomerApi from '@/api/CustomerApi';
@@ -44,6 +44,14 @@ const CreateInvoicePage: FC = () => {
 	const { user } = useUser();
 	const { updateBreadcrumb } = useBreadcrumbsStore();
 	const [currency, setCurrency] = useState(currencyOptions[0].value);
+
+	// Filter coupons by currency
+	const currencyFilteredCoupons = useMemo(() => {
+		if (!currency) {
+			return availableCoupons;
+		}
+		return filterValidCoupons(availableCoupons, currency);
+	}, [availableCoupons, currency]);
 	const [lineItems, setLineItems] = useState<LineItem[]>([
 		{
 			display_name: '',
@@ -111,7 +119,7 @@ const CreateInvoicePage: FC = () => {
 			return;
 		}
 
-		const coupon = availableCoupons.find((c) => c.id === couponId);
+		const coupon = currencyFilteredCoupons.find((c) => c.id === couponId);
 		if (coupon) {
 			setSelectedCoupon(coupon);
 		}
@@ -319,7 +327,7 @@ const CreateInvoicePage: FC = () => {
 										label=''
 										value=''
 										onChange={handleCouponSelect}
-										options={availableCoupons.map((coupon) => ({
+										options={currencyFilteredCoupons.map((coupon) => ({
 											value: coupon.id,
 											label: coupon.name,
 											description: formatCouponName(coupon),

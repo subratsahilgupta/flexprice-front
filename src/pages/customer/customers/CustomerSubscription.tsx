@@ -10,7 +10,7 @@ import CouponApi from '@/api/CouponApi';
 import { toSentenceCase } from '@/utils/common/helper_functions';
 import { ExpandedPlan } from '@/types/plan';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ApiDocsContent, CouponModal } from '@/components/molecules';
@@ -143,8 +143,16 @@ const CustomerSubscription: React.FC = () => {
 
 	const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
 
+	// Filter coupons by currency
+	const currencyFilteredCoupons = useMemo(() => {
+		if (!subscriptionState.currency) {
+			return availableCoupons;
+		}
+		return filterValidCoupons(availableCoupons, subscriptionState.currency);
+	}, [availableCoupons, subscriptionState.currency]);
+
 	const handleCouponSelect = (couponId: string) => {
-		const coupon = availableCoupons.find((c) => c.id === couponId);
+		const coupon = currencyFilteredCoupons.find((c) => c.id === couponId);
 		if (coupon) {
 			setSubscriptionState((prev) => ({ ...prev, linkedCoupon: coupon }));
 		}
@@ -369,7 +377,7 @@ const CustomerSubscription: React.FC = () => {
 				<CouponModal
 					isOpen={isCouponModalOpen}
 					onOpenChange={setIsCouponModalOpen}
-					coupons={availableCoupons}
+					coupons={currencyFilteredCoupons}
 					onSave={handleCouponSelect}
 					onCancel={() => setIsCouponModalOpen(false)}
 				/>

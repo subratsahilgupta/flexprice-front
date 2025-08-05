@@ -3,11 +3,6 @@ import { BILLING_MODEL, Price, PRICE_TYPE } from '@/models/Price';
 import { getAllISOCodes } from 'iso-country-currency';
 import { v4 as uuidv4 } from 'uuid';
 
-export const getCurrencyOptions = () => {
-	const codes = getAllISOCodes();
-	return [...codes.filter((code) => code.currency === 'USD'), ...codes.filter((code) => code.currency !== 'USD')];
-};
-
 export function getCurrencySymbol(currency: string): string {
 	try {
 		const info = getAllISOCodes().filter((code) => code.currency === currency.toUpperCase());
