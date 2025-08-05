@@ -1,6 +1,6 @@
 import { Coupon } from '@/models/Coupon';
 
-const filterValidCoupons = (coupons: Coupon[]) => {
+const filterValidCoupons = (coupons: Coupon[], currency?: string) => {
 	const validCoupons = coupons.filter((coupon) => {
 		if (coupon.redeem_after && coupon.redeem_before) {
 			return new Date(coupon.redeem_after) <= new Date() && new Date(coupon.redeem_before) >= new Date();
@@ -15,7 +15,12 @@ const filterValidCoupons = (coupons: Coupon[]) => {
 		return true; // No redemption limit, so it's valid
 	});
 
-	return validCouponsWithRedemptions;
+	// Filter by currency if provided
+	const validCouponsWithCurrency = currency
+		? validCouponsWithRedemptions.filter((coupon) => coupon.currency.toLowerCase() === currency.toLowerCase())
+		: validCouponsWithRedemptions;
+
+	return validCouponsWithCurrency;
 };
 
 export default filterValidCoupons;
