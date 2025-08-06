@@ -8,7 +8,8 @@ import { useQuery } from '@tanstack/react-query';
 import TenantApi from '@/api/TenantApi';
 import { TenantMetadataKey } from '@/models/Tenant';
 
-const INACTIVITY_TIMEOUT = 300_000; // 5 minutes
+// mseconds * seconds * minutes
+const INACTIVITY_TIMEOUT = 1000 * 60 * 15; // 15 minutes
 
 const IntercomMessenger = () => {
 	const { user } = useUser();
