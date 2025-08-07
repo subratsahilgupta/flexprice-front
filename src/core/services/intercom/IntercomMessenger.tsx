@@ -50,7 +50,7 @@ const IntercomMessenger = () => {
 		// Clear existing timer
 		if (inactivityTimer.current) {
 			clearTimeout(inactivityTimer.current);
-			console.log('Intercom auto-popup: Timer reset due to user activity');
+			// console.log('Intercom auto-popup: Timer reset due to user activity');
 		}
 
 		// Set new timer if onboarding is not completed (metadata is null, field doesn't exist, or isn't 'true')
@@ -59,12 +59,12 @@ const IntercomMessenger = () => {
 
 		if (!onboardingCompleted) {
 			inactivityTimer.current = setTimeout(() => {
-				console.log('Intercom auto-popup: Timer expired - opening Intercom messenger');
+				// console.log('Intercom auto-popup: Timer expired - opening Intercom messenger');
 				openIntercom();
 			}, INACTIVITY_TIMEOUT);
-			console.log('Intercom auto-popup: New timer set for', INACTIVITY_TIMEOUT / 1000, 'seconds');
+			// console.log('Intercom auto-popup: New timer set for', INACTIVITY_TIMEOUT / 1000, 'seconds');
 		} else {
-			console.log('Intercom auto-popup: Timer NOT set - onboarding completed during activity (metadata = "true")');
+			// console.log('Intercom auto-popup: Timer NOT set - onboarding completed during activity (metadata = "true")');
 		}
 	}, [tenant?.metadata, openIntercom]);
 
@@ -80,11 +80,11 @@ const IntercomMessenger = () => {
 		// 1. User is not loaded
 		// 2. Tenant is still loading
 		if (!user || isTenantLoading) {
-			console.log('Intercom auto-popup: Timer NOT set up because:', {
-				userLoaded: !!user,
-				isTenantLoading,
-				reason: !user ? 'User not loaded' : 'Tenant still loading',
-			});
+			// console.log('Intercom auto-popup: Timer NOT set up because:', {
+			// 	userLoaded: !!user,
+			// 	isTenantLoading,
+			// 	reason: !user ? 'User not loaded' : 'Tenant still loading',
+			// });
 			return;
 		}
 
@@ -92,36 +92,36 @@ const IntercomMessenger = () => {
 		const onboardingMetadata = tenant?.metadata?.[TenantMetadataKey.ONBOARDING_COMPLETED];
 		const onboardingCompleted = onboardingMetadata === 'true';
 
-		console.log('Intercom auto-popup: Decision factors:', {
-			userLoaded: !!user,
-			isTenantLoading,
-			hasTenantMetadata: !!tenant?.metadata,
-			onboardingMetadataValue: onboardingMetadata,
-			onboardingCompleted,
-			tenantId: user?.tenant?.id,
-			metadataExists: !!tenant?.metadata,
-			onboardingFieldExists: TenantMetadataKey.ONBOARDING_COMPLETED in (tenant?.metadata || {}),
-		});
+		// console.log('Intercom auto-popup: Decision factors:', {
+		// 	userLoaded: !!user,
+		// 	isTenantLoading,
+		// 	hasTenantMetadata: !!tenant?.metadata,
+		// 	onboardingMetadataValue: onboardingMetadata,
+		// 	onboardingCompleted,
+		// 	tenantId: user?.tenant?.id,
+		// 	metadataExists: !!tenant?.metadata,
+		// 	onboardingFieldExists: TenantMetadataKey.ONBOARDING_COMPLETED in (tenant?.metadata || {}),
+		// });
 
 		// Show timer if:
 		// 1. Metadata is null/undefined
 		// 2. Onboarding field doesn't exist in metadata
 		// 3. Onboarding field exists but isn't set to 'true'
 		if (onboardingCompleted) {
-			console.log('Intercom auto-popup: Timer NOT set up - onboarding already completed (metadata = "true")');
+			// console.log('Intercom auto-popup: Timer NOT set up - onboarding already completed (metadata = "true")');
 			return;
 		}
 
-		console.log('Intercom auto-popup: Timer WILL be set up because:', {
-			metadataIsNull: !tenant?.metadata,
-			onboardingFieldMissing: !(TenantMetadataKey.ONBOARDING_COMPLETED in (tenant?.metadata || {})),
-			onboardingNotTrue: onboardingMetadata !== 'true',
-			reason: !tenant?.metadata
-				? 'Metadata is null/undefined'
-				: !(TenantMetadataKey.ONBOARDING_COMPLETED in tenant.metadata)
-					? 'Onboarding field does not exist in metadata'
-					: 'Onboarding field exists but is not set to "true"',
-		});
+		// console.log('Intercom auto-popup: Timer WILL be set up because:', {
+		// 	metadataIsNull: !tenant?.metadata,
+		// 	onboardingFieldMissing: !(TenantMetadataKey.ONBOARDING_COMPLETED in (tenant?.metadata || {})),
+		// 	onboardingNotTrue: onboardingMetadata !== 'true',
+		// 	reason: !tenant?.metadata
+		// 		? 'Metadata is null/undefined'
+		// 		: !(TenantMetadataKey.ONBOARDING_COMPLETED in tenant.metadata)
+		// 			? 'Onboarding field does not exist in metadata'
+		// 			: 'Onboarding field exists but is not set to "true"',
+		// });
 
 		const activityEvents = ['mousemove', 'keydown', 'scroll', 'touchstart'];
 
