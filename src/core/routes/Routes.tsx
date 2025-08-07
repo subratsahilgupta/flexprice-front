@@ -27,6 +27,8 @@ import Integrations from '@/pages/insights-tools/integrations/Integrations';
 import IntegrationDetails from '@/pages/insights-tools/integrations/IntegrationDetails';
 import FeatureDetails from '@/pages/product-catalog/features/FeatureDetails';
 import AddOn from '@/pages/product-catalog/addons/AddOn';
+import AddonsPage from '@/pages/product-catalog/addons/Addons';
+import AddonDetailsPage from '@/pages/product-catalog/addons/AddonDetails';
 import CustomerInvoiceDetailsPage from '@/pages/customer/customers/CustomerInvoiceDetailsPage';
 import DeveloperPage from '@/pages/developer/developer';
 import SignupConfirmation from '@/pages/auth/SignupConfirmation';
@@ -85,6 +87,8 @@ export const RouteNames = {
 
 	// add on routes
 	addOn: '/product-catalog/add-on',
+	addons: '/product-catalog/addons',
+	addonDetails: '/product-catalog/addons',
 
 	// tools routes
 	tools: '/tools',
@@ -172,6 +176,14 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: RouteNames.addOn,
 						element: <AddOn />,
+					},
+					{
+						path: RouteNames.addons,
+						element: <AddonsPage />,
+					},
+					{
+						path: `${RouteNames.addonDetails}/:id`,
+						element: <AddonDetailsPage />,
 					},
 					{
 						path: RouteNames.addCharges,

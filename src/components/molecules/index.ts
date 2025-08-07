@@ -65,6 +65,8 @@ export { default as BreadCrumbs } from './BreadCrumbs';
 
 export { default as FeatureTable } from './FeatureTable';
 
+export { default as AddonDrawer } from './AddonDrawer';
+
 export { default as AddEntitlementDrawer } from './AddEntitlementDrawer';
 
 export { default as ImportFileDrawer } from './ImportFileDrawer';
@@ -110,3 +112,5 @@ export { MetadataModal } from './MetadataModal';
 export { default as PriceOverrideDialog } from './PriceOverrideDialog';
 
 export { default as WalletAlertDialog } from './WalletAlertDialog';
+
+export { default as AddonTable } from './AddonTable';

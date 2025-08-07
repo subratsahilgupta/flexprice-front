@@ -31,6 +31,10 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 					title: 'Coupons',
 					url: RouteNames.coupons,
 				},
+				{
+					title: 'Addons',
+					url: RouteNames.addons,
+				},
 			],
 		},
 		{
