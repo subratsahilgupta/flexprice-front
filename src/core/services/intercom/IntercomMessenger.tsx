@@ -8,7 +8,6 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import TenantApi from '@/api/TenantApi';
 import { TenantMetadataKey } from '@/models/Tenant';
 import { toast } from 'react-hot-toast';
-import OnboardingApi from '@/api/OnboardingApi';
 import { refetchQueries } from '../tanstack/ReactQueryProvider';
 
 // mseconds * seconds * minutes
@@ -50,11 +49,6 @@ const IntercomMessenger = () => {
 		onSuccess: async () => {
 			// Refetch user data to update the UI
 			await refetchQueries(['user', 'tenant']);
-
-			// Mark user as onboarded
-			OnboardingApi.MarkUserAsOnboarded();
-
-			// console.log('User marked as onboarded after closing Intercom');
 			toast.success("Welcome! You've been marked as onboarded.");
 		},
 		onError: (error: any) => {
