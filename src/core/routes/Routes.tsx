@@ -38,12 +38,12 @@ import PaymentPage from '@/pages/customer/payments/PaymentPage';
 import BillingPage from '@/pages/settings/Billing';
 import AddChargesPage from '@/pages/product-catalog/plans/AddCharges';
 import CreateInvoicePage from '@/pages/customer/invoices/CreateInvoice';
-import OnboardingApi from '@/api/OnboardingApi';
 import { useUser } from '@/hooks/UserContext';
 import OnboardingTenant from '@/pages/onboarding/OnboardingTenant';
 import WebhookDashboard from '@/pages/webhooks/WebhookDashboard';
 import CouponsPage from '@/pages/product-catalog/coupons/Coupons';
 import CouponDetails from '@/pages/product-catalog/coupons/CouponDetails';
+import { TenantMetadataKey } from '@/models/Tenant';
 
 export const RouteNames = {
 	home: '/',
@@ -101,8 +101,9 @@ export const RouteNames = {
 
 const DefaultRoute = () => {
 	const { user } = useUser();
-	const isOnboarded = OnboardingApi.IsUserOnboarded(user);
-	return <Navigate to={isOnboarded ? RouteNames.pricing : RouteNames.onboarding} />;
+	const onboardingMetadata = user?.tenant?.metadata?.[TenantMetadataKey.ONBOARDING_COMPLETED];
+	const onboardingCompleted = onboardingMetadata === 'true';
+	return <Navigate to={onboardingCompleted ? RouteNames.pricing : RouteNames.onboarding} />;
 };
 
 export const MainRouter = createBrowserRouter([
