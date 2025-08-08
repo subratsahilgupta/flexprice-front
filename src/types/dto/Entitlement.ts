@@ -4,6 +4,8 @@ import { Pagination } from '@/models/Pagination';
 import { Plan } from '@/models/Plan';
 import Addon from '@/models/Addon';
 import Feature from '@/models/Feature';
+import { BILLING_PERIOD } from '@/models/Price';
+import { FEATURE_TYPE } from '@/models/Feature';
 
 export interface EntitlementFilters {
 	end_time?: string;
@@ -30,4 +32,25 @@ export interface EntitlementResponse extends Entitlement {
 export interface EntitlementResponse {
 	items: EntitlementResponse[];
 	pagination: Pagination;
+}
+
+export interface CreateEntitlementRequest {
+	plan_id?: string;
+	feature_id: string;
+	feature_type: FEATURE_TYPE;
+	is_enabled?: boolean;
+	usage_limit?: number | null;
+	usage_reset_period?: BILLING_PERIOD;
+	is_soft_limit?: boolean;
+	static_value?: string;
+	entity_type: ENTITLEMENT_ENTITY_TYPE;
+	entity_id: string;
+}
+
+export interface CreateBulkEntitlementRequest {
+	items: CreateEntitlementRequest[];
+}
+
+export interface CreateBulkEntitlementResponse {
+	items: EntitlementResponse[];
 }

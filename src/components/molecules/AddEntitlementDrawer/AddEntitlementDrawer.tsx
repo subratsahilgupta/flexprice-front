@@ -7,7 +7,8 @@ import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { Entitlement, ENTITLEMENT_ENTITY_TYPE } from '@/models/Entitlement';
 import Feature, { FEATURE_TYPE } from '@/models/Feature';
 import { METER_USAGE_RESET_PERIOD } from '@/models/Meter';
-import { PlanApi } from '@/api/PlanApi';
+import EntitlementApi from '@/api/EntitlementApi';
+import { CreateBulkEntitlementRequest } from '@/types/dto/Entitlement';
 import { useMutation } from '@tanstack/react-query';
 import { X } from 'lucide-react';
 import { FC, useState, useEffect } from 'react';
@@ -48,6 +49,9 @@ const AddEntitlementDrawer: FC<Props> = ({
 	const [activeFeature, setActiveFeature] = useState<Feature | null>(null);
 	const [tempEntitlement, setEntitlement] = useState<Partial<Entitlement>>({});
 
+	// Get existing feature IDs from initial entitlements to prevent duplicates
+	const existingFeatureIds = initialEntitlements?.map((ent) => ent.feature_id) || [];
+
 	// Reset all states when drawer closes
 	const resetState = () => {
 		setEntitlements([]);
@@ -56,6 +60,13 @@ const AddEntitlementDrawer: FC<Props> = ({
 		setShowSelect(true);
 		setActiveFeature(null);
 		setEntitlement({});
+	};
+
+	// Get all feature IDs that are already selected or exist in initial entitlements
+	const getAllExistingFeatureIds = () => {
+		const selectedFeatureIds = selectedFeatures.map((feature) => feature.id);
+		const initialFeatureIds = existingFeatureIds;
+		return [...new Set([...selectedFeatureIds, ...initialFeatureIds])];
 	};
 
 	// Handle drawer close
@@ -126,12 +137,6 @@ const AddEntitlementDrawer: FC<Props> = ({
 		return newErrors;
 	};
 
-	// const validateBooleanFeature = (): ValidationErrors => {
-	// 	const newErrors: ValidationErrors = {};
-	// 	// Boolean features are always enabled by default
-	// 	return newErrors;
-	// };
-
 	const validateEntitlement = (): boolean => {
 		if (!activeFeature) {
 			setErrors({ feature: 'Please select a feature' });
@@ -159,15 +164,32 @@ const AddEntitlementDrawer: FC<Props> = ({
 		return Object.keys(validationErrors).length === 0;
 	};
 
-	const { mutate: addEntitleMents, isPending } = useMutation({
-		mutationKey: ['addEntitlement', tempEntitlement],
+	const { mutate: createBulkEntitlements, isPending } = useMutation({
+		mutationKey: ['createBulkEntitlements', entitlements],
 		mutationFn: async () => {
-			if (!planId) {
-				throw new Error('Plan ID is required');
+			if (!entityId) {
+				throw new Error('Entity ID is required');
 			}
-			return await PlanApi.updatePlan(planId, {
-				entitlements: [...(initialEntitlements ?? []), ...entitlements] as Entitlement[],
-			});
+
+			// Convert entitlements to CreateEntitlementRequest format
+			const entitlementRequests = entitlements.map((entitlement) => ({
+				plan_id: planId,
+				feature_id: entitlement.feature_id!,
+				feature_type: entitlement.feature_type! as FEATURE_TYPE,
+				is_enabled: entitlement.is_enabled,
+				usage_limit: entitlement.usage_limit,
+				usage_reset_period: entitlement.usage_reset_period as any,
+				is_soft_limit: entitlement.is_soft_limit,
+				static_value: entitlement.static_value,
+				entity_type: entityType,
+				entity_id: entityId,
+			}));
+
+			const bulkRequest: CreateBulkEntitlementRequest = {
+				items: entitlementRequests,
+			};
+
+			return await EntitlementApi.CreateBulkEntitlement(bulkRequest);
 		},
 		onSuccess: () => {
 			toast.success('Entitlements added successfully');
@@ -187,7 +209,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 			toast.error('Please add at least one entitlement');
 			return;
 		}
-		addEntitleMents();
+		createBulkEntitlements();
 	};
 
 	function handleAdd(): void {
@@ -195,6 +217,16 @@ const AddEntitlementDrawer: FC<Props> = ({
 
 		if (!validateEntitlement()) {
 			// toast.error('Please fix the validation errors');
+			return;
+		}
+
+		// Check if feature is already in entitlements or initial entitlements
+		const isFeatureAlreadyAdded =
+			entitlements.some((ent) => ent.feature_id === activeFeature.id) || existingFeatureIds.includes(activeFeature.id);
+
+		if (isFeatureAlreadyAdded) {
+			setErrors({ feature: 'This feature is already added' });
+			toast.error('This feature is already added');
 			return;
 		}
 
@@ -256,7 +288,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 
 					{showSelect && (
 						<SelectFeature
-							disabledFeatures={selectedFeatures.map((feature) => feature.id)}
+							disabledFeatures={getAllExistingFeatureIds()}
 							onChange={(feature) => {
 								if (feature.type === FEATURE_TYPE.BOOLEAN) {
 									// Automatically add boolean features
@@ -288,6 +320,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 
 					{activeFeature && (
 						<div className='card p-4'>
+							{errors.feature && <div className='p-3 rounded-md bg-red-50 text-red-600 text-sm mb-4'>{errors.feature}</div>}
 							<div className='flex justify-between items-start gap-4'>
 								<FormHeader title={activeFeature?.name} variant='sub-header' />
 								<span className='mt-1'>{getFeatureIcon(activeFeature?.type)}</span>

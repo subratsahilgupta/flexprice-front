@@ -74,7 +74,7 @@ const FeatureDetails = () => {
 		{
 			title: 'Plan',
 			render: (rowData) => {
-				return <RedirectCell redirectUrl={`${RouteNames.plan}/${rowData?.entity_id}`}>{rowData?.entity_id}</RedirectCell>;
+				return <RedirectCell redirectUrl={`${RouteNames.plan}/${rowData?.entity_id}`}>{rowData?.plan?.name}</RedirectCell>;
 			},
 		},
 		{
