@@ -7,6 +7,10 @@ import Feature from '@/models/Feature';
 import { Meter } from '@/models/Meter';
 import { QueryFilter, TimeRangeFilter } from './base';
 
+export interface CreateBulkPriceRequest {
+	items: CreatePriceRequest[];
+}
+
 export interface GetAllPricesResponse {
 	prices: Price[];
 	total: number;

@@ -29,6 +29,7 @@ import FeatureDetails from '@/pages/product-catalog/features/FeatureDetails';
 import AddOn from '@/pages/product-catalog/addons/AddOn';
 import AddonsPage from '@/pages/product-catalog/addons/Addons';
 import AddonDetailsPage from '@/pages/product-catalog/addons/AddonDetails';
+import AddonChargesPage from '@/pages/product-catalog/addons/AddonCharges';
 import CustomerInvoiceDetailsPage from '@/pages/customer/customers/CustomerInvoiceDetailsPage';
 import DeveloperPage from '@/pages/developer/developer';
 import SignupConfirmation from '@/pages/auth/SignupConfirmation';
@@ -89,6 +90,7 @@ export const RouteNames = {
 	addOn: '/product-catalog/add-on',
 	addons: '/product-catalog/addons',
 	addonDetails: '/product-catalog/addons',
+	addonCharges: '/product-catalog/addons/:addonId/add-charges',
 
 	// tools routes
 	tools: '/tools',
@@ -184,6 +186,10 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: `${RouteNames.addonDetails}/:id`,
 						element: <AddonDetailsPage />,
+					},
+					{
+						path: RouteNames.addonCharges,
+						element: <AddonChargesPage />,
 					},
 					{
 						path: RouteNames.addCharges,

@@ -3,6 +3,10 @@ import { Price } from '@/models/Price';
 import { GetAllPricesResponse, CreatePriceRequest, UpdatePriceRequest, PriceFilter } from '@/types/dto/Price';
 import { generateQueryParams } from '@/utils/common/api_helper';
 
+export interface CreateBulkPriceRequest {
+	items: CreatePriceRequest[];
+}
+
 export class PriceApi {
 	private static baseUrl = '/prices';
 
@@ -17,6 +21,10 @@ export class PriceApi {
 
 	public static async CreatePrice(data: CreatePriceRequest) {
 		return await AxiosClient.post<Price>(this.baseUrl, data);
+	}
+
+	public static async CreateBulkPrice(data: CreateBulkPriceRequest) {
+		return await AxiosClient.post<Price[]>(`${this.baseUrl}/bulk`, data);
 	}
 
 	public static async UpdatePrice(id: string, data: UpdatePriceRequest) {

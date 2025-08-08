@@ -1,30 +1,21 @@
-import { ActionButton, Button, CardHeader, Chip, Loader, Page, Spacer, NoDataCard } from '@/components/atoms';
-import { AddEntitlementDrawer, ApiDocsContent, ColumnData, FlexpriceTable, RedirectCell, AddonDrawer } from '@/components/molecules';
+import { Button, CardHeader, Chip, Loader, Page, Spacer, NoDataCard } from '@/components/atoms';
+import { ApiDocsContent, ColumnData, FlexpriceTable, AddonDrawer } from '@/components/molecules';
 import { DetailsCard } from '@/components/molecules';
 import { RouteNames } from '@/core/routes/Routes';
 import { Price } from '@/models/Price';
-import { FEATURE_TYPE } from '@/models/Feature';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
-import EntitlementApi from '@/api/EntitlementApi';
 import AddonApi from '@/api/AddonApi';
-import formatDate from '@/utils/common/format_date';
 import { getPriceTypeLabel } from '@/utils/common/helper_functions';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { EyeOff, Plus, Pencil, Trash2 } from 'lucide-react';
+import { EyeOff, Plus, Pencil } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card } from '@/components/atoms';
 import formatChips from '@/utils/common/format_chips';
-import { getFeatureTypeChips } from '@/components/molecules/CustomerUsageTable/CustomerUsageTable';
-import { formatAmount } from '@/components/atoms/Input/Input';
 import ChargeValueCell from '../plans/ChargeValueCell';
 import { BILLING_PERIOD } from '@/constants/constants';
-import { Entitlement } from '@/models/Entitlement';
-import { ENTITY_STATUS } from '@/models/base';
 import { ADDON_TYPE } from '@/models/Addon';
-import { ENTITLEMENT_ENTITY_TYPE } from '@/models/Entitlement';
-import { EntitlementResponse } from '@/types/dto';
 
 const formatBillingPeriod = (billingPeriod: string) => {
 	switch (billingPeriod.toUpperCase()) {
@@ -93,36 +84,9 @@ const chargeColumns: ColumnData<Price>[] = [
 	},
 ];
 
-const getFeatureValue = (entitlement: Entitlement) => {
-	const value = entitlement.usage_limit?.toFixed() || '';
-
-	switch (entitlement.feature_type) {
-		case FEATURE_TYPE.STATIC:
-			return entitlement.static_value;
-		case FEATURE_TYPE.METERED:
-			return (
-				<span className='flex items-end gap-1'>
-					{formatAmount(value || 'Unlimited')}
-					<span className='text-[#64748B] text-sm font-normal font-sans'>
-						{value
-							? Number(value) > 0
-								? entitlement.feature.unit_plural || 'units'
-								: entitlement.feature.unit_singular || 'unit'
-							: entitlement.feature.unit_plural || 'units'}
-					</span>
-				</span>
-			);
-		case FEATURE_TYPE.BOOLEAN:
-			return entitlement.is_enabled ? 'Yes' : 'No';
-		default:
-			return '--';
-	}
-};
-
 const AddonDetails = () => {
 	const navigate = useNavigate();
 	const { id } = useParams<Params>();
-	const [drawerOpen, setDrawerOpen] = useState(false);
 	const [addonDrawerOpen, setAddonDrawerOpen] = useState(false);
 
 	const {
@@ -158,48 +122,6 @@ const AddonDetails = () => {
 		}
 	}, [addonData, updateBreadcrumb]);
 
-	const columnData: ColumnData<EntitlementResponse>[] = [
-		{
-			title: 'Feature Name',
-			render(row) {
-				return <RedirectCell redirectUrl={`${RouteNames.featureDetails}/${row?.feature?.id}`}>{row?.feature?.name}</RedirectCell>;
-			},
-		},
-		{
-			title: 'Type',
-			render(row) {
-				return getFeatureTypeChips({ type: row?.feature_type || '', showIcon: true, showLabel: true });
-			},
-		},
-		{
-			title: 'Value',
-			render(row) {
-				return getFeatureValue(row);
-			},
-		},
-		{
-			fieldVariant: 'interactive',
-			width: '30px',
-			hideOnEmpty: true,
-			render(row) {
-				return (
-					<ActionButton
-						deleteMutationFn={async () => {
-							return await EntitlementApi.deleteEntitlementById(row?.id);
-						}}
-						archiveIcon={<Trash2 />}
-						archiveText='Delete'
-						id={row?.id}
-						isEditDisabled={true}
-						isArchiveDisabled={row?.status === ENTITY_STATUS.ARCHIVED}
-						refetchQueryKey={'fetchAddon'}
-						entityName={row?.feature?.name}
-					/>
-				);
-			},
-		},
-	];
-
 	if (isLoading) {
 		return <Loader />;
 	}
@@ -217,13 +139,12 @@ const AddonDetails = () => {
 	const addonDetails = [
 		{ label: 'Addon Name', value: addonData?.name },
 		{ label: 'Lookup Key', value: addonData?.lookup_key },
-		{ label: 'Description', value: addonData?.description || '--' },
 		{ label: 'Type', value: addonData?.type === ADDON_TYPE.ONETIME ? 'One Time' : 'Multiple' },
-		{ label: 'Created Date', value: formatDate(addonData?.created_at ?? '') },
 		{
 			label: 'Status',
 			value: <Chip label={formatChips(addonData?.status)} variant={addonData?.status === 'published' ? 'success' : 'default'} />,
 		},
+		{ label: 'Description', value: addonData?.description || '--' },
 	];
 
 	return (
@@ -244,16 +165,6 @@ const AddonDetails = () => {
 			}>
 			<AddonDrawer data={addonData} open={addonDrawerOpen} onOpenChange={setAddonDrawerOpen} refetchQueryKeys={['fetchAddon']} />
 			<ApiDocsContent tags={['Addons']} />
-			<AddEntitlementDrawer
-				selectedFeatures={addonData.entitlements?.map((v) => v.feature)}
-				entitlements={addonData.entitlements}
-				planId={addonData.id}
-				entityType={ENTITLEMENT_ENTITY_TYPE.ADDON}
-				entityId={addonData.id}
-				isOpen={drawerOpen}
-				onOpenChange={(value) => setDrawerOpen(value)}
-			/>
-
 			<div className='space-y-6'>
 				<DetailsCard variant='stacked' title='Addon Details' data={addonDetails} />
 
@@ -263,7 +174,7 @@ const AddonDetails = () => {
 						<CardHeader
 							title='Charges'
 							cta={
-								<Button prefixIcon={<Plus />} onClick={() => navigate(`${RouteNames.addonDetails}/${id}/add-charges`)}>
+								<Button prefixIcon={<Plus />} onClick={() => navigate(`${RouteNames.addonCharges.replace(':addonId', id!)}`)}>
 									Add
 								</Button>
 							}
@@ -275,31 +186,7 @@ const AddonDetails = () => {
 						title='Charges'
 						subtitle='No charges added to the addon yet'
 						cta={
-							<Button prefixIcon={<Plus />} onClick={() => navigate(`${RouteNames.addonDetails}/${id}/add-charges`)}>
-								Add
-							</Button>
-						}
-					/>
-				)}
-
-				{addonData.entitlements?.length || 0 > 0 ? (
-					<Card variant='notched'>
-						<CardHeader
-							title='Entitlements'
-							cta={
-								<Button prefixIcon={<Plus />} onClick={() => setDrawerOpen(true)}>
-									Add
-								</Button>
-							}
-						/>
-						<FlexpriceTable showEmptyRow data={addonData.entitlements || []} columns={columnData} />
-					</Card>
-				) : (
-					<NoDataCard
-						title='Entitlements'
-						subtitle='No entitlements added to the addon yet'
-						cta={
-							<Button prefixIcon={<Plus />} onClick={() => setDrawerOpen(true)}>
+							<Button prefixIcon={<Plus />} onClick={() => navigate(`${RouteNames.addonCharges.replace(':addonId', id!)}`)}>
 								Add
 							</Button>
 						}

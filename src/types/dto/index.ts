@@ -13,6 +13,7 @@ export type {
 	CreatePriceTier,
 	TransformQuantity,
 	PriceFilter,
+	CreateBulkPriceRequest,
 } from './Price';
 
 export type {
