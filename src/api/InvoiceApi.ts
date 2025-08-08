@@ -8,7 +8,7 @@ import {
 	GetAllInvoicesPayload,
 	UpdateInvoiceStatusPayload,
 	GetInvoicePreviewPayload,
-	CreateOneOffInvoicePayload,
+	CreateInvoicePayload,
 	GetInvoicesByFiltersPayload,
 } from '@/types/dto';
 
@@ -59,7 +59,7 @@ class InvoiceApi {
 		return await AxiosClient.get(url);
 	}
 
-	public static async createInvoice(payload: CreateOneOffInvoicePayload): Promise<Invoice> {
+	public static async createInvoice(payload: CreateInvoicePayload): Promise<Invoice> {
 		return await AxiosClient.post<Invoice>(`${this.baseurl}`, payload);
 	}
 

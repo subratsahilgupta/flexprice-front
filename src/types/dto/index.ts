@@ -23,7 +23,7 @@ export type {
 	GetCustomerEntitlementPayload,
 	CreateCustomerSubscriptionPayload,
 	GetUsageSummaryResponse,
-	GetCustomerByFiltersPayload as GetCustomerByQueryPayload,
+	GetCustomerByFiltersPayload,
 } from './Customer';
 
 export type { EntitlementFilters, EntitlementResponse } from './Entitlement';
@@ -35,7 +35,7 @@ export type {
 	GetAllInvoicesPayload,
 	UpdateInvoiceStatusPayload,
 	GetInvoicePreviewPayload,
-	CreateInvoicePayload as CreateOneOffInvoicePayload,
+	CreateInvoicePayload,
 	GetInvoicePdfPayload,
 	GetInvoicesByFiltersPayload,
 } from './InvoiceApi';
@@ -78,7 +78,19 @@ export type {
 	CreditNote,
 	CreditNoteLineItem,
 } from './CreditNote';
+
 export { CREDIT_NOTE_STATUS, CREDIT_NOTE_REASON, CREDIT_NOTE_TYPE } from '@/models/CreditNote';
+
 export type { SynchronizePlanPricesWithSubscriptionResponse } from './Plan';
 
 export type { CreateCouponRequest, UpdateCouponRequest, GetCouponResponse, ListCouponsResponse, CouponFilter } from './Coupon';
+
+export type {
+	CreateAddonRequest,
+	UpdateAddonRequest,
+	GetAddonsPayload,
+	GetAddonsResponse,
+	GetAddonByFilterPayload,
+	AddAddonToSubscriptionRequest,
+	AddonResponse,
+} from './Addon';
