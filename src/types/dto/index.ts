@@ -13,7 +13,6 @@ export type {
 	GetCustomerSubscriptionsResponse,
 	GetCustomerEntitlementsResponse,
 	GetCustomerEntitlementPayload,
-	CreateCustomerSubscriptionPayload,
 	GetUsageSummaryResponse,
 	GetCustomerByFiltersPayload as GetCustomerByQueryPayload,
 } from './Customer';
@@ -45,6 +44,7 @@ export type {
 	ResumeSubscriptionPayload,
 	SubscriptionPauseResponse,
 	SubscriptionResumeResponse,
+	CreateSubscriptionPayload,
 } from './Subscription';
 
 export type { GetBillingdetailsResponse, UpdateTenantRequest } from './Tenant';
@@ -74,3 +74,22 @@ export { CREDIT_NOTE_STATUS, CREDIT_NOTE_REASON, CREDIT_NOTE_TYPE } from '@/mode
 export type { SynchronizePlanPricesWithSubscriptionResponse } from './Plan';
 
 export type { CreateCouponRequest, UpdateCouponRequest, GetCouponResponse, ListCouponsResponse, CouponFilter } from './Coupon';
+export type {
+	CreateTaxRateRequest,
+	UpdateTaxRateRequest,
+	TaxRateResponse,
+	ListTaxRatesResponse,
+	CreateTaxAssociationRequest,
+	TaxAssociationUpdateRequest,
+	TaxAssociationResponse,
+	TaxRateOverride,
+	CreateTaxAppliedRequest,
+	TaxAppliedResponse,
+	ListTaxAppliedResponse,
+	TaxAppliedFilter,
+	TaxAssociationFilter,
+	ListTaxAssociationsResponse,
+	LinkTaxRateToEntityRequest,
+	CreateInvoiceRequest,
+	TaxCalculationResult,
+} from './tax';

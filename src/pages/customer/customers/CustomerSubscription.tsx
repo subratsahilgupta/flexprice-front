@@ -27,6 +27,10 @@ import { getLineItemOverrides } from '@/utils/common/price_override_helpers';
 import { Coupon } from '@/models/Coupon';
 import formatCouponName from '@/utils/common/format_coupon_name';
 import filterValidCoupons from '@/utils/helpers/coupons';
+import TaxApi from '@/api/TaxApi';
+import { TAXRATE_ENTITY_TYPE } from '@/models/Tax';
+import { TaxRateOverride } from '@/types/dto/tax';
+import { EXPAND } from '@/models/expand';
 
 type Params = {
 	id: string;
@@ -58,6 +62,10 @@ export type SubscriptionFormState = {
 
 	// Coupons
 	linkedCoupon: Coupon | null;
+	customerId: string;
+
+	// Tax Rate Overrides
+	tax_rate_overrides: TaxRateOverride[];
 };
 
 // Data Fetching Hooks
@@ -124,6 +132,35 @@ const CustomerSubscription: React.FC = () => {
 	const { data: customerData } = useCustomerData(customerId);
 	const { data: subscriptionData } = useSubscriptionData(subscription_id);
 	const { data: availableCoupons = [] } = useAvailableCoupons();
+	const { data: customerTaxAssociations } = useQuery({
+		queryKey: ['customerTaxAssociations', customerId],
+		queryFn: async () => {
+			return await TaxApi.listTaxAssociations({
+				limit: 100,
+				offset: 0,
+				entity_id: customerId!,
+				expand: EXPAND.TAX_RATE,
+				entity_type: TAXRATE_ENTITY_TYPE.CUSTOMER,
+			});
+		},
+		enabled: !!customerId,
+	});
+
+	useEffect(() => {
+		if (customerTaxAssociations?.items) {
+			setSubscriptionState((prev) => ({
+				...prev,
+				tax_rate_overrides: customerTaxAssociations.items.map((item) => ({
+					tax_rate_id: item.tax_rate_id,
+					tax_rate_code: item.tax_rate?.code ?? '',
+					currency: item.currency.toLowerCase(),
+					auto_apply: item.auto_apply,
+					priority: item.priority,
+					tax_rate_name: item.tax_rate?.name ?? '',
+				})),
+			}));
+		}
+	}, [customerTaxAssociations]);
 
 	// Local state
 	const [subscriptionState, setSubscriptionState] = useState<SubscriptionFormState>({
@@ -139,6 +176,8 @@ const CustomerSubscription: React.FC = () => {
 		originalPhases: [],
 		priceOverrides: {},
 		linkedCoupon: null,
+		customerId: customerId!,
+		tax_rate_overrides: [],
 	});
 
 	const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
@@ -200,10 +239,12 @@ const CustomerSubscription: React.FC = () => {
 					originalPhases: [initialPhase as SubscriptionPhase],
 					priceOverrides: {},
 					linkedCoupon: null,
+					customerId: customerId!,
+					tax_rate_overrides: [],
 				});
 			}
 		}
-	}, [subscriptionData, plans]);
+	}, [subscriptionData, plans, customerId]);
 
 	// Create subscription mutation
 	const { mutate: createSubscription, isPending: isCreating } = useMutation({
@@ -225,7 +266,7 @@ const CustomerSubscription: React.FC = () => {
 	});
 
 	const handleSubscriptionSubmit = () => {
-		const { billingPeriod, selectedPlan, currency, phases, priceOverrides, prices, linkedCoupon } = subscriptionState;
+		const { billingPeriod, selectedPlan, currency, phases, priceOverrides, prices, linkedCoupon, tax_rate_overrides } = subscriptionState;
 
 		if (!billingPeriod || !selectedPlan) {
 			toast.error('Please select a plan and billing period.');
@@ -308,6 +349,9 @@ const CustomerSubscription: React.FC = () => {
 
 			// TODO: remove this once the feature is released
 			overage_factor: firstPhase.overage_factor ?? 1,
+
+			// Tax rate overrides
+			tax_rate_overrides: tax_rate_overrides.length > 0 ? tax_rate_overrides : undefined,
 		};
 
 		createSubscription(payload);

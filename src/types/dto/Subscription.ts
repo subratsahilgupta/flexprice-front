@@ -24,6 +24,8 @@ export interface ListSubscriptionsPayload extends QueryFilter, TimeRangeFilter {
 	with_line_items?: boolean;
 }
 
+import { TaxRateOverride } from './tax';
+
 export interface GetSubscriptionDetailsPayload {
 	subscription_id: string;
 	period_end?: string;
@@ -141,10 +143,12 @@ export interface CreateSubscriptionPayload {
 	overage_factor?: number;
 	override_line_items?: SubscriptionLineItemOverrideRequest[];
 	subscription_coupons?: string[];
+	tax_rate_overrides?: TaxRateOverride[];
 }
 
 export interface SubscriptionLineItemOverrideRequest {
 	price_id: string;
 	quantity?: number;
 	amount?: number;
+	tax_rate_overrides?: TaxRateOverride[];
 }

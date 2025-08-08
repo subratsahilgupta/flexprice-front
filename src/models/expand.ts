@@ -1,0 +1,17 @@
+export enum EXPAND {
+	PRICES = 'prices',
+	PLAN = 'plan',
+	METERS = 'meters',
+	FEATURES = 'features',
+	PLANS = 'plans',
+	ENTITLEMENTS = 'entitlements',
+	SCHEDULE = 'schedule',
+	INVOICE = 'invoice',
+	SUBSCRIPTION = 'subscription',
+	CUSTOMER = 'customer',
+	CREDIT_NOTE = 'credit_note',
+	CREDIT_GRANT = 'credit_grant',
+	TAX_APPLIED = 'tax_applied',
+	TAX_RATE = 'tax_rate',
+	TAX_ASSOCIATION = 'tax_association',
+}

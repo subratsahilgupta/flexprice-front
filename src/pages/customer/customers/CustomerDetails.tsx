@@ -15,6 +15,7 @@ const tabs = [
 	{ id: 'wallet', label: 'Wallet' },
 	{ id: 'invoice', label: 'Invoice' },
 	{ id: 'information', label: 'Information' },
+	{ id: 'tax-association', label: 'Tax Association' },
 	// { id: 'credit-note', label: 'Credit Note' },
 ] as const;
 
