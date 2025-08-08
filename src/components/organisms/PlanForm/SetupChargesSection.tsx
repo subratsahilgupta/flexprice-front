@@ -10,6 +10,7 @@ import RecurringChargesForm from './RecurringChargesForm';
 import UsagePricingForm from './UsagePricingForm';
 import { CirclePlus } from 'lucide-react';
 import { BILLING_CADENCE, INVOICE_CADENCE } from '@/models/Invoice';
+import { PRICE_ENTITY_TYPE } from '@/models/Price';
 
 interface Props {
 	plan: Partial<Plan>;
@@ -143,6 +144,8 @@ const SetupChargesSection: React.FC<Props> = ({ plan, setPlanField }) => {
 						<RecurringChargesForm
 							key={index}
 							price={price}
+							entityType={PRICE_ENTITY_TYPE.PLAN}
+							entityId={plan.id}
 							onAdd={(newPrice) => {
 								setRecurringCharges((prevCharges) => {
 									const newCharges = prevCharges.map((p, i) => {
@@ -210,6 +213,8 @@ const SetupChargesSection: React.FC<Props> = ({ plan, setPlanField }) => {
 						<UsagePricingForm
 							key={index}
 							price={price}
+							entityType={PRICE_ENTITY_TYPE.PLAN}
+							entityId={plan.id}
 							onAdd={(newPrice) => {
 								const newCharges = usageCharges.map((p, i) => {
 									if (index === i) {

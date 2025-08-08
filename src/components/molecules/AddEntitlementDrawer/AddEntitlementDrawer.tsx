@@ -4,7 +4,7 @@ import { AddChargesButton } from '@/components/organisms/PlanForm/SetupChargesSe
 
 import { billlingPeriodOptions } from '@/constants/constants';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
-import { Entitlement } from '@/models/Entitlement';
+import { Entitlement, ENTITLEMENT_ENTITY_TYPE } from '@/models/Entitlement';
 import Feature, { FEATURE_TYPE } from '@/models/Feature';
 import { METER_USAGE_RESET_PERIOD } from '@/models/Meter';
 import { PlanApi } from '@/api/PlanApi';
@@ -19,6 +19,8 @@ interface Props {
 	planId?: string;
 	selectedFeatures?: Feature[];
 	entitlements?: Entitlement[];
+	entityType?: ENTITLEMENT_ENTITY_TYPE;
+	entityId?: string;
 }
 
 interface ValidationErrors {
@@ -36,6 +38,8 @@ const AddEntitlementDrawer: FC<Props> = ({
 	planId,
 	selectedFeatures: disabledFeatures,
 	entitlements: initialEntitlements,
+	entityType = ENTITLEMENT_ENTITY_TYPE.PLAN,
+	entityId,
 }) => {
 	const [entitlements, setEntitlements] = useState<Partial<Entitlement>[]>([]);
 	const [errors, setErrors] = useState<ValidationErrors>({});
@@ -202,6 +206,8 @@ const AddEntitlementDrawer: FC<Props> = ({
 				feature_id: activeFeature.id,
 				feature_type: activeFeature.type,
 				is_enabled: activeFeature.type === FEATURE_TYPE.BOOLEAN ? true : undefined,
+				entity_type: entityType,
+				entity_id: entityId || '',
 			},
 		]);
 		setEntitlement({});

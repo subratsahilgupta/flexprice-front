@@ -63,7 +63,7 @@ const AddonTable: FC<Props> = ({ data, onEdit }) => {
 				return (
 					<ActionButton
 						deleteMutationFn={async () => {
-							return await AddonApi.deleteAddon(row?.id);
+							return await AddonApi.DeleteAddon(row?.id);
 						}}
 						id={row?.id}
 						editPath={''}

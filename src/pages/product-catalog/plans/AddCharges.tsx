@@ -18,6 +18,7 @@ import { BILLING_CADENCE, INVOICE_CADENCE } from '@/models/Invoice';
 import { BILLING_MODEL, PRICE_TYPE } from '@/models/Price';
 import { logger } from '@/utils/common/Logger';
 import SubscriptionApi from '@/api/SubscriptionApi';
+import { PRICE_ENTITY_TYPE } from '@/models/Price';
 
 // ===== TYPES & CONSTANTS (moved outside component) =====
 
@@ -355,6 +356,8 @@ const AddChargesPage = () => {
 						<div key={`recurring-${index}`}>
 							<RecurringChargesForm
 								price={charge}
+								entityType={PRICE_ENTITY_TYPE.PLAN}
+								entityId={planId}
 								onAdd={(charge) => handleRecurringChargeAdd(index, charge)}
 								onUpdate={(price) => handleRecurringChargeUpdate(index, price)}
 								onDeleteClicked={() => handleRecurringChargeDelete(index)}
@@ -368,6 +371,8 @@ const AddChargesPage = () => {
 						<div key={`usage-${index}`}>
 							<UsagePricingForm
 								price={charge}
+								entityType={PRICE_ENTITY_TYPE.PLAN}
+								entityId={planId}
 								onAdd={(charge) => handleUsageChargeAdd(index, charge)}
 								onUpdate={(charge) => handleUsageChargeUpdate(index, charge)}
 								onEditClicked={() => handleUsageChargeEdit(index)}

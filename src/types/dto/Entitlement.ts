@@ -1,8 +1,9 @@
-import { Plan } from '@/models/Plan';
 import { BaseEntityStatus } from '../common';
-import Feature from '@/models/Feature';
-import { Entitlement } from '@/models/Entitlement';
+import { Entitlement, ENTITLEMENT_ENTITY_TYPE } from '@/models/Entitlement';
 import { Pagination } from '@/models/Pagination';
+import { Plan } from '@/models/Plan';
+import Addon from '@/models/Addon';
+import Feature from '@/models/Feature';
 
 export interface EntitlementFilters {
 	end_time?: string;
@@ -13,18 +14,20 @@ export interface EntitlementFilters {
 	limit?: number;
 	offset?: number;
 	order?: 'asc' | 'desc';
-	plan_ids?: string[];
+	entity_type?: ENTITLEMENT_ENTITY_TYPE;
+	entity_ids?: string[];
 	sort?: string;
 	start_time?: string;
 	status?: BaseEntityStatus;
 }
 
-export interface ExtendedEntitlement extends Entitlement {
-	plan: Plan;
+export interface EntitlementResponse extends Entitlement {
 	feature: Feature;
+	plan?: Plan;
+	addon?: Addon;
 }
 
 export interface EntitlementResponse {
-	items: ExtendedEntitlement[] | Entitlement[];
+	items: EntitlementResponse[];
 	pagination: Pagination;
 }

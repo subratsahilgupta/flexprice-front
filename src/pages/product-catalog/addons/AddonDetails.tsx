@@ -21,10 +21,10 @@ import { formatAmount } from '@/components/atoms/Input/Input';
 import ChargeValueCell from '../plans/ChargeValueCell';
 import { BILLING_PERIOD } from '@/constants/constants';
 import { Entitlement } from '@/models/Entitlement';
-import { ExtendedEntitlement } from '@/types/dto/Entitlement';
 import { ENTITY_STATUS } from '@/models/base';
 import { ADDON_TYPE } from '@/models/Addon';
-import { ExtendedAddon } from '@/types/dto/Addon';
+import { ENTITLEMENT_ENTITY_TYPE } from '@/models/Entitlement';
+import { EntitlementResponse } from '@/types/dto';
 
 const formatBillingPeriod = (billingPeriod: string) => {
 	switch (billingPeriod.toUpperCase()) {
@@ -132,14 +132,14 @@ const AddonDetails = () => {
 	} = useQuery({
 		queryKey: ['fetchAddon', id],
 		queryFn: async () => {
-			return (await AddonApi.getAddonById(id!)) as ExtendedAddon;
+			return await AddonApi.GetAddonById(id!);
 		},
 		enabled: !!id,
 	});
 
 	const { mutate: archiveAddon } = useMutation({
 		mutationFn: async () => {
-			return await AddonApi.deleteAddon(id!);
+			return await AddonApi.DeleteAddon(id!);
 		},
 		onSuccess: () => {
 			toast.success('Addon archived successfully');
@@ -158,7 +158,7 @@ const AddonDetails = () => {
 		}
 	}, [addonData, updateBreadcrumb]);
 
-	const columnData: ColumnData<ExtendedEntitlement>[] = [
+	const columnData: ColumnData<EntitlementResponse>[] = [
 		{
 			title: 'Feature Name',
 			render(row) {
@@ -245,9 +245,11 @@ const AddonDetails = () => {
 			<AddonDrawer data={addonData} open={addonDrawerOpen} onOpenChange={setAddonDrawerOpen} refetchQueryKeys={['fetchAddon']} />
 			<ApiDocsContent tags={['Addons']} />
 			<AddEntitlementDrawer
-				selectedFeatures={addonData.entitlements?.map((v: ExtendedEntitlement) => v.feature)}
+				selectedFeatures={addonData.entitlements?.map((v) => v.feature)}
 				entitlements={addonData.entitlements}
 				planId={addonData.id}
+				entityType={ENTITLEMENT_ENTITY_TYPE.ADDON}
+				entityId={addonData.id}
 				isOpen={drawerOpen}
 				onOpenChange={(value) => setDrawerOpen(value)}
 			/>

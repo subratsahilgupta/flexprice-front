@@ -20,6 +20,11 @@ export interface CreateAddonRequest {
 	metadata?: Record<string, any>;
 }
 
+export interface AddonResponse extends Addon {
+	prices: Price[];
+	entitlements: Entitlement[];
+}
+
 export interface UpdateAddonRequest {
 	name?: string;
 	description?: string;

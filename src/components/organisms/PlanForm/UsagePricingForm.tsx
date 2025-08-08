@@ -11,7 +11,7 @@ import { InternalPrice } from './SetupChargesSection';
 import UsageChargePreview from './UsageChargePreview';
 import { toast } from 'react-hot-toast';
 import { BILLING_CADENCE, INVOICE_CADENCE } from '@/models/Invoice';
-import { BILLING_MODEL, TIER_MODE } from '@/models/Price';
+import { BILLING_MODEL, TIER_MODE, PRICE_ENTITY_TYPE } from '@/models/Price';
 import { BILLING_PERIOD, PRICE_TYPE } from '@/models/Price';
 interface Props {
 	onAdd: (price: InternalPrice) => void;
@@ -19,6 +19,8 @@ interface Props {
 	onEditClicked: () => void;
 	onDeleteClicked: () => void;
 	price: Partial<InternalPrice>;
+	entityType?: PRICE_ENTITY_TYPE;
+	entityId?: string;
 }
 
 export interface PriceTier {
@@ -42,7 +44,15 @@ const billingModels: SelectOption[] = [
 	{ value: 'TIERED', label: 'Volume Tiered' },
 ];
 
-const UsagePricingForm: FC<Props> = ({ onAdd, onUpdate, onEditClicked, onDeleteClicked, price }) => {
+const UsagePricingForm: FC<Props> = ({
+	onAdd,
+	onUpdate,
+	onEditClicked,
+	onDeleteClicked,
+	price,
+	entityType = PRICE_ENTITY_TYPE.PLAN,
+	entityId,
+}) => {
 	const [currency, setCurrency] = useState(price.currency || currencyOptions[0].value);
 	const [billingModel, setBillingModel] = useState(price.billing_model || billingModels[0].value);
 	const [meterId, setMeterId] = useState<string>(price.meter_id || '');
@@ -173,6 +183,8 @@ const UsagePricingForm: FC<Props> = ({ onAdd, onUpdate, onEditClicked, onDeleteC
 			billing_period_count: 1,
 			billing_cadence: 'RECURRING' as BILLING_CADENCE,
 			invoice_cadence: invoiceCadence as INVOICE_CADENCE,
+			entity_type: entityType,
+			entity_id: entityId || '',
 		};
 
 		let finalPrice: Partial<Price>;

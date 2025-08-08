@@ -9,7 +9,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { RouteNames } from '@/core/routes/Routes';
 import FeatureApi from '@/api/FeatureApi';
 import EntitlementApi from '@/api/EntitlementApi';
-import { ExtendedEntitlement } from '@/types/dto/Entitlement';
 import formatChips from '@/utils/common/format_chips';
 
 // Store
@@ -30,6 +29,7 @@ import { formatAmount } from '@/components/atoms/Input/Input';
 import { ApiDocsSnippet } from '@/store/useApiDocsStore';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { ENTITY_STATUS } from '@/models/base';
+import { EntitlementResponse } from '@/types/dto';
 
 const FeatureDetails = () => {
 	const { id: featureId } = useParams() as { id: string };
@@ -70,16 +70,16 @@ const FeatureDetails = () => {
 		}
 	}, [data, featureId, updateBreadcrumb]);
 
-	const columns: ColumnData<ExtendedEntitlement>[] = [
+	const columns: ColumnData<EntitlementResponse>[] = [
 		{
 			title: 'Plan',
-			render: (rowData: ExtendedEntitlement) => {
-				return <RedirectCell redirectUrl={`${RouteNames.plan}/${rowData?.plan?.id}`}>{rowData?.plan?.name}</RedirectCell>;
+			render: (rowData) => {
+				return <RedirectCell redirectUrl={`${RouteNames.plan}/${rowData?.entity_id}`}>{rowData?.entity_id}</RedirectCell>;
 			},
 		},
 		{
 			title: 'Status',
-			render: (rowData: ExtendedEntitlement) => {
+			render: (rowData) => {
 				const label = formatChips(rowData?.plan?.status || '');
 				return <Chip variant={label === 'Active' ? 'success' : 'default'} label={label} />;
 			},
@@ -87,7 +87,7 @@ const FeatureDetails = () => {
 		{
 			title: 'Value',
 			align: 'right',
-			render: (rowData: ExtendedEntitlement) => {
+			render: (rowData) => {
 				if (rowData.feature_type === FEATURE_TYPE.BOOLEAN) {
 					return rowData.is_enabled ? 'Yes' : 'No';
 				}
