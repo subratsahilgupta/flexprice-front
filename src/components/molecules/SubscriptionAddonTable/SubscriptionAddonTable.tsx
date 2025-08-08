@@ -109,6 +109,7 @@ const SubscriptionAddonTable: React.FC<Props> = ({ data, onChange, disabled, get
 			<SubscriptionAddonModal
 				getEmptyAddon={getEmptyAddon}
 				data={selectedAddon || undefined}
+				currentAddons={data}
 				isOpen={isOpen}
 				onOpenChange={setIsOpen}
 				onSave={handleSave}

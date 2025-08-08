@@ -1,16 +1,15 @@
 import { AddAddonToSubscriptionRequest } from '@/types/dto/Addon';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Button, DatePicker } from '@/components/atoms';
-import { Sheet } from '@/components/atoms';
+import Dialog from '@/components/atoms/Dialog';
 import { useQuery } from '@tanstack/react-query';
 import AddonApi from '@/api/AddonApi';
 import { Select } from '@/components/atoms';
 import { toSentenceCase } from '@/utils/common/helper_functions';
 import { ADDON_TYPE } from '@/models/Addon';
-import { Chip } from '@/components/atoms';
-
 interface Props {
 	data?: AddAddonToSubscriptionRequest;
+	currentAddons: AddAddonToSubscriptionRequest[];
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;
 	onSave: (addon: AddAddonToSubscriptionRequest) => void;
@@ -18,10 +17,15 @@ interface Props {
 	getEmptyAddon: () => Partial<AddAddonToSubscriptionRequest>;
 }
 
-const SubscriptionAddonModal: React.FC<Props> = ({ data, isOpen, onOpenChange, onSave, onCancel, getEmptyAddon }) => {
+interface FormErrors {
+	addon_id?: string;
+	end_date?: string;
+}
+
+const SubscriptionAddonModal: React.FC<Props> = ({ data, currentAddons, isOpen, onOpenChange, onSave, onCancel, getEmptyAddon }) => {
 	const [formData, setFormData] = useState<Partial<AddAddonToSubscriptionRequest>>({});
-	const [errors, setErrors] = useState<Record<string, string>>({});
-	const [selectedAddonDetails, setSelectedAddonDetails] = useState<any>(null);
+	const [errors, setErrors] = useState<FormErrors>({});
+	const [_, setSelectedAddonDetails] = useState<any>(null);
 
 	// Fetch available addons
 	const { data: addons = [] } = useQuery({
@@ -48,8 +52,8 @@ const SubscriptionAddonModal: React.FC<Props> = ({ data, isOpen, onOpenChange, o
 		}
 	}, [isOpen, data, getEmptyAddon, addons]);
 
-	const validateForm = (): boolean => {
-		const newErrors: Record<string, string> = {};
+	const validateForm = useCallback((): { isValid: boolean; errors: FormErrors } => {
+		const newErrors: FormErrors = {};
 
 		if (!formData.addon_id) {
 			newErrors.addon_id = 'Addon is required';
@@ -63,15 +67,21 @@ const SubscriptionAddonModal: React.FC<Props> = ({ data, isOpen, onOpenChange, o
 			}
 		}
 
-		setErrors(newErrors);
-		return Object.keys(newErrors).length === 0;
-	};
+		return {
+			isValid: Object.keys(newErrors).length === 0,
+			errors: newErrors,
+		};
+	}, [formData]);
 
-	const handleSave = () => {
-		if (!validateForm()) {
+	const handleSave = useCallback(() => {
+		const validation = validateForm();
+
+		if (!validation.isValid) {
+			setErrors(validation.errors);
 			return;
 		}
 
+		setErrors({});
 		const addonData: AddAddonToSubscriptionRequest = {
 			addon_id: formData.addon_id!,
 			start_date: formData.start_date,
@@ -80,107 +90,115 @@ const SubscriptionAddonModal: React.FC<Props> = ({ data, isOpen, onOpenChange, o
 		};
 
 		onSave(addonData);
-	};
+		setFormData(getEmptyAddon());
+		setSelectedAddonDetails(null);
+		onOpenChange(false);
+	}, [formData, validateForm, onSave, getEmptyAddon, onOpenChange]);
 
-	const handleCancel = () => {
+	const handleCancel = useCallback(() => {
 		setFormData({});
 		setErrors({});
 		setSelectedAddonDetails(null);
 		onCancel();
-	};
+	}, [onCancel]);
 
-	const handleAddonSelect = (addonId: string) => {
-		const addonDetails = addons.find((addon) => addon.id === addonId);
-		setSelectedAddonDetails(addonDetails);
-		setFormData({ ...formData, addon_id: addonId });
-	};
+	const handleAddonSelect = useCallback(
+		(addonId: string) => {
+			const addonDetails = addons.find((addon) => addon.id === addonId);
+			setSelectedAddonDetails(addonDetails);
+			setFormData((prev) => ({ ...prev, addon_id: addonId }));
+			// Clear error for this field when user selects
+			if (errors.addon_id) {
+				setErrors((prev) => ({ ...prev, addon_id: undefined }));
+			}
+		},
+		[addons, errors.addon_id],
+	);
 
-	const addonOptions = addons.map((addon) => ({
-		label: addon.name,
-		value: addon.id,
-		description: `${toSentenceCase(addon.type)} - ${addon.description || 'No description'}`,
-	}));
+	const handleDateChange = useCallback(
+		(field: 'start_date' | 'end_date', date: Date | undefined) => {
+			setFormData((prev) => ({ ...prev, [field]: date?.toISOString() }));
+			// Clear error for end_date when user changes dates
+			if (field === 'end_date' && errors.end_date) {
+				setErrors((prev) => ({ ...prev, end_date: undefined }));
+			}
+		},
+		[errors.end_date],
+	);
 
-	const getAddonTypeChip = (type: string) => {
-		switch (type.toLowerCase()) {
-			case ADDON_TYPE.ONETIME:
-				return <Chip textColor='#4B5563' bgColor='#F3F4F6' label={toSentenceCase(type)} className='text-xs' />;
-			case ADDON_TYPE.MULTIPLE:
-				return <Chip textColor='#1E40AF' bgColor='#DBEAFE' label={toSentenceCase(type)} className='text-xs' />;
-			default:
-				return <Chip textColor='#6B7280' bgColor='#F9FAFB' label={toSentenceCase(type)} className='text-xs' />;
-		}
-	};
+	// Filter addon options based on current addons and addon type
+	const filteredAddonOptions = useMemo(() => {
+		return addons
+			.filter((addon) => {
+				// If editing, always include the current addon
+				if (data && data.addon_id === addon.id) {
+					return true;
+				}
+
+				// For one-time addons, check if they're already linked
+				if (addon.type === ADDON_TYPE.ONETIME) {
+					const isAlreadyLinked = currentAddons.some((currentAddon) => currentAddon.addon_id === addon.id);
+					return !isAlreadyLinked;
+				}
+
+				// For multiple addons, always include them (can be added multiple times)
+				return true;
+			})
+			.map((addon) => ({
+				label: addon.name,
+				value: addon.id,
+				description: `${toSentenceCase(addon.type)} - ${addon.description || 'No description'}`,
+			}));
+	}, [addons, currentAddons, data]);
 
 	return (
-		<Sheet
+		<Dialog
 			isOpen={isOpen}
+			showCloseButton={false}
 			onOpenChange={onOpenChange}
 			title={data ? 'Edit Addon' : 'Add Addon'}
-			description={data ? 'Edit addon configuration' : 'Add an addon to the subscription'}>
-			<div className='space-y-4 mt-6'>
-				<Select
-					label='Addon*'
-					placeholder='Select addon'
-					options={addonOptions}
-					value={formData.addon_id || ''}
-					onChange={handleAddonSelect}
-					error={errors.addon_id}
-				/>
+			className='sm:max-w-[600px]'>
+			<div className='grid gap-4 mt-3'>
+				<div className='space-y-2'>
+					<Select
+						label='Addon'
+						placeholder='Select addon'
+						options={filteredAddonOptions}
+						value={formData.addon_id || ''}
+						onChange={handleAddonSelect}
+						error={errors.addon_id}
+					/>
+				</div>
 
-				{/* Addon Details Card */}
-				{selectedAddonDetails && (
-					<div className='p-4 bg-gray-50 rounded-lg border'>
-						<div className='flex items-center justify-between mb-2'>
-							<h4 className='font-medium text-gray-900'>{selectedAddonDetails.name}</h4>
-							{getAddonTypeChip(selectedAddonDetails.type)}
-						</div>
-						{selectedAddonDetails.description && <p className='text-sm text-gray-600 mb-2'>{selectedAddonDetails.description}</p>}
-						<div className='text-xs text-gray-500'>
-							<p>Lookup Key: {selectedAddonDetails.lookup_key}</p>
-							{selectedAddonDetails.prices && selectedAddonDetails.prices.length > 0 && (
-								<>
-									<p className='mt-1'>
-										Pricing: {selectedAddonDetails.prices.length} price{selectedAddonDetails.prices.length > 1 ? 's' : ''} configured
-									</p>
-									<div className='mt-2 space-y-1'>
-										{selectedAddonDetails.prices.map((price: any, index: number) => (
-											<div key={index} className='flex justify-between items-center text-xs'>
-												<span>
-													{price.currency.toUpperCase()} {price.amount}
-												</span>
-												<span className='text-gray-400'>{price.tax_behavior ? 'Tax: ' + price.tax_behavior : 'No tax'}</span>
-											</div>
-										))}
-									</div>
-								</>
-							)}
-						</div>
+				{/* Start and End Date on same line */}
+				<div className='grid grid-cols-2 gap-4'>
+					<div className='space-y-2'>
+						<DatePicker
+							label='Start Date'
+							placeholder='Select start date'
+							date={formData.start_date ? new Date(formData.start_date) : undefined}
+							setDate={(date) => handleDateChange('start_date', date)}
+						/>
 					</div>
-				)}
-
-				<DatePicker
-					label='Start Date'
-					placeholder='Select start date'
-					date={formData.start_date ? new Date(formData.start_date) : undefined}
-					setDate={(date) => setFormData({ ...formData, start_date: date?.toISOString() })}
-				/>
-
-				<DatePicker
-					label='End Date'
-					placeholder='Select end date'
-					date={formData.end_date ? new Date(formData.end_date) : undefined}
-					setDate={(date) => setFormData({ ...formData, end_date: date?.toISOString() })}
-				/>
-
-				<div className='flex justify-end space-x-2 pt-4'>
-					<Button variant='outline' onClick={handleCancel}>
-						Cancel
-					</Button>
-					<Button onClick={handleSave}>{data ? 'Update' : 'Add'} Addon</Button>
+					<div className='space-y-2'>
+						<DatePicker
+							label='End Date'
+							placeholder='Select end date'
+							date={formData.end_date ? new Date(formData.end_date) : undefined}
+							setDate={(date) => handleDateChange('end_date', date)}
+						/>
+						{errors.end_date && <p className='text-sm text-red-500'>{errors.end_date}</p>}
+					</div>
 				</div>
 			</div>
-		</Sheet>
+
+			<div className='flex justify-end gap-2 mt-6'>
+				<Button variant='outline' onClick={handleCancel}>
+					Cancel
+				</Button>
+				<Button onClick={handleSave}>{data ? 'Save Changes' : 'Add Addon'}</Button>
+			</div>
+		</Dialog>
 	);
 };
 
