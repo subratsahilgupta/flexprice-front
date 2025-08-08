@@ -20,6 +20,14 @@ const formatNumber = (value: string): number | null => {
 	return parseInt(numericString, 10);
 };
 
+const validateDecimal = (value: string): boolean => {
+	if (value.trim() === '') {
+		return true; // Allow empty values for validation to be handled elsewhere
+	}
+	const decimalRegex = /^\d*\.?\d*$/;
+	return decimalRegex.test(value);
+};
+
 const VolumeTieredPricingForm: FC<Props> = ({ setTieredPrices, tieredPrices, currency }) => {
 	const addTieredPrice = () => {
 		setTieredPrices((prev) => {
@@ -30,7 +38,12 @@ const VolumeTieredPricingForm: FC<Props> = ({ setTieredPrices, tieredPrices, cur
 			}
 			const newFrom = lastTier.up_to ?? lastTier.from + 1;
 
-			const newTier = { from: newFrom + 1, up_to: null };
+			const newTier = {
+				from: newFrom + 1,
+				up_to: null,
+				unit_amount: '',
+				flat_amount: '0',
+			};
 			return [...prev, newTier];
 		});
 	};
@@ -77,12 +90,18 @@ const VolumeTieredPricingForm: FC<Props> = ({ setTieredPrices, tieredPrices, cur
 	};
 
 	const updatePrice = (index: number, key: string, value: string) => {
+		// Allow only valid decimal numbers for price fields
 		const numericString = value.replace(/[^0-9.]/g, '');
+
+		// Prevent multiple decimal points
+		const decimalCount = (numericString.match(/\./g) || []).length;
+		if (decimalCount > 1) {
+			return;
+		}
+
 		setTieredPrices((prev) => {
 			const updatedTiers = [...prev];
-			// if (newValue !== null) {
 			updatedTiers[index] = { ...updatedTiers[index], [key]: numericString };
-			// }
 			return updatedTiers;
 		});
 	};
@@ -123,19 +142,27 @@ const VolumeTieredPricingForm: FC<Props> = ({ setTieredPrices, tieredPrices, cur
 								<td className='px-4 py-2'>
 									<Input
 										className='h-9'
-										onChange={(e) => updatePrice(index, 'unit_amount', e)}
-										value={tier.unit_amount?.toString()}
+										onChange={(e) => {
+											if (validateDecimal(e)) {
+												updatePrice(index, 'unit_amount', e);
+											}
+										}}
+										value={tier.unit_amount?.toString() || ''}
 										inputPrefix={currency ? `${getCurrencySymbol(currency)}` : undefined}
-										placeholder={'0'}
+										placeholder={'0.00'}
 									/>
 								</td>
 								<td className='px-4 py-2'>
 									<Input
 										className='h-9'
-										onChange={(e) => updatePrice(index, 'flat_amount', e)}
+										onChange={(e) => {
+											if (validateDecimal(e)) {
+												updatePrice(index, 'flat_amount', e);
+											}
+										}}
 										value={tier.flat_amount?.toString() ?? '0'}
 										inputPrefix={currency ? `${getCurrencySymbol(currency)}` : undefined}
-										placeholder={'0'}
+										placeholder={'0.00'}
 									/>
 								</td>
 								<td className='px-4 py-2 text-center'>

@@ -264,36 +264,34 @@ const EntityChargesPage: React.FC<EntityChargesPageProps> = ({ entityType, entit
 			}
 
 			// Convert internal prices to CreatePriceRequest format, filtering out invalid ones
-			const priceRequests = allPrices
-				.filter((price) => price.amount && price.currency && price.type && price.billing_period && price.billing_model)
-				.map((price) => ({
-					amount: price.amount!,
-					currency: price.currency!,
-					entity_type: priceEntityType,
-					entity_id: entityId,
-					type: price.type!,
-					price_unit_type: price.price_unit_type || PRICE_UNIT_TYPE.FIAT,
-					billing_period: price.billing_period!,
-					billing_period_count: price.billing_period_count || 1,
-					billing_model: price.billing_model!,
-					billing_cadence: price.billing_cadence || BILLING_CADENCE.RECURRING,
-					meter_id: price.meter_id,
-					filter_values: price.filter_values || undefined,
-					lookup_key: price.lookup_key,
-					invoice_cadence: price.invoice_cadence || INVOICE_CADENCE.ARREAR,
-					trial_period: price.trial_period,
-					description: price.description,
-					metadata: price.metadata || undefined,
-					tier_mode: price.tier_mode,
-					tiers:
-						price.tiers?.map((tier) => ({
-							up_to: tier.up_to,
-							unit_amount: tier.unit_amount,
-							flat_amount: tier.flat_amount,
-						})) || undefined,
-					transform_quantity: price.transform_quantity || undefined,
-					price_unit_config: price.price_unit_config,
-				}));
+			const priceRequests = allPrices.map((price) => ({
+				amount: price.amount!,
+				currency: price.currency!,
+				entity_type: priceEntityType,
+				entity_id: entityId,
+				type: price.type!,
+				price_unit_type: price.price_unit_type || PRICE_UNIT_TYPE.FIAT,
+				billing_period: price.billing_period!,
+				billing_period_count: price.billing_period_count || 1,
+				billing_model: price.billing_model!,
+				billing_cadence: price.billing_cadence || BILLING_CADENCE.RECURRING,
+				meter_id: price.meter_id,
+				filter_values: price.filter_values || undefined,
+				lookup_key: price.lookup_key,
+				invoice_cadence: price.invoice_cadence || INVOICE_CADENCE.ARREAR,
+				trial_period: price.trial_period,
+				description: price.description,
+				metadata: price.metadata || undefined,
+				tier_mode: price.tier_mode,
+				tiers:
+					price.tiers?.map((tier) => ({
+						up_to: tier.up_to,
+						unit_amount: tier.unit_amount,
+						flat_amount: tier.flat_amount,
+					})) || undefined,
+				transform_quantity: price.transform_quantity || undefined,
+				price_unit_config: price.price_unit_config,
+			}));
 
 			const bulkPriceRequest: CreateBulkPriceRequest = {
 				items: priceRequests,
