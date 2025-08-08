@@ -17,7 +17,7 @@ import { ApiDocsContent, CouponModal } from '@/components/molecules';
 import { Trash2 } from 'lucide-react';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { RouteNames } from '@/core/routes/Routes';
-import { BILLING_CYCLE, SubscriptionPhase } from '@/models/Subscription';
+import { SubscriptionPhase } from '@/models/Subscription';
 import { CreateSubscriptionPayload } from '@/types/dto/Subscription';
 import { BILLING_CADENCE, INVOICE_CADENCE } from '@/models/Invoice';
 import { BILLING_PERIOD } from '@/constants/constants';
@@ -27,6 +27,7 @@ import { getLineItemOverrides } from '@/utils/common/price_override_helpers';
 import { Coupon } from '@/models/Coupon';
 import formatCouponName from '@/utils/common/format_coupon_name';
 import filterValidCoupons from '@/utils/helpers/coupons';
+import { AddAddonToSubscriptionRequest } from '@/types/dto/Addon';
 
 type Params = {
 	id: string;
@@ -58,6 +59,9 @@ export type SubscriptionFormState = {
 
 	// Coupons
 	linkedCoupon: Coupon | null;
+
+	// Addons
+	addons?: AddAddonToSubscriptionRequest[];
 };
 
 // Data Fetching Hooks
@@ -139,6 +143,7 @@ const CustomerSubscription: React.FC = () => {
 		originalPhases: [],
 		priceOverrides: {},
 		linkedCoupon: null,
+		addons: [],
 	});
 
 	const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
@@ -173,7 +178,7 @@ const CustomerSubscription: React.FC = () => {
 			if (planDetails) {
 				// Create initial phase
 				const initialPhase: Partial<SubscriptionPhase> = {
-					billing_cycle: subscriptionData.details.billing_cycle as BILLING_CYCLE,
+					billing_cycle: subscriptionData.details.billing_cycle,
 					start_date: new Date(subscriptionData.details.start_date),
 					end_date: subscriptionData.details.end_date ? new Date(subscriptionData.details.end_date) : null,
 					line_items: [],
@@ -200,6 +205,7 @@ const CustomerSubscription: React.FC = () => {
 					originalPhases: [initialPhase as SubscriptionPhase],
 					priceOverrides: {},
 					linkedCoupon: null,
+					addons: [],
 				});
 			}
 		}
@@ -225,7 +231,7 @@ const CustomerSubscription: React.FC = () => {
 	});
 
 	const handleSubscriptionSubmit = () => {
-		const { billingPeriod, selectedPlan, currency, phases, priceOverrides, prices, linkedCoupon } = subscriptionState;
+		const { billingPeriod, selectedPlan, currency, phases, priceOverrides, prices, linkedCoupon, addons } = subscriptionState;
 
 		if (!billingPeriod || !selectedPlan) {
 			toast.error('Please select a plan and billing period.');
@@ -305,6 +311,7 @@ const CustomerSubscription: React.FC = () => {
 			commitment_amount: firstPhase.commitment_amount,
 			override_line_items: overrideLineItems.length > 0 ? overrideLineItems : undefined,
 			subscription_coupons: linkedCoupon ? [linkedCoupon.id] : undefined,
+			addons: (addons?.length ?? 0) > 0 ? addons : undefined,
 
 			// TODO: remove this once the feature is released
 			overage_factor: firstPhase.overage_factor ?? 1,

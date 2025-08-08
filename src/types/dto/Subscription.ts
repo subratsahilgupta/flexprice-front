@@ -6,6 +6,7 @@ import { BILLING_CADENCE } from '@/models/Invoice';
 import { QueryFilter, TimeRangeFilter } from './base';
 import { Subscription } from '@/models/Subscription';
 import { Pagination } from '@/models/Pagination';
+import { AddAddonToSubscriptionRequest } from './Addon';
 
 // Re-export existing enums for convenience
 export { BILLING_PERIOD } from '@/constants/constants';
@@ -141,6 +142,7 @@ export interface CreateSubscriptionPayload {
 	overage_factor?: number;
 	override_line_items?: SubscriptionLineItemOverrideRequest[];
 	subscription_coupons?: string[];
+	addons?: AddAddonToSubscriptionRequest[];
 }
 
 export interface SubscriptionLineItemOverrideRequest {

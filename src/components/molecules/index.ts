@@ -113,4 +113,4 @@ export { default as PriceOverrideDialog } from './PriceOverrideDialog';
 
 export { default as WalletAlertDialog } from './WalletAlertDialog';
 
-export { default as AddonTable } from './AddonTable';
+export { AddonTable, SubscriptionAddonTable, AddonModal } from './AddonTable';

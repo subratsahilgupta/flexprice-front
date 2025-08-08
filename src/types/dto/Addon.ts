@@ -54,7 +54,7 @@ export interface GetAddonsPayload {
 }
 
 export interface GetAddonsResponse extends Pagination {
-	items: Addon[];
+	items: AddonResponse[];
 	pagination: Pagination;
 }
 

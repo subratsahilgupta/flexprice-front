@@ -6,6 +6,7 @@ import { ExpandedPlan } from '@/types/plan';
 import { useMemo, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import CreditGrantTable from '@/components/molecules/CreditGrant/CreditGrantTable';
+import SubscriptionAddonTable from '@/components/molecules/SubscriptionAddonTable/SubscriptionAddonTable';
 import { BILLING_CYCLE, SubscriptionPhase } from '@/models/Subscription';
 import { usePriceOverrides } from '@/hooks/usePriceOverrides';
 import { getLineItemOverrides } from '@/utils/common/price_override_helpers';
@@ -25,6 +26,7 @@ import { uniqueId } from 'lodash';
 import { SubscriptionFormState, SubscriptionPhaseState } from '@/pages/customer/customers/CustomerSubscription';
 import { useQuery } from '@tanstack/react-query';
 import { PlanApi } from '@/api/PlanApi';
+import { AddAddonToSubscriptionRequest } from '@/types/dto/Addon';
 
 // Helper components
 const BillingCycleSelector = ({
@@ -228,6 +230,15 @@ const SubscriptionForm = ({
 			plan_id: state.selectedPlan,
 			expiration_type: CREDIT_GRANT_EXPIRATION_TYPE.NEVER,
 			expiration_duration_unit: CREDIT_GRANT_PERIOD_UNIT.DAYS,
+		};
+	};
+
+	const getEmptyAddon = (): Partial<AddAddonToSubscriptionRequest> => {
+		return {
+			addon_id: '',
+			start_date: undefined,
+			end_date: undefined,
+			metadata: {},
 		};
 	};
 
@@ -639,6 +650,20 @@ const SubscriptionForm = ({
 							</div>
 						);
 					})}
+				</div>
+			)}
+
+			{/* Addons Section */}
+			{state.selectedPlan && (
+				<div className='space-y-3 mt-4 pt-3 border-t border-gray-200'>
+					<SubscriptionAddonTable
+						getEmptyAddon={getEmptyAddon}
+						data={state.addons || []}
+						onChange={(data) => {
+							setState((prev) => ({ ...prev, addons: data }));
+						}}
+						disabled={isDisabled}
+					/>
 				</div>
 			)}
 		</div>

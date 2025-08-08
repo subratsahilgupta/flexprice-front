@@ -214,7 +214,7 @@ const AddonsPage = () => {
 					<>
 						<AddonTable
 							data={(addonsData?.items || []) as Addon[]}
-							onEdit={(addon) => {
+							onEdit={(addon: Addon) => {
 								setActiveAddon(addon);
 								setAddonDrawerOpen(true);
 							}}
