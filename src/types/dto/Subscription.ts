@@ -67,6 +67,7 @@ export interface GetSubscriptionPreviewResponse {
 	version: number;
 	voided_at: string;
 	total_discount: number;
+	total_tax: number;
 }
 
 export interface PauseSubscriptionPayload {
@@ -142,7 +143,7 @@ export interface CreateSubscriptionPayload {
 	commitment_amount?: number;
 	overage_factor?: number;
 	override_line_items?: SubscriptionLineItemOverrideRequest[];
-	subscription_coupons?: string[];
+	coupons?: string[];
 	tax_rate_overrides?: TaxRateOverride[];
 }
 

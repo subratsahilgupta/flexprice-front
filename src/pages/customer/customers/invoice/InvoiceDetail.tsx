@@ -162,6 +162,7 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 						title='Order Details'
 						subtotal={data?.subtotal}
 						total={data?.total}
+						discount={data?.total_discount}
 						total_tax={data?.total_tax}
 						amount_paid={data?.amount_paid}
 						amount_remaining={Number(data?.amount_remaining)}
@@ -171,18 +172,6 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 						invoiceType={invoiceType as INVOICE_TYPE}
 					/>
 				</div>
-				<InvoiceLineItemTable
-					discount={data?.total_discount}
-					title='Order Details'
-					subtotal={data?.subtotal}
-					total={data?.total}
-					amount_paid={data?.amount_paid}
-					amount_remaining={Number(data?.amount_remaining)}
-					data={data?.line_items ?? []}
-					amount_due={data?.amount_due}
-					currency={data?.currency}
-					invoiceType={invoiceType as INVOICE_TYPE}
-				/>
 			</div>
 
 			{/* applied taxes if exists */}

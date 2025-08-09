@@ -345,7 +345,7 @@ const CustomerSubscription: React.FC = () => {
 			credit_grants: (firstPhase.credit_grants?.length ?? 0 > 0) ? firstPhase.credit_grants : undefined,
 			commitment_amount: firstPhase.commitment_amount,
 			override_line_items: overrideLineItems.length > 0 ? overrideLineItems : undefined,
-			subscription_coupons: linkedCoupon ? [linkedCoupon.id] : undefined,
+			coupons: linkedCoupon ? [linkedCoupon.id] : undefined,
 
 			// TODO: remove this once the feature is released
 			overage_factor: firstPhase.overage_factor ?? 1,

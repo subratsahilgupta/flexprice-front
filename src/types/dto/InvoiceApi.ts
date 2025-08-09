@@ -1,4 +1,5 @@
 import { Invoice } from '@/models/Invoice';
+import { TaxRateOverride } from './tax';
 import { Pagination } from '@/models/Pagination';
 import { TypedBackendFilter, TypedBackendSort } from '@/types/formatters/QueryBuilder';
 
@@ -111,6 +112,9 @@ export interface CreateInvoicePayload {
 
 	// Optional: unique identifier of the coupons applied to this invoice
 	coupons?: string[];
+
+	// Optional: tax rate overrides to apply on this invoice
+	tax_rate_overrides?: TaxRateOverride[];
 }
 
 export interface GetInvoicePdfPayload {

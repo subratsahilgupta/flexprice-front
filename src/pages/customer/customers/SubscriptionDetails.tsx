@@ -282,6 +282,7 @@ const SubscriptionDetails: FC = () => {
 						refetch={refetch}
 						currency={data?.currency}
 						amount_due={data?.amount_due}
+						tax={data?.total_tax}
 						title='Upcoming Invoices'
 						subtitle={`This is a preview of the invoice that will be billed on ${formatDateShort(subscriptionDetails?.current_period_end ?? '')}. It may change if subscription is updated.`}
 						data={data?.line_items ?? []}
