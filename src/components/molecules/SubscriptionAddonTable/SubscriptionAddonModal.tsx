@@ -32,7 +32,8 @@ const SubscriptionAddonModal: React.FC<Props> = ({ data, currentAddons, isOpen, 
 		queryKey: ['addons'],
 		queryFn: async () => {
 			const response = await AddonApi.ListAddon({ limit: 1000, offset: 0 });
-			return response.items;
+			const filteredAddons = response.items.filter((addon) => addon?.prices?.length > 0);
+			return filteredAddons;
 		},
 	});
 
