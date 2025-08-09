@@ -164,7 +164,7 @@ const SubscriptionAddonTable: React.FC<Props> = ({ data, onChange, disabled, get
 				},
 			},
 		],
-		[disabled, getAddonDetails, getAddonTypeChip, handleDelete, handleEdit],
+		[disabled, getAddonDetails, handleDelete, handleEdit],
 	);
 
 	return (
