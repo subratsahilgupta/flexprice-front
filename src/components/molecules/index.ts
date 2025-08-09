@@ -114,3 +114,5 @@ export { default as PriceOverrideDialog } from './PriceOverrideDialog';
 export { default as WalletAlertDialog } from './WalletAlertDialog';
 
 export { AddonTable, SubscriptionAddonTable, AddonModal } from './AddonTable';
+
+export { default as SubscriptionCoupon } from './SubscriptionCoupon/SubscriptionCoupon';

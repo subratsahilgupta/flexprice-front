@@ -27,6 +27,7 @@ import { SubscriptionFormState, SubscriptionPhaseState } from '@/pages/customer/
 import { useQuery } from '@tanstack/react-query';
 import { PlanApi } from '@/api/PlanApi';
 import { AddAddonToSubscriptionRequest } from '@/types/dto/Addon';
+import { SubscriptionCoupon } from '@/components/molecules';
 
 // Helper components
 const BillingCycleSelector = ({
@@ -83,6 +84,10 @@ const SubscriptionForm = ({
 	plansError: boolean;
 	isDisabled: boolean;
 }) => {
+	const toDate = (value: Date | string | null | undefined): Date | undefined => {
+		if (!value) return undefined;
+		return value instanceof Date ? value : new Date(value);
+	};
 	// Price overrides functionality
 	const currentPrices =
 		state.prices?.prices?.filter(
@@ -250,6 +255,8 @@ const SubscriptionForm = ({
 			return response;
 		},
 	});
+
+	// Coupons are handled in SubscriptionCoupon
 
 	// Phase selection - only allow if no phase is currently being edited
 	const handlePhaseChange = (index: number) => {
@@ -534,13 +541,61 @@ const SubscriptionForm = ({
 					{state.phases.map((phase, index) => {
 						const isSelected = index === state.selectedPhase;
 						const isEditing = isSelected && state.isPhaseEditing;
-						const startDate = phase.start_date ? new Date(phase.start_date as any).toLocaleDateString() : 'Not set';
-						const endDate = phase.end_date ? new Date(phase.end_date as any).toLocaleDateString() : 'Forever';
+						const startDate = phase.start_date ? toDate(phase.start_date)!.toLocaleDateString() : 'Not set';
+						const endDate = phase.end_date ? toDate(phase.end_date)!.toLocaleDateString() : 'Forever';
 
 						// If this phase is selected and in edit mode, render edit view
 						if (isEditing) {
 							return (
 								<div key={index} className='space-y-6 rounded-md'>
+									<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+										<div>
+											<Label label='Start Date' />
+											<DatePicker
+												date={toDate(phase.start_date)}
+												setDate={(date) => {
+													if (date) {
+														updatePhase(index, { start_date: date });
+													}
+												}}
+												disabled={isDisabled || index > 0} // Disable if not the first phase
+												maxDate={toDate(phase.end_date)}
+											/>
+										</div>
+										<div>
+											<Label label='End Date' />
+											<DatePicker
+												date={toDate(phase.end_date)}
+												setDate={(date) => {
+													updatePhase(index, { end_date: date ?? null });
+												}}
+												placeholder='Forever'
+												disabled={isDisabled}
+												minDate={toDate(phase.start_date)}
+											/>
+										</div>
+									</div>
+
+									<div>
+										<BillingCycleSelector
+											value={phase.billing_cycle ?? BILLING_CYCLE.ANNIVERSARY}
+											onChange={(value) => {
+												updatePhase(index, { billing_cycle: value });
+											}}
+											disabled={isDisabled}
+										/>
+									</div>
+
+									<div className='mt-4 hidden'>
+										<Label label='Prorate Charges' />
+										<Toggle
+											disabled
+											description='Prorate Charges'
+											checked={phase.prorate_charges ?? false}
+											onChange={(value) => setState((prev) => ({ ...prev, prorate_charges: value }))}
+										/>
+									</div>
+
 									{/* charges */}
 									{state.prices && state.selectedPlan && state.billingPeriod && state.currency && (
 										<div className='mb-2'>
@@ -570,54 +625,6 @@ const SubscriptionForm = ({
 										}}
 										disabled={isDisabled || isCreditGrantDisabled}
 									/>
-
-									<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-										<div>
-											<Label label='Start Date' />
-											<DatePicker
-												date={phase.start_date ? new Date(phase.start_date as any) : undefined}
-												setDate={(date) => {
-													if (date) {
-														updatePhase(index, { start_date: date });
-													}
-												}}
-												disabled={isDisabled || index > 0} // Disable if not the first phase
-												maxDate={phase.end_date ? new Date(phase.end_date as any) : undefined}
-											/>
-										</div>
-										<div>
-											<Label label='End Date' />
-											<DatePicker
-												date={phase.end_date ? new Date(phase.end_date as any) : undefined}
-												setDate={(date) => {
-													updatePhase(index, { end_date: date ?? null });
-												}}
-												placeholder='Forever'
-												disabled={isDisabled}
-												minDate={phase.start_date ? new Date(phase.start_date as any) : undefined}
-											/>
-										</div>
-									</div>
-
-									<div>
-										<BillingCycleSelector
-											value={phase.billing_cycle ?? BILLING_CYCLE.ANNIVERSARY}
-											onChange={(value) => {
-												updatePhase(index, { billing_cycle: value });
-											}}
-											disabled={isDisabled}
-										/>
-									</div>
-
-									<div className='mt-4 hidden'>
-										<Label label='Prorate Charges' />
-										<Toggle
-											disabled
-											description='Prorate Charges'
-											checked={phase.prorate_charges ?? false}
-											onChange={(value) => setState((prev) => ({ ...prev, prorate_charges: value }))}
-										/>
-									</div>
 								</div>
 							);
 						}
@@ -665,6 +672,15 @@ const SubscriptionForm = ({
 						disabled={isDisabled}
 					/>
 				</div>
+			)}
+
+			{state.selectedPlan && (
+				<SubscriptionCoupon
+					currency={state.currency}
+					selectedCoupons={state.linkedCoupons || []}
+					onChange={(coupons) => setState((prev) => ({ ...prev, linkedCoupons: coupons }))}
+					disabled={isDisabled}
+				/>
 			)}
 		</div>
 	);

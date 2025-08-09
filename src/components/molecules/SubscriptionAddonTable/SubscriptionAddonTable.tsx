@@ -75,14 +75,14 @@ const SubscriptionAddonTable: React.FC<Props> = ({ data, onChange, disabled, get
 				return addonDetails ? getAddonTypeChip(addonDetails.type) : '--';
 			},
 		},
-		{
-			title: 'Start Date',
-			render: (row) => (row.start_date ? new Date(row.start_date).toLocaleDateString() : '--'),
-		},
-		{
-			title: 'End Date',
-			render: (row) => (row.end_date ? new Date(row.end_date).toLocaleDateString() : '--'),
-		},
+		// {
+		// 	title: 'Start Date',
+		// 	render: (row) => (row.start_date ? new Date(row.start_date).toLocaleDateString() : '--'),
+		// },
+		// {
+		// 	title: 'End Date',
+		// 	render: (row) => (row.end_date ? new Date(row.end_date).toLocaleDateString() : '--'),
+		// },
 		{
 			fieldVariant: 'interactive',
 			hideOnEmpty: true,

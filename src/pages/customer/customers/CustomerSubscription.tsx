@@ -6,15 +6,13 @@ import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import CustomerApi from '@/api/CustomerApi';
 import { PlanApi } from '@/api/PlanApi';
 import SubscriptionApi from '@/api/SubscriptionApi';
-import CouponApi from '@/api/CouponApi';
 import { toSentenceCase } from '@/utils/common/helper_functions';
 import { ExpandedPlan } from '@/types/plan';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ApiDocsContent, CouponModal } from '@/components/molecules';
-import { Trash2 } from 'lucide-react';
+import { ApiDocsContent } from '@/components/molecules';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { RouteNames } from '@/core/routes/Routes';
 import { SubscriptionPhase } from '@/models/Subscription';
@@ -25,8 +23,6 @@ import { uniqueId } from 'lodash';
 import SubscriptionForm from '@/components/organisms/Subscription/SubscriptionForm';
 import { getLineItemOverrides } from '@/utils/common/price_override_helpers';
 import { Coupon } from '@/models/Coupon';
-import formatCouponName from '@/utils/common/format_coupon_name';
-import filterValidCoupons from '@/utils/helpers/coupons';
 import { AddAddonToSubscriptionRequest } from '@/types/dto/Addon';
 
 type Params = {
@@ -58,7 +54,7 @@ export type SubscriptionFormState = {
 	priceOverrides: Record<string, string>;
 
 	// Coupons
-	linkedCoupon: Coupon | null;
+	linkedCoupons: Coupon[];
 
 	// Addons
 	addons?: AddAddonToSubscriptionRequest[];
@@ -108,15 +104,7 @@ const useSubscriptionData = (subscription_id: string | undefined) => {
 	});
 };
 
-const useAvailableCoupons = () => {
-	return useQuery({
-		queryKey: ['availableCoupons'],
-		queryFn: async () => {
-			const response = await CouponApi.getAllCoupons({ limit: 1000, offset: 0 });
-			return filterValidCoupons(response.items);
-		},
-	});
-};
+// Coupons are now handled inside SubscriptionForm
 
 const CustomerSubscription: React.FC = () => {
 	const { id: customerId, subscription_id } = useParams<Params>();
@@ -127,7 +115,6 @@ const CustomerSubscription: React.FC = () => {
 	const { data: plans, isLoading: plansLoading, isError: plansError } = usePlans();
 	const { data: customerData } = useCustomerData(customerId);
 	const { data: subscriptionData } = useSubscriptionData(subscription_id);
-	const { data: availableCoupons = [] } = useAvailableCoupons();
 
 	// Local state
 	const [subscriptionState, setSubscriptionState] = useState<SubscriptionFormState>({
@@ -142,27 +129,11 @@ const CustomerSubscription: React.FC = () => {
 		isPhaseEditing: false,
 		originalPhases: [],
 		priceOverrides: {},
-		linkedCoupon: null,
+		linkedCoupons: [],
 		addons: [],
 	});
 
-	const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
-
-	// Filter coupons by currency
-	const currencyFilteredCoupons = useMemo(() => {
-		if (!subscriptionState.currency) {
-			return availableCoupons;
-		}
-		return filterValidCoupons(availableCoupons, subscriptionState.currency);
-	}, [availableCoupons, subscriptionState.currency]);
-
-	const handleCouponSelect = (couponId: string) => {
-		const coupon = currencyFilteredCoupons.find((c) => c.id === couponId);
-		if (coupon) {
-			setSubscriptionState((prev) => ({ ...prev, linkedCoupon: coupon }));
-		}
-		setIsCouponModalOpen(false);
-	};
+	// Coupons are handled in SubscriptionForm
 
 	// Update breadcrumb when customer data changes
 	useEffect(() => {
@@ -204,7 +175,7 @@ const CustomerSubscription: React.FC = () => {
 					isPhaseEditing: false,
 					originalPhases: [initialPhase as SubscriptionPhase],
 					priceOverrides: {},
-					linkedCoupon: null,
+					linkedCoupons: [],
 					addons: [],
 				});
 			}
@@ -231,7 +202,7 @@ const CustomerSubscription: React.FC = () => {
 	});
 
 	const handleSubscriptionSubmit = () => {
-		const { billingPeriod, selectedPlan, currency, phases, priceOverrides, prices, linkedCoupon, addons } = subscriptionState;
+		const { billingPeriod, selectedPlan, currency, phases, priceOverrides, prices, linkedCoupons, addons } = subscriptionState;
 
 		if (!billingPeriod || !selectedPlan) {
 			toast.error('Please select a plan and billing period.');
@@ -310,7 +281,7 @@ const CustomerSubscription: React.FC = () => {
 			credit_grants: (firstPhase.credit_grants?.length ?? 0 > 0) ? firstPhase.credit_grants : undefined,
 			commitment_amount: firstPhase.commitment_amount,
 			override_line_items: overrideLineItems.length > 0 ? overrideLineItems : undefined,
-			subscription_coupons: linkedCoupon ? [linkedCoupon.id] : undefined,
+			subscription_coupons: (linkedCoupons?.length ?? 0) > 0 ? linkedCoupons.map((c) => c.id) : undefined,
 			addons: (addons?.length ?? 0) > 0 ? addons : undefined,
 
 			// TODO: remove this once the feature is released
@@ -343,51 +314,7 @@ const CustomerSubscription: React.FC = () => {
 					isDisabled={!!subscription_id}
 				/>
 
-				{subscriptionState.selectedPlan && (
-					<div className='space-y-4'>
-						<div className='flex items-center justify-between'>
-							<h3 className='text-lg font-medium'>Add Coupon</h3>
-							{!subscriptionState.linkedCoupon && (
-								<Button onClick={() => setIsCouponModalOpen(true)} variant='outline' size='sm'>
-									Add Coupon
-								</Button>
-							)}
-						</div>
-						{subscriptionState.linkedCoupon ? (
-							<div className='flex items-center gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg'>
-								<div className='w-2 h-2 bg-blue-500 rounded-full'></div>
-								<div className='flex-1'>
-									<p className='text-sm text-[#09090B]'>
-										<span className='font-semibold'>{subscriptionState.linkedCoupon.name}</span>
-										<span className='text-[#71717A] font-medium'> - {formatCouponName(subscriptionState.linkedCoupon)}</span>
-									</p>
-								</div>
-								<Button
-									onClick={() => {
-										setSubscriptionState((prev) => ({
-											...prev,
-											linkedCoupon: null,
-										}));
-									}}
-									variant='ghost'
-									size='sm'
-									className='h-8 w-8 p-0 hover:bg-blue-200 hover:text-blue-600'>
-									<Trash2 className='h-4 w-4' />
-								</Button>
-							</div>
-						) : (
-							<p className='text-sm text-[#71717A]'>No coupon linked</p>
-						)}
-					</div>
-				)}
-
-				<CouponModal
-					isOpen={isCouponModalOpen}
-					onOpenChange={setIsCouponModalOpen}
-					coupons={currencyFilteredCoupons}
-					onSave={handleCouponSelect}
-					onCancel={() => setIsCouponModalOpen(false)}
-				/>
+				{/* Coupon UI moved to SubscriptionForm */}
 
 				{subscriptionState.selectedPlan && !subscription_id && (
 					<div className='flex items-center justify-start space-x-4'>
@@ -414,7 +341,7 @@ const CustomerSubscription: React.FC = () => {
 							}
 							selectedPlan={subscriptionState.prices}
 							phases={subscriptionState.phases}
-							coupons={subscriptionState.linkedCoupon ? [subscriptionState.linkedCoupon] : []}
+							coupons={subscriptionState.linkedCoupons}
 							priceOverrides={subscriptionState.priceOverrides}
 						/>
 					)}

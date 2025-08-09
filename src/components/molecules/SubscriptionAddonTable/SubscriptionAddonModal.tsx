@@ -1,6 +1,6 @@
 import { AddAddonToSubscriptionRequest } from '@/types/dto/Addon';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Button, DatePicker } from '@/components/atoms';
+import { Button } from '@/components/atoms';
 import Dialog from '@/components/atoms/Dialog';
 import { useQuery } from '@tanstack/react-query';
 import AddonApi from '@/api/AddonApi';
@@ -115,16 +115,16 @@ const SubscriptionAddonModal: React.FC<Props> = ({ data, currentAddons, isOpen, 
 		[addons, errors.addon_id],
 	);
 
-	const handleDateChange = useCallback(
-		(field: 'start_date' | 'end_date', date: Date | undefined) => {
-			setFormData((prev) => ({ ...prev, [field]: date?.toISOString() }));
-			// Clear error for end_date when user changes dates
-			if (field === 'end_date' && errors.end_date) {
-				setErrors((prev) => ({ ...prev, end_date: undefined }));
-			}
-		},
-		[errors.end_date],
-	);
+	// const handleDateChange = useCallback(
+	// 	(field: 'start_date' | 'end_date', date: Date | undefined) => {
+	// 		setFormData((prev) => ({ ...prev, [field]: date?.toISOString() }));
+	// 		// Clear error for end_date when user changes dates
+	// 		if (field === 'end_date' && errors.end_date) {
+	// 			setErrors((prev) => ({ ...prev, end_date: undefined }));
+	// 		}
+	// 	},
+	// 	[errors.end_date],
+	// );
 
 	// Filter addon options based on current addons and addon type
 	const filteredAddonOptions = useMemo(() => {
@@ -170,8 +170,9 @@ const SubscriptionAddonModal: React.FC<Props> = ({ data, currentAddons, isOpen, 
 					/>
 				</div>
 
+				{/* TODO: Add start and end date */}
 				{/* Start and End Date on same line */}
-				<div className='grid grid-cols-2 gap-4'>
+				{/* <div className='grid grid-cols-2 gap-4'>
 					<div className='space-y-2'>
 						<DatePicker
 							label='Start Date'
@@ -189,7 +190,7 @@ const SubscriptionAddonModal: React.FC<Props> = ({ data, currentAddons, isOpen, 
 						/>
 						{errors.end_date && <p className='text-sm text-red-500'>{errors.end_date}</p>}
 					</div>
-				</div>
+				</div> */}
 			</div>
 
 			<div className='flex justify-end gap-2 mt-6'>
