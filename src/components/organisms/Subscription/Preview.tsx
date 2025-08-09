@@ -1,4 +1,4 @@
-import { Price } from '@/models/Price';
+import { Price, PRICE_TYPE } from '@/models/Price';
 import { useMemo } from 'react';
 import {
 	formatBillingPeriodForDisplay,
@@ -137,9 +137,9 @@ const Preview = ({
 	const startDate = firstPhase?.start_date;
 	const billingCycle = firstPhase?.billing_cycle || BILLING_CYCLE.ANNIVERSARY;
 
-	const recurringCharges = useMemo(() => data.filter((charge) => charge.type === 'FIXED'), [data]);
+	const recurringCharges = useMemo(() => data.filter((charge) => charge.type === PRICE_TYPE.FIXED), [data]);
 
-	const usageCharges = useMemo(() => data.filter((charge) => charge.type === 'USAGE'), [data]);
+	const usageCharges = useMemo(() => data.filter((charge) => charge.type === PRICE_TYPE.USAGE), [data]);
 
 	const { total: recurringTotal, totalDiscount: lineItemTotalDiscount } = useMemo(() => {
 		return calculateTotalWithLineItemCoupons(recurringCharges, priceOverrides, lineItemCoupons);

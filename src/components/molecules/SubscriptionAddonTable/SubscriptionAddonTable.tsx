@@ -6,17 +6,18 @@ import SubscriptionAddonModal from './SubscriptionAddonModal';
 import { useQuery } from '@tanstack/react-query';
 import AddonApi from '@/api/AddonApi';
 import { ADDON_TYPE } from '@/models/Addon';
-import { toSentenceCase } from '@/utils/common/helper_functions';
+import { getTotalPayableTextWithCoupons, toSentenceCase } from '@/utils/common/helper_functions';
 import { Price, PRICE_TYPE } from '@/models/Price';
-import { BILLING_CADENCE } from '@/models/Invoice';
-import { getCurrencySymbol } from '@/utils/common/helper_functions';
-import { formatAmount } from '@/components/atoms/Input/Input';
+import { getCurrentPriceAmount } from '@/utils/common/price_override_helpers';
+import { Coupon } from '@/models/Coupon';
 
 interface Props {
 	data: AddAddonToSubscriptionRequest[];
 	onChange: (data: AddAddonToSubscriptionRequest[]) => void;
 	disabled?: boolean;
 	getEmptyAddon: () => Partial<AddAddonToSubscriptionRequest>;
+	priceOverrides?: Record<string, string>;
+	coupons?: Coupon[];
 }
 const getAddonTypeChip = (type: string) => {
 	switch (type.toLowerCase()) {
@@ -29,10 +30,10 @@ const getAddonTypeChip = (type: string) => {
 	}
 };
 
-const formatAddonCharges = (prices: Price[] = []): string => {
+const formatAddonCharges = (prices: Price[] = [], priceOverrides: Record<string, string> = {}, coupons: Coupon[] = []): string => {
 	if (!prices || prices.length === 0) return '--';
 
-	const recurringPrices = prices.filter((p) => p.type === PRICE_TYPE.FIXED && p.billing_cadence === BILLING_CADENCE.RECURRING);
+	const recurringPrices = prices.filter((p) => p.type === PRICE_TYPE.FIXED);
 	const usagePrices = prices.filter((p) => p.type === PRICE_TYPE.USAGE);
 
 	const hasUsage = usagePrices.length > 0;
@@ -41,26 +42,17 @@ const formatAddonCharges = (prices: Price[] = []): string => {
 		return hasUsage ? 'Depends on usage' : '--';
 	}
 
-	// Prefer the smallest recurring amount for display
-	const amounts = recurringPrices.map((p) => {
-		const parsed = parseFloat(p.amount);
-		return Number.isFinite(parsed) ? parsed : 0;
-	});
-	const minIndex = amounts.reduce((idxMin, value, idx, arr) => (value < arr[idxMin] ? idx : idxMin), 0);
-	const chosen = recurringPrices[minIndex];
+	// Calculate total recurring amount
+	const recurringTotal = recurringPrices.reduce((acc, charge) => {
+		const currentAmount = getCurrentPriceAmount(charge, priceOverrides);
+		return acc + parseFloat(currentAmount);
+	}, 0);
 
-	const amountNumber = amounts[minIndex] || 0;
-	const currencySymbol = getCurrencySymbol(chosen.currency);
-	const baseText = `${currencySymbol}${formatAmount(amountNumber.toString())}`;
-
-	if (hasUsage) {
-		return `${baseText} + Usage`;
-	}
-
-	return baseText;
+	// Use the same helper as Preview component for consistent display
+	return getTotalPayableTextWithCoupons(recurringPrices, usagePrices, recurringTotal, coupons);
 };
 
-const SubscriptionAddonTable: React.FC<Props> = ({ data, onChange, disabled, getEmptyAddon }) => {
+const SubscriptionAddonTable: React.FC<Props> = ({ data, onChange, disabled, getEmptyAddon, priceOverrides = {}, coupons = [] }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [selectedAddon, setSelectedAddon] = useState<AddAddonToSubscriptionRequest | null>(null);
 
@@ -133,7 +125,7 @@ const SubscriptionAddonTable: React.FC<Props> = ({ data, onChange, disabled, get
 				render: (row) => {
 					const addonDetails = getAddonDetails(row.addon_id);
 					const prices = addonDetails?.prices || [];
-					return <span>{formatAddonCharges(prices)}</span>;
+					return <span>{formatAddonCharges(prices, priceOverrides, coupons)}</span>;
 				},
 			},
 			// {
@@ -164,7 +156,7 @@ const SubscriptionAddonTable: React.FC<Props> = ({ data, onChange, disabled, get
 				},
 			},
 		],
-		[disabled, getAddonDetails, handleDelete, handleEdit],
+		[disabled, getAddonDetails, handleDelete, handleEdit, priceOverrides, coupons],
 	);
 
 	return (
