@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { CreateSecretKeyResponse } from '@/types/dto';
 import { PermissionType } from '@/components/molecules/SecretKeyDrawer/SecretKeyDrawer';
-import OnboardingApi from '@/api/OnboardingApi';
 import { TenantMetadataKey } from '@/models/Tenant';
 import useUser from '@/hooks/useUser';
 import { useQuery } from '@tanstack/react-query';
@@ -78,7 +77,6 @@ const OnboardingTenant = () => {
 			await refetchQueries(['user']);
 			toast.success('Tenant details updated successfully');
 			handleStepComplete(0);
-			OnboardingApi.MarkUserAsOnboarded();
 		},
 		onError: (error: ServerError) => {
 			toast.error(error.error.message || 'Failed to update tenant details. Please try again.');
