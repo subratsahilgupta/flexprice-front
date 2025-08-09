@@ -52,9 +52,19 @@ const formatAddonCharges = (prices: Price[] = [], priceOverrides: Record<string,
 	return getTotalPayableTextWithCoupons(recurringPrices, usagePrices, recurringTotal, coupons);
 };
 
+interface ExtendedAddon extends AddAddonToSubscriptionRequest {
+	internal_id: number;
+}
+
 const SubscriptionAddonTable: React.FC<Props> = ({ data, onChange, disabled, getEmptyAddon, priceOverrides = {}, coupons = [] }) => {
 	const [isOpen, setIsOpen] = useState(false);
-	const [selectedAddon, setSelectedAddon] = useState<AddAddonToSubscriptionRequest | null>(null);
+	const [selectedAddon, setSelectedAddon] = useState<ExtendedAddon | null>(null);
+	const extendedData = useMemo(() => {
+		return data.map((addon, index) => ({
+			...addon,
+			internal_id: index,
+		}));
+	}, [data]);
 
 	const { data: addons = [] } = useQuery({
 		queryKey: ['addons'],
@@ -78,23 +88,34 @@ const SubscriptionAddonTable: React.FC<Props> = ({ data, onChange, disabled, get
 	const handleSave = useCallback(
 		(newAddon: AddAddonToSubscriptionRequest) => {
 			if (selectedAddon) {
-				onChange(data.map((addon) => (addon.addon_id === selectedAddon.addon_id ? newAddon : addon)));
+				// Update specific instance using internal_id
+				const updatedData = extendedData.map((addon) =>
+					addon.internal_id === selectedAddon.internal_id ? { ...newAddon, internal_id: addon.internal_id } : addon,
+				);
+				// Strip internal_id before passing to parent
+				onChange(updatedData.map(({ internal_id, ...rest }) => rest));
 			} else {
-				onChange([...data, newAddon]);
+				// Add new instance with next available internal_id
+				const nextId = extendedData.length > 0 ? Math.max(...extendedData.map((a) => a.internal_id)) + 1 : 0;
+				const newData = [...extendedData, { ...newAddon, internal_id: nextId }];
+				// Strip internal_id before passing to parent
+				onChange(newData.map(({ internal_id, ...rest }) => rest));
 			}
 			setSelectedAddon(null);
 		},
-		[data, onChange, selectedAddon],
+		[extendedData, onChange, selectedAddon],
 	);
 
 	const handleDelete = useCallback(
-		async (addonId: string) => {
-			onChange(data.filter((addon) => addon.addon_id !== addonId));
+		async (internalId: number) => {
+			const filteredData = extendedData.filter((addon) => addon.internal_id !== internalId);
+			// Strip internal_id before passing to parent
+			onChange(filteredData.map(({ internal_id, ...rest }) => rest));
 		},
-		[data, onChange],
+		[extendedData, onChange],
 	);
 
-	const handleEdit = useCallback((addon: AddAddonToSubscriptionRequest) => {
+	const handleEdit = useCallback((addon: ExtendedAddon) => {
 		setSelectedAddon(addon);
 		setIsOpen(true);
 	}, []);
@@ -104,7 +125,7 @@ const SubscriptionAddonTable: React.FC<Props> = ({ data, onChange, disabled, get
 		setIsOpen(true);
 	}, []);
 
-	const columns: ColumnData<AddAddonToSubscriptionRequest>[] = useMemo(
+	const columns: ColumnData<ExtendedAddon>[] = useMemo(
 		() => [
 			{
 				title: 'Name',
@@ -143,9 +164,9 @@ const SubscriptionAddonTable: React.FC<Props> = ({ data, onChange, disabled, get
 					const addonDetails = getAddonDetails(row.addon_id);
 					return (
 						<ActionButton
-							archiveText='Delete'
+							archiveText='Remove'
 							id={row.addon_id}
-							deleteMutationFn={() => handleDelete(row.addon_id)}
+							deleteMutationFn={() => handleDelete(row.internal_id)}
 							refetchQueryKey='addons'
 							entityName={addonDetails?.name || row.addon_id}
 							isEditDisabled={disabled}
@@ -179,7 +200,7 @@ const SubscriptionAddonTable: React.FC<Props> = ({ data, onChange, disabled, get
 					<AddButton onClick={handleOpenCreate} disabled={disabled} />
 				</div>
 				<div className='rounded-xl border border-gray-300 space-y-6 mt-2 '>
-					<FlexpriceTable data={data} columns={columns} showEmptyRow />
+					<FlexpriceTable data={extendedData} columns={columns} showEmptyRow />
 				</div>
 			</div>
 		</>
