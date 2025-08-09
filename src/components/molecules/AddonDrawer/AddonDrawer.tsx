@@ -123,12 +123,13 @@ const AddonDrawer: FC<Props> = ({ data, open, onOpenChange, trigger, refetchQuer
 				description={'A system identifier used for API calls and integrations.'}
 			/>
 
-			<Spacer height={'20px'} />
+			<Spacer className='hidden' height={'20px'} />
 			<Select
 				label='Addon Type'
 				value={formData.type}
 				onChange={(value) => setFormData({ ...formData, type: value as ADDON_TYPE })}
 				options={addonTypeOptions}
+				className='hidden'
 				placeholder='Select addon type'
 				description='Choose whether this addon can be used once or multiple times.'
 			/>

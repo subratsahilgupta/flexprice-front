@@ -609,7 +609,7 @@ const SubscriptionForm = ({
 										/>
 									</div>
 
-									<div className='mt-4'>
+									<div className='mt-4 hidden'>
 										<Label label='Prorate Charges' />
 										<Toggle
 											disabled
