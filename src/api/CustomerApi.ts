@@ -8,7 +8,6 @@ import {
 	GetCustomerSubscriptionsResponse,
 	GetCustomerEntitlementPayload,
 	GetUsageSummaryResponse,
-	CreateCustomerSubscriptionPayload,
 	GetCustomerEntitlementsResponse,
 } from '@/types/dto/Customer';
 import { generateQueryParams } from '@/utils/common/api_helper';
@@ -30,10 +29,6 @@ class CustomerApi {
 
 	public static async deleteCustomerById(id: string): Promise<void> {
 		return await AxiosClient.delete(`${this.baseUrl}/${id}`);
-	}
-
-	public static async createCustomerSubscription(payload: CreateCustomerSubscriptionPayload): Promise<void> {
-		return await AxiosClient.post(`/subscriptions`, payload);
 	}
 
 	public static async getCustomerSubscriptions(id: string): Promise<GetCustomerSubscriptionsResponse> {

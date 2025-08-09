@@ -21,7 +21,6 @@ export type {
 	GetCustomerSubscriptionsResponse,
 	GetCustomerEntitlementsResponse,
 	GetCustomerEntitlementPayload,
-	CreateCustomerSubscriptionPayload,
 	GetUsageSummaryResponse,
 	GetCustomerByFiltersPayload,
 } from './Customer';
@@ -53,6 +52,7 @@ export type {
 	ResumeSubscriptionPayload,
 	SubscriptionPauseResponse,
 	SubscriptionResumeResponse,
+	CreateSubscriptionPayload,
 } from './Subscription';
 
 export type { GetBillingdetailsResponse, UpdateTenantRequest } from './Tenant';
@@ -94,3 +94,23 @@ export type {
 	AddAddonToSubscriptionRequest,
 	AddonResponse,
 } from './Addon';
+
+export type {
+	CreateTaxRateRequest,
+	UpdateTaxRateRequest,
+	TaxRateResponse,
+	ListTaxRatesResponse,
+	CreateTaxAssociationRequest,
+	TaxAssociationUpdateRequest,
+	TaxAssociationResponse,
+	TaxRateOverride,
+	CreateTaxAppliedRequest,
+	TaxAppliedResponse,
+	ListTaxAppliedResponse,
+	TaxAppliedFilter,
+	TaxAssociationFilter,
+	ListTaxAssociationsResponse,
+	LinkTaxRateToEntityRequest,
+	CreateInvoiceRequest,
+	TaxCalculationResult,
+} from './tax';

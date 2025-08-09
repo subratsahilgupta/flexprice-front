@@ -2,6 +2,7 @@ import { BaseModel, Metadata } from './base';
 import Customer from './Customer';
 import { Subscription } from './Subscription';
 import { PAYMENT_STATUS } from '@/constants/payment';
+import { TaxApplied } from './Tax';
 
 export interface Invoice extends BaseModel {
 	readonly customer_id: string;
@@ -28,11 +29,13 @@ export interface Invoice extends BaseModel {
 	readonly finalized_at: string;
 	readonly billing_reason: INVOICE_BILLING_REASON;
 	readonly line_items: LineItem[];
+	readonly total_tax: number;
 	readonly version: number;
 	readonly tenant_id: string;
 	readonly subscription: Subscription;
 	readonly customer?: Customer;
 	readonly total_discount?: number;
+	readonly taxes?: TaxApplied[];
 }
 
 export interface LineItem extends BaseModel {

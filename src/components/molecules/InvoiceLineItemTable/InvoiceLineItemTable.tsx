@@ -11,7 +11,7 @@ interface Props {
 	amount_due?: number;
 	total?: number;
 	subtotal?: number;
-	tax?: number;
+	total_tax?: number;
 	discount?: number;
 	amount_paid?: number;
 	amount_remaining?: number;
@@ -51,7 +51,7 @@ const InvoiceLineItemTable: FC<Props> = ({
 	invoiceType,
 	subtitle,
 	discount,
-	tax,
+	total_tax,
 	amount_paid,
 	amount_remaining,
 	subtotal,
@@ -136,26 +136,18 @@ const InvoiceLineItemTable: FC<Props> = ({
 							</div>
 						)}
 
-						{/* Tax - only show if provided and > 0 */}
-						{tax !== undefined && tax !== null && Number(tax) > 0 && (
-							<div className='flex flex-row justify-end items-center py-1'>
-								<div className='flex-1 text-right text-sm text-gray-900 font-medium'>{formatAmount(Number(tax), currency ?? '')}</div>
-							</div>
-						)}
-
-						{/* Always show a tax row if not shown above */}
-						{!(tax !== undefined && tax !== null && Number(tax) > 0) && (
-							<div className='flex flex-row justify-end items-center py-1'>
-								<div className='w-40 text-right text-base font-medium text-gray-900'>Tax</div>
-								<div className='flex-1 text-right text-sm text-gray-900 font-medium'>-</div>
-							</div>
-						)}
-
 						{/* Discount - only show if provided and > 0 */}
 						{discount !== undefined && discount !== null && Number(discount) > 0 && (
 							<div className='flex flex-row justify-end items-center py-1'>
 								<div className='w-40 text-right text-base font-medium text-gray-900'>Discount</div>
 								<div className='flex-1 text-right text-sm text-gray-900 font-medium'>−{formatAmount(Number(discount), currency ?? '')}</div>
+							</div>
+						)}
+
+						{total_tax !== undefined && total_tax !== null && Number(total_tax) !== 0 && (
+							<div className='flex flex-row justify-end items-center py-1'>
+								<div className='w-40 text-right text-base font-medium text-gray-900'>Tax</div>
+								<div className='flex-1 text-right text-sm text-gray-900 font-medium'>{formatAmount(Number(total_tax), currency ?? '')}</div>
 							</div>
 						)}
 

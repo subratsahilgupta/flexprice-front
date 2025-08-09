@@ -1,8 +1,7 @@
-import { FC, useEffect, useState, useMemo } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Button, FormHeader, Input, Loader, Page, Select, Spacer, Divider } from '@/components/atoms';
 import CustomerApi from '@/api/CustomerApi';
-import CouponApi from '@/api/CouponApi';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import useUser from '@/hooks/useUser';
@@ -15,8 +14,11 @@ import { Trash2 } from 'lucide-react';
 import { AddChargesButton } from '@/components/organisms/PlanForm/SetupChargesSection';
 import { InvoiceType, PAYMENT_STATUS } from '@/constants';
 import { Coupon } from '@/models/Coupon';
-import formatCouponName from '@/utils/common/format_coupon_name';
-import filterValidCoupons from '@/utils/helpers/coupons';
+import InvoiceTaxAssociationTable from '@/components/molecules/InvoiceTaxAssociationTable/InvoiceTaxAssociationTable';
+import { TaxRateOverride } from '@/types/dto/tax';
+import TaxApi from '@/api/TaxApi';
+import { EXPAND } from '@/models/expand';
+import { TAXRATE_ENTITY_TYPE } from '@/models/Tax';
 
 interface LineItem {
 	display_name: string;
@@ -33,25 +35,10 @@ const CreateInvoicePage: FC = () => {
 		enabled: !!customerId,
 	});
 
-	const { data: availableCoupons = [] } = useQuery({
-		queryKey: ['availableCoupons'],
-		queryFn: async () => {
-			const response = await CouponApi.getAllCoupons({ limit: 1000, offset: 0 });
-			return filterValidCoupons(response.items);
-		},
-	});
-
 	const { user } = useUser();
 	const { updateBreadcrumb } = useBreadcrumbsStore();
 	const [currency, setCurrency] = useState(currencyOptions[0].value);
 
-	// Filter coupons by currency
-	const currencyFilteredCoupons = useMemo(() => {
-		if (!currency) {
-			return availableCoupons;
-		}
-		return filterValidCoupons(availableCoupons, currency);
-	}, [availableCoupons, currency]);
 	const [lineItems, setLineItems] = useState<LineItem[]>([
 		{
 			display_name: '',
@@ -59,9 +46,10 @@ const CreateInvoicePage: FC = () => {
 			amount: '0',
 		},
 	]);
-	const [selectedCoupon, setSelectedCoupon] = useState<Coupon | null>(null);
+	const [selectedCoupon, _] = useState<Coupon | null>(null);
 	const [calculatedDiscount, setCalculatedDiscount] = useState<number>(0);
 	const [finalTotal, setFinalTotal] = useState<number>(0);
+	const [taxOverrides, setTaxOverrides] = useState<TaxRateOverride[]>([]);
 
 	// Calculate period start as today at midnight UTC
 	const today = new Date();
@@ -72,6 +60,34 @@ const CreateInvoicePage: FC = () => {
 			updateBreadcrumb(2, customer?.name);
 		}
 	}, [customer, updateBreadcrumb]);
+
+	// Prefill with customer's tax associations as overrides (like subscription)
+	const { data: customerTaxAssociations } = useQuery({
+		queryKey: ['customerTaxAssociations', customerId],
+		queryFn: async () => {
+			return await TaxApi.listTaxAssociations({
+				limit: 100,
+				offset: 0,
+				entity_id: customerId!,
+				expand: EXPAND.TAX_RATE,
+				entity_type: TAXRATE_ENTITY_TYPE.CUSTOMER,
+			});
+		},
+		enabled: !!customerId,
+	});
+
+	useEffect(() => {
+		if (customerTaxAssociations?.items) {
+			setTaxOverrides(
+				customerTaxAssociations.items.map((item: any) => ({
+					tax_rate_code: item.tax_rate?.code ?? '',
+					currency: item.currency?.toLowerCase(),
+					auto_apply: item.auto_apply,
+					priority: item.priority,
+				})),
+			);
+		}
+	}, [customerTaxAssociations]);
 
 	// Recalculate discounts whenever line items or coupon change
 	useEffect(() => {
@@ -113,22 +129,6 @@ const CreateInvoicePage: FC = () => {
 		}, 0);
 	};
 
-	const handleCouponSelect = (couponId: string) => {
-		if (!couponId) {
-			setSelectedCoupon(null);
-			return;
-		}
-
-		const coupon = currencyFilteredCoupons.find((c) => c.id === couponId);
-		if (coupon) {
-			setSelectedCoupon(coupon);
-		}
-	};
-
-	const handleRemoveCoupon = () => {
-		setSelectedCoupon(null);
-	};
-
 	const { mutate: createInvoice, isPending } = useMutation({
 		mutationFn: async () => {
 			// Create line items including coupon discounts as negative line items
@@ -152,6 +152,7 @@ const CreateInvoicePage: FC = () => {
 				subtotal: calculateSubtotal(),
 				billing_reason: 'manual',
 				coupons: selectedCoupon ? [selectedCoupon.id] : [],
+				tax_rate_overrides: taxOverrides.length > 0 ? taxOverrides : undefined,
 				metadata: {},
 			});
 		},
@@ -177,12 +178,7 @@ const CreateInvoicePage: FC = () => {
 		}
 
 		const hasEmptyFields = lineItems.some(
-			(item) =>
-				!item.display_name ||
-				!item.quantity ||
-				// !item.amount ||
-				// parseFloat(item.amount) <= 0 ||
-				parseFloat(item.quantity) <= 0,
+			(item) => !item.display_name || !item.quantity || !item.amount || parseFloat(item.amount) <= 0 || parseFloat(item.quantity) <= 0,
 		);
 
 		if (hasEmptyFields) {
@@ -292,87 +288,55 @@ const CreateInvoicePage: FC = () => {
 
 					<Divider />
 
-					{/* Coupons Section */}
+					{/* Tax Section */}
+					<div className='p-4'>
+						<FormHeader title='Taxes' variant='sub-header' titleClassName='font-semibold' />
+						<InvoiceTaxAssociationTable data={taxOverrides} onChange={setTaxOverrides} defaultCurrency={currency} />
+					</div>
+
+					<Divider />
+
 					<div className='p-4'>
 						<FormHeader title='Coupons' variant='sub-header' titleClassName='font-semibold' />
+						{/* <CouponAssociation
+							data={disc}
+							onChange={setCoupons}
+							currency={currency}
+						/> */}
+					</div>
 
-						<div className='mt-6'>
-							{/* Selected Coupon Display */}
-							{selectedCoupon ? (
-								<div className='flex items-center gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg'>
-									<div className='w-2 h-2 bg-blue-500 rounded-full'></div>
-									<div className='flex-1'>
-										<p className='text-sm text-[#09090B]'>
-											<span className='font-semibold'>{selectedCoupon.name}</span>
-											<span className='text-[#71717A] font-medium'> - {formatCouponName(selectedCoupon)}</span>
-										</p>
-									</div>
-									<div className='min-w-[100px] text-right'>
-										<span className='text-sm font-medium text-blue-600'>
-											-{getCurrencySymbol(currency)}
-											{calculatedDiscount.toFixed(2)}
-										</span>
-									</div>
-									<Button
-										onClick={handleRemoveCoupon}
-										variant='ghost'
-										size='sm'
-										className='h-8 w-8 p-0 hover:bg-blue-200 hover:text-blue-600'>
-										<Trash2 className='h-4 w-4' />
-									</Button>
-								</div>
-							) : (
-								<div className='flex gap-4 mb-4 items-end'>
-									<Select
-										label=''
-										value=''
-										onChange={handleCouponSelect}
-										options={currencyFilteredCoupons.map((coupon) => ({
-											value: coupon.id,
-											label: coupon.name,
-											description: formatCouponName(coupon),
-										}))}
-										placeholder='Choose a coupon'
-									/>
-									<div className='min-w-[100px]'></div>
-									<div className='size-[42px]'></div>
+					<div className='flex justify-end mt-8'>
+						<div className='text-sm text-gray-800 space-y-4 w-1/3 px-2'>
+							<div className='flex justify-between'>
+								<span>Subtotal</span>
+								<span>{`${getCurrencySymbol(currency)}${calculateSubtotal().toFixed(2)}`}</span>
+							</div>
+							{calculatedDiscount > 0 && (
+								<div className='flex justify-between text-green-600'>
+									<span>Coupon Discount</span>
+									<span>-{`${getCurrencySymbol(currency)}${calculatedDiscount.toFixed(2)}`}</span>
 								</div>
 							)}
-						</div>
-
-						<div className='flex justify-end mt-8'>
-							<div className='text-sm text-gray-800 space-y-4 w-1/3 px-2'>
-								<div className='flex justify-between'>
-									<span>Subtotal</span>
-									<span>{`${getCurrencySymbol(currency)}${calculateSubtotal().toFixed(2)}`}</span>
-								</div>
-								{calculatedDiscount > 0 && (
-									<div className='flex justify-between text-green-600'>
-										<span>Coupon Discount</span>
-										<span>-{`${getCurrencySymbol(currency)}${calculatedDiscount.toFixed(2)}`}</span>
-									</div>
-								)}
-								<div className='flex justify-between'>
-									<span>Tax</span>
-									<span>-</span>
-								</div>
-								<div className='border-t'></div>
-								<div className='flex justify-between font-bold'>
-									<span>Total Amount</span>
-									<span>{`${getCurrencySymbol(currency)}${(finalTotal - calculatedDiscount).toFixed(2)}`}</span>
-								</div>
+							<div className='flex justify-between'>
+								<span>Tax</span>
+								<span>-</span>
+							</div>
+							<div className='border-t'></div>
+							<div className='flex justify-between font-bold'>
+								<span>Total Amount</span>
+								<span>{`${getCurrencySymbol(currency)}${(finalTotal - calculatedDiscount).toFixed(2)}`}</span>
 							</div>
 						</div>
 					</div>
+				</div>
 
-					<div className='flex justify-end p-4'>
-						<Button variant='outline' className='mr-4' onClick={handleCancel}>
-							Cancel
-						</Button>
-						<Button onClick={handleSubmit} disabled={isPending}>
-							{isPending ? 'Creating...' : 'Create Invoice'}
-						</Button>
-					</div>
+				<div className='flex justify-end p-4'>
+					<Button variant='outline' className='mr-4' onClick={handleCancel}>
+						Cancel
+					</Button>
+					<Button onClick={handleSubmit} disabled={isPending}>
+						{isPending ? 'Creating...' : 'Create Invoice'}
+					</Button>
 				</div>
 			</div>
 		</Page>

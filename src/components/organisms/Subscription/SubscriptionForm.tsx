@@ -20,14 +20,14 @@ import {
 	CREDIT_GRANT_CADENCE,
 } from '@/models/CreditGrant';
 import { BILLING_PERIOD } from '@/constants/constants';
-import { Pencil } from 'lucide-react';
-import { Trash2 } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { uniqueId } from 'lodash';
 import { SubscriptionFormState, SubscriptionPhaseState } from '@/pages/customer/customers/CustomerSubscription';
 import { useQuery } from '@tanstack/react-query';
 import { PlanApi } from '@/api/PlanApi';
 import { AddAddonToSubscriptionRequest } from '@/types/dto/Addon';
 import { SubscriptionCoupon } from '@/components/molecules';
+import SubscriptionTaxAssociationTable from '@/components/molecules/SubscriptionTaxAssociationTable';
 
 // Helper components
 const BillingCycleSelector = ({
@@ -657,6 +657,27 @@ const SubscriptionForm = ({
 							</div>
 						);
 					})}
+
+					{/* Add Phase Button - always show but disable when editing except if only 1 phase*/}
+					{/* {!isDisabled && (
+						<div className='flex justify-center mt-6'>
+							<AddButton
+								size='sm'
+								label='Add Phase'
+								variant='outline'
+								onClick={addPhase}
+								disabled={state.isPhaseEditing && state.phases.length > 1}
+								className='w-full text-sm py-1.5'
+							/>
+						</div>
+					)} */}
+
+					{/* Tax Rate Overrides */}
+					<SubscriptionTaxAssociationTable
+						data={state.tax_rate_overrides || []}
+						onChange={(data) => setState((prev) => ({ ...prev, tax_rate_overrides: data }))}
+						disabled={isDisabled}
+					/>
 				</div>
 			)}
 

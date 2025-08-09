@@ -47,6 +47,9 @@ import WebhookDashboard from '@/pages/webhooks/WebhookDashboard';
 import CouponsPage from '@/pages/product-catalog/coupons/Coupons';
 import CouponDetails from '@/pages/product-catalog/coupons/CouponDetails';
 import { TenantMetadataKey } from '@/models/Tenant';
+import TaxPage from '@/pages/customer/taxes/TaxRatesPage';
+import TaxAssociation from '@/pages/customer/tabs/TaxAssociation';
+import TaxrateDetailsPage from '@/pages/customer/taxes/TaxrateDetailsPage';
 
 export const RouteNames = {
 	home: '/',
@@ -67,6 +70,7 @@ export const RouteNames = {
 	// customer management routes
 	customerManagement: '/customer-management',
 	customers: '/customer-management/customers',
+	taxes: '/customer-management/taxes',
 	invoices: '/customer-management/invoices',
 	createInvoice: '/customer-management/customers/:customerId/invoices/create',
 	creditNotes: '/customer-management/credit-notes',
@@ -268,6 +272,10 @@ export const MainRouter = createBrowserRouter([
 								path: 'invoice',
 								element: <Invoice />,
 							},
+							{
+								path: 'tax-association',
+								element: <TaxAssociation />,
+							},
 
 							{
 								path: 'invoice/:invoice_id',
@@ -290,6 +298,14 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: RouteNames.invoices,
 						element: <InvoicePage />,
+					},
+					{
+						path: RouteNames.taxes,
+						element: <TaxPage />,
+					},
+					{
+						path: `${RouteNames.taxes}/:taxrateId`,
+						element: <TaxrateDetailsPage />,
 					},
 					{
 						path: `${RouteNames.invoices}/:invoiceId`,

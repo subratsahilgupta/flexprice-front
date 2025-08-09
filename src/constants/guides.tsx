@@ -189,6 +189,25 @@ const GUIDES: Record<
 			},
 		],
 	},
+	taxes: {
+		tutorials: [
+			{
+				title: 'How to create a tax rate?',
+				description: 'Learn how to set up tax rates for your billing system.',
+				onClick: () => openGuide('https://docs.flexprice.io/docs/Taxes/Overview'),
+			},
+			{
+				title: 'Understanding tax types',
+				description: 'Explore percentage vs fixed amount tax calculations.',
+				onClick: () => openGuide('https://docs.flexprice.io/docs/Taxes/TaxTypes'),
+			},
+			{
+				title: 'Tax associations and overrides',
+				description: 'Learn how to apply taxes to specific entities.',
+				onClick: () => openGuide('https://docs.flexprice.io/docs/Taxes/Associations'),
+			},
+		],
+	},
 };
 
 export default GUIDES;
