@@ -16,7 +16,7 @@ class InvoiceApi {
 	private static baseurl = '/invoices';
 
 	public static async getCustomerInvoices(customerId: string): Promise<GetInvoicesResponse> {
-		const url = generateQueryParams(`/invoices`, { customer_id: customerId });
+		const url = generateQueryParams(this.baseurl, { customer_id: customerId });
 		return await AxiosClient.get<GetInvoicesResponse>(url);
 	}
 
