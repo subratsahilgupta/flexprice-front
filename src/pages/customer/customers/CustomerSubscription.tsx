@@ -215,7 +215,7 @@ const CustomerSubscription: React.FC = () => {
 					price.currency.toLowerCase() === subscriptionState.currency.toLowerCase(),
 			) || [];
 
-		// Get matching addon prices and duplicate them based on count
+		// Get matching addon prices and create unique instances for each count
 		const addonPrices =
 			addons?.items?.flatMap((addon) => {
 				const count = getAddonCounts.get(addon.id) || 0;
@@ -226,8 +226,14 @@ const CustomerSubscription: React.FC = () => {
 							price.currency.toLowerCase() === subscriptionState.currency.toLowerCase(),
 					) || [];
 
-				// Duplicate prices based on count
-				return Array(count).fill(matchingPrices).flat();
+				// Create unique instances for each count with unique IDs
+				return Array.from({ length: count }, (_, index) =>
+					matchingPrices.map(price => ({
+						...price,
+						// Append instance index to make price ID unique for each instance
+						id: `${price.id}_instance_${index}`
+					}))
+				).flat();
 			}) || [];
 
 		return [...subscriptionPrices, ...addonPrices];
