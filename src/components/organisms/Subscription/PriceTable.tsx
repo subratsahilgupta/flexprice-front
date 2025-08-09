@@ -170,20 +170,6 @@ const PriceTable: FC<Props> = ({
 			charge: (
 				<div>
 					<div>{price.meter?.name ? `${price.meter.name}` : price.description || 'Charge'}</div>
-					{appliedCoupon && !overriddenPrices[price.id] && (
-						<div className='mt-1'>
-							<LineItemCoupon
-								priceId={price.id}
-								currency={currency}
-								selectedCoupon={appliedCoupon}
-								onChange={(priceId, coupon) => onLineItemCouponsChange?.(priceId, coupon)}
-								disabled={disabled}
-								showAddButton={false}
-								allLineItemCoupons={lineItemCoupons}
-								subscriptionLevelCoupons={subscriptionLevelCoupon ? [subscriptionLevelCoupon] : []}
-							/>
-						</div>
-					)}
 				</div>
 			),
 			quantity: price.type === 'FIXED' ? '1' : 'pay as you go',
@@ -191,6 +177,7 @@ const PriceTable: FC<Props> = ({
 				<ChargeValueCell
 					data={{ ...price, currency: price.currency } as any}
 					overriddenAmount={isOverridden ? overriddenPrices[price.id] : undefined}
+					appliedCoupon={appliedCoupon}
 				/>
 			),
 			invoice_cadence: price.invoice_cadence,

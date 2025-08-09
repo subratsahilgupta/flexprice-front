@@ -26,7 +26,7 @@ import { SubscriptionFormState, SubscriptionPhaseState } from '@/pages/customer/
 import { useQuery } from '@tanstack/react-query';
 import { PlanApi } from '@/api/PlanApi';
 import { AddAddonToSubscriptionRequest } from '@/types/dto/Addon';
-import { SubscriptionCoupon } from '@/components/molecules';
+import { SubscriptionDiscountTable } from '@/components/molecules';
 import SubscriptionTaxAssociationTable from '@/components/molecules/SubscriptionTaxAssociationTable';
 
 // Helper components
@@ -713,11 +713,11 @@ const SubscriptionForm = ({
 			)}
 
 			{state.selectedPlan && (
-				<SubscriptionCoupon
-					currency={state.currency}
-					selectedCoupon={state.linkedCoupon}
+				<SubscriptionDiscountTable
+					coupon={state.linkedCoupon}
 					onChange={(coupon) => setState((prev) => ({ ...prev, linkedCoupon: coupon }))}
 					disabled={isDisabled}
+					currency={state.currency}
 					allLineItemCoupons={state.lineItemCoupons}
 				/>
 			)}

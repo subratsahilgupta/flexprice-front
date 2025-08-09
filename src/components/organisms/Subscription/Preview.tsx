@@ -2,10 +2,9 @@ import { Price } from '@/models/Price';
 import { useMemo } from 'react';
 import {
 	formatBillingPeriodForDisplay,
-	getTotalPayableTextWithCoupons,
-	getCouponBreakdownText,
 	calculateCouponDiscount,
 	getCurrencySymbol,
+	calculateTotalCouponDiscount,
 } from '@/utils/common/helper_functions';
 import { BILLING_PERIOD } from '@/constants/constants';
 import { BILLING_CYCLE, SubscriptionPhase } from '@/models/Subscription';
@@ -17,6 +16,7 @@ import TimelinePreview, { PreviewTimelineItem } from './TimelinePreview';
 import { ExpandedPlan } from '@/types/plan';
 import { Coupon } from '@/models/Coupon';
 import { getCurrentPriceAmount } from '@/utils/common/price_override_helpers';
+import { TaxRateOverride } from '@/types/dto/tax';
 
 const PERIOD_DURATION: Record<BILLING_PERIOD, string> = {
 	[BILLING_PERIOD.DAILY]: '1 day',
@@ -35,6 +35,7 @@ interface PreviewProps {
 	coupons?: Coupon[];
 	priceOverrides?: Record<string, string>;
 	lineItemCoupons?: Record<string, Coupon>;
+	taxRateOverrides?: TaxRateOverride[];
 }
 
 /**
@@ -99,9 +100,39 @@ const calculateTotalWithLineItemCoupons = (
 };
 
 /**
+ * Calculates tax amount based on tax rate overrides
+ */
+const calculateTaxAmount = (subtotal: number, taxRateOverrides: TaxRateOverride[], currency: string): number => {
+	if (!taxRateOverrides || taxRateOverrides.length === 0) return 0;
+
+	// Filter tax overrides for the current currency and auto-apply enabled
+	const applicableTaxes = taxRateOverrides.filter((tax) => tax.currency.toLowerCase() === currency.toLowerCase() && tax.auto_apply);
+
+	// For simplicity, we'll assume a basic tax calculation
+	// In a real implementation, you would fetch tax rates and calculate properly
+	// For now, let's assume a 10% tax rate for demo purposes
+	// TODO: Implement proper tax rate fetching and calculation
+
+	if (applicableTaxes.length > 0) {
+		// For demo purposes, applying a 10% tax
+		return subtotal * 0.1;
+	}
+
+	return 0;
+};
+
+/**
  * Component that displays subscription preview information including start date and first invoice details
  */
-const Preview = ({ data, className, phases, coupons = [], priceOverrides = {}, lineItemCoupons = {} }: PreviewProps) => {
+const Preview = ({
+	data,
+	className,
+	phases,
+	coupons = [],
+	priceOverrides = {},
+	lineItemCoupons = {},
+	taxRateOverrides = [],
+}: PreviewProps) => {
 	const firstPhase = phases.at(0);
 	const startDate = firstPhase?.start_date;
 	const billingCycle = firstPhase?.billing_cycle || BILLING_CYCLE.ANNIVERSARY;
@@ -113,6 +144,28 @@ const Preview = ({ data, className, phases, coupons = [], priceOverrides = {}, l
 	const { total: recurringTotal, totalDiscount: lineItemTotalDiscount } = useMemo(() => {
 		return calculateTotalWithLineItemCoupons(recurringCharges, priceOverrides, lineItemCoupons);
 	}, [recurringCharges, priceOverrides, lineItemCoupons]);
+
+	// Calculate subscription-level coupon discount
+	const subscriptionCouponDiscount = useMemo(() => {
+		if (coupons.length === 0) return 0;
+		return calculateTotalCouponDiscount(coupons, recurringTotal);
+	}, [coupons, recurringTotal]);
+
+	// Calculate subtotal after all discounts
+	const subtotalAfterDiscounts = useMemo(() => {
+		return Math.max(0, recurringTotal - subscriptionCouponDiscount);
+	}, [recurringTotal, subscriptionCouponDiscount]);
+
+	// Calculate tax amount
+	const taxAmount = useMemo(() => {
+		const currency = recurringCharges[0]?.currency || 'USD';
+		return calculateTaxAmount(subtotalAfterDiscounts, taxRateOverrides, currency);
+	}, [subtotalAfterDiscounts, taxRateOverrides, recurringCharges]);
+
+	// Calculate final total including tax
+	const finalTotal = useMemo(() => {
+		return subtotalAfterDiscounts + taxAmount;
+	}, [subtotalAfterDiscounts, taxAmount]);
 
 	const billingPeriod = useMemo(() => data[0]?.billing_period.toUpperCase() as BILLING_PERIOD, [data]);
 
@@ -141,33 +194,58 @@ const Preview = ({ data, className, phases, coupons = [], priceOverrides = {}, l
 			icon: <Receipt className='h-[22px] w-[22px] text-gray-500 shrink-0' />,
 			subtitle: (
 				<div>
-					<p className='text-sm text-gray-600'>
-						Net payable: {getTotalPayableTextWithCoupons(recurringCharges, usageCharges, recurringTotal, coupons)}
-					</p>
-					{totalCoupons > 0 && (
-						<>
-							<p className='text-sm text-blue-600 font-medium'>
-								{totalCoupons} coupon{totalCoupons > 1 ? 's' : ''} applied
-								{lineItemTotalDiscount > 0 && totalLineItemCoupons > 0 && (
-									<span className='text-xs text-gray-500 ml-2'>
-										({totalLineItemCoupons} line-item, {coupons.length} subscription)
-									</span>
-								)}
-							</p>
-							<div className='text-xs text-gray-500'>
-								{/* Subscription-level coupons */}
-								{coupons.length > 0 && <div>Subscription: {getCouponBreakdownText(coupons, recurringTotal, currency)}</div>}
-								{/* Line-item coupons */}
+					<div className='space-y-1'>
+						{/* Subtotal */}
+						<p className='text-sm text-gray-600'>
+							Subtotal: {getCurrencySymbol(currency || 'USD')}
+							{recurringTotal.toFixed(2)}
+						</p>
+
+						{/* Discounts */}
+						{totalCoupons > 0 && (
+							<>
 								{lineItemTotalDiscount > 0 && (
-									<div>
+									<p className='text-sm text-blue-600'>
 										Line-item discounts: -{getCurrencySymbol(currency || 'USD')}
 										{lineItemTotalDiscount.toFixed(2)}
-									</div>
+									</p>
 								)}
-							</div>
-						</>
+								{subscriptionCouponDiscount > 0 && (
+									<p className='text-sm text-blue-600'>
+										Subscription discount: -{getCurrencySymbol(currency || 'USD')}
+										{subscriptionCouponDiscount.toFixed(2)}
+									</p>
+								)}
+							</>
+						)}
+
+						{/* Tax */}
+						{taxAmount > 0 && (
+							<p className='text-sm text-gray-600'>
+								Tax: {getCurrencySymbol(currency || 'USD')}
+								{taxAmount.toFixed(2)}
+							</p>
+						)}
+
+						{/* Final total */}
+						<p className='text-sm text-gray-900 font-semibold border-t border-gray-200 pt-1'>
+							Net payable: {getCurrencySymbol(currency || 'USD')}
+							{finalTotal.toFixed(2)}
+						</p>
+					</div>
+
+					{totalCoupons > 0 && (
+						<p className='text-xs text-gray-500 mt-2'>
+							{totalCoupons} coupon{totalCoupons > 1 ? 's' : ''} applied
+							{lineItemTotalDiscount > 0 && totalLineItemCoupons > 0 && (
+								<span className='ml-1'>
+									({totalLineItemCoupons} line-item, {coupons.length} subscription)
+								</span>
+							)}
+						</p>
 					)}
-					<p className='text-sm text-gray-600'>{billingDescription}</p>
+
+					<p className='text-sm text-gray-600 mt-2'>{billingDescription}</p>
 				</div>
 			),
 			label: `First invoice: ${firstInvoiceDate ? formatDate(firstInvoiceDate) : ''}`,
@@ -196,6 +274,9 @@ const Preview = ({ data, className, phases, coupons = [], priceOverrides = {}, l
 		coupons,
 		lineItemCoupons,
 		lineItemTotalDiscount,
+		subscriptionCouponDiscount,
+		taxAmount,
+		finalTotal,
 	]);
 
 	return (

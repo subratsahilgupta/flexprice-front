@@ -120,6 +120,7 @@ export { AddonTable, AddonModal } from './AddonTable';
 export { default as SubscriptionCoupon } from './SubscriptionCoupon/SubscriptionCoupon';
 
 export { default as LineItemCoupon } from './LineItemCoupon';
+export { SubscriptionDiscountTable } from './SubscriptionDiscountTable';
 
 export { default as TaxTable } from './TaxTable/TaxTable';
 

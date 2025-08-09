@@ -413,6 +413,7 @@ const CustomerSubscription: React.FC = () => {
 							coupons={subscriptionState.linkedCoupon ? [subscriptionState.linkedCoupon] : []}
 							priceOverrides={subscriptionState.priceOverrides}
 							lineItemCoupons={subscriptionState.lineItemCoupons}
+							taxRateOverrides={subscriptionState.tax_rate_overrides}
 						/>
 					)}
 				</div>
