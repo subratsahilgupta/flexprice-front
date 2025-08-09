@@ -147,6 +147,7 @@ export interface CreateSubscriptionPayload {
 	subscription_coupons?: string[];
 	addons?: AddAddonToSubscriptionRequest[];
 	coupons?: string[];
+	line_item_coupons?: Record<string, string[]>;
 	tax_rate_overrides?: TaxRateOverride[];
 }
 

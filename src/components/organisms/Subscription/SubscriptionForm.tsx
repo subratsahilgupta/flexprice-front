@@ -606,6 +606,23 @@ const SubscriptionForm = ({
 												onPriceOverride={overridePrice}
 												onResetOverride={resetOverride}
 												overriddenPrices={overriddenPrices}
+												lineItemCoupons={state.lineItemCoupons || {}}
+												onLineItemCouponsChange={(priceId, coupon) => {
+													setState((prev) => {
+														const newLineItemCoupons = { ...prev.lineItemCoupons };
+														if (coupon) {
+															newLineItemCoupons[priceId] = coupon;
+														} else {
+															delete newLineItemCoupons[priceId];
+														}
+														return {
+															...prev,
+															lineItemCoupons: newLineItemCoupons,
+														};
+													});
+												}}
+												disabled={isDisabled}
+												subscriptionLevelCoupon={state.linkedCoupon}
 											/>
 
 											{/* Price Override Summary */}
@@ -698,9 +715,10 @@ const SubscriptionForm = ({
 			{state.selectedPlan && (
 				<SubscriptionCoupon
 					currency={state.currency}
-					selectedCoupons={state.linkedCoupons || []}
-					onChange={(coupons) => setState((prev) => ({ ...prev, linkedCoupons: coupons }))}
+					selectedCoupon={state.linkedCoupon}
+					onChange={(coupon) => setState((prev) => ({ ...prev, linkedCoupon: coupon }))}
 					disabled={isDisabled}
+					allLineItemCoupons={state.lineItemCoupons}
 				/>
 			)}
 		</div>

@@ -1,6 +1,12 @@
 import { Price } from '@/models/Price';
 import { useMemo } from 'react';
-import { formatBillingPeriodForDisplay, getTotalPayableTextWithCoupons, getCouponBreakdownText } from '@/utils/common/helper_functions';
+import {
+	formatBillingPeriodForDisplay,
+	getTotalPayableTextWithCoupons,
+	getCouponBreakdownText,
+	calculateCouponDiscount,
+	getCurrencySymbol,
+} from '@/utils/common/helper_functions';
 import { BILLING_PERIOD } from '@/constants/constants';
 import { BILLING_CYCLE, SubscriptionPhase } from '@/models/Subscription';
 import formatDate from '@/utils/common/format_date';
@@ -28,6 +34,7 @@ interface PreviewProps {
 	phases: SubscriptionPhase[];
 	coupons?: Coupon[];
 	priceOverrides?: Record<string, string>;
+	lineItemCoupons?: Record<string, Coupon>;
 }
 
 /**
@@ -57,9 +64,44 @@ const calculateFirstInvoiceDate = (startDate: Date, billingPeriod: BILLING_PERIO
 };
 
 /**
+ * Calculates the total amount with line item coupons applied
+ */
+const calculateTotalWithLineItemCoupons = (
+	charges: Price[],
+	priceOverrides: Record<string, string>,
+	lineItemCoupons: Record<string, Coupon>,
+): { total: number; lineItemDiscounts: Record<string, number>; totalDiscount: number } => {
+	let total = 0;
+	let totalDiscount = 0;
+	const lineItemDiscounts: Record<string, number> = {};
+
+	charges.forEach((charge) => {
+		const currentAmount = getCurrentPriceAmount(charge, priceOverrides);
+		const chargeAmount = parseFloat(currentAmount);
+
+		// Only apply line item coupons to FIXED charges, not USAGE/metered charges
+		if (charge.type === 'FIXED') {
+			const chargeCoupon = lineItemCoupons[charge.id];
+
+			// Calculate discount for this charge
+			const chargeDiscount = chargeCoupon ? calculateCouponDiscount(chargeCoupon, chargeAmount) : 0;
+
+			lineItemDiscounts[charge.id] = chargeDiscount;
+			totalDiscount += chargeDiscount;
+			total += Math.max(0, chargeAmount - chargeDiscount);
+		} else {
+			// For usage charges, just add the amount without line item coupon discount
+			total += chargeAmount;
+		}
+	});
+
+	return { total, lineItemDiscounts, totalDiscount };
+};
+
+/**
  * Component that displays subscription preview information including start date and first invoice details
  */
-const Preview = ({ data, className, phases, coupons = [], priceOverrides = {} }: PreviewProps) => {
+const Preview = ({ data, className, phases, coupons = [], priceOverrides = {}, lineItemCoupons = {} }: PreviewProps) => {
 	const firstPhase = phases.at(0);
 	const startDate = firstPhase?.start_date;
 	const billingCycle = firstPhase?.billing_cycle || BILLING_CYCLE.ANNIVERSARY;
@@ -68,12 +110,9 @@ const Preview = ({ data, className, phases, coupons = [], priceOverrides = {} }:
 
 	const usageCharges = useMemo(() => data.filter((charge) => charge.type === 'USAGE'), [data]);
 
-	const recurringTotal = useMemo(() => {
-		return recurringCharges.reduce((acc, charge) => {
-			const currentAmount = getCurrentPriceAmount(charge, priceOverrides);
-			return acc + parseFloat(currentAmount);
-		}, 0);
-	}, [recurringCharges, priceOverrides]);
+	const { total: recurringTotal, totalDiscount: lineItemTotalDiscount } = useMemo(() => {
+		return calculateTotalWithLineItemCoupons(recurringCharges, priceOverrides, lineItemCoupons);
+	}, [recurringCharges, priceOverrides, lineItemCoupons]);
 
 	const billingPeriod = useMemo(() => data[0]?.billing_period.toUpperCase() as BILLING_PERIOD, [data]);
 
@@ -92,21 +131,40 @@ const Preview = ({ data, className, phases, coupons = [], priceOverrides = {} }:
 			label: formatDate(phase.start_date),
 		}));
 
+		// Calculate total coupons and discounts
+		const totalLineItemCoupons = Object.keys(lineItemCoupons).length;
+		const totalCoupons = coupons.length + totalLineItemCoupons;
+		const currency = recurringCharges[0]?.currency;
+
 		// Insert first invoice preview after the first item
 		const invoicePreview: PreviewTimelineItem = {
 			icon: <Receipt className='h-[22px] w-[22px] text-gray-500 shrink-0' />,
 			subtitle: (
 				<div>
 					<p className='text-sm text-gray-600'>
-						{' '}
 						Net payable: {getTotalPayableTextWithCoupons(recurringCharges, usageCharges, recurringTotal, coupons)}
 					</p>
-					{coupons.length > 0 && (
+					{totalCoupons > 0 && (
 						<>
 							<p className='text-sm text-blue-600 font-medium'>
-								{coupons.length} coupon{coupons.length > 1 ? 's' : ''} applied
+								{totalCoupons} coupon{totalCoupons > 1 ? 's' : ''} applied
+								{lineItemTotalDiscount > 0 && totalLineItemCoupons > 0 && (
+									<span className='text-xs text-gray-500 ml-2'>
+										({totalLineItemCoupons} line-item, {coupons.length} subscription)
+									</span>
+								)}
 							</p>
-							<p className='text-xs text-gray-500'>{getCouponBreakdownText(coupons, recurringTotal, recurringCharges[0]?.currency)}</p>
+							<div className='text-xs text-gray-500'>
+								{/* Subscription-level coupons */}
+								{coupons.length > 0 && <div>Subscription: {getCouponBreakdownText(coupons, recurringTotal, currency)}</div>}
+								{/* Line-item coupons */}
+								{lineItemTotalDiscount > 0 && (
+									<div>
+										Line-item discounts: -{getCurrencySymbol(currency || 'USD')}
+										{lineItemTotalDiscount.toFixed(2)}
+									</div>
+								)}
+							</div>
 						</>
 					)}
 					<p className='text-sm text-gray-600'>{billingDescription}</p>
@@ -128,7 +186,17 @@ const Preview = ({ data, className, phases, coupons = [], priceOverrides = {} }:
 		}
 
 		return updatedItems;
-	}, [phases, firstInvoiceDate, recurringCharges, usageCharges, recurringTotal, billingDescription, coupons]);
+	}, [
+		phases,
+		firstInvoiceDate,
+		recurringCharges,
+		usageCharges,
+		recurringTotal,
+		billingDescription,
+		coupons,
+		lineItemCoupons,
+		lineItemTotalDiscount,
+	]);
 
 	return (
 		<div className={cn('w-full', className)}>

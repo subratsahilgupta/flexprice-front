@@ -57,13 +57,14 @@ export type SubscriptionFormState = {
 	// Price Overrides
 	priceOverrides: Record<string, string>;
 
-	// Coupons
-	linkedCoupons: Coupon[];
+	// Subscription Level Coupon (single coupon)
+	linkedCoupon: Coupon | null;
+
+	// Line Item Coupons - maps price_id to single Coupon object
+	lineItemCoupons: Record<string, Coupon>;
 
 	// Addons
 	addons?: AddAddonToSubscriptionRequest[];
-
-	linkedCoupon: Coupon | null;
 	customerId: string;
 
 	// Tax Rate Overrides
@@ -168,9 +169,9 @@ const CustomerSubscription: React.FC = () => {
 		isPhaseEditing: false,
 		originalPhases: [],
 		priceOverrides: {},
-		linkedCoupons: [],
-		addons: [],
 		linkedCoupon: null,
+		lineItemCoupons: {},
+		addons: [],
 		customerId: customerId!,
 		tax_rate_overrides: [],
 	});
@@ -217,9 +218,9 @@ const CustomerSubscription: React.FC = () => {
 					isPhaseEditing: false,
 					originalPhases: [initialPhase as SubscriptionPhase],
 					priceOverrides: {},
-					linkedCoupons: [],
-					addons: [],
 					linkedCoupon: null,
+					lineItemCoupons: {},
+					addons: [],
 					customerId: customerId!,
 					tax_rate_overrides: [],
 				});
@@ -247,8 +248,18 @@ const CustomerSubscription: React.FC = () => {
 	});
 
 	const handleSubscriptionSubmit = () => {
-		const { billingPeriod, selectedPlan, currency, phases, priceOverrides, prices, linkedCoupons, tax_rate_overrides, addons } =
-			subscriptionState;
+		const {
+			billingPeriod,
+			selectedPlan,
+			currency,
+			phases,
+			priceOverrides,
+			prices,
+			linkedCoupon,
+			lineItemCoupons,
+			tax_rate_overrides,
+			addons,
+		} = subscriptionState;
 
 		if (!billingPeriod || !selectedPlan) {
 			toast.error('Please select a plan and billing period.');
@@ -328,7 +339,16 @@ const CustomerSubscription: React.FC = () => {
 			commitment_amount: firstPhase.commitment_amount,
 			override_line_items: overrideLineItems.length > 0 ? overrideLineItems : undefined,
 			addons: (addons?.length ?? 0) > 0 ? addons : undefined,
-			coupons: linkedCoupons.length > 0 ? linkedCoupons.map((coupon) => coupon.id) : undefined,
+			coupons: linkedCoupon ? [linkedCoupon.id] : undefined,
+			line_item_coupons:
+				Object.keys(lineItemCoupons).length > 0
+					? Object.fromEntries(
+							Object.entries(lineItemCoupons).map(([priceId, coupon]) => [
+								priceId,
+								[coupon.id], // Convert single coupon to array format for API
+							]),
+						)
+					: undefined,
 
 			// TODO: remove this once the feature is released
 			overage_factor: firstPhase.overage_factor ?? 1,
@@ -390,8 +410,9 @@ const CustomerSubscription: React.FC = () => {
 							}
 							selectedPlan={subscriptionState.prices}
 							phases={subscriptionState.phases}
-							coupons={subscriptionState.linkedCoupons}
+							coupons={subscriptionState.linkedCoupon ? [subscriptionState.linkedCoupon] : []}
 							priceOverrides={subscriptionState.priceOverrides}
+							lineItemCoupons={subscriptionState.lineItemCoupons}
 						/>
 					)}
 				</div>
