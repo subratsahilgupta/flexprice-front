@@ -471,6 +471,7 @@ const CustomerSubscription: React.FC = () => {
 							priceOverrides={subscriptionState.priceOverrides}
 							lineItemCoupons={subscriptionState.lineItemCoupons}
 							taxRateOverrides={subscriptionState.tax_rate_overrides}
+							addons={subscriptionState.addons || []}
 						/>
 					)}
 				</div>

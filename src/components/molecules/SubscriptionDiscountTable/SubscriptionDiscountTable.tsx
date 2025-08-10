@@ -155,7 +155,7 @@ const SubscriptionDiscountTable: FC<Props> = ({ coupon, onChange, disabled, curr
 
 			<div className='space-y-4'>
 				<div className='flex items-center justify-between'>
-					<FormHeader className='mb-0' title='Subscription Discount' variant='sub-header' />
+					<FormHeader className='mb-0' title='Discounts' variant='sub-header' />
 					{!coupon && <AddButton onClick={() => setIsModalOpen(true)} disabled={disabled} label='Add Discount' />}
 				</div>
 				<div className='rounded-xl border border-gray-300 space-y-6 mt-2'>

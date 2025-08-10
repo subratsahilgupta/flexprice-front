@@ -17,6 +17,9 @@ import { ExpandedPlan } from '@/types/plan';
 import { Coupon } from '@/models/Coupon';
 import { getCurrentPriceAmount } from '@/utils/common/price_override_helpers';
 import { TaxRateOverride } from '@/types/dto/tax';
+import { AddAddonToSubscriptionRequest } from '@/types/dto/Addon';
+import { useQuery } from '@tanstack/react-query';
+import AddonApi from '@/api/AddonApi';
 
 const PERIOD_DURATION: Record<BILLING_PERIOD, string> = {
 	[BILLING_PERIOD.DAILY]: '1 day',
@@ -36,6 +39,7 @@ interface PreviewProps {
 	priceOverrides?: Record<string, string>;
 	lineItemCoupons?: Record<string, Coupon>;
 	taxRateOverrides?: TaxRateOverride[];
+	addons?: AddAddonToSubscriptionRequest[];
 }
 
 /**
@@ -100,6 +104,43 @@ const calculateTotalWithLineItemCoupons = (
 };
 
 /**
+ * Calculates addon total based on addon requests and their prices
+ */
+const calculateAddonTotal = (
+	addons: AddAddonToSubscriptionRequest[],
+	allAddons: any[],
+	billingPeriod: string,
+	currency: string,
+): { total: number; addonDetails: Array<{ name: string; amount: number }> } => {
+	let total = 0;
+	const addonDetails: Array<{ name: string; amount: number }> = [];
+
+	addons.forEach((addonRequest) => {
+		const addon = allAddons.find((a) => a.id === addonRequest.addon_id);
+		if (addon?.prices) {
+			// Find the price that matches the billing period and currency
+			const matchingPrice = addon.prices.find(
+				(price: Price) =>
+					price.billing_period.toLowerCase() === billingPeriod.toLowerCase() &&
+					price.currency.toLowerCase() === currency.toLowerCase() &&
+					price.type === 'FIXED',
+			);
+
+			if (matchingPrice) {
+				const amount = parseFloat(matchingPrice.amount);
+				total += amount;
+				addonDetails.push({
+					name: addon.name,
+					amount: amount,
+				});
+			}
+		}
+	});
+
+	return { total, addonDetails };
+};
+
+/**
  * Calculates tax amount based on tax rate overrides
  */
 const calculateTaxAmount = (subtotal: number, taxRateOverrides: TaxRateOverride[], currency: string): number => {
@@ -132,12 +173,24 @@ const Preview = ({
 	priceOverrides = {},
 	lineItemCoupons = {},
 	taxRateOverrides = [],
+	addons = [],
 }: PreviewProps) => {
 	const firstPhase = phases.at(0);
 	const startDate = firstPhase?.start_date;
 	const billingCycle = firstPhase?.billing_cycle || BILLING_CYCLE.ANNIVERSARY;
 
-	const recurringCharges = useMemo(() => data.filter((charge) => charge.type === PRICE_TYPE.FIXED), [data]);
+	// Fetch addons data for calculation
+	const { data: allAddons = [] } = useQuery({
+		queryKey: ['addons'],
+		queryFn: async () => {
+			const response = await AddonApi.ListAddon({ limit: 1000, offset: 0 });
+			return response.items;
+		},
+		staleTime: 5 * 60 * 1000,
+		refetchOnWindowFocus: false,
+	});
+
+	const recurringCharges = useMemo(() => data.filter((charge) => charge.type === 'FIXED'), [data]);
 
 	const usageCharges = useMemo(() => data.filter((charge) => charge.type === PRICE_TYPE.USAGE), [data]);
 
@@ -145,29 +198,39 @@ const Preview = ({
 		return calculateTotalWithLineItemCoupons(recurringCharges, priceOverrides, lineItemCoupons);
 	}, [recurringCharges, priceOverrides, lineItemCoupons]);
 
-	// Calculate subscription-level coupon discount
+	// Calculate addon total
+	const billingPeriod = useMemo(() => data[0]?.billing_period.toUpperCase() as BILLING_PERIOD, [data]);
+	const currency = useMemo(() => recurringCharges[0]?.currency || 'USD', [recurringCharges]);
+
+	const { total: addonTotal, addonDetails } = useMemo(() => {
+		return calculateAddonTotal(addons, allAddons, billingPeriod, currency);
+	}, [addons, allAddons, billingPeriod, currency]);
+
+	// Calculate subscription-level coupon discount (applies only to plan, not addons)
 	const subscriptionCouponDiscount = useMemo(() => {
 		if (coupons.length === 0) return 0;
 		return calculateTotalCouponDiscount(coupons, recurringTotal);
 	}, [coupons, recurringTotal]);
 
-	// Calculate subtotal after all discounts
-	const subtotalAfterDiscounts = useMemo(() => {
+	// Calculate plan subtotal after discounts (addons are separate)
+	const planSubtotalAfterDiscounts = useMemo(() => {
 		return Math.max(0, recurringTotal - subscriptionCouponDiscount);
 	}, [recurringTotal, subscriptionCouponDiscount]);
 
-	// Calculate tax amount
+	// Calculate total before tax (plan after discount + addons)
+	const totalBeforeTax = useMemo(() => {
+		return planSubtotalAfterDiscounts + addonTotal;
+	}, [planSubtotalAfterDiscounts, addonTotal]);
+
+	// Calculate tax amount (applied to plan after discount + addons)
 	const taxAmount = useMemo(() => {
-		const currency = recurringCharges[0]?.currency || 'USD';
-		return calculateTaxAmount(subtotalAfterDiscounts, taxRateOverrides, currency);
-	}, [subtotalAfterDiscounts, taxRateOverrides, recurringCharges]);
+		return calculateTaxAmount(totalBeforeTax, taxRateOverrides, currency);
+	}, [totalBeforeTax, taxRateOverrides, currency]);
 
 	// Calculate final total including tax
 	const finalTotal = useMemo(() => {
-		return subtotalAfterDiscounts + taxAmount;
-	}, [subtotalAfterDiscounts, taxAmount]);
-
-	const billingPeriod = useMemo(() => data[0]?.billing_period.toUpperCase() as BILLING_PERIOD, [data]);
+		return totalBeforeTax + taxAmount;
+	}, [totalBeforeTax, taxAmount]);
 
 	const firstInvoiceDate = useMemo(() => {
 		return startDate ? calculateFirstInvoiceDate(startDate as Date, billingPeriod, billingCycle) : undefined;
@@ -187,7 +250,6 @@ const Preview = ({
 		// Calculate total coupons and discounts
 		const totalLineItemCoupons = Object.keys(lineItemCoupons).length;
 		const totalCoupons = coupons.length + totalLineItemCoupons;
-		const currency = recurringCharges[0]?.currency;
 
 		// Insert first invoice preview after the first item
 		const invoicePreview: PreviewTimelineItem = {
@@ -195,11 +257,27 @@ const Preview = ({
 			subtitle: (
 				<div>
 					<div className='space-y-1'>
-						{/* Subtotal */}
+						{/* Plan Subtotal */}
 						<p className='text-sm text-gray-600'>
-							Subtotal: {getCurrencySymbol(currency || 'USD')}
+							Plan: {getCurrencySymbol(currency || 'USD')}
 							{recurringTotal.toFixed(2)}
 						</p>
+
+						{/* Addons */}
+						{addonTotal > 0 && (
+							<>
+								<p className='text-sm text-gray-600'>
+									Addons: {getCurrencySymbol(currency || 'USD')}
+									{addonTotal.toFixed(2)}
+								</p>
+								{addonDetails.map((addon, index) => (
+									<p key={index} className='text-xs text-gray-500 ml-4'>
+										• {addon.name}: {getCurrencySymbol(currency || 'USD')}
+										{addon.amount.toFixed(2)}
+									</p>
+								))}
+							</>
+						)}
 
 						{/* Discounts */}
 						{totalCoupons > 0 && (
@@ -270,6 +348,9 @@ const Preview = ({
 		recurringCharges,
 		usageCharges,
 		recurringTotal,
+		addonTotal,
+		addonDetails,
+		planSubtotalAfterDiscounts,
 		billingDescription,
 		coupons,
 		lineItemCoupons,
@@ -277,6 +358,7 @@ const Preview = ({
 		subscriptionCouponDiscount,
 		taxAmount,
 		finalTotal,
+		currency,
 	]);
 
 	return (
