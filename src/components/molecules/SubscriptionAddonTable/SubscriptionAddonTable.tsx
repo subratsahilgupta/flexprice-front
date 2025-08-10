@@ -6,17 +6,18 @@ import SubscriptionAddonModal from './SubscriptionAddonModal';
 import { useQuery } from '@tanstack/react-query';
 import AddonApi from '@/api/AddonApi';
 import { ADDON_TYPE } from '@/models/Addon';
-import { toSentenceCase } from '@/utils/common/helper_functions';
+import { getTotalPayableTextWithCoupons, toSentenceCase } from '@/utils/common/helper_functions';
 import { Price, PRICE_TYPE } from '@/models/Price';
-import { BILLING_CADENCE } from '@/models/Invoice';
-import { getCurrencySymbol } from '@/utils/common/helper_functions';
-import { formatAmount } from '@/components/atoms/Input/Input';
+import { getCurrentPriceAmount } from '@/utils/common/price_override_helpers';
+import { Coupon } from '@/models/Coupon';
 
 interface Props {
 	data: AddAddonToSubscriptionRequest[];
 	onChange: (data: AddAddonToSubscriptionRequest[]) => void;
 	disabled?: boolean;
 	getEmptyAddon: () => Partial<AddAddonToSubscriptionRequest>;
+	priceOverrides?: Record<string, string>;
+	coupons?: Coupon[];
 }
 const getAddonTypeChip = (type: string) => {
 	switch (type.toLowerCase()) {
@@ -29,10 +30,10 @@ const getAddonTypeChip = (type: string) => {
 	}
 };
 
-const formatAddonCharges = (prices: Price[] = []): string => {
+const formatAddonCharges = (prices: Price[] = [], priceOverrides: Record<string, string> = {}, coupons: Coupon[] = []): string => {
 	if (!prices || prices.length === 0) return '--';
 
-	const recurringPrices = prices.filter((p) => p.type === PRICE_TYPE.FIXED && p.billing_cadence === BILLING_CADENCE.RECURRING);
+	const recurringPrices = prices.filter((p) => p.type === PRICE_TYPE.FIXED);
 	const usagePrices = prices.filter((p) => p.type === PRICE_TYPE.USAGE);
 
 	const hasUsage = usagePrices.length > 0;
@@ -41,28 +42,29 @@ const formatAddonCharges = (prices: Price[] = []): string => {
 		return hasUsage ? 'Depends on usage' : '--';
 	}
 
-	// Prefer the smallest recurring amount for display
-	const amounts = recurringPrices.map((p) => {
-		const parsed = parseFloat(p.amount);
-		return Number.isFinite(parsed) ? parsed : 0;
-	});
-	const minIndex = amounts.reduce((idxMin, value, idx, arr) => (value < arr[idxMin] ? idx : idxMin), 0);
-	const chosen = recurringPrices[minIndex];
+	// Calculate total recurring amount
+	const recurringTotal = recurringPrices.reduce((acc, charge) => {
+		const currentAmount = getCurrentPriceAmount(charge, priceOverrides);
+		return acc + parseFloat(currentAmount);
+	}, 0);
 
-	const amountNumber = amounts[minIndex] || 0;
-	const currencySymbol = getCurrencySymbol(chosen.currency);
-	const baseText = `${currencySymbol}${formatAmount(amountNumber.toString())}`;
-
-	if (hasUsage) {
-		return `${baseText} + Usage`;
-	}
-
-	return baseText;
+	// Use the same helper as Preview component for consistent display
+	return getTotalPayableTextWithCoupons(recurringPrices, usagePrices, recurringTotal, coupons);
 };
 
-const SubscriptionAddonTable: React.FC<Props> = ({ data, onChange, disabled, getEmptyAddon }) => {
+interface ExtendedAddon extends AddAddonToSubscriptionRequest {
+	internal_id: number;
+}
+
+const SubscriptionAddonTable: React.FC<Props> = ({ data, onChange, disabled, getEmptyAddon, priceOverrides = {}, coupons = [] }) => {
 	const [isOpen, setIsOpen] = useState(false);
-	const [selectedAddon, setSelectedAddon] = useState<AddAddonToSubscriptionRequest | null>(null);
+	const [selectedAddon, setSelectedAddon] = useState<ExtendedAddon | null>(null);
+	const extendedData = useMemo(() => {
+		return data.map((addon, index) => ({
+			...addon,
+			internal_id: index,
+		}));
+	}, [data]);
 
 	const { data: addons = [] } = useQuery({
 		queryKey: ['addons'],
@@ -86,23 +88,34 @@ const SubscriptionAddonTable: React.FC<Props> = ({ data, onChange, disabled, get
 	const handleSave = useCallback(
 		(newAddon: AddAddonToSubscriptionRequest) => {
 			if (selectedAddon) {
-				onChange(data.map((addon) => (addon.addon_id === selectedAddon.addon_id ? newAddon : addon)));
+				// Update specific instance using internal_id
+				const updatedData = extendedData.map((addon) =>
+					addon.internal_id === selectedAddon.internal_id ? { ...newAddon, internal_id: addon.internal_id } : addon,
+				);
+				// Strip internal_id before passing to parent
+				onChange(updatedData.map(({ internal_id, ...rest }) => rest));
 			} else {
-				onChange([...data, newAddon]);
+				// Add new instance with next available internal_id
+				const nextId = extendedData.length > 0 ? Math.max(...extendedData.map((a) => a.internal_id)) + 1 : 0;
+				const newData = [...extendedData, { ...newAddon, internal_id: nextId }];
+				// Strip internal_id before passing to parent
+				onChange(newData.map(({ internal_id, ...rest }) => rest));
 			}
 			setSelectedAddon(null);
 		},
-		[data, onChange, selectedAddon],
+		[extendedData, onChange, selectedAddon],
 	);
 
 	const handleDelete = useCallback(
-		async (addonId: string) => {
-			onChange(data.filter((addon) => addon.addon_id !== addonId));
+		async (internalId: number) => {
+			const filteredData = extendedData.filter((addon) => addon.internal_id !== internalId);
+			// Strip internal_id before passing to parent
+			onChange(filteredData.map(({ internal_id, ...rest }) => rest));
 		},
-		[data, onChange],
+		[extendedData, onChange],
 	);
 
-	const handleEdit = useCallback((addon: AddAddonToSubscriptionRequest) => {
+	const handleEdit = useCallback((addon: ExtendedAddon) => {
 		setSelectedAddon(addon);
 		setIsOpen(true);
 	}, []);
@@ -112,7 +125,7 @@ const SubscriptionAddonTable: React.FC<Props> = ({ data, onChange, disabled, get
 		setIsOpen(true);
 	}, []);
 
-	const columns: ColumnData<AddAddonToSubscriptionRequest>[] = useMemo(
+	const columns: ColumnData<ExtendedAddon>[] = useMemo(
 		() => [
 			{
 				title: 'Name',
@@ -133,7 +146,7 @@ const SubscriptionAddonTable: React.FC<Props> = ({ data, onChange, disabled, get
 				render: (row) => {
 					const addonDetails = getAddonDetails(row.addon_id);
 					const prices = addonDetails?.prices || [];
-					return <span>{formatAddonCharges(prices)}</span>;
+					return <span>{formatAddonCharges(prices, priceOverrides, coupons)}</span>;
 				},
 			},
 			// {
@@ -151,9 +164,9 @@ const SubscriptionAddonTable: React.FC<Props> = ({ data, onChange, disabled, get
 					const addonDetails = getAddonDetails(row.addon_id);
 					return (
 						<ActionButton
-							archiveText='Delete'
+							archiveText='Remove'
 							id={row.addon_id}
-							deleteMutationFn={() => handleDelete(row.addon_id)}
+							deleteMutationFn={() => handleDelete(row.internal_id)}
 							refetchQueryKey='addons'
 							entityName={addonDetails?.name || row.addon_id}
 							isEditDisabled={disabled}
@@ -164,7 +177,7 @@ const SubscriptionAddonTable: React.FC<Props> = ({ data, onChange, disabled, get
 				},
 			},
 		],
-		[disabled, getAddonDetails, handleDelete, handleEdit],
+		[disabled, getAddonDetails, handleDelete, handleEdit, priceOverrides, coupons],
 	);
 
 	return (
@@ -187,7 +200,7 @@ const SubscriptionAddonTable: React.FC<Props> = ({ data, onChange, disabled, get
 					<AddButton onClick={handleOpenCreate} disabled={disabled} />
 				</div>
 				<div className='rounded-xl border border-gray-300 space-y-6 mt-2 '>
-					<FlexpriceTable data={data} columns={columns} showEmptyRow />
+					<FlexpriceTable data={extendedData} columns={columns} showEmptyRow />
 				</div>
 			</div>
 		</>
