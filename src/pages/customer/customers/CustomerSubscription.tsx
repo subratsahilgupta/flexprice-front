@@ -9,8 +9,9 @@ import SubscriptionApi from '@/api/SubscriptionApi';
 import { toSentenceCase } from '@/utils/common/helper_functions';
 import { ExpandedPlan } from '@/types/plan';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import toast from 'react-hot-toast';
+import AddonApi from '@/api/AddonApi';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ApiDocsContent } from '@/components/molecules';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
@@ -115,7 +116,21 @@ const useSubscriptionData = (subscription_id: string | undefined) => {
 	});
 };
 
-// Coupons are now handled inside SubscriptionForm
+// Hook to fetch addons data
+const useAddons = (addonIds: string[] = []) => {
+	return useQuery({
+		queryKey: ['addons', addonIds],
+		queryFn: async () => {
+			if (!addonIds.length) return { items: [] };
+			const response = await AddonApi.ListAddon({
+				addon_ids: addonIds,
+				expand: 'prices,entitlements',
+			});
+			return response;
+		},
+		enabled: addonIds.length > 0,
+	});
+};
 
 const CustomerSubscription: React.FC = () => {
 	const { id: customerId, subscription_id } = useParams<Params>();
@@ -123,9 +138,6 @@ const CustomerSubscription: React.FC = () => {
 	const updateBreadcrumb = useBreadcrumbsStore((state) => state.updateBreadcrumb);
 
 	// Fetch data using React Query
-	const { data: plans, isLoading: plansLoading, isError: plansError } = usePlans();
-	const { data: customerData } = useCustomerData(customerId);
-	const { data: subscriptionData } = useSubscriptionData(subscription_id);
 	const { data: customerTaxAssociations } = useQuery({
 		queryKey: ['customerTaxAssociations', customerId],
 		queryFn: async () => {
@@ -175,6 +187,57 @@ const CustomerSubscription: React.FC = () => {
 		customerId: customerId!,
 		tax_rate_overrides: [],
 	});
+
+	// Fetch data using React Query
+	const { data: plans, isLoading: plansLoading, isError: plansError } = usePlans();
+	const { data: customerData } = useCustomerData(customerId);
+	const { data: subscriptionData } = useSubscriptionData(subscription_id);
+
+	// Get addon IDs from subscription state
+	const addonIds = useMemo(() => subscriptionState.addons?.map((addon) => addon.addon_id) || [], [subscriptionState.addons]);
+	const { data: addons } = useAddons(addonIds);
+
+	// Helper function to count addon ID occurrences
+	const getAddonCounts = useMemo(() => {
+		const counts = new Map<string, number>();
+		subscriptionState.addons?.forEach((addon) => {
+			counts.set(addon.addon_id, (counts.get(addon.addon_id) || 0) + 1);
+		});
+		return counts;
+	}, [subscriptionState.addons]);
+
+	// Memoized function to get combined prices from subscription and addons
+	const getPrices = useMemo(() => {
+		const subscriptionPrices =
+			subscriptionState.prices?.prices?.filter(
+				(price) =>
+					price.billing_period.toLowerCase() === subscriptionState.billingPeriod.toLowerCase() &&
+					price.currency.toLowerCase() === subscriptionState.currency.toLowerCase(),
+			) || [];
+
+		// Get matching addon prices and create unique instances for each count
+		const addonPrices =
+			addons?.items?.flatMap((addon) => {
+				const count = getAddonCounts.get(addon.id) || 0;
+				const matchingPrices =
+					addon.prices?.filter(
+						(price) =>
+							price.billing_period.toLowerCase() === subscriptionState.billingPeriod.toLowerCase() &&
+							price.currency.toLowerCase() === subscriptionState.currency.toLowerCase(),
+					) || [];
+
+				// Create unique instances for each count with unique IDs
+				return Array.from({ length: count }, (_, index) =>
+					matchingPrices.map(price => ({
+						...price,
+						// Append instance index to make price ID unique for each instance
+						id: `${price.id}_instance_${index}`
+					}))
+				).flat();
+			}) || [];
+
+		return [...subscriptionPrices, ...addonPrices];
+	}, [subscriptionState.prices, subscriptionState.billingPeriod, subscriptionState.currency, addons, getAddonCounts]);
 
 	// Coupons are handled in SubscriptionForm
 
@@ -343,11 +406,11 @@ const CustomerSubscription: React.FC = () => {
 			line_item_coupons:
 				Object.keys(lineItemCoupons).length > 0
 					? Object.fromEntries(
-							Object.entries(lineItemCoupons).map(([priceId, coupon]) => [
-								priceId,
-								[coupon.id], // Convert single coupon to array format for API
-							]),
-						)
+						Object.entries(lineItemCoupons).map(([priceId, coupon]) => [
+							priceId,
+							[coupon.id], // Convert single coupon to array format for API
+						]),
+					)
 					: undefined,
 
 			// TODO: remove this once the feature is released
@@ -401,13 +464,7 @@ const CustomerSubscription: React.FC = () => {
 				<div className='sticky top-6'>
 					{showPreview && (
 						<Preview
-							data={
-								subscriptionState.prices?.prices?.filter(
-									(price) =>
-										price.billing_period.toLowerCase() === subscriptionState.billingPeriod.toLowerCase() &&
-										price.currency.toLowerCase() === subscriptionState.currency.toLowerCase(),
-								) || []
-							}
+							data={getPrices}
 							selectedPlan={subscriptionState.prices}
 							phases={subscriptionState.phases}
 							coupons={subscriptionState.linkedCoupon ? [subscriptionState.linkedCoupon] : []}
