@@ -88,8 +88,8 @@ const TaxAssociation = () => {
 					onCancel={handleCancelTaxAssociation}
 				/>
 				<NoDataCard
-					title='Tax Associations'
-					subtitle='No tax associations found for this customer'
+					title='Tax'
+					subtitle='No tax rate assigned to this customer'
 					cta={!isArchived && <AddButton onClick={handleAddTaxAssociation} disabled={false} />}
 				/>
 			</div>

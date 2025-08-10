@@ -104,7 +104,7 @@ const SubscriptionTaxAssociationTable: FC<Props> = ({ data, onChange, disabled }
 			/>
 			<div className='space-y-4'>
 				<div className='flex items-center justify-between'>
-					<FormHeader className='mb-0' title='Tax Rate Overrides' variant='sub-header' />
+					<FormHeader className='mb-0' title='Taxes' variant='sub-header' />
 					<AddButton
 						onClick={() => {
 							setSelectedTaxOverride(null);

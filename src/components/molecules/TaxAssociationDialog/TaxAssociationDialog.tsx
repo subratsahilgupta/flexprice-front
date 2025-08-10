@@ -143,7 +143,7 @@ const TaxAssociationDialog: FC<TaxAssociationDialogProps> = ({
 	}));
 
 	return (
-		<Dialog isOpen={open} onOpenChange={onOpenChange} title='Link Tax Association' className='sm:max-w-[500px]'>
+		<Dialog isOpen={open} onOpenChange={onOpenChange} title='Link Tax Rate' className='sm:max-w-[500px]'>
 			<form onSubmit={handleSubmit} className='space-y-6'>
 				<div className='space-y-4'>
 					<div className='space-y-2'>
@@ -200,7 +200,7 @@ const TaxAssociationDialog: FC<TaxAssociationDialogProps> = ({
 						Cancel
 					</Button>
 					<Button type='submit' disabled={!formData.tax_rate_code || isLoadingTaxRates}>
-						Link Tax Association
+						Link Tax Rate
 					</Button>
 				</div>
 			</form>

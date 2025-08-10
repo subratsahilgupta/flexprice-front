@@ -25,11 +25,11 @@ const taxTypeOptions: SelectOption[] = [
 	{ label: 'Fixed Amount', value: TAX_RATE_TYPE.FIXED },
 ];
 
-const scopeOptions: SelectOption[] = [
-	{ label: 'Internal', value: TAX_RATE_SCOPE.INTERNAL },
-	{ label: 'External', value: TAX_RATE_SCOPE.EXTERNAL },
-	{ label: 'One-time', value: TAX_RATE_SCOPE.ONETIME },
-];
+// const scopeOptions: SelectOption[] = [
+// 	{ label: 'Internal', value: TAX_RATE_SCOPE.INTERNAL },
+// 	{ label: 'External', value: TAX_RATE_SCOPE.EXTERNAL },
+// 	{ label: 'One-time', value: TAX_RATE_SCOPE.ONETIME },
+// ];
 
 const TaxDrawer: FC<Props> = ({ data, open, onOpenChange, trigger, refetchQueryKeys }) => {
 	const isEdit = !!data;
@@ -221,16 +221,6 @@ const TaxDrawer: FC<Props> = ({ data, open, onOpenChange, trigger, refetchQueryK
 					disabled={isEdit}
 				/>
 			)}
-
-			<Spacer height={'20px'} />
-			<Select
-				label='Scope'
-				options={scopeOptions}
-				value={formData.scope}
-				onChange={(e) => setFormData({ ...formData, scope: e as TAX_RATE_SCOPE })}
-				description={isEdit ? 'Scope cannot be changed after creation.' : 'Define where this tax rate applies.'}
-				disabled={isEdit}
-			/>
 
 			<Spacer height={'20px'} />
 			<Textarea
