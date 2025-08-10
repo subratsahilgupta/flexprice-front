@@ -1,27 +1,37 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import { Price } from '@/models/Price';
-import { GetAllPricesResponse, CreatePriceRequest, UpdatePriceRequest } from '@/types/dto';
+import { GetAllPricesResponse, CreatePriceRequest, UpdatePriceRequest, PriceFilter } from '@/types/dto/Price';
+import { generateQueryParams } from '@/utils/common/api_helper';
+
+export interface CreateBulkPriceRequest {
+	items: CreatePriceRequest[];
+}
 
 export class PriceApi {
 	private static baseUrl = '/prices';
 
-	public static async getAllPrices() {
-		return await AxiosClient.get<GetAllPricesResponse>(this.baseUrl);
+	public static async ListPrices(filters?: PriceFilter) {
+		const url = filters ? generateQueryParams(this.baseUrl, filters) : this.baseUrl;
+		return await AxiosClient.get<GetAllPricesResponse>(url);
 	}
 
-	public static async getPriceById(id: string) {
+	public static async GetPriceById(id: string) {
 		return await AxiosClient.get<Price>(`${this.baseUrl}/${id}`);
 	}
 
-	public static async createPrice(data: CreatePriceRequest) {
+	public static async CreatePrice(data: CreatePriceRequest) {
 		return await AxiosClient.post<Price>(this.baseUrl, data);
 	}
 
-	public static async updatePrice(id: string, data: UpdatePriceRequest) {
+	public static async CreateBulkPrice(data: CreateBulkPriceRequest) {
+		return await AxiosClient.post<Price[]>(`${this.baseUrl}/bulk`, data);
+	}
+
+	public static async UpdatePrice(id: string, data: UpdatePriceRequest) {
 		return await AxiosClient.put<Price>(`${this.baseUrl}/${id}`, data);
 	}
 
-	public static async deletePrice(id: string) {
+	public static async DeletePrice(id: string) {
 		return await AxiosClient.delete(`${this.baseUrl}/${id}`);
 	}
 }

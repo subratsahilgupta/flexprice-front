@@ -1,11 +1,14 @@
 import { FC, useState, useMemo } from 'react';
-import { ColumnData, FlexpriceTable, PriceOverrideDialog } from '@/components/molecules';
+import { ColumnData, FlexpriceTable, PriceOverrideDialog, LineItemCoupon } from '@/components/molecules';
 import { Price, BILLING_MODEL } from '@/models/Price';
-import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
-import { FormHeader, ActionButton } from '@/components/atoms';
+import { ChevronDownIcon, ChevronUpIcon, Pencil, EyeOff, RotateCcw, Tag } from 'lucide-react';
+import { FormHeader } from '@/components/atoms';
 import { motion } from 'framer-motion';
 import ChargeValueCell from '@/pages/product-catalog/plans/ChargeValueCell';
 import { capitalize } from 'es-toolkit';
+import { Coupon } from '@/models/Coupon';
+import { BsThreeDots } from 'react-icons/bs';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 export interface Props {
 	data: Price[];
@@ -14,20 +17,40 @@ export interface Props {
 	onPriceOverride?: (priceId: string, newAmount: string) => void;
 	onResetOverride?: (priceId: string) => void;
 	overriddenPrices?: Record<string, string>;
+	lineItemCoupons?: Record<string, Coupon>;
+	onLineItemCouponsChange?: (priceId: string, coupon: Coupon | null) => void;
+	disabled?: boolean;
+	subscriptionLevelCoupon?: Coupon | null; // For tracking subscription level coupon
 }
 
 type ChargeTableData = {
-	charge: string;
+	charge: JSX.Element;
 	quantity: string;
 	price: JSX.Element;
 	invoice_cadence: string;
 	actions?: JSX.Element;
+	priceId: string;
 };
 
-const PriceTable: FC<Props> = ({ data, billingPeriod, currency, onPriceOverride, onResetOverride, overriddenPrices = {} }) => {
+const PriceTable: FC<Props> = ({
+	data,
+	billingPeriod,
+	currency,
+	onPriceOverride,
+	onResetOverride,
+	overriddenPrices = {},
+	lineItemCoupons = {},
+	onLineItemCouponsChange,
+	disabled = false,
+	subscriptionLevelCoupon = null,
+}) => {
 	const [showAllRows, setShowAllRows] = useState(false);
 	const [selectedPrice, setSelectedPrice] = useState<Price | null>(null);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
+	const [couponModalState, setCouponModalState] = useState<{ isOpen: boolean; priceId: string | null }>({
+		isOpen: false,
+		priceId: null,
+	});
 
 	// Filter prices based on billing period and currency if provided
 	const filteredPrices = useMemo(() => {
@@ -45,36 +68,120 @@ const PriceTable: FC<Props> = ({ data, billingPeriod, currency, onPriceOverride,
 	}, [data, billingPeriod, currency]);
 
 	const handleOverride = (price: Price) => {
+		// Remove any existing coupon for this line item when overriding price
+		const appliedCoupon = lineItemCoupons[price.id];
+		if (appliedCoupon) {
+			onLineItemCouponsChange?.(price.id, null);
+		}
+
 		setSelectedPrice(price);
 		setIsDialogOpen(true);
 	};
 
-	const mappedData: ChargeTableData[] = (filteredPrices ?? []).map((price) => {
+	// Custom action component for price rows
+	const PriceActionMenu: FC<{ price: Price }> = ({ price }) => {
+		const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 		const isOverridable = price.billing_model === BILLING_MODEL.FLAT_FEE || price.billing_model === BILLING_MODEL.PACKAGE;
+		const appliedCoupon = lineItemCoupons[price.id];
 		const isOverridden = overriddenPrices[price.id] !== undefined;
 
+		const handleClick = (e: React.MouseEvent) => {
+			e.preventDefault();
+			e.stopPropagation();
+			setIsDropdownOpen(!isDropdownOpen);
+		};
+
+		return (
+			<div data-interactive='true' onClick={handleClick}>
+				<DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+					<DropdownMenuTrigger asChild>
+						<button>
+							<BsThreeDots className='text-base size-4' />
+						</button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent align='end'>
+						{isOverridable && (
+							<DropdownMenuItem
+								disabled={disabled}
+								onSelect={(event) => {
+									event.preventDefault();
+									setIsDropdownOpen(false);
+									handleOverride(price);
+								}}
+								className='flex gap-2 items-center w-full cursor-pointer'>
+								<Pencil size={16} />
+								<span>Override Price</span>
+							</DropdownMenuItem>
+						)}
+						{isOverridable && isOverridden && (
+							<DropdownMenuItem
+								disabled={disabled}
+								onSelect={(event) => {
+									event.preventDefault();
+									setIsDropdownOpen(false);
+									onResetOverride?.(price.id);
+								}}
+								className='flex gap-2 items-center w-full cursor-pointer text-orange-600'>
+								<RotateCcw size={16} />
+								<span>Reset Override</span>
+							</DropdownMenuItem>
+						)}
+						{/* Only show coupon options if price is NOT overridden */}
+						{!isOverridden && (
+							<>
+								<DropdownMenuItem
+									disabled={disabled}
+									onSelect={(event) => {
+										event.preventDefault();
+										setIsDropdownOpen(false);
+										setCouponModalState({ isOpen: true, priceId: price.id });
+									}}
+									className='flex gap-2 items-center w-full cursor-pointer'>
+									<Tag size={16} />
+									<span>{appliedCoupon ? 'Change Coupon' : 'Apply Coupon'}</span>
+								</DropdownMenuItem>
+								{appliedCoupon && (
+									<DropdownMenuItem
+										disabled={disabled}
+										onSelect={(event) => {
+											event.preventDefault();
+											setIsDropdownOpen(false);
+											onLineItemCouponsChange?.(price.id, null);
+										}}
+										className='flex gap-2 items-center w-full cursor-pointer text-red-600'>
+										<EyeOff size={16} />
+										<span>Remove Coupon</span>
+									</DropdownMenuItem>
+								)}
+							</>
+						)}
+					</DropdownMenuContent>
+				</DropdownMenu>
+			</div>
+		);
+	};
+
+	const mappedData: ChargeTableData[] = (filteredPrices ?? []).map((price) => {
+		const isOverridden = overriddenPrices[price.id] !== undefined;
+		const appliedCoupon = lineItemCoupons[price.id];
+
 		return {
-			charge: price.meter?.name ? `${price.meter.name}` : price.description || 'Charge',
+			priceId: price.id,
+			charge: (
+				<div>
+					<div>{price.meter?.name ? `${price.meter.name}` : price.description || 'Charge'}</div>
+				</div>
+			),
 			quantity: price.type === 'FIXED' ? '1' : 'pay as you go',
 			price: (
 				<ChargeValueCell
 					data={{ ...price, currency: price.currency } as any}
 					overriddenAmount={isOverridden ? overriddenPrices[price.id] : undefined}
+					appliedCoupon={appliedCoupon}
 				/>
 			),
 			invoice_cadence: price.invoice_cadence,
-			actions: isOverridable ? (
-				<ActionButton
-					editText={'Override Price'}
-					id={price.id}
-					deleteMutationFn={() => Promise.resolve()}
-					refetchQueryKey='prices'
-					entityName={price.meter?.name || price.description || 'Charge'}
-					isEditDisabled={false}
-					isArchiveDisabled={true}
-					onEdit={() => handleOverride(price)}
-				/>
-			) : undefined,
+			actions: <PriceActionMenu price={price} />,
 		};
 	});
 
@@ -103,7 +210,6 @@ const PriceTable: FC<Props> = ({ data, billingPeriod, currency, onPriceOverride,
 			width: 50,
 			align: 'center',
 			fieldVariant: 'interactive',
-			hideOnEmpty: true,
 		},
 	];
 
@@ -148,6 +254,25 @@ const PriceTable: FC<Props> = ({ data, billingPeriod, currency, onPriceOverride,
 					onPriceOverride={onPriceOverride || (() => {})}
 					onResetOverride={onResetOverride || (() => {})}
 					overriddenPrices={overriddenPrices}
+				/>
+			)}
+
+			{/* Line Item Coupon Modal - Only show if price is not overridden */}
+			{couponModalState.priceId && !overriddenPrices[couponModalState.priceId] && (
+				<LineItemCoupon
+					priceId={couponModalState.priceId}
+					currency={currency}
+					selectedCoupon={lineItemCoupons[couponModalState.priceId]}
+					onChange={(priceId, coupon) => {
+						onLineItemCouponsChange?.(priceId, coupon);
+						setCouponModalState({ isOpen: false, priceId: null });
+					}}
+					disabled={disabled}
+					showAddButton={true}
+					isModalOpen={couponModalState.isOpen}
+					onModalClose={() => setCouponModalState({ isOpen: false, priceId: null })}
+					allLineItemCoupons={lineItemCoupons}
+					subscriptionLevelCoupons={subscriptionLevelCoupon ? [subscriptionLevelCoupon] : []}
 				/>
 			)}
 		</div>

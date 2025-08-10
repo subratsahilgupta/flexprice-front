@@ -24,7 +24,7 @@ const WalletAlertDialog: React.FC<WalletAlertDialogProps> = ({ open, alertEnable
 		alertConfig || {
 			threshold: {
 				type: 'amount',
-				value: '50.00',
+				value: '0.00',
 			},
 		},
 	);
@@ -36,7 +36,7 @@ const WalletAlertDialog: React.FC<WalletAlertDialogProps> = ({ open, alertEnable
 			alertConfig || {
 				threshold: {
 					type: 'amount',
-					value: '50.00',
+					value: '0.00',
 				},
 			},
 		);
@@ -58,7 +58,7 @@ const WalletAlertDialog: React.FC<WalletAlertDialogProps> = ({ open, alertEnable
 			alertConfig || {
 				threshold: {
 					type: 'amount',
-					value: '50.00',
+					value: '0.00',
 				},
 			},
 		);
@@ -87,7 +87,7 @@ const WalletAlertDialog: React.FC<WalletAlertDialogProps> = ({ open, alertEnable
 				{/* Alert Configuration */}
 				{localAlertEnabled && (
 					<div className='space-y-4'>
-						<div className='space-y-2'>
+						<div className='space-y-2 hidden'>
 							<label className='text-sm font-medium text-gray-700'>Threshold Type</label>
 							<Select
 								options={[

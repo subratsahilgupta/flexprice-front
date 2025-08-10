@@ -1,6 +1,15 @@
 import { BILLING_CADENCE, INVOICE_CADENCE } from '@/constants';
 import { Price } from '@/models/Price';
-import { BILLING_MODEL, BILLING_PERIOD, PRICE_TYPE, PRICE_UNIT_TYPE, TIER_MODE } from '@/models/Price';
+import { BILLING_MODEL, BILLING_PERIOD, PRICE_TYPE, PRICE_UNIT_TYPE, TIER_MODE, PRICE_ENTITY_TYPE } from '@/models/Price';
+import { Plan } from '@/models/Plan';
+import Addon from '@/models/Addon';
+import Feature from '@/models/Feature';
+import { Meter } from '@/models/Meter';
+import { QueryFilter, TimeRangeFilter } from './base';
+
+export interface CreateBulkPriceRequest {
+	items: CreatePriceRequest[];
+}
 
 export interface GetAllPricesResponse {
 	prices: Price[];
@@ -9,10 +18,19 @@ export interface GetAllPricesResponse {
 	limit: number;
 }
 
+export interface PriceFilter extends QueryFilter, TimeRangeFilter {
+	price_ids?: string[];
+	entity_type?: PRICE_ENTITY_TYPE;
+	entity_ids?: string[];
+	subscription_id?: string;
+	parent_price_id?: string;
+}
+
 export interface CreatePriceRequest {
 	amount?: string;
 	currency: string;
-	plan_id?: string;
+	entity_type?: PRICE_ENTITY_TYPE;
+	entity_id?: string;
 	type: PRICE_TYPE;
 	price_unit_type: PRICE_UNIT_TYPE;
 	billing_period: BILLING_PERIOD;
@@ -29,12 +47,26 @@ export interface CreatePriceRequest {
 	tier_mode?: TIER_MODE;
 	tiers?: CreatePriceTier[];
 	transform_quantity?: TransformQuantity;
+	price_unit_config?: PriceUnitConfig;
+}
+
+export interface GetPriceResponse extends Price {
+	plan: Plan;
+	addon: Addon;
+	feature: Feature;
+	meter: Meter;
 }
 
 export interface CreatePriceTier {
+	up_to?: number;
+	unit_amount: string;
 	flat_amount?: string;
-	unit_amount?: string;
-	up_to: number;
+}
+
+export interface PriceUnitConfig {
+	amount?: string;
+	price_unit: string;
+	price_unit_tiers?: CreatePriceTier[];
 }
 
 export interface TransformQuantity {

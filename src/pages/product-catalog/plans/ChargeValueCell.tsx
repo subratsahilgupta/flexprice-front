@@ -1,16 +1,19 @@
 import { BILLING_MODEL, Price } from '@/models/Price';
-import { getPriceTableCharge } from '@/utils/common/price_helpers';
+import { getPriceTableCharge, calculateDiscountedPrice } from '@/utils/common/price_helpers';
 import { Info } from 'lucide-react';
 import { formatAmount } from '@/components/atoms/Input/Input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
+import { Coupon } from '@/models/Coupon';
+import formatCouponName from '@/utils/common/format_coupon_name';
 
 interface Props {
 	data: Price;
 	overriddenAmount?: string;
+	appliedCoupon?: Coupon | null;
 }
 
-const ChargeValueCell = ({ data, overriddenAmount }: Props) => {
+const ChargeValueCell = ({ data, overriddenAmount, appliedCoupon }: Props) => {
 	// Use overridden amount if provided, otherwise use original price
 	const priceData = overriddenAmount ? { ...data, amount: overriddenAmount } : data;
 	const price = getPriceTableCharge(priceData as any, false);
@@ -20,6 +23,9 @@ const ChargeValueCell = ({ data, overriddenAmount }: Props) => {
 		flat_amount: string;
 	}> | null;
 	const isTiered = data.billing_model === BILLING_MODEL.TIERED && Array.isArray(tiers) && tiers.length > 0;
+
+	// Calculate discount if coupon is applied and price is not overridden
+	const discountInfo = !overriddenAmount && appliedCoupon ? calculateDiscountedPrice(data, appliedCoupon) : null;
 
 	const formatRange = (tier: any, index: number, allTiers: any[]) => {
 		// Calculate 'from' based on previous tier's up_to
@@ -34,7 +40,37 @@ const ChargeValueCell = ({ data, overriddenAmount }: Props) => {
 
 	return (
 		<div className='flex items-center gap-2'>
-			<div className={overriddenAmount ? '' : ''}>{price}</div>
+			{discountInfo ? (
+				// Show discounted price with strikethrough original
+				<div className='flex items-center gap-2'>
+					<div className='flex flex-col'>
+						<div className='line-through text-gray-400 text-sm'>
+							{getCurrencySymbol(data.currency)}
+							{formatAmount(discountInfo.originalAmount.toString())}
+						</div>
+						<div className='text-gray-900 font-medium'>
+							{getCurrencySymbol(data.currency)}
+							{formatAmount(discountInfo.discountedAmount.toString())}
+						</div>
+					</div>
+					{/* Coupon info icon */}
+					<TooltipProvider delayDuration={0}>
+						<Tooltip>
+							<TooltipTrigger>
+								<Info className='h-4 w-4 text-blue-500 hover:text-blue-600 transition-colors duration-150' />
+							</TooltipTrigger>
+							<TooltipContent
+								sideOffset={5}
+								className='bg-white border border-gray-200 shadow-lg text-sm text-gray-900 px-3 py-2 rounded-lg'>
+								<div className='font-medium'>{appliedCoupon ? formatCouponName(appliedCoupon) : 'No coupon applied'}</div>
+							</TooltipContent>
+						</Tooltip>
+					</TooltipProvider>
+				</div>
+			) : (
+				// Show normal price
+				<div>{price}</div>
+			)}
 			{isTiered && (
 				<TooltipProvider delayDuration={0}>
 					<Tooltip>

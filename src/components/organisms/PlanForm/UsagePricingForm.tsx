@@ -11,7 +11,7 @@ import { InternalPrice } from './SetupChargesSection';
 import UsageChargePreview from './UsageChargePreview';
 import { toast } from 'react-hot-toast';
 import { BILLING_CADENCE, INVOICE_CADENCE } from '@/models/Invoice';
-import { BILLING_MODEL, TIER_MODE } from '@/models/Price';
+import { BILLING_MODEL, TIER_MODE, PRICE_ENTITY_TYPE } from '@/models/Price';
 import { BILLING_PERIOD, PRICE_TYPE } from '@/models/Price';
 interface Props {
 	onAdd: (price: InternalPrice) => void;
@@ -19,6 +19,8 @@ interface Props {
 	onEditClicked: () => void;
 	onDeleteClicked: () => void;
 	price: Partial<InternalPrice>;
+	entityType?: PRICE_ENTITY_TYPE;
+	entityId?: string;
 }
 
 export interface PriceTier {
@@ -42,14 +44,22 @@ const billingModels: SelectOption[] = [
 	{ value: 'TIERED', label: 'Volume Tiered' },
 ];
 
-const UsagePricingForm: FC<Props> = ({ onAdd, onUpdate, onEditClicked, onDeleteClicked, price }) => {
+const UsagePricingForm: FC<Props> = ({
+	onAdd,
+	onUpdate,
+	onEditClicked,
+	onDeleteClicked,
+	price,
+	entityType = PRICE_ENTITY_TYPE.PLAN,
+	entityId,
+}) => {
 	const [currency, setCurrency] = useState(price.currency || currencyOptions[0].value);
 	const [billingModel, setBillingModel] = useState(price.billing_model || billingModels[0].value);
 	const [meterId, setMeterId] = useState<string>(price.meter_id || '');
 	const [activeMeter, setActiveMeter] = useState<Meter | null>(price.meter || null);
 	const [tieredPrices, setTieredPrices] = useState<PriceTier[]>([
-		{ from: 1, up_to: 1 },
-		{ from: 2, up_to: null },
+		{ from: 1, up_to: 1, unit_amount: '', flat_amount: '0' },
+		{ from: 2, up_to: null, unit_amount: '', flat_amount: '0' },
 	]);
 	const [billingPeriod, setBillingPeriod] = useState(price.billing_period || billlingPeriodOptions[1].value);
 	const [flatFee, setFlatFee] = useState<string>(price.amount || '');
@@ -116,35 +126,115 @@ const UsagePricingForm: FC<Props> = ({ onAdd, onUpdate, onEditClicked, onDeleteC
 			return false;
 		}
 
+		// Tiered pricing validation
 		if (billingModel === billingModels[2].value) {
+			// Check if tiers are provided
+			if (tieredPrices.length === 0) {
+				setInputErrors((prev) => ({
+					...prev,
+					tieredModelError: 'Tiers are required when billing model is TIERED',
+				}));
+				toast.error('Tiers are required when billing model is TIERED');
+				return false;
+			}
+
+			// Validate each tier
 			for (let i = 0; i < tieredPrices.length; i++) {
-				const upTo = tieredPrices[i].up_to;
+				const tier = tieredPrices[i];
 
-				if (!upTo) {
-					continue;
-				}
-
-				if (tieredPrices[i].from > upTo) {
+				// Validate unit amount is provided and valid
+				if (!tier.unit_amount || tier.unit_amount.trim() === '') {
 					setInputErrors((prev) => ({
 						...prev,
-						tieredModelError: `From value cannot be greater than up to in row ${i + 1}`,
+						tieredModelError: `Unit amount is required for tier ${i + 1}`,
 					}));
-					toast.error('From value cannot be smaller than up to in row ' + (i + 1));
+					toast.error(`Unit amount is required for tier ${i + 1}`);
 					return false;
+				}
+
+				// Validate unit amount is a valid decimal and greater than 0
+				const unitAmount = parseFloat(tier.unit_amount);
+				if (isNaN(unitAmount) || unitAmount <= 0) {
+					setInputErrors((prev) => ({
+						...prev,
+						tieredModelError: `Unit amount must be greater than 0 for tier ${i + 1}`,
+					}));
+					toast.error(`Unit amount must be greater than 0 for tier ${i + 1}`);
+					return false;
+				}
+
+				// Validate flat amount if provided
+				if (tier.flat_amount && tier.flat_amount.trim() !== '') {
+					const flatAmount = parseFloat(tier.flat_amount);
+					if (isNaN(flatAmount) || flatAmount < 0) {
+						setInputErrors((prev) => ({
+							...prev,
+							tieredModelError: `Flat amount must be greater than or equal to 0 for tier ${i + 1}`,
+						}));
+						toast.error(`Flat amount must be greater than or equal to 0 for tier ${i + 1}`);
+						return false;
+					}
+				}
+
+				// Validate tier ranges
+				if (tier.up_to !== null) {
+					if (tier.from > tier.up_to) {
+						setInputErrors((prev) => ({
+							...prev,
+							tieredModelError: `From value cannot be greater than up to in tier ${i + 1}`,
+						}));
+						toast.error(`From value cannot be greater than up to in tier ${i + 1}`);
+						return false;
+					}
+				}
+
+				// Check for overlapping tiers (except for the last tier which can have up_to as null)
+				if (i < tieredPrices.length - 1 && tier.up_to !== null) {
+					const nextTier = tieredPrices[i + 1];
+					if (tier.up_to >= nextTier.from) {
+						setInputErrors((prev) => ({
+							...prev,
+							tieredModelError: `Tier ${i + 1} overlaps with tier ${i + 2}`,
+						}));
+						toast.error(`Tier ${i + 1} overlaps with tier ${i + 2}`);
+						return false;
+					}
 				}
 			}
 		}
 
+		// Package pricing validation
 		if (billingModel === billingModels[1].value) {
 			if (packagedFee.price === '' || packagedFee.unit === '') {
 				setInputErrors((prev) => ({ ...prev, packagedModelError: 'Invalid package fee' }));
 				return false;
 			}
+
+			// Validate package price is a valid decimal
+			const packagePrice = parseFloat(packagedFee.price);
+			if (isNaN(packagePrice) || packagePrice < 0) {
+				setInputErrors((prev) => ({ ...prev, packagedModelError: 'Package price must be a valid number greater than or equal to 0' }));
+				return false;
+			}
+
+			// Validate package unit is a valid integer greater than 0
+			const packageUnit = parseInt(packagedFee.unit);
+			if (isNaN(packageUnit) || packageUnit <= 0) {
+				setInputErrors((prev) => ({ ...prev, packagedModelError: 'Package unit must be a valid number greater than 0' }));
+				return false;
+			}
 		}
 
+		// Flat fee validation
 		if (billingModel === billingModels[0].value) {
-			if (!flatFee || Number(flatFee) < 0) {
-				setInputErrors((prev) => ({ ...prev, flatModelError: 'Invalid flat fee' }));
+			if (!flatFee || flatFee.trim() === '') {
+				setInputErrors((prev) => ({ ...prev, flatModelError: 'Flat fee is required' }));
+				return false;
+			}
+
+			const flatFeeAmount = parseFloat(flatFee);
+			if (isNaN(flatFeeAmount) || flatFeeAmount < 0) {
+				setInputErrors((prev) => ({ ...prev, flatModelError: 'Flat fee must be a valid number greater than or equal to 0' }));
 				return false;
 			}
 		}
@@ -173,6 +263,8 @@ const UsagePricingForm: FC<Props> = ({ onAdd, onUpdate, onEditClicked, onDeleteC
 			billing_period_count: 1,
 			billing_cadence: 'RECURRING' as BILLING_CADENCE,
 			invoice_cadence: invoiceCadence as INVOICE_CADENCE,
+			entity_type: entityType,
+			entity_id: entityId || '',
 		};
 
 		let finalPrice: Partial<Price>;
@@ -286,14 +378,18 @@ const UsagePricingForm: FC<Props> = ({ onAdd, onUpdate, onEditClicked, onDeleteC
 			{billingModel === billingModels[0].value && (
 				<div className='space-y-2'>
 					<Input
-						placeholder='0'
+						placeholder='0.00'
 						variant='formatted-number'
 						error={inputErrors.flatModelError}
 						label='Price'
 						value={flatFee}
 						inputPrefix={getCurrencySymbol(currency)}
 						onChange={(e) => {
-							setFlatFee(e);
+							// Validate decimal input
+							const decimalRegex = /^\d*\.?\d*$/;
+							if (decimalRegex.test(e) || e === '') {
+								setFlatFee(e);
+							}
 						}}
 						suffix={<span className='text-[#64748B]'>{`/ unit / ${formatBillingPeriodForPrice(billingPeriod)}`}</span>}
 					/>
@@ -306,10 +402,16 @@ const UsagePricingForm: FC<Props> = ({ onAdd, onUpdate, onEditClicked, onDeleteC
 						<Input
 							variant='formatted-number'
 							label='Price'
-							placeholder='0'
+							placeholder='0.00'
 							value={packagedFee.price}
 							inputPrefix={getCurrencySymbol(currency)}
-							onChange={(e) => setPackagedFee({ ...packagedFee, price: e })}
+							onChange={(e) => {
+								// Validate decimal input
+								const decimalRegex = /^\d*\.?\d*$/;
+								if (decimalRegex.test(e) || e === '') {
+									setPackagedFee({ ...packagedFee, price: e });
+								}
+							}}
 						/>
 						<div className='h-[50px] items-center flex gap-2'>
 							<p className='text-[#18181B] font-medium'>per</p>
@@ -318,12 +420,16 @@ const UsagePricingForm: FC<Props> = ({ onAdd, onUpdate, onEditClicked, onDeleteC
 							value={packagedFee.unit}
 							variant='integer'
 							placeholder='0'
-							onChange={(e) =>
-								setPackagedFee({
-									...packagedFee,
-									unit: e,
-								})
-							}
+							onChange={(e) => {
+								// Validate integer input
+								const integerRegex = /^\d*$/;
+								if (integerRegex.test(e) || e === '') {
+									setPackagedFee({
+										...packagedFee,
+										unit: e,
+									});
+								}
+							}}
 							suffix={`/ units / ${formatBillingPeriodForPrice(billingPeriod)}`}
 						/>
 					</div>
@@ -332,7 +438,10 @@ const UsagePricingForm: FC<Props> = ({ onAdd, onUpdate, onEditClicked, onDeleteC
 			)}
 
 			{billingModel === billingModels[2].value && (
-				<VolumeTieredPricingForm setTieredPrices={setTieredPrices} tieredPrices={tieredPrices} currency={currency} />
+				<div className='space-y-2'>
+					<VolumeTieredPricingForm setTieredPrices={setTieredPrices} tieredPrices={tieredPrices} currency={currency} />
+					{inputErrors.tieredModelError && <p className='text-red-500 text-sm'>{inputErrors.tieredModelError}</p>}
+				</div>
 			)}
 
 			<Spacer height='16px' />

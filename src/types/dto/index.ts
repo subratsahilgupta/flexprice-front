@@ -6,16 +6,23 @@ export type { GetTasksPayload, GetTasksResponse, AddTaskPayload } from './Task';
 
 export type { SignupData, LoginData, LocalUser } from './Auth';
 
-export type { GetAllPricesResponse, CreatePriceRequest, UpdatePriceRequest, CreatePriceTier, TransformQuantity } from './Price';
+export type {
+	GetAllPricesResponse,
+	CreatePriceRequest,
+	UpdatePriceRequest,
+	CreatePriceTier,
+	TransformQuantity,
+	PriceFilter,
+	CreateBulkPriceRequest,
+} from './Price';
 
 export type {
 	GetCustomerResponse,
 	GetCustomerSubscriptionsResponse,
 	GetCustomerEntitlementsResponse,
 	GetCustomerEntitlementPayload,
-	CreateCustomerSubscriptionPayload,
 	GetUsageSummaryResponse,
-	GetCustomerByFiltersPayload as GetCustomerByQueryPayload,
+	GetCustomerByFiltersPayload,
 } from './Customer';
 
 export type { EntitlementFilters, EntitlementResponse } from './Entitlement';
@@ -27,7 +34,7 @@ export type {
 	GetAllInvoicesPayload,
 	UpdateInvoiceStatusPayload,
 	GetInvoicePreviewPayload,
-	CreateInvoicePayload as CreateOneOffInvoicePayload,
+	CreateInvoicePayload,
 	GetInvoicePdfPayload,
 	GetInvoicesByFiltersPayload,
 } from './InvoiceApi';
@@ -45,6 +52,7 @@ export type {
 	ResumeSubscriptionPayload,
 	SubscriptionPauseResponse,
 	SubscriptionResumeResponse,
+	CreateSubscriptionPayload,
 } from './Subscription';
 
 export type { GetBillingdetailsResponse, UpdateTenantRequest } from './Tenant';
@@ -70,7 +78,39 @@ export type {
 	CreditNote,
 	CreditNoteLineItem,
 } from './CreditNote';
+
 export { CREDIT_NOTE_STATUS, CREDIT_NOTE_REASON, CREDIT_NOTE_TYPE } from '@/models/CreditNote';
+
 export type { SynchronizePlanPricesWithSubscriptionResponse } from './Plan';
 
 export type { CreateCouponRequest, UpdateCouponRequest, GetCouponResponse, ListCouponsResponse, CouponFilter } from './Coupon';
+
+export type {
+	CreateAddonRequest,
+	UpdateAddonRequest,
+	GetAddonsPayload,
+	GetAddonsResponse,
+	GetAddonByFilterPayload,
+	AddAddonToSubscriptionRequest,
+	AddonResponse,
+} from './Addon';
+
+export type {
+	CreateTaxRateRequest,
+	UpdateTaxRateRequest,
+	TaxRateResponse,
+	ListTaxRatesResponse,
+	CreateTaxAssociationRequest,
+	TaxAssociationUpdateRequest,
+	TaxAssociationResponse,
+	TaxRateOverride,
+	CreateTaxAppliedRequest,
+	TaxAppliedResponse,
+	ListTaxAppliedResponse,
+	TaxAppliedFilter,
+	TaxAssociationFilter,
+	ListTaxAssociationsResponse,
+	LinkTaxRateToEntityRequest,
+	CreateInvoiceRequest,
+	TaxCalculationResult,
+} from './tax';

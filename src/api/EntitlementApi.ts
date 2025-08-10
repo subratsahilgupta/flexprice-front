@@ -2,6 +2,7 @@ import { AxiosClient } from '@/core/axios/verbs';
 import { Entitlement } from '@/models/Entitlement';
 import { generateQueryParams } from '@/utils/common/api_helper';
 import { EntitlementFilters, EntitlementResponse } from '@/types/dto';
+import { CreateBulkEntitlementRequest, CreateBulkEntitlementResponse } from '@/types/dto/Entitlement';
 
 class EntitlementApi {
 	private static baseUrl = '/entitlements';
@@ -17,6 +18,10 @@ class EntitlementApi {
 
 	public static async deleteEntitlementById(id: string) {
 		return await AxiosClient.delete<void>(`${this.baseUrl}/${id}`);
+	}
+
+	public static async CreateBulkEntitlement(data: CreateBulkEntitlementRequest) {
+		return await AxiosClient.post<CreateBulkEntitlementResponse>(`${this.baseUrl}/bulk`, data);
 	}
 }
 

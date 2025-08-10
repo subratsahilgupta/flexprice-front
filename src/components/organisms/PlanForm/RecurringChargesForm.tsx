@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import RecurringChargePreview from './RecurringChargePreview';
 import { BILLING_CADENCE, INVOICE_CADENCE } from '@/models/Invoice';
-import { BILLING_PERIOD } from '@/models/Price';
+import { BILLING_PERIOD, PRICE_ENTITY_TYPE } from '@/models/Price';
 
 interface Props {
 	price: Partial<InternalPrice>;
@@ -15,9 +15,19 @@ interface Props {
 	onUpdate: (price: Partial<InternalPrice>) => void;
 	onEditClicked: () => void;
 	onDeleteClicked: () => void;
+	entityType?: PRICE_ENTITY_TYPE;
+	entityId?: string;
 }
 
-const RecurringChargesForm = ({ price, onAdd, onUpdate, onEditClicked, onDeleteClicked }: Props) => {
+const RecurringChargesForm = ({
+	price,
+	onAdd,
+	onUpdate,
+	onEditClicked,
+	onDeleteClicked,
+	entityType = PRICE_ENTITY_TYPE.PLAN,
+	entityId,
+}: Props) => {
 	const [localPrice, setLocalPrice] = useState<Partial<InternalPrice>>(price);
 	const [errors, setErrors] = useState<Partial<Record<keyof InternalPrice, string>>>({});
 
@@ -49,14 +59,20 @@ const RecurringChargesForm = ({ price, onAdd, onUpdate, onEditClicked, onDeleteC
 	const handleSubmit = () => {
 		if (!validate()) return;
 
+		const priceWithEntity = {
+			...localPrice,
+			entity_type: entityType,
+			entity_id: entityId || '',
+		};
+
 		if (price.internal_state === 'edit') {
 			onUpdate({
-				...localPrice,
+				...priceWithEntity,
 				isEdit: false,
 			});
 		} else {
 			onAdd({
-				...localPrice,
+				...priceWithEntity,
 				isEdit: false,
 			});
 		}

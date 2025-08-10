@@ -18,6 +18,9 @@ import { formatExpirationType } from '@/components/molecules/CreditGrant/CreditG
 import { CreditGrant, CREDIT_GRANT_EXPIRATION_TYPE } from '@/models/CreditGrant';
 import FlexpriceTable from '@/components/molecules/Table';
 import { INVOICE_TYPE } from '@/models/Invoice';
+import TaxApi from '@/api/TaxApi';
+import { TAXRATE_ENTITY_TYPE } from '@/models/Tax';
+import TaxAssociationTable from '@/components/molecules/TaxAssociationTable';
 
 // Enhanced function to format expiration period with duration units
 export const formatExpirationPeriod = (grant: CreditGrant): string => {
@@ -96,6 +99,19 @@ const SubscriptionDetails: FC = () => {
 		queryFn: async () => {
 			return await CreditGrantApi.getGrantCredits({
 				subscription_ids: [subscription_id!],
+			});
+		},
+		enabled: !!subscription_id,
+	});
+
+	const { data: subscriptionTaxAssociations } = useQuery({
+		queryKey: ['subscriptionTaxAssociations', subscription_id],
+		queryFn: async () => {
+			return await TaxApi.listTaxAssociations({
+				limit: 100,
+				offset: 0,
+				entity_id: subscription_id!,
+				entity_type: TAXRATE_ENTITY_TYPE.SUBSCRIPTION,
 			});
 		},
 		enabled: !!subscription_id,
@@ -195,6 +211,15 @@ const SubscriptionDetails: FC = () => {
 				</Card>
 			)}
 
+			{subscriptionTaxAssociations?.items && subscriptionTaxAssociations.items.length > 0 && (
+				<Card className='card mt-8'>
+					<FormHeader title='Tax Associations' variant='sub-header' titleClassName='font-semibold' />
+					<div className='mt-4'>
+						<TaxAssociationTable data={subscriptionTaxAssociations.items} />
+					</div>
+				</Card>
+			)}
+
 			{/* subscription schedule */}
 			{subscriptionDetails?.schedule?.phases?.length && subscriptionDetails?.schedule?.phases?.length > 0 && (
 				<Card className='card mt-8'>
@@ -257,6 +282,7 @@ const SubscriptionDetails: FC = () => {
 						refetch={refetch}
 						currency={data?.currency}
 						amount_due={data?.amount_due}
+						tax={data?.total_tax}
 						title='Upcoming Invoices'
 						subtitle={`This is a preview of the invoice that will be billed on ${formatDateShort(subscriptionDetails?.current_period_end ?? '')}. It may change if subscription is updated.`}
 						data={data?.line_items ?? []}

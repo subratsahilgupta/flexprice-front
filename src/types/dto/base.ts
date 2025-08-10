@@ -4,7 +4,7 @@ export interface QueryFilter {
 	limit?: number;
 	offset?: number;
 	status?: BaseEntityStatus;
-	sort?: string;
+	sort?: string | any;
 	order?: string;
 	expand?: string;
 }
