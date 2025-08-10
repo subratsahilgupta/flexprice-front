@@ -31,3 +31,26 @@ export const getActualPriceForTotal = (price: Price) => {
 
 	return result;
 };
+
+export const calculateDiscountedPrice = (price: Price, coupon: any) => {
+	if (!coupon || price.type !== 'FIXED') return null;
+
+	const originalAmount = parseFloat(price.amount);
+	let discountedAmount = originalAmount;
+
+	if (coupon.type === 'fixed') {
+		// Fixed amount discount
+		const discountAmount = parseFloat(coupon.amount_off || '0');
+		discountedAmount = Math.max(0, originalAmount - discountAmount);
+	} else if (coupon.type === 'percentage') {
+		// Percentage discount
+		const discountPercentage = parseFloat(coupon.percentage_off || '0');
+		discountedAmount = originalAmount * (1 - discountPercentage / 100);
+	}
+
+	return {
+		originalAmount,
+		discountedAmount,
+		savings: originalAmount - discountedAmount,
+	};
+};

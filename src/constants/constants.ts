@@ -1,6 +1,7 @@
 import { getAllISOCodes } from 'iso-country-currency';
 import { CREDIT_GRANT_PERIOD } from '@/models/CreditGrant';
-import { BILLING_MODEL, PRICE_TYPE, PRICE_UNIT_TYPE, TIER_MODE } from '@/models/Price';
+import { BILLING_MODEL, PRICE_TYPE, PRICE_UNIT_TYPE, TIER_MODE, PRICE_ENTITY_TYPE } from '@/models/Price';
+import { ENTITLEMENT_ENTITY_TYPE } from '@/models/Entitlement';
 import { BILLING_CADENCE, INVOICE_CADENCE } from '@/models/Invoice';
 
 export enum BILLING_PERIOD {
@@ -97,6 +98,19 @@ export const tierModeOptions = [
 export const billingCadenceOptions = [
 	{ label: 'Recurring', value: BILLING_CADENCE.RECURRING },
 	{ label: 'One Time', value: BILLING_CADENCE.ONETIME },
+];
+
+export const priceEntityTypeOptions = [
+	{ label: 'Plan', value: PRICE_ENTITY_TYPE.PLAN },
+	{ label: 'Addon', value: PRICE_ENTITY_TYPE.ADDON },
+	{ label: 'Feature', value: PRICE_ENTITY_TYPE.FEATURE },
+	{ label: 'Meter', value: PRICE_ENTITY_TYPE.METER },
+];
+
+export const entitlementEntityTypeOptions = [
+	{ label: 'Plan', value: ENTITLEMENT_ENTITY_TYPE.PLAN },
+	{ label: 'Addon', value: ENTITLEMENT_ENTITY_TYPE.ADDON },
+	{ label: 'Feature', value: ENTITLEMENT_ENTITY_TYPE.FEATURE },
 ];
 
 export const invoiceCadenceOptions = [

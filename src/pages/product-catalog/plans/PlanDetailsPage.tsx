@@ -29,7 +29,6 @@ import { formatAmount } from '@/components/atoms/Input/Input';
 import ChargeValueCell from './ChargeValueCell';
 import { BILLING_PERIOD } from '@/constants/constants';
 import { Entitlement } from '@/models/Entitlement';
-import { ExtendedEntitlement } from '@/types/dto/Entitlement';
 import { ENTITY_STATUS } from '@/models/base';
 import {
 	CREDIT_GRANT_PERIOD_UNIT,
@@ -42,6 +41,8 @@ import {
 import { uniqueId } from 'lodash';
 import { formatExpirationPeriod } from '@/pages/customer/customers/SubscriptionDetails';
 import CreditGrantApi from '@/api/CreditGrantApi';
+import { ENTITLEMENT_ENTITY_TYPE } from '@/models/Entitlement';
+import { EntitlementResponse } from '@/types/dto';
 
 const creditGrantColumns: ColumnData<CreditGrant>[] = [
 	{
@@ -229,7 +230,7 @@ const PlanDetailsPage = () => {
 		}
 	}, [planData, updateBreadcrumb]);
 
-	const columnData: ColumnData<ExtendedEntitlement>[] = [
+	const columnData: ColumnData<EntitlementResponse>[] = [
 		{
 			title: 'Feature Name',
 
@@ -371,6 +372,8 @@ const PlanDetailsPage = () => {
 				selectedFeatures={planData.entitlements?.map((v) => v.feature)}
 				entitlements={planData.entitlements}
 				planId={planData.id}
+				entityType={ENTITLEMENT_ENTITY_TYPE.PLAN}
+				entityId={planData.id}
 				isOpen={drawerOpen}
 				onOpenChange={(value) => setdrawerOpen(value)}
 			/>

@@ -27,6 +27,9 @@ import Integrations from '@/pages/insights-tools/integrations/Integrations';
 import IntegrationDetails from '@/pages/insights-tools/integrations/IntegrationDetails';
 import FeatureDetails from '@/pages/product-catalog/features/FeatureDetails';
 import AddOn from '@/pages/product-catalog/addons/AddOn';
+import AddonsPage from '@/pages/product-catalog/addons/Addons';
+import AddonDetailsPage from '@/pages/product-catalog/addons/AddonDetails';
+import AddonChargesPage from '@/pages/product-catalog/addons/AddonCharges';
 import CustomerInvoiceDetailsPage from '@/pages/customer/customers/CustomerInvoiceDetailsPage';
 import DeveloperPage from '@/pages/developer/developer';
 import SignupConfirmation from '@/pages/auth/SignupConfirmation';
@@ -44,6 +47,9 @@ import WebhookDashboard from '@/pages/webhooks/WebhookDashboard';
 import CouponsPage from '@/pages/product-catalog/coupons/Coupons';
 import CouponDetails from '@/pages/product-catalog/coupons/CouponDetails';
 import { TenantMetadataKey } from '@/models/Tenant';
+import TaxPage from '@/pages/customer/taxes/TaxRatesPage';
+import TaxAssociation from '@/pages/customer/tabs/TaxAssociation';
+import TaxrateDetailsPage from '@/pages/customer/taxes/TaxrateDetailsPage';
 
 export const RouteNames = {
 	home: '/',
@@ -64,6 +70,7 @@ export const RouteNames = {
 	// customer management routes
 	customerManagement: '/customer-management',
 	customers: '/customer-management/customers',
+	taxes: '/customer-management/taxes',
 	invoices: '/customer-management/invoices',
 	createInvoice: '/customer-management/customers/:customerId/invoices/create',
 	creditNotes: '/customer-management/credit-notes',
@@ -85,6 +92,9 @@ export const RouteNames = {
 
 	// add on routes
 	addOn: '/product-catalog/add-on',
+	addons: '/product-catalog/addons',
+	addonDetails: '/product-catalog/addons',
+	addonCharges: '/product-catalog/addons/:addonId/add-charges',
 
 	// tools routes
 	tools: '/tools',
@@ -174,6 +184,18 @@ export const MainRouter = createBrowserRouter([
 						element: <AddOn />,
 					},
 					{
+						path: RouteNames.addons,
+						element: <AddonsPage />,
+					},
+					{
+						path: `${RouteNames.addonDetails}/:id`,
+						element: <AddonDetailsPage />,
+					},
+					{
+						path: RouteNames.addonCharges,
+						element: <AddonChargesPage />,
+					},
+					{
 						path: RouteNames.addCharges,
 						element: <AddChargesPage />,
 					},
@@ -250,6 +272,10 @@ export const MainRouter = createBrowserRouter([
 								path: 'invoice',
 								element: <Invoice />,
 							},
+							{
+								path: 'tax-association',
+								element: <TaxAssociation />,
+							},
 
 							{
 								path: 'invoice/:invoice_id',
@@ -272,6 +298,14 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: RouteNames.invoices,
 						element: <InvoicePage />,
+					},
+					{
+						path: RouteNames.taxes,
+						element: <TaxPage />,
+					},
+					{
+						path: `${RouteNames.taxes}/:taxrateId`,
+						element: <TaxrateDetailsPage />,
 					},
 					{
 						path: `${RouteNames.invoices}/:invoiceId`,
