@@ -5,7 +5,7 @@ export interface Meter extends BaseModel {
 		field: string;
 		type: METER_AGGREGATION_TYPE;
 		multiplier?: number;
-		bucket_size?: WINDOW_SIZE;
+		bucket_size?: BUCKET_SIZE;
 	};
 	readonly event_name: string;
 	readonly filters: Array<{
@@ -30,7 +30,7 @@ export enum METER_AGGREGATION_TYPE {
 	MAX = 'MAX',
 }
 
-export enum WINDOW_SIZE {
+export enum BUCKET_SIZE {
 	WindowSizeMinute = 'MINUTE',
 	WindowSize15Min = '15MIN',
 	WindowSize30Min = '30MIN',

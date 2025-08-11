@@ -6,7 +6,7 @@ import { RouteNames } from '@/core/routes/Routes';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { cn } from '@/lib/utils';
 import Feature, { FEATURE_TYPE } from '@/models/Feature';
-import { Meter, METER_AGGREGATION_TYPE, METER_USAGE_RESET_PERIOD, WINDOW_SIZE } from '@/models/Meter';
+import { BUCKET_SIZE, Meter, METER_AGGREGATION_TYPE, METER_USAGE_RESET_PERIOD } from '@/models/Meter';
 import FeatureApi from '@/api/FeatureApi';
 import { useMutation } from '@tanstack/react-query';
 import { Gauge, SquareCheckBig, Wrench } from 'lucide-react';
@@ -100,42 +100,42 @@ const AGGREGATION_OPTIONS: SelectOption[] = [
 	},
 ];
 
-const WINDOW_SIZE_OPTIONS: SelectOption[] = [
+const BUCKET_SIZE_OPTIONS: SelectOption[] = [
 	{
 		label: 'Minute',
-		value: WINDOW_SIZE.WindowSizeMinute,
+		value: BUCKET_SIZE.WindowSizeMinute,
 	},
 	{
 		label: '15 Minute',
-		value: WINDOW_SIZE.WindowSize15Min,
+		value: BUCKET_SIZE.WindowSize15Min,
 	},
 	{
 		label: '30 Minute',
-		value: WINDOW_SIZE.WindowSize30Min,
+		value: BUCKET_SIZE.WindowSize30Min,
 	},
 	{
 		label: 'Hour',
-		value: WINDOW_SIZE.WindowSizeHour,
+		value: BUCKET_SIZE.WindowSizeHour,
 	},
 	{
 		label: '3 Hour',
-		value: WINDOW_SIZE.WindowSize3Hour,
+		value: BUCKET_SIZE.WindowSize3Hour,
 	},
 	{
 		label: '6 Hour',
-		value: WINDOW_SIZE.WindowSize6Hour,
+		value: BUCKET_SIZE.WindowSize6Hour,
 	},
 	{
 		label: '12 Hour',
-		value: WINDOW_SIZE.WindowSize12Hour,
+		value: BUCKET_SIZE.WindowSize12Hour,
 	},
 	{
 		label: 'Day',
-		value: WINDOW_SIZE.WindowSizeDay,
+		value: BUCKET_SIZE.WindowSizeDay,
 	},
 	{
 		label: 'Week',
-		value: WINDOW_SIZE.WindowSizeWeek,
+		value: BUCKET_SIZE.WindowSizeWeek,
 	},
 ];
 
@@ -482,7 +482,7 @@ const AggregationSection = ({
 				...prev,
 				aggregation: {
 					...prev.aggregation!,
-					bucket_size: type as WINDOW_SIZE,
+					bucket_size: type as BUCKET_SIZE,
 				},
 			}));
 		},
@@ -539,9 +539,9 @@ const AggregationSection = ({
 
 				{showWindowSizeInput && (
 					<Select
-						options={WINDOW_SIZE_OPTIONS}
+						options={BUCKET_SIZE_OPTIONS}
 						onChange={handleWindowSizeChange}
-						label='Window Size'
+						label='Bucket Size'
 						placeholder=''
 						description='The size of the window to aggregate over. eg. 15MIN, 30MIN, HOUR, etc.'
 						value={meter.aggregation?.bucket_size || undefined}
