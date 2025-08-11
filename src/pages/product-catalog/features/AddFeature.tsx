@@ -6,7 +6,7 @@ import { RouteNames } from '@/core/routes/Routes';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { cn } from '@/lib/utils';
 import Feature, { FEATURE_TYPE } from '@/models/Feature';
-import { Meter, METER_AGGREGATION_TYPE, METER_USAGE_RESET_PERIOD } from '@/models/Meter';
+import { Meter, METER_AGGREGATION_TYPE, METER_USAGE_RESET_PERIOD, WINDOW_SIZE } from '@/models/Meter';
 import FeatureApi from '@/api/FeatureApi';
 import { useMutation } from '@tanstack/react-query';
 import { Gauge, SquareCheckBig, Wrench } from 'lucide-react';
@@ -92,6 +92,50 @@ const AGGREGATION_OPTIONS: SelectOption[] = [
 		label: 'Latest',
 		value: METER_AGGREGATION_TYPE.LATEST,
 		description: 'Get the latest value of a defined property for incoming events.',
+	},
+	{
+		label: 'Max',
+		value: METER_AGGREGATION_TYPE.MAX,
+		description: 'Get the maximum value of a defined property for incoming events.',
+	},
+];
+
+const WINDOW_SIZE_OPTIONS: SelectOption[] = [
+	{
+		label: 'Minute',
+		value: WINDOW_SIZE.WindowSizeMinute,
+	},
+	{
+		label: '15 Minute',
+		value: WINDOW_SIZE.WindowSize15Min,
+	},
+	{
+		label: '30 Minute',
+		value: WINDOW_SIZE.WindowSize30Min,
+	},
+	{
+		label: 'Hour',
+		value: WINDOW_SIZE.WindowSizeHour,
+	},
+	{
+		label: '3 Hour',
+		value: WINDOW_SIZE.WindowSize3Hour,
+	},
+	{
+		label: '6 Hour',
+		value: WINDOW_SIZE.WindowSize6Hour,
+	},
+	{
+		label: '12 Hour',
+		value: WINDOW_SIZE.WindowSize12Hour,
+	},
+	{
+		label: 'Day',
+		value: WINDOW_SIZE.WindowSizeDay,
+	},
+	{
+		label: 'Week',
+		value: WINDOW_SIZE.WindowSizeWeek,
 	},
 ];
 
@@ -432,6 +476,19 @@ const AggregationSection = ({
 		[onUpdateMeter],
 	);
 
+	const handleWindowSizeChange = useCallback(
+		(type: string) => {
+			onUpdateMeter((prev) => ({
+				...prev,
+				aggregation: {
+					...prev.aggregation!,
+					bucket_size: type as WINDOW_SIZE,
+				},
+			}));
+		},
+		[onUpdateMeter],
+	);
+
 	const handleResetUsageChange = useCallback(
 		(value: { value?: string }) => {
 			onUpdateMeter((prev) => ({ ...prev, reset_usage: value.value! as METER_USAGE_RESET_PERIOD }));
@@ -441,6 +498,7 @@ const AggregationSection = ({
 
 	const showFieldInput = meter.aggregation?.type !== METER_AGGREGATION_TYPE.COUNT;
 	const showMultiplierInput = meter.aggregation?.type === METER_AGGREGATION_TYPE.SUM_WITH_MULTIPLIER;
+	const showWindowSizeInput = meter.aggregation?.type === METER_AGGREGATION_TYPE.MAX;
 
 	return (
 		<div className='card'>
@@ -476,6 +534,17 @@ const AggregationSection = ({
 						placeholder='1'
 						description='Specify the multiplier for the aggregation. e.g. 1.5, 0.25, or 1000.'
 						error={meterErrors.aggregation_multiplier}
+					/>
+				)}
+
+				{showWindowSizeInput && (
+					<Select
+						options={WINDOW_SIZE_OPTIONS}
+						onChange={handleWindowSizeChange}
+						label='Window Size'
+						placeholder=''
+						description='The size of the window to aggregate over. eg. 15MIN, 30MIN, HOUR, etc.'
+						value={meter.aggregation?.bucket_size || undefined}
 					/>
 				)}
 			</Card>
@@ -549,6 +618,7 @@ const AddFeaturePage = () => {
 					type: meter.aggregation?.type || METER_AGGREGATION_TYPE.SUM,
 					field: meter.aggregation?.field || '',
 					multiplier: meter.aggregation?.multiplier || 1,
+					bucket_size: meter.aggregation?.bucket_size || undefined,
 				},
 				reset_usage: meter.reset_usage || METER_USAGE_RESET_PERIOD.BILLING_PERIOD,
 				filters: meter.filters?.filter((filter) => filter.key !== '' && filter.values.length > 0),

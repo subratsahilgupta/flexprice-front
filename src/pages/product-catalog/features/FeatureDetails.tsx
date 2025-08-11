@@ -30,6 +30,7 @@ import { ApiDocsSnippet } from '@/store/useApiDocsStore';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { ENTITY_STATUS } from '@/models/base';
 import { EntitlementResponse } from '@/types/dto';
+import { METER_AGGREGATION_TYPE } from '@/models/Meter';
 
 const FeatureDetails = () => {
 	const { id: featureId } = useParams() as { id: string };
@@ -246,6 +247,12 @@ const FeatureDetails = () => {
 										<span className='text-gray-500 text-sm'>Usage Reset </span>
 										<span className='text-gray-800 text-sm'>{formatMeterUsageResetPeriodToDisplay(data?.meter?.reset_usage || '--')}</span>
 									</div>
+									{data?.meter?.aggregation?.type === METER_AGGREGATION_TYPE.MAX && data?.meter?.aggregation?.bucket_size && (
+										<div className='grid grid-cols-[200px_1fr] items-center'>
+											<span className='text-gray-500 text-sm'>Window Size</span>
+											<span className='text-gray-800 text-sm'>{data?.meter?.aggregation.bucket_size || '--'}</span>
+										</div>
+									)}
 								</div>
 							</div>
 						</div>
