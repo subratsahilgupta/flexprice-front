@@ -228,11 +228,11 @@ const CustomerSubscription: React.FC = () => {
 
 				// Create unique instances for each count with unique IDs
 				return Array.from({ length: count }, (_, index) =>
-					matchingPrices.map(price => ({
+					matchingPrices.map((price) => ({
 						...price,
 						// Append instance index to make price ID unique for each instance
-						id: `${price.id}_instance_${index}`
-					}))
+						id: `${price.id}_instance_${index}`,
+					})),
 				).flat();
 			}) || [];
 
@@ -406,11 +406,11 @@ const CustomerSubscription: React.FC = () => {
 			line_item_coupons:
 				Object.keys(lineItemCoupons).length > 0
 					? Object.fromEntries(
-						Object.entries(lineItemCoupons).map(([priceId, coupon]) => [
-							priceId,
-							[coupon.id], // Convert single coupon to array format for API
-						]),
-					)
+							Object.entries(lineItemCoupons).map(([priceId, coupon]) => [
+								priceId,
+								[coupon.id], // Convert single coupon to array format for API
+							]),
+						)
 					: undefined,
 
 			// TODO: remove this once the feature is released
