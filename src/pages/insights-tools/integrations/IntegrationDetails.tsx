@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { integrations } from './integrationsData';
 import { cn } from '@/lib/utils';
-import { Button, FormHeader, Page } from '@/components/atoms';
+import { Button, FormHeader, Page, Dialog } from '@/components/atoms';
 import { useState } from 'react';
 import IntegrationDrawer from '@/components/molecules/IntegrationDrawer/IntegrationDrawer';
 import StripeConnectionDrawer from '@/components/molecules/StripeConnectionDrawer';
@@ -11,6 +11,7 @@ import { ApiDocsContent } from '@/components/molecules';
 
 import { useQuery, useMutation } from '@tanstack/react-query';
 import ConnectionApi from '@/api/ConnectionApi';
+import { CONNECTION_PROVIDER_TYPE } from '@/models/Connection';
 
 const IntegrationDetails = () => {
 	const { id: name } = useParams() as { id: string };
@@ -18,6 +19,8 @@ const IntegrationDetails = () => {
 
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 	const [editingConnection, setEditingConnection] = useState<any | null>(null);
+	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+	const [connectionToDelete, setConnectionToDelete] = useState<{ id: string; name: string } | null>(null);
 
 	// Fetch connections from API
 	const { data: connectionsResponse, refetch: refetchConnections } = useQuery({
@@ -49,9 +52,23 @@ const IntegrationDetails = () => {
 
 	// Delete connection with confirmation
 	const handleDeleteConnection = (id: string, connectionName: string) => {
-		if (window.confirm(`Are you sure you want to delete the connection "${connectionName}"? This action cannot be undone.`)) {
-			deleteConnection(id);
+		setConnectionToDelete({ id, name: connectionName });
+		setIsDeleteDialogOpen(true);
+	};
+
+	// Confirm delete action
+	const confirmDeleteConnection = () => {
+		if (connectionToDelete) {
+			deleteConnection(connectionToDelete.id);
+			setIsDeleteDialogOpen(false);
+			setConnectionToDelete(null);
 		}
+	};
+
+	// Cancel delete action
+	const cancelDeleteConnection = () => {
+		setIsDeleteDialogOpen(false);
+		setConnectionToDelete(null);
 	};
 
 	// Open drawer for add/edit
@@ -103,7 +120,7 @@ const IntegrationDetails = () => {
 			</div>
 
 			{/* Integration Drawer for Add/Edit */}
-			{name.toLowerCase() === 'stripe' ? (
+			{name.toLowerCase() === CONNECTION_PROVIDER_TYPE.STRIPE ? (
 				<StripeConnectionDrawer
 					isOpen={isDrawerOpen}
 					onOpenChange={(open) => {
@@ -174,6 +191,26 @@ const IntegrationDetails = () => {
 					</div>
 				))}
 			</div>
+
+			{/* Delete Confirmation Dialog */}
+			<Dialog
+				title={`Are you sure you want to delete the connection "${connectionToDelete?.name}"?`}
+				description='This action cannot be undone.'
+				titleClassName='text-lg font-normal text-gray-800'
+				isOpen={isDeleteDialogOpen}
+				onOpenChange={setIsDeleteDialogOpen}
+				showCloseButton={false}>
+				<div className='flex flex-col gap-4 items-end justify-center'>
+					<div className='flex gap-4'>
+						<Button variant='outline' onClick={cancelDeleteConnection}>
+							Cancel
+						</Button>
+						<Button onClick={confirmDeleteConnection} isLoading={isDeletingConnection} disabled={isDeletingConnection}>
+							Delete Connection
+						</Button>
+					</div>
+				</div>
+			</Dialog>
 		</Page>
 	);
 };

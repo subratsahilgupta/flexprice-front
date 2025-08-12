@@ -5,7 +5,7 @@ export interface Connection extends BaseModel {
 	readonly provider_type: string;
 	readonly environment_id: string;
 	readonly tenant_id: string;
-	readonly connection_status: 'published' | 'draft' | 'archived';
+	readonly connection_status: CONNECTION_STATUS;
 }
 
 export enum CONNECTION_PROVIDER_TYPE {

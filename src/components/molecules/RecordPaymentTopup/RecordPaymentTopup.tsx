@@ -1,4 +1,4 @@
-import { Button, Input, Select, Textarea } from '@/components/atoms';
+import { Button, Input, Select, Textarea, PaymentUrlSuccessDialog } from '@/components/atoms';
 import { FC, useState, useEffect } from 'react';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import { PAYMENT_METHOD_TYPE, PAYMENT_DESTINATION_TYPE, Payment } from '@/models/Payment';
@@ -8,7 +8,7 @@ import ConnectionApi from '@/api/ConnectionApi';
 import { RecordPaymentPayload } from '@/types/dto/Payment';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { LoaderCircleIcon, ExternalLink, Copy, CheckCircle } from 'lucide-react';
+import { LoaderCircleIcon } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ServerError } from '@/core/axios/types';
 import { CONNECTION_PROVIDER_TYPE } from '@/models/Connection';
@@ -291,15 +291,41 @@ const RecordPaymentTopup: FC<Props> = ({
 		recordPayment();
 	};
 
-	const handleCopyUrl = () => {
-		navigator.clipboard.writeText(paymentUrlPopup.paymentUrl);
-		setPaymentUrlPopup((prev) => ({ ...prev, isCopied: true }));
-		toast.success('Payment URL copied to clipboard!');
+	const handleCopyUrl = async () => {
+		try {
+			// Check if clipboard API is available
+			if (navigator.clipboard && window.isSecureContext) {
+				await navigator.clipboard.writeText(paymentUrlPopup.paymentUrl);
+			} else {
+				// Fallback for browsers that don't support clipboard API or insecure contexts
+				const textArea = document.createElement('textarea');
+				textArea.value = paymentUrlPopup.paymentUrl;
+				textArea.style.position = 'fixed';
+				textArea.style.left = '-9999px';
+				textArea.style.top = '-9999px';
+				document.body.appendChild(textArea);
+				textArea.focus();
+				textArea.select();
 
-		// Reset copy status after 2 seconds
-		setTimeout(() => {
-			setPaymentUrlPopup((prev) => ({ ...prev, isCopied: false }));
-		}, 2000);
+				const successful = document.execCommand('copy');
+				document.body.removeChild(textArea);
+
+				if (!successful) {
+					throw new Error('Fallback copy method failed');
+				}
+			}
+
+			setPaymentUrlPopup((prev) => ({ ...prev, isCopied: true }));
+			toast.success('Payment URL copied to clipboard!');
+
+			// Reset copy status after 2 seconds
+			setTimeout(() => {
+				setPaymentUrlPopup((prev) => ({ ...prev, isCopied: false }));
+			}, 2000);
+		} catch (error) {
+			console.error('Failed to copy payment URL:', error);
+			toast.error('Failed to copy payment URL. Please try again or copy manually.');
+		}
 	};
 
 	const handleGoToLink = () => {
@@ -463,37 +489,14 @@ const RecordPaymentTopup: FC<Props> = ({
 			</Dialog>
 
 			{/* Payment URL Success Popup */}
-			<Dialog open={paymentUrlPopup.isOpen} onOpenChange={handleCloseUrlPopup}>
-				<DialogContent className='bg-white sm:max-w-[500px]'>
-					<DialogHeader>
-						<DialogTitle className='text-lg font-semibold text-[#18181B]'>Payment Link Created</DialogTitle>
-					</DialogHeader>
-					<div className='space-y-4 py-4'>
-						<div className='p-4 bg-green-50 border border-green-200 rounded-lg'>
-							<div className='text-sm text-green-800 mb-2'>Your payment link has been successfully created!</div>
-						</div>
-
-						<div className='flex gap-3'>
-							<Button onClick={handleGoToLink} className='flex-1' prefixIcon={<ExternalLink className='w-4 h-4' />}>
-								Go to Payment Link
-							</Button>
-							<Button
-								variant='outline'
-								onClick={handleCopyUrl}
-								className='flex-1'
-								prefixIcon={paymentUrlPopup.isCopied ? <CheckCircle className='w-4 h-4' /> : <Copy className='w-4 h-4' />}>
-								{paymentUrlPopup.isCopied ? 'Copied!' : 'Get Link'}
-							</Button>
-						</div>
-
-						<div className='pt-2 flex justify-end'>
-							<Button variant='outline' onClick={handleCloseUrlPopup}>
-								Close
-							</Button>
-						</div>
-					</div>
-				</DialogContent>
-			</Dialog>
+			<PaymentUrlSuccessDialog
+				isOpen={paymentUrlPopup.isOpen}
+				paymentUrl={paymentUrlPopup.paymentUrl}
+				isCopied={paymentUrlPopup.isCopied}
+				onClose={handleCloseUrlPopup}
+				onCopyUrl={handleCopyUrl}
+				onGoToLink={handleGoToLink}
+			/>
 		</>
 	);
 };

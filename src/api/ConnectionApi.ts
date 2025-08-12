@@ -1,5 +1,6 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import { Connection } from '@/models/Connection';
+import { ENTITY_STATUS } from '@/models/base';
 import { generateQueryParams } from '@/utils/common/api_helper';
 import { GetConnectionsPayload, GetConnectionsResponse, CreateConnectionPayload } from '@/types/dto/Connection';
 
@@ -16,7 +17,7 @@ class ConnectionApi {
 	}
 
 	public static async getPublishedConnections(): Promise<GetConnectionsResponse> {
-		return this.getAllConnections({ status: 'published' });
+		return this.getAllConnections({ status: ENTITY_STATUS.PUBLISHED });
 	}
 
 	public static async createConnection(payload: CreateConnectionPayload): Promise<Connection> {
