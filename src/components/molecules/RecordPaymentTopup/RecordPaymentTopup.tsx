@@ -293,28 +293,7 @@ const RecordPaymentTopup: FC<Props> = ({
 
 	const handleCopyUrl = async () => {
 		try {
-			// Check if clipboard API is available
-			if (navigator.clipboard && window.isSecureContext) {
-				await navigator.clipboard.writeText(paymentUrlPopup.paymentUrl);
-			} else {
-				// Fallback for browsers that don't support clipboard API or insecure contexts
-				const textArea = document.createElement('textarea');
-				textArea.value = paymentUrlPopup.paymentUrl;
-				textArea.style.position = 'fixed';
-				textArea.style.left = '-9999px';
-				textArea.style.top = '-9999px';
-				document.body.appendChild(textArea);
-				textArea.focus();
-				textArea.select();
-
-				const successful = document.execCommand('copy');
-				document.body.removeChild(textArea);
-
-				if (!successful) {
-					throw new Error('Fallback copy method failed');
-				}
-			}
-
+			await navigator.clipboard.writeText(paymentUrlPopup.paymentUrl);
 			setPaymentUrlPopup((prev) => ({ ...prev, isCopied: true }));
 			toast.success('Payment URL copied to clipboard!');
 
