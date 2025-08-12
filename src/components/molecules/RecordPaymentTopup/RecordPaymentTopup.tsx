@@ -222,6 +222,35 @@ const RecordPaymentTopup: FC<Props> = ({
 				? availableConnections.find((conn) => conn.id === formData.selected_connection_id)
 				: null;
 
+			// Check if this is a payment link (when a connection is selected, it becomes a payment link)
+			const isPaymentLink = !!selectedConnection;
+
+			// Generate success and cancel URLs for payment links
+			const generatePaymentUrls = (): Record<string, string> => {
+				if (!isPaymentLink) return {};
+
+				const baseUrl = window.location.origin;
+				const currentUrl = window.location.href;
+
+				// Extract the current page URL (for invoices it would be something like:
+				// /customer-management/invoices/inv_123?page=1)
+				let redirectUrl = currentUrl;
+
+				// If destination_type is INVOICE, construct the invoice page URL
+				if (destination_type === 'INVOICE') {
+					const urlParams = new URLSearchParams(window.location.search);
+					const pageParam = urlParams.get('page') || '1';
+					redirectUrl = `${baseUrl}/customer-management/invoices/${destination_id}?page=${pageParam}`;
+				}
+
+				return {
+					success_url: redirectUrl,
+					cancel_url: redirectUrl,
+				};
+			};
+
+			const paymentUrls = generatePaymentUrls();
+
 			const payload: RecordPaymentPayload = {
 				amount: formData.amount,
 				currency,
@@ -256,6 +285,8 @@ const RecordPaymentTopup: FC<Props> = ({
 						connection_id: selectedConnection.id,
 						connection_name: selectedConnection.name,
 					}),
+					// For payment links, add success and cancel URLs
+					...paymentUrls,
 				},
 			};
 
