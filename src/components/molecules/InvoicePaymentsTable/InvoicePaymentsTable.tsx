@@ -4,7 +4,7 @@ import { formatDateShort } from '@/utils/common/helper_functions';
 import { Chip, NoDataCard } from '@/components/atoms';
 import { toSentenceCase } from '@/utils/common/helper_functions';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
-import { CreditCard, Banknote, Receipt, CircleDollarSign } from 'lucide-react';
+import { CreditCard, Banknote, Receipt, CircleDollarSign, ExternalLink } from 'lucide-react';
 import { RouteNames } from '@/core/routes/Routes';
 import { RedirectCell } from '../Table';
 import { PAYMENT_METHOD_TYPE } from '@/constants';
@@ -23,6 +23,8 @@ const getPaymentMethodIcon = (method: string) => {
 			return <Receipt className='w-4 h-4' />;
 		case PAYMENT_METHOD_TYPE.CREDITS:
 			return <CircleDollarSign className='w-4 h-4' />;
+		case PAYMENT_METHOD_TYPE.PAYMENT_LINK:
+			return <ExternalLink className='w-4 h-4' />;
 		default:
 			return <CreditCard className='w-4 h-4' />;
 	}
@@ -38,6 +40,8 @@ const getPaymentMethodLabel = (method: string) => {
 			return 'Offline';
 		case PAYMENT_METHOD_TYPE.CREDITS:
 			return 'Wallet Credits';
+		case PAYMENT_METHOD_TYPE.PAYMENT_LINK:
+			return 'Payment Link';
 		default:
 			return method;
 	}

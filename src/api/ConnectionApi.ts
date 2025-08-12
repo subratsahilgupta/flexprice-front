@@ -1,0 +1,31 @@
+import { AxiosClient } from '@/core/axios/verbs';
+import { Connection } from '@/models/Connection';
+import { generateQueryParams } from '@/utils/common/api_helper';
+import { GetConnectionsPayload, GetConnectionsResponse, CreateConnectionPayload } from '@/types/dto/Connection';
+
+class ConnectionApi {
+	private static baseUrl = '/connections';
+
+	public static async getAllConnections(payload: GetConnectionsPayload = {}): Promise<GetConnectionsResponse> {
+		const url = generateQueryParams(this.baseUrl, payload);
+		return await AxiosClient.get<GetConnectionsResponse>(url);
+	}
+
+	public static async getConnectionById(id: string): Promise<Connection> {
+		return await AxiosClient.get<Connection>(`${this.baseUrl}/${id}`);
+	}
+
+	public static async getPublishedConnections(): Promise<GetConnectionsResponse> {
+		return this.getAllConnections({ status: 'published' });
+	}
+
+	public static async createConnection(payload: CreateConnectionPayload): Promise<Connection> {
+		return await AxiosClient.post<Connection>(this.baseUrl, payload);
+	}
+
+	public static async deleteConnection(id: string): Promise<void> {
+		return await AxiosClient.delete(`${this.baseUrl}/${id}`);
+	}
+}
+
+export default ConnectionApi;

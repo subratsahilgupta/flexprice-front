@@ -2,81 +2,56 @@ import { useParams } from 'react-router-dom';
 import { integrations } from './integrationsData';
 import { cn } from '@/lib/utils';
 import { Button, FormHeader, Page } from '@/components/atoms';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import IntegrationDrawer from '@/components/molecules/IntegrationDrawer/IntegrationDrawer';
+import StripeConnectionDrawer from '@/components/molecules/StripeConnectionDrawer';
 import { PencilIcon, TrashIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { ApiDocsContent } from '@/components/molecules';
-import { generateUniqueId } from '@/utils/common/helper_functions';
-import { useUser } from '@/hooks/UserContext';
 
-const getStorageKey = (userId: string) => `connections_${userId}`;
-
-function maskCode(code: string, options = { start: 1, end: 4, maskChar: '*', maskLength: 4, defaultMask: '********' }) {
-	if (typeof code !== 'string' || code.length === 0) return options.defaultMask;
-
-	const { start, end, maskChar, maskLength } = options;
-
-	// If code is too short to preserve visible chars
-	if (code.length <= start + end) {
-		return maskChar.repeat(code.length);
-	}
-
-	return code.slice(0, start) + maskChar.repeat(maskLength) + code.slice(code.length - end);
-}
+import { useQuery, useMutation } from '@tanstack/react-query';
+import ConnectionApi from '@/api/ConnectionApi';
 
 const IntegrationDetails = () => {
 	const { id: name } = useParams() as { id: string };
 	const integration = integrations.find((integration) => integration.name.toLocaleLowerCase() === name.toLocaleLowerCase())!;
-	const { user } = useUser();
 
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 	const [editingConnection, setEditingConnection] = useState<any | null>(null);
-	const [connections, setConnections] = useState<any[]>([]);
 
-	// Load connections from localStorage
-	useEffect(() => {
-		if (!user?.id) return;
-		const key = getStorageKey(user.id);
-		const allConnections = JSON.parse(localStorage.getItem(key) || '[]');
-		setConnections(allConnections.filter((c: any) => c.provider === name));
-	}, [user, name]);
+	// Fetch connections from API
+	const { data: connectionsResponse, refetch: refetchConnections } = useQuery({
+		queryKey: ['connections', name],
+		queryFn: () => ConnectionApi.getAllConnections({ provider_type: name.toLowerCase() }),
+		enabled: !!name,
+	});
 
-	// Save connections to localStorage
-	const saveConnections = (updated: any[]) => {
-		if (!user?.id) return;
-		const key = getStorageKey(user.id);
-		// Get all connections, update only those for this provider
-		const allConnections = JSON.parse(localStorage.getItem(key) || '[]');
-		const filtered = allConnections.filter((c: any) => c.provider !== name);
-		const merged = [...filtered, ...updated];
-		localStorage.setItem(key, JSON.stringify(merged));
-		setConnections(updated);
-	};
+	const connections = connectionsResponse?.connections || [];
 
-	// Add or update connection
-	const handleSaveConnection = (connection: any) => {
-		let updated;
-		if (connection.id) {
-			// Edit
-			updated = connections.map((c) => (c.id === connection.id ? connection : c));
-			toast.success('Connection updated');
-		} else {
-			// Add
-			const newConn = { ...connection, id: generateUniqueId(), provider: name };
-			updated = [...connections, newConn];
-			toast.success('Connection added');
-		}
-		saveConnections(updated);
+	// Delete connection mutation
+	const { mutate: deleteConnection, isPending: isDeletingConnection } = useMutation({
+		mutationFn: (id: string) => ConnectionApi.deleteConnection(id),
+		onSuccess: () => {
+			toast.success('Connection deleted successfully');
+			refetchConnections();
+		},
+		onError: (error: any) => {
+			toast.error(error?.message || 'Failed to delete connection');
+		},
+	});
+
+	// Handle save connection (called by the drawer after API success)
+	const handleSaveConnection = () => {
+		refetchConnections();
 		setIsDrawerOpen(false);
 		setEditingConnection(null);
 	};
 
-	// Delete connection
-	const handleDeleteConnection = (id: string) => {
-		const updated = connections.filter((c) => c.id !== id);
-		saveConnections(updated);
-		toast.success('Connection deleted');
+	// Delete connection with confirmation
+	const handleDeleteConnection = (id: string, connectionName: string) => {
+		if (window.confirm(`Are you sure you want to delete the connection "${connectionName}"? This action cannot be undone.`)) {
+			deleteConnection(id);
+		}
 	};
 
 	// Open drawer for add/edit
@@ -128,17 +103,29 @@ const IntegrationDetails = () => {
 			</div>
 
 			{/* Integration Drawer for Add/Edit */}
-			<IntegrationDrawer
-				isOpen={isDrawerOpen}
-				onOpenChange={(open) => {
-					setIsDrawerOpen(open);
-					if (!open) setEditingConnection(null);
-				}}
-				provider={name}
-				providerName={integration.name}
-				connection={editingConnection}
-				onSave={handleSaveConnection}
-			/>
+			{name.toLowerCase() === 'stripe' ? (
+				<StripeConnectionDrawer
+					isOpen={isDrawerOpen}
+					onOpenChange={(open) => {
+						setIsDrawerOpen(open);
+						if (!open) setEditingConnection(null);
+					}}
+					connection={editingConnection}
+					onSave={handleSaveConnection}
+				/>
+			) : (
+				<IntegrationDrawer
+					isOpen={isDrawerOpen}
+					onOpenChange={(open) => {
+						setIsDrawerOpen(open);
+						if (!open) setEditingConnection(null);
+					}}
+					provider={name}
+					providerName={integration.name}
+					connection={editingConnection}
+					onSave={handleSaveConnection}
+				/>
+			)}
 
 			{/* List all connections for this provider */}
 			{connections.length > 0 && (
@@ -146,18 +133,24 @@ const IntegrationDetails = () => {
 					<FormHeader variant='form-component-title' title='Connected Accounts' />
 					<div className='card'>
 						{connections.map((item, idx) => {
-							const maskedCode = maskCode(item.code);
 							return (
 								<div key={idx} className='flex items-center justify-between text-sm p-3 border-b last:border-b-0'>
 									<div>
 										<p className='text-gray-900 font-medium'>{item.name}</p>
-										{item.code && <p className='text-xs text-gray-500'>{maskedCode}</p>}
+										<p className='text-xs text-gray-500 capitalize'>
+											{item.connection_status} • {item.provider_type}
+										</p>
 									</div>
 									<div className='flex items-center gap-2'>
 										<Button className='hidden' variant='outline' size='icon' onClick={() => handleEdit(item)}>
 											<PencilIcon className='size-4' />
 										</Button>
-										<Button variant='outline' size='icon' onClick={() => handleDeleteConnection(item.id)}>
+										<Button
+											variant='outline'
+											size='icon'
+											onClick={() => handleDeleteConnection(item.id, item.name)}
+											disabled={isDeletingConnection}
+											isLoading={isDeletingConnection}>
 											<TrashIcon className='size-4' />
 										</Button>
 									</div>
