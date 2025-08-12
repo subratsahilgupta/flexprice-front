@@ -105,6 +105,10 @@ class InvoiceApi {
 
 		window.open(presignedUrl, '_blank');
 	}
+
+	public static async triggerCommunication(invoiceId: string) {
+		return await AxiosClient.post(`${this.baseurl}/${invoiceId}/commtrigger`);
+	}
 }
 
 export default InvoiceApi;

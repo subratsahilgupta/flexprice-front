@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { PAYMENT_DESTINATION_TYPE } from '@/models/Payment';
 import { PAYMENT_STATUS } from '@/constants';
+import { RouteNames } from '@/core/routes/Routes';
 
 interface Props {
 	data: Invoice;
@@ -19,18 +20,19 @@ interface Props {
 const InvoiceTableMenu: FC<Props> = ({ data }) => {
 	const navigate = useNavigate();
 
-	// const { mutate: attemptPayment } = useMutation({
-	// 	mutationFn: async (invoice_id: string) => {
-	// 		return await InvoiceApi.attemptPayment(invoice_id);
-	// 	},
-	// 	onSuccess: () => {
-	// 		toast.success('Invoice paid successfully');
-	// 		refetchQueries();
-	// 	},
-	// 	onError: (error: ServerError) => {
-	// 		toast.error(error.error.message || 'Unable to pay invoice. Please try again.');
-	// 	},
-	// });
+	const { mutate: triggerCommunication } = useMutation({
+		mutationFn: async (invoice_id: string) => {
+			return await InvoiceApi.triggerCommunication(invoice_id);
+		},
+		onSuccess: () => {
+			toast.success('Communication triggered');
+			refetchQueries(['fetchInvoice', data.id]);
+			refetchQueries(['fetchInvoices']);
+		},
+		onError: (error: ServerError) => {
+			toast.error(error.error.message || 'Unable to trigger communication');
+		},
+	});
 
 	const { mutate: downloadInvoice } = useMutation({
 		mutationFn: async (invoice_id: string) => {
@@ -63,15 +65,13 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 				downloadInvoice(data.id);
 			},
 		},
-		// {
-		// 	label: 'Attempt Payment',
-		// 	group: 'Actions',
-		// 	onSelect: () => {
-		// 		attemptPayment(data.id);
-		// 	},
-		// 	disabled:
-		// 		data?.payment_status === PAYMENT_STATUS.SUCCEEDED || data?.invoice_status === INVOICE_STATUS.VOIDED || data.amount_remaining === 0,
-		// },
+		{
+			label: 'Send Communication',
+			group: 'Actions',
+			onSelect: () => {
+				triggerCommunication(data.id);
+			},
+		},
 		{
 			label: 'Record Payment',
 			group: 'Actions',
@@ -112,21 +112,21 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 			group: 'Actions',
 			disabled: data?.invoice_status !== 'FINALIZED' || data?.payment_status === 'REFUNDED',
 			onSelect: () => {
-				navigate(`/customer-management/customers/${data?.customer_id}/invoice/${data?.id}/credit-note`);
+				navigate(`${RouteNames.customers}/${data?.customer_id}/invoice/${data?.id}/credit-note`);
 			},
 		},
 		{
 			label: 'View Customer',
 			group: 'Connections',
 			onSelect: () => {
-				navigate(`/customer-management/customers/${data.customer_id}`);
+				navigate(`${RouteNames.customers}/${data.customer_id}`);
 			},
 		},
 		{
 			label: 'View Subscription',
 			group: 'Connections',
 			onSelect() {
-				navigate(`/customer-management/customers/${data.customer_id}/subscription/${data.subscription_id}`);
+				navigate(`${RouteNames.customers}/${data.customer_id}/subscription/${data.subscription_id}`);
 			},
 		},
 	];
