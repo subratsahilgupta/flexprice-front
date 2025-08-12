@@ -69,3 +69,4 @@ export { default as CodeBlock } from './CodeBlock';
 export { default as Label } from './Label';
 export { Combobox } from './Combobox';
 export type { ComboboxOption, ComboboxProps } from './Combobox';
+export { default as PaymentUrlSuccessDialog } from './PaymentUrlSuccessDialog';
