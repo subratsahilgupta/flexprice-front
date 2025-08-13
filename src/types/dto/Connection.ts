@@ -19,7 +19,7 @@ export interface CreateConnectionPayload {
 	provider_type: string;
 	encrypted_secret_data: {
 		account_id?: string;
-		publishable_key: string;
+		publishable_key?: string;
 		secret_key: string;
 		webhook_secret: string;
 	};

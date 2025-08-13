@@ -9,6 +9,7 @@
 export enum PAYMENT_STATUS {
 	PENDING = 'PENDING',
 	PROCESSING = 'PROCESSING',
+	INITIATED = 'INITIATED',
 	SUCCEEDED = 'SUCCEEDED',
 	FAILED = 'FAILED',
 	REFUNDED = 'REFUNDED',
@@ -37,6 +38,8 @@ export const formatPaymentStatus = (status: string): string => {
 			return 'Pending';
 		case PAYMENT_STATUS.PROCESSING:
 			return 'Processing';
+		case PAYMENT_STATUS.INITIATED:
+			return 'Initiated';
 		case PAYMENT_STATUS.SUCCEEDED:
 			return 'Succeeded';
 		case PAYMENT_STATUS.FAILED:
