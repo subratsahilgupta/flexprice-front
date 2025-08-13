@@ -2,7 +2,7 @@ import { Button, Checkbox, FormHeader, Input, Select, SelectFeature, Sheet, Spac
 import { getFeatureIcon } from '@/components/atoms/SelectFeature/SelectFeature';
 import { AddChargesButton } from '@/components/organisms/PlanForm/SetupChargesSection';
 
-import { billlingPeriodOptions } from '@/constants/constants';
+import { BILLING_PERIOD } from '@/constants/constants';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { Entitlement, ENTITLEMENT_ENTITY_TYPE } from '@/models/Entitlement';
 import Feature, { FEATURE_TYPE } from '@/models/Feature';
@@ -32,6 +32,12 @@ interface ValidationErrors {
 	general?: string;
 	feature?: string;
 }
+
+// TODO: remove this after we ship the reset usage feature and use billlingPeriodOptions from constants.ts
+const billlingPeriodOptions = [
+	{ label: 'Daily', value: BILLING_PERIOD.DAILY },
+	{ label: 'Monthly', value: BILLING_PERIOD.MONTHLY },
+];
 
 const AddEntitlementDrawer: FC<Props> = ({
 	isOpen,
