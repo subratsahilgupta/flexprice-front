@@ -35,12 +35,7 @@ const CustomerOverviewCard: React.FC<CustomerCardProps> = ({ customerId }) => {
 			labelStyle: 'semibold',
 			valueVariant: 'foreground',
 		},
-		{
-			label: 'Phone',
-			value: customer?.phone || '--',
-			labelStyle: 'semibold',
-			valueVariant: 'foreground',
-		},
+
 		{
 			label: 'Billing ID',
 			value: customer?.external_id || '--',
@@ -82,8 +77,8 @@ const CustomerOverviewCard: React.FC<CustomerCardProps> = ({ customerId }) => {
 			valueVariant: 'muted',
 		},
 		{
-			label: 'Timezone',
-			value: customer?.timezone || '--',
+			label: 'Postal Code',
+			value: customer?.address_postal_code || '--',
 			valueVariant: 'muted',
 		},
 	];
