@@ -83,6 +83,10 @@ const CustomerInformation = () => {
 			label: 'City',
 			value: customer?.address_city || '--',
 		},
+		{
+			label: 'Postal Code',
+			value: customer?.address_postal_code || '--',
+		},
 	];
 
 	if (isLoading) {
