@@ -34,5 +34,6 @@ export interface RecordPaymentPayload {
 	metadata?: Metadata;
 	payment_method_id?: string;
 	payment_method_type: PAYMENT_METHOD_TYPE;
+	payment_gateway?: string;
 	process_payment?: boolean;
 }

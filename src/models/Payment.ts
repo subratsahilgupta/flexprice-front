@@ -18,6 +18,12 @@ export interface Payment extends BaseModel {
 	readonly refunded_at: string;
 	readonly succeeded_at: string;
 	readonly track_attempts: boolean;
+	readonly payment_gateway?: string;
+	readonly gateway_payment_id?: string;
+	readonly gateway_tracking_id?: string;
+	readonly gateway_metadata?: Metadata;
+	readonly payment_url?: string;
+	readonly session_id?: string;
 }
 
 export interface Attempt extends BaseModel {
@@ -32,6 +38,7 @@ export enum PAYMENT_METHOD_TYPE {
 	ACH = 'ACH',
 	OFFLINE = 'OFFLINE',
 	CREDITS = 'CREDITS',
+	PAYMENT_LINK = 'PAYMENT_LINK',
 }
 
 export enum PAYMENT_DESTINATION_TYPE {
