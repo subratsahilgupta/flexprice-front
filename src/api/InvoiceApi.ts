@@ -107,7 +107,7 @@ class InvoiceApi {
 	}
 
 	public static async triggerCommunication(invoiceId: string) {
-		return await AxiosClient.post(`${this.baseurl}/${invoiceId}/commtrigger`);
+		return await AxiosClient.post(`${this.baseurl}/${invoiceId}/comms/trigger`);
 	}
 }
 
