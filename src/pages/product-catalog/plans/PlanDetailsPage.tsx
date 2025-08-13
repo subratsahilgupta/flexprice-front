@@ -90,7 +90,7 @@ const formatBillingPeriod = (billingPeriod: string) => {
 	}
 };
 
-const formatInvoiceCadence = (cadence: string): string => {
+export const formatInvoiceCadence = (cadence: string): string => {
 	switch (cadence.toUpperCase()) {
 		case 'ADVANCE':
 			return 'Advance';
