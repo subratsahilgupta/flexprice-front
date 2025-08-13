@@ -9,6 +9,8 @@ import {
 	GetCustomerEntitlementPayload,
 	GetUsageSummaryResponse,
 	GetCustomerEntitlementsResponse,
+	CreateCustomerRequest,
+	UpdateCustomerRequest,
 } from '@/types/dto/Customer';
 import { generateQueryParams } from '@/utils/common/api_helper';
 
@@ -39,10 +41,11 @@ class CustomerApi {
 		return await AxiosClient.get(`/subscriptions/${id}`);
 	}
 
-	public static async createCustomer(customer: Partial<Customer>): Promise<Customer> {
+	public static async createCustomer(customer: CreateCustomerRequest): Promise<Customer> {
 		return await AxiosClient.post(`${this.baseUrl}`, customer);
 	}
-	public static async updateCustomer(customer: Partial<Customer>, id: string): Promise<Customer> {
+
+	public static async updateCustomer(customer: UpdateCustomerRequest, id: string): Promise<Customer> {
 		return await AxiosClient.put(`${this.baseUrl}/${id}`, customer);
 	}
 

@@ -9,13 +9,9 @@ export interface Customer extends BaseModel {
 	address_state: string;
 	email: string;
 	external_id: string;
-	metadata: Record<string, unknown>;
+	metadata: Record<string, string>;
 	name: string;
-	tenant_id: string;
-
-	// TODO - add these to the backend
-	phone: string;
-	timezone: string;
+	environment_id: string;
 }
 
 export default Customer;

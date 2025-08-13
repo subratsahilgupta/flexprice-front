@@ -25,6 +25,8 @@ export type {
 	GetCustomerEntitlementPayload,
 	GetUsageSummaryResponse,
 	GetCustomerByFiltersPayload,
+	CreateCustomerRequest,
+	UpdateCustomerRequest,
 } from './Customer';
 
 export type { EntitlementFilters, EntitlementResponse } from './Entitlement';

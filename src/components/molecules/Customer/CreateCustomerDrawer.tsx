@@ -4,6 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import CustomerApi from '@/api/CustomerApi';
 import Customer from '@/models/Customer';
+import { CreateCustomerRequest, UpdateCustomerRequest } from '@/types/dto/Customer';
 import { Plus, LinkIcon } from 'lucide-react';
 import { Country, State, City, IState } from 'country-state-city';
 import { z } from 'zod';
@@ -40,9 +41,9 @@ function maskCode(code: string) {
 }
 
 const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) => {
-	const [formData, setFormData] = useState<Partial<Customer>>(data || {});
+	const [formData, setFormData] = useState<Partial<CreateCustomerRequest>>(data || {});
 	const isEdit = !!data;
-	const [errors, setErrors] = useState<Partial<Record<keyof Customer, string>>>({});
+	const [errors, setErrors] = useState<Partial<Record<keyof CreateCustomerRequest, string>>>({});
 	const [internalOpen, setInternalOpen] = useState(false);
 	const isControlled = open !== undefined && onOpenChange !== undefined;
 	const [showBillingDetails, setShowBillingDetails] = useState(false);
@@ -123,23 +124,23 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 		}
 	}, [formData.name, isEdit]);
 
+	// Updated validation schema to match backend requirements
 	const customerSchema = z
 		.object({
 			external_id: z.string().nonempty('Customer Slug is required'),
-			email: z.union([z.string().email('Invalid email address'), z.string().length(0)]).optional(),
 			name: z.string().nonempty('Customer Name is required'),
-			address_country: z.union([z.string().min(1, 'Country cannot be empty if provided'), z.string().length(0)]).optional(),
-			address_state: z.union([z.string().min(1, 'State cannot be empty if provided'), z.string().length(0)]).optional(),
-			address_city: z.union([z.string().min(1, 'City cannot be empty if provided'), z.string().length(0)]).optional(),
-			address_line1: z.union([z.string().min(1, 'Address Line 1 cannot be empty if provided'), z.string().length(0)]).optional(),
-			address_line2: z.union([z.string().min(1, 'Address Line 2 cannot be empty if provided'), z.string().length(0)]).optional(),
-			phone: z.union([z.string().min(1, 'Phone cannot be empty if provided'), z.string().length(0)]).optional(),
-			timezone: z.union([z.string().min(1, 'Timezone cannot be empty if provided'), z.string().length(0)]).optional(),
+			email: z.string().email('Invalid email address').optional().or(z.literal('')),
+			address_line1: z.string().max(255, 'Address Line 1 must be less than 255 characters').optional().or(z.literal('')),
+			address_line2: z.string().max(255, 'Address Line 2 must be less than 255 characters').optional().or(z.literal('')),
+			address_city: z.string().max(100, 'City name must be less than 100 characters').optional().or(z.literal('')),
+			address_state: z.string().max(100, 'State name must be less than 100 characters').optional().or(z.literal('')),
+			address_postal_code: z.string().max(20, 'Postal code must be less than 20 characters').optional().or(z.literal('')),
+			address_country: z.string().length(2, 'Country code must be exactly 2 characters').optional().or(z.literal('')),
 		})
 		.refine(
 			(data) => {
 				// If any address field is filled, require country and state
-				const hasAddressFields = data.address_line1 || data.address_line2 || data.address_city;
+				const hasAddressFields = data.address_line1 || data.address_line2 || data.address_city || data.address_postal_code;
 				if (hasAddressFields) {
 					if (!data.address_country) return false;
 					if (!data.address_state) return false;
@@ -148,16 +149,16 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 			},
 			{
 				message: 'Country and State are required when address fields are provided',
-				path: ['address_country'], // This will show the error under the country field
+				path: ['address_country'],
 			},
 		);
 
 	const validateForm = () => {
 		const result = customerSchema.safeParse(formData);
 		if (!result.success) {
-			const newErrors: Partial<Record<keyof Customer, string>> = {};
+			const newErrors: Partial<Record<keyof CreateCustomerRequest, string>> = {};
 			result.error.errors.forEach((error) => {
-				const field = error.path[0] as keyof Customer;
+				const field = error.path[0] as keyof CreateCustomerRequest;
 				newErrors[field] = error.message;
 			});
 			setErrors(newErrors);
@@ -176,57 +177,56 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 
 	const { mutate: createCustomer, isPending } = useMutation({
 		mutationFn: async () => {
-			// Get connection details if linked
-			const connectionData = linkConnection && selectedConnection ? availableConnections.find((c) => c.id === selectedConnection) : null;
-
-			// Mock payload structure with connection
-			const payload = {
-				customer: {
-					...(data
-						? {
-								email: formData.email || undefined,
-								name: formData.name || undefined,
-								address_city: formData.address_city || '',
-								address_country: formData.address_country || '',
-								address_line1: formData.address_line1 || undefined,
-								address_line2: formData.address_line2 || undefined,
-								address_state: activeState?.name || '',
-								phone: formData.phone || undefined,
-								timezone: formData.timezone || undefined,
-							}
-						: {
-								email: formData.email!,
-								name: formData.name,
-								external_id: formData.external_id!,
-								address_city: formData.address_city,
-								address_country: formData.address_country || undefined,
-								address_state: activeState?.name || undefined,
-								address_line1: formData.address_line1 || undefined,
-								address_line2: formData.address_line2 || undefined,
-								phone: formData.phone || undefined,
-								timezone: formData.timezone || undefined,
-							}),
-				},
-				connection: connectionData
-					? {
-							provider: 'stripe',
-							connection_id: connectionData.id,
-							connection_name: connectionData.name,
-						}
-					: undefined,
-			};
-
-			// Keep the original API calls for now
 			if (data) {
-				return await CustomerApi.updateCustomer(payload.customer as Customer, data.id);
+				// Update customer
+				const updatePayload: UpdateCustomerRequest = {
+					external_id: formData.external_id,
+					name: formData.name,
+					email: formData.email || undefined,
+					address_line1: formData.address_line1 || undefined,
+					address_line2: formData.address_line2 || undefined,
+					address_city: formData.address_city || undefined,
+					address_state: activeState?.name || undefined,
+					address_postal_code: formData.address_postal_code || undefined,
+					address_country: formData.address_country || undefined,
+				};
+
+				// Remove undefined values
+				Object.keys(updatePayload).forEach((key) => {
+					if (updatePayload[key as keyof UpdateCustomerRequest] === undefined) {
+						delete updatePayload[key as keyof UpdateCustomerRequest];
+					}
+				});
+
+				return await CustomerApi.updateCustomer(updatePayload, data.id);
 			} else {
-				return await CustomerApi.createCustomer(payload.customer as any);
+				// Create customer
+				const createPayload: CreateCustomerRequest = {
+					external_id: formData.external_id!,
+					name: formData.name!,
+					email: formData.email || '',
+					address_line1: formData.address_line1 || undefined,
+					address_line2: formData.address_line2 || undefined,
+					address_city: formData.address_city || undefined,
+					address_state: activeState?.name || undefined,
+					address_postal_code: formData.address_postal_code || undefined,
+					address_country: formData.address_country || undefined,
+				};
+
+				// Remove undefined values
+				Object.keys(createPayload).forEach((key) => {
+					if (createPayload[key as keyof CreateCustomerRequest] === undefined) {
+						delete createPayload[key as keyof CreateCustomerRequest];
+					}
+				});
+
+				return await CustomerApi.createCustomer(createPayload);
 			}
 		},
 
 		onSuccess: async () => {
 			if (data) {
-				await refetchQueries(['fetchCustomerDetails', formData?.id || '']);
+				await refetchQueries(['fetchCustomerDetails', data.id || '']);
 				toast.success('Customer updated successfully');
 			} else {
 				await refetchQueries(['fetchCustomers']);
@@ -348,9 +348,9 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 										setFormData((prev) => ({
 											...prev,
 											address_country: e,
-											timezone: undefined,
 											address_city: '',
 											address_state: '',
+											address_postal_code: '',
 										}));
 										setactiveState(undefined);
 									}}
@@ -361,6 +361,7 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 									value={formData.address_line1 || ''}
 									onChange={(e) => handleChange('address_line1', e)}
 									error={errors.address_line1}
+									maxLength={255}
 								/>
 								<Input
 									label='Address Line 2'
@@ -368,6 +369,7 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 									value={formData.address_line2 || ''}
 									onChange={(e) => handleChange('address_line2', e)}
 									error={errors.address_line2}
+									maxLength={255}
 								/>
 
 								<div className='grid grid-cols-2 gap-4'>
@@ -379,7 +381,6 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 										onChange={(e) => {
 											setFormData({
 												...formData,
-												timezone: undefined,
 												address_city: '',
 												address_state: e,
 											});
@@ -397,6 +398,15 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 										onChange={(e) => handleChange('address_city', e)}
 									/>
 								</div>
+
+								<Input
+									label='Postal Code'
+									placeholder='Enter Postal Code'
+									value={formData.address_postal_code || ''}
+									onChange={(e) => handleChange('address_postal_code', e)}
+									error={errors.address_postal_code}
+									maxLength={20}
+								/>
 							</div>
 						</div>
 					)}
