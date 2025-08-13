@@ -4,14 +4,50 @@ import { formatDateShort } from '@/utils/common/helper_functions';
 import { Chip, NoDataCard } from '@/components/atoms';
 import { toSentenceCase } from '@/utils/common/helper_functions';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
-import { CreditCard, Banknote, Receipt, CircleDollarSign, ExternalLink } from 'lucide-react';
+import { CreditCard, Banknote, Receipt, CircleDollarSign, ExternalLink, Copy } from 'lucide-react';
 import { RouteNames } from '@/core/routes/Routes';
 import { RedirectCell } from '../Table';
 import { PAYMENT_METHOD_TYPE } from '@/constants';
+import DropdownMenu, { DropdownMenuOption } from '../DropdownMenu';
+import toast from 'react-hot-toast';
+import { FC } from 'react';
 
 interface Props {
 	data: Payment[];
 }
+
+interface PaymentTableMenuProps {
+	payment: Payment;
+}
+
+const PaymentTableMenu: FC<PaymentTableMenuProps> = ({ payment }) => {
+	const handleCopyPaymentLink = async () => {
+		if (payment.payment_url) {
+			try {
+				await navigator.clipboard.writeText(payment.payment_url);
+				toast.success('Payment link copied to clipboard!');
+			} catch (error) {
+				console.error('Failed to copy payment link:', error);
+				toast.error('Failed to copy payment link. Please try again.');
+			}
+		}
+	};
+
+	// Create menu options based on payment method and availability of payment_url
+	const menuOptions: DropdownMenuOption[] = [];
+
+	// Only add "Copy Link" option for payment links that have a payment_url
+	if (payment.payment_method_type.toUpperCase() === PAYMENT_METHOD_TYPE.PAYMENT_LINK && payment.payment_url) {
+		menuOptions.push({
+			label: 'Copy Link',
+			icon: <Copy className='w-4 h-4' />,
+			onSelect: handleCopyPaymentLink,
+		});
+	}
+
+	// Always show the dropdown menu, even if options array is empty
+	return <DropdownMenu options={menuOptions} />;
+};
 
 const getPaymentMethodIcon = (method: string) => {
 	switch (method.toUpperCase()) {
@@ -74,12 +110,20 @@ const columns: ColumnData<Payment>[] = [
 	},
 	{
 		title: 'Status',
-		render: (payment) => (
-			<Chip
-				label={toSentenceCase(payment.payment_status)}
-				variant={payment.payment_status.toLowerCase() === 'succeeded' ? 'success' : 'failed'}
-			/>
-		),
+		render: (payment) => {
+			const status = payment.payment_status.toUpperCase();
+			let variant: 'warning' | 'success' | 'failed' | 'default' = 'default';
+
+			if (status === 'PENDING' || status === 'PROCESSING' || status === 'INITIATED') {
+				variant = 'warning';
+			} else if (status === 'SUCCEEDED') {
+				variant = 'success';
+			} else if (status === 'FAILED') {
+				variant = 'failed';
+			}
+
+			return <Chip label={toSentenceCase(payment.payment_status)} variant={variant} />;
+		},
 	},
 	{
 		title: 'Payment Method',
@@ -93,6 +137,11 @@ const columns: ColumnData<Payment>[] = [
 	{
 		title: 'Amount',
 		render: (payment) => `${getCurrencySymbol(payment.currency)} ${payment.amount}`,
+	},
+	{
+		title: '',
+		width: 50,
+		render: (payment) => <PaymentTableMenu payment={payment} />,
 	},
 ];
 

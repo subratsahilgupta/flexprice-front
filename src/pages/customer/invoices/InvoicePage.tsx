@@ -80,6 +80,7 @@ const filterOptions: FilterField[] = [
 		options: [
 			{ value: PAYMENT_STATUS.PENDING, label: 'Pending' },
 			{ value: PAYMENT_STATUS.PROCESSING, label: 'Processing' },
+			{ value: PAYMENT_STATUS.INITIATED, label: 'Initiated' },
 			{ value: PAYMENT_STATUS.SUCCEEDED, label: 'Succeeded' },
 			{ value: PAYMENT_STATUS.FAILED, label: 'Failed' },
 			{ value: PAYMENT_STATUS.REFUNDED, label: 'Refunded' },

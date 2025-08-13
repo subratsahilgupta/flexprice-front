@@ -16,8 +16,6 @@ interface StripeConnectionDrawerProps {
 
 interface StripeFormData {
 	name: string;
-	account_id: string;
-	publishable_key: string;
 	secret_key: string;
 	webhook_secret: string;
 }
@@ -28,8 +26,6 @@ const StripeConnectionDrawer: FC<StripeConnectionDrawerProps> = ({ isOpen, onOpe
 
 	const [formData, setFormData] = useState<StripeFormData>({
 		name: '',
-		account_id: '',
-		publishable_key: '',
 		secret_key: '',
 		webhook_secret: '',
 	});
@@ -46,16 +42,12 @@ const StripeConnectionDrawer: FC<StripeConnectionDrawerProps> = ({ isOpen, onOpe
 			if (connection) {
 				setFormData({
 					name: connection.name || '',
-					account_id: connection.account_id || '',
-					publishable_key: connection.publishable_key || '',
 					secret_key: connection.secret_key || '',
 					webhook_secret: connection.webhook_secret || '',
 				});
 			} else {
 				setFormData({
 					name: '',
-					account_id: '',
-					publishable_key: '',
 					secret_key: '',
 					webhook_secret: '',
 				});
@@ -76,9 +68,6 @@ const StripeConnectionDrawer: FC<StripeConnectionDrawerProps> = ({ isOpen, onOpe
 		if (!formData.name.trim()) {
 			newErrors.name = 'Connection name is required';
 		}
-		if (!formData.publishable_key.trim()) {
-			newErrors.publishable_key = 'Publishable key is required';
-		}
 		if (!formData.secret_key.trim()) {
 			newErrors.secret_key = 'Secret key is required';
 		}
@@ -96,8 +85,6 @@ const StripeConnectionDrawer: FC<StripeConnectionDrawerProps> = ({ isOpen, onOpe
 				name: formData.name,
 				provider_type: 'stripe',
 				encrypted_secret_data: {
-					account_id: formData.account_id,
-					publishable_key: formData.publishable_key,
 					secret_key: formData.secret_key,
 					webhook_secret: formData.webhook_secret,
 				},
@@ -165,25 +152,6 @@ const StripeConnectionDrawer: FC<StripeConnectionDrawerProps> = ({ isOpen, onOpe
 					onChange={(value) => handleChange('name', value)}
 					error={errors.name}
 					description='A friendly name to identify this Stripe connection'
-				/>
-
-				<Input
-					label='Account ID (Optional)'
-					placeholder='acct_1234567890'
-					value={formData.account_id}
-					onChange={(value) => handleChange('account_id', value)}
-					error={errors.account_id}
-					description='Your Stripe account ID (optional for direct integrations)'
-				/>
-
-				<Input
-					label='Publishable Key'
-					placeholder='pk_...'
-					type='password'
-					value={formData.publishable_key}
-					onChange={(value) => handleChange('publishable_key', value)}
-					error={errors.publishable_key}
-					description='Your Stripe publishable key from the API keys section'
 				/>
 
 				<Input

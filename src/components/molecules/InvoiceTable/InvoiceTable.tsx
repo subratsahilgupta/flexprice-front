@@ -27,7 +27,9 @@ const getStatusChip = (status: string) => {
 export const getPaymentStatusChip = (status: string) => {
 	switch (status.toUpperCase()) {
 		case PAYMENT_STATUS.PENDING:
-			return <Chip variant='default' label='Pending' />;
+			return <Chip variant='warning' label='Pending' />;
+		case PAYMENT_STATUS.INITIATED:
+			return <Chip variant='warning' label='Initiated' />;
 		case PAYMENT_STATUS.SUCCEEDED:
 			return <Chip variant='success' label='Succeeded' />;
 		case PAYMENT_STATUS.FAILED:
