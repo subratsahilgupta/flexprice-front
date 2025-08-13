@@ -1,15 +1,17 @@
-import { Button, Input, Select, Textarea } from '@/components/atoms';
+import { Button, Input, Select, Textarea, PaymentUrlSuccessDialog } from '@/components/atoms';
 import { FC, useState, useEffect } from 'react';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import { PAYMENT_METHOD_TYPE, PAYMENT_DESTINATION_TYPE, Payment } from '@/models/Payment';
 import PaymentApi from '@/api/PaymentApi';
 import WalletApi from '@/api/WalletApi';
+import ConnectionApi from '@/api/ConnectionApi';
 import { RecordPaymentPayload } from '@/types/dto/Payment';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { LoaderCircleIcon } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ServerError } from '@/core/axios/types';
+import { CONNECTION_PROVIDER_TYPE } from '@/models/Connection';
 
 interface Props {
 	isOpen: boolean;
@@ -28,6 +30,7 @@ interface ValidationErrors {
 	reference_id?: string;
 	description?: string;
 	wallet_id?: string;
+	selected_connection_id?: string;
 	general?: string;
 }
 
@@ -40,6 +43,8 @@ interface PaymentFormData {
 	description?: string;
 	// Wallet fields (optional for CREDITS - backend will auto-select if not provided)
 	wallet_id?: string;
+	// Connection fields (for provider-based payments)
+	selected_connection_id?: string;
 }
 
 const RecordPaymentTopup: FC<Props> = ({
@@ -57,6 +62,15 @@ const RecordPaymentTopup: FC<Props> = ({
 		payment_method_type: '',
 	});
 	const [errors, setErrors] = useState<ValidationErrors>({});
+	const [paymentUrlPopup, setPaymentUrlPopup] = useState<{
+		isOpen: boolean;
+		paymentUrl: string;
+		isCopied: boolean;
+	}>({
+		isOpen: false,
+		paymentUrl: '',
+		isCopied: false,
+	});
 
 	// Fetch customer wallets when CREDITS payment method is selected
 	const { data: wallets } = useQuery({
@@ -64,6 +78,15 @@ const RecordPaymentTopup: FC<Props> = ({
 		queryFn: () => WalletApi.getCustomerWallets({ id: customer_id }),
 		enabled: !!customer_id && formData.payment_method_type === PAYMENT_METHOD_TYPE.CREDITS,
 	});
+
+	// Fetch available connections to determine available payment methods
+	const { data: connectionsResponse } = useQuery({
+		queryKey: ['connections', 'published'],
+		queryFn: () => ConnectionApi.getPublishedConnections(),
+		enabled: isOpen, // Only fetch when the dialog is open
+	});
+
+	const availableConnections = connectionsResponse?.connections || [];
 
 	// Filter wallets by currency and create options
 	const filteredWallets = wallets?.filter((wallet) => wallet.currency === currency) || [];
@@ -84,19 +107,8 @@ const RecordPaymentTopup: FC<Props> = ({
 		}
 	}, [filteredWallets, formData.payment_method_type]);
 
+	// Generate payment method options based on available connections
 	const paymentMethodOptions = [
-		// {
-		// 	label: 'Card',
-		// 	value: PAYMENT_METHOD_TYPE.CARD,
-		// 	disabled: true,
-		// 	description: 'Card payment processing is not available yet',
-		// },
-		// {
-		// 	label: 'ACH',
-		// 	value: PAYMENT_METHOD_TYPE.ACH,
-		// 	disabled: true,
-		// 	description: 'ACH payment processing is not available yet',
-		// },
 		{
 			label: 'Offline',
 			value: PAYMENT_METHOD_TYPE.OFFLINE,
@@ -107,7 +119,34 @@ const RecordPaymentTopup: FC<Props> = ({
 			value: PAYMENT_METHOD_TYPE.CREDITS,
 			description: 'Pay using customer wallet balance',
 		},
+		// Add Payment Link if connections are available
+		...(availableConnections.length > 0
+			? [
+					{
+						label: 'Payment Link',
+						value: PAYMENT_METHOD_TYPE.PAYMENT_LINK,
+						description: 'Generate a payment link for online payment',
+					},
+				]
+			: []),
 	];
+
+	// Generate provider options for Payment Link
+	const providerOptions = availableConnections
+		.map((connection) => {
+			switch (connection.provider_type) {
+				case CONNECTION_PROVIDER_TYPE.STRIPE:
+					return {
+						label: 'Stripe',
+						value: connection.id,
+						description: `Process payment through Stripe (${connection.name})`,
+					};
+				// Add more provider types as needed
+				default:
+					return null;
+			}
+		})
+		.filter((option): option is { label: string; value: string; description: string } => option !== null);
 
 	// Reset form when drawer opens/closes
 	useEffect(() => {
@@ -118,6 +157,7 @@ const RecordPaymentTopup: FC<Props> = ({
 				reference_id: '',
 				description: '',
 				wallet_id: '',
+				selected_connection_id: '',
 			});
 			setErrors({});
 		}
@@ -136,6 +176,11 @@ const RecordPaymentTopup: FC<Props> = ({
 		// Validate payment method type
 		if (!formData.payment_method_type) {
 			newErrors.payment_method_type = 'Payment method is required';
+		}
+
+		// Validate provider selection for Payment Links
+		if (formData.payment_method_type === PAYMENT_METHOD_TYPE.PAYMENT_LINK && !formData.selected_connection_id) {
+			newErrors.selected_connection_id = 'Payment provider is required';
 		}
 
 		// Validate payment method specific fields
@@ -160,6 +205,10 @@ const RecordPaymentTopup: FC<Props> = ({
 					newErrors.wallet_id = `No ${currency} wallets available. Please create a wallet first.`;
 				}
 				break;
+
+			case PAYMENT_METHOD_TYPE.PAYMENT_LINK:
+				// No additional validation needed for Payment Link
+				break;
 		}
 
 		setErrors(newErrors);
@@ -168,6 +217,40 @@ const RecordPaymentTopup: FC<Props> = ({
 
 	const { mutate: recordPayment, isPending } = useMutation({
 		mutationFn: async (): Promise<Payment> => {
+			// Find the selected connection for connection-based payments
+			const selectedConnection = formData.selected_connection_id
+				? availableConnections.find((conn) => conn.id === formData.selected_connection_id)
+				: null;
+
+			// Check if this is a payment link (when a connection is selected, it becomes a payment link)
+			const isPaymentLink = !!selectedConnection;
+
+			// Generate success and cancel URLs for payment links
+			const generatePaymentUrls = (): Record<string, string> => {
+				if (!isPaymentLink) return {};
+
+				const baseUrl = window.location.origin;
+				const currentUrl = window.location.href;
+
+				// Extract the current page URL (for invoices it would be something like:
+				// /customer-management/invoices/inv_123?page=1)
+				let redirectUrl = currentUrl;
+
+				// If destination_type is INVOICE, construct the invoice page URL
+				if (destination_type === 'INVOICE') {
+					const urlParams = new URLSearchParams(window.location.search);
+					const pageParam = urlParams.get('page') || '1';
+					redirectUrl = `${baseUrl}/customer-management/invoices/${destination_id}?page=${pageParam}`;
+				}
+
+				return {
+					success_url: redirectUrl,
+					cancel_url: redirectUrl,
+				};
+			};
+
+			const paymentUrls = generatePaymentUrls();
+
 			const payload: RecordPaymentPayload = {
 				amount: formData.amount,
 				currency,
@@ -177,6 +260,11 @@ const RecordPaymentTopup: FC<Props> = ({
 				process_payment: true,
 				...(formData.payment_method_type === PAYMENT_METHOD_TYPE.CREDITS && {
 					payment_method_id: formData.wallet_id || '',
+				}),
+				// Add payment_gateway for connection-based payments
+				...(selectedConnection && {
+					payment_gateway: selectedConnection.provider_type,
+					payment_method_type: PAYMENT_METHOD_TYPE.PAYMENT_LINK,
 				}),
 				metadata: {
 					// Add description if provided
@@ -192,6 +280,13 @@ const RecordPaymentTopup: FC<Props> = ({
 						formData.wallet_id && {
 							wallet_id: formData.wallet_id,
 						}),
+					// For connection-based payments, add connection info
+					...(selectedConnection && {
+						connection_id: selectedConnection.id,
+						connection_name: selectedConnection.name,
+					}),
+					// For payment links, add success and cancel URLs
+					...paymentUrls,
 				},
 			};
 
@@ -199,8 +294,21 @@ const RecordPaymentTopup: FC<Props> = ({
 		},
 		onSuccess: (payment: Payment) => {
 			toast.success('Payment recorded successfully');
+
+			// If payment has a URL (for payment links), show the popup and close main dialog
+			if (payment.payment_url) {
+				onOpenChange(false); // Close main dialog first
+				setPaymentUrlPopup({
+					isOpen: true,
+					paymentUrl: payment.payment_url,
+					isCopied: false,
+				});
+			} else {
+				// For non-payment-link payments, close the dialog immediately
+				onOpenChange(false);
+			}
+
 			onSuccess?.(payment);
-			onOpenChange(false);
 		},
 		onError: (error: ServerError) => {
 			toast.error(error?.error?.message || 'Failed to record payment. Please try again.');
@@ -212,6 +320,35 @@ const RecordPaymentTopup: FC<Props> = ({
 			return;
 		}
 		recordPayment();
+	};
+
+	const handleCopyUrl = async () => {
+		try {
+			await navigator.clipboard.writeText(paymentUrlPopup.paymentUrl);
+			setPaymentUrlPopup((prev) => ({ ...prev, isCopied: true }));
+			toast.success('Payment URL copied to clipboard!');
+
+			// Reset copy status after 2 seconds
+			setTimeout(() => {
+				setPaymentUrlPopup((prev) => ({ ...prev, isCopied: false }));
+			}, 2000);
+		} catch (error) {
+			console.error('Failed to copy payment URL:', error);
+			toast.error('Failed to copy payment URL. Please try again or copy manually.');
+		}
+	};
+
+	const handleGoToLink = () => {
+		window.open(paymentUrlPopup.paymentUrl, '_blank');
+	};
+
+	const handleCloseUrlPopup = () => {
+		setPaymentUrlPopup({
+			isOpen: false,
+			paymentUrl: '',
+			isCopied: false,
+		});
+		// Don't close main dialog again since it's already closed
 	};
 
 	const renderPaymentMethodFields = () => {
@@ -277,66 +414,100 @@ const RecordPaymentTopup: FC<Props> = ({
 					</div>
 				);
 
+			case PAYMENT_METHOD_TYPE.PAYMENT_LINK:
+				return <div className='space-y-3'>{commonDescriptionField}</div>;
+
 			default:
 				return null;
 		}
 	};
 
 	return (
-		<Dialog open={isOpen} onOpenChange={onOpenChange}>
-			<DialogContent className='bg-white sm:max-w-[500px]'>
-				<DialogHeader>
-					<DialogTitle className='text-lg font-semibold text-[#18181B]'>Record Payment</DialogTitle>
-				</DialogHeader>
-				<div className='space-y-4 py-4'>
-					<Input
-						label='Amount'
-						placeholder='0.00'
-						variant='formatted-number'
-						inputPrefix={getCurrencySymbol(currency)}
-						value={formData.amount.toString()}
-						onChange={(value) => setFormData({ ...formData, amount: Number(value) || 0 })}
-						error={errors.amount}
-						description={max_amount ? `Amount Due:${getCurrencySymbol(currency)}${max_amount}` : undefined}
-					/>
+		<>
+			{/* Main Record Payment Dialog */}
+			<Dialog open={isOpen} onOpenChange={onOpenChange}>
+				<DialogContent className='bg-white sm:max-w-[500px]'>
+					<DialogHeader>
+						<DialogTitle className='text-lg font-semibold text-[#18181B]'>Record Payment</DialogTitle>
+					</DialogHeader>
+					<div className='space-y-4 py-4'>
+						<Input
+							label='Amount'
+							placeholder='0.00'
+							variant='formatted-number'
+							inputPrefix={getCurrencySymbol(currency)}
+							value={formData.amount.toString()}
+							onChange={(value) => setFormData({ ...formData, amount: Number(value) || 0 })}
+							error={errors.amount}
+							description={max_amount ? `Amount Due:${getCurrencySymbol(currency)}${max_amount}` : undefined}
+						/>
 
-					<Select
-						label='Payment Method'
-						placeholder='Select payment method'
-						options={paymentMethodOptions}
-						value={formData.payment_method_type}
-						onChange={(value) =>
-							setFormData({
-								...formData,
-								payment_method_type: value as PAYMENT_METHOD_TYPE,
-								// Reset payment method specific fields when changing method
-								reference_id: '',
-								description: '',
-								wallet_id: '',
-							})
-						}
-						error={errors.payment_method_type}
-					/>
+						<Select
+							label='Payment Method'
+							placeholder='Select payment method'
+							options={paymentMethodOptions}
+							value={formData.payment_method_type}
+							onChange={(value) => {
+								setFormData({
+									...formData,
+									payment_method_type: value as PAYMENT_METHOD_TYPE,
+									selected_connection_id: '', // Reset connection when changing payment method
+									// Reset payment method specific fields when changing method
+									reference_id: '',
+									description: '',
+									wallet_id: '',
+								});
+							}}
+							error={errors.payment_method_type}
+						/>
 
-					{formData.payment_method_type && <div className=''>{renderPaymentMethodFields()}</div>}
+						{/* Provider Selection for Payment Links */}
+						{formData.payment_method_type === PAYMENT_METHOD_TYPE.PAYMENT_LINK && providerOptions.length > 0 && (
+							<Select
+								label='Payment Provider'
+								placeholder='Select payment provider'
+								options={providerOptions}
+								value={formData.selected_connection_id}
+								onChange={(connectionId) => {
+									setFormData({
+										...formData,
+										selected_connection_id: connectionId,
+									});
+								}}
+								error={errors.selected_connection_id}
+							/>
+						)}
 
-					<div className='pt-2 flex justify-end'>
-						<Button variant='outline' onClick={() => onOpenChange(false)} className='mr-2'>
-							Cancel
-						</Button>
-						<Button onClick={handleSubmit} disabled={isPending} isLoading={isPending}>
-							{isPending ? (
-								<>
-									<LoaderCircleIcon className='w-4 h-4 animate-spin mr-2' />
-								</>
-							) : (
-								'Record'
-							)}
-						</Button>
+						{formData.payment_method_type && <div className=''>{renderPaymentMethodFields()}</div>}
+
+						<div className='pt-2 flex justify-end'>
+							<Button variant='outline' onClick={() => onOpenChange(false)} className='mr-2'>
+								Cancel
+							</Button>
+							<Button onClick={handleSubmit} disabled={isPending} isLoading={isPending}>
+								{isPending ? (
+									<>
+										<LoaderCircleIcon className='w-4 h-4 animate-spin mr-2' />
+									</>
+								) : (
+									'Record'
+								)}
+							</Button>
+						</div>
 					</div>
-				</div>
-			</DialogContent>
-		</Dialog>
+				</DialogContent>
+			</Dialog>
+
+			{/* Payment URL Success Popup */}
+			<PaymentUrlSuccessDialog
+				isOpen={paymentUrlPopup.isOpen}
+				paymentUrl={paymentUrlPopup.paymentUrl}
+				isCopied={paymentUrlPopup.isCopied}
+				onClose={handleCloseUrlPopup}
+				onCopyUrl={handleCopyUrl}
+				onGoToLink={handleGoToLink}
+			/>
+		</>
 	);
 };
 

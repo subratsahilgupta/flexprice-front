@@ -9,6 +9,7 @@
 export enum PAYMENT_STATUS {
 	PENDING = 'PENDING',
 	PROCESSING = 'PROCESSING',
+	INITIATED = 'INITIATED',
 	SUCCEEDED = 'SUCCEEDED',
 	FAILED = 'FAILED',
 	REFUNDED = 'REFUNDED',
@@ -20,6 +21,7 @@ export enum PAYMENT_METHOD_TYPE {
 	ACH = 'ACH',
 	OFFLINE = 'OFFLINE',
 	CREDITS = 'CREDITS',
+	PAYMENT_LINK = 'PAYMENT_LINK',
 }
 
 export enum PAYMENT_DESTINATION_TYPE {
@@ -36,6 +38,8 @@ export const formatPaymentStatus = (status: string): string => {
 			return 'Pending';
 		case PAYMENT_STATUS.PROCESSING:
 			return 'Processing';
+		case PAYMENT_STATUS.INITIATED:
+			return 'Initiated';
 		case PAYMENT_STATUS.SUCCEEDED:
 			return 'Succeeded';
 		case PAYMENT_STATUS.FAILED:
@@ -59,6 +63,8 @@ export const formatPaymentMethodType = (type: string): string => {
 			return 'Offline Payment';
 		case PAYMENT_METHOD_TYPE.CREDITS:
 			return 'Credits';
+		case PAYMENT_METHOD_TYPE.PAYMENT_LINK:
+			return 'Payment Link';
 		default:
 			return type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
 	}

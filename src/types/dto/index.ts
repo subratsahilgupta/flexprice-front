@@ -1,5 +1,7 @@
 export type { GetFeaturesPayload, GetFeaturesResponse, GetFeatureByFilterPayload } from './Feature';
 
+export type { GetConnectionsPayload, GetConnectionsResponse, CreateConnectionPayload } from './Connection';
+
 export type { GetEventsPayload, GetEventsResponse, GetUsageByMeterPayload, GetUsageByMeterResponse, FireEventsPayload } from './Events';
 
 export type { GetTasksPayload, GetTasksResponse, AddTaskPayload } from './Task';

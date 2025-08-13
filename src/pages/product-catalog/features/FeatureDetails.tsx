@@ -31,6 +31,38 @@ import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { ENTITY_STATUS } from '@/models/base';
 import { EntitlementResponse } from '@/types/dto';
 import { METER_AGGREGATION_TYPE } from '@/models/Meter';
+import { Price } from '@/models/Price';
+import ChargeValueCell from '@/pages/product-catalog/plans/ChargeValueCell';
+import { PriceApi } from '@/api/PriceApi';
+import { formatBillingPeriodForDisplay, getPriceTypeLabel } from '@/utils/common/helper_functions';
+import { formatInvoiceCadence } from '@/pages/product-catalog/plans/PlanDetailsPage';
+
+const priceColumns: ColumnData<Price>[] = [
+	{
+		title: 'Charge Type',
+		render: (row) => {
+			return <span>{getPriceTypeLabel(row.type)}</span>;
+		},
+	},
+	{
+		title: 'Billing timing ',
+		render(rowData) {
+			return <span>{formatInvoiceCadence(rowData.invoice_cadence as string)}</span>;
+		},
+	},
+	{
+		title: 'Billing Period',
+		render(rowData) {
+			return <span>{formatBillingPeriodForDisplay(rowData.billing_period as string)}</span>;
+		},
+	},
+	{
+		title: 'Value',
+		render(rowData) {
+			return <ChargeValueCell data={rowData} />;
+		},
+	},
+];
 
 const FeatureDetails = () => {
 	const { id: featureId } = useParams() as { id: string };
@@ -47,10 +79,19 @@ const FeatureDetails = () => {
 		queryFn: async () =>
 			await EntitlementApi.getAllEntitlements({
 				feature_ids: [featureId!],
-				expand: 'plans,features',
+				expand: 'plans,features,prices',
 				status: BaseEntityStatus.PUBLISHED,
 			}),
 		enabled: !!featureId,
+	});
+
+	const { data: linkedPrices } = useQuery({
+		queryKey: ['fetchLinkedPrices', featureId],
+		queryFn: async () =>
+			await PriceApi.ListPrices({
+				meter_ids: [data?.meter?.id || ''],
+			}),
+		enabled: !!data?.meter?.id,
 	});
 
 	const { mutate: archiveFeature, isPending: isArchiving } = useMutation({
@@ -155,6 +196,7 @@ const FeatureDetails = () => {
 	if (isError) {
 		toast.error('Error fetching feature details');
 	}
+
 	return (
 		<Page
 			headingCTA={
@@ -186,6 +228,19 @@ const FeatureDetails = () => {
 					</Card>
 				) : (
 					<NoDataCard title='Linked Plans' subtitle='No plans linked to the feature yet' />
+				)}
+
+				{data?.type === FEATURE_TYPE.METERED && (
+					<div>
+						{linkedPrices?.items?.length && linkedPrices?.items?.length > 0 ? (
+							<Card variant='notched'>
+								<CardHeader title='Linked Prices' />
+								<FlexpriceTable showEmptyRow columns={priceColumns} data={linkedPrices?.items ?? []} variant='no-bordered' />
+							</Card>
+						) : (
+							<NoDataCard title='Linked Prices' subtitle='No prices linked to the feature yet' />
+						)}
+					</div>
 				)}
 				{data?.type === FEATURE_TYPE.METERED && (
 					<Card variant='notched'>

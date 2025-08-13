@@ -6,16 +6,14 @@ import Addon from '@/models/Addon';
 import Feature from '@/models/Feature';
 import { Meter } from '@/models/Meter';
 import { QueryFilter, TimeRangeFilter } from './base';
+import { Pagination } from '@/models/Pagination';
 
 export interface CreateBulkPriceRequest {
 	items: CreatePriceRequest[];
 }
 
-export interface GetAllPricesResponse {
-	prices: Price[];
-	total: number;
-	offset: number;
-	limit: number;
+export interface GetAllPricesResponse extends Pagination {
+	items: Price[];
 }
 
 export interface PriceFilter extends QueryFilter, TimeRangeFilter {
@@ -24,6 +22,7 @@ export interface PriceFilter extends QueryFilter, TimeRangeFilter {
 	entity_ids?: string[];
 	subscription_id?: string;
 	parent_price_id?: string;
+	meter_ids?: string[];
 }
 
 export interface CreatePriceRequest {
