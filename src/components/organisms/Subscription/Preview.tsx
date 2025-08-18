@@ -1,4 +1,4 @@
-import { Price, PRICE_TYPE } from '@/models/Price';
+import { Price, PRICE_TYPE, PRICE_ENTITY_TYPE } from '@/models/Price';
 import { useMemo } from 'react';
 import {
 	formatBillingPeriodForDisplay,
@@ -8,6 +8,7 @@ import {
 } from '@/utils/common/helper_functions';
 import { BILLING_PERIOD } from '@/constants/constants';
 import { BILLING_CYCLE, SubscriptionPhase } from '@/models/Subscription';
+import { INVOICE_CADENCE } from '@/models/Invoice';
 import formatDate from '@/utils/common/format_date';
 import { calculateAnniversaryBillingAnchor, calculateCalendarBillingAnchor } from '@/utils/helpers/subscription';
 import { cn } from '@/lib/utils';
@@ -20,6 +21,9 @@ import { TaxRateOverride } from '@/types/dto/tax';
 import { AddAddonToSubscriptionRequest } from '@/types/dto/Addon';
 import { useQuery } from '@tanstack/react-query';
 import AddonApi from '@/api/AddonApi';
+import TaxApi from '@/api/TaxApi';
+import { TaxRateResponse } from '@/types/dto/tax';
+import { BaseEntityStatus } from '@/types/common';
 
 const PERIOD_DURATION: Record<BILLING_PERIOD, string> = {
 	[BILLING_PERIOD.DAILY]: '1 day',
@@ -43,12 +47,12 @@ interface PreviewProps {
 }
 
 /**
- * Determines if any charge has ADVANCE invoice cadence
+ * Determines if any plan charge has ADVANCE invoice cadence (excludes addon charges)
  */
-// TODO: This is a temporary function to check if any charge has ADVANCE invoice cadence
-// TODO: This should be removed once the invoice cadence is implemented
 const hasAdvanceCharge = (charges: Price[]): boolean => {
-	return charges?.some((charge) => charge.invoice_cadence === 'ADVANCE') ?? false;
+	return (
+		charges?.some((charge) => charge.invoice_cadence === INVOICE_CADENCE.ADVANCE && charge.entity_type === PRICE_ENTITY_TYPE.PLAN) ?? false
+	);
 };
 
 /**
@@ -105,6 +109,7 @@ const calculateTotalWithLineItemCoupons = (
 
 /**
  * Calculates addon total based on addon requests and their prices
+ * Only considers prices with ADVANCE invoice cadence
  */
 const calculateAddonTotal = (
 	addons: AddAddonToSubscriptionRequest[],
@@ -118,12 +123,13 @@ const calculateAddonTotal = (
 	addons.forEach((addonRequest) => {
 		const addon = allAddons.find((a) => a.id === addonRequest.addon_id);
 		if (addon?.prices) {
-			// Find the price that matches the billing period and currency
+			// Find the price that matches the billing period, currency, and is an ADVANCE charge
 			const matchingPrice = addon.prices.find(
 				(price: Price) =>
 					price.billing_period.toLowerCase() === billingPeriod.toLowerCase() &&
 					price.currency.toLowerCase() === currency.toLowerCase() &&
-					price.type === 'FIXED',
+					price.type === 'FIXED' &&
+					price.invoice_cadence === INVOICE_CADENCE.ADVANCE,
 			);
 
 			if (matchingPrice) {
@@ -141,29 +147,49 @@ const calculateAddonTotal = (
 };
 
 /**
- * Calculates tax amount based on tax rate overrides
+ * Calculates tax amount based on tax rate overrides and fetched tax rate data
+ * Tax is calculated on the subtotal amount after discounts are applied
  */
-const calculateTaxAmount = (subtotal: number, taxRateOverrides: TaxRateOverride[], currency: string): number => {
+const calculateTaxAmount = (
+	subtotal: number,
+	taxRateOverrides: TaxRateOverride[],
+	currency: string,
+	taxRates: TaxRateResponse[],
+): number => {
 	if (!taxRateOverrides || taxRateOverrides.length === 0) return 0;
 
 	// Filter tax overrides for the current currency and auto-apply enabled
 	const applicableTaxes = taxRateOverrides.filter((tax) => tax.currency.toLowerCase() === currency.toLowerCase() && tax.auto_apply);
 
-	// For simplicity, we'll assume a basic tax calculation
-	// In a real implementation, you would fetch tax rates and calculate properly
-	// For now, let's assume a 10% tax rate for demo purposes
-	// TODO: Implement proper tax rate fetching and calculation
+	// Calculate total tax amount by matching overrides with actual tax rate data
+	let totalTaxAmount = 0;
 
-	if (applicableTaxes.length > 0) {
-		// For demo purposes, applying a 10% tax
-		return subtotal * 0.1;
+	for (const taxOverride of applicableTaxes) {
+		// Find the corresponding tax rate data using the tax_rate_code
+		const taxRateData = taxRates.find((rate) => rate.code === taxOverride.tax_rate_code);
+
+		if (taxRateData) {
+			// Apply percentage-based tax
+			if (taxRateData.percentage_value !== undefined && taxRateData.percentage_value !== null) {
+				totalTaxAmount += (taxRateData.percentage_value / 100) * subtotal;
+			}
+			// Apply fixed-amount tax
+			else if (taxRateData.fixed_value !== undefined && taxRateData.fixed_value !== null) {
+				totalTaxAmount += taxRateData.fixed_value;
+			}
+		} else {
+			// Tax rate data not found - this could happen if the tax rate was deleted or not published
+			console.warn(`Tax rate data not found for code: ${taxOverride.tax_rate_code}. Skipping tax calculation.`);
+		}
 	}
 
-	return 0;
+	return totalTaxAmount;
 };
 
 /**
  * Component that displays subscription preview information including start date and first invoice details
+ * Shows only ADVANCE charges (charges that will be billed immediately)
+ * Separates plan charges from addon charges to prevent double-counting
  */
 const Preview = ({
 	data,
@@ -190,12 +216,44 @@ const Preview = ({
 		refetchOnWindowFocus: false,
 	});
 
-	const recurringCharges = useMemo(() => data.filter((charge) => charge.type === 'FIXED'), [data]);
+	// Extract unique tax rate codes from overrides to fetch only needed tax rates
+	const taxRateCodes = useMemo(() => {
+		if (!taxRateOverrides || taxRateOverrides.length === 0) return [];
+		return [...new Set(taxRateOverrides.map((override) => override.tax_rate_code))];
+	}, [taxRateOverrides]);
 
+	// Fetch tax rates data for calculation
+	const { data: allTaxRates = [] } = useQuery({
+		queryKey: ['publishedTaxRates', taxRateCodes],
+		queryFn: async () => {
+			const response = await TaxApi.listTaxRates({
+				limit: 1000,
+				status: BaseEntityStatus.PUBLISHED,
+			});
+			// Filter to only return tax rates that are referenced in the overrides
+			return response.items.filter((rate) => taxRateCodes.includes(rate.code));
+		},
+		staleTime: 5 * 60 * 1000,
+		refetchOnWindowFocus: false,
+		enabled: taxRateCodes.length > 0, // Only fetch if there are tax rate codes to fetch
+	});
+
+	// Filter to only show PLAN charges with ADVANCE invoice cadence (excludes addon charges to prevent double-counting)
+	const recurringCharges = useMemo(
+		() =>
+			data.filter(
+				(charge) =>
+					charge.type === 'FIXED' && charge.invoice_cadence === INVOICE_CADENCE.ADVANCE && charge.entity_type === PRICE_ENTITY_TYPE.PLAN,
+			),
+		[data],
+	);
+
+	// Usage charges are typically billed in arrears, so we include all usage charges
 	const usageCharges = useMemo(() => data.filter((charge) => charge.type === PRICE_TYPE.USAGE), [data]);
 
 	const { total: recurringTotal, totalDiscount: lineItemTotalDiscount } = useMemo(() => {
-		return calculateTotalWithLineItemCoupons(recurringCharges, priceOverrides, lineItemCoupons);
+		const result = calculateTotalWithLineItemCoupons(recurringCharges, priceOverrides, lineItemCoupons);
+		return result;
 	}, [recurringCharges, priceOverrides, lineItemCoupons]);
 
 	// Calculate addon total
@@ -217,20 +275,21 @@ const Preview = ({
 		return Math.max(0, recurringTotal - subscriptionCouponDiscount);
 	}, [recurringTotal, subscriptionCouponDiscount]);
 
-	// Calculate total before tax (plan after discount + addons)
-	const totalBeforeTax = useMemo(() => {
+	// Calculate subtotal after discounts (plan after discounts + addons)
+	const subtotalAfterDiscounts = useMemo(() => {
 		return planSubtotalAfterDiscounts + addonTotal;
 	}, [planSubtotalAfterDiscounts, addonTotal]);
 
-	// Calculate tax amount (applied to plan after discount + addons)
+	// Calculate tax amount (applied to amount after discounts)
+	// Tax is calculated on the final amount after discounts are applied
 	const taxAmount = useMemo(() => {
-		return calculateTaxAmount(totalBeforeTax, taxRateOverrides, currency);
-	}, [totalBeforeTax, taxRateOverrides, currency]);
+		return calculateTaxAmount(subtotalAfterDiscounts, taxRateOverrides, currency, allTaxRates);
+	}, [subtotalAfterDiscounts, taxRateOverrides, currency, allTaxRates]);
 
-	// Calculate final total including tax
+	// Calculate final total: subtotal after discounts + tax
 	const finalTotal = useMemo(() => {
-		return totalBeforeTax + taxAmount;
-	}, [totalBeforeTax, taxAmount]);
+		return subtotalAfterDiscounts + taxAmount;
+	}, [subtotalAfterDiscounts, taxAmount]);
 
 	const firstInvoiceDate = useMemo(() => {
 		return startDate ? calculateFirstInvoiceDate(startDate as Date, billingPeriod, billingCycle) : undefined;
@@ -297,7 +356,7 @@ const Preview = ({
 							</>
 						)}
 
-						{/* Tax */}
+						{/* Tax (calculated on discounted amount) */}
 						{taxAmount > 0 && (
 							<p className='text-sm text-gray-600'>
 								Tax: {getCurrencySymbol(currency || 'USD')}
