@@ -221,15 +221,6 @@ const FeatureDetails = () => {
 
 			<Spacer className='!h-4' />
 			<div className='space-y-6'>
-				{(linkedEntitlements?.items?.length || 0) > 0 ? (
-					<Card variant='notched'>
-						<CardHeader title='Linked Plans' />
-						<FlexpriceTable showEmptyRow columns={columns} data={linkedEntitlements?.items ?? []} variant='no-bordered' />
-					</Card>
-				) : (
-					<NoDataCard title='Linked Plans' subtitle='No plans linked to the feature yet' />
-				)}
-
 				{data?.type === FEATURE_TYPE.METERED && (
 					<div>
 						{linkedPrices?.items?.length && linkedPrices?.items?.length > 0 ? (
@@ -242,6 +233,16 @@ const FeatureDetails = () => {
 						)}
 					</div>
 				)}
+
+				{(linkedEntitlements?.items?.length || 0) > 0 ? (
+					<Card variant='notched'>
+						<CardHeader title='Linked Plans' />
+						<FlexpriceTable showEmptyRow columns={columns} data={linkedEntitlements?.items ?? []} variant='no-bordered' />
+					</Card>
+				) : (
+					<NoDataCard title='Linked Plans' subtitle='No plans linked to the feature yet' />
+				)}
+
 				{data?.type === FEATURE_TYPE.METERED && (
 					<Card variant='notched'>
 						<div className='!space-y-6'>
