@@ -102,7 +102,7 @@ const filterOptions: FilterField[] = [
 	},
 	{
 		field: 'external_customer_id',
-		label: 'Customer ID',
+		label: 'External Customer ID',
 		fieldType: FilterFieldType.INPUT,
 		operators: DEFAULT_OPERATORS_PER_DATA_TYPE[DataType.STRING],
 		dataType: DataType.STRING,
@@ -118,14 +118,14 @@ const filterOptions: FilterField[] = [
 		field: 'start_time',
 		label: 'Start Time',
 		fieldType: FilterFieldType.DATEPICKER,
-		operators: DEFAULT_OPERATORS_PER_DATA_TYPE[DataType.DATE],
+		operators: [FilterOperator.AFTER],
 		dataType: DataType.DATE,
 	},
 	{
 		field: 'end_time',
 		label: 'End Time',
 		fieldType: FilterFieldType.DATEPICKER,
-		operators: DEFAULT_OPERATORS_PER_DATA_TYPE[DataType.DATE],
+		operators: [FilterOperator.BEFORE],
 		dataType: DataType.DATE,
 	},
 ];
@@ -137,17 +137,6 @@ const EventsPage: React.FC = () => {
 	const [loading, setLoading] = useState(false);
 	const [iterLastKey, setIterLastKey] = useState<string | undefined>(undefined);
 	const observer = useRef<IntersectionObserver | null>(null);
-	const [queryData, setQueryData] = useState<{
-		startTime?: string;
-		endTime?: string;
-		externalCustomerId?: string;
-		eventName?: string;
-		eventId?: string;
-		source?: string;
-	}>({
-		startTime: new Date(new Date().setDate(new Date().getDate() - 7)).toISOString(),
-		endTime: new Date().toISOString(),
-	});
 
 	const initialFilters = useMemo(() => {
 		return [
@@ -178,13 +167,6 @@ const EventsPage: React.FC = () => {
 				valueDate: new Date(new Date().setDate(new Date().getDate() - 7)),
 				dataType: DataType.DATE,
 				id: 'initial-start-time',
-			},
-			{
-				field: 'end_time',
-				operator: FilterOperator.BEFORE,
-				valueDate: new Date(),
-				dataType: DataType.DATE,
-				id: 'initial-end-time',
 			},
 			{
 				field: 'source',
@@ -223,20 +205,10 @@ const EventsPage: React.FC = () => {
 		[loading, hasMore],
 	);
 
-	// Convert sanitized filters to API parameters
+	// Convert sanitized filters to API parameters - only include parameters that are actually specified
 	const apiParams = useMemo(() => {
-		const filterParams = convertFiltersToEventParams(sanitizedFilters);
-		// Merge with queryData for backward compatibility
-		return {
-			...filterParams,
-			start_time: filterParams.start_time || queryData?.startTime,
-			end_time: filterParams.end_time || queryData?.endTime,
-			external_customer_id: filterParams.external_customer_id || queryData?.externalCustomerId,
-			event_name: filterParams.event_name || queryData?.eventName,
-			event_id: filterParams.event_id || queryData?.eventId,
-			source: filterParams.source || queryData?.source,
-		};
-	}, [sanitizedFilters, queryData]);
+		return convertFiltersToEventParams(sanitizedFilters);
+	}, [sanitizedFilters]);
 
 	// Fetch events from API
 	const fetchEvents = useCallback(
@@ -273,26 +245,13 @@ const EventsPage: React.FC = () => {
 
 	const resetFilters = () => {
 		setFilters(initialFilters);
-		// Reset queryData as well
-		setQueryData({
-			startTime: new Date(new Date().setDate(new Date().getDate() - 7)).toISOString(),
-			endTime: new Date().toISOString(),
-		});
+		refetchEvents();
 	};
 
 	// Reset pagination when filters change
 	useEffect(() => {
 		reset();
 	}, [sanitizedFilters, sanitizedSorts]);
-
-	useEffect(() => {
-		setEvents([]);
-		setIterLastKey(undefined);
-		setHasMore(true);
-		if (!!queryData.startTime && !!queryData.endTime) {
-			refetchEvents();
-		}
-	}, [queryData]);
 
 	// Refetch events when filters change
 	useEffect(() => {
@@ -301,6 +260,7 @@ const EventsPage: React.FC = () => {
 		setHasMore(true);
 		fetchEvents(undefined);
 	}, [apiParams]);
+
 	return (
 		<Page heading='Events'>
 			<ApiDocsContent tags={['Events']} />
