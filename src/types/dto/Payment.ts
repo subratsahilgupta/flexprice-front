@@ -36,4 +36,5 @@ export interface RecordPaymentPayload {
 	payment_method_type: PAYMENT_METHOD_TYPE;
 	payment_gateway?: string;
 	process_payment?: boolean;
+	recorded_at?: Date;
 }

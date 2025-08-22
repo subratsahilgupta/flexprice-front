@@ -1,4 +1,4 @@
-import { Button, Input, Select, Textarea, PaymentUrlSuccessDialog } from '@/components/atoms';
+import { Button, Input, Select, Textarea, PaymentUrlSuccessDialog, DatePicker } from '@/components/atoms';
 import { FC, useState, useEffect } from 'react';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import { PAYMENT_METHOD_TYPE, PAYMENT_DESTINATION_TYPE, Payment } from '@/models/Payment';
@@ -31,6 +31,7 @@ interface ValidationErrors {
 	description?: string;
 	wallet_id?: string;
 	selected_connection_id?: string;
+	recorded_at?: string;
 	general?: string;
 }
 
@@ -45,6 +46,8 @@ interface PaymentFormData {
 	wallet_id?: string;
 	// Connection fields (for provider-based payments)
 	selected_connection_id?: string;
+	// Recorded at date (for offline payments)
+	recorded_at?: Date;
 }
 
 const RecordPaymentTopup: FC<Props> = ({
@@ -158,6 +161,7 @@ const RecordPaymentTopup: FC<Props> = ({
 				description: '',
 				wallet_id: '',
 				selected_connection_id: '',
+				recorded_at: undefined,
 			});
 			setErrors({});
 		}
@@ -186,6 +190,10 @@ const RecordPaymentTopup: FC<Props> = ({
 		// Validate payment method specific fields
 		switch (formData.payment_method_type) {
 			case PAYMENT_METHOD_TYPE.OFFLINE:
+				// Validate recorded_at for offline payments only if user sets it
+				if (formData.recorded_at && formData.recorded_at > new Date()) {
+					newErrors.recorded_at = 'Recorded date cannot be in the future';
+				}
 				// if (!formData.reference_id?.trim()) {
 				// newErrors.reference_id = 'Reference ID is required for offline payments';
 				// }
@@ -237,7 +245,7 @@ const RecordPaymentTopup: FC<Props> = ({
 				let redirectUrl = currentUrl;
 
 				// If destination_type is INVOICE, construct the invoice page URL
-				if (destination_type === 'INVOICE') {
+				if (destination_type === PAYMENT_DESTINATION_TYPE.INVOICE) {
 					const urlParams = new URLSearchParams(window.location.search);
 					const pageParam = urlParams.get('page') || '1';
 					redirectUrl = `${baseUrl}/customer-management/invoices/${destination_id}?page=${pageParam}`;
@@ -261,6 +269,11 @@ const RecordPaymentTopup: FC<Props> = ({
 				...(formData.payment_method_type === PAYMENT_METHOD_TYPE.CREDITS && {
 					payment_method_id: formData.wallet_id || '',
 				}),
+				// Add recorded_at for offline payments
+				...(formData.payment_method_type === PAYMENT_METHOD_TYPE.OFFLINE &&
+					formData.recorded_at && {
+						recorded_at: formData.recorded_at,
+					}),
 				// Add payment_gateway for connection-based payments
 				...(selectedConnection && {
 					payment_gateway: selectedConnection.provider_type,
@@ -374,6 +387,19 @@ const RecordPaymentTopup: FC<Props> = ({
 							error={errors.reference_id}
 							description='Enter the reference number or payment details from your payment processor.'
 						/>
+						<div className='space-y-2 w-full'>
+							<DatePicker
+								className='w-full'
+								label='Recorded At (Optional)'
+								popoverTriggerClassName='w-full'
+								date={formData.recorded_at}
+								setDate={(date) => setFormData({ ...formData, recorded_at: date })}
+								placeholder='Select when the payment was recorded (optional)'
+								maxDate={new Date()} // Cannot record future payments
+							/>
+							<p className='text-xs text-muted-foreground'>Optionally select the date when this payment was actually received</p>
+							{errors.recorded_at && <p className='text-xs text-red-500'>{errors.recorded_at}</p>}
+						</div>
 						{commonDescriptionField}
 					</div>
 				);
@@ -456,6 +482,7 @@ const RecordPaymentTopup: FC<Props> = ({
 									reference_id: '',
 									description: '',
 									wallet_id: '',
+									recorded_at: undefined,
 								});
 							}}
 							error={errors.payment_method_type}
