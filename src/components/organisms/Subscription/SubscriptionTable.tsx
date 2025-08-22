@@ -20,6 +20,16 @@ export const getSubscriptionStatus = (status: string) => {
 			return <Chip variant='warning' label='Paused' />;
 		case SUBSCRIPTION_STATUS.CANCELLED:
 			return <Chip variant='failed' label='Cancelled' />;
+		case SUBSCRIPTION_STATUS.INCOMPLETE:
+			return <Chip variant='warning' label='Incomplete' />;
+		case SUBSCRIPTION_STATUS.INCOMPLETE_EXPIRED:
+			return <Chip variant='failed' label='Incomplete Expired' />;
+		case SUBSCRIPTION_STATUS.PAST_DUE:
+			return <Chip variant='failed' label='Past Due' />;
+		case SUBSCRIPTION_STATUS.TRIALING:
+			return <Chip variant='warning' label='Trialing' />;
+		case SUBSCRIPTION_STATUS.UNPAID:
+			return <Chip variant='failed' label='Unpaid' />;
 		default:
 			return <Chip variant='default' label='Inactive' />;
 	}
@@ -33,6 +43,16 @@ export const formatSubscriptionStatus = (status: string) => {
 			return 'Paused';
 		case SUBSCRIPTION_STATUS.CANCELLED:
 			return 'Cancelled';
+		case SUBSCRIPTION_STATUS.INCOMPLETE:
+			return 'Incomplete';
+		case SUBSCRIPTION_STATUS.INCOMPLETE_EXPIRED:
+			return 'Incomplete Expired';
+		case SUBSCRIPTION_STATUS.PAST_DUE:
+			return 'Past Due';
+		case SUBSCRIPTION_STATUS.TRIALING:
+			return 'Trialing';
+		case SUBSCRIPTION_STATUS.UNPAID:
+			return 'Unpaid';
 		default:
 			return 'Inactive';
 	}
