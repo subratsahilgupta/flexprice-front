@@ -1,4 +1,4 @@
-import { BILLING_MODEL, Price } from '@/models/Price';
+import { BILLING_MODEL, Price, TIER_MODE } from '@/models/Price';
 import { getPriceTableCharge, calculateDiscountedPrice } from '@/utils/common/price_helpers';
 import { Info } from 'lucide-react';
 import { formatAmount } from '@/components/atoms/Input/Input';
@@ -81,7 +81,9 @@ const ChargeValueCell = ({ data, overriddenAmount, appliedCoupon }: Props) => {
 							sideOffset={5}
 							className='bg-white border border-gray-200 shadow-lg text-sm text-gray-900 px-4 py-3 rounded-lg max-w-[320px]'>
 							<div className='space-y-3'>
-								<div className='font-medium border-b border-spacing-1 border-gray-200 pb-2 text-base text-gray-900'>Tier Pricing</div>
+								<div className='font-medium border-b border-spacing-1 border-gray-200 pb-2 text-base text-gray-900'>
+									{data.tier_mode === TIER_MODE.VOLUME ? 'Volume Pricing' : 'Slab Pricing'}
+								</div>
 								<div className='space-y-2 '>
 									{tiers.map((tier, index) => (
 										<div key={index} className='flex flex-col gap-1'>
