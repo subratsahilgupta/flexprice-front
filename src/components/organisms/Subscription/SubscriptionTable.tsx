@@ -13,7 +13,7 @@ export interface SubscriptionTableProps {
 }
 
 export const getSubscriptionStatus = (status: string) => {
-	switch (status.toUpperCase()) {
+	switch (status) {
 		case SUBSCRIPTION_STATUS.ACTIVE:
 			return <Chip variant='success' label='Active' />;
 		case SUBSCRIPTION_STATUS.PAUSED:
@@ -36,7 +36,7 @@ export const getSubscriptionStatus = (status: string) => {
 };
 
 export const formatSubscriptionStatus = (status: string) => {
-	switch (status.toUpperCase()) {
+	switch (status) {
 		case SUBSCRIPTION_STATUS.ACTIVE:
 			return 'Active';
 		case SUBSCRIPTION_STATUS.PAUSED:
@@ -78,13 +78,13 @@ const SubscriptionTable: FC<SubscriptionTableProps> = ({ data, onRowClick, allow
 		},
 		...(allowRedirect
 			? [
-					{
-						width: '30px',
-						fieldVariant: 'interactive' as const,
-						hideOnEmpty: true,
-						render: (row: Subscription) => <SubscriptionActionButton subscription={row} />,
-					},
-				]
+				{
+					width: '30px',
+					fieldVariant: 'interactive' as const,
+					hideOnEmpty: true,
+					render: (row: Subscription) => <SubscriptionActionButton subscription={row} />,
+				},
+			]
 			: []),
 	];
 
