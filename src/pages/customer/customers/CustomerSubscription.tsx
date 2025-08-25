@@ -70,6 +70,10 @@ export type SubscriptionFormState = {
 
 	// Tax Rate Overrides
 	tax_rate_overrides: TaxRateOverride[];
+
+	// Proration and timezone settings
+	proration_mode: boolean;
+	customer_timezone: string;
 };
 
 // Data Fetching Hooks
@@ -186,6 +190,8 @@ const CustomerSubscription: React.FC = () => {
 		addons: [],
 		customerId: customerId!,
 		tax_rate_overrides: [],
+		proration_mode: false,
+		customer_timezone: 'UTC',
 	});
 
 	// Fetch data using React Query
@@ -286,6 +292,8 @@ const CustomerSubscription: React.FC = () => {
 					addons: [],
 					customerId: customerId!,
 					tax_rate_overrides: [],
+					proration_mode: false,
+					customer_timezone: 'UTC',
 				});
 			}
 		}
@@ -322,6 +330,8 @@ const CustomerSubscription: React.FC = () => {
 			lineItemCoupons,
 			tax_rate_overrides,
 			addons,
+			proration_mode,
+			customer_timezone,
 		} = subscriptionState;
 
 		if (!billingPeriod || !selectedPlan) {
@@ -418,6 +428,10 @@ const CustomerSubscription: React.FC = () => {
 
 			// Tax rate overrides
 			tax_rate_overrides: tax_rate_overrides.length > 0 ? tax_rate_overrides : undefined,
+
+			// Proration and timezone settings with defaults
+			proration_mode: proration_mode ? 'active' : null,
+			customer_timezone: customer_timezone || 'UTC',
 		};
 
 		createSubscription(payload);

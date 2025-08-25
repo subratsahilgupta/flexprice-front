@@ -26,6 +26,7 @@ import { PlanApi } from '@/api/PlanApi';
 import { AddAddonToSubscriptionRequest } from '@/types/dto/Addon';
 import { SubscriptionDiscountTable } from '@/components/molecules';
 import SubscriptionTaxAssociationTable from '@/components/molecules/SubscriptionTaxAssociationTable';
+import { TIMEZONE_OPTIONS } from '@/constants/timezone';
 
 // Helper components
 const BillingCycleSelector = ({
@@ -712,6 +713,34 @@ const SubscriptionForm = ({
 					currency={state.currency}
 					allLineItemCoupons={state.lineItemCoupons}
 				/>
+			)}
+
+			{/* Proration and Timezone Settings - Only show when plan is selected and billing cycle is calendar */}
+			{state.selectedPlan && state.phases.length > 0 && state.phases.some((phase) => phase.billing_cycle === BILLING_CYCLE.CALENDAR) && (
+				<div className='space-y-4 mt-6 pt-4 border-t border-gray-200'>
+					<FormHeader title='Proration Settings' variant='sub-header' />
+
+					{/* Proration Mode Toggle */}
+					<div className='space-y-2'>
+						<Toggle
+							checked={state.proration_mode}
+							onChange={(checked) => setState((prev) => ({ ...prev, proration_mode: checked }))}
+							label='Enable Proration'
+							description='Prorate charges when subscription changes occur'
+							disabled={isDisabled}
+						/>
+					</div>
+
+					{/* Customer Timezone Selection */}
+					<Select
+						value={state.customer_timezone}
+						options={TIMEZONE_OPTIONS}
+						onChange={(value) => setState((prev) => ({ ...prev, customer_timezone: value }))}
+						label='Customer Timezone'
+						placeholder='Select timezone'
+						disabled={isDisabled}
+					/>
+				</div>
 			)}
 		</div>
 	);
