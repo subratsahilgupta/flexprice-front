@@ -15,6 +15,7 @@ import { FEATURE_TYPE } from '@/models/Feature';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import EntitlementApi from '@/api/EntitlementApi';
 import { PlanApi } from '@/api/PlanApi';
+import { PriceApi } from '@/api/PriceApi';
 import formatDate from '@/utils/common/format_date';
 import { getPriceTypeLabel } from '@/utils/common/helper_functions';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -134,6 +135,27 @@ const chargeColumns: ColumnData<Price>[] = [
 		title: 'Value',
 		render(rowData) {
 			return <ChargeValueCell data={rowData} />;
+		},
+	},
+	{
+		fieldVariant: 'interactive',
+		width: '30px',
+		hideOnEmpty: true,
+		render(row) {
+			return (
+				<ActionButton
+					deleteMutationFn={async () => {
+						await PriceApi.DeletePrice(row.id);
+					}}
+					archiveIcon={<Trash2 />}
+					archiveText='Terminate'
+					id={row.id}
+					isEditDisabled={true}
+					isArchiveDisabled={false}
+					refetchQueryKey={'fetchPlan'}
+					entityName='charge'
+				/>
+			);
 		},
 	},
 ];

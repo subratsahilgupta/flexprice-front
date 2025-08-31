@@ -70,32 +70,34 @@ const ActionButton: FC<ActionProps> = ({
 						</button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align='end'>
-						<DropdownMenuItem
-							disabled={isEditDisabled}
-							onSelect={(event) => {
-								event.preventDefault();
-								setIsOpen(false);
-								if (onEdit) {
-									onEdit();
-								} else if (editPath) {
-									navigate(editPath);
-								}
-							}}
-							className='flex gap-2 items-center w-full cursor-pointer'>
-							{editIcon || <Pencil />}
-							<span>{editText || 'Edit'}</span>
-						</DropdownMenuItem>
-						<DropdownMenuItem
-							disabled={isArchiveDisabled}
-							onSelect={(event) => {
-								event.preventDefault();
-								setIsOpen(false);
-								setIsDialogOpen(true);
-							}}
-							className='flex gap-2 items-center w-full cursor-pointer'>
-							{archiveIcon || <EyeOff />}
-							<span>{archiveText || 'Archive'}</span>
-						</DropdownMenuItem>
+						{!isEditDisabled && (
+							<DropdownMenuItem
+								onSelect={(event) => {
+									event.preventDefault();
+									setIsOpen(false);
+									if (onEdit) {
+										onEdit();
+									} else if (editPath) {
+										navigate(editPath);
+									}
+								}}
+								className='flex gap-2 items-center w-full cursor-pointer'>
+								{editIcon || <Pencil />}
+								<span>{editText || 'Edit'}</span>
+							</DropdownMenuItem>
+						)}
+						{!isArchiveDisabled && (
+							<DropdownMenuItem
+								onSelect={(event) => {
+									event.preventDefault();
+									setIsOpen(false);
+									setIsDialogOpen(true);
+								}}
+								className='flex gap-2 items-center w-full cursor-pointer'>
+								{archiveIcon || <EyeOff />}
+								<span>{archiveText || 'Archive'}</span>
+							</DropdownMenuItem>
+						)}
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</div>

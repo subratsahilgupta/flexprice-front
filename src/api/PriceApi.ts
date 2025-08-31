@@ -32,6 +32,6 @@ export class PriceApi {
 	}
 
 	public static async DeletePrice(id: string) {
-		return await AxiosClient.delete(`${this.baseUrl}/${id}`);
+		return await AxiosClient.delete<void>(`${this.baseUrl}/${id}`, {});
 	}
 }

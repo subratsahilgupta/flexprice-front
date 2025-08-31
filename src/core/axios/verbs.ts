@@ -39,8 +39,9 @@ export class AxiosClient {
 		return response as T;
 	}
 
-	public static async delete<T>(url: string): Promise<T> {
-		const response: AxiosResponse<T> = await axiosClient.delete(url);
+	public static async delete<T, D extends DataObject = any>(url: string, data?: D): Promise<T> {
+		const sanitizedData = sanitizeData(data);
+		const response: AxiosResponse<T> = await axiosClient.delete(url, { data: sanitizedData });
 		return response as T;
 	}
 }
