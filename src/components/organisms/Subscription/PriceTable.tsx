@@ -137,20 +137,26 @@ const PriceTable: FC<Props> = ({
 			quantity: (() => {
 				if (price.type === PRICE_TYPE.FIXED) return '1';
 
-				// Check if there's a package override with quantity
 				const override = overriddenPrices[price.id];
-				if (override?.billing_model === BILLING_MODEL.PACKAGE && override?.quantity) {
-					return override.quantity.toString();
+
+				// PRIORITY 1: Check for any package overrides first (including transform_quantity)
+				if (override?.billing_model === BILLING_MODEL.PACKAGE) {
+					if (override?.quantity) {
+						return override.quantity.toString();
+					}
+					if (override?.transform_quantity) {
+						return `${override.transform_quantity.divide_by} units`;
+					}
 				}
 
-				// Check if original price is package type
+				// PRIORITY 2: Check for transform_quantity overrides even when billing model hasn't changed
+				if (override?.transform_quantity && price.billing_model === BILLING_MODEL.PACKAGE) {
+					return `${override.transform_quantity.divide_by} units`;
+				}
+
+				// PRIORITY 3: Show original package transform_quantity if no overrides
 				if (price.billing_model === BILLING_MODEL.PACKAGE && price.transform_quantity) {
 					return `${price.transform_quantity.divide_by} units`;
-				}
-
-				// Check if override changes to package type
-				if (override?.billing_model === BILLING_MODEL.PACKAGE && override?.transform_quantity) {
-					return `${override.transform_quantity.divide_by} units`;
 				}
 
 				return 'pay as you go';

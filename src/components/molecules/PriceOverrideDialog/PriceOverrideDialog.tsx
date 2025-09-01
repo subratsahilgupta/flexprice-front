@@ -132,7 +132,8 @@ const PriceOverrideDialog: FC<Props> = ({ isOpen, onOpenChange, price, onPriceOv
 				},
 			]);
 		}
-		setOverrideTransformQuantity({ divide_by: 1 });
+		// Reset transform_quantity to original value or default
+		setOverrideTransformQuantity(price.transform_quantity || { divide_by: 1, round: 'up' });
 		setIsOverridden(false);
 	};
 
@@ -143,7 +144,7 @@ const PriceOverrideDialog: FC<Props> = ({ isOpen, onOpenChange, price, onPriceOv
 			setOverrideQuantity(currentOverride.quantity);
 			setOverrideBillingModel(currentOverride.billing_model || price.billing_model);
 			setOverrideTiers(currentOverride.tiers || []);
-			setOverrideTransformQuantity(currentOverride.transform_quantity || { divide_by: 1 });
+			setOverrideTransformQuantity(currentOverride.transform_quantity || { divide_by: 1, round: 'up' });
 		} else {
 			setOverrideAmount('');
 			setOverrideQuantity(undefined);
@@ -165,7 +166,8 @@ const PriceOverrideDialog: FC<Props> = ({ isOpen, onOpenChange, price, onPriceOv
 					},
 				]);
 			}
-			setOverrideTransformQuantity({ divide_by: 1 });
+			// Reset to original transform_quantity or default
+			setOverrideTransformQuantity(price.transform_quantity || { divide_by: 1, round: 'up' });
 		}
 		onOpenChange(false);
 	};
@@ -260,10 +262,10 @@ const PriceOverrideDialog: FC<Props> = ({ isOpen, onOpenChange, price, onPriceOv
 
 												if (index === 0) {
 													from = 0;
-													up_to = overrideTiers.length > 1 ? overrideTiers[1]?.up_to || 1 : null;
+													up_to = overrideTiers[0]?.up_to || null;
 												} else {
 													from = overrideTiers[index - 1]?.up_to || 0;
-													up_to = index < overrideTiers.length - 1 ? overrideTiers[index + 1]?.up_to || null : null;
+													up_to = overrideTiers[index]?.up_to || null;
 												}
 
 												return {
@@ -293,17 +295,12 @@ const PriceOverrideDialog: FC<Props> = ({ isOpen, onOpenChange, price, onPriceOv
 
 									// Convert the PriceTier format to CreatePriceTier format
 									// and properly handle the from/up_to values
-									const convertedTiers = newTiers.map((tier: any, index: number) => {
-										// Calculate proper up_to value for the CreatePriceTier format
-										let up_to: number | null = null;
-										if (index < newTiers.length - 1) {
-											up_to = newTiers[index + 1]?.from || null;
-										}
-
+									const convertedTiers = newTiers.map((tier) => {
+										// Use the tier's own up_to value directly
 										return {
 											unit_amount: tier.unit_amount || '',
 											flat_amount: tier.flat_amount || '0',
-											up_to,
+											up_to: tier.up_to,
 										};
 									});
 									setOverrideTiers(convertedTiers);
@@ -332,6 +329,10 @@ const PriceOverrideDialog: FC<Props> = ({ isOpen, onOpenChange, price, onPriceOv
 									placeholder='Enter units per package'
 									className='w-full'
 								/>
+								{/* Show original transform quantity if it exists and is different */}
+								{price.transform_quantity && (
+									<div className='text-xs text-gray-500'>Original: {price.transform_quantity.divide_by} units per package</div>
+								)}
 							</div>
 						</div>
 					)}
