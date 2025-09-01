@@ -156,7 +156,7 @@ const PlanChargesTable: FC<PlanChargesTableProps> = ({ plan, onPriceUpdate }) =>
 			},
 		},
 		{
-			title: 'Billing timing ',
+			title: 'Billing Timing',
 			render(rowData) {
 				return <span>{formatInvoiceCadence(rowData.invoice_cadence as string)}</span>;
 			},
