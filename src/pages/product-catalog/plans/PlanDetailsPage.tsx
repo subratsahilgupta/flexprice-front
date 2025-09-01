@@ -10,14 +10,11 @@ import {
 } from '@/components/molecules';
 import { DetailsCard } from '@/components/molecules';
 import { RouteNames } from '@/core/routes/Routes';
-import { Price } from '@/models/Price';
 import { FEATURE_TYPE } from '@/models/Feature';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import EntitlementApi from '@/api/EntitlementApi';
 import { PlanApi } from '@/api/PlanApi';
-import { PriceApi } from '@/api/PriceApi';
 import formatDate from '@/utils/common/format_date';
-import { getPriceTypeLabel } from '@/utils/common/helper_functions';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { EyeOff, Plus, Pencil, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -27,8 +24,6 @@ import { Card } from '@/components/atoms';
 import formatChips from '@/utils/common/format_chips';
 import { getFeatureTypeChips } from '@/components/molecules/CustomerUsageTable/CustomerUsageTable';
 import { formatAmount } from '@/components/atoms/Input/Input';
-import ChargeValueCell from './ChargeValueCell';
-import { BILLING_PERIOD } from '@/constants/constants';
 import { Entitlement } from '@/models/Entitlement';
 import { ENTITY_STATUS } from '@/models/base';
 import {
@@ -44,6 +39,7 @@ import { formatExpirationPeriod } from '@/pages/customer/customers/SubscriptionD
 import CreditGrantApi from '@/api/CreditGrantApi';
 import { ENTITLEMENT_ENTITY_TYPE } from '@/models/Entitlement';
 import { EntitlementResponse } from '@/types/dto';
+import { PlanChargesTable } from '@/components/organisms';
 
 const creditGrantColumns: ColumnData<CreditGrant>[] = [
 	{
@@ -72,25 +68,6 @@ const creditGrantColumns: ColumnData<CreditGrant>[] = [
 	},
 ];
 
-const formatBillingPeriod = (billingPeriod: string) => {
-	switch (billingPeriod.toUpperCase()) {
-		case BILLING_PERIOD.DAILY:
-			return 'Daily';
-		case BILLING_PERIOD.WEEKLY:
-			return 'Weekly';
-		case BILLING_PERIOD.MONTHLY:
-			return 'Monthly';
-		case BILLING_PERIOD.ANNUAL:
-			return 'Yearly';
-		case BILLING_PERIOD.QUARTERLY:
-			return 'Quarterly';
-		case BILLING_PERIOD.HALF_YEARLY:
-			return 'Half Yearly';
-		default:
-			return '--';
-	}
-};
-
 export const formatInvoiceCadence = (cadence: string): string => {
 	switch (cadence.toUpperCase()) {
 		case 'ADVANCE':
@@ -105,61 +82,6 @@ export const formatInvoiceCadence = (cadence: string): string => {
 type Params = {
 	planId: string;
 };
-
-const chargeColumns: ColumnData<Price>[] = [
-	{
-		title: 'Charge Type',
-		render: (row) => {
-			return <span>{getPriceTypeLabel(row.type)}</span>;
-		},
-	},
-	{
-		title: 'Feature',
-		render(rowData) {
-			return <span>{rowData.meter?.name ?? '--'}</span>;
-		},
-	},
-	{
-		title: 'Billing timing ',
-		render(rowData) {
-			return <span>{formatInvoiceCadence(rowData.invoice_cadence as string)}</span>;
-		},
-	},
-	{
-		title: 'Billing Period',
-		render(rowData) {
-			return <span>{formatBillingPeriod(rowData.billing_period as string)}</span>;
-		},
-	},
-	{
-		title: 'Value',
-		render(rowData) {
-			return <ChargeValueCell data={rowData} />;
-		},
-	},
-	{
-		fieldVariant: 'interactive',
-		width: '30px',
-		hideOnEmpty: true,
-		render(row) {
-			return (
-				<ActionButton
-					deleteMutationFn={async () => {
-						await PriceApi.DeletePrice(row.id);
-					}}
-					archiveIcon={<Trash2 />}
-					archiveText='Terminate'
-					id={row.id}
-					isEditDisabled={true}
-					isArchiveDisabled={false}
-					refetchQueryKey={'fetchPlan'}
-					entityName='charge'
-				/>
-			);
-		},
-	},
-];
-
 const getFeatureValue = (entitlement: Entitlement) => {
 	const value = entitlement.usage_limit?.toFixed() || '';
 
@@ -404,29 +326,7 @@ const PlanDetailsPage = () => {
 				<DetailsCard variant='stacked' title='Plan Details' data={planDetails} />
 
 				{/* plan charges table */}
-				{(planData?.prices?.length ?? 0) > 0 ? (
-					<Card variant='notched'>
-						<CardHeader
-							title='Charges'
-							cta={
-								<Button prefixIcon={<Plus />} onClick={() => navigate(`${RouteNames.plan}/${planId}/add-charges`)}>
-									Add
-								</Button>
-							}
-						/>
-						<FlexpriceTable columns={chargeColumns} data={planData?.prices ?? []} />
-					</Card>
-				) : (
-					<NoDataCard
-						title='Charges'
-						subtitle='No charges added to the plan yet'
-						cta={
-							<Button prefixIcon={<Plus />} onClick={() => navigate(`${RouteNames.plan}/${planId}/add-charges`)}>
-								Add
-							</Button>
-						}
-					/>
-				)}
+				<PlanChargesTable plan={planData} onPriceUpdate={() => queryClient.invalidateQueries({ queryKey: ['fetchPlan', planId] })} />
 
 				{planData.entitlements?.length || 0 > 0 ? (
 					<Card variant='notched'>
