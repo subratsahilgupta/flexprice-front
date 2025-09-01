@@ -72,7 +72,7 @@ const SubscriptionWithOverrides: FC<Props> = ({ prices, onCreateSubscription, cl
 						<div className='flex-1'>
 							<h4 className='font-medium text-blue-900 mb-2'>Price Overrides Applied</h4>
 							<div className='space-y-2'>
-								{Object.entries(overriddenPrices).map(([priceId, newAmount]) => {
+								{Object.entries(overriddenPrices).map(([priceId, override]) => {
 									const price = prices.find((p) => p.id === priceId);
 									if (!price) return null;
 
@@ -80,7 +80,7 @@ const SubscriptionWithOverrides: FC<Props> = ({ prices, onCreateSubscription, cl
 										<div key={priceId} className='flex items-center justify-between text-sm'>
 											<span className='text-blue-800'>{price.meter?.name || price.description || 'Charge'}</span>
 											<span className='text-blue-700 font-medium'>
-												{price.currency} {price.amount} → {price.currency} {newAmount}
+												{price.currency} {price.amount} → {price.currency} {override.amount || price.amount}
 											</span>
 										</div>
 									);

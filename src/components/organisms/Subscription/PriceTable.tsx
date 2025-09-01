@@ -1,7 +1,8 @@
 import { FC, useState, useMemo } from 'react';
-import { ColumnData, FlexpriceTable, PriceOverrideDialog, LineItemCoupon } from '@/components/molecules';
-import { Price, BILLING_MODEL } from '@/models/Price';
-import { ChevronDownIcon, ChevronUpIcon, Pencil, EyeOff, RotateCcw, Tag } from 'lucide-react';
+import { ColumnData, FlexpriceTable, LineItemCoupon } from '@/components/molecules';
+import PriceOverrideDialog from '@/components/molecules/PriceOverrideDialog/PriceOverrideDialog';
+import { Price } from '@/models/Price';
+import { ChevronDownIcon, ChevronUpIcon, Pencil, RotateCcw, Tag } from 'lucide-react';
 import { FormHeader } from '@/components/atoms';
 import { motion } from 'framer-motion';
 import ChargeValueCell from '@/pages/product-catalog/plans/ChargeValueCell';
@@ -9,14 +10,15 @@ import { capitalize } from 'es-toolkit';
 import { Coupon } from '@/models/Coupon';
 import { BsThreeDots } from 'react-icons/bs';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { ExtendedPriceOverride } from '@/utils/common/price_override_helpers';
 
 export interface Props {
 	data: Price[];
 	billingPeriod?: string;
 	currency?: string;
-	onPriceOverride?: (priceId: string, newAmount: string) => void;
+	onPriceOverride?: (priceId: string, override: Partial<ExtendedPriceOverride>) => void;
 	onResetOverride?: (priceId: string) => void;
-	overriddenPrices?: Record<string, string>;
+	overriddenPrices?: Record<string, ExtendedPriceOverride>;
 	lineItemCoupons?: Record<string, Coupon>;
 	onLineItemCouponsChange?: (priceId: string, coupon: Coupon | null) => void;
 	disabled?: boolean;
@@ -81,8 +83,7 @@ const PriceTable: FC<Props> = ({
 	// Custom action component for price rows
 	const PriceActionMenu: FC<{ price: Price }> = ({ price }) => {
 		const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-		const isOverridable = price.billing_model === BILLING_MODEL.FLAT_FEE || price.billing_model === BILLING_MODEL.PACKAGE;
-		const appliedCoupon = lineItemCoupons[price.id];
+		// Now all billing models are overridable with the new comprehensive dialog
 		const isOverridden = overriddenPrices[price.id] !== undefined;
 
 		const handleClick = (e: React.MouseEvent) => {
@@ -99,61 +100,22 @@ const PriceTable: FC<Props> = ({
 							<BsThreeDots className='text-base size-4' />
 						</button>
 					</DropdownMenuTrigger>
-					<DropdownMenuContent align='end'>
-						{isOverridable && (
-							<DropdownMenuItem
-								disabled={disabled}
-								onSelect={(event) => {
-									event.preventDefault();
-									setIsDropdownOpen(false);
-									handleOverride(price);
-								}}
-								className='flex gap-2 items-center w-full cursor-pointer'>
-								<Pencil size={16} />
-								<span>Override Price</span>
+					<DropdownMenuContent align='end' className='w-48'>
+						<DropdownMenuItem onClick={() => handleOverride(price)}>
+							<Pencil className='mr-2 h-4 w-4' />
+							{isOverridden ? 'Edit Override' : 'Override Price'}
+						</DropdownMenuItem>
+						{isOverridden && (
+							<DropdownMenuItem onClick={() => onResetOverride?.(price.id)}>
+								<RotateCcw className='mr-2 h-4 w-4' />
+								Reset Override
 							</DropdownMenuItem>
 						)}
-						{isOverridable && isOverridden && (
-							<DropdownMenuItem
-								disabled={disabled}
-								onSelect={(event) => {
-									event.preventDefault();
-									setIsDropdownOpen(false);
-									onResetOverride?.(price.id);
-								}}
-								className='flex gap-2 items-center w-full cursor-pointer text-orange-600'>
-								<RotateCcw size={16} />
-								<span>Reset Override</span>
-							</DropdownMenuItem>
-						)}
-						{/* Only show coupon options if price is NOT overridden */}
 						{!isOverridden && (
-							<>
-								<DropdownMenuItem
-									disabled={disabled}
-									onSelect={(event) => {
-										event.preventDefault();
-										setIsDropdownOpen(false);
-										setCouponModalState({ isOpen: true, priceId: price.id });
-									}}
-									className='flex gap-2 items-center w-full cursor-pointer'>
-									<Tag size={16} />
-									<span>{appliedCoupon ? 'Change Coupon' : 'Apply Coupon'}</span>
-								</DropdownMenuItem>
-								{appliedCoupon && (
-									<DropdownMenuItem
-										disabled={disabled}
-										onSelect={(event) => {
-											event.preventDefault();
-											setIsDropdownOpen(false);
-											onLineItemCouponsChange?.(price.id, null);
-										}}
-										className='flex gap-2 items-center w-full cursor-pointer text-red-600'>
-										<EyeOff size={16} />
-										<span>Remove Coupon</span>
-									</DropdownMenuItem>
-								)}
-							</>
+							<DropdownMenuItem onClick={() => setCouponModalState({ isOpen: true, priceId: price.id })}>
+								<Tag className='mr-2 h-4 w-4' />
+								Apply Coupon
+							</DropdownMenuItem>
 						)}
 					</DropdownMenuContent>
 				</DropdownMenu>
@@ -176,8 +138,9 @@ const PriceTable: FC<Props> = ({
 			price: (
 				<ChargeValueCell
 					data={{ ...price, currency: price.currency } as any}
-					overriddenAmount={isOverridden ? overriddenPrices[price.id] : undefined}
+					overriddenAmount={isOverridden ? overriddenPrices[price.id]?.amount : undefined}
 					appliedCoupon={appliedCoupon}
+					priceOverride={isOverridden ? overriddenPrices[price.id] : undefined}
 				/>
 			),
 			invoice_cadence: price.invoice_cadence,
@@ -245,7 +208,7 @@ const PriceTable: FC<Props> = ({
 				</div>
 			)}
 
-			{/* Price Override Dialog */}
+			{/* Comprehensive Price Override Dialog */}
 			{selectedPrice && (
 				<PriceOverrideDialog
 					isOpen={isDialogOpen}

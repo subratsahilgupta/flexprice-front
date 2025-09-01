@@ -6,23 +6,55 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import { Coupon } from '@/models/Coupon';
 import formatCouponName from '@/utils/common/format_coupon_name';
+import { ExtendedPriceOverride } from '@/utils/common/price_override_helpers';
 
 interface Props {
 	data: Price;
 	overriddenAmount?: string;
 	appliedCoupon?: Coupon | null;
+	priceOverride?: ExtendedPriceOverride; // Add this to get full override details
 }
 
-const ChargeValueCell = ({ data, overriddenAmount, appliedCoupon }: Props) => {
+const ChargeValueCell = ({ data, overriddenAmount, appliedCoupon, priceOverride }: Props) => {
 	// Use overridden amount if provided, otherwise use original price
 	const priceData = overriddenAmount ? { ...data, amount: overriddenAmount } : data;
-	const price = getPriceTableCharge(priceData as any, false);
-	const tiers = data.tiers as unknown as Array<{
-		up_to: number | null;
-		unit_amount: string;
-		flat_amount: string;
-	}> | null;
-	const isTiered = data.billing_model === BILLING_MODEL.TIERED && Array.isArray(tiers) && tiers.length > 0;
+
+	// If we have tiered overrides, create a custom display instead of using getPriceTableCharge
+	let price: React.ReactNode;
+	if (
+		priceOverride?.tiers &&
+		priceOverride.tiers.length > 0 &&
+		(priceOverride.billing_model === BILLING_MODEL.TIERED || priceOverride.billing_model === 'SLAB_TIERED')
+	) {
+		// Show tiered pricing information
+		const firstTier = priceOverride.tiers[0];
+		const currencySymbol = getCurrencySymbol(data.currency);
+		price = (
+			<div>
+				starts at {currencySymbol}
+				{formatAmount(firstTier.unit_amount || '0')} per unit
+			</div>
+		);
+	} else {
+		// Use normal price display
+		price = getPriceTableCharge(priceData as any, false);
+	}
+
+	// Determine which tiers to show - overridden or original
+	const tiers =
+		priceOverride?.tiers ||
+		(data.tiers as unknown as Array<{
+			up_to: number | null;
+			unit_amount: string;
+			flat_amount: string;
+		}> | null);
+
+	// Determine billing model and tier mode - use overridden values if available
+	const effectiveBillingModel = priceOverride?.billing_model || data.billing_model;
+	const effectiveTierMode = priceOverride?.tier_mode || data.tier_mode;
+
+	const isTiered =
+		(effectiveBillingModel === BILLING_MODEL.TIERED || effectiveBillingModel === 'SLAB_TIERED') && Array.isArray(tiers) && tiers.length > 0;
 
 	// Calculate discount if coupon is applied and price is not overridden
 	const discountInfo = !overriddenAmount && appliedCoupon ? calculateDiscountedPrice(data, appliedCoupon) : null;
@@ -37,6 +69,15 @@ const ChargeValueCell = ({ data, overriddenAmount, appliedCoupon }: Props) => {
 		}
 		return `${from} - ${tier.up_to}`;
 	};
+
+	// Check if there are any overrides beyond just amount
+	const hasOverrides =
+		priceOverride &&
+		(priceOverride.billing_model !== undefined ||
+			priceOverride.tier_mode !== undefined ||
+			priceOverride.tiers !== undefined ||
+			priceOverride.quantity !== undefined ||
+			priceOverride.transform_quantity !== undefined);
 
 	return (
 		<div className='flex items-center gap-2'>
@@ -71,6 +112,55 @@ const ChargeValueCell = ({ data, overriddenAmount, appliedCoupon }: Props) => {
 				// Show normal price
 				<div>{price}</div>
 			)}
+
+			{/* Show override indicator if there are overrides */}
+			{hasOverrides && (
+				<TooltipProvider delayDuration={0}>
+					<Tooltip>
+						<TooltipTrigger>
+							<Info className='h-4 w-4 text-orange-500 hover:text-orange-600 transition-colors duration-150' />
+						</TooltipTrigger>
+						<TooltipContent
+							sideOffset={5}
+							className='bg-white border border-gray-200 shadow-lg text-sm text-gray-900 px-4 py-3 rounded-lg max-w-[300px]'>
+							<div className='space-y-2'>
+								<div className='font-medium text-base text-gray-900'>Price Override Applied</div>
+								<div className='text-sm text-gray-600'>
+									{/* Show original vs overridden pricing */}
+									{priceOverride?.tiers &&
+									priceOverride.tiers.length > 0 &&
+									(priceOverride.billing_model === BILLING_MODEL.TIERED || priceOverride.billing_model === 'SLAB_TIERED') ? (
+										<div>
+											<div>
+												Original: {getCurrencySymbol(data.currency)}
+												{formatAmount(data.amount)}
+											</div>
+											<div>
+												Now: starts at {getCurrencySymbol(data.currency)}
+												{formatAmount(priceOverride.tiers[0]?.unit_amount || '0')} per unit
+											</div>
+										</div>
+									) : priceOverride?.amount ? (
+										<div>
+											<div>
+												Original: {getCurrencySymbol(data.currency)}
+												{formatAmount(data.amount)}
+											</div>
+											<div>
+												Now: {getCurrencySymbol(data.currency)}
+												{formatAmount(priceOverride.amount)}
+											</div>
+										</div>
+									) : (
+										<div>Price configuration modified</div>
+									)}
+								</div>
+							</div>
+						</TooltipContent>
+					</Tooltip>
+				</TooltipProvider>
+			)}
+
 			{isTiered && (
 				<TooltipProvider delayDuration={0}>
 					<Tooltip>
@@ -82,7 +172,8 @@ const ChargeValueCell = ({ data, overriddenAmount, appliedCoupon }: Props) => {
 							className='bg-white border border-gray-200 shadow-lg text-sm text-gray-900 px-4 py-3 rounded-lg max-w-[320px]'>
 							<div className='space-y-3'>
 								<div className='font-medium border-b border-spacing-1 border-gray-200 pb-2 text-base text-gray-900'>
-									{data.tier_mode === TIER_MODE.VOLUME ? 'Volume' : 'Slab'} Tier Pricing
+									{effectiveTierMode === TIER_MODE.VOLUME ? 'Volume' : 'Slab'} Tier Pricing
+									{hasOverrides && <span className='text-xs text-orange-600 ml-2'>(Overridden)</span>}
 								</div>
 								<div className='space-y-2 '>
 									{tiers.map((tier, index) => (
@@ -97,7 +188,7 @@ const ChargeValueCell = ({ data, overriddenAmount, appliedCoupon }: Props) => {
 													{Number(tier.flat_amount) > 0 && (
 														<div className='text-xs text-gray-500'>
 															+ {getCurrencySymbol(data.currency)}
-															{formatAmount(tier.flat_amount)} flat fee
+															{formatAmount(tier.flat_amount || '0')} flat fee
 														</div>
 													)}
 												</div>

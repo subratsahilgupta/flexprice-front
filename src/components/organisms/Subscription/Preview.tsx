@@ -1,4 +1,4 @@
-import { Price, PRICE_TYPE } from '@/models/Price';
+import { Price } from '@/models/Price';
 import { useMemo } from 'react';
 import {
 	formatBillingPeriodForDisplay,
@@ -15,7 +15,7 @@ import { Calendar, Receipt } from 'lucide-react';
 import TimelinePreview, { PreviewTimelineItem } from './TimelinePreview';
 import { ExpandedPlan } from '@/types/plan';
 import { Coupon } from '@/models/Coupon';
-import { getCurrentPriceAmount } from '@/utils/common/price_override_helpers';
+import { ExtendedPriceOverride, getCurrentPriceAmount } from '@/utils/common/price_override_helpers';
 import { TaxRateOverride } from '@/types/dto/tax';
 import { AddAddonToSubscriptionRequest } from '@/types/dto/Addon';
 import { useQuery } from '@tanstack/react-query';
@@ -36,7 +36,7 @@ interface PreviewProps {
 	selectedPlan?: ExpandedPlan | null;
 	phases: SubscriptionPhase[];
 	coupons?: Coupon[];
-	priceOverrides?: Record<string, string>;
+	priceOverrides?: Record<string, ExtendedPriceOverride>;
 	lineItemCoupons?: Record<string, Coupon>;
 	taxRateOverrides?: TaxRateOverride[];
 	addons?: AddAddonToSubscriptionRequest[];
@@ -73,7 +73,7 @@ const calculateFirstInvoiceDate = (startDate: Date, billingPeriod: BILLING_PERIO
  */
 const calculateTotalWithLineItemCoupons = (
 	charges: Price[],
-	priceOverrides: Record<string, string>,
+	priceOverrides: Record<string, ExtendedPriceOverride>,
 	lineItemCoupons: Record<string, Coupon>,
 ): { total: number; lineItemDiscounts: Record<string, number>; totalDiscount: number } => {
 	let total = 0;
@@ -191,8 +191,6 @@ const Preview = ({
 	});
 
 	const recurringCharges = useMemo(() => data.filter((charge) => charge.type === 'FIXED'), [data]);
-
-	const usageCharges = useMemo(() => data.filter((charge) => charge.type === PRICE_TYPE.USAGE), [data]);
 
 	const { total: recurringTotal, totalDiscount: lineItemTotalDiscount } = useMemo(() => {
 		return calculateTotalWithLineItemCoupons(recurringCharges, priceOverrides, lineItemCoupons);
@@ -345,12 +343,9 @@ const Preview = ({
 	}, [
 		phases,
 		firstInvoiceDate,
-		recurringCharges,
-		usageCharges,
 		recurringTotal,
 		addonTotal,
 		addonDetails,
-		planSubtotalAfterDiscounts,
 		billingDescription,
 		coupons,
 		lineItemCoupons,
