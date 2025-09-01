@@ -7,6 +7,7 @@ import { QueryFilter, TimeRangeFilter } from './base';
 import { Subscription } from '@/models/Subscription';
 import { Pagination } from '@/models/Pagination';
 import { AddAddonToSubscriptionRequest } from './Addon';
+import { BILLING_MODEL, TIER_MODE, CreatePriceTier, TransformQuantity } from '@/models/Price';
 
 // Re-export existing enums for convenience
 export { BILLING_PERIOD } from '@/constants/constants';
@@ -155,5 +156,9 @@ export interface SubscriptionLineItemOverrideRequest {
 	price_id: string;
 	quantity?: number;
 	amount?: number;
+	billing_model?: BILLING_MODEL;
+	tier_mode?: TIER_MODE;
+	tiers?: CreatePriceTier[];
+	transform_quantity?: TransformQuantity;
 	tax_rate_overrides?: TaxRateOverride[];
 }

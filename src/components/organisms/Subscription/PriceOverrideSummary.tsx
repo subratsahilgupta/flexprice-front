@@ -15,6 +15,40 @@ interface Props {
 const PriceOverrideSummary: FC<Props> = ({ overrides, prices, className }) => {
 	if (overrides.length === 0) return null;
 
+	const getOverrideDescription = (override: SubscriptionLineItemOverrideRequest, price: Price): string => {
+		const descriptions: string[] = [];
+
+		if (override.amount !== undefined) {
+			const originalAmount = formatAmount(price.amount);
+			const newAmount = formatAmount(override.amount.toString());
+			const currencySymbol = getCurrencySymbol(price.currency);
+			descriptions.push(`Amount: ${currencySymbol}${originalAmount} → ${currencySymbol}${newAmount}`);
+		}
+
+		if (override.quantity !== undefined) {
+			descriptions.push(`Quantity: ${override.quantity}`);
+		}
+
+		if (override.billing_model !== undefined) {
+			descriptions.push(`Billing Model: ${override.billing_model.replace('_', ' ')}`);
+		}
+
+		if (override.tier_mode !== undefined) {
+			descriptions.push(`Tier Mode: ${override.tier_mode}`);
+		}
+
+		if (override.tiers !== undefined && override.tiers.length > 0) {
+			descriptions.push(`Tiers: ${override.tiers.length} tier(s)`);
+		}
+
+		if (override.transform_quantity !== undefined) {
+			const { divide_by, round } = override.transform_quantity;
+			descriptions.push(`Package: ${divide_by} units, round ${round}`);
+		}
+
+		return descriptions.join(', ');
+	};
+
 	return (
 		<Card className={`border bg-gray-50 rounded-lg p-4 ${className}`}>
 			<div className='flex items-start gap-3'>
@@ -26,18 +60,12 @@ const PriceOverrideSummary: FC<Props> = ({ overrides, prices, className }) => {
 							const price = prices.find((p) => p.id === override.price_id);
 							if (!price) return null;
 
-							const originalAmount = formatAmount(price.amount);
-							const newAmount = formatAmount(override.amount?.toString() || '0');
-							const currencySymbol = getCurrencySymbol(price.currency);
+							const overrideDescription = getOverrideDescription(override, price);
 
 							return (
 								<div key={override.price_id} className='flex items-center justify-between text-sm text-muted-foreground'>
 									<span className='truncate'>{price.meter?.name || price.description || 'Charge'}</span>
-									<span className='ml-2 flex-shrink-0'>
-										{currencySymbol}
-										{originalAmount} → {currencySymbol}
-										{newAmount}
-									</span>
+									<span className='ml-2 flex-shrink-0 text-xs'>{overrideDescription}</span>
 								</div>
 							);
 						})}

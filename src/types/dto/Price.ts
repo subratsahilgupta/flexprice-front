@@ -57,7 +57,7 @@ export interface GetPriceResponse extends Price {
 }
 
 export interface CreatePriceTier {
-	up_to?: number;
+	up_to?: number | null;
 	unit_amount: string;
 	flat_amount?: string;
 }
