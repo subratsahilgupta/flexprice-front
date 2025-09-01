@@ -1,4 +1,4 @@
-import { BILLING_MODEL, Price, TIER_MODE } from '@/models/Price';
+import { BILLING_MODEL, CreatePriceTier, Price, TIER_MODE } from '@/models/Price';
 import { getPriceTableCharge, calculateDiscountedPrice } from '@/utils/common/price_helpers';
 import { Info } from 'lucide-react';
 import { formatAmount } from '@/components/atoms/Input/Input';
@@ -58,13 +58,13 @@ const ChargeValueCell = ({ data, overriddenAmount, appliedCoupon, priceOverride 
 		);
 	} else {
 		// Use normal price display
-		price = getPriceTableCharge(priceData as any, false);
+		price = getPriceTableCharge(priceData, false);
 	}
 
 	// Determine which tiers to show - overridden or original
 	const tiers =
 		priceOverride?.tiers ||
-		(data.tiers as unknown as Array<{
+		(data.tiers as Array<{
 			up_to: number | null;
 			unit_amount: string;
 			flat_amount: string;
@@ -80,7 +80,7 @@ const ChargeValueCell = ({ data, overriddenAmount, appliedCoupon, priceOverride 
 	// Calculate discount if coupon is applied and price is not overridden
 	const discountInfo = !overriddenAmount && appliedCoupon ? calculateDiscountedPrice(data, appliedCoupon) : null;
 
-	const formatRange = (tier: any, index: number, allTiers: any[]) => {
+	const formatRange = (tier: CreatePriceTier, index: number, allTiers: CreatePriceTier[]) => {
 		// Calculate 'from' based on previous tier's up_to, first tier starts at 0
 		const from = index === 0 ? 0 : allTiers[index - 1].up_to;
 
@@ -174,7 +174,7 @@ const ChargeValueCell = ({ data, overriddenAmount, appliedCoupon, priceOverride 
 										if (priceOverride?.billing_model === BILLING_MODEL.PACKAGE && priceOverride.transform_quantity) {
 											const originalDisplay =
 												data.billing_model === BILLING_MODEL.PACKAGE
-													? `${getCurrencySymbol(data.currency)}${formatAmount(data.amount)} / ${(data.transform_quantity as any)?.divide_by || 1} units`
+													? `${getCurrencySymbol(data.currency)}${formatAmount(data.amount)} / ${data.transform_quantity?.divide_by || 1} units`
 													: `${getCurrencySymbol(data.currency)}${formatAmount(data.amount)}`;
 
 											return (
@@ -202,6 +202,60 @@ const ChargeValueCell = ({ data, overriddenAmount, appliedCoupon, priceOverride 
 													</div>
 												</div>
 											);
+										}
+
+										// Handle other configuration changes with meaningful display
+										if (priceOverride?.billing_model && priceOverride.billing_model !== data.billing_model) {
+											const originalDisplay =
+												data.billing_model === BILLING_MODEL.PACKAGE
+													? `${getCurrencySymbol(data.currency)}${formatAmount(data.amount)} / ${data.transform_quantity?.divide_by || 1} units`
+													: data.billing_model === BILLING_MODEL.TIERED
+														? `starts at ${getCurrencySymbol(data.currency)}${formatAmount(data.tiers?.[0]?.unit_amount || '0')} per unit`
+														: `${getCurrencySymbol(data.currency)}${formatAmount(data.amount)}`;
+
+											const newDisplay =
+												priceOverride.billing_model === BILLING_MODEL.PACKAGE
+													? `${getCurrencySymbol(data.currency)}${priceOverride.amount || data.amount} / ${priceOverride.transform_quantity?.divide_by || 1} units`
+													: priceOverride.billing_model === BILLING_MODEL.TIERED
+														? `starts at ${getCurrencySymbol(data.currency)}${priceOverride.tiers?.[0]?.unit_amount || '0'} per unit`
+														: `${getCurrencySymbol(data.currency)}${priceOverride.amount || data.amount}`;
+
+											return (
+												<div>
+													<div>Original: {originalDisplay}</div>
+													<div>Now: {newDisplay}</div>
+												</div>
+											);
+										}
+
+										// Handle quantity changes
+										if (priceOverride?.quantity && priceOverride.quantity !== 1) {
+											return (
+												<div>
+													<div>Original: Quantity 1</div>
+													<div>Now: Quantity {priceOverride.quantity}</div>
+												</div>
+											);
+										}
+
+										// Handle transform quantity changes for package
+										if (priceOverride?.transform_quantity && data.billing_model === BILLING_MODEL.PACKAGE) {
+											const originalDivideBy = data.transform_quantity?.divide_by || 1;
+											const newDivideBy = priceOverride.transform_quantity.divide_by;
+											if (originalDivideBy !== newDivideBy) {
+												return (
+													<div>
+														<div>
+															Original: {getCurrencySymbol(data.currency)}
+															{formatAmount(data.amount)} / {originalDivideBy} units
+														</div>
+														<div>
+															Now: {getCurrencySymbol(data.currency)}
+															{formatAmount(priceOverride.amount || data.amount)} / {newDivideBy} units
+														</div>
+													</div>
+												);
+											}
 										}
 
 										return <div>Price configuration modified</div>;
