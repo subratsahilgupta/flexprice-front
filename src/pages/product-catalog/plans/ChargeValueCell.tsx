@@ -35,6 +35,27 @@ const ChargeValueCell = ({ data, overriddenAmount, appliedCoupon, priceOverride 
 				{formatAmount(firstTier.unit_amount || '0')} per unit
 			</div>
 		);
+	} else if (priceOverride?.billing_model === BILLING_MODEL.PACKAGE && priceOverride.transform_quantity) {
+		// Show package pricing with overridden transform quantity
+		const currencySymbol = getCurrencySymbol(data.currency);
+		const overriddenAmount = priceOverride.amount || data.amount;
+		const divideBy = priceOverride.transform_quantity.divide_by;
+		price = (
+			<div>
+				{currencySymbol}
+				{formatAmount(overriddenAmount)} / {divideBy} units
+			</div>
+		);
+	} else if (priceOverride?.billing_model === BILLING_MODEL.TIERED && priceOverride.tiers && priceOverride.tiers.length > 0) {
+		// Show tiered pricing when overridden from another billing model
+		const firstTier = priceOverride.tiers[0];
+		const currencySymbol = getCurrencySymbol(data.currency);
+		price = (
+			<div>
+				starts at {currencySymbol}
+				{formatAmount(firstTier.unit_amount || '0')} per unit
+			</div>
+		);
 	} else {
 		// Use normal price display
 		price = getPriceTableCharge(priceData as any, false);
@@ -127,33 +148,64 @@ const ChargeValueCell = ({ data, overriddenAmount, appliedCoupon, priceOverride 
 								<div className='font-medium text-base text-gray-900'>Price Override Applied</div>
 								<div className='text-sm text-gray-600'>
 									{/* Show original vs overridden pricing */}
-									{priceOverride?.tiers &&
-									priceOverride.tiers.length > 0 &&
-									(priceOverride.billing_model === BILLING_MODEL.TIERED || priceOverride.billing_model === 'SLAB_TIERED') ? (
-										<div>
-											<div>
-												Original: {getCurrencySymbol(data.currency)}
-												{formatAmount(data.amount)}
-											</div>
-											<div>
-												Now: starts at {getCurrencySymbol(data.currency)}
-												{formatAmount(priceOverride.tiers[0]?.unit_amount || '0')} per unit
-											</div>
-										</div>
-									) : priceOverride?.amount ? (
-										<div>
-											<div>
-												Original: {getCurrencySymbol(data.currency)}
-												{formatAmount(data.amount)}
-											</div>
-											<div>
-												Now: {getCurrencySymbol(data.currency)}
-												{formatAmount(priceOverride.amount)}
-											</div>
-										</div>
-									) : (
-										<div>Price configuration modified</div>
-									)}
+									{(() => {
+										// Handle tiered pricing overrides
+										if (
+											priceOverride?.tiers &&
+											priceOverride.tiers.length > 0 &&
+											(priceOverride.billing_model === BILLING_MODEL.TIERED || priceOverride.billing_model === 'SLAB_TIERED')
+										) {
+											const firstTier = priceOverride.tiers[0];
+											return (
+												<div>
+													<div>
+														Original: {getCurrencySymbol(data.currency)}
+														{formatAmount(data.amount)}
+													</div>
+													<div>
+														Now: starts at {getCurrencySymbol(data.currency)}
+														{formatAmount(firstTier.unit_amount || '0')} per unit
+													</div>
+												</div>
+											);
+										}
+
+										// Handle package pricing overrides
+										if (priceOverride?.billing_model === BILLING_MODEL.PACKAGE && priceOverride.transform_quantity) {
+											const originalDisplay =
+												data.billing_model === BILLING_MODEL.PACKAGE
+													? `${getCurrencySymbol(data.currency)}${formatAmount(data.amount)} / ${(data.transform_quantity as any)?.divide_by || 1} units`
+													: `${getCurrencySymbol(data.currency)}${formatAmount(data.amount)}`;
+
+											return (
+												<div>
+													<div>Original: {originalDisplay}</div>
+													<div>
+														Now: {getCurrencySymbol(data.currency)}
+														{formatAmount(priceOverride.amount || data.amount)} / {priceOverride.transform_quantity.divide_by} units
+													</div>
+												</div>
+											);
+										}
+
+										// Handle simple amount overrides
+										if (priceOverride?.amount) {
+											return (
+												<div>
+													<div>
+														Original: {getCurrencySymbol(data.currency)}
+														{formatAmount(data.amount)}
+													</div>
+													<div>
+														Now: {getCurrencySymbol(data.currency)}
+														{formatAmount(priceOverride.amount)}
+													</div>
+												</div>
+											);
+										}
+
+										return <div>Price configuration modified</div>;
+									})()}
 								</div>
 							</div>
 						</TooltipContent>

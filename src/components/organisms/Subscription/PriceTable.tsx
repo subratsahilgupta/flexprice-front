@@ -1,7 +1,7 @@
 import { FC, useState, useMemo } from 'react';
 import { ColumnData, FlexpriceTable, LineItemCoupon } from '@/components/molecules';
 import PriceOverrideDialog from '@/components/molecules/PriceOverrideDialog/PriceOverrideDialog';
-import { Price } from '@/models/Price';
+import { BILLING_MODEL, Price, PRICE_TYPE } from '@/models/Price';
 import { ChevronDownIcon, ChevronUpIcon, Pencil, RotateCcw, Tag } from 'lucide-react';
 import { FormHeader } from '@/components/atoms';
 import { motion } from 'framer-motion';
@@ -134,7 +134,27 @@ const PriceTable: FC<Props> = ({
 					<div>{price.meter?.name ? `${price.meter.name}` : price.description || 'Charge'}</div>
 				</div>
 			),
-			quantity: price.type === 'FIXED' ? '1' : 'pay as you go',
+			quantity: (() => {
+				if (price.type === PRICE_TYPE.FIXED) return '1';
+
+				// Check if there's a package override with quantity
+				const override = overriddenPrices[price.id];
+				if (override?.billing_model === BILLING_MODEL.PACKAGE && override?.quantity) {
+					return override.quantity.toString();
+				}
+
+				// Check if original price is package type
+				if (price.billing_model === BILLING_MODEL.PACKAGE && price.transform_quantity) {
+					return `${price.transform_quantity.divide_by} units`;
+				}
+
+				// Check if override changes to package type
+				if (override?.billing_model === BILLING_MODEL.PACKAGE && override?.transform_quantity) {
+					return `${override.transform_quantity.divide_by} units`;
+				}
+
+				return 'pay as you go';
+			})(),
 			price: (
 				<ChargeValueCell
 					data={{ ...price, currency: price.currency } as any}

@@ -77,11 +77,17 @@ const SubscriptionWithOverrides: FC<Props> = ({ prices, onCreateSubscription, cl
 									if (!price) return null;
 
 									return (
-										<div key={priceId} className='flex items-center justify-between text-sm'>
-											<span className='text-blue-800'>{price.meter?.name || price.description || 'Charge'}</span>
-											<span className='text-blue-700 font-medium'>
-												{price.currency} {price.amount} → {price.currency} {override.amount || price.amount}
-											</span>
+										<div key={priceId} className='space-y-2'>
+											<div className='flex items-center justify-between text-sm'>
+												<span className='text-blue-800'>{price.meter?.name || price.description || 'Charge'}</span>
+												<span className='text-blue-700 font-medium'>
+													{price.currency} {price.amount} → {price.currency} {override.amount || price.amount}
+												</span>
+											</div>
+											{/* Show package details only when relevant */}
+											{override.billing_model === 'PACKAGE' && override.transform_quantity && (
+												<div className='text-xs text-blue-600 ml-4'>{override.transform_quantity.divide_by} units</div>
+											)}
 										</div>
 									);
 								})}

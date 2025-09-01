@@ -1,7 +1,7 @@
 import { FC, useState, useEffect } from 'react';
 import { Dialog } from '@/components/atoms';
 import { Input, Button, Select, SelectOption } from '@/components/atoms';
-import { Price, BILLING_MODEL, TIER_MODE, CreatePriceTier, TransformQuantity } from '@/models/Price';
+import { Price, BILLING_MODEL, TIER_MODE, CreatePriceTier, TransformQuantity, PRICE_TYPE } from '@/models/Price';
 import { formatAmount, removeFormatting } from '@/components/atoms/Input/Input';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import { ExtendedPriceOverride } from '@/utils/common/price_override_helpers';
@@ -55,6 +55,7 @@ const PriceOverrideDialog: FC<Props> = ({ isOpen, onOpenChange, price, onPriceOv
 					price.tiers.map((tier) => ({
 						unit_amount: tier.unit_amount,
 						flat_amount: tier.flat_amount || '0',
+						up_to: tier.up_to,
 					})),
 				);
 			} else {
@@ -63,6 +64,7 @@ const PriceOverrideDialog: FC<Props> = ({ isOpen, onOpenChange, price, onPriceOv
 					{
 						unit_amount: '',
 						flat_amount: '0',
+						up_to: null,
 					},
 				]);
 			}
@@ -118,6 +120,7 @@ const PriceOverrideDialog: FC<Props> = ({ isOpen, onOpenChange, price, onPriceOv
 				price.tiers.map((tier) => ({
 					unit_amount: tier.unit_amount,
 					flat_amount: tier.flat_amount || '0',
+					up_to: tier.up_to,
 				})),
 			);
 		} else {
@@ -125,6 +128,7 @@ const PriceOverrideDialog: FC<Props> = ({ isOpen, onOpenChange, price, onPriceOv
 				{
 					unit_amount: '',
 					flat_amount: '0',
+					up_to: null,
 				},
 			]);
 		}
@@ -149,6 +153,7 @@ const PriceOverrideDialog: FC<Props> = ({ isOpen, onOpenChange, price, onPriceOv
 					price.tiers.map((tier) => ({
 						unit_amount: tier.unit_amount,
 						flat_amount: tier.flat_amount || '0',
+						up_to: tier.up_to,
 					})),
 				);
 			} else {
@@ -156,6 +161,7 @@ const PriceOverrideDialog: FC<Props> = ({ isOpen, onOpenChange, price, onPriceOv
 					{
 						unit_amount: '',
 						flat_amount: '0',
+						up_to: null,
 					},
 				]);
 			}
@@ -212,16 +218,18 @@ const PriceOverrideDialog: FC<Props> = ({ isOpen, onOpenChange, price, onPriceOv
 						</div>
 					</div>
 
-					{/* Billing Model Override - Always shown at top */}
-					<div className='space-y-2'>
-						<label className='text-sm font-medium text-gray-700'>Billing Model</label>
-						<Select
-							value={overrideBillingModel}
-							onChange={(value) => setOverrideBillingModel(value as BILLING_MODEL)}
-							options={billingModelOptions}
-							placeholder='Select billing model'
-						/>
-					</div>
+					{/* Billing Model Override - Only show for USAGE price types */}
+					{price.type === PRICE_TYPE.USAGE && (
+						<div className='space-y-2'>
+							<label className='text-sm font-medium text-gray-700'>Billing Model</label>
+							<Select
+								value={overrideBillingModel}
+								onChange={(value) => setOverrideBillingModel(value as BILLING_MODEL)}
+								options={billingModelOptions}
+								placeholder='Select billing model'
+							/>
+						</div>
+					)}
 
 					{/* Amount Override - only show if billing model is not TIERED or SLAB_TIERED */}
 					{overrideBillingModel !== BILLING_MODEL.TIERED && overrideBillingModel !== 'SLAB_TIERED' && (
@@ -252,10 +260,10 @@ const PriceOverrideDialog: FC<Props> = ({ isOpen, onOpenChange, price, onPriceOv
 
 												if (index === 0) {
 													from = 0;
-													up_to = overrideTiers.length > 1 ? 1 : null;
+													up_to = overrideTiers.length > 1 ? overrideTiers[1]?.up_to || 1 : null;
 												} else {
-													from = overrideTiers[index - 1]?.up_to || index;
-													up_to = index < overrideTiers.length - 1 ? from + 1 : null;
+													from = overrideTiers[index - 1]?.up_to || 0;
+													up_to = index < overrideTiers.length - 1 ? overrideTiers[index + 1]?.up_to || null : null;
 												}
 
 												return {
@@ -287,9 +295,9 @@ const PriceOverrideDialog: FC<Props> = ({ isOpen, onOpenChange, price, onPriceOv
 									// and properly handle the from/up_to values
 									const convertedTiers = newTiers.map((tier: any, index: number) => {
 										// Calculate proper up_to value for the CreatePriceTier format
-										let up_to: number | undefined = undefined;
+										let up_to: number | null = null;
 										if (index < newTiers.length - 1) {
-											up_to = newTiers[index + 1]?.from;
+											up_to = newTiers[index + 1]?.from || null;
 										}
 
 										return {
