@@ -54,6 +54,7 @@
     "cmdk": "^1.0.0",
     "country-state-city": "^3.2.1",
     "date-fns": "^3.6.0",
+    "decimal.js": "^10.6.0",
     "es-toolkit": "^1.37.2",
     "framer-motion": "^12.4.2",
     "html2canvas": "^1.4.1",
