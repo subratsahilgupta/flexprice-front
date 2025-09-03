@@ -43,7 +43,7 @@ const formatBillingPeriod = (billingPeriod: string) => {
 	}
 };
 
-const PlanChargesTable: FC<PlanChargesTableProps> = ({ plan, onPriceUpdate }) => {
+const PlanPriceTable: FC<PlanChargesTableProps> = ({ plan, onPriceUpdate }) => {
 	const navigate = useNavigate();
 	const [showRolloutModal, setShowRolloutModal] = useState(false);
 	const [selectedPrice, setSelectedPrice] = useState<Price | null>(null);
@@ -229,4 +229,4 @@ const PlanChargesTable: FC<PlanChargesTableProps> = ({ plan, onPriceUpdate }) =>
 	);
 };
 
-export default PlanChargesTable;
+export default PlanPriceTable;

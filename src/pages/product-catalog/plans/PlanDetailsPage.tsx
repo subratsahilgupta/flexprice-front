@@ -39,7 +39,7 @@ import { formatExpirationPeriod } from '@/pages/customer/customers/SubscriptionD
 import CreditGrantApi from '@/api/CreditGrantApi';
 import { ENTITLEMENT_ENTITY_TYPE } from '@/models/Entitlement';
 import { EntitlementResponse } from '@/types/dto';
-import { PlanChargesTable } from '@/components/organisms';
+import { PlanPriceTable } from '@/components/organisms';
 
 const creditGrantColumns: ColumnData<CreditGrant>[] = [
 	{
@@ -326,7 +326,7 @@ const PlanDetailsPage = () => {
 				<DetailsCard variant='stacked' title='Plan Details' data={planDetails} />
 
 				{/* plan charges table */}
-				<PlanChargesTable plan={planData} onPriceUpdate={() => queryClient.invalidateQueries({ queryKey: ['fetchPlan', planId] })} />
+				<PlanPriceTable plan={planData} onPriceUpdate={() => queryClient.invalidateQueries({ queryKey: ['fetchPlan', planId] })} />
 
 				{planData.entitlements?.length || 0 > 0 ? (
 					<Card variant='notched'>

@@ -27,6 +27,7 @@ const PriceOverrideDialog: FC<Props> = ({ isOpen, onOpenChange, price, onPriceOv
 	const [overrideAmount, setOverrideAmount] = useState('');
 	const [overrideQuantity, setOverrideQuantity] = useState<number | undefined>(undefined);
 	const [overrideBillingModel, setOverrideBillingModel] = useState<BILLING_MODEL | 'SLAB_TIERED'>(price.billing_model);
+	const [overrideTierMode, setOverrideTierMode] = useState<TIER_MODE>(price.tier_mode || TIER_MODE.VOLUME);
 	const [overrideTiers, setOverrideTiers] = useState<CreatePriceTier[]>([]);
 	const [overrideTransformQuantity, setOverrideTransformQuantity] = useState<TransformQuantity>({
 		divide_by: 1,
@@ -43,12 +44,16 @@ const PriceOverrideDialog: FC<Props> = ({ isOpen, onOpenChange, price, onPriceOv
 			setOverrideAmount(currentOverride.amount || '');
 			setOverrideQuantity(currentOverride.quantity);
 			setOverrideBillingModel(currentOverride.billing_model || price.billing_model);
+			setOverrideTierMode(currentOverride.tier_mode || price.tier_mode || TIER_MODE.VOLUME);
 			setOverrideTiers(currentOverride.tiers || []);
 			setOverrideTransformQuantity(currentOverride.transform_quantity || { divide_by: 1, round: 'up' });
 		} else {
-			setOverrideAmount('');
-			setOverrideQuantity(undefined);
+			// Prefill with original price values
+			setOverrideAmount(price.amount);
+			setOverrideQuantity(1); // Default quantity for usage-based prices
 			setOverrideBillingModel(price.billing_model);
+			setOverrideTierMode(price.tier_mode || TIER_MODE.VOLUME);
+
 			// Initialize with original tiers if they exist, otherwise start with one default tier
 			if (price.tiers && price.tiers.length > 0) {
 				setOverrideTiers(
@@ -62,15 +67,17 @@ const PriceOverrideDialog: FC<Props> = ({ isOpen, onOpenChange, price, onPriceOv
 				// Start with one default tier
 				setOverrideTiers([
 					{
-						unit_amount: '',
+						unit_amount: price.amount, // Prefill with original amount
 						flat_amount: '0',
 						up_to: null,
 					},
 				]);
 			}
-			setOverrideTransformQuantity({ divide_by: 1, round: 'up' });
+
+			// Prefill transform quantity with original value if it exists
+			setOverrideTransformQuantity(price.transform_quantity || { divide_by: 1, round: 'up' });
 		}
-	}, [price.id, overriddenPrices, price.billing_model, price.tier_mode, price.tiers]);
+	}, [price.id, overriddenPrices, price.billing_model, price.tier_mode, price.tiers, price.amount, price.transform_quantity]);
 
 	const handleOverride = () => {
 		const override: Partial<ExtendedPriceOverride> = {};
@@ -90,6 +97,11 @@ const PriceOverrideDialog: FC<Props> = ({ isOpen, onOpenChange, price, onPriceOv
 		// Billing model override
 		if (overrideBillingModel !== price.billing_model) {
 			override.billing_model = overrideBillingModel;
+		}
+
+		// Tier mode override
+		if (overrideTierMode !== (price.tier_mode || TIER_MODE.VOLUME)) {
+			override.tier_mode = overrideTierMode;
 		}
 
 		// Only include tiers if billing model is tiered
