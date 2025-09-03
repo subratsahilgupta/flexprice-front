@@ -1,4 +1,4 @@
-import { BILLING_MODEL, Price, TIER_MODE } from '@/models/Price';
+import { BILLING_MODEL, Price, PRICE_TYPE, TIER_MODE } from '@/models/Price';
 import { getPriceTableCharge, calculateDiscountedPrice } from '@/utils/common/price_helpers';
 import { Info } from 'lucide-react';
 import { formatAmount } from '@/components/atoms/Input/Input';
@@ -7,6 +7,7 @@ import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import { Coupon } from '@/models/Coupon';
 import formatCouponName from '@/utils/common/format_coupon_name';
 import { ExtendedPriceOverride } from '@/utils/common/price_override_helpers';
+import { cn } from '@/lib/utils';
 
 interface Props {
 	data: Price;
@@ -41,131 +42,186 @@ const ChargeValueCell = ({ data, overriddenAmount, appliedCoupon, priceOverride 
 		}
 	};
 
-	const getOriginalPriceDisplay = () => {
-		return formatPriceDisplay(data.amount, data.currency, data.billing_model, data.transform_quantity, data.tiers || undefined);
-	};
-
-	const getOverriddenPriceDisplay = () => {
-		if (!priceOverride) return null;
-
-		if (priceOverride.billing_model === BILLING_MODEL.PACKAGE && priceOverride.transform_quantity) {
-			return formatPriceDisplay(
-				priceOverride.amount || data.amount,
-				data.currency,
-				BILLING_MODEL.PACKAGE,
-				priceOverride.transform_quantity,
-			);
-		}
-
-		if (priceOverride.billing_model === BILLING_MODEL.TIERED && priceOverride.tiers?.length) {
-			return formatPriceDisplay(priceOverride.amount || data.amount, data.currency, BILLING_MODEL.TIERED, undefined, priceOverride.tiers);
-		}
-
-		// Handle tier overrides even when billing model hasn't changed
-		if (priceOverride.tiers && data.billing_model === BILLING_MODEL.TIERED) {
-			return formatPriceDisplay(priceOverride.amount || data.amount, data.currency, BILLING_MODEL.TIERED, undefined, priceOverride.tiers);
-		}
-
-		if (priceOverride.amount) {
-			return formatPriceDisplay(priceOverride.amount, data.currency, data.billing_model, data.transform_quantity, data.tiers);
-		}
-
-		return null;
-	};
-
 	const renderOverrideTooltip = () => {
 		if (!priceOverride) return null;
 
-		const originalDisplay = getOriginalPriceDisplay();
-		const overriddenDisplay = getOverriddenPriceDisplay();
+		const changes: string[] = [];
 
-		// Handle billing model changes
+		// Check for billing model changes
 		if (priceOverride.billing_model && priceOverride.billing_model !== data.billing_model) {
-			const newDisplay = formatPriceDisplay(
-				priceOverride.amount || data.amount,
-				data.currency,
-				priceOverride.billing_model,
-				priceOverride.transform_quantity,
-				priceOverride.tiers,
-			);
+			const originalModel = data.billing_model;
+			const newModel = priceOverride.billing_model;
 
-			return (
-				<div>
-					<div>Original: {originalDisplay}</div>
-					<div>Current: {newDisplay}</div>
-				</div>
+			// Create more descriptive billing model names
+			const getBillingModelLabel = (model: string) => {
+				switch (model) {
+					case BILLING_MODEL.FLAT_FEE:
+						return 'Flat Fee';
+					case BILLING_MODEL.PACKAGE:
+						return 'Package';
+					case BILLING_MODEL.TIERED:
+						return 'Volume Tiered';
+					case 'SLAB_TIERED':
+						return 'Slab Tiered';
+					default:
+						return model;
+				}
+			};
+
+			changes.push(`Billing Model: ${getBillingModelLabel(originalModel)} → ${getBillingModelLabel(newModel)}`);
+		}
+
+		// Check for tier mode changes
+		if (priceOverride.tier_mode && priceOverride.tier_mode !== data.tier_mode) {
+			const originalMode = data.tier_mode;
+			const newMode = priceOverride.tier_mode;
+
+			// Create more descriptive tier mode names
+			const getTierModeLabel = (mode: string) => {
+				switch (mode) {
+					case TIER_MODE.VOLUME:
+						return 'Volume';
+					case TIER_MODE.SLAB:
+						return 'Slab';
+					default:
+						return mode;
+				}
+			};
+
+			changes.push(`Tier Mode: ${getTierModeLabel(originalMode)} → ${getTierModeLabel(newMode)}`);
+		}
+
+		// Check for amount changes
+		if (priceOverride.amount && priceOverride.amount !== data.amount) {
+			changes.push(
+				`Amount: ${getCurrencySymbol(data.currency)}${formatAmount(data.amount)} → ${getCurrencySymbol(data.currency)}${formatAmount(priceOverride.amount)}`,
 			);
 		}
 
-		// Handle simple amount overrides
-		if (priceOverride.amount && overriddenDisplay) {
-			return (
-				<div>
-					<div>Original: {originalDisplay}</div>
-					<div>Current: {overriddenDisplay}</div>
-				</div>
-			);
+		// Check for quantity changes - only show if original price was usage-based
+		if (priceOverride.quantity && priceOverride.quantity !== 1 && data.type === PRICE_TYPE.USAGE) {
+			changes.push(`Quantity: 1 → ${priceOverride.quantity}`);
 		}
 
-		// Handle quantity changes
-		if (priceOverride.quantity && priceOverride.quantity !== 1) {
-			return (
-				<div>
-					<div>Original: Quantity 1</div>
-					<div>Current: Quantity {priceOverride.quantity}</div>
-				</div>
-			);
-		}
-
-		// Handle package size changes
-		if (priceOverride.transform_quantity && data.billing_model === BILLING_MODEL.PACKAGE) {
+		// Check for transform quantity changes - only show if original price was package or if billing model changed to package
+		if (
+			priceOverride.transform_quantity &&
+			(data.billing_model === BILLING_MODEL.PACKAGE || priceOverride.billing_model === BILLING_MODEL.PACKAGE)
+		) {
 			const originalDivideBy = (data.transform_quantity as any)?.divide_by || 1;
 			const newDivideBy = priceOverride.transform_quantity.divide_by;
-
 			if (originalDivideBy !== newDivideBy) {
-				return (
-					<div>
-						<div>
-							Original: {getCurrencySymbol(data.currency)}
-							{formatAmount(data.amount)} / {originalDivideBy} units
-						</div>
-						<div>
-							Current: {getCurrencySymbol(data.currency)}
-							{formatAmount(priceOverride.amount || data.amount)} / {newDivideBy} units
-						</div>
-					</div>
-				);
+				changes.push(`Package Size: ${originalDivideBy} units → ${newDivideBy} units`);
 			}
 		}
 
-		// Handle tier changes
-		if (priceOverride.tiers && data.billing_model === BILLING_MODEL.TIERED) {
-			const tierDisplay = formatPriceDisplay(
-				priceOverride.amount || data.amount,
-				data.currency,
-				BILLING_MODEL.TIERED,
-				undefined,
-				priceOverride.tiers,
-			);
-			return (
-				<div>
-					<div>Original: {originalDisplay}</div>
-					<div>Current: {tierDisplay}</div>
-				</div>
-			);
+		// Check for tier changes
+		if (priceOverride.tiers && priceOverride.tiers.length > 0) {
+			const originalTiers = data.tiers || [];
+			const newTiers = priceOverride.tiers;
+
+			// If tier count changed, show the change
+			if (originalTiers.length !== newTiers.length) {
+				changes.push(`Tiers: ${originalTiers.length} tiers → ${newTiers.length} tiers`);
+			} else {
+				// Show detailed tier changes in dropdown format
+				const tierChanges: string[] = [];
+				newTiers.forEach((newTier, index) => {
+					const originalTier = originalTiers[index];
+					if (originalTier) {
+						const tierChangesForThisTier: string[] = [];
+
+						// Check From value changes
+						const originalFrom = index === 0 ? 0 : originalTiers[index - 1]?.up_to || 0;
+						const newFrom = index === 0 ? 0 : newTiers[index - 1]?.up_to || 0;
+						if (originalFrom !== newFrom) {
+							tierChangesForThisTier.push(`From (>): ${originalFrom} → ${newFrom}`);
+						}
+
+						// Check Up to value changes
+						const originalUpTo = originalTier.up_to;
+						const newUpTo = newTier.up_to;
+						if (originalUpTo !== newUpTo) {
+							const originalUpToDisplay = originalUpTo === null || originalUpTo === undefined ? '∞' : originalUpTo.toString();
+							const newUpToDisplay = newUpTo === null || newUpTo === undefined ? '∞' : newUpTo.toString();
+							tierChangesForThisTier.push(`Up to (<=): ${originalUpToDisplay} → ${newUpToDisplay}`);
+						}
+
+						// Check unit amount changes
+						if (originalTier.unit_amount !== newTier.unit_amount) {
+							tierChangesForThisTier.push(
+								`Per unit price: ${getCurrencySymbol(data.currency)}${formatAmount(originalTier.unit_amount)} → ${getCurrencySymbol(data.currency)}${formatAmount(newTier.unit_amount)}`,
+							);
+						}
+
+						// Check flat amount changes
+						if ((originalTier.flat_amount || '0') !== (newTier.flat_amount || '0')) {
+							tierChangesForThisTier.push(
+								`Flat fee: ${getCurrencySymbol(data.currency)}${formatAmount(originalTier.flat_amount || '0')} → ${getCurrencySymbol(data.currency)}${formatAmount(newTier.flat_amount || '0')}`,
+							);
+						}
+
+						if (tierChangesForThisTier.length > 0) {
+							tierChanges.push(`Tier ${index + 1}: ${tierChangesForThisTier.join(', ')}`);
+						}
+					} else {
+						// New tier added - format like table structure
+						const newFrom = index === 0 ? 0 : newTiers[index - 1]?.up_to || 0;
+						const newUpToDisplay = newTier.up_to === null || newTier.up_to === undefined ? '∞' : newTier.up_to.toString();
+						tierChanges.push(
+							`Tier ${index + 1} added: From (>): ${newFrom}, Up to (<=): ${newUpToDisplay}, Per unit price: ${getCurrencySymbol(data.currency)}${formatAmount(newTier.unit_amount)}, Flat fee: ${getCurrencySymbol(data.currency)}${formatAmount(newTier.flat_amount || '0')}`,
+						);
+					}
+				});
+
+				if (tierChanges.length > 0) {
+					changes.push(...tierChanges);
+				} else {
+					changes.push('Tier structure modified');
+				}
+			}
 		}
 
-		// If we have any override but couldn't determine specific changes, show generic but informative message
-		if (Object.keys(priceOverride).length > 0) {
-			return (
-				<div>
-					<div>Original: {originalDisplay}</div>
-					<div>Current: {overriddenDisplay || 'Modified'}</div>
-				</div>
-			);
+		// If no specific changes detected but we have overrides, show generic message
+		if (changes.length === 0 && Object.keys(priceOverride).length > 0) {
+			changes.push('Price configuration modified');
 		}
 
-		return null;
+		if (changes.length === 0) return null;
+
+		return (
+			<div className='space-y-2'>
+				<div className='font-medium text-gray-900'>Price Override Applied</div>
+				{changes.map((change, index) => {
+					// Check if this is a tier change that should be formatted as a table
+					if (change.startsWith('Tier ') && change.includes(':')) {
+						const tierInfo = change.split(': ');
+						const tierHeader = tierInfo[0];
+						const tierDetails = tierInfo[1];
+
+						return (
+							<div key={index} className='text-sm text-gray-600 space-y-1'>
+								<div className='font-medium'>{tierHeader}:</div>
+								<div className='ml-2 space-y-1'>
+									{tierDetails.split(', ').map((detail, detailIndex) => (
+										<div key={detailIndex} className='text-xs'>
+											• {detail}
+										</div>
+									))}
+								</div>
+							</div>
+						);
+					}
+
+					// Regular change format
+					return (
+						<div key={index} className='text-sm text-gray-600'>
+							• {change}
+						</div>
+					);
+				})}
+			</div>
+		);
 	};
 
 	const renderTieredPricingTooltip = () => {
@@ -191,7 +247,7 @@ const ChargeValueCell = ({ data, overriddenAmount, appliedCoupon, priceOverride 
 			<TooltipProvider delayDuration={0}>
 				<Tooltip>
 					<TooltipTrigger>
-						<Info className='h-4 w-4 text-gray-400 hover:text-gray-500 transition-colors duration-150' />
+						<Info className={cn(hasOverrides && 'text-orange-600', 'h-4 w-4  transition-colors duration-150')} />
 					</TooltipTrigger>
 					<TooltipContent
 						sideOffset={5}
@@ -232,29 +288,44 @@ const ChargeValueCell = ({ data, overriddenAmount, appliedCoupon, priceOverride 
 
 	// Main price display logic
 	const getMainPriceDisplay = () => {
-		if (priceOverride?.billing_model === BILLING_MODEL.PACKAGE && priceOverride.transform_quantity) {
-			return formatPriceDisplay(
-				priceOverride.amount || data.amount,
-				data.currency,
-				BILLING_MODEL.PACKAGE,
-				priceOverride.transform_quantity,
-			);
+		// If we have price overrides, prioritize showing the overridden values
+		if (hasOverrides && priceOverride) {
+			// Determine the effective billing model and tier mode
+			const effectiveBillingModel = priceOverride.billing_model || data.billing_model;
+			const effectiveAmount = priceOverride.amount || data.amount;
+			const effectiveTransformQuantity = priceOverride.transform_quantity || data.transform_quantity;
+			const effectiveTiers = priceOverride.tiers || data.tiers;
+
+			// Handle SLAB_TIERED billing model
+			if (effectiveBillingModel === 'SLAB_TIERED') {
+				return formatPriceDisplay(effectiveAmount, data.currency, 'SLAB_TIERED', undefined, effectiveTiers);
+			}
+
+			// Handle PACKAGE billing model
+			if (effectiveBillingModel === BILLING_MODEL.PACKAGE) {
+				return formatPriceDisplay(effectiveAmount, data.currency, BILLING_MODEL.PACKAGE, effectiveTransformQuantity);
+			}
+
+			// Handle TIERED billing model
+			if (effectiveBillingModel === BILLING_MODEL.TIERED) {
+				return formatPriceDisplay(effectiveAmount, data.currency, BILLING_MODEL.TIERED, undefined, effectiveTiers);
+			}
+
+			// Handle other billing models (fallback)
+			if (effectiveBillingModel && effectiveBillingModel !== data.billing_model) {
+				return formatPriceDisplay(effectiveAmount, data.currency, effectiveBillingModel, effectiveTransformQuantity, effectiveTiers);
+			}
+
+			// Handle FLAT_FEE billing model
+			if (effectiveBillingModel === BILLING_MODEL.FLAT_FEE) {
+				return formatPriceDisplay(effectiveAmount, data.currency, BILLING_MODEL.FLAT_FEE);
+			}
+
+			// Fallback for any other billing model with overrides
+			return formatPriceDisplay(effectiveAmount, data.currency, data.billing_model, effectiveTransformQuantity, effectiveTiers);
 		}
 
-		if (priceOverride?.billing_model === BILLING_MODEL.TIERED && priceOverride.tiers?.length) {
-			return formatPriceDisplay(priceOverride.amount || data.amount, data.currency, BILLING_MODEL.TIERED, undefined, priceOverride.tiers);
-		}
-
-		// Handle package transform_quantity override even when billing model hasn't changed
-		if (priceOverride?.transform_quantity && data.billing_model === BILLING_MODEL.PACKAGE) {
-			return formatPriceDisplay(
-				priceOverride.amount || data.amount,
-				data.currency,
-				BILLING_MODEL.PACKAGE,
-				priceOverride.transform_quantity,
-			);
-		}
-
+		// Fallback to original logic for non-overridden prices
 		const priceData = overriddenAmount ? { ...data, amount: overriddenAmount } : data;
 		return getPriceTableCharge(priceData as any, false);
 	};
@@ -309,17 +380,16 @@ const ChargeValueCell = ({ data, overriddenAmount, appliedCoupon, priceOverride 
 			)}
 
 			{/* Override Indicator Tooltip */}
-			{hasOverrides && (
+			{hasOverrides && !isTiered && (
 				<TooltipProvider delayDuration={0}>
 					<Tooltip>
 						<TooltipTrigger>
-							<Info className='h-4 w-4 text-orange-500 hover:text-orange-600 transition-colors duration-150' />
+							<Info className='h-4 w-4 text-orange-600 hover:text-orange-600 transition-colors duration-150' />
 						</TooltipTrigger>
 						<TooltipContent
 							sideOffset={5}
 							className='bg-white border border-gray-200 shadow-lg text-sm text-gray-900 px-4 py-3 rounded-lg max-w-[300px]'>
 							<div className='space-y-2'>
-								<div className='font-medium text-base text-gray-900'>Price Override Applied</div>
 								<div className='text-sm text-gray-600'>{renderOverrideTooltip()}</div>
 							</div>
 						</TooltipContent>
