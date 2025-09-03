@@ -3,7 +3,7 @@ import { Price } from '@/models/Price';
 import { SubscriptionLineItemOverrideRequest } from '@/utils/common/price_override_helpers';
 import { formatAmount } from '@/components/atoms/Input/Input';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
-import { CheckCircle } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { Card } from '@/components/atoms';
 
 interface Props {
@@ -52,7 +52,7 @@ const PriceOverrideSummary: FC<Props> = ({ overrides, prices, className }) => {
 	return (
 		<Card className={`border bg-gray-50 rounded-lg p-4 ${className}`}>
 			<div className='flex items-start gap-3'>
-				<CheckCircle className='w-5 h-5  mt-0.5 flex-shrink-0' />
+				<Check className='w-5 h-5  mt-0.5 flex-shrink-0' />
 				<div className='flex-1 min-w-0'>
 					<h4 className='font-medium mb-3'>Price Overrides Applied ({overrides.length})</h4>
 					<div className='space-y-3'>

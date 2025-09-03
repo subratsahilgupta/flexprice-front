@@ -1,7 +1,7 @@
 import { FC, useState, useMemo } from 'react';
 import { ColumnData, FlexpriceTable, LineItemCoupon } from '@/components/molecules';
 import PriceOverrideDialog from '@/components/molecules/PriceOverrideDialog/PriceOverrideDialog';
-import { BILLING_MODEL, Price, PRICE_TYPE } from '@/models/Price';
+import { Price, PRICE_TYPE } from '@/models/Price';
 import { ChevronDownIcon, ChevronUpIcon, Pencil, RotateCcw, Tag } from 'lucide-react';
 import { FormHeader } from '@/components/atoms';
 import { motion } from 'framer-motion';
@@ -137,27 +137,27 @@ const PriceTable: FC<Props> = ({
 			quantity: (() => {
 				if (price.type === PRICE_TYPE.FIXED) return '1';
 
-				const override = overriddenPrices[price.id];
+				// const override = overriddenPrices[price.id];
 
-				// PRIORITY 1: Check for any package overrides first (including transform_quantity)
-				if (override?.billing_model === BILLING_MODEL.PACKAGE) {
-					if (override?.quantity) {
-						return override.quantity.toString();
-					}
-					if (override?.transform_quantity) {
-						return `${override.transform_quantity.divide_by} units`;
-					}
-				}
+				// // PRIORITY 1: Check for any package overrides first (including transform_quantity)
+				// if (override?.billing_model === BILLING_MODEL.PACKAGE) {
+				// 	if (override?.quantity) {
+				// 		return override.quantity.toString();
+				// 	}
+				// 	if (override?.transform_quantity) {
+				// 		return `${override.transform_quantity.divide_by} units`;
+				// 	}
+				// }
 
-				// PRIORITY 2: Check for transform_quantity overrides even when billing model hasn't changed
-				if (override?.transform_quantity && price.billing_model === BILLING_MODEL.PACKAGE) {
-					return `${override.transform_quantity.divide_by} units`;
-				}
+				// // PRIORITY 2: Check for transform_quantity overrides even when billing model hasn't changed
+				// if (override?.transform_quantity && price.billing_model === BILLING_MODEL.PACKAGE) {
+				// 	return `${override.transform_quantity.divide_by} units`;
+				// }
 
-				// PRIORITY 3: Show original package transform_quantity if no overrides
-				if (price.billing_model === BILLING_MODEL.PACKAGE && price.transform_quantity) {
-					return `${price.transform_quantity.divide_by} units`;
-				}
+				// // PRIORITY 3: Show original package transform_quantity if no overrides
+				// if (price.billing_model === BILLING_MODEL.PACKAGE && price.transform_quantity) {
+				// 	return `${price.transform_quantity.divide_by} units`;
+				// }
 
 				return 'pay as you go';
 			})(),
