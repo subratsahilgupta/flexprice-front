@@ -25,7 +25,7 @@ const UsageChargePreview: FC<Props> = ({ charge: price, index, onDelete, onEdit,
 						<>
 							<span>•</span>
 							{/* <span>{formatBillingModel(price.billing_model)}</span> */}
-							<ChargeValueCell data={{ ...price, currency: price.currency } as any} />
+							<ChargeValueCell data={{ ...price, currency: price.currency } as any} priceOverride={undefined} />
 						</>
 					)}
 				</div>

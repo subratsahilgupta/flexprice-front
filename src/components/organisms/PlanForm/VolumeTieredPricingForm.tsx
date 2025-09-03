@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { cn } from '@/lib/utils';
 import { RiDeleteBin6Line } from 'react-icons/ri';
-import { Input, Spacer, DecimalUsageInput } from '@/components/atoms';
+import { Input, DecimalUsageInput } from '@/components/atoms';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import { PriceTier } from './UsagePricingForm';
 import { AddChargesButton } from './SetupChargesSection';
@@ -112,8 +112,6 @@ const VolumeTieredPricingForm: FC<Props> = ({ setTieredPrices, tieredPrices, cur
 
 	return (
 		<div className='space-y-4'>
-			<Spacer height='16px' />
-
 			<div className={cn('w-full', tieredPrices.length > 0 ? '' : 'hidden')}>
 				<table className='table-auto w-full border-collapse border border-gray-200 overflow-x-auto'>
 					<thead>

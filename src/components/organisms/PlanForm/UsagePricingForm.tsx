@@ -442,6 +442,7 @@ const UsagePricingForm: FC<Props> = ({
 
 			{(billingModel === billingModels[2].value || billingModel === billingModels[3].value) && (
 				<div className='space-y-2'>
+					<Spacer height='8px' />
 					<VolumeTieredPricingForm
 						setTieredPrices={setTieredPrices}
 						tieredPrices={tieredPrices}
@@ -452,7 +453,7 @@ const UsagePricingForm: FC<Props> = ({
 				</div>
 			)}
 
-			<Spacer height='16px' />
+			<Spacer height='12px' />
 			{/* !TODO: Remove disabled once the feature is released */}
 			<CheckboxRadioGroup
 				title='Billing timing'

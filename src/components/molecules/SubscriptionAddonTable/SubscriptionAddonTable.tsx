@@ -8,7 +8,7 @@ import AddonApi from '@/api/AddonApi';
 import { ADDON_TYPE } from '@/models/Addon';
 import { getTotalPayableTextWithCoupons, toSentenceCase } from '@/utils/common/helper_functions';
 import { Price, PRICE_TYPE } from '@/models/Price';
-import { getCurrentPriceAmount } from '@/utils/common/price_override_helpers';
+import { getCurrentPriceAmount, ExtendedPriceOverride } from '@/utils/common/price_override_helpers';
 import { Coupon } from '@/models/Coupon';
 
 interface Props {
@@ -16,7 +16,7 @@ interface Props {
 	onChange: (data: AddAddonToSubscriptionRequest[]) => void;
 	disabled?: boolean;
 	getEmptyAddon: () => Partial<AddAddonToSubscriptionRequest>;
-	priceOverrides?: Record<string, string>;
+	priceOverrides?: Record<string, ExtendedPriceOverride>;
 	coupons?: Coupon[];
 }
 const getAddonTypeChip = (type: string) => {
@@ -30,7 +30,11 @@ const getAddonTypeChip = (type: string) => {
 	}
 };
 
-const formatAddonCharges = (prices: Price[] = [], priceOverrides: Record<string, string> = {}, coupons: Coupon[] = []): string => {
+const formatAddonCharges = (
+	prices: Price[] = [],
+	priceOverrides: Record<string, ExtendedPriceOverride> = {},
+	coupons: Coupon[] = [],
+): string => {
 	if (!prices || prices.length === 0) return '--';
 
 	const recurringPrices = prices.filter((p) => p.type === PRICE_TYPE.FIXED);

@@ -1,7 +1,7 @@
 import { BaseModel } from './base';
 import { Meter } from './Meter';
 
-interface Feature extends BaseModel {
+export interface Feature extends BaseModel {
 	readonly name: string;
 	readonly description: string;
 	readonly meter_id: string;

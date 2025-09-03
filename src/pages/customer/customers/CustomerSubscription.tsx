@@ -22,7 +22,7 @@ import { BILLING_CADENCE, INVOICE_CADENCE } from '@/models/Invoice';
 import { BILLING_PERIOD } from '@/constants/constants';
 import { uniqueId } from 'lodash';
 import SubscriptionForm from '@/components/organisms/Subscription/SubscriptionForm';
-import { getLineItemOverrides } from '@/utils/common/price_override_helpers';
+import { ExtendedPriceOverride, getLineItemOverrides } from '@/utils/common/price_override_helpers';
 import { Coupon } from '@/models/Coupon';
 import { AddAddonToSubscriptionRequest } from '@/types/dto/Addon';
 import TaxApi from '@/api/TaxApi';
@@ -56,7 +56,7 @@ export type SubscriptionFormState = {
 	originalPhases: SubscriptionPhase[];
 
 	// Price Overrides
-	priceOverrides: Record<string, string>;
+	priceOverrides: Record<string, ExtendedPriceOverride>;
 
 	// Subscription Level Coupon (single coupon)
 	linkedCoupon: Coupon | null;

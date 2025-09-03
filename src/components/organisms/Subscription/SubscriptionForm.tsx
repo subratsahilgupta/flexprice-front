@@ -9,8 +9,6 @@ import CreditGrantTable from '@/components/molecules/CreditGrant/CreditGrantTabl
 import SubscriptionAddonTable from '@/components/molecules/SubscriptionAddonTable/SubscriptionAddonTable';
 import { BILLING_CYCLE, SubscriptionPhase } from '@/models/Subscription';
 import { usePriceOverrides } from '@/hooks/usePriceOverrides';
-import { getLineItemOverrides } from '@/utils/common/price_override_helpers';
-import PriceOverrideSummary from './PriceOverrideSummary';
 import {
 	CREDIT_GRANT_EXPIRATION_TYPE,
 	CREDIT_GRANT_PERIOD,
@@ -624,12 +622,6 @@ const SubscriptionForm = ({
 												disabled={isDisabled}
 												subscriptionLevelCoupon={state.linkedCoupon}
 											/>
-
-											{/* Price Override Summary */}
-											{(() => {
-												const overrideLineItems = getLineItemOverrides(currentPrices, overriddenPrices);
-												return <PriceOverrideSummary overrides={overrideLineItems} prices={currentPrices} className='mt-4' />;
-											})()}
 										</div>
 									)}
 

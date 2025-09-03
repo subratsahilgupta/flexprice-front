@@ -46,7 +46,7 @@ export interface PriceUnitConfig {
 }
 
 export interface CreatePriceTier {
-	readonly up_to?: number;
+	readonly up_to?: number | null;
 	readonly unit_amount: string;
 	readonly flat_amount?: string;
 }
