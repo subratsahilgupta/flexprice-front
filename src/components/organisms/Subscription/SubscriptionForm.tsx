@@ -723,8 +723,8 @@ const SubscriptionForm = ({
 					{/* Proration Mode Toggle */}
 					<div className='space-y-2'>
 						<Toggle
-							checked={state.proration_mode}
-							onChange={(checked) => setState((prev) => ({ ...prev, proration_mode: checked }))}
+							checked={state.proration_behavior === 'create_prorations'}
+							onChange={(checked) => setState((prev) => ({ ...prev, proration_behavior: checked ? 'create_prorations' : 'none' }))}
 							label='Enable Proration'
 							description='Prorate charges when subscription changes occur'
 							disabled={isDisabled}
