@@ -150,6 +150,8 @@ export interface CreateSubscriptionPayload {
 	coupons?: string[];
 	line_item_coupons?: Record<string, string[]>;
 	tax_rate_overrides?: TaxRateOverride[];
+	proration_behavior?: string | null;
+	customer_timezone?: string;
 }
 
 export interface SubscriptionLineItemOverrideRequest {
@@ -161,4 +163,10 @@ export interface SubscriptionLineItemOverrideRequest {
 	tiers?: CreatePriceTier[];
 	transform_quantity?: TransformQuantity;
 	tax_rate_overrides?: TaxRateOverride[];
+}
+
+export interface CancelSubscriptionPayload {
+	proration_behavior?: string;
+	cancellation_type?: string;
+	reason?: string;
 }
