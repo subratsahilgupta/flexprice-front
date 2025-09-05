@@ -68,7 +68,11 @@ const SubscriptionActionButton: React.FC<Props> = ({ subscription }) => {
 	});
 
 	const { mutate: cancelSubscription, isPending: isCancelLoading } = useMutation({
-		mutationFn: (id: string) => SubscriptionApi.cancelSubscription(id),
+		mutationFn: (id: string) =>
+			SubscriptionApi.cancelSubscription(id, {
+				proration_behavior: 'none',
+				cancellation_type: 'immediate',
+			}),
 		onSuccess: async () => {
 			setState((prev) => ({ ...prev, isCancelModalOpen: false }));
 			toast.success('Subscription cancelled successfully');

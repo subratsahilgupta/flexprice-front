@@ -162,3 +162,9 @@ export interface SubscriptionLineItemOverrideRequest {
 	transform_quantity?: TransformQuantity;
 	tax_rate_overrides?: TaxRateOverride[];
 }
+
+export interface CancelSubscriptionPayload {
+	proration_behavior?: string;
+	cancellation_type?: string;
+	reason?: string;
+}
