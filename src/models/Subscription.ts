@@ -175,7 +175,8 @@ export enum RESUME_MODE {
 /**
  * ProrationAction defines the type of change triggering proration.
  */
-export enum SUBSCRIPTION_PRORATION_ACTION {
+export enum
+	SUBSCRIPTION_PRORATION_ACTION {
 	UPGRADE = 'upgrade',
 	DOWNGRADE = 'downgrade',
 	QUANTITY_CHANGE = 'quantity_change',
@@ -198,4 +199,11 @@ export enum SUBSCRIPTION_PRORATION_STRATEGY {
 export enum SUBSCRIPTION_PRORATION_BEHAVIOR {
 	CREATE_PRORATIONS = 'create_prorations', // Default: Create credits/charges on invoice
 	NONE = 'none', // Calculate but don't apply (e.g., for previews)
+}
+
+
+
+export enum SUBSCRIPTION_CANCELLATION_TYPE {
+	IMMEDIATE = "immediate",
+	END_OF_PERIOD = "end_of_period"
 }

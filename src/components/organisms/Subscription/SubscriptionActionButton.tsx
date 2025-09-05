@@ -1,4 +1,4 @@
-import { BILLING_CYCLE, Subscription, SubscriptionPhase, SUBSCRIPTION_PRORATION_BEHAVIOR } from '@/models/Subscription';
+import { BILLING_CYCLE, Subscription, SubscriptionPhase, SUBSCRIPTION_PRORATION_BEHAVIOR, SUBSCRIPTION_CANCELLATION_TYPE } from '@/models/Subscription';
 import { SUBSCRIPTION_PRORATION_ACTION } from '@/models/Subscription';
 import { useMutation } from '@tanstack/react-query';
 import { CirclePause, CirclePlay, X, Plus } from 'lucide-react';
@@ -72,7 +72,7 @@ const SubscriptionActionButton: React.FC<Props> = ({ subscription }) => {
 		mutationFn: (id: string) =>
 			SubscriptionApi.cancelSubscription(id, {
 				proration_behavior: SUBSCRIPTION_PRORATION_BEHAVIOR.NONE,
-				cancellation_type: SUBSCRIPTION_PRORATION_ACTION.CANCELLATION,
+				cancellation_type: SUBSCRIPTION_CANCELLATION_TYPE.IMMEDIATE,
 			}),
 		onSuccess: async () => {
 			setState((prev) => ({ ...prev, isCancelModalOpen: false }));
@@ -92,29 +92,29 @@ const SubscriptionActionButton: React.FC<Props> = ({ subscription }) => {
 	const menuOptions: DropdownMenuOption[] = [
 		...(!isPaused && !isCancelled
 			? [
-					{
-						label: 'Pause Subscription',
-						icon: <CirclePause className='h-4 w-4' />,
-						onSelect: () => setState((prev) => ({ ...prev, isPauseModalOpen: true })),
-						disabled: isPaused || isCancelled,
-					},
-					{
-						label: 'Add Subscription Phase',
-						icon: <Plus className='h-4 w-4' />,
-						onSelect: () => setState((prev) => ({ ...prev, isAddPhaseModalOpen: true })),
-						disabled: isPaused || isCancelled,
-					},
-				]
+				{
+					label: 'Pause Subscription',
+					icon: <CirclePause className='h-4 w-4' />,
+					onSelect: () => setState((prev) => ({ ...prev, isPauseModalOpen: true })),
+					disabled: isPaused || isCancelled,
+				},
+				{
+					label: 'Add Subscription Phase',
+					icon: <Plus className='h-4 w-4' />,
+					onSelect: () => setState((prev) => ({ ...prev, isAddPhaseModalOpen: true })),
+					disabled: isPaused || isCancelled,
+				},
+			]
 			: []),
 		...(isPaused && !isCancelled
 			? [
-					{
-						label: 'Resume Subscription',
-						icon: <CirclePlay className='h-4 w-4' />,
-						onSelect: () => setState((prev) => ({ ...prev, isResumeModalOpen: true })),
-						disabled: isCancelled,
-					},
-				]
+				{
+					label: 'Resume Subscription',
+					icon: <CirclePlay className='h-4 w-4' />,
+					onSelect: () => setState((prev) => ({ ...prev, isResumeModalOpen: true })),
+					disabled: isCancelled,
+				},
+			]
 			: []),
 		{
 			label: 'Cancel Subscription',

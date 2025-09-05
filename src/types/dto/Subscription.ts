@@ -3,8 +3,8 @@ import {
 	BILLING_CYCLE,
 	SUBSCRIPTION_STATUS,
 	SubscriptionPhase,
-	SUBSCRIPTION_PRORATION_ACTION,
 	SUBSCRIPTION_PRORATION_BEHAVIOR,
+	SUBSCRIPTION_CANCELLATION_TYPE,
 } from '@/models/Subscription';
 import { CreditGrant } from '@/models/CreditGrant';
 import { BILLING_PERIOD } from '@/constants/constants';
@@ -171,6 +171,8 @@ export interface SubscriptionLineItemOverrideRequest {
 
 export interface CancelSubscriptionPayload {
 	proration_behavior?: SUBSCRIPTION_PRORATION_BEHAVIOR;
-	cancellation_type?: SUBSCRIPTION_PRORATION_ACTION;
+	cancellation_type?: SUBSCRIPTION_CANCELLATION_TYPE;
 	reason?: string;
 }
+
+
