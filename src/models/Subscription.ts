@@ -171,3 +171,31 @@ export enum RESUME_MODE {
 	SCHEDULED = 'scheduled',
 	AUTO = 'auto',
 }
+
+/**
+ * ProrationAction defines the type of change triggering proration.
+ */
+export enum SUBSCRIPTION_PRORATION_ACTION {
+	UPGRADE = 'upgrade',
+	DOWNGRADE = 'downgrade',
+	QUANTITY_CHANGE = 'quantity_change',
+	CANCELLATION = 'cancellation',
+	ADD_ITEM = 'add_item',
+	REMOVE_ITEM = 'remove_item',
+}
+
+/**
+ * ProrationStrategy defines how the proration coefficient is calculated.
+ */
+export enum SUBSCRIPTION_PRORATION_STRATEGY {
+	DAY_BASED = 'day_based', // Default
+	SECOND_BASED = 'second_based', // Future enhancement
+}
+
+/**
+ * ProrationBehavior defines how proration is applied (e.g., create invoice items).
+ */
+export enum SUBSCRIPTION_PRORATION_BEHAVIOR {
+	CREATE_PRORATIONS = 'create_prorations', // Default: Create credits/charges on invoice
+	NONE = 'none', // Calculate but don't apply (e.g., for previews)
+}

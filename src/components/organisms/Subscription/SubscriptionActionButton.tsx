@@ -1,4 +1,5 @@
-import { BILLING_CYCLE, Subscription, SubscriptionPhase } from '@/models/Subscription';
+import { BILLING_CYCLE, Subscription, SubscriptionPhase, SUBSCRIPTION_PRORATION_BEHAVIOR } from '@/models/Subscription';
+import { SUBSCRIPTION_PRORATION_ACTION } from '@/models/Subscription';
 import { useMutation } from '@tanstack/react-query';
 import { CirclePause, CirclePlay, X, Plus } from 'lucide-react';
 import React, { useState, useMemo } from 'react';
@@ -68,7 +69,11 @@ const SubscriptionActionButton: React.FC<Props> = ({ subscription }) => {
 	});
 
 	const { mutate: cancelSubscription, isPending: isCancelLoading } = useMutation({
-		mutationFn: (id: string) => SubscriptionApi.cancelSubscription(id),
+		mutationFn: (id: string) =>
+			SubscriptionApi.cancelSubscription(id, {
+				proration_behavior: SUBSCRIPTION_PRORATION_BEHAVIOR.NONE,
+				cancellation_type: SUBSCRIPTION_PRORATION_ACTION.CANCELLATION,
+			}),
 		onSuccess: async () => {
 			setState((prev) => ({ ...prev, isCancelModalOpen: false }));
 			toast.success('Subscription cancelled successfully');
