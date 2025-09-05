@@ -1,5 +1,11 @@
 import { INVOICE_CADENCE, LineItem as InvoiceLineItem } from '@/models/Invoice';
-import { BILLING_CYCLE, SUBSCRIPTION_STATUS, SubscriptionPhase } from '@/models/Subscription';
+import {
+	BILLING_CYCLE,
+	SUBSCRIPTION_STATUS,
+	SubscriptionPhase,
+	SUBSCRIPTION_PRORATION_ACTION,
+	SUBSCRIPTION_PRORATION_BEHAVIOR,
+} from '@/models/Subscription';
 import { CreditGrant } from '@/models/CreditGrant';
 import { BILLING_PERIOD } from '@/constants/constants';
 import { BILLING_CADENCE } from '@/models/Invoice';
@@ -164,7 +170,7 @@ export interface SubscriptionLineItemOverrideRequest {
 }
 
 export interface CancelSubscriptionPayload {
-	proration_behavior?: string;
-	cancellation_type?: string;
+	proration_behavior?: SUBSCRIPTION_PRORATION_BEHAVIOR;
+	cancellation_type?: SUBSCRIPTION_PRORATION_ACTION;
 	reason?: string;
 }
