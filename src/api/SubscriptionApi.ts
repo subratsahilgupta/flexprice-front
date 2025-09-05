@@ -2,6 +2,7 @@ import { AxiosClient } from '@/core/axios/verbs';
 import { Subscription, SubscriptionPhase, SubscriptionUsage } from '@/models/Subscription';
 import {
 	AddSubscriptionPhasePayload,
+	CancelSubscriptionPayload,
 	CreateSubscriptionPayload,
 	GetSubscriptionPreviewResponse,
 	ListSubscriptionsPayload,
@@ -47,8 +48,8 @@ class SubscriptionApi {
 		return await AxiosClient.post(`${this.baseUrl}/${id}/resume`, payload);
 	}
 
-	static async cancelSubscription(id: string): Promise<void> {
-		return await AxiosClient.post(`${this.baseUrl}/${id}/cancel`);
+	static async cancelSubscription(id: string, payload: CancelSubscriptionPayload): Promise<void> {
+		return await AxiosClient.post(`${this.baseUrl}/${id}/cancel`, payload);
 	}
 
 	static async addSubscriptionPhase(id: string, payload: AddSubscriptionPhasePayload): Promise<SubscriptionPhase> {
