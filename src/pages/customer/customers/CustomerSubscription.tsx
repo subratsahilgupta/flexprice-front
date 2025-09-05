@@ -72,7 +72,7 @@ export type SubscriptionFormState = {
 	tax_rate_overrides: TaxRateOverride[];
 
 	// Proration and timezone settings
-	proration_mode: boolean;
+	proration_behavior: string;
 	customer_timezone: string;
 };
 
@@ -190,7 +190,7 @@ const CustomerSubscription: React.FC = () => {
 		addons: [],
 		customerId: customerId!,
 		tax_rate_overrides: [],
-		proration_mode: false,
+		proration_behavior: 'none',
 		customer_timezone: 'UTC',
 	});
 
@@ -292,7 +292,7 @@ const CustomerSubscription: React.FC = () => {
 					addons: [],
 					customerId: customerId!,
 					tax_rate_overrides: [],
-					proration_mode: false,
+					proration_behavior: 'none',
 					customer_timezone: 'UTC',
 				});
 			}
@@ -330,7 +330,7 @@ const CustomerSubscription: React.FC = () => {
 			lineItemCoupons,
 			tax_rate_overrides,
 			addons,
-			proration_mode,
+			proration_behavior,
 			customer_timezone,
 		} = subscriptionState;
 
@@ -430,7 +430,7 @@ const CustomerSubscription: React.FC = () => {
 			tax_rate_overrides: tax_rate_overrides.length > 0 ? tax_rate_overrides : undefined,
 
 			// Proration and timezone settings with defaults
-			proration_mode: proration_mode ? 'active' : null,
+			proration_behavior: proration_behavior ?? 'none',
 			customer_timezone: customer_timezone || 'UTC',
 		};
 

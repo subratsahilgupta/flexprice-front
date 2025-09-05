@@ -149,7 +149,7 @@ export interface CreateSubscriptionPayload {
 	coupons?: string[];
 	line_item_coupons?: Record<string, string[]>;
 	tax_rate_overrides?: TaxRateOverride[];
-	proration_mode?: string | null;
+	proration_behavior?: string | null;
 	customer_timezone?: string;
 }
 
@@ -158,4 +158,10 @@ export interface SubscriptionLineItemOverrideRequest {
 	quantity?: number;
 	amount?: number;
 	tax_rate_overrides?: TaxRateOverride[];
+}
+
+export interface CancelSubscriptionPayload {
+	proration_behavior?: string;
+	cancellation_type?: string;
+	reason?: string;
 }

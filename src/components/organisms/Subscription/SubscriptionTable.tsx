@@ -78,13 +78,13 @@ const SubscriptionTable: FC<SubscriptionTableProps> = ({ data, onRowClick, allow
 		},
 		...(allowRedirect
 			? [
-				{
-					width: '30px',
-					fieldVariant: 'interactive' as const,
-					hideOnEmpty: true,
-					render: (row: Subscription) => <SubscriptionActionButton subscription={row} />,
-				},
-			]
+					{
+						width: '30px',
+						fieldVariant: 'interactive' as const,
+						hideOnEmpty: true,
+						render: (row: Subscription) => <SubscriptionActionButton subscription={row} />,
+					},
+				]
 			: []),
 	];
 
