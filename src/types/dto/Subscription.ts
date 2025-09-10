@@ -174,5 +174,3 @@ export interface CancelSubscriptionPayload {
 	cancellation_type?: SUBSCRIPTION_CANCELLATION_TYPE;
 	reason?: string;
 }
-
-
