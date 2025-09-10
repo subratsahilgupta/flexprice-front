@@ -29,7 +29,7 @@ export { default as Pagination } from './Pagination';
 
 export { default as WalletTransactionsTable } from './Wallet';
 
-export { default as TopupCard } from './TopupCard';
+export { default as TopupCard } from './WalletTopupCard';
 
 export { default as RecordPaymentTopup } from './RecordPaymentTopup';
 

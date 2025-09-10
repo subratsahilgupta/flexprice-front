@@ -42,6 +42,7 @@ const CREDITS_TYPE_OPTIONS: RectangleRadiogroupOption[] = [
 interface TopupPayload extends Partial<TopupWalletPayload> {
 	credits_type?: CreditsType;
 	generate_invoice?: boolean;
+	reference_id?: string;
 }
 
 interface TopupCardProps {
@@ -60,6 +61,7 @@ const TopupCard: FC<TopupCardProps> = ({ walletId, currency, conversion_rate = 1
 		generate_invoice: undefined,
 		expiry_date: undefined,
 		priority: undefined,
+		reference_id: undefined,
 	});
 
 	// Determine transaction reason based on credits type and invoice generation
@@ -87,7 +89,7 @@ const TopupCard: FC<TopupCardProps> = ({ walletId, currency, conversion_rate = 1
 
 	// Validate topup payload
 	const validateTopup = useCallback((): boolean => {
-		const { credits_type, credits_to_add, expiry_date_utc } = topupPayload;
+		const { credits_type, credits_to_add, expiry_date_utc, reference_id } = topupPayload;
 
 		if (!credits_type) {
 			toast.error('Please select a credits type');
@@ -96,6 +98,12 @@ const TopupCard: FC<TopupCardProps> = ({ walletId, currency, conversion_rate = 1
 
 		if (!credits_to_add || credits_to_add <= 0) {
 			toast.error('Please enter a valid credits amount');
+			return false;
+		}
+
+		// Validate reference ID for purchased credits with invoice generation
+		if (credits_type === CreditsType.PurchasedCredits && topupPayload.generate_invoice && (!reference_id || reference_id.trim() === '')) {
+			toast.error('Please enter a reference ID for purchased credits with invoice');
 			return false;
 		}
 
@@ -133,7 +141,7 @@ const TopupCard: FC<TopupCardProps> = ({ walletId, currency, conversion_rate = 1
 			return WalletApi.topupWallet({
 				walletId,
 				credits_to_add: topupPayload.credits_to_add,
-				idempotency_key: uuidv4(),
+				idempotency_key: topupPayload.reference_id || uuidv4(),
 				transaction_reason: getTransactionReason(),
 				expiry_date_utc: topupPayload.expiry_date_utc,
 				priority: topupPayload.priority,
@@ -148,6 +156,7 @@ const TopupCard: FC<TopupCardProps> = ({ walletId, currency, conversion_rate = 1
 				generate_invoice: undefined,
 				expiry_date: undefined,
 				priority: undefined,
+				reference_id: undefined,
 			});
 			await refetchWalletData();
 		},
@@ -191,6 +200,7 @@ const TopupCard: FC<TopupCardProps> = ({ walletId, currency, conversion_rate = 1
 							credits_to_add: undefined,
 							generate_invoice: undefined,
 							expiry_date: undefined,
+							reference_id: undefined,
 						});
 					}}
 				/>
@@ -253,13 +263,30 @@ const TopupCard: FC<TopupCardProps> = ({ walletId, currency, conversion_rate = 1
 					}}
 				/>
 			)}
+
+			{/* Reference ID Input for Purchased Credits with Invoice */}
+			{topupPayload.credits_type === CreditsType.PurchasedCredits && topupPayload.generate_invoice && (
+				<Input
+					label='Reference ID'
+					className='w-full'
+					placeholder='Enter reference ID'
+					value={topupPayload.reference_id || ''}
+					onChange={(e) => updateTopupPayload({ reference_id: e as string })}
+					description='This reference ID will be used as the idempotency key for the transaction.'
+				/>
+			)}
+
 			{topupPayload.credits_type === CreditsType.PurchasedCredits && (
 				<div className='flex items-center space-x-4 s'>
 					<Switch
 						id='generate-invoice'
 						checked={topupPayload.generate_invoice || false}
 						onCheckedChange={(value) => {
-							updateTopupPayload({ generate_invoice: value });
+							updateTopupPayload({
+								generate_invoice: value,
+								// Clear reference_id when invoice generation is disabled
+								reference_id: value ? topupPayload.reference_id : undefined,
+							});
 						}}
 					/>
 					<Label htmlFor='generate-invoice'>
