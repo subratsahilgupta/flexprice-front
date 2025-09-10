@@ -1,4 +1,4 @@
-import { AddButton, Loader, Page, ShortPagination, Spacer } from '@/components/atoms';
+import { Loader, Page, ShortPagination, Spacer } from '@/components/atoms';
 import { InvoiceTable, ApiDocsContent, QueryBuilder } from '@/components/molecules';
 import EmptyPage from '@/components/organisms/EmptyPage/EmptyPage';
 import GUIDES from '@/constants/guides';
@@ -229,19 +229,7 @@ const InvoicesPage = () => {
 	}
 
 	return (
-		<Page
-			heading='Invoices'
-			headingCTA={
-				<div className='flex justify-between gap-2 items-center'>
-					<AddButton
-						label='Create Invoice'
-						onClick={() => {
-							// TODO: Implement create invoice functionality
-							console.log('Create invoice clicked');
-						}}
-					/>
-				</div>
-			}>
+		<Page heading='Invoices'>
 			<ApiDocsContent tags={['Invoices']} />
 			<div>
 				<QueryBuilder

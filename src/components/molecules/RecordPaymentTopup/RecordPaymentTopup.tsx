@@ -279,6 +279,7 @@ const RecordPaymentTopup: FC<Props> = ({
 					payment_gateway: selectedConnection.provider_type,
 					payment_method_type: PAYMENT_METHOD_TYPE.PAYMENT_LINK,
 				}),
+				idempotency_key: formData.reference_id,
 				metadata: {
 					// Add description if provided
 					...(formData.description?.trim() && {

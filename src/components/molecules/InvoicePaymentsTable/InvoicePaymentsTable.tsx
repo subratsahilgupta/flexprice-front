@@ -116,9 +116,9 @@ const InvoicePaymentsTable: FC<Props> = ({ data }) => {
 	const columns = useMemo(
 		(): ColumnData<Payment>[] => [
 			{
-				title: 'ID',
+				title: 'Ref ID',
 				width: 200,
-				render: (rowData) => <TooltipCell tooltipContent={rowData.id} tooltipText={rowData.id} />,
+				render: (rowData) => <TooltipCell tooltipContent={rowData.idempotency_key} tooltipText={rowData.idempotency_key} />,
 			},
 			{
 				title: 'Invoice ID',
