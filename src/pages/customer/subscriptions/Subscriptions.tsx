@@ -1,13 +1,12 @@
-import { AddButton, Loader, Page, ShortPagination, Spacer } from '@/components/atoms';
-import { ApiDocsContent, QueryBuilder } from '@/components/molecules';
+import { Loader, Page, ShortPagination, Spacer } from '@/components/atoms';
+import { QueryBuilder } from '@/components/molecules';
 import { SubscriptionTable } from '@/components/molecules/SubscriptionTable';
 import EmptyPage from '@/components/organisms/EmptyPage/EmptyPage';
-import { RouteNames } from '@/core/routes/Routes';
 import GUIDES from '@/constants/guides';
 import usePagination from '@/hooks/usePagination';
 import SubscriptionApi from '@/api/SubscriptionApi';
 import toast from 'react-hot-toast';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useEffect, useMemo } from 'react';
 import {
 	FilterField,
@@ -99,7 +98,6 @@ const filterOptions: FilterField[] = [
 
 const SubscriptionsPage = () => {
 	const { limit, offset, page, reset } = usePagination();
-	const navigate = useNavigate();
 
 	const { filters, sorts, setFilters, setSorts, sanitizedFilters, sanitizedSorts } = useFilterSorting({
 		initialFilters: [
@@ -131,11 +129,8 @@ const SubscriptionsPage = () => {
 	};
 
 	useEffect(() => {
-		// Only reset if we're not on the first page
-		if (page !== 1) {
-			reset();
-		}
-	}, [sanitizedFilters, sanitizedSorts, page, reset]);
+		reset();
+	}, [sanitizedFilters, sanitizedSorts]);
 
 	const {
 		isLoading,
@@ -184,24 +179,13 @@ const SubscriptionsPage = () => {
 					heading: 'Add your first subscription',
 					description: 'Create your first subscription to start billing your customers.',
 					buttonLabel: 'Create Subscription',
-					buttonAction: () => navigate(RouteNames.createSubscription),
 				}}
-				onAddClick={() => navigate(RouteNames.createSubscription)}
 			/>
 		);
 	}
 
 	return (
-		<Page
-			heading='Subscriptions'
-			headingCTA={
-				<div className='flex justify-between gap-2 items-center'>
-					<Link to={RouteNames.createSubscription}>
-						<AddButton label='Add Subscription' />
-					</Link>
-				</div>
-			}>
-			<ApiDocsContent tags={['Subscriptions']} />
+		<Page heading='Subscriptions'>
 			<div>
 				<QueryBuilder
 					filterOptions={filterOptions}

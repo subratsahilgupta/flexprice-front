@@ -7,6 +7,7 @@ import { Subscription, SUBSCRIPTION_CANCELLATION_TYPE, SUBSCRIPTION_STATUS } fro
 import { useNavigate } from 'react-router-dom';
 import { RouteNames } from '@/core/routes/Routes';
 import SubscriptionApi from '@/api/SubscriptionApi';
+import RedirectCell from '../Table/RedirectCell';
 
 interface Props {
 	data: Subscription[];
@@ -19,12 +20,15 @@ const SubscriptionTable: FC<Props> = ({ data, onEdit }) => {
 	const columns: ColumnData<Subscription>[] = [
 		{
 			title: 'Customer',
-			render: (row) => row.customer?.name || row.customer_id,
+			render: (row) => (
+				<RedirectCell redirectUrl={`${RouteNames.customers}/${row.customer_id}`}>{row.customer?.name || row.customer_id}</RedirectCell>
+			),
 		},
 		{
 			title: 'Plan',
-			render: (row) => row.plan?.name || row.plan_id,
+			render: (row) => <RedirectCell redirectUrl={`${RouteNames.plan}/${row.plan_id}`}>{row.plan?.name || row.plan_id}</RedirectCell>,
 		},
+
 		{
 			title: 'Status',
 			render: (row) => {
@@ -69,7 +73,7 @@ const SubscriptionTable: FC<Props> = ({ data, onEdit }) => {
 			columns={columns}
 			data={data}
 			onRowClick={(row) => {
-				navigate(`${RouteNames.subscriptions}/${row?.id}`);
+				navigate(`${RouteNames.customers}/${row?.customer_id}/subscription/${row?.id}`);
 			}}
 		/>
 	);
