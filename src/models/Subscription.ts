@@ -4,6 +4,7 @@ import { BILLING_PERIOD } from '@/constants/constants';
 import { Plan } from './Plan';
 import { CreditGrant } from './CreditGrant';
 import { BaseModel, ENTITY_STATUS, Metadata } from './base';
+import { Price } from './Price';
 
 export interface LineItem extends BaseModel {
 	readonly subscription_id: string;
@@ -91,7 +92,40 @@ export interface SubscriptionUsage extends BaseModel {
 	readonly display_amount: string;
 	readonly start_time: Date;
 	readonly end_time: Date;
-	readonly charges: Charge[];
+	readonly charges: SubscriptionUsageByMeters[];
+	readonly commitment_amount?: number;
+	readonly overage_factor?: number;
+	readonly commitment_utilized?: number; // Amount of commitment used
+	readonly overage_amount?: number; // Amount charged at overage rate
+	readonly has_overage: boolean; // Whether any usage exceeded commitment
+}
+
+export interface SubscriptionUsageByMeters extends BaseModel {
+	readonly amount: number;
+	readonly currency: string;
+	readonly display_amount: string;
+	readonly quantity: number;
+	readonly filter_values: Record<string, any>;
+	readonly meter_id: string;
+	readonly meter_display_name: string;
+	readonly price: Price;
+	readonly is_overage: boolean; // Whether this charge is at overage rate
+	readonly overage_factor?: number; // Factor applied to this charge if in overage
+}
+
+export interface SubscriptionUpdatePeriodResponse {
+	total_success: number;
+	total_failed: number;
+	items: SubscriptionUpdatePeriodResponseItem[];
+	start_at: Date;
+}
+
+export interface SubscriptionUpdatePeriodResponseItem {
+	subscription_id: string;
+	period_start: Date;
+	period_end: Date;
+	success: boolean;
+	error?: string;
 }
 
 export interface Charge extends BaseModel {
@@ -144,6 +178,39 @@ export enum SUBSCRIPTION_STATUS {
 	PAST_DUE = 'past_due',
 	TRIALING = 'trialing',
 	UNPAID = 'unpaid',
+}
+
+// PaymentBehavior determines how subscription payments are handled
+export enum PAYMENT_BEHAVIOR {
+	// Immediately attempts payment. If fails, subscription becomes incomplete
+	ALLOW_INCOMPLETE = 'allow_incomplete',
+	// Always creates incomplete subscription if payment required
+	DEFAULT_INCOMPLETE = 'default_incomplete',
+	// Fails subscription creation if payment fails
+	ERROR_IF_INCOMPLETE = 'error_if_incomplete',
+	// Creates active subscription without payment attempt
+	DEFAULT_ACTIVE = 'default_active',
+}
+
+// CollectionMethod determines how invoices are collected for subscriptions
+export enum COLLECTION_METHOD {
+	// Automatically charge payment method
+	CHARGE_AUTOMATICALLY = 'charge_automatically',
+	// Send invoice to customer for manual payment
+	SEND_INVOICE = 'send_invoice',
+}
+
+// SubscriptionLineItemEntityType is the type of the source of a subscription line item
+export enum SUBSCRIPTION_LINE_ITEM_ENTITY_TYPE {
+	PLAN = 'plan',
+	ADDON = 'addon',
+}
+
+// SubscriptionChangeType defines the type of subscription change
+export enum SUBSCRIPTION_CHANGE_TYPE {
+	UPGRADE = 'upgrade',
+	DOWNGRADE = 'downgrade',
+	LATERAL = 'lateral',
 }
 
 // PauseStatus represents the pause state of a subscription

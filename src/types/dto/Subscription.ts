@@ -30,9 +30,13 @@ export interface ListSubscriptionsPayload extends QueryFilter, TimeRangeFilter {
 	subscription_status_not_in?: SUBSCRIPTION_STATUS[];
 	active_at?: string;
 	with_line_items?: boolean;
+	expand?: string;
+	sort?: TypedBackendSort[];
+	filters?: TypedBackendFilter[];
 }
 
 import { TaxRateOverride } from './tax';
+import { TypedBackendFilter, TypedBackendSort } from '../formatters/QueryBuilder';
 
 export interface GetSubscriptionDetailsPayload {
 	subscription_id: string;
@@ -128,8 +132,11 @@ export interface AddSubscriptionPhasePayload {
 	overage_factor?: number;
 }
 
-export interface ListSubscriptionsResponse extends Pagination {
+export interface ListSubscriptionsResponse extends QueryFilter, TimeRangeFilter {
 	items: Subscription[];
+	pagination: Pagination;
+	sort: TypedBackendSort[];
+	filters: TypedBackendFilter[];
 }
 
 export interface CreateSubscriptionPayload {
