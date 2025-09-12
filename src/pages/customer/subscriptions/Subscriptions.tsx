@@ -21,6 +21,7 @@ import { useQueryWithEmptyState } from '@/hooks/useQueryWithEmptyState';
 import { BILLING_CADENCE } from '@/models/Invoice';
 import { BILLING_PERIOD } from '@/constants/constants';
 import { SUBSCRIPTION_STATUS } from '@/models/Subscription';
+import { toSentenceCase } from '@/utils/common/helper_functions';
 
 const sortingOptions: SortOption[] = [
 	{
@@ -96,7 +97,7 @@ const filterOptions: FilterField[] = [
 		dataType: DataType.ARRAY,
 		options: Object.values(BILLING_PERIOD).map((period) => ({
 			value: period,
-			label: period.charAt(0).toUpperCase() + period.slice(1).toLowerCase(),
+			label: toSentenceCase(period.replace('_', ' ')),
 		})),
 	},
 ];
