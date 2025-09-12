@@ -2,6 +2,7 @@ import MainLayout from '@/layouts/MainLayout';
 import Auth from '@/pages/auth/Auth';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import CustomerPage from '@/pages/customer/customers/Customers';
+import SubscriptionsPage from '@/pages/customer/subscriptions/Subscriptions';
 import AuthMiddleware from '../auth/AuthProvider';
 import PricingPlans from '@/pages/product-catalog/plans/Plans';
 import CustomerSubscription from '@/pages/customer/customers/CustomerSubscription';
@@ -70,6 +71,9 @@ export const RouteNames = {
 	// customer management routes
 	customerManagement: '/customer-management',
 	customers: '/customer-management/customers',
+	subscriptions: '/customer-management/subscriptions',
+	createSubscription: '/customer-management/subscriptions/create',
+	subscriptionDetails: '/customer-management/subscriptions/:id',
 	taxes: '/customer-management/taxes',
 	invoices: '/customer-management/invoices',
 	createInvoice: '/customer-management/customers/:customerId/invoices/create',
@@ -233,6 +237,10 @@ export const MainRouter = createBrowserRouter([
 					{
 						path: RouteNames.customers,
 						element: <CustomerPage />,
+					},
+					{
+						path: RouteNames.subscriptions,
+						element: <SubscriptionsPage />,
 					},
 					{
 						path: `${RouteNames.customers}/:id/add-subscription`,
