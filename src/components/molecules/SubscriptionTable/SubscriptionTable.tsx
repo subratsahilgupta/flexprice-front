@@ -2,7 +2,6 @@ import { FC } from 'react';
 import { ActionButton, Chip } from '@/components/atoms';
 import FlexpriceTable, { ColumnData } from '../Table';
 import formatDate from '@/utils/common/format_date';
-import formatChips from '@/utils/common/format_chips';
 import { Subscription, SUBSCRIPTION_CANCELLATION_TYPE, SUBSCRIPTION_STATUS } from '@/models/Subscription';
 import { useNavigate } from 'react-router-dom';
 import { RouteNames } from '@/core/routes/Routes';
@@ -13,6 +12,29 @@ interface Props {
 	data: Subscription[];
 	onEdit?: (subscription: Subscription) => void;
 }
+
+const getSubscriptionStatusChip = (status: SUBSCRIPTION_STATUS) => {
+	switch (status) {
+		case SUBSCRIPTION_STATUS.ACTIVE:
+			return <Chip variant='success' label='Active' />;
+		case SUBSCRIPTION_STATUS.CANCELLED:
+			return <Chip variant='failed' label='Cancelled' />;
+		case SUBSCRIPTION_STATUS.PAUSED:
+			return <Chip variant='warning' label='Paused' />;
+		case SUBSCRIPTION_STATUS.INCOMPLETE:
+			return <Chip variant='warning' label='Incomplete' />;
+		case SUBSCRIPTION_STATUS.INCOMPLETE_EXPIRED:
+			return <Chip variant='failed' label='Incomplete Expired' />;
+		case SUBSCRIPTION_STATUS.PAST_DUE:
+			return <Chip variant='failed' label='Past Due' />;
+		case SUBSCRIPTION_STATUS.TRIALING:
+			return <Chip variant='warning' label='Trialing' />;
+		case SUBSCRIPTION_STATUS.UNPAID:
+			return <Chip variant='failed' label='Unpaid' />;
+		default:
+			return <Chip variant='default' label='Inactive' />;
+	}
+};
 
 const SubscriptionTable: FC<Props> = ({ data, onEdit }) => {
 	const navigate = useNavigate();
@@ -32,8 +54,8 @@ const SubscriptionTable: FC<Props> = ({ data, onEdit }) => {
 		{
 			title: 'Status',
 			render: (row) => {
-				const label = formatChips(row.status);
-				return <Chip variant={label === 'Active' ? 'success' : 'default'} label={label} />;
+				const label = getSubscriptionStatusChip(row.subscription_status);
+				return label;
 			},
 		},
 		{
@@ -41,8 +63,8 @@ const SubscriptionTable: FC<Props> = ({ data, onEdit }) => {
 			render: (row) => formatDate(row.start_date),
 		},
 		{
-			title: 'Updated At',
-			render: (row) => formatDate(row.updated_at),
+			title: 'Renewal Date',
+			render: (row) => formatDate(row.current_period_end),
 		},
 		{
 			fieldVariant: 'interactive',
