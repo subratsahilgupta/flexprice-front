@@ -15,7 +15,8 @@ import {
 	SubscriptionPauseResponse,
 	SubscriptionResumeResponse,
 } from '@/types/dto';
-import { generateQueryParams } from '@/utils/common/api_helper';
+import { generateExpandQueryParams, generateQueryParams } from '@/utils/common/api_helper';
+import { EXPAND } from '@/models/expand';
 
 class SubscriptionApi {
 	private static baseUrl = '/subscriptions';
@@ -65,6 +66,15 @@ class SubscriptionApi {
 
 	static async createSubscription(payload: CreateSubscriptionPayload): Promise<Subscription> {
 		return await AxiosClient.post(this.baseUrl, payload);
+	}
+
+	static async searchSubscriptions(payload: ListSubscriptionsPayload): Promise<ListSubscriptionsResponse> {
+		const expand = generateExpandQueryParams([EXPAND.CUSTOMER, EXPAND.PLAN, EXPAND.SUBSCRIPTION]);
+
+		return await AxiosClient.post(`${this.baseUrl}/search`, {
+			...payload,
+			expand,
+		});
 	}
 }
 

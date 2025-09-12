@@ -1,6 +1,7 @@
-import { FC, useState, useEffect } from 'react';
+import { FC, useState, useEffect, useCallback } from 'react';
 import { NavItem } from './SidebarMenu';
 import { SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from '@/components/ui/sidebar';
+import { debounce } from 'lodash';
 // import { ChevronRight } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -27,14 +28,17 @@ const SidebarItem: FC<SidebarItemProps> = (item) => {
 		setIsOpen(item.defaultOpen || false);
 	}, [item.defaultOpen, location.pathname]);
 
-	const handleNavigation = (url: string, hasChildren: boolean) => {
-		if (url && !hasChildren) {
-			navigate(url);
-		}
-		if (hasChildren) {
-			navigate(item.items?.[0].url || '#');
-		}
-	};
+	const handleNavigation = useCallback(
+		debounce((url: string, hasChildren: boolean) => {
+			if (url && !hasChildren) {
+				navigate(url);
+			}
+			if (hasChildren) {
+				navigate(item.items?.[0].url || '#');
+			}
+		}, 300),
+		[navigate, item.items],
+	);
 
 	const handleClick = () => {
 		if (hasChildren) {
@@ -78,7 +82,7 @@ const SidebarItem: FC<SidebarItemProps> = (item) => {
 											asChild={false}
 											isActive={subActive}
 											className={cn('w-full font-light text-black')}
-											onClick={() => navigate(subItem.url)}>
+											onClick={() => handleNavigation(subItem.url, false)}>
 											{subItem.title}
 										</SidebarMenuSubButton>
 									</SidebarMenuSubItem>
