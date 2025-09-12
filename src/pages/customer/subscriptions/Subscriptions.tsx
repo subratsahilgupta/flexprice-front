@@ -20,7 +20,7 @@ import useFilterSorting from '@/hooks/useFilterSorting';
 import { useQueryWithEmptyState } from '@/hooks/useQueryWithEmptyState';
 import { BILLING_CADENCE } from '@/models/Invoice';
 import { BILLING_PERIOD } from '@/constants/constants';
-import { BaseEntityStatus } from '@/types/common';
+import { SUBSCRIPTION_STATUS } from '@/models/Subscription';
 
 const sortingOptions: SortOption[] = [
 	{
@@ -61,14 +61,20 @@ const filterOptions: FilterField[] = [
 		dataType: DataType.STRING,
 	},
 	{
-		field: 'status',
+		field: 'subscription_status',
 		label: 'Status',
 		fieldType: FilterFieldType.MULTI_SELECT,
 		operators: [FilterOperator.IS_ANY_OF, FilterOperator.IS_NOT_ANY_OF],
 		dataType: DataType.ARRAY,
 		options: [
-			{ value: BaseEntityStatus.PUBLISHED, label: 'Active' },
-			{ value: BaseEntityStatus.ARCHIVED, label: 'Inactive' },
+			{ value: SUBSCRIPTION_STATUS.ACTIVE, label: 'Active' },
+			{ value: SUBSCRIPTION_STATUS.CANCELLED, label: 'Cancelled' },
+			{ value: SUBSCRIPTION_STATUS.PAUSED, label: 'Paused' },
+			{ value: SUBSCRIPTION_STATUS.INCOMPLETE, label: 'Incomplete' },
+			{ value: SUBSCRIPTION_STATUS.INCOMPLETE_EXPIRED, label: 'Incomplete Expired' },
+			{ value: SUBSCRIPTION_STATUS.PAST_DUE, label: 'Past Due' },
+			{ value: SUBSCRIPTION_STATUS.TRIALING, label: 'Trialing' },
+			{ value: SUBSCRIPTION_STATUS.UNPAID, label: 'Unpaid' },
 		],
 	},
 	{
@@ -101,9 +107,9 @@ const SubscriptionsPage = () => {
 	const { filters, sorts, setFilters, setSorts, sanitizedFilters, sanitizedSorts } = useFilterSorting({
 		initialFilters: [
 			{
-				field: 'status',
+				field: 'subscription_status',
 				operator: FilterOperator.IS_ANY_OF,
-				valueArray: [BaseEntityStatus.PUBLISHED],
+				valueArray: [SUBSCRIPTION_STATUS.ACTIVE],
 				dataType: DataType.ARRAY,
 				id: 'initial-status',
 			},

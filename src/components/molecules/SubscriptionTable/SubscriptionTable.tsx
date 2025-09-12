@@ -12,7 +12,6 @@ interface Props {
 	data: Subscription[];
 	onEdit?: (subscription: Subscription) => void;
 }
-
 const getSubscriptionStatusChip = (status: SUBSCRIPTION_STATUS) => {
 	switch (status) {
 		case SUBSCRIPTION_STATUS.ACTIVE:
