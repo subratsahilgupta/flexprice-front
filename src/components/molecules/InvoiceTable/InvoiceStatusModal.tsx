@@ -1,10 +1,13 @@
-import { Button, CheckboxRadioGroupItem, FormHeader, Modal, Select, Spacer } from '@/components/atoms';
+import { Button, CheckboxRadioGroupItem, FormHeader, Modal, Select, Spacer, Input, Textarea } from '@/components/atoms';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { Invoice } from '@/models/Invoice';
 import InvoiceApi from '@/api/InvoiceApi';
 import { useMutation } from '@tanstack/react-query';
 import { FC, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { AddChargesButton } from '@/components/organisms/PlanForm/SetupChargesSection';
+import { Trash2 } from 'lucide-react';
+import { ServerError } from '@/core/axios/types';
 
 interface InvoiceStatusProps {
 	isOpen: boolean;
@@ -55,7 +58,12 @@ const InvoiceStatusModal: FC<InvoiceStatusProps> = ({ isOpen, onOpenChange, invo
 	const { isPending, mutate: updateStatus } = useMutation({
 		mutationFn: async (status: string) => {
 			if (status === 'VOIDED') {
-				return await InvoiceApi.voidInvoice(invoice?.id as string);
+				const metadataObj: Record<string, string> = {};
+				voidMetadata.forEach(({ key, value }) => {
+					if (key.trim()) metadataObj[key] = value;
+				});
+				const payload = Object.keys(metadataObj).length > 0 ? { metadata: metadataObj } : undefined;
+				return await InvoiceApi.voidInvoice(invoice?.id as string, payload);
 			} else if (status === 'FINALIZED') {
 				return await InvoiceApi.finalizeInvoice(invoice?.id as string);
 				// update invoice status to draft
@@ -80,12 +88,37 @@ const InvoiceStatusModal: FC<InvoiceStatusProps> = ({ isOpen, onOpenChange, invo
 	const [status, setStatus] = useState(
 		invoice ? statusOptions.find((option) => option.value === invoice.invoice_status) || statusOptions[0] : statusOptions[0],
 	);
+	const [voidMetadata, setVoidMetadata] = useState<{ key: string; value: string }[]>([{ key: '', value: '' }]);
 
 	useEffect(() => {
 		if (invoice) {
 			setStatus(statusOptions.find((option) => option.value === invoice.invoice_status) || statusOptions[0]);
 		}
 	}, [invoice]);
+
+	const handleKeyChange = (idx: number, newKey: string) => {
+		setVoidMetadata((prev) => {
+			const arr = [...prev];
+			arr[idx] = { ...arr[idx], key: newKey };
+			return arr;
+		});
+	};
+
+	const handleValueChange = (idx: number, newValue: string) => {
+		setVoidMetadata((prev) => {
+			const arr = [...prev];
+			arr[idx] = { ...arr[idx], value: newValue };
+			return arr;
+		});
+	};
+
+	const handleAddMetadata = () => {
+		setVoidMetadata((prev) => [...prev, { key: '', value: '' }]);
+	};
+
+	const handleRemoveMetadata = (idx: number) => {
+		setVoidMetadata((prev) => prev.filter((_, i) => i !== idx));
+	};
 
 	return (
 		<Modal isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -103,6 +136,41 @@ const InvoiceStatusModal: FC<InvoiceStatusProps> = ({ isOpen, onOpenChange, invo
 					isRadio={true}
 				/>
 
+				{status.value === 'VOIDED' && (
+					<>
+						<Spacer className='!my-6' />
+						<div className='border-t pt-6'>
+							<h3 className='text-lg font-medium text-gray-900 mb-4'>Add Metadata (Optional)</h3>
+							<div className='flex flex-col gap-4'>
+								{voidMetadata.map((item, idx) => (
+									<div key={idx} className='flex gap-2 items-start'>
+										<div className='flex-[3] min-w-0'>
+											<Input placeholder='Key' value={item.key} onChange={(v) => handleKeyChange(idx, v)} className='rounded-lg' />
+										</div>
+										<div className='flex-[5] min-w-0'>
+											<Textarea
+												placeholder='Value'
+												value={item.value}
+												onChange={(v) => handleValueChange(idx, v)}
+												textAreaClassName='min-h-6 h-6 rounded-md'
+												className='rounded-md'
+											/>
+										</div>
+										{voidMetadata.length > 0 && (
+											<Button variant='ghost' className='size-10' onClick={() => handleRemoveMetadata(idx)} aria-label='Remove'>
+												<Trash2 className='size-6' />
+											</Button>
+										)}
+									</div>
+								))}
+								<div>
+									<AddChargesButton onClick={handleAddMetadata} label='Add another metadata item' />
+								</div>
+							</div>
+						</div>
+					</>
+				)}
+
 				<Spacer className='!my-6' />
 				<div className='flex justify-end gap-4'>
 					<Button onClick={() => onOpenChange(false)} variant={'outline'} className='btn btn-primary'>
@@ -115,7 +183,7 @@ const InvoiceStatusModal: FC<InvoiceStatusProps> = ({ isOpen, onOpenChange, invo
 							updateStatus(status.value);
 						}}
 						className='btn btn-primary'>
-						Update
+						{status.value === 'VOIDED' ? 'Void Invoice' : 'Update'}
 					</Button>
 				</div>
 			</div>
