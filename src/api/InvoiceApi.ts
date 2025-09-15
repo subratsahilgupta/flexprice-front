@@ -10,6 +10,7 @@ import {
 	GetInvoicePreviewPayload,
 	CreateInvoicePayload,
 	GetInvoicesByFiltersPayload,
+	VoidInvoicePayload,
 } from '@/types/dto';
 
 class InvoiceApi {
@@ -43,8 +44,8 @@ class InvoiceApi {
 		return await AxiosClient.put<Invoice>(`${this.baseurl}/${payload.invoiceId}/status`, payload);
 	}
 
-	public static async voidInvoice(invoiceId: string) {
-		return await AxiosClient.post(`${this.baseurl}/${invoiceId}/void`);
+	public static async voidInvoice(invoiceId: string, payload?: VoidInvoicePayload) {
+		return await AxiosClient.post(`${this.baseurl}/${invoiceId}/void`, payload);
 	}
 
 	public static async finalizeInvoice(invoiceId: string) {

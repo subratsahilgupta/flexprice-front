@@ -41,6 +41,7 @@ export type {
 	CreateInvoicePayload,
 	GetInvoicePdfPayload,
 	GetInvoicesByFiltersPayload,
+	VoidInvoicePayload,
 } from './InvoiceApi';
 
 export type { GetAllMetersResponse } from './Meter';
