@@ -143,28 +143,33 @@ const InvoiceStatusModal: FC<InvoiceStatusProps> = ({ isOpen, onOpenChange, invo
 							<h3 className='text-lg font-medium text-gray-900 mb-4'>Add Metadata (Optional)</h3>
 							<div className='flex flex-col gap-4'>
 								{voidMetadata.map((item, idx) => (
-									<div key={idx} className='flex gap-2 items-start'>
+									<div key={idx} className='flex gap-2 items-center'>
 										<div className='flex-[3] min-w-0'>
-											<Input placeholder='Key' value={item.key} onChange={(v) => handleKeyChange(idx, v)} className='rounded-lg' />
+											<Input placeholder='Key' value={item.key} onChange={(v) => handleKeyChange(idx, v)} className='rounded-lg h-10' />
 										</div>
 										<div className='flex-[5] min-w-0'>
 											<Textarea
 												placeholder='Value'
 												value={item.value}
 												onChange={(v) => handleValueChange(idx, v)}
-												textAreaClassName='min-h-6 h-6 rounded-md'
-												className='rounded-md'
+												textAreaClassName='min-h-6 h-6'
+												className='rounded-lg'
 											/>
 										</div>
 										{voidMetadata.length > 0 && (
-											<Button variant='ghost' className='size-10' onClick={() => handleRemoveMetadata(idx)} aria-label='Remove'>
-												<Trash2 className='size-6' />
+											<Button
+												variant='ghost'
+												size='sm'
+												className='h-10 w-10 flex-shrink-0'
+												onClick={() => handleRemoveMetadata(idx)}
+												aria-label='Remove'>
+												<Trash2 className='h-4 w-4' />
 											</Button>
 										)}
 									</div>
 								))}
 								<div>
-									<AddChargesButton onClick={handleAddMetadata} label='Add another metadata item' />
+									<AddChargesButton onClick={handleAddMetadata} label='Add more' />
 								</div>
 							</div>
 						</div>
