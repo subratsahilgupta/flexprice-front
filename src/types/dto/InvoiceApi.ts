@@ -121,3 +121,7 @@ export interface GetInvoicePdfPayload {
 	invoice_id: string;
 	invoice_no?: string;
 }
+
+export interface VoidInvoicePayload {
+	metadata?: Record<string, any>;
+}
