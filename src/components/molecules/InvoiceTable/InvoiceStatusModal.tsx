@@ -60,7 +60,9 @@ const InvoiceStatusModal: FC<InvoiceStatusProps> = ({ isOpen, onOpenChange, invo
 			if (status === 'VOIDED') {
 				const metadataObj: Record<string, string> = {};
 				voidMetadata.forEach(({ key, value }) => {
-					if (key.trim()) metadataObj[key] = value.trim();
+					const trimmedKey = key.trim();
+					const trimmedValue = value.trim();
+					if (trimmedKey) metadataObj[trimmedKey] = trimmedValue;
 				});
 				const payload = Object.keys(metadataObj).length > 0 ? { metadata: metadataObj } : undefined;
 				return await InvoiceApi.voidInvoice(invoice?.id as string, payload);
