@@ -16,7 +16,7 @@ const tutorials: TutorialItem[] = [
 	{
 		title: 'Getting Started',
 		description: 'Learn the basics of Flexprice in 5 minutes',
-		onClick: () => window.open('https://docs.flexprice.io/guides/getting-started/video', '_blank'),
+		onClick: () => window.open('https://docs.flexprice.io', '_blank'),
 	},
 	{
 		title: 'Set Up Pricing Plans',
