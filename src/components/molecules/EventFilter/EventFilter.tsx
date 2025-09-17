@@ -19,17 +19,25 @@ export interface EventFilterData {
 
 const EventFilter: FC<Props> = ({ eventFilters, setEventFilters, error, disabled, orientation = 'horizontal' }) => {
 	useEffect(() => {
-		if (eventFilters.length === 0 && !disabled) {
+		if ((!eventFilters || eventFilters.length === 0) && !disabled) {
 			setEventFilters([{ key: '', values: [] }]);
 		}
-	}, [eventFilters, disabled]);
+	}, [eventFilters, disabled, setEventFilters]);
 
 	const isHorizontal = orientation === 'horizontal';
+
+	// Safety check for eventFilters
+	const safeEventFilters = eventFilters || [];
 
 	return (
 		<div className='space-y-4'>
 			<div className={cn('flex flex-col', isHorizontal ? 'gap-4' : 'gap-6')}>
-				{eventFilters.map((eventFilter, index) => {
+				{safeEventFilters.map((eventFilter, index) => {
+					// Safety check for individual eventFilter
+					if (!eventFilter) {
+						return null;
+					}
+
 					return (
 						<div
 							key={index}
@@ -40,18 +48,20 @@ const EventFilter: FC<Props> = ({ eventFilters, setEventFilters, error, disabled
 										type='text'
 										label='Key'
 										placeholder='key'
-										value={eventFilter.key}
+										value={eventFilter.key || ''}
 										onChange={(e) => {
-											const newEventFilters = [...eventFilters];
-											newEventFilters[index].key = e;
-											setEventFilters(newEventFilters);
+											const newEventFilters = [...safeEventFilters];
+											if (newEventFilters[index]) {
+												newEventFilters[index].key = e;
+												setEventFilters(newEventFilters);
+											}
 										}}
 									/>
 									{!isHorizontal && (
 										<button
 											className='absolute right-0 top-8 flex justify-center items-center size-8 rounded-md hover:bg-gray-100 text-gray-500'
 											onClick={() => {
-												const newEventFilters = [...eventFilters];
+												const newEventFilters = [...safeEventFilters];
 												newEventFilters.splice(index, 1);
 												setEventFilters(newEventFilters);
 											}}>
@@ -63,11 +73,13 @@ const EventFilter: FC<Props> = ({ eventFilters, setEventFilters, error, disabled
 									type='text'
 									label='Values'
 									placeholder='value'
-									value={eventFilter.values}
+									value={eventFilter.values || []}
 									onChange={(e) => {
-										const newEventFilters = [...eventFilters];
-										newEventFilters[index].values = e;
-										setEventFilters(newEventFilters);
+										const newEventFilters = [...safeEventFilters];
+										if (newEventFilters[index]) {
+											newEventFilters[index].values = e;
+											setEventFilters(newEventFilters);
+										}
 									}}
 								/>
 							</div>
@@ -75,7 +87,7 @@ const EventFilter: FC<Props> = ({ eventFilters, setEventFilters, error, disabled
 								<button
 									className='flex justify-center items-center size-10 rounded-md border text-zinc self-end mb-[2px]'
 									onClick={() => {
-										const newEventFilters = [...eventFilters];
+										const newEventFilters = [...safeEventFilters];
 										newEventFilters.splice(index, 1);
 										setEventFilters(newEventFilters);
 									}}>
@@ -95,7 +107,7 @@ const EventFilter: FC<Props> = ({ eventFilters, setEventFilters, error, disabled
 					disabled={disabled}
 					variant='outline'
 					onClick={() => {
-						setEventFilters([...eventFilters, { key: '', values: [] }]);
+						setEventFilters([...safeEventFilters, { key: '', values: [] }]);
 					}}>
 					<span className='font-normal flex items-center gap-2'>
 						<Plus className='size-4' />

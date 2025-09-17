@@ -14,8 +14,13 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
 
 const MultichipField = React.forwardRef<HTMLInputElement, InputProps>(
 	({ className, type, label, value, description, error, onChange, placeholder, disabled, ...props }, ref) => {
-		const [chips, setchips] = useState<string[]>(value);
+		const [chips, setchips] = useState<string[]>(value || []);
 		const [inputText, setinputText] = useState('');
+
+		// Sync internal state with external value prop
+		React.useEffect(() => {
+			setchips(value || []);
+		}, [value]);
 
 		return (
 			<div className='space-y-1 w-full'>
