@@ -6,7 +6,6 @@ import {
 	InvoiceLineItemTable,
 	AppliedTaxesTable,
 } from '@/components/molecules';
-import DetailsCard from '@/components/molecules/DetailsCard/DetailsCard';
 import useUser from '@/hooks/useUser';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import InvoiceApi from '@/api/InvoiceApi';
@@ -203,11 +202,18 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 				<Card>
 					<CardHeader title='Metadata' />
 					<div className='p-4'>
-						<DetailsCard
-							variant='stacked'
-							data={Object.entries(metadata).map(([key, value]) => ({ label: key, value }))}
-							cardStyle='borderless'
-						/>
+						<div className='flex flex-wrap justify-between gap-4'>
+							{Object.entries(metadata).map(([key, value], index) => (
+								<div key={index} className='flex flex-col space-y-1 min-w-0 flex-1 max-w-xs'>
+									<div className='text-sm font-medium text-[#09090B] break-words truncate' title={key}>
+										{key}
+									</div>
+									<div className='text-sm text-[#71717A] break-words' title={value}>
+										{value || '--'}
+									</div>
+								</div>
+							))}
+						</div>
 					</div>
 				</Card>
 			)}
