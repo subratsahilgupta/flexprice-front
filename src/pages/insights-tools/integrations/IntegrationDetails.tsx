@@ -15,7 +15,7 @@ import { CONNECTION_PROVIDER_TYPE } from '@/models/Connection';
 
 const IntegrationDetails = () => {
 	const { id: name } = useParams() as { id: string };
-	const integration = integrations.find((integration) => integration.name.toLocaleLowerCase() === name.toLocaleLowerCase())!;
+	const integration = integrations.find((integration) => integration.name.toLocaleLowerCase() === name.toLocaleLowerCase());
 
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 	const [editingConnection, setEditingConnection] = useState<any | null>(null);
@@ -80,6 +80,10 @@ const IntegrationDetails = () => {
 		setEditingConnection(connection);
 		setIsDrawerOpen(true);
 	};
+
+	if (!integration) {
+		return <div>Integration not found</div>;
+	}
 
 	return (
 		<Page>

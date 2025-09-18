@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 export function getCurrencySymbol(currency: string): string {
 	try {
 		const info = getAllISOCodes().filter((code) => code.currency === currency.toUpperCase());
-		return info[0].symbol;
+		return info[0]?.symbol || currency;
 	} catch (error) {
 		console.error('Error getting currency symbol', error);
 		return currency;
@@ -16,7 +16,7 @@ export function getCurrencySymbol(currency: string): string {
 export function getCurrencyName(currency: string): string {
 	try {
 		const info = getAllISOCodes().filter((code) => code.currency === currency.toUpperCase());
-		return info[0].countryName;
+		return info[0]?.countryName || currency;
 	} catch (error) {
 		console.error('Error getting currency name', error);
 		return currency;
