@@ -341,8 +341,10 @@ const UsagePricingForm: FC<Props> = ({
 			<SelectMeter
 				error={errors.meter_id}
 				onChange={(meter) => {
-					setMeterId(meter.id);
-					setActiveMeter(meter);
+					if (meter) {
+						setMeterId(meter.id);
+						setActiveMeter(meter);
+					}
 				}}
 				value={meterId}
 			/>

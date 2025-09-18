@@ -83,13 +83,13 @@ const DebugMenu = () => {
 	}, [isStreaming]);
 
 	const handleStartStreaming = () => {
-		if (!subscriptions?.items[0]?.id) return;
+		if (!subscriptions?.items?.[0]?.id) return;
 		setIsStreaming(true);
 		setProgress(0);
 		setEventsCompleted(false);
 		setEventCount(0);
 		EventsApi.fireEvents({
-			subscription_id: subscriptions.items[0].id,
+			subscription_id: subscriptions.items?.[0]?.id || '',
 			duration: STREAM_DURATION / 1000,
 		});
 	};
@@ -103,8 +103,8 @@ const DebugMenu = () => {
 	};
 
 	const handleCreateSubscription = () => {
-		if (customerData?.items[0]?.id) {
-			navigate(`${RouteNames.customers}/${customerData.items[0].id}/add-subscription`);
+		if (customerData?.items?.[0]?.id) {
+			navigate(`${RouteNames.customers}/${customerData.items?.[0]?.id}/add-subscription`);
 		}
 	};
 
@@ -190,8 +190,8 @@ const DebugMenu = () => {
 								<div className='space-y-3'>
 									<p className='text-sm text-muted-foreground'>
 										Customer{' '}
-										<Link to={`${RouteNames.customers}/${customerData.items[0].id}`} className='text-blue-500'>
-											{customerData.items[0].name}
+										<Link to={`${RouteNames.customers}/${customerData.items?.[0]?.id}`} className='text-blue-500'>
+											{customerData.items?.[0]?.name}
 										</Link>{' '}
 										has no subscriptions.
 									</p>
@@ -201,14 +201,14 @@ const DebugMenu = () => {
 								<>
 									<p className='text-sm text-muted-foreground mb-4'>
 										{eventCount * 5} events have been fired for
-										<Link to={`${RouteNames.customers}/${customerData.items[0].id}`} className='text-blue-500'>
-											{` ${customerData.items[0].name} `}
+										<Link to={`${RouteNames.customers}/${customerData.items?.[0]?.id}`} className='text-blue-500'>
+											{` ${customerData.items?.[0]?.name} `}
 										</Link>
 										for
 										<Link
-											to={`${RouteNames.customers}/${customerData.items[0].id}/subscription/${subscriptions.items[0].id}`}
+											to={`${RouteNames.customers}/${customerData.items?.[0]?.id}/subscription/${subscriptions.items?.[0]?.id}`}
 											className='text-blue-500'>
-											{` ${subscriptions.items[0].plan.name} `}
+											{` ${subscriptions.items?.[0]?.plan?.name} `}
 										</Link>
 										plan.
 									</p>
@@ -227,14 +227,14 @@ const DebugMenu = () => {
 								<>
 									<p className='text-sm text-muted-foreground mb-4'>
 										Experience how metering, billing, and entitlements update in real time. Sample events will be triggered for
-										<Link to={`${RouteNames.customers}/${customerData.items[0].id}`} className='text-blue-500'>
-											{` ${customerData.items[0].name} `}
+										<Link to={`${RouteNames.customers}/${customerData.items?.[0]?.id}`} className='text-blue-500'>
+											{` ${customerData.items?.[0]?.name} `}
 										</Link>{' '}
 										under the{' '}
 										<Link
-											to={`${RouteNames.customers}/${customerData.items[0].id}/subscription/${subscriptions.items[0].id}`}
+											to={`${RouteNames.customers}/${customerData.items?.[0]?.id}/subscription/${subscriptions.items?.[0]?.id}`}
 											className='text-blue-500'>
-											{` ${subscriptions.items[0].plan.name} `}
+											{` ${subscriptions.items?.[0]?.plan?.name} `}
 										</Link>{' '}
 										plan.
 									</p>

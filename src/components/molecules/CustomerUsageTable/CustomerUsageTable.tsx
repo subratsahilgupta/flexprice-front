@@ -38,7 +38,7 @@ export const getFeatureTypeChips = ({
 const getFeatureValue = (data: CustomerUsage) => {
 	switch (data.feature.type) {
 		case FEATURE_TYPE.STATIC:
-			return data.sources[0].static_value;
+			return data.sources?.[0]?.static_value || '--';
 		case FEATURE_TYPE.METERED:
 			return (
 				<span className='flex items-end gap-1'>

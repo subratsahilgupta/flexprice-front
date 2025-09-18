@@ -6,6 +6,7 @@ import {
 	InvoiceLineItemTable,
 	AppliedTaxesTable,
 } from '@/components/molecules';
+import DetailsCard from '@/components/molecules/DetailsCard/DetailsCard';
 import useUser from '@/hooks/useUser';
 import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import InvoiceApi from '@/api/InvoiceApi';
@@ -31,6 +32,7 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 		isPaymentModalOpen: false,
 		isStatusModalOpen: false,
 	});
+	const [metadata, setMetadata] = useState<Record<string, string>>({});
 	const { updateBreadcrumb } = useBreadcrumbsStore();
 	const { data, isLoading, isError } = useQuery({
 		queryKey: ['fetchInvoice', invoice_id],
@@ -45,6 +47,18 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 	useEffect(() => {
 		updateBreadcrumb(breadcrumb_index, data?.invoice_number ?? invoice_id);
 	}, [invoice_id, data?.invoice_number, breadcrumb_index, updateBreadcrumb]);
+
+	// Process metadata from invoice data
+	useEffect(() => {
+		if (data && 'metadata' in data && data.metadata) {
+			const invoiceMetadata = data.metadata as Record<string, unknown>;
+			// Filter to only string values for display
+			const filteredMetadata = Object.entries(invoiceMetadata)
+				.filter(([_, value]) => typeof value === 'string')
+				.reduce((acc, [key, value]) => ({ ...acc, [key]: value as string }), {});
+			setMetadata(filteredMetadata);
+		}
+	}, [data]);
 
 	const customerInfoClass = 'text-sm text-[#71717A] mb-[2px]';
 	const invoiceref = useRef<HTMLDivElement>(null);
@@ -180,6 +194,20 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 					<CardHeader title='Applied Taxes' />
 					<div className='p-4'>
 						<AppliedTaxesTable data={data.taxes} />
+					</div>
+				</Card>
+			)}
+
+			{/* metadata section - only show if metadata exists */}
+			{metadata && Object.keys(metadata).length > 0 && (
+				<Card>
+					<CardHeader title='Metadata' />
+					<div className='p-4'>
+						<DetailsCard
+							variant='stacked'
+							data={Object.entries(metadata).map(([key, value]) => ({ label: key, value }))}
+							cardStyle='borderless'
+						/>
 					</div>
 				</Card>
 			)}
