@@ -237,7 +237,11 @@ const QueryPage: React.FC = () => {
 					<SelectMeter
 						label=''
 						className='w-full rounded-xl max-h-9'
-						onChange={(value) => setSelectedMeter(value.id)}
+						onChange={(value) => {
+							if (value) {
+								setSelectedMeter(value.id);
+							}
+						}}
 						value={selectedMeter}
 					/>
 				</div>

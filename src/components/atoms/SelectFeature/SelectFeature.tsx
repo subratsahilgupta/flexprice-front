@@ -88,7 +88,12 @@ const SelectFeature: FC<Props> = ({
 				error={error}
 				value={value}
 				noOptionsText='No features added yet'
-				onChange={(e) => onChange(featuresData.items.find((feature) => feature.id === e) as Feature)}
+				onChange={(e) => {
+					const selectedFeature = featuresData.items.find((feature) => feature.id === e);
+					if (selectedFeature) {
+						onChange(selectedFeature);
+					}
+				}}
 				options={options}
 				placeholder={placeholder}
 				label={label}
