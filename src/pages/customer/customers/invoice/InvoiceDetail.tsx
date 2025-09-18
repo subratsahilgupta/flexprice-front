@@ -202,18 +202,26 @@ const InvoiceDetails: FC<Props> = ({ invoice_id, breadcrumb_index }) => {
 				<Card>
 					<CardHeader title='Metadata' />
 					<div className='p-4'>
-						<div className='flex flex-wrap justify-between gap-4'>
-							{Object.entries(metadata).map(([key, value], index) => (
-								<div key={index} className='flex flex-col space-y-1 min-w-0 flex-1 max-w-xs'>
-									<div className='text-sm font-medium text-[#09090B] break-words truncate' title={key}>
-										{key}
-									</div>
-									<div className='text-sm text-[#71717A] break-words' title={value}>
-										{value || '--'}
-									</div>
-								</div>
-							))}
-						</div>
+						<table className='w-full table-fixed'>
+							<thead>
+								<tr className='border-b border-gray-200'>
+									<th className='text-left py-3 px-4 text-sm font-large text-[#09090B] w-1/3'>Key</th>
+									<th className='text-left py-3 px-4 text-sm font-large text-[#09090B] w-2/3'>Value</th>
+								</tr>
+							</thead>
+							<tbody>
+								{Object.entries(metadata).map(([key, value], index) => (
+									<tr key={index} className='border-b border-gray-100 last:border-b-0'>
+										<td className='py-3 px-4 text-sm font-medium text-[#09090B] break-words align-top' title={key}>
+											{key}
+										</td>
+										<td className='py-3 px-4 text-sm text-[#71717A] break-words align-top' title={value}>
+											{value || '--'}
+										</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
 					</div>
 				</Card>
 			)}
