@@ -24,6 +24,8 @@ export const formatAggregationType = (data: string): string => {
 		[METER_AGGREGATION_TYPE.COUNT_UNIQUE]: 'Count Unique',
 		[METER_AGGREGATION_TYPE.LATEST]: 'Latest',
 		[METER_AGGREGATION_TYPE.SUM_WITH_MULTIPLIER]: 'Sum with Multiplier',
+		[METER_AGGREGATION_TYPE.MAX]: 'Max',
+		[METER_AGGREGATION_TYPE.WEIGHTED_SUM]: 'Weighted Sum',
 	};
 	return aggregationTypeMap[data] || data;
 };
@@ -97,6 +99,11 @@ const AGGREGATION_OPTIONS: SelectOption[] = [
 		label: 'Max',
 		value: METER_AGGREGATION_TYPE.MAX,
 		description: 'Get the maximum value of a defined property for incoming events.',
+	},
+	{
+		label: 'Weighted Sum',
+		value: METER_AGGREGATION_TYPE.WEIGHTED_SUM,
+		description: 'Sum a defined property for incoming events with weight-based aggregation.',
 	},
 ];
 
