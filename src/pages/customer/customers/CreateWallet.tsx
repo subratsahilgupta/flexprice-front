@@ -9,6 +9,7 @@ import { useMutation } from '@tanstack/react-query';
 import { FC, useState } from 'react';
 import toast from 'react-hot-toast';
 import { CreateWalletPayload } from '@/types/dto';
+import { WALLET_CONFIG_PRICE_TYPE } from '@/models/Wallet';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface Props {
@@ -26,14 +27,16 @@ const CreateWallet: FC<Props> = ({ customerId, onSuccess = () => {}, open, onOpe
 		conversion_rate: '',
 	});
 
-	const [walletPayload, setwalletPayload] = useState<Partial<CreateWalletPayload>>({
+	const [walletPayload, setwalletPayload] = useState<CreateWalletPayload>({
 		currency: '',
 		initial_credits_to_load: 0,
 		conversion_rate: 1,
 		name: 'Prepaid Wallet',
+		config: {
+			allowed_price_types: [WALLET_CONFIG_PRICE_TYPE.ALL],
+		},
+		customerId,
 	});
-
-	// const [autoTopup, setautoTopup] = useState(false);
 
 	const { mutateAsync: createWallet, isPending } = useMutation({
 		mutationKey: ['createWallet', customerId],
@@ -45,6 +48,7 @@ const CreateWallet: FC<Props> = ({ customerId, onSuccess = () => {}, open, onOpe
 				initial_credits_to_load: walletPayload.initial_credits_to_load,
 				conversion_rate: walletPayload.conversion_rate,
 				initial_credits_expiry_date_utc: walletPayload.initial_credits_expiry_date_utc,
+				config: walletPayload.config,
 			});
 		},
 		onError: (error: ServerError) => {
@@ -125,6 +129,26 @@ const CreateWallet: FC<Props> = ({ customerId, onSuccess = () => {}, open, onOpe
 							setwalletPayload({ ...walletPayload, initial_credits_to_load: e as unknown as number });
 						}}
 					/>
+
+					<Select
+						value={walletPayload.config?.allowed_price_types?.[0] || WALLET_CONFIG_PRICE_TYPE.ALL}
+						options={[
+							{ label: 'All Price Types', value: WALLET_CONFIG_PRICE_TYPE.ALL },
+							{ label: 'Usage Only', value: WALLET_CONFIG_PRICE_TYPE.USAGE },
+							{ label: 'Fixed Only', value: WALLET_CONFIG_PRICE_TYPE.FIXED },
+						]}
+						label='Allowed Price Types'
+						onChange={(e) =>
+							setwalletPayload({
+								...walletPayload,
+								config: {
+									allowed_price_types: [e as WALLET_CONFIG_PRICE_TYPE],
+								},
+							})
+						}
+						placeholder='Select Allowed Price Types'
+					/>
+
 					<div>
 						<DatePicker
 							labelClassName='text-foreground'
