@@ -17,17 +17,6 @@ import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { z } from 'zod';
 
-export const formatAggregationType = (data: string): string => {
-	const aggregationTypeMap: Record<string, string> = {
-		[METER_AGGREGATION_TYPE.SUM]: 'Sum',
-		[METER_AGGREGATION_TYPE.COUNT]: 'Count',
-		[METER_AGGREGATION_TYPE.COUNT_UNIQUE]: 'Count Unique',
-		[METER_AGGREGATION_TYPE.LATEST]: 'Latest',
-		[METER_AGGREGATION_TYPE.SUM_WITH_MULTIPLIER]: 'Sum with Multiplier',
-	};
-	return aggregationTypeMap[data] || data;
-};
-
 // Feature type options constant
 const FEATURE_TYPE_OPTIONS: SelectOption[] = [
 	{
@@ -97,6 +86,11 @@ const AGGREGATION_OPTIONS: SelectOption[] = [
 		label: 'Max',
 		value: METER_AGGREGATION_TYPE.MAX,
 		description: 'Get the maximum value of a defined property for incoming events.',
+	},
+	{
+		label: 'Weighted Sum',
+		value: METER_AGGREGATION_TYPE.WEIGHTED_SUM,
+		description: 'Sum a defined property for incoming events with weight-based aggregation.',
 	},
 ];
 
