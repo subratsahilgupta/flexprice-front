@@ -24,7 +24,6 @@ import { BaseEntityStatus } from '@/types/common/BaseEntity';
 import { formatMeterUsageResetPeriodToDisplay } from '@/types/formatters/Feature';
 
 // Local utilities
-import { formatAggregationType } from './AddFeature';
 import { formatAmount } from '@/components/atoms/Input/Input';
 import { ApiDocsSnippet } from '@/store/useApiDocsStore';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
@@ -36,6 +35,19 @@ import ChargeValueCell from '@/pages/product-catalog/plans/ChargeValueCell';
 import { PriceApi } from '@/api/PriceApi';
 import { formatBillingPeriodForDisplay, getPriceTypeLabel } from '@/utils/common/helper_functions';
 import { formatInvoiceCadence } from '@/pages/product-catalog/plans/PlanDetailsPage';
+
+export const formatAggregationType = (data: string): string => {
+	const aggregationTypeMap: Record<string, string> = {
+		[METER_AGGREGATION_TYPE.SUM]: 'Sum',
+		[METER_AGGREGATION_TYPE.COUNT]: 'Count',
+		[METER_AGGREGATION_TYPE.COUNT_UNIQUE]: 'Count Unique',
+		[METER_AGGREGATION_TYPE.LATEST]: 'Latest',
+		[METER_AGGREGATION_TYPE.SUM_WITH_MULTIPLIER]: 'Sum with Multiplier',
+		[METER_AGGREGATION_TYPE.MAX]: 'Max',
+		[METER_AGGREGATION_TYPE.WEIGHTED_SUM]: 'Weighted Sum',
+	};
+	return aggregationTypeMap[data] || data;
+};
 
 const priceColumns: ColumnData<Price>[] = [
 	{
