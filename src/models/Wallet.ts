@@ -57,3 +57,9 @@ export enum WALLET_AUTO_TOPUP_TRIGGER {
 	DISABLED = 'disabled',
 	BALANCE_BELOW_THRESHOLD = 'balance_below_threshold',
 }
+
+export enum WALLET_CONFIG_PRICE_TYPE {
+	ALL = 'ALL',
+	USAGE = 'USAGE',
+	FIXED = 'FIXED',
+}
