@@ -92,6 +92,11 @@ const AGGREGATION_OPTIONS: SelectOption[] = [
 		value: METER_AGGREGATION_TYPE.WEIGHTED_SUM,
 		description: 'Sum a defined property for incoming events with weight-based aggregation.',
 	},
+	{
+		label: 'Average',
+		value: METER_AGGREGATION_TYPE.AVG,
+		description: 'Get the average value of a defined property for incoming events.',
+	},
 ];
 
 const BUCKET_SIZE_OPTIONS: SelectOption[] = [
