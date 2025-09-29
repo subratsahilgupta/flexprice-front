@@ -45,6 +45,7 @@ export const formatAggregationType = (data: string): string => {
 		[METER_AGGREGATION_TYPE.SUM_WITH_MULTIPLIER]: 'Sum with Multiplier',
 		[METER_AGGREGATION_TYPE.MAX]: 'Max',
 		[METER_AGGREGATION_TYPE.WEIGHTED_SUM]: 'Weighted Sum',
+		[METER_AGGREGATION_TYPE.AVG]: 'Average',
 	};
 	return aggregationTypeMap[data] || data;
 };
