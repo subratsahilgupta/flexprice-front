@@ -13,8 +13,6 @@ const SidebarFooter = () => {
 	const navigate = useNavigate();
 	const handleLogout = async () => {
 		await AuthService.logout();
-		localStorage.clear();
-		navigate('/auth');
 	};
 
 	const { loading, user } = useUser();

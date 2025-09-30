@@ -31,7 +31,6 @@ const getTaxTypeLabel = (type: TAX_RATE_TYPE) => {
 // 		[TAX_RATE_STATUS.INACTIVE]: { label: 'Inactive', variant: 'default' as const },
 // 		[TAX_RATE_STATUS.DELETED]: { label: 'Deleted', variant: 'failed' as const },
 // 	};
-// 	console.log(status);
 // 	const config = statusConfig[status] || { label: 'Unknown', variant: 'default' as const };
 // 	return <Chip label={config.label} variant={config.variant} />;
 // };

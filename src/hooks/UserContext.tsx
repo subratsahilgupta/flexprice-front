@@ -1,6 +1,4 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
-import AuthService from '@/core/auth/AuthService';
 import { logger } from '@/utils/common/Logger';
 
 interface UserProviderProps {
@@ -18,15 +16,16 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 
 	useEffect(() => {
 		try {
-			const user = JSON.parse(localStorage.getItem('user')!);
-			setUser(user);
+			const userData = localStorage.getItem('user');
+			if (userData) {
+				const user = JSON.parse(userData);
+				setUser(user);
+			}
 		} catch (error) {
 			logger.error(error);
-
-			// logout user
-			AuthService.logout();
-
-			<Navigate to={'/auth'} />;
+			// Clear invalid user data but don't trigger logout to prevent infinite redirects
+			localStorage.removeItem('user');
+			setUser(null);
 		}
 	}, []);
 
