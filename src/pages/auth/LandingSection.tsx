@@ -104,9 +104,8 @@ const LandingSection = () => {
 				<div className='text-center font-inter text-black font-medium mb-14 text-lg'>Trusted by</div>
 				<div className='w-full max-w-3xl grid grid-cols-3 grid-rows-2 gap-y-12 gap-x-12 justify-items-center items-center'>
 					{customerLogos.map((logo, idx) => (
-						<div className='flex items-center justify-center'>
+						<div key={idx} className='flex items-center justify-center'>
 							<img
-								key={idx}
 								src={logo}
 								alt='customer logo'
 								className='max-h-10 object-contain  transition-all duration-200'

@@ -41,15 +41,12 @@ const TaxAssociationDialog: FC<TaxAssociationDialogProps> = ({
 	data,
 	alreadyLinkedTaxRateCodes,
 }) => {
-	console.log('data', data);
-
 	const [formData, setFormData] = useState<FormData>({
 		tax_rate_code: data?.tax_rate_code || '',
 		priority: data?.priority || 1,
 		currency: data?.currency || 'usd',
 		auto_apply: data?.auto_apply || true,
 	});
-
 	const [errors, setErrors] = useState<FormErrors>({});
 
 	// Fetch published tax rates

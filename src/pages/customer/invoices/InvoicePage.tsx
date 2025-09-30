@@ -202,7 +202,7 @@ const InvoicesPage = () => {
 	if (isError) {
 		const err = error as any;
 		toast.error(err?.error?.message || 'Error fetching invoices');
-		return null;
+		return <div>Error fetching invoices</div>;
 	}
 
 	if (showEmptyPage) {
@@ -213,17 +213,8 @@ const InvoicesPage = () => {
 				emptyStateCard={{
 					heading: 'Create your first invoice',
 					description: 'Generate an invoice to initiate billing and manage customer payments.',
-					buttonLabel: 'Create Invoice',
-					buttonAction: () => {
-						// TODO: Implement create invoice functionality
-						console.log('Create invoice clicked');
-					},
 				}}
 				tutorials={GUIDES.invoices.tutorials}
-				onAddClick={() => {
-					// TODO: Implement create invoice functionality
-					console.log('Create invoice clicked');
-				}}
 			/>
 		);
 	}
