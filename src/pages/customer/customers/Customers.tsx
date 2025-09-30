@@ -173,7 +173,7 @@ const CustomerPage = () => {
 	if (isError) {
 		const err = error as ServerError;
 		toast.error(err.error.message || 'Error fetching customers');
-		return null;
+		return <div>Error fetching customers</div>;
 	}
 
 	if (showEmptyPage) {

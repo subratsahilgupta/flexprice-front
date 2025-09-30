@@ -1,5 +1,6 @@
 import { NODE_ENV, NodeEnv } from '@/types/env';
 import supabase from '../services/supbase/config';
+import { RouteNames } from '../routes/Routes';
 
 class AuthService {
 	public static async getAcessToken() {
@@ -39,11 +40,11 @@ class AuthService {
 	}
 
 	public static async logout() {
-		window.location.href = '/auth';
 		if (NODE_ENV != NodeEnv.SELF_HOSTED) {
 			await supabase.auth.signOut();
 		}
 		localStorage.clear();
+		window.location.href = RouteNames.login;
 	}
 }
 
