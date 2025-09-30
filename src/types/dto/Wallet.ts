@@ -15,7 +15,7 @@ export interface WalletTransactionResponse {
 }
 
 export interface CreateWalletPayload {
-	customerId: string;
+	customer_id: string;
 	currency: string;
 	name?: string;
 	metadata?: Metadata;
