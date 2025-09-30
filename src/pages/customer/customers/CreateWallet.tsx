@@ -35,15 +35,15 @@ const CreateWallet: FC<Props> = ({ customerId, onSuccess = () => {}, open, onOpe
 		config: {
 			allowed_price_types: [WALLET_CONFIG_PRICE_TYPE.ALL],
 		},
-		customerId,
+		customer_id: customerId,
 	});
 
 	const { mutateAsync: createWallet, isPending } = useMutation({
 		mutationKey: ['createWallet', customerId],
 		mutationFn: async () => {
 			return await WalletApi.createWallet({
-				currency: walletPayload.currency!,
-				customerId,
+				customer_id: customerId,
+				currency: walletPayload.currency,
 				name: walletPayload.name,
 				initial_credits_to_load: walletPayload.initial_credits_to_load,
 				conversion_rate: walletPayload.conversion_rate,
