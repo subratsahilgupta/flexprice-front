@@ -25,6 +25,7 @@ export enum WALLET_STATUS {
 	CLOSED = 'closed',
 }
 
+// interface
 export enum WALLET_TX_REFERENCE_TYPE {
 	PAYMENT = 'PAYMENT',
 	EXTERNAL = 'EXTERNAL',
