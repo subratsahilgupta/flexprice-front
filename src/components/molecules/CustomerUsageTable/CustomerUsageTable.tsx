@@ -100,7 +100,7 @@ const CustomerUsageTable: FC<Props> = ({ data, allowRedirect = true }) => {
 					return (
 						<Progress
 							label={`${formatAmount(usage.toString())} / Unlimited`}
-							value={100}
+							value={0}
 							className='h-[6px]'
 							indicatorColor='bg-blue-600'
 							backgroundColor='bg-blue-200'
