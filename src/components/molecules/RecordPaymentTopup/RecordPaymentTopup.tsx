@@ -61,7 +61,7 @@ const RecordPaymentTopup: FC<Props> = ({
 	onSuccess,
 }) => {
 	const [formData, setFormData] = useState<PaymentFormData>({
-		amount: 0,
+		amount: max_amount || 0,
 		payment_method_type: '',
 	});
 	const [errors, setErrors] = useState<ValidationErrors>({});
@@ -155,7 +155,7 @@ const RecordPaymentTopup: FC<Props> = ({
 	useEffect(() => {
 		if (!isOpen) {
 			setFormData({
-				amount: 0,
+				amount: max_amount || 0,
 				payment_method_type: '',
 				reference_id: '',
 				description: '',
@@ -165,7 +165,7 @@ const RecordPaymentTopup: FC<Props> = ({
 			});
 			setErrors({});
 		}
-	}, [isOpen]);
+	}, [isOpen, max_amount]);
 
 	const validateForm = (): boolean => {
 		const newErrors: ValidationErrors = {};
@@ -512,7 +512,7 @@ const RecordPaymentTopup: FC<Props> = ({
 							<Button variant='outline' onClick={() => onOpenChange(false)} className='mr-2'>
 								Cancel
 							</Button>
-							<Button onClick={handleSubmit} disabled={isPending} isLoading={isPending}>
+							<Button onClick={handleSubmit} disabled={isPending || !formData.payment_method_type} isLoading={isPending}>
 								{isPending ? (
 									<>
 										<LoaderCircleIcon className='w-4 h-4 animate-spin mr-2' />

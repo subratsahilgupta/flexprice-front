@@ -58,6 +58,7 @@ const CreateInvoicePage: FC = () => {
 	useEffect(() => {
 		if (customer?.name) {
 			updateBreadcrumb(2, customer?.name);
+			updateBreadcrumb(3, 'Invoices', RouteNames.customers + '/' + customerId + '/invoice');
 		}
 	}, [customer, updateBreadcrumb]);
 
