@@ -83,7 +83,7 @@ const WalletTab = () => {
 		isLoading: isTransactionLoading,
 		isError: isTransactionError,
 	} = useQuery({
-		queryKey: ['fetchWalletsTransactions', customerId, activeWallet?.id],
+		queryKey: ['fetchWalletsTransactions', customerId, activeWallet?.id, limit, offset],
 		queryFn: () =>
 			WalletApi.getWalletTransactions({
 				walletId: activeWallet ? activeWallet.id : '',
