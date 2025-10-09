@@ -111,6 +111,8 @@ export { default as SubscriptionTaxAssociationTable } from './SubscriptionTaxAss
 
 export { MetadataModal } from './MetadataModal';
 
+export { default as SaveCardModal } from './SaveCardModal';
+
 export { default as PriceOverrideDialog } from './PriceOverrideDialog';
 
 export { default as WalletAlertDialog } from './WalletAlertDialog';
