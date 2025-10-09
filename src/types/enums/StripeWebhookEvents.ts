@@ -6,6 +6,7 @@ export enum StripeWebhookEvents {
 	// Default events (always included)
 	PAYMENT_INTENT_SUCCEEDED = 'payment_intent.succeeded',
 	PAYMENT_INTENT_PAYMENT_FAILED = 'payment_intent.payment_failed',
+	CHECKOUT_SESSION_COMPLETED = 'checkout.session.completed',
 	CUSTOMER_CREATED = 'customer.created',
 	CUSTOMER_UPDATED = 'customer.updated',
 	CUSTOMER_DELETED = 'customer.deleted',
@@ -21,10 +22,9 @@ export enum StripeWebhookEvents {
 	CUSTOMER_SUBSCRIPTION_DELETED = 'customer.subscription.deleted',
 
 	// Invoice events
-	INVOICE_CREATED = 'invoice.created',
-	INVOICE_SENT = 'invoice.sent',
 	INVOICE_PAYMENT_SUCCEEDED = 'invoice.payment_succeeded',
-	INVOICE_PAYMENT_FAILED = 'invoice.payment_failed',
+	SETUP_INTENT_SUCCEEDED = 'setup_intent.succeeded',
+	INVOICE_PAYMENT_PAID = 'invoice.payment_paid',
 }
 
 /**
@@ -37,6 +37,7 @@ export const getDefaultWebhookEvents = (): StripeWebhookEvents[] => [
 	StripeWebhookEvents.CUSTOMER_CREATED,
 	StripeWebhookEvents.CUSTOMER_UPDATED,
 	StripeWebhookEvents.CUSTOMER_DELETED,
+	StripeWebhookEvents.CHECKOUT_SESSION_COMPLETED,
 ];
 
 /**
@@ -64,8 +65,7 @@ export const getSubscriptionWebhookEvents = (): StripeWebhookEvents[] => [
  * @returns Array of invoice-related Stripe webhook events
  */
 export const getInvoiceWebhookEvents = (): StripeWebhookEvents[] => [
-	StripeWebhookEvents.INVOICE_CREATED,
-	StripeWebhookEvents.INVOICE_SENT,
 	StripeWebhookEvents.INVOICE_PAYMENT_SUCCEEDED,
-	StripeWebhookEvents.INVOICE_PAYMENT_FAILED,
+	StripeWebhookEvents.SETUP_INTENT_SUCCEEDED,
+	StripeWebhookEvents.INVOICE_PAYMENT_PAID,
 ];
