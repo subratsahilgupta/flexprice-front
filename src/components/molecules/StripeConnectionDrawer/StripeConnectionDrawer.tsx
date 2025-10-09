@@ -7,6 +7,13 @@ import { useMutation } from '@tanstack/react-query';
 import ConnectionApi from '@/api/ConnectionApi';
 import toast from 'react-hot-toast';
 import { Copy, CheckCircle } from 'lucide-react';
+import {
+	StripeWebhookEvents,
+	getDefaultWebhookEvents,
+	getPlanWebhookEvents,
+	getSubscriptionWebhookEvents,
+	getInvoiceWebhookEvents,
+} from '@/types/enums/StripeWebhookEvents';
 
 interface StripeConnectionDrawerProps {
 	isOpen: boolean;
@@ -66,25 +73,25 @@ const StripeConnectionDrawer: FC<StripeConnectionDrawerProps> = ({ isOpen, onOpe
 	const webhookUrl = user?.tenant?.id && activeEnvironment?.id ? `${apiUrl}/webhooks/stripe/${user.tenant.id}/${activeEnvironment.id}` : '';
 
 	// Webhook events mapping based on sync config
-	const getWebhookEvents = () => {
-		const events: string[] = [];
+	const getWebhookEvents = (): StripeWebhookEvents[] => {
+		const events: StripeWebhookEvents[] = [];
 
 		// Default events (always included)
-		events.push('payment_intent.succeeded', 'payment_intent.payment_failed', 'customer.created', 'customer.updated', 'customer.deleted');
+		events.push(...getDefaultWebhookEvents());
 
 		// Plan events
 		if (formData.sync_config.plan.inbound) {
-			events.push('product.created', 'product.updated', 'product.deleted');
+			events.push(...getPlanWebhookEvents());
 		}
 
 		// Subscription events
 		if (formData.sync_config.subscription.inbound) {
-			events.push('customer.subscription.created', 'customer.subscription.updated', 'customer.subscription.deleted');
+			events.push(...getSubscriptionWebhookEvents());
 		}
 
 		// Invoice events
 		if (formData.sync_config.invoice.outbound) {
-			events.push('invoice.created', 'invoice.sent', 'invoice.payment_succeeded', 'invoice.payment_failed');
+			events.push(...getInvoiceWebhookEvents());
 		}
 
 		return events;

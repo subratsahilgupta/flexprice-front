@@ -119,3 +119,11 @@ export type {
 	CreateInvoiceRequest,
 	TaxCalculationResult,
 } from './tax';
+
+export {
+	StripeWebhookEvents,
+	getDefaultWebhookEvents,
+	getPlanWebhookEvents,
+	getSubscriptionWebhookEvents,
+	getInvoiceWebhookEvents,
+} from '../enums/StripeWebhookEvents';
