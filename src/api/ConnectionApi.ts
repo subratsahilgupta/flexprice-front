@@ -24,6 +24,10 @@ class ConnectionApi {
 		return await AxiosClient.post<Connection>(this.baseUrl, payload);
 	}
 
+	public static async updateConnection(id: string, payload: Partial<CreateConnectionPayload>): Promise<Connection> {
+		return await AxiosClient.put<Connection>(`${this.baseUrl}/${id}`, payload);
+	}
+
 	public static async deleteConnection(id: string): Promise<void> {
 		return await AxiosClient.delete(`${this.baseUrl}/${id}`);
 	}
