@@ -163,7 +163,7 @@ const IntegrationDetails = () => {
 										</p>
 									</div>
 									<div className='flex items-center gap-2'>
-										<Button className='hidden' variant='outline' size='icon' onClick={() => handleEdit(item)}>
+										<Button variant='outline' size='icon' onClick={() => handleEdit(item)}>
 											<PencilIcon className='size-4' />
 										</Button>
 										<Button

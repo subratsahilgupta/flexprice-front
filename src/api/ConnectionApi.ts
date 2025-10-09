@@ -2,7 +2,7 @@ import { AxiosClient } from '@/core/axios/verbs';
 import { Connection } from '@/models/Connection';
 import { ENTITY_STATUS } from '@/models/base';
 import { generateQueryParams } from '@/utils/common/api_helper';
-import { GetConnectionsPayload, GetConnectionsResponse, CreateConnectionPayload } from '@/types/dto/Connection';
+import { GetConnectionsPayload, GetConnectionsResponse, CreateConnectionPayload, UpdateConnectionPayload } from '@/types/dto/Connection';
 
 class ConnectionApi {
 	private static baseUrl = '/connections';
@@ -22,6 +22,10 @@ class ConnectionApi {
 
 	public static async createConnection(payload: CreateConnectionPayload): Promise<Connection> {
 		return await AxiosClient.post<Connection>(this.baseUrl, payload);
+	}
+
+	public static async updateConnection(id: string, payload: Partial<UpdateConnectionPayload>): Promise<Connection> {
+		return await AxiosClient.put<Connection>(`${this.baseUrl}/${id}`, payload);
 	}
 
 	public static async deleteConnection(id: string): Promise<void> {
