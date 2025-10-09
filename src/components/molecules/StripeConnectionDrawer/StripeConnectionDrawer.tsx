@@ -6,7 +6,7 @@ import { useEnvironment } from '@/hooks/useEnvironment';
 import { useMutation } from '@tanstack/react-query';
 import ConnectionApi from '@/api/ConnectionApi';
 import toast from 'react-hot-toast';
-import { Copy, CheckCircle } from 'lucide-react';
+import { Copy, CheckCircle, ChevronDown, ChevronRight } from 'lucide-react';
 import {
 	StripeWebhookEvents,
 	getDefaultWebhookEvents,
@@ -27,18 +27,9 @@ interface StripeFormData {
 	secret_key: string;
 	webhook_secret: string;
 	sync_config: {
-		plan: {
-			inbound: boolean;
-			outbound: boolean;
-		};
-		subscription: {
-			inbound: boolean;
-			outbound: boolean;
-		};
-		invoice: {
-			inbound: boolean;
-			outbound: boolean;
-		};
+		plan: boolean; // pull from Stripe
+		subscription: boolean; // pull from Stripe
+		invoice: boolean; // push to Stripe
 	};
 }
 
@@ -51,22 +42,14 @@ const StripeConnectionDrawer: FC<StripeConnectionDrawerProps> = ({ isOpen, onOpe
 		secret_key: '',
 		webhook_secret: '',
 		sync_config: {
-			plan: {
-				inbound: false,
-				outbound: false,
-			},
-			subscription: {
-				inbound: false,
-				outbound: false,
-			},
-			invoice: {
-				inbound: false,
-				outbound: false,
-			},
+			plan: false, // pull from Stripe
+			subscription: false, // pull from Stripe
+			invoice: false, // push to Stripe
 		},
 	});
 	const [errors, setErrors] = useState<Record<string, string>>({});
 	const [webhookCopied, setWebhookCopied] = useState(false);
+	const [isWebhookEventsExpanded, setIsWebhookEventsExpanded] = useState(false);
 
 	// Generate webhook URL using environment variable
 	const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/v1';
@@ -79,18 +62,18 @@ const StripeConnectionDrawer: FC<StripeConnectionDrawerProps> = ({ isOpen, onOpe
 		// Default events (always included)
 		events.push(...getDefaultWebhookEvents());
 
-		// Plan events
-		if (formData.sync_config.plan.inbound) {
+		// Plan events (pull from Stripe)
+		if (formData.sync_config.plan) {
 			events.push(...getPlanWebhookEvents());
 		}
 
-		// Subscription events
-		if (formData.sync_config.subscription.inbound) {
+		// Subscription events (pull from Stripe)
+		if (formData.sync_config.subscription) {
 			events.push(...getSubscriptionWebhookEvents());
 		}
 
-		// Invoice events
-		if (formData.sync_config.invoice.outbound) {
+		// Invoice events (push to Stripe)
+		if (formData.sync_config.invoice) {
 			events.push(...getInvoiceWebhookEvents());
 		}
 
@@ -101,15 +84,19 @@ const StripeConnectionDrawer: FC<StripeConnectionDrawerProps> = ({ isOpen, onOpe
 	useEffect(() => {
 		if (isOpen) {
 			if (connection) {
+				// Handle legacy format with inbound/outbound structure
+				const legacySyncConfig = connection.sync_config;
+				const newSyncConfig = {
+					plan: legacySyncConfig?.plan?.inbound || false,
+					subscription: legacySyncConfig?.subscription?.inbound || false,
+					invoice: legacySyncConfig?.invoice?.outbound || false,
+				};
+
 				setFormData({
 					name: connection.name || '',
 					secret_key: connection.secret_key || '',
 					webhook_secret: connection.webhook_secret || '',
-					sync_config: connection.sync_config || {
-						plan: { inbound: false, outbound: false },
-						subscription: { inbound: false, outbound: false },
-						invoice: { inbound: false, outbound: false },
-					},
+					sync_config: newSyncConfig,
 				});
 			} else {
 				setFormData({
@@ -117,9 +104,9 @@ const StripeConnectionDrawer: FC<StripeConnectionDrawerProps> = ({ isOpen, onOpe
 					secret_key: '',
 					webhook_secret: '',
 					sync_config: {
-						plan: { inbound: false, outbound: false },
-						subscription: { inbound: false, outbound: false },
-						invoice: { inbound: false, outbound: false },
+						plan: false,
+						subscription: false,
+						invoice: false,
 					},
 				});
 			}
@@ -133,15 +120,12 @@ const StripeConnectionDrawer: FC<StripeConnectionDrawerProps> = ({ isOpen, onOpe
 		setErrors((prev) => ({ ...prev, [field]: '' }));
 	};
 
-	const handleSyncConfigChange = (category: keyof typeof formData.sync_config, direction: 'inbound' | 'outbound', value: boolean) => {
+	const handleSyncConfigChange = (category: keyof typeof formData.sync_config, value: boolean) => {
 		setFormData((prev) => ({
 			...prev,
 			sync_config: {
 				...prev.sync_config,
-				[category]: {
-					...prev.sync_config[category],
-					[direction]: value,
-				},
+				[category]: value,
 			},
 		}));
 	};
@@ -176,7 +160,20 @@ const StripeConnectionDrawer: FC<StripeConnectionDrawerProps> = ({ isOpen, onOpe
 					secret_key: formData.secret_key,
 					webhook_secret: formData.webhook_secret,
 				},
-				sync_config: formData.sync_config,
+				sync_config: {
+					plan: {
+						inbound: formData.sync_config.plan,
+						outbound: false,
+					},
+					subscription: {
+						inbound: formData.sync_config.subscription,
+						outbound: false,
+					},
+					invoice: {
+						inbound: false,
+						outbound: formData.sync_config.invoice,
+					},
+				},
 			};
 
 			return await ConnectionApi.createConnection(payload);
@@ -195,7 +192,20 @@ const StripeConnectionDrawer: FC<StripeConnectionDrawerProps> = ({ isOpen, onOpe
 		mutationFn: async () => {
 			const payload = {
 				name: formData.name,
-				sync_config: formData.sync_config,
+				sync_config: {
+					plan: {
+						inbound: formData.sync_config.plan,
+						outbound: false,
+					},
+					subscription: {
+						inbound: formData.sync_config.subscription,
+						outbound: false,
+					},
+					invoice: {
+						inbound: false,
+						outbound: formData.sync_config.invoice,
+					},
+				},
 			};
 
 			return await ConnectionApi.updateConnection(connection.id, payload);
@@ -242,23 +252,8 @@ const StripeConnectionDrawer: FC<StripeConnectionDrawerProps> = ({ isOpen, onOpe
 			title={connection ? 'Edit Stripe Connection' : 'Connect to Stripe'}
 			description='Configure your Stripe integration with the required credentials.'
 			size='lg'>
-			<div className='space-y-4 mt-4'>
-				{/* Webhook URL Section */}
-				<div className='p-4 bg-blue-50 border border-blue-200 rounded-lg'>
-					<h3 className='text-sm font-medium text-blue-800 mb-2'>Webhook Configuration</h3>
-					<p className='text-xs text-blue-700 mb-3'>Set up this webhook URL in your Stripe dashboard to receive event notifications:</p>
-					<div className='flex items-center gap-2 p-2 bg-white border border-blue-200 rounded-md'>
-						<code className='flex-1 text-xs text-gray-800 font-mono break-all'>{webhookUrl}</code>
-						<Button size='xs' variant='outline' onClick={handleCopyWebhookUrl} className='flex items-center gap-1'>
-							{webhookCopied ? <CheckCircle className='w-3 h-3' /> : <Copy className='w-3 h-3' />}
-							{webhookCopied ? 'Copied!' : 'Copy'}
-						</Button>
-					</div>
-					<p className='text-xs text-blue-600 mt-2'>
-						After setting up the webhook in Stripe, you'll receive a webhook secret which you can enter below.
-					</p>
-				</div>
-
+			<div className='space-y-6 mt-4'>
+				{/* Connection Name */}
 				<Input
 					label='Connection Name'
 					placeholder='e.g., Production Stripe, Test Stripe'
@@ -268,105 +263,114 @@ const StripeConnectionDrawer: FC<StripeConnectionDrawerProps> = ({ isOpen, onOpe
 					description='A friendly name to identify this Stripe connection'
 				/>
 
+				{/* Secret Key */}
 				{!connection && (
-					<>
-						<Input
-							label='Secret Key'
-							placeholder='sk_...'
-							type='password'
-							value={formData.secret_key}
-							onChange={(value) => handleChange('secret_key', value)}
-							error={errors.secret_key}
-							description='Your Stripe secret key from the API keys section'
-						/>
-
-						<Input
-							label='Webhook Secret'
-							placeholder='whsec_...'
-							type='password'
-							value={formData.webhook_secret}
-							onChange={(value) => handleChange('webhook_secret', value)}
-							error={errors.webhook_secret}
-							description='The webhook secret provided by Stripe after setting up the webhook endpoint'
-						/>
-					</>
+					<Input
+						label='Secret Key'
+						placeholder='sk_...'
+						type='password'
+						value={formData.secret_key}
+						onChange={(value) => handleChange('secret_key', value)}
+						error={errors.secret_key}
+						description='Your Stripe secret key from the API keys section'
+					/>
 				)}
 
 				{/* Sync Configuration Section */}
 				<div className='p-4 bg-gray-50 border border-gray-200 rounded-lg'>
 					<h3 className='text-sm font-medium text-gray-800 mb-3'>Sync Configuration</h3>
-					<p className='text-xs text-gray-600 mb-4'>Configure what data to sync between Stripe and your system</p>
+					<p className='text-xs text-gray-600 mb-4'>Configure what data to sync between Stripe and Flexprice</p>
 
 					<div className='space-y-4'>
-						{/* Plan Sync */}
-						<div className='space-y-2'>
-							<label className='text-sm font-medium text-gray-700'>Plans</label>
-							<div className='flex items-center gap-6'>
-								<div className='flex items-center gap-3'>
-									<Switch
-										checked={formData.sync_config.plan.inbound}
-										onCheckedChange={(checked) => handleSyncConfigChange('plan', 'inbound', checked)}
-									/>
-									<label className='text-sm text-gray-700'>Inbound</label>
-								</div>
-								<div className='flex items-center gap-3 opacity-50'>
-									<Switch disabled />
-									<label className='text-sm text-gray-500'>Outbound - Disabled</label>
-								</div>
+						{/* Plans */}
+						<div className='flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg'>
+							<div>
+								<label className='text-sm font-medium text-gray-700'>Plans</label>
+								<p className='text-xs text-gray-500'>Pull from Stripe</p>
 							</div>
+							<Switch checked={formData.sync_config.plan} onCheckedChange={(checked) => handleSyncConfigChange('plan', checked)} />
 						</div>
 
-						{/* Subscription Sync */}
-						<div className='space-y-2'>
-							<label className='text-sm font-medium text-gray-700'>Subscriptions</label>
-							<div className='flex items-center gap-6'>
-								<div className='flex items-center gap-3'>
-									<Switch
-										checked={formData.sync_config.subscription.inbound}
-										onCheckedChange={(checked) => handleSyncConfigChange('subscription', 'inbound', checked)}
-									/>
-									<label className='text-sm text-gray-700'>Inbound</label>
-								</div>
-								<div className='flex items-center gap-3 opacity-50'>
-									<Switch disabled />
-									<label className='text-sm text-gray-500'>Outbound - Disabled</label>
-								</div>
+						{/* Invoices */}
+						<div className='flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg'>
+							<div>
+								<label className='text-sm font-medium text-gray-700'>Invoices</label>
+								<p className='text-xs text-gray-500'>Push to Stripe</p>
 							</div>
+							<Switch checked={formData.sync_config.invoice} onCheckedChange={(checked) => handleSyncConfigChange('invoice', checked)} />
 						</div>
 
-						{/* Invoice Sync */}
-						<div className='space-y-2'>
-							<label className='text-sm font-medium text-gray-700'>Invoices</label>
-							<div className='flex items-center gap-6'>
-								<div className='flex items-center gap-3 opacity-50'>
-									<Switch disabled />
-									<label className='text-sm text-gray-500'>Inbound - Disabled</label>
-								</div>
-								<div className='flex items-center gap-3'>
-									<Switch
-										checked={formData.sync_config.invoice.outbound}
-										onCheckedChange={(checked) => handleSyncConfigChange('invoice', 'outbound', checked)}
-									/>
-									<label className='text-sm text-gray-700'>Outbound</label>
-								</div>
+						{/* Subscriptions */}
+						<div className='flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg'>
+							<div>
+								<label className='text-sm font-medium text-gray-700'>Subscriptions</label>
+								<p className='text-xs text-gray-500'>Pull from Stripe</p>
 							</div>
+							<Switch
+								checked={formData.sync_config.subscription}
+								onCheckedChange={(checked) => handleSyncConfigChange('subscription', checked)}
+							/>
 						</div>
 					</div>
 				</div>
 
-				{/* Webhook Events List */}
-				<div className='p-4 bg-green-50 border border-green-200 rounded-lg'>
-					<h3 className='text-sm font-medium text-green-800 mb-2'>Webhook Events to Subscribe</h3>
-					<p className='text-xs text-green-700 mb-3'>
-						Based on your sync configuration, subscribe to these events in your Stripe dashboard:
-					</p>
-					<div className='space-y-1'>
-						{getWebhookEvents().map((event, index) => (
-							<div key={index} className='flex items-center gap-2 text-xs text-green-700'>
-								<div className='w-1.5 h-1.5 bg-green-500 rounded-full'></div>
-								<code className='font-mono'>{event}</code>
+				{/* Webhook Section */}
+				<div className='p-4 bg-blue-50 border border-blue-200 rounded-lg'>
+					<h3 className='text-sm font-medium text-blue-800 mb-3'>Webhook Configuration</h3>
+
+					{/* Webhook Secret */}
+					{!connection && (
+						<div className='mb-4'>
+							<Input
+								label='Webhook Secret'
+								placeholder='whsec_...'
+								type='password'
+								value={formData.webhook_secret}
+								onChange={(value) => handleChange('webhook_secret', value)}
+								error={errors.webhook_secret}
+								description='The webhook secret provided by Stripe after setting up the webhook endpoint'
+							/>
+						</div>
+					)}
+
+					{/* Webhook URL Block */}
+					<div className='mb-4'>
+						<label className='text-sm font-medium text-blue-800 mb-2 block'>Webhook URL</label>
+						<p className='text-xs text-blue-700 mb-3'>Set up this webhook URL in your Stripe dashboard to receive event notifications:</p>
+						<div className='flex items-center gap-2 p-2 bg-white border border-blue-200 rounded-md'>
+							<code className='flex-1 text-xs text-gray-800 font-mono break-all'>{webhookUrl}</code>
+							<Button size='xs' variant='outline' onClick={handleCopyWebhookUrl} className='flex items-center gap-1'>
+								{webhookCopied ? <CheckCircle className='w-3 h-3' /> : <Copy className='w-3 h-3' />}
+								{webhookCopied ? 'Copied!' : 'Copy'}
+							</Button>
+						</div>
+					</div>
+
+					{/* Webhook Events to Subscribe - Collapsible */}
+					<div>
+						<button
+							type='button'
+							onClick={() => setIsWebhookEventsExpanded(!isWebhookEventsExpanded)}
+							className='flex items-center gap-2 text-sm font-medium text-blue-800 hover:text-blue-900 mb-2'>
+							{isWebhookEventsExpanded ? <ChevronDown className='w-4 h-4' /> : <ChevronRight className='w-4 h-4' />}
+							Webhook Events to Subscribe
+						</button>
+
+						{isWebhookEventsExpanded && (
+							<div className='mt-2 p-3 bg-white border border-blue-200 rounded-md'>
+								<p className='text-xs text-blue-700 mb-3'>
+									Based on your sync configuration, subscribe to these events in your Stripe dashboard:
+								</p>
+								<div className='space-y-1'>
+									{getWebhookEvents().map((event, index) => (
+										<div key={index} className='flex items-center gap-2 text-xs text-blue-700'>
+											<div className='w-1.5 h-1.5 bg-blue-500 rounded-full'></div>
+											<code className='font-mono'>{event}</code>
+										</div>
+									))}
+								</div>
 							</div>
-						))}
+						)}
 					</div>
 				</div>
 
