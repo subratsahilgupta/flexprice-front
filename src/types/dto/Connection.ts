@@ -23,4 +23,36 @@ export interface CreateConnectionPayload {
 		secret_key: string;
 		webhook_secret: string;
 	};
+	sync_config: {
+		plan: {
+			inbound: boolean;
+			outbound: boolean;
+		};
+		subscription: {
+			inbound: boolean;
+			outbound: boolean;
+		};
+		invoice: {
+			inbound: boolean;
+			outbound: boolean;
+		};
+	};
+}
+
+export interface UpdateConnectionPayload {
+	name: string;
+	sync_config: {
+		plan: {
+			inbound: boolean;
+			outbound: boolean;
+		};
+		subscription: {
+			inbound: boolean;
+			outbound: boolean;
+		};
+		invoice: {
+			inbound: boolean;
+			outbound: boolean;
+		};
+	};
 }
