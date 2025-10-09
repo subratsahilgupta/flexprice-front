@@ -1,14 +1,16 @@
 import { Spacer, Button, Divider } from '@/components/atoms';
 import CustomerApi from '@/api/CustomerApi';
+import ConnectionApi from '@/api/ConnectionApi';
 import { useQuery } from '@tanstack/react-query';
 import { Country } from 'country-state-city';
-import { CreateCustomerDrawer, Detail, DetailsCard, MetadataModal } from '@/components/molecules';
+import { CreateCustomerDrawer, Detail, DetailsCard, MetadataModal, SaveCardModal } from '@/components/molecules';
 import { useParams, useOutletContext } from 'react-router-dom';
-import { Pencil } from 'lucide-react';
+import { Pencil, CreditCard } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getTypographyClass } from '@/lib/typography';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { logger } from '@/utils/common/Logger';
+import { CONNECTION_PROVIDER_TYPE } from '@/models/Connection';
 
 type ContextType = {
 	isArchived: boolean;
@@ -33,9 +35,24 @@ const CustomerInformation = () => {
 		enabled: !!customerId,
 	});
 
+	// Fetch Stripe connections to check availability
+	const { data: connectionsResponse } = useQuery({
+		queryKey: ['connections', CONNECTION_PROVIDER_TYPE.STRIPE],
+		queryFn: () => ConnectionApi.getPublishedConnections(),
+		enabled: !!customerId && !isArchived,
+	});
+
 	const [showMetadataModal, setShowMetadataModal] = useState(false);
 	const [customerDrawerOpen, setcustomerDrawerOpen] = useState(false);
+	const [showSaveCardModal, setShowSaveCardModal] = useState(false);
 	const [metadata, setMetadata] = useState<Record<string, string>>(filterStringMetadata(customer?.metadata));
+
+	// Check if Stripe connection is available
+	const hasStripeConnection =
+		connectionsResponse?.connections?.some((connection) => connection.provider_type === CONNECTION_PROVIDER_TYPE.STRIPE) || false;
+
+	// Get current URL for success/cancel redirects
+	const currentUrl = window.location.href;
 
 	// Update metadata state when customer changes
 	useEffect(() => {
@@ -104,18 +121,26 @@ const CustomerInformation = () => {
 					<Spacer className='!h-4' />
 					<div className='flex justify-between items-center'>
 						<h3 className={getTypographyClass('card-header') + '!text-[16px]'}>Customer Details</h3>
-						{!isArchived && (
-							<CreateCustomerDrawer
-								trigger={
-									<Button variant={'outline'} size={'icon'}>
-										<Pencil />
-									</Button>
-								}
-								open={customerDrawerOpen}
-								onOpenChange={setcustomerDrawerOpen}
-								data={customer}
-							/>
-						)}
+						<div className='flex gap-2'>
+							{!isArchived && hasStripeConnection && (
+								<Button variant='outline' size='sm' onClick={() => setShowSaveCardModal(true)} className='flex items-center gap-2'>
+									<CreditCard className='size-4' />
+									Save Card on Stripe
+								</Button>
+							)}
+							{!isArchived && (
+								<CreateCustomerDrawer
+									trigger={
+										<Button variant={'outline'} size={'icon'}>
+											<Pencil />
+										</Button>
+									}
+									open={customerDrawerOpen}
+									onOpenChange={setcustomerDrawerOpen}
+									data={customer}
+								/>
+							)}
+						</div>
 					</div>
 					<Spacer className='!h-4' />
 					<DetailsCard variant='stacked' data={billingDetails} childrenAtTop cardStyle='borderless' />
@@ -160,6 +185,9 @@ const CustomerInformation = () => {
 						}}
 						onClose={() => setShowMetadataModal(false)}
 					/>
+
+					{/* Save Card Modal */}
+					<SaveCardModal isOpen={showSaveCardModal} onOpenChange={setShowSaveCardModal} customerId={customerId!} currentUrl={currentUrl} />
 				</div>
 			)}
 		</div>
