@@ -1,4 +1,4 @@
-import { BaseModel } from './base';
+import { BaseModel, Metadata } from './base';
 import { BILLING_CADENCE, INVOICE_CADENCE } from './Invoice';
 import { Meter } from './Meter';
 
@@ -24,7 +24,7 @@ export interface Price extends BaseModel {
 	readonly meter: Meter;
 	readonly invoice_cadence: INVOICE_CADENCE;
 	readonly trial_period: number;
-	readonly metadata: Record<string, string> | null;
+	readonly metadata: Metadata | null;
 	readonly price_unit_config?: PriceUnitConfig;
 }
 

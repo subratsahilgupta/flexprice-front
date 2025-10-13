@@ -1,12 +1,20 @@
 import { BILLING_CADENCE, INVOICE_CADENCE } from '@/constants';
-import { Price } from '@/models/Price';
-import { BILLING_MODEL, BILLING_PERIOD, PRICE_TYPE, PRICE_UNIT_TYPE, TIER_MODE, PRICE_ENTITY_TYPE } from '@/models/Price';
-import { Plan } from '@/models/Plan';
-import Addon from '@/models/Addon';
-import Feature from '@/models/Feature';
-import { Meter } from '@/models/Meter';
+import {
+	Price,
+	BILLING_MODEL,
+	BILLING_PERIOD,
+	PRICE_TYPE,
+	PRICE_UNIT_TYPE,
+	TIER_MODE,
+	PRICE_ENTITY_TYPE,
+	Plan,
+	Addon,
+	Feature,
+	Meter,
+	Metadata,
+	Pagination,
+} from '@/models';
 import { QueryFilter, TimeRangeFilter } from './base';
-import { Pagination } from '@/models/Pagination';
 
 export interface CreateBulkPriceRequest {
 	items: CreatePriceRequest[];
@@ -42,7 +50,7 @@ export interface CreatePriceRequest {
 	invoice_cadence: INVOICE_CADENCE;
 	trial_period?: number;
 	description?: string;
-	metadata?: Record<string, string>;
+	metadata?: Metadata;
 	tier_mode?: TIER_MODE;
 	tiers?: CreatePriceTier[];
 	transform_quantity?: TransformQuantity;
@@ -76,5 +84,5 @@ export interface TransformQuantity {
 export interface UpdatePriceRequest {
 	lookup_key?: string;
 	description?: string;
-	metadata?: Record<string, string>;
+	metadata?: Metadata;
 }

@@ -1,7 +1,7 @@
 import { AxiosClient } from '@/core/axios/verbs';
-import { Payment } from '@/models/Payment';
+import { Payment } from '@/models';
 import { generateQueryParams } from '@/utils/common/api_helper';
-import { GetAllPaymentsPayload, GetAllPaymentsResponse, RecordPaymentPayload } from '@/types/dto/Payment';
+import { GetAllPaymentsPayload, GetAllPaymentsResponse, RecordPaymentPayload } from '@/types/dto';
 
 class PaymentApi {
 	private static baseUrl = '/payments';

@@ -1,7 +1,5 @@
 import { AxiosClient } from '@/core/axios/verbs';
-import Customer from '@/models/Customer';
-import { Pagination } from '@/models/Pagination';
-import { Subscription } from '@/models/Subscription';
+import { Customer, Pagination, Subscription } from '@/models';
 import {
 	GetCustomerResponse,
 	GetCustomerByFiltersPayload,
@@ -11,7 +9,7 @@ import {
 	GetCustomerEntitlementsResponse,
 	CreateCustomerRequest,
 	UpdateCustomerRequest,
-} from '@/types/dto/Customer';
+} from '@/types/dto';
 import { generateQueryParams } from '@/utils/common/api_helper';
 
 class CustomerApi {

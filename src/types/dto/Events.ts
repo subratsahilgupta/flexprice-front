@@ -1,4 +1,4 @@
-import { Event } from '@/models/Event';
+import { Event } from '@/models';
 
 export interface GetEventsPayload {
 	external_customer_id?: string;

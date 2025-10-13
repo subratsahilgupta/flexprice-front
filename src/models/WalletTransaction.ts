@@ -1,3 +1,5 @@
+import { Metadata } from './base';
+
 export type WalletTransaction = {
 	readonly amount: number;
 	readonly balance_after: number;
@@ -5,7 +7,7 @@ export type WalletTransaction = {
 	readonly created_at: string;
 	readonly description: string;
 	readonly id: string;
-	readonly metadata: Record<string, unknown>;
+	readonly metadata: Metadata;
 	readonly reference_id: string;
 	readonly reference_type: string;
 	readonly transaction_status: string;

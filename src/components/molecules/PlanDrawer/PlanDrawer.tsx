@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { useNavigate } from 'react-router-dom';
 import { RouteNames } from '@/core/routes/Routes';
+import { CreatePlanRequest, UpdatePlanRequest, PlanResponse, CreatePlanResponse } from '@/types/dto';
 interface Props {
 	data?: Plan | null;
 	open?: boolean;
@@ -29,9 +30,14 @@ const PlanDrawer: FC<Props> = ({ data, open, onOpenChange, trigger, refetchQuery
 	);
 	const [errors, setErrors] = useState<Partial<Record<keyof Plan, string>>>({});
 
-	const { mutate: updatePlan, isPending } = useMutation({
-		mutationFn: (data: Partial<Plan>) => (isEdit ? PlanApi.updatePlan(data.id!, data) : PlanApi.createPlan(data)),
-		onSuccess: (data: Plan) => {
+	const { mutate: updatePlan, isPending } = useMutation<
+		PlanResponse | CreatePlanResponse,
+		ServerError,
+		Partial<CreatePlanRequest | UpdatePlanRequest> & { id?: string }
+	>({
+		mutationFn: (data) =>
+			isEdit ? PlanApi.updatePlan(data.id!, data as UpdatePlanRequest) : PlanApi.createPlan(data as CreatePlanRequest),
+		onSuccess: (data) => {
 			toast.success(isEdit ? 'Plan updated successfully' : 'Plan created successfully');
 			onOpenChange?.(false);
 			refetchQueries(refetchQueryKeys);

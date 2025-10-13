@@ -1,7 +1,7 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import { ACTIVE_ENVIRONMENT_ID_KEY } from '@/hooks/useEnvironment';
-import Environment from '@/models/Environment';
-import { CreateEnvironmentPayload, ListEnvironmentResponse } from '@/types/dto/Environment';
+import { Environment } from '@/models';
+import { CreateEnvironmentPayload, ListEnvironmentResponse } from '@/types/dto';
 
 class EnvironmentApi {
 	private static baseUrl = '/environments';
@@ -11,8 +11,6 @@ class EnvironmentApi {
 		try {
 			return await AxiosClient.get<ListEnvironmentResponse>(this.baseUrl);
 		} catch (error) {
-			// Return empty environments to prevent UI crashes
-			// Explicitly cast to match the expected type
 			return { environments: [], total: 0 } as ListEnvironmentResponse;
 		}
 	}

@@ -1,8 +1,7 @@
 import { AxiosClient } from '@/core/axios/verbs';
-import { Entitlement } from '@/models/Entitlement';
+import { Entitlement } from '@/models';
 import { generateQueryParams } from '@/utils/common/api_helper';
-import { EntitlementFilters, EntitlementResponse } from '@/types/dto';
-import { CreateBulkEntitlementRequest, CreateBulkEntitlementResponse } from '@/types/dto/Entitlement';
+import { EntitlementFilters, EntitlementResponse, CreateBulkEntitlementRequest, CreateBulkEntitlementResponse } from '@/types/dto';
 
 class EntitlementApi {
 	private static baseUrl = '/entitlements';

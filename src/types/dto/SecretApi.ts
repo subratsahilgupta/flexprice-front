@@ -1,5 +1,4 @@
-import { Pagination } from '@/models/Pagination';
-import { SecretKey } from '@/models/SecretKey';
+import { Pagination, SecretKey } from '@/models';
 
 export interface GetAllSecretKeysResponse {
 	items: SecretKey[];

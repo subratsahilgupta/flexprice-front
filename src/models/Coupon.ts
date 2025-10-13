@@ -1,4 +1,4 @@
-import { BaseModel } from './base';
+import { BaseModel, Metadata } from './base';
 import { COUPON_TYPE, COUPON_CADENCE, CouponRules } from '@/types/common/Coupon';
 
 export interface Coupon extends BaseModel {
@@ -14,5 +14,5 @@ export interface Coupon extends BaseModel {
 	cadence: COUPON_CADENCE;
 	duration_in_periods?: number;
 	currency: string;
-	metadata?: Record<string, string>;
+	metadata?: Metadata;
 }

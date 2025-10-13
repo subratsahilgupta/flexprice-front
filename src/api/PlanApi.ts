@@ -1,13 +1,20 @@
 import { AxiosClient } from '@/core/axios/verbs';
-import { Plan } from '@/models/Plan';
-import { Pagination } from '@/models/Pagination';
-import { ExpandedPlan } from '@/types/plan';
+import { Pagination } from '@/models';
 import { generateQueryParams } from '@/utils/common/api_helper';
-import { GetPlanCreditGrantsResponse, SynchronizePlanPricesWithSubscriptionResponse } from '@/types/dto/Plan';
+import {
+	CreatePlanRequest,
+	UpdatePlanRequest,
+	PlanResponse,
+	CreatePlanResponse,
+	ListPlansResponse,
+	GetPlanCreditGrantsResponse,
+	SynchronizePlanPricesWithSubscriptionResponse,
+	ExpandedPlan,
+} from '@/types/dto';
 import { TypedBackendFilter, TypedBackendSort } from '@/types/formatters/QueryBuilder';
 
 export interface GetAllPlansResponse {
-	items: Plan[] | ExpandedPlan[];
+	items: PlanResponse[] | ExpandedPlan[];
 	pagination: Pagination;
 }
 
@@ -19,25 +26,26 @@ export interface GetPlansByFilterPayload extends Pagination {
 export class PlanApi {
 	private static baseUrl = '/plans';
 
-	public static async createPlan(data: Partial<Plan>) {
-		return await AxiosClient.post<Plan, Partial<Plan>>(this.baseUrl, data);
+	public static async createPlan(data: CreatePlanRequest) {
+		return await AxiosClient.post<CreatePlanResponse, CreatePlanRequest>(this.baseUrl, data);
 	}
 
 	public static async getAllPlans({ limit, offset }: Pagination) {
 		const payload = {
 			limit,
 			offset,
-			expand: 'entitlements,prices,meters,features',
+			expand: 'entitlements,prices,meters,features,credit_grants',
 		};
 		const url = generateQueryParams(this.baseUrl, payload);
 		return await AxiosClient.get<GetAllPlansResponse>(url);
 	}
+
 	public static async getAllActivePlans({ limit, offset }: Pagination) {
 		const payload = {
 			status: 'published',
 			limit,
 			offset,
-			expand: 'entitlements,prices,meters,features',
+			expand: 'entitlements,prices,meters,features,credit_grants',
 		};
 		const url = generateQueryParams(this.baseUrl, payload);
 		return await AxiosClient.get<GetAllPlansResponse>(url);
@@ -52,22 +60,23 @@ export class PlanApi {
 			limit,
 			offset,
 			query,
-			expand: 'entitlements,prices,meters,features',
+			expand: 'entitlements,prices,meters,features,credit_grants',
 		};
 		return await AxiosClient.post<GetAllPlansResponse>(`${this.baseUrl}/search`, payload);
 	}
 
 	public static async getExpandedPlan() {
 		const payload = {
-			expand: 'prices%2Cmeters%2Centitlements',
+			expand: 'prices,meters,entitlements,credit_grants',
 		};
 		const url = generateQueryParams(this.baseUrl, payload);
 		const response = await AxiosClient.get<GetAllPlansResponse>(url);
 		return response.items as ExpandedPlan[];
 	}
+
 	public static async getActiveExpandedPlan(query?: Pagination) {
 		const payload = {
-			expand: 'prices,meters',
+			expand: 'prices,meters,credit_grants',
 			status: 'published',
 			limit: query?.limit,
 			offset: query?.offset,
@@ -79,14 +88,14 @@ export class PlanApi {
 
 	public static async getPlanById(id: string) {
 		const payload = {
-			expand: 'meters,entitlements,prices,features,credit_grant',
+			expand: 'meters,entitlements,prices,features,credit_grants',
 		};
 		const url = generateQueryParams(`${this.baseUrl}/${id}`, payload);
-		return await AxiosClient.get<Plan>(url);
+		return await AxiosClient.get<PlanResponse>(url);
 	}
 
-	public static async updatePlan(id: string, data: Partial<Plan>) {
-		return await AxiosClient.put<Plan, Partial<Plan>>(`${this.baseUrl}/${id}`, data);
+	public static async updatePlan(id: string, data: UpdatePlanRequest) {
+		return await AxiosClient.put<PlanResponse, UpdatePlanRequest>(`${this.baseUrl}/${id}`, data);
 	}
 
 	public static async deletePlan(id: string) {
@@ -99,5 +108,15 @@ export class PlanApi {
 
 	public static async getPlanCreditGrants(id: string) {
 		return await AxiosClient.get<GetPlanCreditGrantsResponse>(`${this.baseUrl}/${id}/creditgrants`);
+	}
+
+	public static async listPlans({ limit, offset }: Pagination) {
+		const payload = {
+			limit,
+			offset,
+			expand: 'prices,entitlements,credit_grants',
+		};
+		const url = generateQueryParams(this.baseUrl, payload);
+		return await AxiosClient.get<ListPlansResponse>(url);
 	}
 }

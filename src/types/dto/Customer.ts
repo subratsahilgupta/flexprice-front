@@ -1,8 +1,4 @@
-import Customer from '@/models/Customer';
-import { CustomerEntitlement } from '@/models/CustomerEntitlement';
-import CustomerUsage from '@/models/CustomerUsage';
-import { Pagination } from '@/models/Pagination';
-import { Subscription } from '@/models/Subscription';
+import { Customer, CustomerEntitlement, CustomerUsage, Pagination, Subscription, Metadata } from '@/models';
 import { TypedBackendFilter, TypedBackendSort } from '../formatters/QueryBuilder';
 
 export interface GetCustomerResponse {
@@ -60,7 +56,7 @@ export interface CreateCustomerRequest {
 	address_state?: string;
 	address_postal_code?: string;
 	address_country?: string;
-	metadata?: Record<string, string>;
+	metadata?: Metadata;
 	tax_rate_overrides?: TaxRateOverride[];
 }
 
@@ -75,5 +71,5 @@ export interface UpdateCustomerRequest {
 	address_state?: string;
 	address_postal_code?: string;
 	address_country?: string;
-	metadata?: Record<string, string>;
+	metadata?: Metadata;
 }

@@ -1,7 +1,15 @@
 import { AxiosClient } from '@/core/axios/verbs';
-import Feature from '@/models/Feature';
 import { generateQueryParams } from '@/utils/common/api_helper';
-import { GetFeaturesPayload, GetFeaturesResponse, GetFeatureByFilterPayload, UpdateFeaturePayload } from '@/types/dto/Feature';
+import {
+	CreateFeatureRequest,
+	UpdateFeatureRequest,
+	FeatureResponse,
+	ListFeaturesResponse,
+	GetFeaturesPayload,
+	GetFeaturesResponse,
+	GetFeatureByFilterPayload,
+	UpdateFeaturePayload,
+} from '@/types/dto';
 
 class FeatureApi {
 	private static baseUrl = '/features';
@@ -15,15 +23,16 @@ class FeatureApi {
 	}
 
 	public static async getFeatureById(id: string) {
-		return await AxiosClient.get<Feature>(`${this.baseUrl}/${id}`);
+		const url = generateQueryParams(`${this.baseUrl}/${id}`, { expand: 'meter' });
+		return await AxiosClient.get<FeatureResponse>(url);
 	}
 
-	public static async createFeature(data: Partial<Feature>) {
-		return await AxiosClient.post<Feature, Partial<Feature>>(this.baseUrl, data);
+	public static async createFeature(data: CreateFeatureRequest) {
+		return await AxiosClient.post<FeatureResponse, CreateFeatureRequest>(this.baseUrl, data);
 	}
 
-	public static async updateFeature(id: string, data: UpdateFeaturePayload) {
-		return await AxiosClient.put<Feature, UpdateFeaturePayload>(`${this.baseUrl}/${id}`, data);
+	public static async updateFeature(id: string, data: UpdateFeatureRequest) {
+		return await AxiosClient.put<FeatureResponse, UpdateFeatureRequest>(`${this.baseUrl}/${id}`, data);
 	}
 
 	public static async deleteFeature(id: string) {
@@ -32,6 +41,19 @@ class FeatureApi {
 
 	public static async getFeaturesByFilter(payload: GetFeatureByFilterPayload) {
 		return await AxiosClient.post<GetFeaturesResponse, GetFeatureByFilterPayload>(`${this.baseUrl}/search`, payload);
+	}
+
+	public static async listFeatures(payload: GetFeaturesPayload = {}): Promise<ListFeaturesResponse> {
+		const url = generateQueryParams(this.baseUrl, {
+			...payload,
+			expand: 'meter',
+		});
+		return await AxiosClient.get<ListFeaturesResponse>(url);
+	}
+
+	// Legacy method for backwards compatibility
+	public static async updateFeatureLegacy(id: string, data: UpdateFeaturePayload) {
+		return await AxiosClient.put<FeatureResponse, UpdateFeaturePayload>(`${this.baseUrl}/${id}`, data);
 	}
 }
 

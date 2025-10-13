@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import Feature, { FEATURE_TYPE } from '@/models/Feature';
 import { BUCKET_SIZE, Meter, METER_AGGREGATION_TYPE, METER_USAGE_RESET_PERIOD } from '@/models/Meter';
 import FeatureApi from '@/api/FeatureApi';
+import { CreateFeatureRequest } from '@/types/dto';
 import { useMutation } from '@tanstack/react-query';
 import { Gauge, SquareCheckBig, Wrench } from 'lucide-react';
 import { useMemo, useState, useCallback } from 'react';
@@ -623,9 +624,15 @@ const AddFeaturePage = () => {
 				filters: meter.filters?.filter((filter) => filter.key !== '' && filter.values.length > 0),
 			};
 
-			const sanitizedData: Partial<Feature> = {
-				...featureData,
-				meter: featureData.type === FEATURE_TYPE.METERED ? (sanitizedMeter as Meter) : undefined,
+			const sanitizedData: CreateFeatureRequest = {
+				name: featureData.name!,
+				description: featureData.description,
+				lookup_key: (featureData as any).lookup_key,
+				type: featureData.type!,
+				meter: featureData.type === FEATURE_TYPE.METERED ? (sanitizedMeter as any) : undefined,
+				metadata: featureData.metadata,
+				unit_singular: featureData.unit_singular,
+				unit_plural: featureData.unit_plural,
 			};
 
 			return await FeatureApi.createFeature(sanitizedData);

@@ -1,4 +1,4 @@
-import { BaseModel } from './base';
+import { BaseModel, Metadata } from './base';
 import { Meter } from './Meter';
 
 export interface Wallet extends BaseModel {
@@ -6,7 +6,7 @@ export interface Wallet extends BaseModel {
 	readonly name: string;
 	readonly currency: string;
 	readonly customer_id: string;
-	readonly metadata: Record<string, any>;
+	readonly metadata: Metadata;
 	readonly wallet_status: WALLET_STATUS;
 	readonly conversion_rate: number;
 	readonly meter: Meter;

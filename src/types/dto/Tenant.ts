@@ -1,8 +1,4 @@
-import { Subscription } from '@/models/Subscription';
-import CustomerUsage from '@/models/CustomerUsage';
-import { Pagination } from '@/models/Pagination';
-import { TenantBillingDetails } from '@/models/Tenant';
-import { Metadata } from '@/models/base';
+import { Subscription, CustomerUsage, Pagination, TenantBillingDetails, Metadata } from '@/models';
 
 export interface GetBillingdetailsResponse {
 	subscriptions: Subscription[];

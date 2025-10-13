@@ -1,5 +1,4 @@
-import { Integration } from '@/models/Integration';
-import { Pagination } from '@supabase/supabase-js';
+import { Integration, Pagination } from '@/models';
 
 export interface CreateIntegrationRequest {
 	provider: string;

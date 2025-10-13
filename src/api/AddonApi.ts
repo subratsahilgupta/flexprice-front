@@ -1,5 +1,5 @@
 import { AxiosClient } from '@/core/axios/verbs';
-import Addon from '@/models/Addon';
+import { Addon } from '@/models';
 import { generateQueryParams } from '@/utils/common/api_helper';
 import {
 	CreateAddonRequest,
@@ -9,7 +9,7 @@ import {
 	GetAddonByFilterPayload,
 	AddAddonToSubscriptionRequest,
 	AddonResponse,
-} from '@/types/dto/Addon';
+} from '@/types/dto';
 
 class AddonApi {
 	private static baseUrl = '/addons';

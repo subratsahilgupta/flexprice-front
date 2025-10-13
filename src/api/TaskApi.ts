@@ -1,5 +1,5 @@
 import { AxiosClient } from '@/core/axios/verbs';
-import { ImportTask } from '@/models/ImportTask';
+import { ImportTask } from '@/models';
 import { generateQueryParams } from '@/utils/common/api_helper';
 import { GetTasksPayload, GetTasksResponse, AddTaskPayload } from '@/types/dto';
 

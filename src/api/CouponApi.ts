@@ -1,7 +1,6 @@
 import { AxiosClient } from '@/core/axios/verbs';
-import { Coupon } from '@/models/Coupon';
-import { Pagination } from '@/models/Pagination';
-import { CreateCouponRequest, UpdateCouponRequest, ListCouponsResponse, CouponFilter } from '@/types/dto/Coupon';
+import { Coupon, Pagination } from '@/models';
+import { CreateCouponRequest, UpdateCouponRequest, ListCouponsResponse, CouponFilter } from '@/types/dto';
 import { generateQueryParams } from '@/utils/common/api_helper';
 
 class CouponApi {
