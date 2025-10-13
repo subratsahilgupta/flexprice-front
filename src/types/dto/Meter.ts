@@ -10,7 +10,7 @@ export interface MeterFilter {
 }
 
 export interface MeterAggregation {
-	type?: METER_AGGREGATION_TYPE;
+	type: METER_AGGREGATION_TYPE;
 	field?: string;
 	multiplier?: number;
 	bucket_size?: BUCKET_SIZE;
