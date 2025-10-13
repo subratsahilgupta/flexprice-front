@@ -8,7 +8,7 @@ import { FC, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import { RouteNames } from '@/core/routes/Routes';
-import { CREDIT_NOTE_STATUS, CREDIT_NOTE_TYPE } from '@/models/CreditNote';
+import { CREDIT_NOTE_STATUS, CREDIT_NOTE_TYPE } from '@/types/dto';
 import { Chip } from '@/components/atoms';
 import { AlertCircle } from 'lucide-react';
 import { getTypographyClass } from '@/lib/typography';

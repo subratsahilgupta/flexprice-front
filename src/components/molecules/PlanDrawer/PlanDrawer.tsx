@@ -33,10 +33,15 @@ const PlanDrawer: FC<Props> = ({ data, open, onOpenChange, trigger, refetchQuery
 	const { mutate: updatePlan, isPending } = useMutation<
 		PlanResponse | CreatePlanResponse,
 		ServerError,
-		Partial<CreatePlanRequest | UpdatePlanRequest> & { id?: string }
+		CreatePlanRequest | (UpdatePlanRequest & { id: string })
 	>({
-		mutationFn: (data) =>
-			isEdit ? PlanApi.updatePlan(data.id!, data as UpdatePlanRequest) : PlanApi.createPlan(data as CreatePlanRequest),
+		mutationFn: (vars) => {
+			if (isEdit) {
+				const { id, ...rest } = vars as UpdatePlanRequest & { id: string };
+				return PlanApi.updatePlan(id, rest);
+			}
+			return PlanApi.createPlan(vars as CreatePlanRequest);
+		},
 		onSuccess: (data) => {
 			toast.success(isEdit ? 'Plan updated successfully' : 'Plan created successfully');
 			onOpenChange?.(false);
@@ -80,7 +85,25 @@ const PlanDrawer: FC<Props> = ({ data, open, onOpenChange, trigger, refetchQuery
 		if (!validateForm()) {
 			return;
 		}
-		updatePlan(formData);
+
+		if (isEdit) {
+			// Build UpdatePlanRequest DTO - only include editable fields
+			const updateDto: UpdatePlanRequest & { id: string } = {
+				id: formData.id!,
+				name: formData.name?.trim(),
+				lookup_key: formData.lookup_key,
+				description: formData.description,
+			};
+			updatePlan(updateDto);
+		} else {
+			// Build CreatePlanRequest DTO
+			const createDto: CreatePlanRequest = {
+				name: formData.name!.trim(),
+				lookup_key: formData.lookup_key,
+				description: formData.description,
+			};
+			updatePlan(createDto);
+		}
 	};
 
 	return (

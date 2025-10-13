@@ -22,7 +22,6 @@ import { AddAddonToSubscriptionRequest } from './Addon';
 
 // Re-export existing enums for convenience
 export { BILLING_PERIOD } from '@/constants/constants';
-export { BILLING_CADENCE } from '@/models/Invoice';
 
 // SubscriptionFilter interface for listing subscriptions
 export interface ListSubscriptionsPayload extends QueryFilter, TimeRangeFilter {

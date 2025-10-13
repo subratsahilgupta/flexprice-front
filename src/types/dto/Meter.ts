@@ -1,4 +1,4 @@
-import { Meter, METER_AGGREGATION_TYPE, METER_USAGE_RESET_PERIOD, Pagination } from '@/models';
+import { Meter, METER_AGGREGATION_TYPE, METER_USAGE_RESET_PERIOD, Pagination, BUCKET_SIZE } from '@/models';
 
 // ============================================
 // Meter Request Types
@@ -6,13 +6,20 @@ import { Meter, METER_AGGREGATION_TYPE, METER_USAGE_RESET_PERIOD, Pagination } f
 
 export interface MeterFilter {
 	key: string;
-	value: string;
+	values: string[];
+}
+
+export interface MeterAggregation {
+	type?: METER_AGGREGATION_TYPE;
+	field?: string;
+	multiplier?: number;
+	bucket_size?: BUCKET_SIZE;
 }
 
 export interface CreateMeterRequest {
 	name: string;
 	event_name: string;
-	aggregation: METER_AGGREGATION_TYPE;
+	aggregation: MeterAggregation;
 	reset_usage: METER_USAGE_RESET_PERIOD;
 	filters?: MeterFilter[];
 }

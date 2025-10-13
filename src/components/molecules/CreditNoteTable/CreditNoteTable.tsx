@@ -1,4 +1,5 @@
-import { CreditNote, CREDIT_NOTE_STATUS, CREDIT_NOTE_TYPE } from '@/models/CreditNote';
+import { CreditNote } from '@/models';
+import { CREDIT_NOTE_STATUS, CREDIT_NOTE_TYPE } from '@/types/dto';
 import { FC } from 'react';
 import FlexpriceTable, { ColumnData, RedirectCell } from '../Table';
 import { formatDateShort, getCurrencySymbol } from '@/utils/common/helper_functions';

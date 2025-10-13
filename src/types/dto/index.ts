@@ -60,7 +60,15 @@ export type {
 	VoidInvoicePayload,
 } from './InvoiceApi';
 
-export type { MeterFilter, CreateMeterRequest, UpdateMeterRequest, MeterResponse, GetAllMetersResponse, ListMetersResponse } from './Meter';
+export type {
+	MeterFilter,
+	MeterAggregation,
+	CreateMeterRequest,
+	UpdateMeterRequest,
+	MeterResponse,
+	GetAllMetersResponse,
+	ListMetersResponse,
+} from './Meter';
 
 export type { GetAllPaymentsPayload, GetAllPaymentsResponse, RecordPaymentPayload } from './Payment';
 
