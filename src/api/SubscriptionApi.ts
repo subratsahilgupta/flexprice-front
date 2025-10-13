@@ -1,5 +1,5 @@
 import { AxiosClient } from '@/core/axios/verbs';
-import { Subscription, SubscriptionPhase, SubscriptionUsage } from '@/models/Subscription';
+import { Subscription, SubscriptionPhase, SubscriptionUsage, EXPAND } from '@/models';
 import {
 	AddSubscriptionPhasePayload,
 	CancelSubscriptionPayload,
@@ -7,8 +7,6 @@ import {
 	GetSubscriptionPreviewResponse,
 	ListSubscriptionsPayload,
 	ListSubscriptionsResponse,
-} from '@/types/dto/Subscription';
-import {
 	GetSubscriptionDetailsPayload,
 	PauseSubscriptionPayload,
 	ResumeSubscriptionPayload,
@@ -16,7 +14,6 @@ import {
 	SubscriptionResumeResponse,
 } from '@/types/dto';
 import { generateExpandQueryParams, generateQueryParams } from '@/utils/common/api_helper';
-import { EXPAND } from '@/models/expand';
 
 class SubscriptionApi {
 	private static baseUrl = '/subscriptions';

@@ -1,5 +1,5 @@
 import { AxiosClient } from '@/core/axios/verbs';
-import { Tenant } from '@/models/Tenant';
+import { Tenant } from '@/models';
 import { GetBillingdetailsResponse, UpdateTenantRequest } from '@/types/dto';
 
 class TenantApi {

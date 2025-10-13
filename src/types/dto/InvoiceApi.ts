@@ -1,6 +1,5 @@
-import { Invoice } from '@/models/Invoice';
+import { Invoice, Pagination, Metadata } from '@/models';
 import { TaxRateOverride } from './tax';
-import { Pagination } from '@/models/Pagination';
 import { TypedBackendFilter, TypedBackendSort } from '@/types/formatters/QueryBuilder';
 
 export interface GetInvoicesResponse {
@@ -105,7 +104,7 @@ export interface CreateInvoicePayload {
 	line_items?: CreateInvoiceLineItemRequest[];
 
 	// Optional: additional custom key-value pairs for storing extra information
-	metadata?: Record<string, any>;
+	metadata?: Metadata;
 
 	// Optional: unique identifier of the environment this invoice belongs to
 	environment_id?: string;
@@ -123,5 +122,5 @@ export interface GetInvoicePdfPayload {
 }
 
 export interface VoidInvoicePayload {
-	metadata?: Record<string, any>;
+	metadata?: Metadata;
 }

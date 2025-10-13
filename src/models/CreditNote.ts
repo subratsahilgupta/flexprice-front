@@ -1,6 +1,7 @@
 import Customer from './Customer';
 import { Invoice } from './Invoice';
 import { Subscription } from './Subscription';
+import { Metadata } from './base';
 
 // Enums
 export enum CREDIT_NOTE_STATUS {
@@ -30,7 +31,7 @@ export interface CreditNoteLineItem {
 	invoice_line_item_id: string;
 	display_name: string;
 	amount: number;
-	metadata?: Record<string, any>;
+	metadata?: Metadata;
 	credit_note_id: string;
 	currency: string;
 	environment_id: string;
@@ -51,7 +52,7 @@ export interface CreditNote {
 	reason: CREDIT_NOTE_REASON;
 	currency: string;
 	total_amount: number;
-	metadata?: Record<string, any>;
+	metadata?: Metadata;
 	line_items: CreditNoteLineItem[];
 	idempotency_key?: string;
 	created_at: string;

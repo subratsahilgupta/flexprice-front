@@ -1,4 +1,4 @@
-import { Connection } from '@/models/Connection';
+import { Connection } from '@/models';
 
 export interface GetConnectionsPayload {
 	status?: string;

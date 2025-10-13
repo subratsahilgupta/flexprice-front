@@ -1,7 +1,6 @@
 import { COUPON_TYPE, COUPON_CADENCE, CouponRules } from '@/types/common/Coupon';
 import { QueryFilter } from './base';
-import { Coupon } from '@/models/Coupon';
-import { Pagination } from '@/models/Pagination';
+import { Coupon, Pagination, Metadata } from '@/models';
 import { TypedBackendFilter, TypedBackendSort } from '../formatters/QueryBuilder';
 
 export interface CreateCouponRequest {
@@ -15,13 +14,13 @@ export interface CreateCouponRequest {
 	type: COUPON_TYPE;
 	cadence: COUPON_CADENCE;
 	duration_in_periods?: number;
-	metadata?: Record<string, string>;
+	metadata?: Metadata;
 	currency?: string;
 }
 
 export interface UpdateCouponRequest {
 	name?: string;
-	metadata?: Record<string, string>;
+	metadata?: Metadata;
 }
 
 export interface GetCouponResponse {

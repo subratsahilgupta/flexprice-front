@@ -23,7 +23,7 @@ export interface LineItem extends BaseModel {
 	readonly quantity: number;
 	readonly start_date: string;
 	readonly end_date: string;
-	readonly metadata: Record<string, any>;
+	readonly metadata: Metadata;
 }
 
 export interface Pause extends BaseModel {
@@ -40,7 +40,7 @@ export interface Pause extends BaseModel {
 	readonly original_period_start: string;
 	readonly original_period_end: string;
 	readonly resumed_at: string;
-	readonly metadata: Record<string, any>;
+	readonly metadata: Metadata;
 	readonly status: ENTITY_STATUS;
 }
 
@@ -105,7 +105,7 @@ export interface SubscriptionUsageByMeters extends BaseModel {
 	readonly currency: string;
 	readonly display_amount: string;
 	readonly quantity: number;
-	readonly filter_values: Record<string, any>;
+	readonly filter_values: Metadata;
 	readonly meter_id: string;
 	readonly meter_display_name: string;
 	readonly price: Price;

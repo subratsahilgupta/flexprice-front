@@ -1,32 +1,48 @@
-import { Pagination } from '@/models/Pagination';
-import { TypedBackendFilter } from '../formatters/QueryBuilder';
+import { Pagination, Feature, FEATURE_TYPE, Metadata, Meter } from '@/models';
+import { TypedBackendFilter, TypedBackendSort } from '../formatters/QueryBuilder';
+import { MeterFilter, CreateMeterRequest } from './Meter';
 
-import { TypedBackendSort } from '../formatters/QueryBuilder';
-import { Feature } from '@/models/Feature';
-import { EventFilterData } from '@/components/molecules';
+// ============================================
+// Feature Request Types
+// ============================================
 
-export interface GetFeaturesPayload {
-	end_time?: string;
-	expand?: string;
-	feature_ids?: string[];
-	limit?: number;
+export interface CreateFeatureRequest {
+	name: string;
+	description?: string;
 	lookup_key?: string;
-	offset?: number;
-	order?: string;
-	sort?: string;
-	start_time?: string;
-	status?: string;
+	type: FEATURE_TYPE;
+	meter_id?: string;
+	meter?: CreateMeterRequest;
+	metadata?: Metadata;
+	unit_singular?: string;
+	unit_plural?: string;
 }
 
-export interface GetFeaturesResponse extends Pagination {
-	items: Feature[];
+export interface UpdateFeatureRequest {
+	name?: string;
+	description?: string;
+	metadata?: Metadata;
+	unit_singular?: string;
+	unit_plural?: string;
+	filters?: MeterFilter[];
+}
+
+// ============================================
+// Feature Response Types
+// ============================================
+
+export interface FeatureResponse extends Feature {
+	meter?: Meter;
+}
+
+export interface ListFeaturesResponse {
+	items: FeatureResponse[];
 	pagination: Pagination;
 }
 
-export interface GetFeatureByFilterPayload extends Pagination {
-	filters: TypedBackendFilter[];
-	sort: TypedBackendSort[];
-}
+// ============================================
+// Legacy Payload Types (for backwards compatibility)
+// ============================================
 
 export interface GetFeaturesPayload {
 	end_time?: string;
@@ -52,6 +68,7 @@ export interface GetFeatureByFilterPayload extends Pagination {
 	sort: TypedBackendSort[];
 }
 
+// Legacy update payload
 export interface UpdateFeaturePayload extends Partial<Feature> {
-	filters: EventFilterData[];
+	filters?: MeterFilter[];
 }

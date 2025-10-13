@@ -1,6 +1,4 @@
-import { ImportTask } from '@/models/ImportTask';
-
-import { Pagination } from '@/models/Pagination';
+import { ImportTask, Pagination, Metadata } from '@/models';
 
 export interface AddTaskPayload {
 	entity_type: string;
@@ -8,7 +6,7 @@ export interface AddTaskPayload {
 	file_url: string;
 	task_type: string;
 	file_name?: string;
-	metadata?: Record<string, any>;
+	metadata?: Metadata;
 }
 
 export interface GetTasksPayload {

@@ -1,4 +1,4 @@
-import { BaseModel } from './base';
+import { BaseModel, Metadata } from './base';
 
 export enum TAX_RATE_TYPE {
 	PERCENTAGE = 'percentage',
@@ -33,7 +33,7 @@ export interface TaxRate extends BaseModel {
 	readonly scope: TAX_RATE_SCOPE;
 	readonly percentage_value?: number;
 	readonly fixed_value?: number;
-	readonly metadata?: Record<string, string>;
+	readonly metadata?: Metadata;
 }
 
 export interface TaxAssociation extends BaseModel {
@@ -44,7 +44,7 @@ export interface TaxAssociation extends BaseModel {
 	readonly priority: number;
 	readonly auto_apply: boolean;
 	readonly currency: string;
-	readonly metadata?: Record<string, string>;
+	readonly metadata?: Metadata;
 	readonly environment_id: string;
 }
 
@@ -59,6 +59,6 @@ export interface TaxApplied extends BaseModel {
 	readonly currency: string;
 	readonly applied_at: string; // time.Time represented as ISO string
 	readonly environment_id: string;
-	readonly metadata?: Record<string, string>;
+	readonly metadata?: Metadata;
 	readonly idempotency_key?: string;
 }

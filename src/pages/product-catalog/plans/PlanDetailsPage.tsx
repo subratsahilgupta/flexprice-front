@@ -310,7 +310,7 @@ const PlanDetailsPage = () => {
 				onCancel={handleCancelCreditGrant}
 				getEmptyCreditGrant={getEmptyCreditGrant}
 			/>
-			<PlanDrawer data={planData} open={planDrawerOpen} onOpenChange={setPlanDrawerOpen} refetchQueryKeys={['fetchPlan']} />
+			<PlanDrawer data={planData as any} open={planDrawerOpen} onOpenChange={setPlanDrawerOpen} refetchQueryKeys={['fetchPlan']} />
 			<ApiDocsContent tags={['Plans']} />
 			<AddEntitlementDrawer
 				selectedFeatures={planData.entitlements?.map((v) => v.feature)}
@@ -326,7 +326,7 @@ const PlanDetailsPage = () => {
 				<DetailsCard variant='stacked' title='Plan Details' data={planDetails} />
 
 				{/* plan charges table */}
-				<PlanPriceTable plan={planData} onPriceUpdate={() => queryClient.invalidateQueries({ queryKey: ['fetchPlan', planId] })} />
+				<PlanPriceTable plan={planData as any} onPriceUpdate={() => queryClient.invalidateQueries({ queryKey: ['fetchPlan', planId] })} />
 
 				{planData.entitlements?.length || 0 > 0 ? (
 					<Card variant='notched'>

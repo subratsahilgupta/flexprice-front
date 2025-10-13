@@ -1,8 +1,7 @@
 import { AxiosClient } from '@/core/axios/verbs';
-import { Connection } from '@/models/Connection';
-import { ENTITY_STATUS } from '@/models/base';
+import { Connection, ENTITY_STATUS } from '@/models';
 import { generateQueryParams } from '@/utils/common/api_helper';
-import { GetConnectionsPayload, GetConnectionsResponse, CreateConnectionPayload, UpdateConnectionPayload } from '@/types/dto/Connection';
+import { GetConnectionsPayload, GetConnectionsResponse, CreateConnectionPayload, UpdateConnectionPayload } from '@/types/dto';
 
 class ConnectionApi {
 	private static baseUrl = '/connections';

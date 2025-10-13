@@ -1,7 +1,6 @@
 import { FilterCondition } from '@/components/molecules/QueryBuilder';
 import { SortOption } from '@/components/molecules/Table/Toolbar';
-import { Pagination } from '@/models/Pagination';
-import { TAX_RATE_TYPE, TAX_RATE_STATUS, TAX_RATE_SCOPE, TAXRATE_ENTITY_TYPE, TaxRate } from '@/models/Tax';
+import { Pagination, TAX_RATE_TYPE, TAX_RATE_STATUS, TAX_RATE_SCOPE, TAXRATE_ENTITY_TYPE, TaxRate } from '@/models';
 import { QueryFilter } from './base';
 
 // CreateTaxRateRequest represents the request to create a tax rate
