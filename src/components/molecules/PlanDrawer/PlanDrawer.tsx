@@ -89,7 +89,7 @@ const PlanDrawer: FC<Props> = ({ data, open, onOpenChange, trigger, refetchQuery
 		if (metadataString.trim()) {
 			try {
 				const parsed = JSON.parse(metadataString);
-				if (typeof parsed !== 'object' || Array.isArray(parsed)) {
+				if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
 					newErrors.metadata = 'Metadata must be a JSON object';
 				} else {
 					const allStrings = Object.values(parsed).every((val) => typeof val === 'string');
