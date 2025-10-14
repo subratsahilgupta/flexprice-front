@@ -195,6 +195,8 @@ const PlanDetailsPage = () => {
 	useEffect(() => {
 		if (planData?.metadata) {
 			setMetadata(planData.metadata);
+		} else {
+			setMetadata({});
 		}
 	}, [planData?.metadata]);
 
