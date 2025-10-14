@@ -1,6 +1,15 @@
-export type { GetFeaturesPayload, GetFeaturesResponse, GetFeatureByFilterPayload } from './Feature';
+export type {
+	CreateFeatureRequest,
+	UpdateFeatureRequest,
+	FeatureResponse,
+	ListFeaturesResponse,
+	GetFeaturesPayload,
+	GetFeaturesResponse,
+	GetFeatureByFilterPayload,
+	UpdateFeaturePayload,
+} from './Feature';
 
-export type { GetConnectionsPayload, GetConnectionsResponse, CreateConnectionPayload } from './Connection';
+export type { GetConnectionsPayload, GetConnectionsResponse, CreateConnectionPayload, UpdateConnectionPayload } from './Connection';
 
 export type { GetEventsPayload, GetEventsResponse, GetUsageByMeterPayload, GetUsageByMeterResponse, FireEventsPayload } from './Events';
 
@@ -27,9 +36,16 @@ export type {
 	GetCustomerByFiltersPayload,
 	CreateCustomerRequest,
 	UpdateCustomerRequest,
+	TaxRateOverride as CustomerTaxRateOverride,
 } from './Customer';
 
-export type { EntitlementFilters, EntitlementResponse } from './Entitlement';
+export type {
+	EntitlementFilters,
+	EntitlementResponse,
+	CreateEntitlementRequest,
+	CreateBulkEntitlementRequest,
+	CreateBulkEntitlementResponse,
+} from './Entitlement';
 
 export type { CreateIntegrationRequest, LinkedinIntegrationResponse, IntegrationResponse } from './Integration';
 
@@ -44,9 +60,17 @@ export type {
 	VoidInvoicePayload,
 } from './InvoiceApi';
 
-export type { GetAllMetersResponse } from './Meter';
+export type {
+	MeterFilter,
+	MeterAggregation,
+	CreateMeterRequest,
+	UpdateMeterRequest,
+	MeterResponse,
+	GetAllMetersResponse,
+	ListMetersResponse,
+} from './Meter';
 
-export type { GetAllPaymentsPayload, GetAllPaymentsResponse } from './Payment';
+export type { GetAllPaymentsPayload, GetAllPaymentsResponse, RecordPaymentPayload } from './Payment';
 
 export type { GetAllSecretKeysResponse, CreateSecretKeyPayload, CreateSecretKeyResponse } from './SecretApi';
 
@@ -58,6 +82,10 @@ export type {
 	SubscriptionPauseResponse,
 	SubscriptionResumeResponse,
 	CreateSubscriptionPayload,
+	AddSubscriptionPhasePayload,
+	CancelSubscriptionPayload,
+	ListSubscriptionsPayload,
+	ListSubscriptionsResponse,
 } from './Subscription';
 
 export type { GetBillingdetailsResponse, UpdateTenantRequest } from './Tenant';
@@ -71,6 +99,7 @@ export type {
 	WalletTransactionPayload,
 	UpdateWalletRequest,
 	WalletResponse,
+	GetCustomerWalletsPayload,
 } from './Wallet';
 
 export type {
@@ -84,9 +113,26 @@ export type {
 	CreditNoteLineItem,
 } from './CreditNote';
 
-export { CREDIT_NOTE_STATUS, CREDIT_NOTE_REASON, CREDIT_NOTE_TYPE } from '@/models/CreditNote';
+export type { UpdateEnvironmentPayload, CreateEnvironmentPayload, ListEnvironmentResponse } from './Environment';
 
-export type { SynchronizePlanPricesWithSubscriptionResponse } from './Plan';
+export { CREDIT_NOTE_STATUS, CREDIT_NOTE_REASON, CREDIT_NOTE_TYPE } from '@/models';
+
+export type {
+	CreatePlanEntitlementRequest,
+	CreatePlanPriceRequest,
+	CreatePlanRequest,
+	UpdatePlanPriceRequest,
+	UpdatePlanEntitlementRequest,
+	UpdatePlanCreditGrantRequest,
+	UpdatePlanRequest,
+	PlanResponse,
+	CreatePlanResponse,
+	ListPlansResponse,
+	SynchronizationSummary,
+	SynchronizePlanPricesWithSubscriptionResponse,
+	GetPlanCreditGrantsResponse,
+	ExpandedPlan,
+} from './Plan';
 
 export type { CreateCouponRequest, UpdateCouponRequest, GetCouponResponse, ListCouponsResponse, CouponFilter } from './Coupon';
 
@@ -118,7 +164,18 @@ export type {
 	LinkTaxRateToEntityRequest,
 	CreateInvoiceRequest,
 	TaxCalculationResult,
+	TaxRateFilter,
 } from './tax';
+
+export type {
+	CreateCreditGrantRequest,
+	UpdateCreditGrantRequest,
+	CreditGrantResponse,
+	ListCreditGrantsResponse,
+	GetCreditGrantsRequest,
+	GetCreditGrantsResponse,
+	ProcessScheduledCreditGrantApplicationsResponse,
+} from './CreditGrant';
 
 export {
 	StripeWebhookEvents,

@@ -1,23 +1,27 @@
-import { INVOICE_CADENCE, LineItem as InvoiceLineItem } from '@/models/Invoice';
 import {
+	INVOICE_CADENCE,
+	BILLING_CADENCE,
+	LineItem as InvoiceLineItem,
 	BILLING_CYCLE,
 	SUBSCRIPTION_STATUS,
 	SubscriptionPhase,
 	SUBSCRIPTION_PRORATION_BEHAVIOR,
 	SUBSCRIPTION_CANCELLATION_TYPE,
-} from '@/models/Subscription';
-import { CreditGrant } from '@/models/CreditGrant';
+	CreditGrant,
+	Metadata,
+	Subscription,
+	Pagination,
+	BILLING_MODEL,
+	TIER_MODE,
+	CreatePriceTier,
+	TransformQuantity,
+} from '@/models';
 import { BILLING_PERIOD } from '@/constants/constants';
-import { BILLING_CADENCE } from '@/models/Invoice';
 import { QueryFilter, TimeRangeFilter } from './base';
-import { Subscription } from '@/models/Subscription';
-import { Pagination } from '@/models/Pagination';
 import { AddAddonToSubscriptionRequest } from './Addon';
-import { BILLING_MODEL, TIER_MODE, CreatePriceTier, TransformQuantity } from '@/models/Price';
 
 // Re-export existing enums for convenience
 export { BILLING_PERIOD } from '@/constants/constants';
-export { BILLING_CADENCE } from '@/models/Invoice';
 
 // SubscriptionFilter interface for listing subscriptions
 export interface ListSubscriptionsPayload extends QueryFilter, TimeRangeFilter {
@@ -64,7 +68,7 @@ export interface GetSubscriptionPreviewResponse {
 	invoice_status: string;
 	invoice_type: string;
 	line_items: InvoiceLineItem[];
-	metadata: Record<string, any>;
+	metadata: Metadata;
 	paid_at: string;
 	payment_status: string;
 	period_end: string;
@@ -84,7 +88,7 @@ export interface GetSubscriptionPreviewResponse {
 
 export interface PauseSubscriptionPayload {
 	dry_run?: boolean;
-	metadata?: Record<string, any>;
+	metadata?: Metadata;
 	pause_days?: number;
 	pause_end?: string;
 	pause_mode?: 'immediate';
@@ -94,7 +98,7 @@ export interface PauseSubscriptionPayload {
 
 export interface ResumeSubscriptionPayload {
 	dry_run?: boolean;
-	metadata?: Record<string, any>;
+	metadata?: Metadata;
 	resume_mode?: 'immediate';
 }
 
@@ -103,7 +107,7 @@ export interface SubscriptionPauseResponse {
 	created_by: string;
 	environment_id: string;
 	id: string;
-	metadata: Record<string, any>;
+	metadata: Metadata;
 	original_period_end: string;
 	original_period_start: string;
 	pause_end: string;

@@ -11,7 +11,7 @@ import {
 	TaxAssociationResponse,
 	ListTaxAssociationsResponse,
 	TaxAssociationFilter,
-} from '@/types/dto/tax';
+} from '@/types/dto';
 
 class TaxApi {
 	private static baseUrl = '/taxes';

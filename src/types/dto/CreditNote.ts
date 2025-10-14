@@ -1,5 +1,4 @@
-import { Pagination } from '@/models/Pagination';
-import { CreditNote, CreditNoteLineItem, CREDIT_NOTE_STATUS, CREDIT_NOTE_REASON, CREDIT_NOTE_TYPE } from '@/models/CreditNote';
+import { Pagination, CreditNoteLineItem, CREDIT_NOTE_STATUS, CREDIT_NOTE_REASON, CREDIT_NOTE_TYPE, Metadata, CreditNote } from '@/models';
 import { QueryFilter, TimeRangeFilter } from './base';
 
 // API Payloads
@@ -15,7 +14,7 @@ export interface CreateCreditNoteParams {
 	invoice_id: string;
 	memo?: string;
 	reason: CREDIT_NOTE_REASON;
-	metadata?: Record<string, any>;
+	metadata?: Metadata;
 	line_items: CreateCreditNoteLineItemRequest[];
 	idempotency_key?: string;
 	process_credit_note?: boolean;
@@ -25,7 +24,7 @@ export interface CreateCreditNoteLineItemRequest {
 	invoice_line_item_id: string;
 	display_name?: string;
 	amount: number;
-	metadata?: Record<string, any>;
+	metadata?: Metadata;
 }
 
 export interface ProcessDraftCreditNoteParams {

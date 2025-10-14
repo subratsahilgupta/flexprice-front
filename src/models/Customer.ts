@@ -1,4 +1,4 @@
-import { BaseModel } from './base';
+import { BaseModel, Metadata } from './base';
 
 export interface Customer extends BaseModel {
 	address_city: string;
@@ -9,7 +9,7 @@ export interface Customer extends BaseModel {
 	address_state: string;
 	email: string;
 	external_id: string;
-	metadata: Record<string, string>;
+	metadata: Metadata;
 	name: string;
 	environment_id: string;
 }

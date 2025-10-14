@@ -1,13 +1,14 @@
-import { BaseModel, Metadata } from '@/models/base';
-import { Pagination } from '@/models/Pagination';
 import {
+	BaseModel,
+	Metadata,
+	Pagination,
 	WALLET_TRANSACTION_REASON,
 	WALLET_AUTO_TOPUP_TRIGGER,
 	WALLET_STATUS,
 	WALLET_TYPE,
 	WALLET_CONFIG_PRICE_TYPE,
-} from '@/models/Wallet';
-import { WalletTransaction } from '@/models/WalletTransaction';
+	WalletTransaction,
+} from '@/models';
 
 export interface WalletTransactionResponse {
 	items: WalletTransaction[];

@@ -1,4 +1,4 @@
-import { BaseModel } from './base';
+import { BaseModel, Metadata } from './base';
 
 export interface ImportTask extends BaseModel {
 	readonly task_type: string;
@@ -14,7 +14,7 @@ export interface ImportTask extends BaseModel {
 	readonly completed_at: string;
 	readonly error_summary: string;
 	readonly failed_at: string;
-	readonly metadata: Record<string, unknown>;
+	readonly metadata: Metadata;
 	readonly started_at: string;
 	readonly total_records: number;
 }

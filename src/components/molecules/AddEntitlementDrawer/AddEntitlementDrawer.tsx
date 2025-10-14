@@ -373,7 +373,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 									/>
 									<Spacer className='!my-4' />
 									<Select
-										disabled={tempEntitlement.usage_limit === null || activeFeature.meter.reset_usage === METER_USAGE_RESET_PERIOD.NEVER}
+										disabled={tempEntitlement.usage_limit === null || activeFeature.meter?.reset_usage === METER_USAGE_RESET_PERIOD.NEVER}
 										error={errors.usage_reset_period}
 										label='Usage reset'
 										placeholder='Select usage reset period'

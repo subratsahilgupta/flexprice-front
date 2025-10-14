@@ -1,6 +1,6 @@
 import { AxiosClient } from '@/core/axios/verbs';
-import { Price } from '@/models/Price';
-import { GetAllPricesResponse, CreatePriceRequest, UpdatePriceRequest, PriceFilter } from '@/types/dto/Price';
+import { Price } from '@/models';
+import { GetAllPricesResponse, CreatePriceRequest, UpdatePriceRequest, PriceFilter } from '@/types/dto';
 import { generateQueryParams } from '@/utils/common/api_helper';
 
 export interface CreateBulkPriceRequest {

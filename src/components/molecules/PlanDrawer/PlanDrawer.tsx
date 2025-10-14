@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { useNavigate } from 'react-router-dom';
 import { RouteNames } from '@/core/routes/Routes';
+import { CreatePlanRequest, UpdatePlanRequest, PlanResponse, CreatePlanResponse } from '@/types/dto';
 interface Props {
 	data?: Plan | null;
 	open?: boolean;
@@ -29,9 +30,19 @@ const PlanDrawer: FC<Props> = ({ data, open, onOpenChange, trigger, refetchQuery
 	);
 	const [errors, setErrors] = useState<Partial<Record<keyof Plan, string>>>({});
 
-	const { mutate: updatePlan, isPending } = useMutation({
-		mutationFn: (data: Partial<Plan>) => (isEdit ? PlanApi.updatePlan(data.id!, data) : PlanApi.createPlan(data)),
-		onSuccess: (data: Plan) => {
+	const { mutate: updatePlan, isPending } = useMutation<
+		PlanResponse | CreatePlanResponse,
+		ServerError,
+		CreatePlanRequest | (UpdatePlanRequest & { id: string })
+	>({
+		mutationFn: (vars) => {
+			if (isEdit) {
+				const { id, ...rest } = vars as UpdatePlanRequest & { id: string };
+				return PlanApi.updatePlan(id, rest);
+			}
+			return PlanApi.createPlan(vars as CreatePlanRequest);
+		},
+		onSuccess: (data) => {
 			toast.success(isEdit ? 'Plan updated successfully' : 'Plan created successfully');
 			onOpenChange?.(false);
 			refetchQueries(refetchQueryKeys);
@@ -74,7 +85,25 @@ const PlanDrawer: FC<Props> = ({ data, open, onOpenChange, trigger, refetchQuery
 		if (!validateForm()) {
 			return;
 		}
-		updatePlan(formData);
+
+		if (isEdit) {
+			// Build UpdatePlanRequest DTO - only include editable fields
+			const updateDto: UpdatePlanRequest & { id: string } = {
+				id: formData.id!,
+				name: formData.name?.trim(),
+				lookup_key: formData.lookup_key,
+				description: formData.description,
+			};
+			updatePlan(updateDto);
+		} else {
+			// Build CreatePlanRequest DTO
+			const createDto: CreatePlanRequest = {
+				name: formData.name!.trim(),
+				lookup_key: formData.lookup_key,
+				description: formData.description,
+			};
+			updatePlan(createDto);
+		}
 	};
 
 	return (

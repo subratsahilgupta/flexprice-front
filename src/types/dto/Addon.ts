@@ -1,11 +1,8 @@
-import { Pagination } from '@/models/Pagination';
+import { Pagination, Addon, ADDON_TYPE, Metadata, Price, Entitlement } from '@/models';
 import { TypedBackendFilter, TypedBackendSort } from '../formatters/QueryBuilder';
-import Addon, { ADDON_TYPE } from '@/models/Addon';
 import { QueryFilter, TimeRangeFilter } from './base';
 import { FilterCondition } from '../common/QueryBuilder';
 import { SortOption } from '../common/QueryBuilder';
-import { Price } from '@/models/Price';
-import { Entitlement } from '@/models/Entitlement';
 
 export interface ExtendedAddon extends Addon {
 	prices: Price[];
@@ -17,7 +14,7 @@ export interface CreateAddonRequest {
 	lookup_key: string;
 	description?: string;
 	type: ADDON_TYPE;
-	metadata?: Record<string, any>;
+	metadata?: Metadata;
 }
 
 export interface AddonResponse extends Addon {
@@ -28,14 +25,14 @@ export interface AddonResponse extends Addon {
 export interface UpdateAddonRequest {
 	name?: string;
 	description?: string;
-	metadata?: Record<string, any>;
+	metadata?: Metadata;
 }
 
 export interface AddAddonToSubscriptionRequest {
 	addon_id: string;
 	start_date?: string;
 	end_date?: string;
-	metadata?: Record<string, any>;
+	metadata?: Metadata;
 }
 
 export interface GetAddonsPayload {

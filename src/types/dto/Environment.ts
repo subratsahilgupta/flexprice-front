@@ -1,6 +1,4 @@
-import { ENVIRONMENT_TYPE } from '@/models/Environment';
-import { Pagination } from '@/models/Pagination';
-import Environment from '@/models/Environment';
+import { ENVIRONMENT_TYPE, Pagination, Environment } from '@/models';
 
 export interface UpdateEnvironmentPayload {
 	name?: string;

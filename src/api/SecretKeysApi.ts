@@ -1,6 +1,5 @@
 import { AxiosClient } from '@/core/axios/verbs';
-import { Pagination } from '@/models/Pagination';
-import { SecretKey } from '@/models/SecretKey';
+import { Pagination, SecretKey } from '@/models';
 import { generateQueryParams } from '@/utils/common/api_helper';
 import { GetAllSecretKeysResponse, CreateSecretKeyPayload, CreateSecretKeyResponse } from '@/types/dto';
 // Utility function to format permissions for display

@@ -1,6 +1,5 @@
 import { AxiosClient } from '@/core/axios/verbs';
-import { Wallet } from '@/models/Wallet';
-import { RealtimeWalletBalance } from '@/models/WalletBalance';
+import { Wallet, RealtimeWalletBalance } from '@/models';
 import {
 	CreateWalletPayload,
 	TopupWalletPayload,
@@ -8,8 +7,8 @@ import {
 	WalletTransactionPayload,
 	UpdateWalletRequest,
 	WalletResponse,
+	GetCustomerWalletsPayload,
 } from '@/types/dto';
-import { GetCustomerWalletsPayload } from '@/types/dto/Wallet';
 import { generateQueryParams } from '@/utils/common/api_helper';
 
 class WalletApi {

@@ -1,4 +1,4 @@
-import { BaseModel } from './base';
+import { BaseModel, Metadata } from './base';
 
 export enum ADDON_TYPE {
 	ONETIME = 'onetime',
@@ -16,7 +16,7 @@ interface Addon extends BaseModel {
 	readonly description: string;
 	readonly lookup_key: string;
 	readonly type: ADDON_TYPE;
-	readonly metadata: Record<string, any>;
+	readonly metadata: Metadata;
 }
 
 export default Addon;

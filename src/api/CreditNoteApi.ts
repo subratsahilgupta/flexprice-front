@@ -7,7 +7,7 @@ import {
 	VoidCreditNoteParams,
 	ListCreditNotesResponse,
 	CreditNote,
-} from '@/types/dto/CreditNote';
+} from '@/types/dto';
 
 class CreditNoteApi {
 	private static baseUrl = '/creditnotes';

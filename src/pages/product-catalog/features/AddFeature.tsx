@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import Feature, { FEATURE_TYPE } from '@/models/Feature';
 import { BUCKET_SIZE, Meter, METER_AGGREGATION_TYPE, METER_USAGE_RESET_PERIOD } from '@/models/Meter';
 import FeatureApi from '@/api/FeatureApi';
+import { CreateFeatureRequest, CreateMeterRequest } from '@/types/dto';
 import { useMutation } from '@tanstack/react-query';
 import { Gauge, SquareCheckBig, Wrench } from 'lucide-react';
 import { useMemo, useState, useCallback } from 'react';
@@ -610,22 +611,31 @@ const AddFeaturePage = () => {
 
 	const { isPending, mutate: createFeature } = useMutation({
 		mutationFn: async (featureData: Partial<Feature> = data) => {
-			const sanitizedMeter: Partial<Meter> = {
-				...meter,
-				event_name: meter.event_name,
-				aggregation: {
-					type: meter.aggregation?.type || METER_AGGREGATION_TYPE.SUM,
-					field: meter.aggregation?.field || '',
-					multiplier: meter.aggregation?.multiplier || 1,
-					bucket_size: meter.aggregation?.bucket_size || undefined,
-				},
-				reset_usage: meter.reset_usage || METER_USAGE_RESET_PERIOD.BILLING_PERIOD,
-				filters: meter.filters?.filter((filter) => filter.key !== '' && filter.values.length > 0),
-			};
+			// Build CreateMeterRequest with proper structure
+			const meterRequest: CreateMeterRequest | undefined =
+				featureData.type === FEATURE_TYPE.METERED
+					? {
+							name: meter.name || featureData.name || '',
+							event_name: meter.event_name || '',
+							aggregation: {
+								type: meter.aggregation?.type || METER_AGGREGATION_TYPE.SUM,
+								field: meter.aggregation?.field || '',
+								multiplier: meter.aggregation?.multiplier || 1,
+								bucket_size: meter.aggregation?.bucket_size,
+							},
+							reset_usage: meter.reset_usage || METER_USAGE_RESET_PERIOD.BILLING_PERIOD,
+							filters: meter.filters?.filter((filter) => filter.key !== '' && filter.values.length > 0),
+						}
+					: undefined;
 
-			const sanitizedData: Partial<Feature> = {
-				...featureData,
-				meter: featureData.type === FEATURE_TYPE.METERED ? (sanitizedMeter as Meter) : undefined,
+			const sanitizedData: CreateFeatureRequest = {
+				name: featureData.name!,
+				description: featureData.description,
+				type: featureData.type!,
+				meter: meterRequest,
+				metadata: featureData.metadata,
+				unit_singular: featureData.unit_singular,
+				unit_plural: featureData.unit_plural,
 			};
 
 			return await FeatureApi.createFeature(sanitizedData);

@@ -1,11 +1,5 @@
 import { BaseEntityStatus } from '../common';
-import { Entitlement, ENTITLEMENT_ENTITY_TYPE } from '@/models/Entitlement';
-import { Pagination } from '@/models/Pagination';
-import { Plan } from '@/models/Plan';
-import Addon from '@/models/Addon';
-import Feature from '@/models/Feature';
-import { BILLING_PERIOD } from '@/models/Price';
-import { FEATURE_TYPE } from '@/models/Feature';
+import { Entitlement, ENTITLEMENT_ENTITY_TYPE, Pagination, Plan, Addon, Feature, BILLING_PERIOD, FEATURE_TYPE } from '@/models';
 
 export interface EntitlementFilters {
 	end_time?: string;

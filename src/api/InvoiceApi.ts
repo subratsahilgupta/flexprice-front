@@ -1,5 +1,5 @@
 import { AxiosClient } from '@/core/axios/verbs';
-import { Invoice } from '@/models/Invoice';
+import { Invoice } from '@/models';
 import { generateQueryParams } from '@/utils/common/api_helper';
 import AuthService from '@/core/auth/AuthService';
 import EnvironmentApi from '@/api/EnvironmentApi';

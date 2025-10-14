@@ -1,6 +1,4 @@
-import { Metadata } from '@/models/base';
-import { Pagination } from '@/models/Pagination';
-import { Payment, PAYMENT_DESTINATION_TYPE, PAYMENT_METHOD_TYPE } from '@/models/Payment';
+import { Metadata, Pagination, Payment, PAYMENT_DESTINATION_TYPE, PAYMENT_METHOD_TYPE } from '@/models';
 
 export interface GetAllPaymentsPayload {
 	currency?: string;

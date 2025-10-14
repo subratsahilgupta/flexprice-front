@@ -1,42 +1,45 @@
 import { AxiosClient } from '@/core/axios/verbs';
-import { Pagination } from '@/models/Pagination';
 import { generateQueryParams } from '@/utils/common/api_helper';
-import { CreditGrant } from '@/models/CreditGrant';
-import { QueryFilter, TimeRangeFilter } from '@/types/dto/base';
-
-interface GetGrantCreditResponse {
-	items: CreditGrant[];
-	pagination: Pagination;
-}
-
-interface GetCreditGrantRequest extends QueryFilter, TimeRangeFilter {
-	subscription_ids?: string[];
-	plan_ids?: string[];
-}
+import {
+	CreateCreditGrantRequest,
+	UpdateCreditGrantRequest,
+	CreditGrantResponse,
+	ListCreditGrantsResponse,
+	GetCreditGrantsRequest,
+	ProcessScheduledCreditGrantApplicationsResponse,
+} from '@/types/dto';
 
 class CreditGrantApi {
 	private static baseUrl = '/creditgrants';
 
-	public static async createCreditGrant(data: Partial<CreditGrant>) {
-		return AxiosClient.post<CreditGrant, Partial<CreditGrant>>(this.baseUrl, data);
+	public static async createCreditGrant(data: CreateCreditGrantRequest) {
+		return AxiosClient.post<CreditGrantResponse, CreateCreditGrantRequest>(this.baseUrl, data);
 	}
 
-	public static async getGrantCredits(data: GetCreditGrantRequest) {
+	public static async getGrantCredits(data: GetCreditGrantsRequest) {
 		const url = generateQueryParams(this.baseUrl, data);
-		return await AxiosClient.get<GetGrantCreditResponse>(url);
+		return await AxiosClient.get<ListCreditGrantsResponse>(url);
 	}
 
-	public static async updateCreditGrant(subscription_id: string, data: Partial<CreditGrant>) {
-		return await AxiosClient.put<CreditGrant, Partial<CreditGrant>>(`${this.baseUrl}/${subscription_id}`, data);
+	public static async updateCreditGrant(id: string, data: UpdateCreditGrantRequest) {
+		return await AxiosClient.put<CreditGrantResponse, UpdateCreditGrantRequest>(`${this.baseUrl}/${id}`, data);
 	}
 
-	public static async deleteCreditGrant(subscription_id: string) {
-		return await AxiosClient.delete<CreditGrant>(`${this.baseUrl}/${subscription_id}`);
+	public static async deleteCreditGrant(id: string) {
+		return await AxiosClient.delete<void>(`${this.baseUrl}/${id}`);
 	}
 
-	public static async getCreditGrants(data: GetCreditGrantRequest) {
+	public static async getCreditGrants(data: GetCreditGrantsRequest) {
 		const url = generateQueryParams(this.baseUrl, data);
-		return await AxiosClient.get<GetGrantCreditResponse>(url);
+		return await AxiosClient.get<ListCreditGrantsResponse>(url);
+	}
+
+	public static async getCreditGrantById(id: string) {
+		return await AxiosClient.get<CreditGrantResponse>(`${this.baseUrl}/${id}`);
+	}
+
+	public static async processScheduledCreditGrantApplications() {
+		return await AxiosClient.post<ProcessScheduledCreditGrantApplicationsResponse>(`${this.baseUrl}/process-scheduled`);
 	}
 }
 
