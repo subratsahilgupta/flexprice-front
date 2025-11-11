@@ -32,7 +32,6 @@ export const formatPermissionDisplay = (permissions: readonly string[]): string 
 	}
 };
 
-
 export const getPermissionIcon = (permissions: readonly string[]): LucideIcon => {
 	if (!permissions || permissions.length === 0) {
 		return EyeOff;
