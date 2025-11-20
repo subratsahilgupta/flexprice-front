@@ -15,6 +15,8 @@ import { UpdatePriceRequest } from '@/types/dto';
 import { cn } from '@/lib/utils';
 import { SyncOption } from '../TerminatePriceModal';
 import { formatDateTimeWithSecondsAndTimezone } from '@/utils/common/format_date';
+import { GroupApi } from '@/api/GroupApi';
+import { GROUP_ENTITY_TYPE, Group } from '@/models/Group';
 
 interface UpdatePriceDialogProps {
 	isOpen: boolean;
@@ -63,6 +65,7 @@ const UpdatePriceDialog: FC<UpdatePriceDialogProps> = ({ isOpen, onOpenChange, p
 	});
 	const [effectiveFrom, setEffectiveFrom] = useState<Date | undefined>(undefined);
 	const [selectedSyncOption, setSelectedSyncOption] = useState<SyncOption>(SyncOption.NEW_ONLY);
+	const [selectedGroupId, setSelectedGroupId] = useState<string | undefined>(price.group_id);
 
 	// Hide sync option if price type is FIXED
 	const isFixedPrice = price.type === PRICE_TYPE.FIXED;
@@ -73,6 +76,50 @@ const UpdatePriceDialog: FC<UpdatePriceDialogProps> = ({ isOpen, onOpenChange, p
 		queryFn: () => SubscriptionApi.listSubscriptions({ plan_id: planId, limit: 1 }),
 		enabled: !!planId && isOpen && !isFixedPrice,
 	});
+
+	// Fetch groups for the dropdown
+	const { data: groupsData, isLoading: isLoadingGroups } = useQuery({
+		queryKey: ['fetchGroups', { entity_type: GROUP_ENTITY_TYPE.PRICE }],
+		queryFn: () =>
+			GroupApi.getGroupsByFilter({
+				entity_type: GROUP_ENTITY_TYPE.PRICE,
+				limit: 100,
+				offset: 0,
+			}),
+		enabled: isOpen,
+	});
+
+	// Create group options - only show group name, no lookup_key
+	// NOTE: Cannot use empty string for "None" - Radix UI Select doesn't allow it
+	const NONE_VALUE = '__none__';
+	const groupOptions: SelectOption[] = useMemo(() => {
+		const options: SelectOption[] = [{ label: 'None', value: NONE_VALUE }];
+		if (groupsData?.items && Array.isArray(groupsData.items) && groupsData.items.length > 0) {
+			options.push(
+				...groupsData.items
+					.filter((group: Group) => group && group.id && group.name)
+					.map((group: Group) => ({
+						label: String(group.name || ''),
+						value: String(group.id || ''),
+					})),
+			);
+		}
+		return options;
+	}, [groupsData]);
+
+	// Ensure selectedGroupId matches a valid option value - MUST return a string that exists in options
+	const validSelectedGroupId = useMemo(() => {
+		// Always return NONE_VALUE if no options
+		if (!groupOptions || groupOptions.length === 0) return NONE_VALUE;
+		// If no selectedGroupId, return NONE_VALUE (which matches 'None' option)
+		if (!selectedGroupId) return NONE_VALUE;
+		// Convert to string for comparison
+		const selectedValue = String(selectedGroupId);
+		// Check if the selectedGroupId exists in the options
+		const optionExists = groupOptions.some((opt) => String(opt.value) === selectedValue);
+		// Only return the value if it exists in options, otherwise return NONE_VALUE
+		return optionExists ? selectedValue : NONE_VALUE;
+	}, [selectedGroupId, groupOptions]);
 
 	const shouldShowSyncOption = useMemo(
 		() => !isFixedPrice && (existingSubscriptions?.items?.length ?? 0) > 0,
@@ -108,6 +155,7 @@ const UpdatePriceDialog: FC<UpdatePriceDialogProps> = ({ isOpen, onOpenChange, p
 			setOverrideTransformQuantity(price.transform_quantity || { divide_by: 1, round: 'up' });
 			setEffectiveFrom(undefined);
 			setSelectedSyncOption(SyncOption.NEW_ONLY);
+			setSelectedGroupId(price.group_id);
 		}
 	}, [isOpen, price]);
 
@@ -174,6 +222,11 @@ const UpdatePriceDialog: FC<UpdatePriceDialogProps> = ({ isOpen, onOpenChange, p
 			updateData.effective_from = effectiveFrom.toISOString();
 		}
 
+		// Include group_id if changed
+		if (selectedGroupId !== price.group_id) {
+			updateData.group_id = selectedGroupId || undefined;
+		}
+
 		try {
 			// Update the price
 			await updatePrice({ priceId: price.id, data: updateData });
@@ -223,7 +276,8 @@ const UpdatePriceDialog: FC<UpdatePriceDialogProps> = ({ isOpen, onOpenChange, p
 			billingModelChanged ||
 			overrideTiers.length > 0 ||
 			overrideTransformQuantity !== undefined ||
-			effectiveFrom !== undefined
+			effectiveFrom !== undefined ||
+			selectedGroupId !== price.group_id
 		);
 	};
 
@@ -354,6 +408,23 @@ const UpdatePriceDialog: FC<UpdatePriceDialogProps> = ({ isOpen, onOpenChange, p
 									<div className='text-xs text-gray-500'>Original: {price.transform_quantity.divide_by} units per package</div>
 								)}
 							</div>
+						</div>
+					)}
+
+					{/* Group Selection */}
+					{groupOptions && groupOptions.length > 0 && (
+						<div className='space-y-2'>
+							<Select
+								value={validSelectedGroupId || NONE_VALUE}
+								onChange={(value: string) => {
+									// Convert NONE_VALUE back to undefined
+									setSelectedGroupId(value === NONE_VALUE ? undefined : value);
+								}}
+								options={groupOptions}
+								label='Group (Optional)'
+								placeholder={isLoadingGroups ? 'Loading groups...' : 'Select a group'}
+								disabled={isLoadingGroups}
+							/>
 						</div>
 					)}
 

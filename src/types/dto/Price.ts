@@ -133,6 +133,7 @@ export interface UpdatePriceRequest {
 	description?: string;
 	metadata?: Metadata;
 	effective_from?: string; // ISO date string
+	group_id?: string;
 
 	// Critical fields (require creating a new price)
 	billing_model?: BILLING_MODEL;
