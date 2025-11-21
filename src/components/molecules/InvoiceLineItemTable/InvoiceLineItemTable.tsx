@@ -1,9 +1,12 @@
 import { Button, FormHeader, Toggle } from '@/components/atoms';
 import { LineItem, INVOICE_TYPE } from '@/models/Invoice';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
-import { FC, useState } from 'react';
+import { FC, useState, useMemo } from 'react';
 import { RefreshCw, Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useQuery } from '@tanstack/react-query';
+import { PriceApi } from '@/api/PriceApi';
+import { GroupApi } from '@/api/GroupApi';
 
 interface Props {
 	data: LineItem[];
@@ -59,6 +62,79 @@ const InvoiceLineItemTable: FC<Props> = ({
 	const [showZeroCharges, setShowZeroCharges] = useState(false);
 	const filteredData = data.filter((item) => showZeroCharges || Number(item.amount) !== 0);
 
+	// Get unique price IDs from line items
+	const priceIds = useMemo(() => {
+		const uniqueIds = [...new Set(filteredData.map((item) => item.price_id))];
+		return uniqueIds;
+	}, [filteredData]);
+
+	// Fetch prices to get group_id
+	const { data: pricesData } = useQuery({
+		queryKey: ['invoicePrices', priceIds],
+		queryFn: async () => {
+			const prices = await Promise.all(priceIds.map((id) => PriceApi.GetPriceById(id)));
+			return prices.reduce(
+				(acc, price) => {
+					acc[price.id] = price;
+					return acc;
+				},
+				{} as Record<string, (typeof prices)[0]>,
+			);
+		},
+		enabled: priceIds.length > 0,
+	});
+
+	// Get unique group IDs from prices
+	const groupIds = useMemo(() => {
+		if (!pricesData) return [];
+		const uniqueGroupIds = [
+			...new Set(
+				Object.values(pricesData)
+					.map((price) => price.group_id)
+					.filter((id): id is string => !!id),
+			),
+		];
+		return uniqueGroupIds;
+	}, [pricesData]);
+
+	// Fetch groups to get group names
+	const { data: groupsData } = useQuery({
+		queryKey: ['invoiceGroups', groupIds],
+		queryFn: async () => {
+			const groups = await Promise.all(groupIds.map((id) => GroupApi.getGroupById(id)));
+			return groups.reduce(
+				(acc, group) => {
+					acc[group.id] = group;
+					return acc;
+				},
+				{} as Record<string, (typeof groups)[0]>,
+			);
+		},
+		enabled: groupIds.length > 0,
+	});
+
+	// Group line items by group_id
+	const groupedLineItems = useMemo(() => {
+		if (!pricesData) {
+			// If prices not loaded yet, return ungrouped
+			return { ungrouped: filteredData };
+		}
+
+		const grouped: Record<string, LineItem[]> = { ungrouped: [] };
+
+		filteredData.forEach((item) => {
+			const price = pricesData[item.price_id];
+			const groupId = price?.group_id || 'ungrouped';
+
+			if (!grouped[groupId]) {
+				grouped[groupId] = [];
+			}
+			grouped[groupId].push(item);
+		});
+
+		return grouped;
+	}, [filteredData, pricesData]);
+
 	return (
 		<div className='bg-white'>
 			<div className='w-full p-6'>
@@ -106,21 +182,50 @@ const InvoiceLineItemTable: FC<Props> = ({
 							</tr>
 						</thead>
 						<tbody>
-							{filteredData?.map((item, index) => {
-								return (
-									<tr key={index} className='border-b border-gray-100'>
-										<td className='py-4 px-0 text-sm  text-gray-900'>{item.display_name ?? '--'}</td>
-										{invoiceType === INVOICE_TYPE.SUBSCRIPTION && (
-											<td className='py-4 px-4 text-sm text-gray-600 text-right'>{formatPriceType(item.price_type)}</td>
-										)}
-										{invoiceType === INVOICE_TYPE.SUBSCRIPTION && (
-											<td className='py-4 px-4 text-sm text-gray-600 text-right'>{`${formatToShortDate(item.period_start)} - ${formatToShortDate(item.period_end)}`}</td>
-										)}
-										<td className='py-4 px-4 text-right text-sm text-gray-600'>{item.quantity ? item.quantity : '--'}</td>
-										<td className='py-4 px-0 text-right w-36  text-sm text-gray-600'>{formatAmount(item.amount ?? 0, item.currency)}</td>
-									</tr>
-								);
-							})}
+							{Object.entries(groupedLineItems)
+								.filter(([_, items]) => items.length > 0) // Skip empty groups
+								.sort(([groupIdA], [groupIdB]) => {
+									// Sort: grouped items first (alphabetically by group name), then ungrouped
+									if (groupIdA === 'ungrouped') return 1;
+									if (groupIdB === 'ungrouped') return -1;
+									const nameA = groupsData?.[groupIdA]?.name || '';
+									const nameB = groupsData?.[groupIdB]?.name || '';
+									return nameA.localeCompare(nameB);
+								})
+								.map(([groupId, items]) => {
+									const groupName = groupId === 'ungrouped' ? null : groupsData?.[groupId]?.name;
+
+									return (
+										<>
+											{/* Group Header */}
+											{groupName && (
+												<tr key={`group-${groupId}`} className='bg-gray-50 border-b border-gray-200'>
+													<td
+														colSpan={invoiceType === INVOICE_TYPE.SUBSCRIPTION ? 5 : 3}
+														className='py-3 px-0 text-sm font-medium text-gray-900'>
+														{groupName}
+													</td>
+												</tr>
+											)}
+											{/* Group Items */}
+											{items.map((item, index) => (
+												<tr key={`${groupId}-${item.id || index}`} className='border-b border-gray-100'>
+													<td className='py-4 px-0 text-sm text-gray-900'>{item.display_name ?? '--'}</td>
+													{invoiceType === INVOICE_TYPE.SUBSCRIPTION && (
+														<td className='py-4 px-4 text-sm text-gray-600 text-right'>{formatPriceType(item.price_type)}</td>
+													)}
+													{invoiceType === INVOICE_TYPE.SUBSCRIPTION && (
+														<td className='py-4 px-4 text-sm text-gray-600 text-right'>{`${formatToShortDate(item.period_start)} - ${formatToShortDate(item.period_end)}`}</td>
+													)}
+													<td className='py-4 px-4 text-right text-sm text-gray-600'>{item.quantity ? item.quantity : '--'}</td>
+													<td className='py-4 px-0 text-right w-36 text-sm text-gray-600'>
+														{formatAmount(item.amount ?? 0, item.currency)}
+													</td>
+												</tr>
+											))}
+										</>
+									);
+								})}
 						</tbody>
 					</table>
 				</div>
