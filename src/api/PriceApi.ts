@@ -1,4 +1,5 @@
 import { AxiosClient } from '@/core/axios/verbs';
+import axiosClient from '@/core/axios/config';
 import {
 	GetAllPricesResponse,
 	CreatePriceRequest,
@@ -62,7 +63,9 @@ export class PriceApi {
 	 * @returns Promise<PriceResponse>
 	 */
 	public static async UpdatePrice(id: string, data: UpdatePriceRequest) {
-		return await AxiosClient.put<PriceResponse>(`${this.baseUrl}/${id}`, data);
+		// Use axiosClient directly to support group_id: '' for clearing groups
+		// (sanitizeData in AxiosClient filters out empty strings)
+		return await axiosClient.put<PriceResponse>(`${this.baseUrl}/${id}`, data);
 	}
 
 	/**

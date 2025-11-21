@@ -222,9 +222,17 @@ const UpdatePriceDialog: FC<UpdatePriceDialogProps> = ({ isOpen, onOpenChange, p
 			updateData.effective_from = effectiveFrom.toISOString();
 		}
 
-		// Include group_id if changed
-		if (selectedGroupId !== price.group_id) {
-			updateData.group_id = selectedGroupId || undefined;
+		// Handle group_id changes:
+		// Not provided (omitted) → Group remains unchanged
+		// null or "" (empty string) → Removes the group
+		// "group-id" → Assigns to that group
+		const currentGroupId = price.group_id || undefined; // Normalize null/undefined
+		const newGroupId = selectedGroupId || undefined; // Normalize null/undefined
+
+		if (newGroupId !== currentGroupId) {
+			// User selected "None" - send empty string to remove group if price currently has one
+			// User selected a valid group ID - send the group ID
+			updateData.group_id = newGroupId === undefined ? '' : newGroupId;
 		}
 
 		try {
@@ -270,6 +278,11 @@ const UpdatePriceDialog: FC<UpdatePriceDialogProps> = ({ isOpen, onOpenChange, p
 			billingModelChanged = overrideBillingModel !== originalBillingModel;
 		}
 
+		// Normalize group_id for comparison (treat null/undefined as equivalent)
+		const currentGroupId = price.group_id || undefined;
+		const newGroupId = selectedGroupId || undefined;
+		const groupChanged = newGroupId !== currentGroupId;
+
 		return (
 			(overrideAmount && removeFormatting(overrideAmount) !== price.amount) ||
 			overrideQuantity !== undefined ||
@@ -277,7 +290,7 @@ const UpdatePriceDialog: FC<UpdatePriceDialogProps> = ({ isOpen, onOpenChange, p
 			overrideTiers.length > 0 ||
 			overrideTransformQuantity !== undefined ||
 			effectiveFrom !== undefined ||
-			selectedGroupId !== price.group_id
+			groupChanged
 		);
 	};
 
