@@ -62,9 +62,9 @@ const InvoiceLineItemTable: FC<Props> = ({
 	const [showZeroCharges, setShowZeroCharges] = useState(false);
 	const filteredData = data.filter((item) => showZeroCharges || Number(item.amount) !== 0);
 
-	// Get unique price IDs from line items
+	// Get unique price IDs from line items (filter out null/undefined)
 	const priceIds = useMemo(() => {
-		const uniqueIds = [...new Set(filteredData.map((item) => item.price_id))];
+		const uniqueIds = [...new Set(filteredData.map((item) => item.price_id).filter((id): id is string => !!id))];
 		return uniqueIds;
 	}, [filteredData]);
 
@@ -84,23 +84,27 @@ const InvoiceLineItemTable: FC<Props> = ({
 		enabled: priceIds.length > 0,
 	});
 
-	// Get unique group IDs from prices
-	const groupIds = useMemo(() => {
-		if (!pricesData) return [];
-		const uniqueGroupIds = [
-			...new Set(
-				Object.values(pricesData)
-					.map((price) => price.group_id)
-					.filter((id): id is string => !!id),
-			),
-		];
-		return uniqueGroupIds;
+	// Check if any prices have groups - only run grouping logic if there are groups
+	const hasGroups = useMemo(() => {
+		if (!pricesData) return false;
+		return Object.values(pricesData).some((price) => !!price.group_id);
 	}, [pricesData]);
 
-	// Fetch groups to get group names
+	// Fetch groups to get group names (only if there are groups)
 	const { data: groupsData } = useQuery({
-		queryKey: ['invoiceGroups', groupIds],
+		queryKey: ['invoiceGroups', pricesData, hasGroups],
 		queryFn: async () => {
+			if (!pricesData || !hasGroups) return {};
+
+			// Extract unique group IDs directly
+			const groupIds = [
+				...new Set(
+					Object.values(pricesData)
+						.map((price) => price.group_id)
+						.filter((id): id is string => !!id),
+				),
+			];
+
 			const groups = await Promise.all(groupIds.map((id) => GroupApi.getGroupById(id)));
 			return groups.reduce(
 				(acc, group) => {
@@ -110,19 +114,25 @@ const InvoiceLineItemTable: FC<Props> = ({
 				{} as Record<string, (typeof groups)[0]>,
 			);
 		},
-		enabled: groupIds.length > 0,
+		enabled: hasGroups && !!pricesData,
 	});
 
-	// Group line items by group_id
+	// Group line items by group_id (only if there are groups)
 	const groupedLineItems = useMemo(() => {
-		if (!pricesData) {
-			// If prices not loaded yet, return ungrouped
+		// If no groups, return ungrouped - no need to run grouping logic
+		if (!hasGroups || !pricesData) {
 			return { ungrouped: filteredData };
 		}
 
 		const grouped: Record<string, LineItem[]> = { ungrouped: [] };
 
 		filteredData.forEach((item) => {
+			// Skip items without price_id
+			if (!item.price_id) {
+				grouped.ungrouped.push(item);
+				return;
+			}
+
 			const price = pricesData[item.price_id];
 			const groupId = price?.group_id || 'ungrouped';
 
@@ -133,7 +143,7 @@ const InvoiceLineItemTable: FC<Props> = ({
 		});
 
 		return grouped;
-	}, [filteredData, pricesData]);
+	}, [filteredData, pricesData, hasGroups]);
 
 	return (
 		<div className='bg-white'>
