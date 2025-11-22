@@ -3,9 +3,10 @@ import { Button, Card, CardHeader, NoDataCard, Chip, Tooltip } from '@/component
 import { FlexpriceTable, ColumnData, DropdownMenu, TerminatePriceModal, SyncOption, UpdatePriceDialog } from '@/components/molecules';
 import { Price, Plan, PRICE_STATUS } from '@/models';
 import { Plus, Trash2, Pencil } from 'lucide-react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { PriceApi } from '@/api/PriceApi';
 import { PlanApi } from '@/api/PlanApi';
+import { GroupApi } from '@/api/GroupApi';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router';
 import { RouteNames } from '@/core/routes/Routes';
@@ -264,6 +265,30 @@ const PlanPriceTable: FC<PlanChargesTableProps> = ({ plan, onPriceUpdate }) => {
 		setSelectedPriceForTermination(null);
 	}, []);
 
+	// ===== FETCH GROUPS FOR PRICES =====
+	// Get unique group IDs from prices
+	const groupIds = useMemo(() => {
+		if (!plan.prices) return [];
+		return [...new Set(plan.prices.map((price) => price.group_id).filter((id): id is string => !!id))];
+	}, [plan.prices]);
+
+	// Fetch groups to get group names
+	const { data: groupsData } = useQuery({
+		queryKey: ['planGroups', groupIds],
+		queryFn: async () => {
+			if (groupIds.length === 0) return {};
+			const groups = await Promise.all(groupIds.map((id) => GroupApi.getGroupById(id)));
+			return groups.reduce(
+				(acc, group) => {
+					acc[group.id] = group;
+					return acc;
+				},
+				{} as Record<string, (typeof groups)[0]>,
+			);
+		},
+		enabled: groupIds.length > 0,
+	});
+
 	// ===== PROCESSED PRICES WITH PRECOMPUTED STATUS =====
 	const processedPrices = useMemo<PriceWithStatus[]>(() => {
 		if (!plan.prices || plan.prices.length === 0) return [];
@@ -320,6 +345,13 @@ const PlanPriceTable: FC<PlanChargesTableProps> = ({ plan, onPriceUpdate }) => {
 			title: 'Billing Period',
 			render(rowData) {
 				return <span>{formatBillingPeriod(rowData.billing_period as string)}</span>;
+			},
+		},
+		{
+			title: 'Group',
+			render(rowData) {
+				const groupName = rowData.group_id ? groupsData?.[rowData.group_id]?.name : undefined;
+				return <span>{groupName || '--'}</span>;
 			},
 		},
 		{
