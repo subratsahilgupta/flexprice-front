@@ -195,9 +195,9 @@ const InvoiceLineItemTable: FC<Props> = ({
 							{Object.entries(groupedLineItems)
 								.filter(([_, items]) => items.length > 0) // Skip empty groups
 								.sort(([groupIdA], [groupIdB]) => {
-									// Sort: grouped items first (alphabetically by group name), then ungrouped
-									if (groupIdA === 'ungrouped') return 1;
-									if (groupIdB === 'ungrouped') return -1;
+									// Sort: ungrouped items first, then grouped items (alphabetically by group name)
+									if (groupIdA === 'ungrouped') return -1;
+									if (groupIdB === 'ungrouped') return 1;
 									const nameA = groupsData?.[groupIdA]?.name || '';
 									const nameB = groupsData?.[groupIdB]?.name || '';
 									return nameA.localeCompare(nameB);
