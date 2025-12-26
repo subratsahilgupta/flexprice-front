@@ -3,6 +3,7 @@ import Customer from './Customer';
 import { Subscription } from './Subscription';
 import { PAYMENT_STATUS } from '@/constants/payment';
 import { TaxApplied } from './Tax';
+import { PRICE_TYPE } from './Price';
 
 export interface Invoice extends BaseModel {
 	readonly customer_id: string;
@@ -46,7 +47,7 @@ export interface LineItem extends BaseModel {
 	readonly price_id: string;
 	readonly plan_id: string;
 	readonly plan_display_name: string;
-	readonly price_type: string;
+	readonly price_type: PRICE_TYPE;
 	readonly display_name: string;
 	readonly amount: number;
 	readonly quantity: string;

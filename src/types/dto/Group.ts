@@ -24,6 +24,7 @@ export interface ListGroupsResponse {
 }
 
 export interface GroupFilter extends QueryFilter {
+	group_ids?: string[];
 	entity_type?: GROUP_ENTITY_TYPE;
 	name?: string;
 	lookup_key?: string;

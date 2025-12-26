@@ -1,7 +1,9 @@
 import { Button, FormHeader, Toggle } from '@/components/atoms';
 import { LineItem, INVOICE_TYPE } from '@/models/Invoice';
+import { Price, PRICE_TYPE } from '@/models';
+import { GroupResponse } from '@/types/dto/Group';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
-import { FC, useState, useMemo } from 'react';
+import { FC, useState, useMemo, useCallback } from 'react';
 import { RefreshCw, Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useQuery } from '@tanstack/react-query';
@@ -34,15 +36,154 @@ const formatAmount = (amount: number, currency: string): string => {
 	return `${getCurrencySymbol(currency)}${amount}`;
 };
 
-const formatPriceType = (value: string): string => {
+const formatPriceType = (value: PRICE_TYPE): string => {
 	switch (value) {
-		case 'FIXED':
+		case PRICE_TYPE.FIXED:
 			return 'Recurring';
-		case 'USAGE':
+		case PRICE_TYPE.USAGE:
 			return 'Usage Based';
 		default:
 			return 'Unknown';
 	}
+};
+
+interface InvoiceTableRowProps {
+	item: LineItem;
+	invoiceType?: INVOICE_TYPE;
+}
+
+const InvoiceTableRow: FC<InvoiceTableRowProps> = ({ item, invoiceType }) => {
+	const formattedAmount = useMemo(() => formatAmount(item.amount ?? 0, item.currency), [item.amount, item.currency]);
+
+	const periodText = useMemo(() => {
+		if (invoiceType !== INVOICE_TYPE.SUBSCRIPTION) return null;
+		return `${formatToShortDate(item.period_start)} - ${formatToShortDate(item.period_end)}`;
+	}, [invoiceType, item.period_start, item.period_end]);
+
+	return (
+		<tr className='border-b border-gray-100'>
+			<td className='py-4 px-0 text-sm text-gray-900'>{item.display_name ?? '--'}</td>
+			{invoiceType === INVOICE_TYPE.SUBSCRIPTION && (
+				<td className='py-4 px-4 text-sm text-gray-600 text-right'>{formatPriceType(item.price_type)}</td>
+			)}
+			{invoiceType === INVOICE_TYPE.SUBSCRIPTION && periodText && (
+				<td className='py-4 px-4 text-sm text-gray-600 text-right'>{periodText}</td>
+			)}
+			<td className='py-4 px-4 text-right text-sm text-gray-600'>{item.quantity ? item.quantity : '--'}</td>
+			<td className='py-4 px-0 text-right w-36 text-sm text-gray-600'>{formattedAmount}</td>
+		</tr>
+	);
+};
+
+interface InvoiceTableGroupHeaderProps {
+	groupName: string;
+	invoiceType?: INVOICE_TYPE;
+}
+
+const InvoiceTableGroupHeader: FC<InvoiceTableGroupHeaderProps> = ({ groupName, invoiceType }) => {
+	const colSpan = invoiceType === INVOICE_TYPE.SUBSCRIPTION ? 5 : 3;
+	return (
+		<tr className='bg-gray-50 border-b border-gray-200'>
+			<td colSpan={colSpan} className='py-3 px-0 text-sm font-medium text-gray-900'>
+				{groupName}
+			</td>
+		</tr>
+	);
+};
+
+interface InvoiceSummaryProps {
+	currency?: string;
+	subtotal?: number;
+	discount?: number;
+	total_tax?: number;
+	amount_due?: number;
+	amount_paid?: number;
+	amount_remaining?: number;
+}
+
+const InvoiceSummary: FC<InvoiceSummaryProps> = ({
+	currency = '',
+	subtotal,
+	discount,
+	total_tax,
+	amount_due,
+	amount_paid,
+	amount_remaining,
+}) => {
+	const numericSubtotal = useMemo(() => Number(subtotal ?? 0), [subtotal]);
+	const numericDiscount = useMemo(() => Number(discount ?? 0), [discount]);
+	const numericTax = useMemo(() => Number(total_tax ?? 0), [total_tax]);
+	const numericAmountDue = useMemo(() => Number(amount_due ?? 0), [amount_due]);
+	const numericAmountPaid = useMemo(() => Number(amount_paid ?? 0), [amount_paid]);
+	const numericAmountRemaining = useMemo(() => Number(amount_remaining ?? amount_due ?? 0), [amount_remaining, amount_due]);
+
+	const formattedSubtotal = useMemo(() => formatAmount(numericSubtotal, currency), [numericSubtotal, currency]);
+	const formattedDiscount = useMemo(() => formatAmount(numericDiscount, currency), [numericDiscount, currency]);
+	const formattedTax = useMemo(() => formatAmount(numericTax, currency), [numericTax, currency]);
+	const formattedAmountDue = useMemo(() => formatAmount(numericAmountDue, currency), [numericAmountDue, currency]);
+	const formattedAmountPaid = useMemo(() => formatAmount(numericAmountPaid, currency), [numericAmountPaid, currency]);
+	const formattedAmountRemaining = useMemo(() => formatAmount(numericAmountRemaining, currency), [numericAmountRemaining, currency]);
+
+	const showSubtotal = numericSubtotal !== 0;
+	const showDiscount = numericDiscount > 0;
+	const showTax = numericTax !== 0;
+	const showRemainingBalance = numericAmountRemaining > 0 || numericAmountDue > 0;
+
+	return (
+		<div className='flex justify-end'>
+			<div className='w-80 space-y-2'>
+				{showSubtotal && (
+					<div className='flex flex-row justify-end items-center py-1'>
+						<div className='w-40 text-right text-sm font-medium text-gray-900'>Subtotal</div>
+						<div className='flex-1 text-right text-sm text-gray-900 font-medium'>{formattedSubtotal}</div>
+					</div>
+				)}
+
+				{showDiscount && (
+					<div className='flex flex-row justify-end items-center py-1'>
+						<div className='w-40 text-right text-sm font-medium text-gray-900'>Discount</div>
+						<div className='flex-1 text-right text-sm text-gray-900 font-medium'>−{formattedDiscount}</div>
+					</div>
+				)}
+
+				{showTax && (
+					<div className='flex flex-row justify-end items-center py-1'>
+						<div className='w-40 text-right text-sm font-medium text-gray-900'>Tax</div>
+						<div className='flex-1 text-right text-sm text-gray-900 font-medium'>{formattedTax}</div>
+					</div>
+				)}
+
+				<div className='flex flex-row justify-end border-t border-gray-200 items-center py-3'>
+					<div className='w-40 flex items-center gap-2 justify-end'>
+						<span className='text-sm text-gray-900 font-medium'>Net payable</span>
+						<TooltipProvider delayDuration={0}>
+							<Tooltip>
+								<TooltipTrigger>
+									<Info className='h-4 w-4 text-gray-400 hover:text-gray-600 transition-colors' />
+								</TooltipTrigger>
+								<TooltipContent sideOffset={5} className='bg-gray-900 text-xs text-white px-3 py-1.5 rounded-lg max-w-[200px]'>
+									Final amount due after applying credit notes
+								</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
+					</div>
+					<div className='flex-1 text-right text-sm text-gray-900 font-semibold'>{formattedAmountDue}</div>
+				</div>
+
+				<div className='flex flex-row justify-end items-center py-1'>
+					<div className='w-40 text-right text-sm font-medium text-gray-900'>Amount paid</div>
+					<div className='flex-1 text-right text-sm text-gray-900 font-medium'>{formattedAmountPaid}</div>
+				</div>
+
+				{showRemainingBalance && (
+					<div className='flex flex-row justify-end items-center py-3 border-t border-gray-200'>
+						<div className='w-40 text-right text-sm font-medium text-gray-900'>Remaining balance</div>
+						<div className='flex-1 text-right text-sm font-semibold text-gray-900'>{formattedAmountRemaining}</div>
+					</div>
+				)}
+			</div>
+		</div>
+	);
 };
 
 const InvoiceLineItemTable: FC<Props> = ({
@@ -60,77 +201,75 @@ const InvoiceLineItemTable: FC<Props> = ({
 	subtotal,
 }) => {
 	const [showZeroCharges, setShowZeroCharges] = useState(false);
-	const filteredData = data.filter((item) => showZeroCharges || Number(item.amount) !== 0);
+	const [isRefreshing, setIsRefreshing] = useState(false);
 
-	// Get unique price IDs from line items (filter out null/undefined)
+	const filteredData = useMemo(() => {
+		return data.filter((item) => showZeroCharges || Number(item.amount) !== 0);
+	}, [data, showZeroCharges]);
+
 	const priceIds = useMemo(() => {
-		const uniqueIds = [...new Set(filteredData.map((item) => item.price_id).filter((id): id is string => !!id))];
-		return uniqueIds;
+		const ids = new Set<string>();
+		for (const item of filteredData) {
+			if (item.price_id) {
+				ids.add(item.price_id);
+			}
+		}
+		return Array.from(ids);
 	}, [filteredData]);
 
-	// Fetch prices to get group_id
 	const { data: pricesData } = useQuery({
 		queryKey: ['invoicePrices', priceIds],
 		queryFn: async () => {
-			const prices = await Promise.all(priceIds.map((id) => PriceApi.GetPriceById(id)));
-			return prices.reduce(
-				(acc, price) => {
-					acc[price.id] = price;
-					return acc;
-				},
-				{} as Record<string, (typeof prices)[0]>,
-			);
+			const response = await PriceApi.ListPrices({ price_ids: priceIds });
+			const pricesMap: Record<string, Price> = {};
+			for (const price of response.items) {
+				pricesMap[price.id] = price;
+			}
+			return pricesMap;
 		},
 		enabled: priceIds.length > 0,
 	});
 
-	// Check if any prices have groups - only run grouping logic if there are groups
-	const hasGroups = useMemo(() => {
-		if (!pricesData) return false;
-		return Object.values(pricesData).some((price) => !!price.group_id);
+	const groupIds = useMemo(() => {
+		if (!pricesData) return [];
+		const ids = new Set<string>();
+		for (const price of Object.values(pricesData)) {
+			if (price.group_id) {
+				ids.add(price.group_id);
+			}
+		}
+		return Array.from(ids);
 	}, [pricesData]);
 
-	// Fetch groups to get group names (only if there are groups)
+	const hasGroups = groupIds.length > 0;
+
 	const { data: groupsData } = useQuery({
-		queryKey: ['invoiceGroups', pricesData, hasGroups],
+		queryKey: ['invoiceGroups', groupIds],
 		queryFn: async () => {
-			if (!pricesData || !hasGroups) return {};
+			if (groupIds.length === 0) return {};
 
-			// Extract unique group IDs directly
-			const groupIds = [
-				...new Set(
-					Object.values(pricesData)
-						.map((price) => price.group_id)
-						.filter((id): id is string => !!id),
-				),
-			];
+			const response = await GroupApi.getGroupsByFilter({ group_ids: groupIds });
+			const groupsMap: Record<string, GroupResponse> = {};
 
-			const groups = await Promise.all(groupIds.map((id) => GroupApi.getGroupById(id)));
-			return groups.reduce(
-				(acc, group) => {
-					acc[group.id] = group;
-					return acc;
-				},
-				{} as Record<string, (typeof groups)[0]>,
-			);
+			for (const group of response.items) {
+				groupsMap[group.id] = group;
+			}
+			return groupsMap;
 		},
-		enabled: hasGroups && !!pricesData,
+		enabled: hasGroups,
 	});
 
-	// Group line items by group_id (only if there are groups)
 	const groupedLineItems = useMemo(() => {
-		// If no groups, return ungrouped - no need to run grouping logic
 		if (!hasGroups || !pricesData) {
 			return { ungrouped: filteredData };
 		}
 
 		const grouped: Record<string, LineItem[]> = { ungrouped: [] };
 
-		filteredData.forEach((item) => {
-			// Skip items without price_id
+		for (const item of filteredData) {
 			if (!item.price_id) {
 				grouped.ungrouped.push(item);
-				return;
+				continue;
 			}
 
 			const price = pricesData[item.price_id];
@@ -140,10 +279,29 @@ const InvoiceLineItemTable: FC<Props> = ({
 				grouped[groupId] = [];
 			}
 			grouped[groupId].push(item);
-		});
+		}
 
 		return grouped;
 	}, [filteredData, pricesData, hasGroups]);
+
+	const sortedGroupEntries = useMemo(() => {
+		return Object.entries(groupedLineItems)
+			.filter(([_, items]) => items.length > 0)
+			.sort(([groupIdA], [groupIdB]) => {
+				if (groupIdA === 'ungrouped') return -1;
+				if (groupIdB === 'ungrouped') return 1;
+				const nameA = groupsData?.[groupIdA]?.name || '';
+				const nameB = groupsData?.[groupIdB]?.name || '';
+				return nameA.localeCompare(nameB);
+			});
+	}, [groupedLineItems, groupsData]);
+
+	const handleRefresh = useCallback(() => {
+		if (!refetch) return;
+		setIsRefreshing(true);
+		refetch();
+		setTimeout(() => setIsRefreshing(false), 500);
+	}, [refetch]);
 
 	return (
 		<div className='bg-white'>
@@ -159,23 +317,14 @@ const InvoiceLineItemTable: FC<Props> = ({
 					/>
 					<div className='flex items-center gap-4'>
 						{refetch && (
-							<Button
-								onClick={() => {
-									const icon = document.querySelector('.refresh-icon');
-									icon?.classList.add('animate-spin');
-									refetch();
-									icon?.classList.remove('animate-spin');
-								}}
-								variant='outline'
-								size='sm'>
-								<RefreshCw className='refresh-icon h-4 w-4' />
+							<Button onClick={handleRefresh} variant='outline' size='sm'>
+								<RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
 							</Button>
 						)}
 						<Toggle checked={showZeroCharges} onChange={() => setShowZeroCharges(!showZeroCharges)} label='Show Zero Charges' />
 					</div>
 				</div>
 
-				{/* Line Items Table */}
 				<div className='overflow-x-auto mb-8'>
 					<table className='w-full border-collapse'>
 						<thead>
@@ -192,120 +341,31 @@ const InvoiceLineItemTable: FC<Props> = ({
 							</tr>
 						</thead>
 						<tbody>
-							{Object.entries(groupedLineItems)
-								.filter(([_, items]) => items.length > 0) // Skip empty groups
-								.sort(([groupIdA], [groupIdB]) => {
-									// Sort: ungrouped items first, then grouped items (alphabetically by group name)
-									if (groupIdA === 'ungrouped') return -1;
-									if (groupIdB === 'ungrouped') return 1;
-									const nameA = groupsData?.[groupIdA]?.name || '';
-									const nameB = groupsData?.[groupIdB]?.name || '';
-									return nameA.localeCompare(nameB);
-								})
-								.map(([groupId, items]) => {
-									const groupName = groupId === 'ungrouped' ? null : groupsData?.[groupId]?.name;
+							{sortedGroupEntries.map(([groupId, items]) => {
+								const groupName = groupId === 'ungrouped' ? null : groupsData?.[groupId]?.name;
 
-									return (
-										<>
-											{/* Group Header */}
-											{groupName && (
-												<tr key={`group-${groupId}`} className='bg-gray-50 border-b border-gray-200'>
-													<td
-														colSpan={invoiceType === INVOICE_TYPE.SUBSCRIPTION ? 5 : 3}
-														className='py-3 px-0 text-sm font-medium text-gray-900'>
-														{groupName}
-													</td>
-												</tr>
-											)}
-											{/* Group Items */}
-											{items.map((item, index) => (
-												<tr key={`${groupId}-${item.id || index}`} className='border-b border-gray-100'>
-													<td className='py-4 px-0 text-sm text-gray-900'>{item.display_name ?? '--'}</td>
-													{invoiceType === INVOICE_TYPE.SUBSCRIPTION && (
-														<td className='py-4 px-4 text-sm text-gray-600 text-right'>{formatPriceType(item.price_type)}</td>
-													)}
-													{invoiceType === INVOICE_TYPE.SUBSCRIPTION && (
-														<td className='py-4 px-4 text-sm text-gray-600 text-right'>{`${formatToShortDate(item.period_start)} - ${formatToShortDate(item.period_end)}`}</td>
-													)}
-													<td className='py-4 px-4 text-right text-sm text-gray-600'>{item.quantity ? item.quantity : '--'}</td>
-													<td className='py-4 px-0 text-right w-36 text-sm text-gray-600'>
-														{formatAmount(item.amount ?? 0, item.currency)}
-													</td>
-												</tr>
-											))}
-										</>
-									);
-								})}
+								return (
+									<>
+										{groupName && <InvoiceTableGroupHeader key={`group-${groupId}`} groupName={groupName} invoiceType={invoiceType} />}
+										{items.map((item) => (
+											<InvoiceTableRow key={`${groupId}-${item.id}`} item={item} invoiceType={invoiceType} />
+										))}
+									</>
+								);
+							})}
 						</tbody>
 					</table>
 				</div>
 
-				{/* Stripe-style Summary Section */}
-				<div className='flex justify-end'>
-					<div className='w-80 space-y-2'>
-						{/* Subtotal - always show if exists */}
-						{subtotal !== undefined && subtotal !== null && Number(subtotal) !== 0 && (
-							<div className='flex flex-row justify-end items-center py-1'>
-								<div className='w-40 text-right text-sm font-medium text-gray-900'>Subtotal</div>
-								<div className='flex-1 text-right text-sm text-gray-900 font-medium'>{formatAmount(Number(subtotal), currency ?? '')}</div>
-							</div>
-						)}
-
-						{/* Discount - only show if provided and > 0 */}
-						{discount !== undefined && discount !== null && Number(discount) > 0 && (
-							<div className='flex flex-row justify-end items-center py-1'>
-								<div className='w-40 text-right text-sm font-medium text-gray-900'>Discount</div>
-								<div className='flex-1 text-right text-sm text-gray-900 font-medium'>−{formatAmount(Number(discount), currency ?? '')}</div>
-							</div>
-						)}
-
-						{total_tax !== undefined && total_tax !== null && Number(total_tax) !== 0 && (
-							<div className='flex flex-row justify-end items-center py-1'>
-								<div className='w-40 text-right text-sm font-medium text-gray-900'>Tax</div>
-								<div className='flex-1 text-right text-sm text-gray-900 font-medium'>{formatAmount(Number(total_tax), currency ?? '')}</div>
-							</div>
-						)}
-
-						{/* Net payable - always show, default to 0 if not provided */}
-						<div className='flex flex-row justify-end border-t border-gray-200 items-center py-3'>
-							<div className='w-40 flex items-center gap-2 justify-end'>
-								<span className='text-sm text-gray-900 font-medium'>Net payable</span>
-								<TooltipProvider delayDuration={0}>
-									<Tooltip>
-										<TooltipTrigger>
-											<Info className='h-4 w-4 text-gray-400 hover:text-gray-600 transition-colors' />
-										</TooltipTrigger>
-										<TooltipContent sideOffset={5} className='bg-gray-900 text-xs text-white px-3 py-1.5 rounded-lg max-w-[200px]'>
-											Final amount due after applying credit notes
-										</TooltipContent>
-									</Tooltip>
-								</TooltipProvider>
-							</div>
-							<div className='flex-1 text-right text-sm text-gray-900 font-semibold'>
-								{formatAmount(Number(amount_due ?? 0), currency ?? '')}
-							</div>
-						</div>
-
-						{/* Amount paid - always show, default to 0 if not provided */}
-						<div className='flex flex-row justify-end items-center py-1'>
-							<div className='w-40 text-right text-sm font-medium text-gray-900'>Amount paid</div>
-							<div className='flex-1 text-right text-sm text-gray-900 font-medium'>
-								{formatAmount(Number(amount_paid ?? 0), currency ?? '')}
-							</div>
-						</div>
-
-						{/* Remaining balance - show the final outstanding amount */}
-						{((amount_remaining !== undefined && amount_remaining !== null && Number(amount_remaining) > 0) ||
-							(amount_due !== undefined && amount_due !== null && Number(amount_due) > 0)) && (
-							<div className='flex flex-row justify-end items-center py-3 border-t border-gray-200'>
-								<div className='w-40 text-right text-sm font-medium text-gray-900'>Remaining balance</div>
-								<div className='flex-1 text-right text-sm font-semibold text-gray-900'>
-									{formatAmount(Number(amount_remaining ?? amount_due ?? 0), currency ?? '')}
-								</div>
-							</div>
-						)}
-					</div>
-				</div>
+				<InvoiceSummary
+					currency={currency}
+					subtotal={subtotal}
+					discount={discount}
+					total_tax={total_tax}
+					amount_due={amount_due}
+					amount_paid={amount_paid}
+					amount_remaining={amount_remaining}
+				/>
 			</div>
 		</div>
 	);
