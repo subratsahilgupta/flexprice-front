@@ -35,8 +35,8 @@ axiosClient.interceptors.request.use(
 
 		// Normal app mode: use JWT token and environment ID
 		const token = await AuthService.getAcessToken();
-		// add active environment to the request
-		const activeEnvId = EnvironmentApi.getActiveEnvironmentId();
+		// Add active environment to the request (don't overwrite if caller set it explicitly, e.g. webhook dashboard)
+		const activeEnvId = config.headers['X-Environment-ID'] ?? EnvironmentApi.getActiveEnvironmentId();
 		if (activeEnvId) {
 			config.headers['X-Environment-ID'] = activeEnvId;
 		}

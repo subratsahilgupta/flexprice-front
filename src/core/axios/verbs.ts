@@ -70,8 +70,8 @@ export class AxiosClient {
 	}
 
 	// Static methods for backward compatibility (uses default axiosClient)
-	public static async get<T>(url: string): Promise<T> {
-		const response: AxiosResponse<T> = await axiosClient.get(url);
+	public static async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+		const response: AxiosResponse<T> = await axiosClient.get(url, config);
 		return response as T;
 	}
 

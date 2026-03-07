@@ -15,14 +15,17 @@ import { useEnvironment } from '@/hooks/useEnvironment';
  */
 const WebhookDashboard = () => {
 	const queryClient = useQueryClient();
-	const { activeEnvironment } = useEnvironment();
+	const { activeEnvironment, isLoading: envLoading, isError: envError } = useEnvironment();
 
 	const { data, isLoading, isError, error } = useQuery({
 		queryKey: ['webhookDashboardUrl', activeEnvironment?.id],
-		queryFn: async () => await WebhookApi.getWebhookDashboardUrl(),
-		// Only fetch when an environment is selected (backend uses X-Environment-ID from axios interceptor)
-		enabled: !!activeEnvironment?.id,
-		// Cache per environment; 5 minutes
+		queryFn: async () => {
+			const envId = activeEnvironment?.id;
+			if (!envId) throw new Error('No environment selected');
+			return WebhookApi.getWebhookDashboardUrl(envId);
+		},
+		// Only fetch when environment has settled and one is selected; request is bound to that env via explicit header
+		enabled: !envLoading && !envError && !!activeEnvironment?.id,
 		staleTime: 5 * 60 * 1000,
 		gcTime: 10 * 60 * 1000,
 		retry: 2,
@@ -33,10 +36,11 @@ const WebhookDashboard = () => {
 
 	// Preload the dashboard URL when component mounts and environment is set
 	useEffect(() => {
-		if (activeEnvironment?.id && !queryClient.getQueryData(['webhookDashboardUrl', activeEnvironment.id])) {
+		const envId = activeEnvironment?.id;
+		if (envId && !queryClient.getQueryData(['webhookDashboardUrl', envId])) {
 			queryClient.prefetchQuery({
-				queryKey: ['webhookDashboardUrl', activeEnvironment.id],
-				queryFn: async () => await WebhookApi.getWebhookDashboardUrl(),
+				queryKey: ['webhookDashboardUrl', envId],
+				queryFn: () => WebhookApi.getWebhookDashboardUrl(envId),
 				staleTime: 5 * 60 * 1000,
 			});
 		}
@@ -57,6 +61,48 @@ const WebhookDashboard = () => {
 		}),
 		[data?.url],
 	);
+
+	// Wait for useEnvironment() to settle before showing env-dependent UI
+	if (envLoading) {
+		return (
+			<Page className='h-full w-full' heading='Webhooks'>
+				<ApiDocsContent tags={['Webhooks']} />
+				<div className='flex items-center justify-center h-96'>
+					<Loader />
+				</div>
+			</Page>
+		);
+	}
+
+	if (envError) {
+		return (
+			<Page className='h-full w-full' heading='Webhooks'>
+				<ApiDocsContent tags={['Webhooks']} />
+				<EmptyPage
+					heading='Webhooks'
+					emptyStateCard={{
+						heading: 'Unable to Load Environments',
+						description: 'Environments could not be loaded. Please refresh the page.',
+					}}
+				/>
+			</Page>
+		);
+	}
+
+	if (!activeEnvironment?.id) {
+		return (
+			<Page className='h-full w-full' heading='Webhooks'>
+				<ApiDocsContent tags={['Webhooks']} />
+				<EmptyPage
+					heading='Webhooks'
+					emptyStateCard={{
+						heading: 'Select an environment',
+						description: 'Select an environment from the header to manage webhooks. Endpoints are scoped to the selected environment only.',
+					}}
+				/>
+			</Page>
+		);
+	}
 
 	if (isLoading) {
 		return (
@@ -79,21 +125,6 @@ const WebhookDashboard = () => {
 					emptyStateCard={{
 						heading: 'Unable to Load Webhooks',
 						description: 'There was an error loading the webhook dashboard. Please try refreshing the page.',
-					}}
-				/>
-			</Page>
-		);
-	}
-
-	if (!activeEnvironment?.id) {
-		return (
-			<Page className='h-full w-full' heading='Webhooks'>
-				<ApiDocsContent tags={['Webhooks']} />
-				<EmptyPage
-					heading='Webhooks'
-					emptyStateCard={{
-						heading: 'Select an environment',
-						description: 'Select an environment from the header to manage webhooks. Endpoints are scoped to the selected environment only.',
 					}}
 				/>
 			</Page>
