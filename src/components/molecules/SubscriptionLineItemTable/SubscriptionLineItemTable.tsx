@@ -182,43 +182,83 @@ const formatLineItemDateTooltip = (lineItem: LineItem): React.ReactNode => {
 	return <div className='flex flex-col gap-2'>{dateItems}</div>;
 };
 
-// Show icon only on USAGE line items when subscription has enable_true_up = true
-const shouldShowCommitmentIcon = (lineItem: LineItem, commitmentInfo?: SubscriptionCommitmentInfo): boolean => {
-	return commitmentInfo?.enable_true_up === true && lineItem.price_type?.toUpperCase() === 'USAGE';
+const hasLineItemCommitment = (lineItem: LineItem, commitmentInfo?: SubscriptionCommitmentInfo): boolean => {
+	if (lineItem.price_type?.toUpperCase() !== 'USAGE') return false;
+	return (
+		commitmentInfo?.commitment_amount != null ||
+		lineItem.commitment_quantity != null ||
+		lineItem.commitment_type != null ||
+		lineItem.commitment_overage_factor != null ||
+		lineItem.commitment_true_up_enabled === true ||
+		lineItem.commitment_windowed === true
+	);
 };
 
-const formatCommitmentTooltip = (info: SubscriptionCommitmentInfo): React.ReactNode => {
+const formatCommitmentTooltip = (lineItem: LineItem, commitmentInfo?: SubscriptionCommitmentInfo): React.ReactNode => {
 	const rows: React.ReactNode[] = [];
 
-	if (info.commitment_amount != null) {
+	if (commitmentInfo?.commitment_amount != null) {
 		rows.push(
 			<div key='amount' className='flex items-center gap-2'>
 				<span className='text-xs font-medium text-gray-500'>Commitment Amount</span>
-				<span className='text-sm font-medium'>{`${getCurrencySymbol(info.currency ?? '')}${info.commitment_amount}`}</span>
+				<span className='text-sm font-medium'>{`${getCurrencySymbol(commitmentInfo.currency ?? '')}${commitmentInfo.commitment_amount}`}</span>
 			</div>,
 		);
 	}
-	if (info.overage_factor != null) {
+	if (commitmentInfo?.overage_factor != null) {
 		rows.push(
-			<div key='overage' className='flex items-center gap-2'>
+			<div key='overage_sub' className='flex items-center gap-2'>
 				<span className='text-xs font-medium text-gray-500'>Overage Factor</span>
-				<span className='text-sm font-medium'>{info.overage_factor}×</span>
+				<span className='text-sm font-medium'>{commitmentInfo.overage_factor}×</span>
 			</div>,
 		);
 	}
-	if (info.enable_true_up != null) {
-		rows.push(
-			<div key='trueup' className='flex items-center gap-2'>
-				<span className='text-xs font-medium text-gray-500'>True-up</span>
-				<span className='text-sm font-medium'>{info.enable_true_up ? 'Enabled' : 'Disabled'}</span>
-			</div>,
-		);
-	}
-	if (info.commitment_duration) {
+	if (commitmentInfo?.commitment_duration) {
 		rows.push(
 			<div key='duration' className='flex items-center gap-2'>
 				<span className='text-xs font-medium text-gray-500'>Duration</span>
-				<span className='text-sm font-medium capitalize'>{info.commitment_duration.toLowerCase()}</span>
+				<span className='text-sm font-medium capitalize'>{commitmentInfo.commitment_duration.toLowerCase()}</span>
+			</div>,
+		);
+	}
+	if (lineItem.commitment_quantity != null) {
+		rows.push(
+			<div key='quantity' className='flex items-center gap-2'>
+				<span className='text-xs font-medium text-gray-500'>Commitment Quantity</span>
+				<span className='text-sm font-medium'>{lineItem.commitment_quantity}</span>
+			</div>,
+		);
+	}
+	if (lineItem.commitment_type != null) {
+		rows.push(
+			<div key='type' className='flex items-center gap-2'>
+				<span className='text-xs font-medium text-gray-500'>Commitment Type</span>
+				<span className='text-sm font-medium capitalize'>{lineItem.commitment_type}</span>
+			</div>,
+		);
+	}
+	if (lineItem.commitment_overage_factor != null) {
+		rows.push(
+			<div key='overage_li' className='flex items-center gap-2'>
+				<span className='text-xs font-medium text-gray-500'>Overage Factor</span>
+				<span className='text-sm font-medium'>{lineItem.commitment_overage_factor}×</span>
+			</div>,
+		);
+	}
+	const trueUpEnabled = commitmentInfo?.enable_true_up === true || lineItem.commitment_true_up_enabled === true;
+	if (lineItem.commitment_true_up_enabled != null || commitmentInfo?.enable_true_up != null) {
+		rows.push(
+			<div key='trueup' className='flex items-center gap-2'>
+				<span className='text-xs font-medium text-gray-500'>True-up</span>
+				<span className='text-sm font-medium'>{trueUpEnabled ? 'Enabled' : 'Disabled'}</span>
+			</div>,
+		);
+	}
+	if (lineItem.commitment_windowed != null) {
+		rows.push(
+			<div key='windowed' className='flex items-center gap-2'>
+				<span className='text-xs font-medium text-gray-500'>Windowed</span>
+				<span className='text-sm font-medium'>{lineItem.commitment_windowed ? 'Yes' : 'No'}</span>
 			</div>,
 		);
 	}
@@ -296,9 +336,9 @@ const SubscriptionLineItemTable: FC<Props> = ({ data, onEdit, onTerminate, isLoa
 				render: (row: LineItemWithStatus) => (
 					<div className='flex items-center gap-1'>
 						<span>{row.display_name}</span>
-						{shouldShowCommitmentIcon(row, commitmentInfo) && (
+						{hasLineItemCommitment(row, commitmentInfo) && (
 							<Tooltip
-								content={formatCommitmentTooltip(commitmentInfo!)}
+								content={formatCommitmentTooltip(row, commitmentInfo)}
 								delayDuration={0}
 								sideOffset={5}
 								className='bg-white border border-gray-200 shadow-lg text-sm text-gray-900 px-4 py-3 rounded-[6px] max-w-[320px]'>
