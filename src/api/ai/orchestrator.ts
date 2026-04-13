@@ -46,7 +46,6 @@ function toBillingPeriod(period: PricingPrice['billing_period']): BILLING_PERIOD
 	}
 }
 
-
 function billingPeriodToResetPeriod(period: PricingPrice['billing_period']): ENTITLEMENT_USAGE_RESET_PERIOD {
 	if (period === 'annual') return ENTITLEMENT_USAGE_RESET_PERIOD.ANNUAL;
 	if (period === 'one_time') return ENTITLEMENT_USAGE_RESET_PERIOD.NEVER;
@@ -103,10 +102,6 @@ function meterAggregationForFeature(feat: PricingFeature): { type: METER_AGGREGA
 	}
 	return { type: METER_AGGREGATION_TYPE.COUNT };
 }
-
-// ============================================
-// Credit grant helpers
-// ============================================
 
 function pricingCadenceToCreditGrantCadence(c: PricingCreditGrant['cadence']): CREDIT_GRANT_CADENCE {
 	return c === 'recurring' ? CREDIT_GRANT_CADENCE.RECURRING : CREDIT_GRANT_CADENCE.ONETIME;
@@ -371,10 +366,10 @@ export async function orchestrateSetup(schema: PricingSchema, onProgress?: Progr
 					...(isStatic
 						? { static_value: ent.is_unlimited ? 'unlimited' : String(ent.value ?? 'true') }
 						: {
-							usage_limit: ent.is_unlimited ? null : (ent.value ?? null),
-							usage_reset_period: billingPeriodToResetPeriod(planBillingPeriod),
-							is_soft_limit: false,
-						}),
+								usage_limit: ent.is_unlimited ? null : (ent.value ?? null),
+								usage_reset_period: billingPeriodToResetPeriod(planBillingPeriod),
+								is_soft_limit: false,
+							}),
 				});
 			}
 		}
