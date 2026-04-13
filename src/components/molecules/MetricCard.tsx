@@ -26,18 +26,19 @@ const MetricCard: React.FC<MetricCardProps> = ({
 			return `${formatNumber(value, 2)}%`;
 		}
 		if (currency) {
-			return `${getCurrencySymbol(currency)} ${formatNumber(value, 2)}`;
+			// NBSP keeps symbol + amount on one line so narrow cards (e.g. 5-up grid with trend icon) don't grow taller than siblings.
+			return `${getCurrencySymbol(currency)}\u00A0${formatNumber(value, 2)}`;
 		}
 		return formatNumber(value, 2);
 	};
 
 	return (
-		<div className='bg-white border border-[#E5E7EB] p-[25px] flex flex-col gap-3 rounded-md'>
+		<div className='bg-white border border-[#E5E7EB] p-[25px] flex flex-col gap-3 rounded-md min-h-0'>
 			<p className='text-[14px] leading-[21px] text-[#4B5563] font-normal'>{title}</p>
-			<p className='text-[24px] leading-[28px] font-medium text-[#111827] flex items-center'>
-				{renderValue()}
+			<p className='text-[24px] leading-[28px] font-medium text-[#111827] flex flex-nowrap items-center gap-3 min-w-0'>
+				<span className='whitespace-nowrap tabular-nums'>{renderValue()}</span>
 				{showChangeIndicator && (
-					<span className={`inline-block ${arrowColor} ml-3`}>{isNegative ? <TrendingDown size={18} /> : <TrendingUp size={18} />}</span>
+					<span className={`inline-flex shrink-0 ${arrowColor}`}>{isNegative ? <TrendingDown size={18} /> : <TrendingUp size={18} />}</span>
 				)}
 			</p>
 		</div>
