@@ -4,6 +4,7 @@ import {
 	SUBSCRIPTION_CANCELLATION_TYPE,
 	SUBSCRIPTION_CANCEL_IMMEDIATELY_INVOICE_POLICY,
 	SUBSCRIPTION_STATUS,
+	SUBSCRIPTION_TYPE,
 } from '@/models/Subscription';
 import { useMutation } from '@tanstack/react-query';
 import { CirclePause, CirclePlay, X, Plus, Pencil, Play } from 'lucide-react';
@@ -147,6 +148,7 @@ const SubscriptionActionButton: React.FC<Props> = ({ subscription }) => {
 	const isPaused = subscription.subscription_status.toUpperCase() === 'PAUSED';
 	const isCancelled = subscription.subscription_status.toUpperCase() === 'CANCELLED';
 	const isDraft = subscription.subscription_status === SUBSCRIPTION_STATUS.DRAFT;
+	const isInherited = subscription.subscription_type === SUBSCRIPTION_TYPE.INHERITED;
 
 	const menuOptions: DropdownMenuOption[] = [
 		...(isDraft
@@ -201,7 +203,7 @@ const SubscriptionActionButton: React.FC<Props> = ({ subscription }) => {
 
 	return (
 		<>
-			<DropdownMenu options={menuOptions} />
+			{!isInherited && <DropdownMenu options={menuOptions} />}
 
 			{/* Pause Modal */}
 			<Modal
