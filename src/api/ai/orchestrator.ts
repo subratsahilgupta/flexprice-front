@@ -130,7 +130,7 @@ async function createPlanCreditGrantsIfNeeded(
 		const planId = planIdMap[g.plan_name];
 		if (!planId) continue;
 
-		const existingList = await CreditGrantApi.list({ plan_ids: [planId], limit: 100 });
+		const existingList = await CreditGrantApi.list({ plan_ids: [planId], status: ENTITY_STATUS.PUBLISHED, limit: 100 });
 		const cadence = pricingCadenceToCreditGrantCadence(g.cadence);
 		const duplicate = existingList.items?.some(
 			(cg) => cg.name === g.name && cg.credits === g.credits && cg.cadence === cadence && cg.plan_id === planId,

@@ -255,6 +255,7 @@ const SubscriptionForm = ({
 			const response = await CreditGrantApi.list({
 				plan_ids: [state.selectedPlan],
 				scope: CREDIT_GRANT_SCOPE.PLAN,
+				status: ENTITY_STATUS.PUBLISHED,
 			});
 			return response;
 		},
