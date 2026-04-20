@@ -78,11 +78,14 @@ const EditSubscriptionCreditGrantModal: React.FC<Props> = ({
 		start_date: subscriptionStartDate || new Date().toISOString(),
 		period: CREDIT_GRANT_PERIOD.MONTHLY, // Default to monthly
 	});
+	const [conversionRateInput, setConversionRateInput] = useState<string>('1');
+	const [topupConversionRateInput, setTopupConversionRateInput] = useState<string>('1');
+	const [isTopupRateTouched, setIsTopupRateTouched] = useState(false);
 
 	// Reset form when modal opens
 	useEffect(() => {
 		if (isOpen) {
-			setFormData({
+			const next: Partial<CreateCreditGrantRequest> = {
 				scope: CREDIT_GRANT_SCOPE.SUBSCRIPTION,
 				subscription_id: subscriptionId,
 				cadence: CREDIT_GRANT_CADENCE.ONETIME,
@@ -93,15 +96,35 @@ const EditSubscriptionCreditGrantModal: React.FC<Props> = ({
 				topup_conversion_rate: 1,
 				start_date: subscriptionStartDate || new Date().toISOString(),
 				period: CREDIT_GRANT_PERIOD.MONTHLY, // Default to monthly
-			});
+			};
+			setFormData(next);
+			setConversionRateInput(next.conversion_rate !== undefined && next.conversion_rate !== null ? String(next.conversion_rate) : '1');
+			setTopupConversionRateInput(
+				next.topup_conversion_rate !== undefined && next.topup_conversion_rate !== null
+					? String(next.topup_conversion_rate)
+					: next.conversion_rate !== undefined && next.conversion_rate !== null
+						? String(next.conversion_rate)
+						: '1',
+			);
+			setIsTopupRateTouched(false);
 			setErrors({});
 		}
 	}, [isOpen, subscriptionId, subscriptionStartDate]);
+
+	// Keep top-up rate in sync with conversion rate until the user edits it
+	useEffect(() => {
+		if (!isTopupRateTouched) {
+			setTopupConversionRateInput(conversionRateInput);
+		}
+	}, [conversionRateInput, isTopupRateTouched]);
 
 	// Sanitize and validate data before saving
 	const sanitizeData = useCallback(
 		(data: Partial<CreateCreditGrantRequest>): CreateCreditGrantRequest => {
 			const isRecurring = data.cadence === CREDIT_GRANT_CADENCE.RECURRING;
+			const conversionRate = conversionRateInput.trim() === '' ? NaN : Number(conversionRateInput);
+			const topupConversionRate = topupConversionRateInput.trim() === '' ? NaN : Number(topupConversionRateInput);
+
 			// Build sanitized object with required fields explicitly set
 			const sanitized: CreateCreditGrantRequest = {
 				name: data.name?.trim() || '',
@@ -116,8 +139,8 @@ const EditSubscriptionCreditGrantModal: React.FC<Props> = ({
 				expiration_duration_unit: data.expiration_duration_unit,
 				priority: Math.max(0, Math.floor(Number(data.priority) || 0)),
 				metadata: data.metadata || {},
-				conversion_rate: data.conversion_rate,
-				topup_conversion_rate: data.topup_conversion_rate,
+				conversion_rate: isNaN(conversionRate) ? undefined : conversionRate,
+				topup_conversion_rate: isNaN(topupConversionRate) ? undefined : topupConversionRate,
 				start_date: isRecurring && subscriptionCurrentPeriodEnd ? subscriptionCurrentPeriodEnd : data.start_date,
 			};
 
@@ -134,7 +157,7 @@ const EditSubscriptionCreditGrantModal: React.FC<Props> = ({
 
 			return sanitized;
 		},
-		[subscriptionId, subscriptionCurrentPeriodEnd],
+		[subscriptionId, subscriptionCurrentPeriodEnd, conversionRateInput, topupConversionRateInput],
 	);
 
 	const validateForm = useCallback((): { isValid: boolean; errors: FormErrors } => {
@@ -184,17 +207,17 @@ const EditSubscriptionCreditGrantModal: React.FC<Props> = ({
 			newErrors.priority = 'Priority must be a non-negative number';
 		}
 
-		// Validate conversion_rate if provided
-		if (formData.conversion_rate !== undefined && formData.conversion_rate !== null) {
-			const conversionRate = Number(formData.conversion_rate);
+		// Validate conversion_rate
+		{
+			const conversionRate = conversionRateInput.trim() === '' ? NaN : Number(conversionRateInput);
 			if (isNaN(conversionRate) || conversionRate <= 0) {
 				newErrors.conversion_rate = 'Conversion rate must be greater than 0';
 			}
 		}
 
-		// Validate topup_conversion_rate if provided
-		if (formData.topup_conversion_rate !== undefined && formData.topup_conversion_rate !== null) {
-			const topupConversionRate = Number(formData.topup_conversion_rate);
+		// Validate topup_conversion_rate
+		{
+			const topupConversionRate = topupConversionRateInput.trim() === '' ? NaN : Number(topupConversionRateInput);
 			if (isNaN(topupConversionRate) || topupConversionRate <= 0) {
 				newErrors.topup_conversion_rate = 'Top-up conversion rate must be greater than 0';
 			}
@@ -204,7 +227,7 @@ const EditSubscriptionCreditGrantModal: React.FC<Props> = ({
 			isValid: Object.keys(newErrors).length === 0,
 			errors: newErrors,
 		};
-	}, [formData, subscriptionCurrentPeriodEnd]);
+	}, [formData, subscriptionCurrentPeriodEnd, conversionRateInput, topupConversionRateInput]);
 
 	const handleSave = useCallback(() => {
 		const validation = validateForm();
@@ -324,11 +347,15 @@ const EditSubscriptionCreditGrantModal: React.FC<Props> = ({
 						<span>=</span>
 						<Input
 							className='w-full'
-							variant='number'
-							value={formData.conversion_rate || 1}
-							onChange={(value) => {
-								handleFieldChange('conversion_rate', parseFloat(value) || 1);
+							variant='formatted-number'
+							formatOptions={{
+								allowDecimals: true,
+								allowNegative: false,
+								decimalSeparator: '.',
+								thousandSeparator: ',',
 							}}
+							value={conversionRateInput}
+							onChange={(value) => setConversionRateInput(value)}
 						/>
 					</div>
 					<p className='text-sm text-muted-foreground'>
@@ -345,10 +372,17 @@ const EditSubscriptionCreditGrantModal: React.FC<Props> = ({
 						<span>=</span>
 						<Input
 							className='w-full'
-							variant='number'
-							value={formData.topup_conversion_rate || formData.conversion_rate || 1}
+							variant='formatted-number'
+							formatOptions={{
+								allowDecimals: true,
+								allowNegative: false,
+								decimalSeparator: '.',
+								thousandSeparator: ',',
+							}}
+							value={topupConversionRateInput}
 							onChange={(value) => {
-								handleFieldChange('topup_conversion_rate', parseFloat(value) || formData.conversion_rate || 1);
+								setIsTopupRateTouched(true);
+								setTopupConversionRateInput(value);
 							}}
 						/>
 					</div>

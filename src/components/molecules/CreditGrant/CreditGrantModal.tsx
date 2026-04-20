@@ -50,6 +50,9 @@ const CreditGrantModal: React.FC<Props> = ({ data, isOpen, onOpenChange, onSave,
 
 	const [errors, setErrors] = useState<FormErrors>({});
 	const [formData, setFormData] = useState<Partial<InternalCreditGrantRequest>>(data || getEmptyCreditGrant());
+	const [conversionRateInput, setConversionRateInput] = useState<string>('1');
+	const [topupConversionRateInput, setTopupConversionRateInput] = useState<string>('1');
+	const [isTopupRateTouched, setIsTopupRateTouched] = useState(false);
 
 	// Update formData when data prop changes (for editing) or when modal opens
 	useEffect(() => {
@@ -57,55 +60,91 @@ const CreditGrantModal: React.FC<Props> = ({ data, isOpen, onOpenChange, onSave,
 			if (data) {
 				// Editing: load the credit grant data
 				setFormData(data);
+				setConversionRateInput(data.conversion_rate !== undefined && data.conversion_rate !== null ? String(data.conversion_rate) : '1');
+				setTopupConversionRateInput(
+					data.topup_conversion_rate !== undefined && data.topup_conversion_rate !== null
+						? String(data.topup_conversion_rate)
+						: data.conversion_rate !== undefined && data.conversion_rate !== null
+							? String(data.conversion_rate)
+							: '1',
+				);
+				setIsTopupRateTouched(
+					data.topup_conversion_rate !== undefined &&
+						data.topup_conversion_rate !== null &&
+						data.topup_conversion_rate !== data.conversion_rate,
+				);
 			} else {
 				// Adding new: reset to empty credit grant
-				setFormData(getEmptyCreditGrant());
+				const empty = getEmptyCreditGrant();
+				setFormData(empty);
+				setConversionRateInput(empty.conversion_rate !== undefined && empty.conversion_rate !== null ? String(empty.conversion_rate) : '1');
+				setTopupConversionRateInput(
+					empty.topup_conversion_rate !== undefined && empty.topup_conversion_rate !== null
+						? String(empty.topup_conversion_rate)
+						: empty.conversion_rate !== undefined && empty.conversion_rate !== null
+							? String(empty.conversion_rate)
+							: '1',
+				);
+				setIsTopupRateTouched(false);
 			}
 			// Clear errors when modal opens
 			setErrors({});
 		}
 	}, [isOpen, data, getEmptyCreditGrant]);
 
+	// Keep top-up rate in sync with conversion rate until the user edits it
+	useEffect(() => {
+		if (!isTopupRateTouched) {
+			setTopupConversionRateInput(conversionRateInput);
+		}
+	}, [conversionRateInput, isTopupRateTouched]);
+
 	// Sanitize and validate data before saving
-	const sanitizeData = useCallback((data: Partial<InternalCreditGrantRequest>): InternalCreditGrantRequest => {
-		// Build sanitized object with required fields explicitly set (not from spread)
-		const sanitized: InternalCreditGrantRequest = {
-			// Required fields - explicitly set to avoid undefined
-			id: data.id || '',
-			name: data.name?.trim() || '',
-			scope: data.scope || CREDIT_GRANT_SCOPE.PLAN,
-			cadence: data.cadence || CREDIT_GRANT_CADENCE.ONETIME,
-			credits: Math.max(0, Number(data.credits) || 0),
-			// Optional fields
-			plan_id: data.plan_id,
-			subscription_id: data.subscription_id,
-			period: data.period,
-			period_count: data.period_count,
-			expiration_type: data.expiration_type,
-			expiration_duration: data.expiration_duration ? Math.max(1, Math.floor(Number(data.expiration_duration))) : undefined,
-			expiration_duration_unit: data.expiration_duration_unit,
-			priority: Math.max(0, Math.floor(Number(data.priority) || 0)),
-			metadata: data.metadata,
-			conversion_rate: data.conversion_rate,
-			topup_conversion_rate: data.topup_conversion_rate,
-		};
+	const sanitizeData = useCallback(
+		(data: Partial<InternalCreditGrantRequest>): InternalCreditGrantRequest => {
+			const conversionRate = conversionRateInput.trim() === '' ? NaN : Number(conversionRateInput);
+			const topupConversionRate = topupConversionRateInput.trim() === '' ? NaN : Number(topupConversionRateInput);
 
-		// Remove expiration_duration if not needed
-		if (sanitized.expiration_type !== CREDIT_GRANT_EXPIRATION_TYPE.DURATION) {
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			const { expiration_duration, ...rest } = sanitized;
-			return rest as InternalCreditGrantRequest;
-		}
+			// Build sanitized object with required fields explicitly set (not from spread)
+			const sanitized: InternalCreditGrantRequest = {
+				// Required fields - explicitly set to avoid undefined
+				id: data.id || '',
+				name: data.name?.trim() || '',
+				scope: data.scope || CREDIT_GRANT_SCOPE.PLAN,
+				cadence: data.cadence || CREDIT_GRANT_CADENCE.ONETIME,
+				credits: Math.max(0, Number(data.credits) || 0),
+				// Optional fields
+				plan_id: data.plan_id,
+				subscription_id: data.subscription_id,
+				period: data.period,
+				period_count: data.period_count,
+				expiration_type: data.expiration_type,
+				expiration_duration: data.expiration_duration ? Math.max(1, Math.floor(Number(data.expiration_duration))) : undefined,
+				expiration_duration_unit: data.expiration_duration_unit,
+				priority: Math.max(0, Math.floor(Number(data.priority) || 0)),
+				metadata: data.metadata,
+				conversion_rate: isNaN(conversionRate) ? undefined : conversionRate,
+				topup_conversion_rate: isNaN(topupConversionRate) ? undefined : topupConversionRate,
+			};
 
-		// Remove period if not recurring
-		if (sanitized.cadence !== CREDIT_GRANT_CADENCE.RECURRING) {
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			const { period, ...rest } = sanitized;
-			return rest as InternalCreditGrantRequest;
-		}
+			// Remove expiration_duration if not needed
+			if (sanitized.expiration_type !== CREDIT_GRANT_EXPIRATION_TYPE.DURATION) {
+				// eslint-disable-next-line @typescript-eslint/no-unused-vars
+				const { expiration_duration, ...rest } = sanitized;
+				return rest as InternalCreditGrantRequest;
+			}
 
-		return sanitized;
-	}, []);
+			// Remove period if not recurring
+			if (sanitized.cadence !== CREDIT_GRANT_CADENCE.RECURRING) {
+				// eslint-disable-next-line @typescript-eslint/no-unused-vars
+				const { period, ...rest } = sanitized;
+				return rest as InternalCreditGrantRequest;
+			}
+
+			return sanitized;
+		},
+		[conversionRateInput, topupConversionRateInput],
+	);
 
 	const validateForm = useCallback((): { isValid: boolean; errors: FormErrors } => {
 		const newErrors: FormErrors = {};
@@ -145,17 +184,17 @@ const CreditGrantModal: React.FC<Props> = ({ data, isOpen, onOpenChange, onSave,
 			newErrors.priority = 'Priority must be a non-negative number';
 		}
 
-		// Validate conversion_rate if provided
-		if (formData.conversion_rate !== undefined && formData.conversion_rate !== null) {
-			const conversionRate = Number(formData.conversion_rate);
+		// Validate conversion_rate (always required for this form UX)
+		{
+			const conversionRate = conversionRateInput.trim() === '' ? NaN : Number(conversionRateInput);
 			if (isNaN(conversionRate) || conversionRate <= 0) {
 				newErrors.conversion_rate = 'Conversion rate must be greater than 0';
 			}
 		}
 
-		// Validate topup_conversion_rate if provided
-		if (formData.topup_conversion_rate !== undefined && formData.topup_conversion_rate !== null) {
-			const topupConversionRate = Number(formData.topup_conversion_rate);
+		// Validate topup_conversion_rate (defaults to conversion rate if not specified)
+		{
+			const topupConversionRate = topupConversionRateInput.trim() === '' ? NaN : Number(topupConversionRateInput);
 			if (isNaN(topupConversionRate) || topupConversionRate <= 0) {
 				newErrors.topup_conversion_rate = 'Top-up conversion rate must be greater than 0';
 			}
@@ -165,7 +204,7 @@ const CreditGrantModal: React.FC<Props> = ({ data, isOpen, onOpenChange, onSave,
 			isValid: Object.keys(newErrors).length === 0,
 			errors: newErrors,
 		};
-	}, [formData]);
+	}, [formData, conversionRateInput, topupConversionRateInput]);
 
 	const handleSave = useCallback(() => {
 		const validation = validateForm();
@@ -279,11 +318,15 @@ const CreditGrantModal: React.FC<Props> = ({ data, isOpen, onOpenChange, onSave,
 						<span>=</span>
 						<Input
 							className='w-full'
-							variant='number'
-							value={formData.conversion_rate || 1}
-							onChange={(value) => {
-								handleFieldChange('conversion_rate', parseFloat(value) || 1);
+							variant='formatted-number'
+							formatOptions={{
+								allowDecimals: true,
+								allowNegative: false,
+								decimalSeparator: '.',
+								thousandSeparator: ',',
 							}}
+							value={conversionRateInput}
+							onChange={(value) => setConversionRateInput(value)}
 						/>
 					</div>
 					<p className='text-sm text-muted-foreground'>
@@ -300,10 +343,17 @@ const CreditGrantModal: React.FC<Props> = ({ data, isOpen, onOpenChange, onSave,
 						<span>=</span>
 						<Input
 							className='w-full'
-							variant='number'
-							value={formData.topup_conversion_rate || formData.conversion_rate || 1}
+							variant='formatted-number'
+							formatOptions={{
+								allowDecimals: true,
+								allowNegative: false,
+								decimalSeparator: '.',
+								thousandSeparator: ',',
+							}}
+							value={topupConversionRateInput}
 							onChange={(value) => {
-								handleFieldChange('topup_conversion_rate', parseFloat(value) || formData.conversion_rate || 1);
+								setIsTopupRateTouched(true);
+								setTopupConversionRateInput(value);
 							}}
 						/>
 					</div>
