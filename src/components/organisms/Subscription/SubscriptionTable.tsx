@@ -23,7 +23,16 @@ function subscriptionHierarchyKind(row: Subscription): SUBSCRIPTION_HIERARCHY_DI
 	return null;
 }
 
-export const getSubscriptionStatus = (status: string) => {
+export const getSubscriptionStatus = (status: string, outOfSync?: boolean) => {
+	if (outOfSync && status === SUBSCRIPTION_STATUS.ACTIVE) {
+		return (
+			<Tooltip content='Subscription is out of sync with the current plan configuration.' delayDuration={0}>
+				<span className='inline-flex'>
+					<Chip bgColor='#FEFCE8' textColor='#92400E' borderColor='#FDE68A' label='Active' />
+				</span>
+			</Tooltip>
+		);
+	}
 	switch (status) {
 		case SUBSCRIPTION_STATUS.ACTIVE:
 			return <Chip variant='success' label='Active' />;
@@ -176,7 +185,7 @@ const SubscriptionTable: FC<SubscriptionTableProps> = ({ data, onRowClick, allow
 			},
 			{
 				title: 'Status',
-				render: (row) => getSubscriptionStatus(row.subscription_status),
+				render: (row) => getSubscriptionStatus(row.subscription_status, row.out_of_sync),
 			},
 			{
 				title: 'Start Date',

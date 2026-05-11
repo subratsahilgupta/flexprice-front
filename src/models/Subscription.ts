@@ -101,6 +101,9 @@ export interface Subscription extends BaseModel {
 
 	// commitment duration
 	readonly commitment_duration?: string;
+
+	/** True when the subscription's prices are out of sync with the current plan configuration. */
+	readonly out_of_sync?: boolean;
 }
 
 export interface SubscriptionUsage extends BaseModel {

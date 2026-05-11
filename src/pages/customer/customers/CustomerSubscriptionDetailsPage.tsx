@@ -319,7 +319,7 @@ const CustomerSubscriptionDetailsPage: FC = () => {
 				<div className='w-full flex justify-between items-center'>
 					<p className='text-[#71717A] text-sm'>Status</p>
 					<div className='text-[#09090B] text-sm flex items-center gap-2'>
-						{getSubscriptionStatus(subscriptionDetails?.subscription_status ?? '')}
+						{getSubscriptionStatus(subscriptionDetails?.subscription_status ?? '', subscriptionDetails?.out_of_sync)}
 						{showEndDateTag ? (
 							<Chip variant='default' label={`Cancels on ${formatDateNoYear(subscriptionDetails!.end_date)}`} />
 						) : (
