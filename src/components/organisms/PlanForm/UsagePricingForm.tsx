@@ -55,7 +55,7 @@ interface TieredPrice {
 }
 
 // TODO: Remove disabled once the feature is released
-const billingModels: SelectOption[] = [
+export const billingModels: SelectOption[] = [
 	{
 		value: BILLING_MODEL.FLAT_FEE,
 		label: 'Flat Fee',
