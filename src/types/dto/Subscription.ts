@@ -563,7 +563,7 @@ export interface ListAddonAssociationsResponse {
 // SUBSCRIPTION LINE ITEM TYPES
 // =============================================================================
 
-/** Inline price for subscription-scoped line items. Currency/entity_type/entity_id are set server-side from subscription. */
+/** Inline price for subscription-scoped line items. Entity_type/entity_id are set server-side from subscription. */
 export interface SubscriptionPriceCreateRequest {
 	type: PRICE_TYPE;
 	price_unit_type: PRICE_UNIT_TYPE;
@@ -571,6 +571,8 @@ export interface SubscriptionPriceCreateRequest {
 	billing_period_count?: number;
 	billing_model: BILLING_MODEL;
 	invoice_cadence: INVOICE_CADENCE;
+	/** Lowercase ISO currency code; defaults from subscription when omitted. */
+	currency?: string;
 	amount?: string;
 	meter_id?: string;
 	filter_values?: Record<string, string[]>;
@@ -665,11 +667,13 @@ export interface SubscriptionLineItemResponse {
 	// Addon association link
 	addon_association_id?: string;
 	// Commitment fields
+	commitment_amount?: string | number;
 	commitment_quantity?: string;
 	commitment_type?: string;
 	commitment_overage_factor?: string;
 	commitment_true_up_enabled?: boolean;
 	commitment_windowed?: boolean;
+	commitment_duration?: string;
 	commitment_time_buckets?: CommitmentTimeBucket[];
 }
 
