@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next';
 import CommitmentTimeBucketsEditor from '@/components/molecules/CommitmentTimeBucketsEditor';
 import CommitmentTypeSelect from '@/components/molecules/CommitmentTypeSelect';
 import {
-	buildCommitmentTimeBucketDefaults,
+	bucketDefaultsFromPrice,
 	normalizeTimeBucketDraftsOrError,
 	timeBucketToDraft,
 	type CommitmentTimeBucketDraft,
@@ -31,7 +31,7 @@ interface CommitmentConfigDialogProps {
 	isOpen: boolean;
 	onOpenChange: (isOpen: boolean) => void;
 	price: Price;
-	onSave: (priceId: string, config: LineItemCommitmentConfig | null, timeBuckets?: CommitmentTimeBucket[]) => void;
+	onSave: (priceId: string, config: LineItemCommitmentConfig | null, timeBuckets?: CommitmentTimeBucket[]) => void | Promise<void>;
 	currentConfig: LineItemCommitmentConfig | undefined;
 	currentTimeBuckets?: CommitmentTimeBucket[];
 	billingPeriod?: BILLING_PERIOD;
@@ -57,6 +57,7 @@ const CommitmentConfigDialog: FC<CommitmentConfigDialogProps> = ({
 	const [timeBuckets, setTimeBuckets] = useState<CommitmentTimeBucketDraft[]>([]);
 	const [validationError, setValidationError] = useState<string | null>(null);
 	const [commitmentErrorTarget, setCommitmentErrorTarget] = useState<CommitmentValidationTarget | null>(null);
+	const [isSaving, setIsSaving] = useState(false);
 
 	const commitmentDurationOptions = useMemo(
 		() => [
@@ -74,16 +75,7 @@ const CommitmentConfigDialog: FC<CommitmentConfigDialogProps> = ({
 	const showTimeBucketEditor = showWindowCommitment && supportsCommitmentTimeBuckets(price) && isWindowCommitment;
 	const bucketPriceContext = useMemo(() => bucketPriceContextFromPrice(price), [price]);
 
-	const bucketDefaults = useMemo(
-		() =>
-			buildCommitmentTimeBucketDefaults(price, {
-				commitmentType,
-				commitmentValue: commitmentType === CommitmentType.AMOUNT ? commitmentAmount : commitmentQuantity,
-				overageFactor,
-				trueUpEnabled: enableTrueUp,
-			}),
-		[commitmentType, commitmentAmount, commitmentQuantity, overageFactor, enableTrueUp, price],
-	);
+	const bucketDefaults = useMemo(() => bucketDefaultsFromPrice(price), [price]);
 
 	const clearValidation = useCallback(() => {
 		setValidationError(null);
@@ -113,7 +105,14 @@ const CommitmentConfigDialog: FC<CommitmentConfigDialogProps> = ({
 		clearValidation();
 	}, [currentConfig, currentTimeBuckets, isOpen, showWindowCommitment, billingPeriod, clearValidation]);
 
-	const handleSave = () => {
+	const handleDialogOpenChange = (open: boolean) => {
+		if (!open && isSaving) return;
+		onOpenChange(open);
+	};
+
+	const handleSave = async () => {
+		if (isSaving) return;
+
 		const config: Partial<LineItemCommitmentConfig> = {
 			commitment_type: commitmentType,
 			overage_factor: parseFloat(overageFactor) || 1.0,
@@ -156,16 +155,33 @@ const CommitmentConfigDialog: FC<CommitmentConfigDialogProps> = ({
 		}
 
 		setCommitmentErrorTarget(null);
-		onSave(price.id, config as LineItemCommitmentConfig, normalizedTimeBuckets);
-		onOpenChange(false);
+		try {
+			setIsSaving(true);
+			await onSave(price.id, config as LineItemCommitmentConfig, normalizedTimeBuckets);
+			onOpenChange(false);
+		} catch {
+			// Keep dialog open so the user can fix and retry.
+		} finally {
+			setIsSaving(false);
+		}
 	};
 
-	const handleClear = () => {
-		onSave(price.id, null);
-		onOpenChange(false);
+	const handleClear = async () => {
+		if (isSaving) return;
+
+		try {
+			setIsSaving(true);
+			await onSave(price.id, null);
+			onOpenChange(false);
+		} catch {
+			// Keep dialog open so the user can fix and retry.
+		} finally {
+			setIsSaving(false);
+		}
 	};
 
 	const handleCancel = () => {
+		if (isSaving) return;
 		clearValidation();
 		onOpenChange(false);
 	};
@@ -179,7 +195,7 @@ const CommitmentConfigDialog: FC<CommitmentConfigDialogProps> = ({
 	return (
 		<Dialog
 			isOpen={isOpen}
-			onOpenChange={onOpenChange}
+			onOpenChange={handleDialogOpenChange}
 			title={t('commitmentConfig.title')}
 			description={t('commitmentConfig.description', { name: meterDisplayName })}
 			className='w-full max-w-4xl'>
@@ -313,15 +329,15 @@ const CommitmentConfigDialog: FC<CommitmentConfigDialogProps> = ({
 				)}
 
 				<div className='flex gap-3 pt-4 border-t'>
-					<Button variant='outline' onClick={handleCancel} className='flex-1'>
+					<Button variant='outline' onClick={handleCancel} className='flex-1' disabled={isSaving}>
 						{t('commitmentConfig.cancel')}
 					</Button>
 					{hasExistingConfig && (
-						<Button variant='outline' onClick={handleClear} className='flex-1 text-red-600 hover:bg-red-50'>
+						<Button variant='outline' onClick={handleClear} className='flex-1 text-red-600 hover:bg-red-50' disabled={isSaving}>
 							{t('commitmentConfig.clearCommitment')}
 						</Button>
 					)}
-					<Button onClick={handleSave} className='flex-1'>
+					<Button onClick={handleSave} className='flex-1' isLoading={isSaving} disabled={isSaving}>
 						{hasExistingConfig ? t('commitmentConfig.updateCommitment') : t('commitmentConfig.saveCommitment')}
 					</Button>
 				</div>
