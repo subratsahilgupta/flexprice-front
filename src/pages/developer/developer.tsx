@@ -99,8 +99,11 @@ const DeveloperPage = () => {
 				title: t('labels.name'),
 				render(rowData: SecretKey) {
 					return (
-						<div className='flex gap-2 items-center font-medium'>
-							<span>{rowData.name}</span>
+						<div className='flex flex-col gap-0.5'>
+							<span className='font-medium text-sm text-gray-900'>{rowData.name}</span>
+							{rowData.user_type === 'service_account' && rowData.service_account_name && (
+								<span className='text-xs text-gray-400'>{rowData.service_account_name}</span>
+							)}
 						</div>
 					);
 				},
@@ -144,9 +147,8 @@ const DeveloperPage = () => {
 				title: t('labels.roles'),
 				render(rowData: SecretKey) {
 					if (!rowData.roles || rowData.roles.length === 0) {
-						return <span className='text-gray-500 text-sm'>{t('apiKeys.roles.fullAccess')}</span>;
+						return <span className='text-sm text-gray-500'>{t('apiKeys.roles.fullAccess')}</span>;
 					}
-
 					return (
 						<div className='flex flex-wrap gap-1'>
 							{rowData.roles.map((role) => (
@@ -160,10 +162,10 @@ const DeveloperPage = () => {
 			},
 			{
 				title: t('labels.createdAt'),
-				width: 150,
+				width: 160,
 				align: 'right',
 				render(rowData) {
-					return <span className='text-gray-600'>{formatDateShort(rowData.created_at)}</span>;
+					return <span className='text-gray-600 pr-6'>{formatDateShort(rowData.created_at)}</span>;
 				},
 			},
 		],
@@ -174,7 +176,7 @@ const DeveloperPage = () => {
 		() => [
 			...baseColumns,
 			{
-				width: '30px',
+				width: '48px',
 				align: 'right',
 				hideOnEmpty: true,
 				render(rowData: SecretKey) {
