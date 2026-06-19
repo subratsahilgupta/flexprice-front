@@ -68,6 +68,11 @@ interface RestrictionsConfig {
 	rawEnvs: string;
 }
 
+interface FeaturesConfig {
+	/** Tenant IDs allowed to use gated UI features (e.g. customer org_type metadata filter). */
+	tenantFeatureAllowlist: string[];
+}
+
 /** Primary defaults to **Geist** (Google Fonts in `src/index.css`). Override via `VITE_FONT_CONFIG`. */
 export interface TypographyConfig {
 	primaryFont: string;
@@ -112,6 +117,30 @@ function parseTypographyConfig(): TypographyConfig {
 
 const typographyConfig = parseTypographyConfig();
 
+function parseTenantFeatureAllowlist(): string[] {
+	const raw = import.meta.env.VITE_TENANT_FEATURE_ALLOWLIST?.trim();
+	if (!raw) return [];
+
+	try {
+		const parsed = JSON.parse(raw) as unknown;
+		if (Array.isArray(parsed)) {
+			return parsed
+				.filter((entry): entry is string => typeof entry === 'string')
+				.map((entry) => entry.trim())
+				.filter(Boolean);
+		}
+	} catch {
+		// fall through to comma-separated parsing
+	}
+
+	return raw
+		.split(',')
+		.map((entry: string) => entry.trim())
+		.filter(Boolean);
+}
+
+const tenantFeatureAllowlist = parseTenantFeatureAllowlist();
+
 export interface Config {
 	app: AppConfig;
 	api: ApiConfig;
@@ -129,6 +158,7 @@ export interface Config {
 	regions: RegionsConfig;
 	allowedLocales: Locale[];
 	typography: TypographyConfig;
+	features: FeaturesConfig;
 }
 
 function parseAppEnv(): APP_ENV {
@@ -189,6 +219,9 @@ export const config: Config = {
 	regions: regionsConfig,
 	allowedLocales: allowedLocalesConfig,
 	typography: typographyConfig,
+	features: {
+		tenantFeatureAllowlist,
+	},
 };
 
 /** Sets `--font-sans` from `config.typography.fontFamily` (see `src/index.css`). Call once at startup. */
