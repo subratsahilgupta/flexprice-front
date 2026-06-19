@@ -19,6 +19,7 @@ interface MoyasarConnectionDrawerProps {
 
 interface MoyasarFormData {
 	name: string;
+	publishable_key: string;
 	secret_key: string;
 	webhook_secret: string;
 }
@@ -32,6 +33,7 @@ const MoyasarConnectionDrawer: FC<MoyasarConnectionDrawerProps> = ({ isOpen, onO
 
 	const [formData, setFormData] = useState<MoyasarFormData>({
 		name: '',
+		publishable_key: '',
 		secret_key: '',
 		webhook_secret: '',
 	});
@@ -50,12 +52,14 @@ const MoyasarConnectionDrawer: FC<MoyasarConnectionDrawerProps> = ({ isOpen, onO
 				const encryptedData = connection.encrypted_secret_data || {};
 				setFormData({
 					name: connection.name || '',
+					publishable_key: encryptedData.publishable_key || '',
 					secret_key: encryptedData.secret_key || '',
 					webhook_secret: encryptedData.webhook_secret || '',
 				});
 			} else {
 				setFormData({
 					name: '',
+					publishable_key: '',
 					secret_key: '',
 					webhook_secret: '',
 				});
@@ -82,9 +86,6 @@ const MoyasarConnectionDrawer: FC<MoyasarConnectionDrawerProps> = ({ isOpen, onO
 			if (!formData.secret_key.trim()) {
 				newErrors.secret_key = t('connection.validation.secretKeyRequired');
 			}
-			if (!formData.webhook_secret.trim()) {
-				newErrors.webhook_secret = t('connection.validation.webhookSecretRequired');
-			}
 		}
 
 		setErrors(newErrors);
@@ -98,7 +99,7 @@ const MoyasarConnectionDrawer: FC<MoyasarConnectionDrawerProps> = ({ isOpen, onO
 				provider_type: CONNECTION_PROVIDER_TYPE.MOYASAR,
 				encrypted_secret_data: {
 					provider_type: CONNECTION_PROVIDER_TYPE.MOYASAR,
-					publishable_key: undefined, // Included in payload by default, not shown in UI
+					publishable_key: formData.publishable_key || undefined,
 					secret_key: formData.secret_key,
 					webhook_secret: formData.webhook_secret,
 				},
@@ -197,6 +198,19 @@ const MoyasarConnectionDrawer: FC<MoyasarConnectionDrawerProps> = ({ isOpen, onO
 						onChange={(value) => handleChange('secret_key', value)}
 						error={errors.secret_key}
 						description={t('connection.moyasar.secretKeyHint')}
+					/>
+				)}
+
+				{/* Publishable Key — required for customer autopay (Moyasar.js tokenization) */}
+				{!connection && (
+					<Input
+						label={t('connection.moyasar.publishableKey')}
+						placeholder={t('connection.moyasar.publishableKeyPlaceholder')}
+						type='password'
+						value={formData.publishable_key}
+						onChange={(value) => handleChange('publishable_key', value)}
+						error={errors.publishable_key}
+						description={t('connection.moyasar.publishableKeyHint')}
 					/>
 				)}
 

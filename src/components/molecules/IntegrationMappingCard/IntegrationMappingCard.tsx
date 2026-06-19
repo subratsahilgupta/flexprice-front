@@ -11,6 +11,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import IntegrationMappingApi, { IntegrationConfigItem, IntegrationMappingItem } from '@/api/IntegrationMappingApi';
 import { integrationCatalogSpecs } from '@/pages/insights-tools/integrations/integrationsData';
 import formatDate from '@/utils/common/format_date';
+import { useNavigate } from 'react-router';
+import { RouteNames } from '@/core/routes/Routes';
 
 const PROVIDER_ID_MAP: Record<string, string> = {
 	zoho_books: 'zoho',
@@ -61,6 +63,7 @@ const IntegrationMappingCard: FC<IntegrationMappingCardProps> = ({
 }) => {
 	const { t } = useTranslation('common');
 	const queryClient = useQueryClient();
+	const navigate = useNavigate();
 
 	const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
 	const [linkDialogOpen, setLinkDialogOpen] = useState(false);
@@ -266,6 +269,18 @@ const IntegrationMappingCard: FC<IntegrationMappingCardProps> = ({
 										className='cursor-pointer text-destructive focus:text-destructive'>
 										{t('actions.unlink')}
 									</DropdownMenuItem>
+									{entityType === 'customer' && row.provider_type === 'moyasar' && (
+										<DropdownMenuItem
+											disabled={isActionDisabled}
+											onSelect={(e) => {
+												e.preventDefault();
+												setDropdownOpen(null);
+												navigate(`${RouteNames.moyasarCheckout}?customer_id=${entityId}`);
+											}}
+											className='cursor-pointer'>
+											Setup Autopay
+										</DropdownMenuItem>
+									)}
 									<DropdownMenuItem
 										disabled={isMappingsPending || isSyncing || !row.syncOutboundEnabled || isActionDisabled}
 										onSelect={(e) => {
@@ -384,6 +399,7 @@ const IntegrationMappingCard: FC<IntegrationMappingCardProps> = ({
 					</div>
 				</div>
 			</Dialog>
+
 		</>
 	);
 };

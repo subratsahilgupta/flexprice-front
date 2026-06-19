@@ -141,6 +141,7 @@ export type { EventFilterData } from './EventFilter';
 export { default as TerminatePriceModal } from './TerminatePriceModal';
 export { default as TerminateLineItemModal } from './TerminateLineItemModal';
 export { default as SaveCardModal } from './SaveCardModal';
+export { MoyasarSaveCardModal } from './MoyasarSaveCardModal';
 export { MetadataModal } from './MetadataModal';
 
 // Form Controls & UI Components

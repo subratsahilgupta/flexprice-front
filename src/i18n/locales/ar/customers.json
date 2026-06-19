@@ -295,6 +295,7 @@
 		},
 		"information": {
 			"saveCardOnStripe": "حفظ البطاقة على Stripe",
+			"setupAutopayMoyasar": "إعداد الدفع التلقائي (Moyasar)",
 			"sharePortalLinkTitle": "مشاركة رابط بوابة العميل",
 			"childCustomersTitle": "العملاء الفرعيون"
 		},
@@ -358,6 +359,21 @@
 			"creditGrantDeleteFailed": "فشل في حذف منحة الائتمان",
 			"loadError": "خطأ في تحميل بيانات الاشتراك"
 		}
+	},
+	"moyasarAutopay": {
+		"title": "إعداد الدفع التلقائي مع Moyasar",
+		"intro": "أدخل تفاصيل البطاقة لتفعيل الدفع التلقائي. يتم ترميز البطاقة بأمان بواسطة Moyasar — نحن لا نخزّن رقم البطاقة الأصلي.",
+		"loadingForm": "جارٍ تحميل نموذج البطاقة الآمن…",
+		"savingCard": "جارٍ حفظ البطاقة…",
+		"successTitle": "تم تفعيل الدفع التلقائي. سيتم تحصيل الفواتير المستقبلية لهذا العميل تلقائيًا.",
+		"alreadyConfiguredTitle": "تم إعداد الدفع التلقائي مسبقاً",
+		"alreadyConfiguredDesc": "هذا العميل لديه طريقة دفع محفوظة بالفعل. قم بإزالتها أولاً لتسجيل بطاقة جديدة.",
+		"done": "تم",
+		"toastEnabled": "تم تفعيل الدفع التلقائي. سيتم تحصيل الفواتير المستقبلية تلقائيًا.",
+		"toastInitFailed": "فشل في تهيئة الدفع التلقائي لـ Moyasar",
+		"toastSaveFailed": "فشل في حفظ البطاقة",
+		"toastScriptFailed": "فشل تحميل Moyasar.js. يرجى تحديث الصفحة والمحاولة مرة أخرى.",
+		"toastNoToken": "لم يتم إرجاع رمز البطاقة من Moyasar"
 	},
 	"organisms": {
 		"phaseForm": {

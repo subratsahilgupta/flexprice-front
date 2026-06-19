@@ -295,6 +295,7 @@
 		},
 		"information": {
 			"saveCardOnStripe": "Save Card on Stripe",
+			"setupAutopayMoyasar": "Setup Autopay (Moyasar)",
 			"sharePortalLinkTitle": "Share Customer Portal Link",
 			"childCustomersTitle": "Child customers"
 		},
@@ -339,6 +340,21 @@
 			"noMetadataTitle": "No metadata",
 			"noMetadataHint": "Add custom metadata to store additional information about this wallet."
 		}
+	},
+	"moyasarAutopay": {
+		"title": "Setup Autopay with Moyasar",
+		"intro": "Enter card details to enable autopay. The card is securely tokenized by Moyasar.",
+		"loadingForm": "Loading secure card form…",
+		"savingCard": "Saving card…",
+		"successTitle": "Autopay is enabled. Future invoices for this customer will be charged automatically.",
+		"alreadyConfiguredTitle": "Autopay already configured",
+		"alreadyConfiguredDesc": "This customer already has a saved payment method. Remove it first to register a new card.",
+		"done": "Done",
+		"toastEnabled": "Autopay enabled. Future invoices will be charged automatically.",
+		"toastInitFailed": "Failed to initialize Moyasar autopay",
+		"toastSaveFailed": "Failed to save card",
+		"toastScriptFailed": "Moyasar.js failed to load. Please refresh and try again.",
+		"toastNoToken": "No card token returned from Moyasar"
 	},
 	"organisms": {
 		"phaseForm": {
