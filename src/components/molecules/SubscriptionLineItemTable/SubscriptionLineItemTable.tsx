@@ -32,6 +32,8 @@ interface Props {
 	showCommitmentColumn?: boolean;
 	onApplyCoupon?: (lineItem: LineItem) => void;
 	onRemoveCoupon?: (lineItem: LineItem) => void;
+	/** Set of line item IDs that have an active coupon association — used to conditionally show "Remove coupon" */
+	lineItemIdsWithCoupon?: Set<string>;
 }
 
 interface LineItemWithStatus extends LineItem {
@@ -86,6 +88,7 @@ interface LineItemDropdownProps {
 	onViewCommitment?: (lineItem: LineItem) => void;
 	onApplyCoupon?: (lineItem: LineItem) => void;
 	onRemoveCoupon?: (lineItem: LineItem) => void;
+	hasLinkedCoupon?: boolean;
 }
 
 const LineItemDropdown: FC<LineItemDropdownProps> = ({
@@ -97,6 +100,7 @@ const LineItemDropdown: FC<LineItemDropdownProps> = ({
 	onViewCommitment,
 	onApplyCoupon,
 	onRemoveCoupon,
+	hasLinkedCoupon,
 }) => {
 	const { t } = useTranslation('billing');
 	const [isOpen, setIsOpen] = useState(false);
@@ -160,7 +164,7 @@ const LineItemDropdown: FC<LineItemDropdownProps> = ({
 								},
 							]
 						: []),
-					...(onRemoveCoupon
+					...(onRemoveCoupon && hasLinkedCoupon
 						? [
 								{
 									label: 'Remove coupon',
@@ -344,6 +348,7 @@ const SubscriptionLineItemTable: FC<Props> = ({
 	showCommitmentColumn = false,
 	onApplyCoupon,
 	onRemoveCoupon,
+	lineItemIdsWithCoupon,
 }) => {
 	const { t } = useTranslation('common');
 	const [showTerminateModal, setShowTerminateModal] = useState(false);
@@ -539,6 +544,7 @@ const SubscriptionLineItemTable: FC<Props> = ({
 										onViewCommitment={setViewCommitmentLineItem}
 										onApplyCoupon={onApplyCoupon}
 										onRemoveCoupon={onRemoveCoupon}
+										hasLinkedCoupon={lineItemIdsWithCoupon?.has(row.id)}
 									/>
 								);
 							},
@@ -556,6 +562,7 @@ const SubscriptionLineItemTable: FC<Props> = ({
 			t,
 			onApplyCoupon,
 			onRemoveCoupon,
+			lineItemIdsWithCoupon,
 		],
 	);
 
