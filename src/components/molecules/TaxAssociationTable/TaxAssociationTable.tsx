@@ -1,11 +1,10 @@
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import FlexpriceTable, { ColumnData, RedirectCell } from '../Table';
 import { TaxAssociationResponse } from '@/types/dto/tax';
 import { Chip, ActionButton, Button } from '@/components/atoms';
 import { formatDateShort } from '@/utils/common/helper_functions';
 import TaxApi from '@/api/TaxApi';
-import formatChips from '@/utils/common/format_chips';
 import { RouteNames } from '@/core/routes/Routes';
 import { TrashIcon } from 'lucide-react';
 
@@ -18,6 +17,12 @@ interface Props {
 
 const TaxAssociationTable: FC<Props> = ({ data, showDelete = true, refetchQueryKey = 'fetchTaxAssociations', onRemove }) => {
 	const { t } = useTranslation('common');
+
+	const rows = useMemo(() => {
+		const now = new Date();
+		return data.filter((a) => !a.valid_to || new Date(a.valid_to) > now);
+	}, [data]);
+
 	const columns: ColumnData<TaxAssociationResponse>[] = [
 		{
 			title: 'Tax ID',
@@ -32,21 +37,6 @@ const TaxAssociationTable: FC<Props> = ({ data, showDelete = true, refetchQueryK
 		{
 			title: 'Auto Apply',
 			render: (row) => <Chip variant={row.auto_apply ? 'success' : 'default'} label={row.auto_apply ? t('labels.yes') : t('labels.no')} />,
-		},
-		{
-			title: 'Currency',
-			render: (row) => row.currency,
-		},
-		{
-			title: 'Status',
-			render: (row) => {
-				const label = formatChips(row?.status);
-				return <Chip variant={label === 'Active' ? 'success' : 'default'} label={label} />;
-			},
-		},
-		{
-			title: 'Created',
-			render: (row) => formatDateShort(row.created_at),
 		},
 		{
 			title: 'Valid From',
@@ -88,7 +78,7 @@ const TaxAssociationTable: FC<Props> = ({ data, showDelete = true, refetchQueryK
 
 	return (
 		<div>
-			<FlexpriceTable showEmptyRow={true} columns={columns} data={data} />
+			<FlexpriceTable showEmptyRow={true} columns={columns} data={rows} />
 		</div>
 	);
 };
