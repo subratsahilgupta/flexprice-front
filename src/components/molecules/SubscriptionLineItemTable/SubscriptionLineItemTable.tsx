@@ -151,7 +151,7 @@ const LineItemDropdown: FC<LineItemDropdownProps> = ({
 						},
 						disabled: isTerminateDisabled,
 					},
-					...(onApplyCoupon
+					...(onApplyCoupon && !hasLinkedCoupon
 						? [
 								{
 									label: 'Apply coupon',
