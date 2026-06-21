@@ -161,6 +161,7 @@ const CustomerSubscriptionDetailsPage: FC = () => {
 				offset: 0,
 				entity_id: subscription_id!,
 				entity_type: TAXRATE_ENTITY_TYPE.SUBSCRIPTION,
+				expand: generateExpandQueryParams([EXPAND.TAX_RATE]),
 			});
 		},
 		enabled: !!subscription_id,
