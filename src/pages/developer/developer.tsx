@@ -186,7 +186,7 @@ const DeveloperPage = () => {
 									await SecretKeysApi.deleteSecretKey(id);
 								}}
 								refetchQueryKey='secret-keys'
-								entityName={t('apiKeys.entityName')}
+								entityName={rowData?.name}
 								// edit={{
 								// 	enabled: true,
 								// 	onClick: () => {},

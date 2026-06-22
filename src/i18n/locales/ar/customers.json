@@ -203,6 +203,9 @@
 		"fallback": "--"
 	},
 	"subscriptionCreate": {
+		"selectCustomerLabel": "العميل",
+		"selectCustomerPlaceholder": "ابحث عن عميل...",
+		"selectCustomerHint": "اختر عميلاً للمتابعة مع إنشاء اشتراك",
 		"toast": {
 			"draftSaved": "تم حفظ مسودة الاشتراك بنجاح",
 			"created": "تم إنشاء الاشتراك بنجاح",
@@ -241,6 +244,7 @@
 		"renewalDate": "تاريخ التجديد",
 		"subscriptionsInheritance": "وراثة الاشتراكات",
 		"taxAssociations": "ارتباطات الضرائب",
+		"couponAssociations": "ارتباطات القسيمة",
 		"subscriptionPhases": "مراحل الاشتراك",
 		"phaseHeading": "مرحلة {{index}}",
 		"phaseStart": "البداية",
@@ -348,6 +352,10 @@
 	"subscriptionEdit": {
 		"pageTitle": "تعديل الاشتراك",
 		"pageHeading": "تعديل الاشتراك",
+		"couponAssociations": "ارتباطات الكوبون",
+		"addCoupon": "إضافة كوبون",
+		"taxAssociations": "ارتباطات الضريبة",
+		"addTax": "إضافة ضريبة",
 		"toast": {
 			"lineItemUpdated": "تم تحديث بند الخط بنجاح",
 			"lineItemUpdateFailed": "فشل في تحديث بند الخط",

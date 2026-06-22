@@ -13,17 +13,28 @@ import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import CustomerApi from '@/api/CustomerApi';
 import SubscriptionApi from '@/api/SubscriptionApi';
 import CreditGrantApi from '@/api/CreditGrantApi';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { useCallback, useEffect, useState } from 'react';
+import TaxApi from '@/api/TaxApi';
+import CouponApi from '@/api/CouponApi';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 import { LineItem, SUBSCRIPTION_LINE_ITEM_EDIT_MODE, SUBSCRIPTION_STATUS } from '@/models/Subscription';
 import { PRICE_TYPE } from '@/models/Price';
+import { TAXRATE_ENTITY_TYPE } from '@/models/Tax';
 import PriceOverrideDialog from '@/components/molecules/PriceOverrideDialog/PriceOverrideDialog';
 import AddSubscriptionChargeDialog, {
 	type AddedSubscriptionLineItem,
 } from '@/components/organisms/Subscription/AddSubscriptionChargeDialog';
+import CouponAssociationTable from '@/components/molecules/CouponAssociationTable/CouponAssociationTable';
+import TaxAssociationTable from '@/components/molecules/TaxAssociationTable/TaxAssociationTable';
+import ApplyCouponDialog from '@/components/molecules/ApplyCouponDialog/ApplyCouponDialog';
+import RemoveCouponDialog from '@/components/molecules/RemoveCouponDialog/RemoveCouponDialog';
+import ApplyTaxDialog from '@/components/molecules/ApplyTaxDialog/ApplyTaxDialog';
+import RemoveTaxDialog from '@/components/molecules/RemoveTaxDialog/RemoveTaxDialog';
+import { CouponAssociation } from '@/models/CouponAssociation';
+import { TaxAssociationResponse } from '@/types/dto/tax';
 import {
 	CreateSubscriptionLineItemRequest,
 	DeleteSubscriptionLineItemRequest,
@@ -67,6 +78,17 @@ const CustomerSubscriptionEditPage: React.FC = () => {
 
 	const [updateSubscriptionDrawerOpen, setUpdateSubscriptionDrawerOpen] = useState(false);
 	const [isAddChargeDialogOpen, setIsAddChargeDialogOpen] = useState(false);
+
+	const queryClient = useQueryClient();
+
+	// Coupon dialog state
+	const [applyCouponOpen, setApplyCouponOpen] = useState(false);
+	const [applyCouponLineItemId, setApplyCouponLineItemId] = useState<string | undefined>();
+	const [removeCouponAssociation, setRemoveCouponAssociation] = useState<CouponAssociation | null>(null);
+
+	// Tax dialog state
+	const [applyTaxOpen, setApplyTaxOpen] = useState(false);
+	const [removeTaxAssociation, setRemoveTaxAssociation] = useState<TaxAssociationResponse | null>(null);
 
 	const { updateBreadcrumb } = useBreadcrumbsStore();
 
@@ -130,6 +152,45 @@ const CustomerSubscriptionEditPage: React.FC = () => {
 	});
 
 	const inheritedSubscriptionRows = inheritedSubscriptionsData?.items ?? [];
+
+	const { data: lineItemsForDialog } = useQuery({
+		queryKey: subscriptionId ? [...subscriptionEditScopeQueryKey(subscriptionId), 'lineItemsForDialog'] : ['disabled'],
+		queryFn: () => SubscriptionApi.searchSubscriptionLineItems({ subscription_ids: [subscriptionId!], limit: 100, offset: 0 }),
+		enabled: !!subscriptionId,
+	});
+
+	const { data: taxAssociationsData, refetch: refetchTaxAssociations } = useQuery({
+		queryKey: subscriptionId ? ['subscriptionTaxAssociations', subscriptionId] : ['disabled'],
+		queryFn: () =>
+			TaxApi.listTaxAssociations({
+				limit: 1000,
+				offset: 0,
+				entity_id: subscriptionId!,
+				entity_type: TAXRATE_ENTITY_TYPE.SUBSCRIPTION,
+				expand: generateExpandQueryParams([EXPAND.TAX_RATE]),
+			}),
+		enabled: !!subscriptionId,
+	});
+
+	const { data: couponAssociationsData } = useQuery({
+		queryKey: subscriptionId ? ['couponAssociations', subscriptionId] : ['disabled'],
+		queryFn: () => CouponApi.listCouponAssociations({ subscription_ids: [subscriptionId!], active_only: true }),
+		enabled: !!subscriptionId,
+	});
+
+	const invalidateCouponAssociations = () => {
+		if (subscriptionId) queryClient.invalidateQueries({ queryKey: ['couponAssociations', subscriptionId] });
+	};
+
+	const lineItemIdsWithCoupon = useMemo(
+		() =>
+			new Set((couponAssociationsData?.items ?? []).filter((a) => !!a.subscription_line_item_id).map((a) => a.subscription_line_item_id!)),
+		[couponAssociationsData?.items],
+	);
+
+	const invalidateTaxAssociations = () => {
+		if (subscriptionId) void refetchTaxAssociations();
+	};
 
 	const { mutateAsync: updateLineItem, isPending: isUpdatingLineItem } = useMutation({
 		mutationFn: async ({ lineItemId, updateData }: { lineItemId: string; updateData: UpdateSubscriptionLineItemRequest }) => {
@@ -371,6 +432,15 @@ const CustomerSubscriptionEditPage: React.FC = () => {
 								commitment_duration: subscriptionDetails?.commitment_duration,
 								currency: subscriptionDetails?.currency,
 							}}
+							onApplyCouponToLineItem={(lineItem) => {
+								setApplyCouponLineItemId(lineItem.id);
+								setApplyCouponOpen(true);
+							}}
+							onRemoveCouponFromLineItem={(lineItem) => {
+								const assoc = couponAssociationsData?.items?.find((a) => a.subscription_line_item_id === lineItem.id);
+								if (assoc) setRemoveCouponAssociation(assoc);
+							}}
+							lineItemIdsWithCoupon={lineItemIdsWithCoupon}
 						/>
 
 						<SubscriptionEditCreditGrantsSection
@@ -403,6 +473,80 @@ const CustomerSubscriptionEditPage: React.FC = () => {
 							subscriptionCurrentPeriodStart={subscriptionDetails.current_period_start}
 							subscriptionCurrentPeriodEnd={subscriptionDetails.current_period_end}
 						/>
+
+						{/* Coupon Associations */}
+						{subscriptionId && (
+							<div className='mt-8'>
+								<CouponAssociationTable
+									subscriptionId={subscriptionId}
+									onAdd={() => setApplyCouponOpen(true)}
+									onRemove={(assoc) => setRemoveCouponAssociation(assoc)}
+								/>
+							</div>
+						)}
+
+						{/* Tax Associations */}
+						{subscriptionId && (
+							<div className='mt-8'>
+								<TaxAssociationTable
+									data={taxAssociationsData?.items ?? []}
+									showDelete={false}
+									onAdd={() => setApplyTaxOpen(true)}
+									onRemove={(assoc) => setRemoveTaxAssociation(assoc)}
+								/>
+							</div>
+						)}
+
+						{/* Coupon + Tax Dialogs */}
+						{subscriptionId && (
+							<>
+								<ApplyCouponDialog
+									subscriptionId={subscriptionId}
+									lineItems={lineItemsForDialog?.items ?? []}
+									prefilledLineItemId={applyCouponLineItemId}
+									open={applyCouponOpen}
+									onOpenChange={(o) => {
+										setApplyCouponOpen(o);
+										if (!o) setApplyCouponLineItemId(undefined);
+									}}
+									onSuccess={invalidateCouponAssociations}
+								/>
+								{removeCouponAssociation && (
+									<RemoveCouponDialog
+										subscriptionId={subscriptionId}
+										association={removeCouponAssociation}
+										open={!!removeCouponAssociation}
+										onOpenChange={(o) => {
+											if (!o) setRemoveCouponAssociation(null);
+										}}
+										onSuccess={() => {
+											setRemoveCouponAssociation(null);
+											invalidateCouponAssociations();
+										}}
+									/>
+								)}
+								<ApplyTaxDialog
+									subscriptionId={subscriptionId}
+									open={applyTaxOpen}
+									onOpenChange={setApplyTaxOpen}
+									onSuccess={invalidateTaxAssociations}
+								/>
+								{removeTaxAssociation && (
+									<RemoveTaxDialog
+										subscriptionId={subscriptionId}
+										association={removeTaxAssociation}
+										open={!!removeTaxAssociation}
+										onOpenChange={(o) => {
+											if (!o) setRemoveTaxAssociation(null);
+										}}
+										onSuccess={() => {
+											setRemoveTaxAssociation(null);
+											invalidateTaxAssociations();
+										}}
+									/>
+								)}
+							</>
+						)}
 
 						{editingLineItem?.mode === SUBSCRIPTION_LINE_ITEM_EDIT_MODE.USAGE_OVERRIDE && (
 							<PriceOverrideDialog
