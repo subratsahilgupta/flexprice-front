@@ -19,6 +19,7 @@ import { useParams, Link } from 'react-router';
 import { INVOICE_TYPE } from '@/models/Invoice';
 import { TAXRATE_ENTITY_TYPE } from '@/models/Tax';
 import TaxAssociationTable from '@/components/molecules/TaxAssociationTable';
+import CouponAssociationTable from '@/components/molecules/CouponAssociationTable/CouponAssociationTable';
 import { Subscription as SubscriptionType, SUBSCRIPTION_STATUS, SUBSCRIPTION_TYPE } from '@/models/Subscription';
 import { EXPAND } from '@/models';
 import { DataType, FilterOperator } from '@/types/common/QueryBuilder';
@@ -160,6 +161,7 @@ const CustomerSubscriptionDetailsPage: FC = () => {
 				offset: 0,
 				entity_id: subscription_id!,
 				entity_type: TAXRATE_ENTITY_TYPE.SUBSCRIPTION,
+				expand: generateExpandQueryParams([EXPAND.TAX_RATE]),
 			});
 		},
 		enabled: !!subscription_id,
@@ -582,13 +584,16 @@ const CustomerSubscriptionDetailsPage: FC = () => {
 				</Card>
 			)}
 
+			{subscription_id && (
+				<div className='mt-8'>
+					<CouponAssociationTable subscriptionId={subscription_id} />
+				</div>
+			)}
+
 			{subscriptionTaxAssociations?.items && subscriptionTaxAssociations.items.length > 0 && (
-				<Card className='card mt-8'>
-					<FormHeader title={t('subscriptionDetail.taxAssociations')} variant='sub-header' titleClassName='font-semibold' />
-					<div className='mt-4'>
-						<TaxAssociationTable data={subscriptionTaxAssociations.items} refetchQueryKey='subscriptionTaxAssociations' />
-					</div>
-				</Card>
+				<div className='mt-8'>
+					<TaxAssociationTable data={subscriptionTaxAssociations.items} refetchQueryKey='subscriptionTaxAssociations' />
+				</div>
 			)}
 		</div>
 	);
