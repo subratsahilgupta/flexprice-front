@@ -8,6 +8,7 @@ import { useMutation } from '@tanstack/react-query';
 import PaymentApi from '@/api/PaymentApi';
 import toast from 'react-hot-toast';
 import { RouteNames } from '@/core/routes/Routes';
+import { z } from 'zod';
 
 declare global {
 	interface Window {
@@ -27,18 +28,12 @@ const MOYASAR_SESSION_KEY = 'moyasar_pending_token';
 const MOYASAR_FORM_SELECTOR = 'moyasar-autopay-form';
 const TOKENIZATION_AMOUNT = 100; // 1 SAR in halalas
 
-interface StoredTokenData {
-	customerId: string;
-	tokenId: string;
-	flexpricePaymentId: string;
-	cardSource?: {
-		company?: string;
-		last4?: string;
-		month?: string;
-		year?: string;
-		name?: string;
-	};
-}
+const storedTokenSchema = z.object({
+	customerId: z.string().min(1),
+	flexpricePaymentId: z.string().min(1),
+});
+
+type StoredTokenData = z.infer<typeof storedTokenSchema>;
 
 // ─── Shared card wrapper ───────────────────────────────────────────────────────
 
@@ -127,7 +122,10 @@ const MoyasarCheckoutPage = () => {
 		mutationFn: () => PaymentApi.getMoyasarSetupIntent(customerId),
 		onSuccess: (res) => {
 			try {
-				const payload = JSON.parse(atob(res.checkout_token.split('.')[1])) as {
+				// JWTs use base64url (RFC 7519)
+				const raw = res.checkout_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+				const padded = raw.padEnd(raw.length + ((4 - (raw.length % 4)) % 4), '=');
+				const payload = JSON.parse(atob(padded)) as {
 					publishable_key: string;
 					flexprice_payment_id: string;
 				};
@@ -169,9 +167,21 @@ const MoyasarCheckoutPage = () => {
 
 		let stored: StoredTokenData;
 		try {
-			stored = JSON.parse(raw) as StoredTokenData;
+			const parsed = storedTokenSchema.safeParse(JSON.parse(raw));
+			if (!parsed.success) {
+				setErrorMsg('Invalid session data.');
+				setResultState('failed');
+				return;
+			}
+			stored = parsed.data;
 		} catch {
 			setErrorMsg('Invalid session data.');
+			setResultState('failed');
+			return;
+		}
+
+		if (stored.customerId !== customerId) {
+			setErrorMsg('Session customer mismatch. Please try again.');
 			setResultState('failed');
 			return;
 		}
@@ -231,17 +241,11 @@ const MoyasarCheckoutPage = () => {
 					toast.error('No token received. Please try again.');
 					return;
 				}
-				const src = payment?.source ?? {};
-				const maskedNumber: string = src.number ?? '';
-				const last4 = maskedNumber.length >= 4 ? maskedNumber.slice(-4) : '';
-
 				sessionStorage.setItem(
 					MOYASAR_SESSION_KEY,
 					JSON.stringify({
 						customerId,
-						tokenId: token,
 						flexpricePaymentId,
-						cardSource: { company: src.company, last4, month: src.month, year: src.year, name: src.name },
 					} satisfies StoredTokenData),
 				);
 			},

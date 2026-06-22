@@ -86,6 +86,9 @@ const MoyasarConnectionDrawer: FC<MoyasarConnectionDrawerProps> = ({ isOpen, onO
 			if (!formData.secret_key.trim()) {
 				newErrors.secret_key = t('connection.validation.secretKeyRequired');
 			}
+			if (!formData.publishable_key.trim()) {
+				newErrors.publishable_key = t('connection.validation.publishableKeyRequired', 'Publishable key is required');
+			}
 		}
 
 		setErrors(newErrors);

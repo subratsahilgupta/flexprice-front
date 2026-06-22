@@ -295,7 +295,7 @@
 		},
 		"information": {
 			"saveCardOnStripe": "Save Card on Stripe",
-			"setupAutopayMoyasar": "Setup Autopay (Moyasar)",
+			"setupAutopayMoyasar": "Setup Autopay",
 			"sharePortalLinkTitle": "Share Customer Portal Link",
 			"childCustomersTitle": "Child customers"
 		},
@@ -344,6 +344,7 @@
 	"moyasarAutopay": {
 		"title": "Setup Autopay with Moyasar",
 		"intro": "Enter card details to enable autopay. The card is securely tokenized by Moyasar.",
+		"setupCard": "Set up card",
 		"loadingForm": "Loading secure card form…",
 		"savingCard": "Saving card…",
 		"successTitle": "Autopay is enabled. Future invoices for this customer will be charged automatically.",

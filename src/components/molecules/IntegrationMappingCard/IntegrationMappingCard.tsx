@@ -62,6 +62,7 @@ const IntegrationMappingCard: FC<IntegrationMappingCardProps> = ({
 	isActionDisabled = false,
 }) => {
 	const { t } = useTranslation('common');
+	const { t: tCustomers } = useTranslation('customers');
 	const queryClient = useQueryClient();
 	const navigate = useNavigate();
 
@@ -275,10 +276,10 @@ const IntegrationMappingCard: FC<IntegrationMappingCardProps> = ({
 											onSelect={(e) => {
 												e.preventDefault();
 												setDropdownOpen(null);
-												navigate(`${RouteNames.moyasarCheckout}?customer_id=${entityId}`);
+												navigate(`${RouteNames.moyasarCheckout}?customer_id=${encodeURIComponent(entityId)}`);
 											}}
 											className='cursor-pointer'>
-											Setup Autopay
+											{tCustomers('tabPanels.information.setupAutopayMoyasar')}
 										</DropdownMenuItem>
 									)}
 									<DropdownMenuItem
@@ -318,7 +319,10 @@ const IntegrationMappingCard: FC<IntegrationMappingCardProps> = ({
 			handleLinkClick,
 			handleSyncClick,
 			handleDelinkClick,
+			entityId,
+			navigate,
 			t,
+			tCustomers,
 		],
 	);
 

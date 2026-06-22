@@ -18,7 +18,7 @@ const MoyasarSaveCardModal: FC<MoyasarSaveCardModalProps> = ({ isOpen, onOpenCha
 
 	const handleSetupCard = () => {
 		onOpenChange(false);
-		navigate(`${RouteNames.moyasarCheckout}?customer_id=${customerId}`);
+		navigate(`${RouteNames.moyasarCheckout}?customer_id=${encodeURIComponent(customerId)}`);
 	};
 
 	return (
