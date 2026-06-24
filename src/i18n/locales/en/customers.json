@@ -27,6 +27,11 @@
             "email": "Email",
             "createdAt": "Created At",
             "updatedAt": "Updated At"
+		},
+		"orgTypeFilter": {
+			"ariaLabel": "Filter by organization type",
+			"parent": "Parent",
+			"child": "Child"
         }
     },
     "detail": {
@@ -198,6 +203,9 @@
         "fallback": "--"
     },
     "subscriptionCreate": {
+		"selectCustomerLabel": "Customer",
+		"selectCustomerPlaceholder": "Search for customer...",
+		"selectCustomerHint": "Select a customer to continue with creating a subscription",
         "toast": {
             "draftSaved": "Draft subscription saved successfully",
             "created": "Subscription created successfully",
@@ -210,7 +218,8 @@
             "saveEditsFirst": "Please save your changes before submitting.",
             "trialDays": "Enter a valid trial length in days (at least 1), or leave empty to use the plan default.",
             "autoThresholdFixed": "Auto invoice threshold is not available when the plan includes fixed charges.",
-            "autoThresholdNonNegative": "Enter a valid auto invoice threshold (0 or greater), or leave empty to omit."
+            "autoThresholdNonNegative": "Enter a valid auto invoice threshold (0 or greater), or leave empty to omit.",
+			"entitlementOverridesWithProration": "Entitlement overrides cannot be combined with proration. Disable proration or remove entitlement overrides."
         },
         "billingCustomer": {
             "loadFailed": "Could not load billing customer details.",
@@ -236,6 +245,7 @@
         "renewalDate": "Renewal date",
         "subscriptionsInheritance": "Subscriptions Inheritance",
         "taxAssociations": "Tax Associations",
+		"couponAssociations": "Coupon Associations",
         "subscriptionPhases": "Subscription Phases",
         "phaseHeading": "Phase {{index}}",
         "phaseStart": "Start",
@@ -518,6 +528,10 @@
     "subscriptionEdit": {
         "pageTitle": "Edit Subscription",
         "pageHeading": "Edit Subscription",
+		"couponAssociations": "Coupon Associations",
+		"addCoupon": "Add Coupon",
+		"taxAssociations": "Tax Associations",
+		"addTax": "Add Tax",
         "toast": {
             "lineItemUpdated": "Line item updated successfully",
             "lineItemUpdateFailed": "Failed to update line item",

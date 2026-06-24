@@ -6,22 +6,13 @@ import { ChargeValueCell, ColumnData, FlexpriceTable, TerminateLineItemModal, Dr
 import { PriceTooltip } from '@/components/molecules/PriceTooltip';
 import { LineItem, SUBSCRIPTION_LINE_ITEM_ENTITY_TYPE } from '@/models/Subscription';
 import { FC, useState, useCallback, useMemo } from 'react';
-import { Trash2, Pencil, Info, Eye } from 'lucide-react';
+import { Trash2, Pencil, Info, Eye, Tag, TicketX } from 'lucide-react';
 import { ENTITY_STATUS } from '@/models/base';
 import { formatBillingPeriodForDisplay, getCurrencySymbol, getPriceTypeLabel } from '@/utils/common/helper_functions';
 import { PRICE_ENTITY_TYPE, PRICE_STATUS } from '@/models/Price';
 import { formatDateTimeWithSecondsAndTimezone } from '@/utils/common/format_date';
 import LineItemWindowCommitmentViewDialog from '@/components/molecules/Subscription/LineItemWindowCommitmentViewDialog';
-import {
-	attachCommitmentBucketPrices,
-	getMinutesEnabledForMeter,
-	lineItemHasWindowCommitment,
-	formatCommitmentTimeBucketLabel,
-} from '@/utils/subscription/subscription_line_item_commitment_helpers';
-import { hydrateCommitmentTimeBucketsForDisplay } from '@/utils/common/commitment_time_bucket_draft';
-import { useCommitmentTimeBucketPrices } from '@/hooks/useCommitmentTimeBucketPrices';
-import type { Price } from '@/models/Price';
-
+import { lineItemHasWindowCommitment } from '@/utils/subscription/subscription_line_item_commitment_helpers';
 interface Props {
 	data: LineItem[];
 	onEdit?: (lineItem: LineItem) => void;
@@ -39,6 +30,10 @@ interface Props {
 	noDataSubtitle?: string;
 	/** Show per-line-item window commitment buckets (details + edit pages). */
 	showCommitmentColumn?: boolean;
+	onApplyCoupon?: (lineItem: LineItem) => void;
+	onRemoveCoupon?: (lineItem: LineItem) => void;
+	/** Set of line item IDs that have an active coupon association — used to conditionally show "Remove coupon" */
+	lineItemIdsWithCoupon?: Set<string>;
 }
 
 interface LineItemWithStatus extends LineItem {
@@ -91,6 +86,9 @@ interface LineItemDropdownProps {
 	onEdit: (lineItem: LineItem) => void;
 	onTerminate: (lineItem: LineItem) => void;
 	onViewCommitment?: (lineItem: LineItem) => void;
+	onApplyCoupon?: (lineItem: LineItem) => void;
+	onRemoveCoupon?: (lineItem: LineItem) => void;
+	hasLinkedCoupon?: boolean;
 }
 
 const LineItemDropdown: FC<LineItemDropdownProps> = ({
@@ -100,6 +98,9 @@ const LineItemDropdown: FC<LineItemDropdownProps> = ({
 	onEdit,
 	onTerminate,
 	onViewCommitment,
+	onApplyCoupon,
+	onRemoveCoupon,
+	hasLinkedCoupon,
 }) => {
 	const { t } = useTranslation('billing');
 	const [isOpen, setIsOpen] = useState(false);
@@ -150,6 +151,32 @@ const LineItemDropdown: FC<LineItemDropdownProps> = ({
 						},
 						disabled: isTerminateDisabled,
 					},
+					...(onApplyCoupon && !hasLinkedCoupon
+						? [
+								{
+									label: 'Apply coupon',
+									icon: <Tag />,
+									onSelect: (e: Event) => {
+										e.preventDefault();
+										setIsOpen(false);
+										onApplyCoupon(row);
+									},
+								},
+							]
+						: []),
+					...(onRemoveCoupon && hasLinkedCoupon
+						? [
+								{
+									label: 'Remove coupon',
+									icon: <TicketX />,
+									onSelect: (e: Event) => {
+										e.preventDefault();
+										setIsOpen(false);
+										onRemoveCoupon(row);
+									},
+								},
+							]
+						: []),
 				]}
 			/>
 		</div>
@@ -307,56 +334,6 @@ const formatCommitmentTooltip = (info: SubscriptionCommitmentInfo, t: TFunction)
 	return <div className='flex flex-col gap-2'>{rows}</div>;
 };
 
-interface CommitmentColumnCellProps {
-	row: LineItemWithStatus;
-	pricesById: Record<string, Price>;
-}
-
-const CommitmentColumnCell: FC<CommitmentColumnCellProps> = ({ row, pricesById }) => {
-	const { t } = useTranslation('billing');
-	if (!lineItemHasWindowCommitment(row)) {
-		return <span className='text-sm text-gray-400'>—</span>;
-	}
-
-	const buckets = hydrateCommitmentTimeBucketsForDisplay(attachCommitmentBucketPrices(row.commitment_time_buckets ?? [], pricesById));
-	const minutesEnabled = getMinutesEnabledForMeter(row.price?.meter);
-	const currencySymbol = getCurrencySymbol(row.currency ?? 'usd');
-
-	if (buckets.length === 0) {
-		return <span className='text-sm text-gray-400'>—</span>;
-	}
-
-	const labels = buckets.map((bucket) => formatCommitmentTimeBucketLabel(bucket, currencySymbol, minutesEnabled));
-	const primaryLabel = labels[0];
-
-	if (labels.length === 1) {
-		return <span className='text-sm text-gray-600 leading-snug'>{primaryLabel}</span>;
-	}
-
-	return (
-		<Tooltip
-			content={
-				<ul className='space-y-1.5'>
-					{labels.map((label, index) => (
-						<li key={index} className='text-sm leading-snug'>
-							{label}
-						</li>
-					))}
-				</ul>
-			}
-			delayDuration={0}
-			sideOffset={5}
-			className='bg-white border border-gray-200 shadow-lg text-sm text-gray-900 px-4 py-3 rounded-lg max-w-[420px]'>
-			<span className='text-sm text-gray-600 leading-snug'>
-				{primaryLabel}
-				<span className='ms-1 text-xs text-gray-500'>
-					+{labels.length - 1} {t('commitmentConfig.timeBuckets.moreBuckets')}
-				</span>
-			</span>
-		</Tooltip>
-	);
-};
-
 const SubscriptionLineItemTable: FC<Props> = ({
 	data,
 	onEdit,
@@ -369,6 +346,9 @@ const SubscriptionLineItemTable: FC<Props> = ({
 	showNoDataCard = true,
 	noDataSubtitle,
 	showCommitmentColumn = false,
+	onApplyCoupon,
+	onRemoveCoupon,
+	lineItemIdsWithCoupon,
 }) => {
 	const { t } = useTranslation('common');
 	const [showTerminateModal, setShowTerminateModal] = useState(false);
@@ -434,35 +414,42 @@ const SubscriptionLineItemTable: FC<Props> = ({
 		return types.size > 1;
 	}, [data]);
 
-	const allCommitmentBuckets = useMemo(
-		() => (showCommitmentColumn ? (data ?? []).flatMap((item) => item.commitment_time_buckets ?? []) : []),
-		[data, showCommitmentColumn],
-	);
-	const { pricesById } = useCommitmentTimeBucketPrices(allCommitmentBuckets);
-
 	const columns: ColumnData<LineItemWithStatus>[] = useMemo(
 		() => [
 			{
 				title: 'Display Name',
-				render: (row: LineItemWithStatus) => (
-					<div className='flex items-center gap-1'>
-						<span>{row.display_name}</span>
-						{shouldShowCommitmentIcon(row, commitmentInfo) && (
-							<Tooltip
-								content={formatCommitmentTooltip(commitmentInfo!, t)}
-								delayDuration={0}
-								sideOffset={5}
-								className='bg-white border border-gray-200 shadow-lg text-sm text-gray-900 px-4 py-3 rounded-[6px] max-w-[320px]'>
-								<button
-									type='button'
-									data-interactive='true'
-									className='inline-flex items-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500'>
-									<Info className='h-4 w-4 text-blue-500 flex-shrink-0' />
-								</button>
-							</Tooltip>
-						)}
-					</div>
-				),
+				render: (row: LineItemWithStatus) => {
+					const displayName = row.display_name?.trim() || '--';
+					return (
+						<div className='flex min-w-0 max-w-[240px] items-center gap-1'>
+							{displayName === '--' ? (
+								<span className='truncate'>{displayName}</span>
+							) : (
+								<Tooltip
+									content={displayName}
+									delayDuration={0}
+									sideOffset={5}
+									className='bg-white border border-gray-200 shadow-lg text-sm text-gray-900 px-4 py-3 rounded-[6px] max-w-[320px]'>
+									<span className='block min-w-0 truncate'>{displayName}</span>
+								</Tooltip>
+							)}
+							{shouldShowCommitmentIcon(row, commitmentInfo) && (
+								<Tooltip
+									content={formatCommitmentTooltip(commitmentInfo!, t)}
+									delayDuration={0}
+									sideOffset={5}
+									className='bg-white border border-gray-200 shadow-lg text-sm text-gray-900 px-4 py-3 rounded-[6px] max-w-[320px]'>
+									<button
+										type='button'
+										data-interactive='true'
+										className='inline-flex items-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500'>
+										<Info className='h-4 w-4 text-blue-500 flex-shrink-0' />
+									</button>
+								</Tooltip>
+							)}
+						</div>
+					);
+				},
 			},
 			...(phaseLabelsById && Object.keys(phaseLabelsById).length > 0
 				? [
@@ -510,14 +497,6 @@ const SubscriptionLineItemTable: FC<Props> = ({
 					);
 				},
 			},
-			...(showCommitmentColumn
-				? [
-						{
-							title: 'Commitment',
-							render: (row: LineItemWithStatus) => <CommitmentColumnCell row={row} pricesById={pricesById} />,
-						},
-					]
-				: []),
 			{
 				title: 'Charge',
 				render: (row) => {
@@ -539,7 +518,6 @@ const SubscriptionLineItemTable: FC<Props> = ({
 							width: '48px',
 							hideOnEmpty: true,
 							render: (row: LineItemWithStatus) => {
-								if (!lineItemHasWindowCommitment(row)) return null;
 								return <ViewCommitmentDropdown row={row} onView={setViewCommitmentLineItem} />;
 							},
 						},
@@ -564,6 +542,9 @@ const SubscriptionLineItemTable: FC<Props> = ({
 										onEdit={handleEditClick}
 										onTerminate={handleTerminateClick}
 										onViewCommitment={setViewCommitmentLineItem}
+										onApplyCoupon={onApplyCoupon}
+										onRemoveCoupon={onRemoveCoupon}
+										hasLinkedCoupon={lineItemIdsWithCoupon?.has(row.id)}
 									/>
 								);
 							},
@@ -578,8 +559,10 @@ const SubscriptionLineItemTable: FC<Props> = ({
 			readOnly,
 			phaseLabelsById,
 			showCommitmentColumn,
-			pricesById,
 			t,
+			onApplyCoupon,
+			onRemoveCoupon,
+			lineItemIdsWithCoupon,
 		],
 	);
 

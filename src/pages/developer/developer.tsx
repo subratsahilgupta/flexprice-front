@@ -99,8 +99,11 @@ const DeveloperPage = () => {
 				title: t('labels.name'),
 				render(rowData: SecretKey) {
 					return (
-						<div className='flex gap-2 items-center font-medium'>
-							<span>{rowData.name}</span>
+						<div className='flex flex-col gap-0.5'>
+							<span className='font-medium text-sm text-gray-900'>{rowData.name}</span>
+							{rowData.user_type === 'service_account' && rowData.service_account_name && (
+								<span className='text-xs text-gray-400'>{rowData.service_account_name}</span>
+							)}
 						</div>
 					);
 				},
@@ -144,9 +147,8 @@ const DeveloperPage = () => {
 				title: t('labels.roles'),
 				render(rowData: SecretKey) {
 					if (!rowData.roles || rowData.roles.length === 0) {
-						return <span className='text-gray-500 text-sm'>{t('apiKeys.roles.fullAccess')}</span>;
+						return <span className='text-sm text-gray-500'>{t('apiKeys.roles.fullAccess')}</span>;
 					}
-
 					return (
 						<div className='flex flex-wrap gap-1'>
 							{rowData.roles.map((role) => (
@@ -174,9 +176,7 @@ const DeveloperPage = () => {
 		() => [
 			...baseColumns,
 			{
-				width: '30px',
-				align: 'right',
-				hideOnEmpty: true,
+				fieldVariant: 'interactive',
 				render(rowData: SecretKey) {
 					return (
 						<div className='flex justify-end'>
@@ -186,7 +186,12 @@ const DeveloperPage = () => {
 									await SecretKeysApi.deleteSecretKey(id);
 								}}
 								refetchQueryKey='secret-keys'
-								entityName={t('apiKeys.entityName')}
+								entityName={rowData?.name}
+								// edit={{
+								// 	enabled: true,
+								// 	onClick: () => {},
+								// }}
+								edit={{ enabled: false }}
 								archive={{
 									text: t('common:actions.delete'),
 									icon: <TrashIcon />,

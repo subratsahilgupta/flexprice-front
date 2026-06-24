@@ -415,6 +415,45 @@
 			"change": "تغيير",
 			"remove": "إزالة",
 			"emptyState": "لا يوجد كوبون اشتراك مُطبَّق"
+		},
+		"tax": {
+			"remove": "إزالة"
+		},
+		"modifyDialog": {
+			"previewHeading": "معاينة",
+			"noBillingImpact": "لا تأثير على الفوترة",
+			"invoicesAffected": "الفواتير المتأثرة",
+			"lineItemsAffected": "بنود السطر المتأثرة"
+		},
+		"applyCouponDialog": {
+			"title": "تطبيق الكوبون",
+			"couponCodeLabel": "رمز الكوبون",
+			"couponCodePlaceholder": "مثال: SUMMER20",
+			"applyToLabel": "تطبيق على",
+			"subscriptionLevel": "مستوى الاشتراك",
+			"lineItemLevel": "مستوى بند السطر",
+			"lineItemLabel": "بند السطر",
+			"selectLineItemPlaceholder": "اختر بند سطر",
+			"startDateOptional": "تاريخ البدء (اختياري)",
+			"pickStartDate": "اختر تاريخ البدء",
+			"endDateOptional": "تاريخ الانتهاء (اختياري)",
+			"pickEndDate": "اختر تاريخ الانتهاء"
+		},
+		"removeCouponDialog": {
+			"title": "إزالة الكوبون",
+			"confirmMessage": "إزالة <bold>{{name}}</bold> من هذا الاشتراك؟",
+			"confirmMessageWithCode": "إزالة <bold>{{name}}</bold> ({{code}}) من هذا الاشتراك؟"
+		},
+		"removeTaxDialog": {
+			"title": "إزالة الضريبة",
+			"confirmMessage": "إزالة الضريبة <bold>{{name}}</bold> من هذا الاشتراك؟"
+		},
+		"applyTaxDialog": {
+			"title": "تطبيق الضريبة",
+			"taxRateLabel": "معدل الضريبة",
+			"selectTaxRatePlaceholder": "اختر معدل ضريبة",
+			"effectiveDateOptional": "تاريخ السريان (اختياري)",
+			"pickDate": "اختر تاريخاً"
 		}
 	},
 	"payments": {
@@ -852,12 +891,19 @@
 			"unitsPerPackage": "الوحدات لكل حزمة",
 			"pricingFlat": "ثابت",
 			"pricingSlab": "شرائح",
+			"volumeTiers": "شرائح الحجم",
 			"slabTiers": "شرائح التسعير",
 			"upTo": "حتى",
 			"unitAmount": "مبلغ الوحدة",
 			"lookupKey": "مفتاح البحث",
 			"overageFactor": "التجاوز",
 			"trueUpEnabled": "التسوية",
+			"bucketAmountHint": "سعر الوحدة المطبق خلال هذه النافذة الزمنية",
+			"bucketAmountVolumeTieredHint": "يُحدَّد التسعير في شرائح الحجم أدناه",
+			"bucketAmountSlabTieredHint": "يُحدَّد التسعير في شرائح التسعير أدناه",
+			"bucketAmountTieredHint": "يُحدَّد التسعير في شرائح التسعير أدناه",
+			"billingModelHint": "كيفية فوترة الاستخدام في هذه النافذة",
+			"unitsPerPackageHint": "عدد الوحدات المضمنة في كل حزمة",
 			"errors": {
 				"sameTime": "لا يمكن أن يكون وقت البداية والنهاية متطابقين",
 				"incomplete": "يرجى اختيار وقت البداية والنهاية لجميع الفترات",
