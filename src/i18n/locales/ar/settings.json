@@ -507,6 +507,9 @@
 			"secretKey": "المفتاح السري",
 			"secretKeyPlaceholder": "sk_...",
 			"secretKeyHint": "المفتاح السري من قسم مفاتيح API",
+			"publishableKey": "المفتاح القابل للنشر",
+			"publishableKeyPlaceholder": "pk_live_... أو pk_test_...",
+			"publishableKeyHint": "يُستخدم لعرض نموذج البطاقة الآمن للدفع التلقائي. ابحث عنه في لوحة تحكم Moyasar.",
 			"webhookIntro": "اضبط عنوان الويب هوك في لوحة Moyasar:",
 			"webhookEventsIntro": "اشترك في هذه الأحداث في Moyasar:",
 			"webhookEventPaymentPaid": "payment_paid"

@@ -507,6 +507,9 @@
 			"secretKey": "Secret Key",
 			"secretKeyPlaceholder": "sk_...",
 			"secretKeyHint": "Your Moyasar secret key from the API keys section",
+			"publishableKey": "Publishable Key",
+			"publishableKeyPlaceholder": "pk_live_... or pk_test_...",
+			"publishableKeyHint": "Used to render the secure card form for autopay. Find it in your Moyasar dashboard.",
 			"webhookIntro": "Set up this webhook URL in your Moyasar dashboard to receive event notifications:",
 			"webhookEventsIntro": "Subscribe to these events in your Moyasar dashboard:",
 			"webhookEventPaymentPaid": "payment_paid"

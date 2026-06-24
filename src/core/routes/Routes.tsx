@@ -94,6 +94,7 @@ import {
 	CustomerPortalWrapper,
 	// Checkout
 	CheckoutPage,
+	MoyasarCheckoutPage,
 } from '@/pages';
 import { RouterErrorElement } from '@/components/atoms/ErrorBoundary';
 
@@ -192,6 +193,7 @@ export const RouteNames = {
 
 	// checkout (public - for invoice payments)
 	checkout: '/checkout',
+	moyasarCheckout: '/moyasar-checkout',
 };
 
 const DefaultRoute = () => {
@@ -230,6 +232,10 @@ export const MainRouter: any = createBrowserRouter([
 	{
 		path: RouteNames.checkout,
 		element: <CheckoutPage />,
+	},
+	{
+		path: RouteNames.moyasarCheckout,
+		element: <MoyasarCheckoutPage />,
 	},
 	{
 		path: RouteNames.onboarding,
