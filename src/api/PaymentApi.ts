@@ -1,7 +1,7 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import { Payment } from '@/models';
 import { generateQueryParams } from '@/utils/common/api_helper';
-import { GetAllPaymentsPayload, GetAllPaymentsResponse, RecordPaymentPayload } from '@/types/dto';
+import { GetAllPaymentsPayload, GetAllPaymentsResponse, MoyasarSetupIntentResponse, RecordPaymentPayload } from '@/types/dto';
 
 class PaymentApi {
 	private static baseUrl = '/payments';
@@ -52,11 +52,10 @@ class PaymentApi {
 	// Moyasar autopay: returns a checkout_token JWT encoding publishable_key and payment_id.
 	// Decode the JWT on the frontend to initialise Moyasar.js.
 	public static async getMoyasarSetupIntent(customerId: string) {
-		return await AxiosClient.post<{
-			status: string;
-			customer_id: string;
-			checkout_token: string;
-		}>(`${this.baseUrl}/customers/${customerId}/setup/intent`, { provider: 'moyasar' });
+		return await AxiosClient.post<MoyasarSetupIntentResponse>(
+			`${this.baseUrl}/customers/${customerId}/setup/intent`,
+			{ provider: 'moyasar' },
+		);
 	}
 
 	// Moyasar autopay: confirm the 1-SAR auth payment by linking the Moyasar gateway payment ID.

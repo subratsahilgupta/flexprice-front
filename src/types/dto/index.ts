@@ -148,7 +148,7 @@ export type {
 	ListMetersResponse,
 } from './Meter';
 
-export type { GetAllPaymentsPayload, GetAllPaymentsResponse, RecordPaymentPayload } from './Payment';
+export type { GetAllPaymentsPayload, GetAllPaymentsResponse, MoyasarSetupIntentResponse, RecordPaymentPayload } from './Payment';
 
 export type { GetAllSecretKeysResponse, CreateSecretKeyPayload, CreateSecretKeyResponse } from './SecretApi';
 

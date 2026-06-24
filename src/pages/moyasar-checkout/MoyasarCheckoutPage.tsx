@@ -9,6 +9,14 @@ import PaymentApi from '@/api/PaymentApi';
 import toast from 'react-hot-toast';
 import { RouteNames } from '@/core/routes/Routes';
 import { z } from 'zod';
+import { useTranslation } from 'react-i18next';
+
+enum CheckoutResultState {
+	Loading = 'loading',
+	Success = 'success',
+	Processing = 'processing',
+	Failed = 'failed',
+}
 
 declare global {
 	interface Window {
@@ -100,6 +108,7 @@ const ResultScreen = ({
 const MoyasarCheckoutPage = () => {
 	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
+	const { t } = useTranslation('customers');
 	const customerId = searchParams.get(MOYASAR_CUSTOMER_PARAM) ?? '';
 	const moyasarStatus = searchParams.get(MOYASAR_STATUS_PARAM);
 	const moyasarPaymentId = searchParams.get(MOYASAR_PAYMENT_ID_PARAM);
@@ -110,8 +119,8 @@ const MoyasarCheckoutPage = () => {
 	const [formReady, setFormReady] = useState(false);
 	const [publishableKey, setPublishableKey] = useState('');
 	const [flexpricePaymentId, setFlexpricePaymentId] = useState('');
-	const [resultState, setResultState] = useState<'loading' | 'success' | 'processing' | 'failed' | null>(
-		isResultMode ? 'loading' : null,
+	const [resultState, setResultState] = useState<CheckoutResultState | null>(
+		isResultMode ? CheckoutResultState.Loading : null,
 	);
 	const [errorMsg, setErrorMsg] = useState('');
 	const moyasarInitialized = useRef(false);
@@ -132,10 +141,10 @@ const MoyasarCheckoutPage = () => {
 				setPublishableKey(payload.publishable_key);
 				setFlexpricePaymentId(payload.flexprice_payment_id);
 			} catch {
-				toast.error('Failed to parse checkout token');
+				toast.error(t('moyasarAutopay.toastParseTokenFailed'));
 			}
 		},
-		onError: (err: Error) => toast.error(err.message || 'Failed to initialise payment form'),
+		onError: (err: Error) => toast.error(err.message || t('moyasarAutopay.toastInitFailed')),
 	});
 
 	// ── Confirm auth payment (RESULT mode only) ──────────────────────────────────
@@ -144,10 +153,10 @@ const MoyasarCheckoutPage = () => {
 	const { mutate: saveToken } = useMutation({
 		mutationFn: (data: { stored: StoredTokenData; gatewayPaymentId: string }) =>
 			PaymentApi.confirmMoyasarAuthPayment(data.stored.flexpricePaymentId, data.gatewayPaymentId),
-		onSuccess: () => setResultState('success'),
+		onSuccess: () => setResultState(CheckoutResultState.Success),
 		onError: (err: Error) => {
 			setErrorMsg(err.message || 'Failed to confirm card setup. Please contact support.');
-			setResultState('failed');
+			setResultState(CheckoutResultState.Failed);
 		},
 	});
 
@@ -161,7 +170,7 @@ const MoyasarCheckoutPage = () => {
 
 		if (!raw) {
 			setErrorMsg('Session data missing. Please try again.');
-			setResultState('failed');
+			setResultState(CheckoutResultState.Failed);
 			return;
 		}
 
@@ -170,31 +179,31 @@ const MoyasarCheckoutPage = () => {
 			const parsed = storedTokenSchema.safeParse(JSON.parse(raw));
 			if (!parsed.success) {
 				setErrorMsg('Invalid session data.');
-				setResultState('failed');
+				setResultState(CheckoutResultState.Failed);
 				return;
 			}
 			stored = parsed.data;
 		} catch {
 			setErrorMsg('Invalid session data.');
-			setResultState('failed');
+			setResultState(CheckoutResultState.Failed);
 			return;
 		}
 
 		if (stored.customerId !== customerId) {
 			setErrorMsg('Session customer mismatch. Please try again.');
-			setResultState('failed');
+			setResultState(CheckoutResultState.Failed);
 			return;
 		}
 
 		if (moyasarStatus === 'failed' || moyasarStatus === 'canceled') {
 			setErrorMsg('Card authentication failed. Please try again.');
-			setResultState('failed');
+			setResultState(CheckoutResultState.Failed);
 			return;
 		}
 
 		if (moyasarStatus !== 'paid') {
 			// initiated / in_progress — cron will reconcile
-			setResultState('processing');
+			setResultState(CheckoutResultState.Processing);
 			return;
 		}
 
@@ -267,9 +276,9 @@ const MoyasarCheckoutPage = () => {
 
 	// ── RESULT mode renders ──────────────────────────────────────────────────────
 	if (isResultMode) {
-		if (resultState === 'loading') return <LoadingScreen message='Completing card setup…' />;
+		if (resultState === CheckoutResultState.Loading) return <LoadingScreen message={t('moyasarAutopay.loadingSetup')} />;
 
-		if (resultState === 'success') {
+		if (resultState === CheckoutResultState.Success) {
 			return (
 				<ResultScreen
 					icon={<CheckCircle className='h-9 w-9 text-green-500' />}
@@ -287,7 +296,7 @@ const MoyasarCheckoutPage = () => {
 			);
 		}
 
-		if (resultState === 'processing') {
+		if (resultState === CheckoutResultState.Processing) {
 			return (
 				<ResultScreen
 					icon={<Clock className='h-9 w-9 text-zinc-500' />}
@@ -297,7 +306,7 @@ const MoyasarCheckoutPage = () => {
 			);
 		}
 
-		if (resultState === 'failed') {
+		if (resultState === CheckoutResultState.Failed) {
 			return (
 				<ResultScreen
 					icon={<AlertCircle className='h-9 w-9 text-red-500' />}
@@ -327,18 +336,16 @@ const MoyasarCheckoutPage = () => {
 				<div className='mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-100'>
 					<CreditCard className='h-8 w-8 text-zinc-600' />
 				</div>
-				<CardTitle className='text-[20px] font-medium text-zinc-950'>Save card for autopay</CardTitle>
+				<CardTitle className='text-[20px] font-medium text-zinc-950'>{t('moyasarAutopay.formTitle')}</CardTitle>
 			</CardHeader>
 			<CardContent className='px-8 pb-10'>
-				<p className='text-sm text-zinc-500 text-center mb-6'>
-					We'll charge 1 SAR to verify your card, then refund it automatically.
-				</p>
+				<p className='text-sm text-zinc-500 text-center mb-6'>{t('moyasarAutopay.formDesc')}</p>
 
 				{/* Moyasar.js renders the card form here */}
 				<div className={`${MOYASAR_FORM_SELECTOR} ${!formReady && publishableKey ? 'opacity-0' : ''}`} />
 
 				{!publishableKey && !isFetchingIntent && (
-					<p className='text-sm text-red-500 text-center mt-4'>Failed to load payment form. Please refresh.</p>
+					<p className='text-sm text-red-500 text-center mt-4'>{t('moyasarAutopay.formLoadFailed')}</p>
 				)}
 			</CardContent>
 		</PageCard>

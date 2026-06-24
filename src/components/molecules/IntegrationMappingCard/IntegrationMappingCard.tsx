@@ -13,6 +13,8 @@ import { integrationCatalogSpecs } from '@/pages/insights-tools/integrations/int
 import formatDate from '@/utils/common/format_date';
 import { useNavigate } from 'react-router';
 import { RouteNames } from '@/core/routes/Routes';
+import { CONNECTION_PROVIDER_TYPE } from '@/models/Connection';
+import { IntegrationEntityType } from '@/types/dto';
 
 const PROVIDER_ID_MAP: Record<string, string> = {
 	zoho_books: 'zoho',
@@ -49,7 +51,7 @@ interface IntegrationRow {
 }
 
 interface IntegrationMappingCardProps {
-	entityType: 'customer' | 'invoice';
+	entityType: IntegrationEntityType;
 	entityId: string;
 	entityIdColumnTitle?: string;
 	isActionDisabled?: boolean;
@@ -270,7 +272,7 @@ const IntegrationMappingCard: FC<IntegrationMappingCardProps> = ({
 										className='cursor-pointer text-destructive focus:text-destructive'>
 										{t('actions.unlink')}
 									</DropdownMenuItem>
-									{entityType === 'customer' && row.provider_type === 'moyasar' && (
+									{entityType === 'customer' && row.provider_type === CONNECTION_PROVIDER_TYPE.MOYASAR && (
 										<DropdownMenuItem
 											disabled={isActionDisabled}
 											onSelect={(e) => {
