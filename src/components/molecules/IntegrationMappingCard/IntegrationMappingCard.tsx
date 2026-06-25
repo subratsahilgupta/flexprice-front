@@ -11,6 +11,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import IntegrationMappingApi, { IntegrationConfigItem, IntegrationMappingItem } from '@/api/IntegrationMappingApi';
 import { integrationCatalogSpecs } from '@/pages/insights-tools/integrations/integrationsData';
 import formatDate from '@/utils/common/format_date';
+import { useNavigate } from 'react-router';
+import { RouteNames } from '@/core/routes/Routes';
+import { CONNECTION_PROVIDER_TYPE } from '@/models/Connection';
+import { IntegrationEntityType } from '@/types/dto';
 
 const PROVIDER_ID_MAP: Record<string, string> = {
 	zoho_books: 'zoho',
@@ -47,7 +51,7 @@ interface IntegrationRow {
 }
 
 interface IntegrationMappingCardProps {
-	entityType: 'customer' | 'invoice';
+	entityType: IntegrationEntityType;
 	entityId: string;
 	entityIdColumnTitle?: string;
 	isActionDisabled?: boolean;
@@ -60,7 +64,9 @@ const IntegrationMappingCard: FC<IntegrationMappingCardProps> = ({
 	isActionDisabled = false,
 }) => {
 	const { t } = useTranslation('common');
+	const { t: tCustomers } = useTranslation('customers');
 	const queryClient = useQueryClient();
+	const navigate = useNavigate();
 
 	const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
 	const [linkDialogOpen, setLinkDialogOpen] = useState(false);
@@ -266,6 +272,18 @@ const IntegrationMappingCard: FC<IntegrationMappingCardProps> = ({
 										className='cursor-pointer text-destructive focus:text-destructive'>
 										{t('actions.unlink')}
 									</DropdownMenuItem>
+									{entityType === 'customer' && row.provider_type === CONNECTION_PROVIDER_TYPE.MOYASAR && (
+										<DropdownMenuItem
+											disabled={isActionDisabled}
+											onSelect={(e) => {
+												e.preventDefault();
+												setDropdownOpen(null);
+												navigate(`${RouteNames.moyasarCheckout}?customer_id=${encodeURIComponent(entityId)}`);
+											}}
+											className='cursor-pointer'>
+											{tCustomers('tabPanels.information.setupAutopayMoyasar')}
+										</DropdownMenuItem>
+									)}
 									<DropdownMenuItem
 										disabled={isMappingsPending || isSyncing || !row.syncOutboundEnabled || isActionDisabled}
 										onSelect={(e) => {
@@ -303,7 +321,10 @@ const IntegrationMappingCard: FC<IntegrationMappingCardProps> = ({
 			handleLinkClick,
 			handleSyncClick,
 			handleDelinkClick,
+			entityId,
+			navigate,
 			t,
+			tCustomers,
 		],
 	);
 
@@ -384,6 +405,7 @@ const IntegrationMappingCard: FC<IntegrationMappingCardProps> = ({
 					</div>
 				</div>
 			</Dialog>
+
 		</>
 	);
 };

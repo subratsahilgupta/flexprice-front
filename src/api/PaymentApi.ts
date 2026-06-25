@@ -1,7 +1,7 @@
 import { AxiosClient } from '@/core/axios/verbs';
 import { Payment } from '@/models';
 import { generateQueryParams } from '@/utils/common/api_helper';
-import { GetAllPaymentsPayload, GetAllPaymentsResponse, RecordPaymentPayload } from '@/types/dto';
+import { GetAllPaymentsPayload, GetAllPaymentsResponse, MoyasarSetupIntentResponse, RecordPaymentPayload } from '@/types/dto';
 
 class PaymentApi {
 	private static baseUrl = '/payments';
@@ -47,6 +47,24 @@ class PaymentApi {
 			created_at: number;
 			expires_at: number;
 		}>(`${this.baseUrl}/customers/${customerId}/setup/intent`, data);
+	}
+
+	// Moyasar autopay: returns a checkout_token JWT encoding publishable_key and payment_id.
+	// Decode the JWT on the frontend to initialise Moyasar.js.
+	public static async getMoyasarSetupIntent(customerId: string) {
+		return await AxiosClient.post<MoyasarSetupIntentResponse>(
+			`${this.baseUrl}/customers/${customerId}/setup/intent`,
+			{ provider: 'moyasar' },
+		);
+	}
+
+	// Moyasar autopay: confirm the 1-SAR auth payment by linking the Moyasar gateway payment ID.
+	// This transitions the Flexprice payment INITIATED → PENDING.
+	// The webhook (payment_paid) will then save the token and mark it SUCCEEDED.
+	public static async confirmMoyasarAuthPayment(flexpricePaymentId: string, gatewayPaymentId: string) {
+		return await AxiosClient.put<Payment>(`${this.baseUrl}/${flexpricePaymentId}`, {
+			gateway_payment_id: gatewayPaymentId,
+		});
 	}
 
 	public static async processPayment(id: string): Promise<Payment> {
