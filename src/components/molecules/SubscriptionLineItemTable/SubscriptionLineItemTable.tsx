@@ -12,7 +12,7 @@ import { formatBillingPeriodForDisplay, getCurrencySymbol, getPriceTypeLabel } f
 import { PRICE_ENTITY_TYPE, PRICE_STATUS } from '@/models/Price';
 import { formatDateTimeWithSecondsAndTimezone } from '@/utils/common/format_date';
 import LineItemWindowCommitmentViewDialog from '@/components/molecules/Subscription/LineItemWindowCommitmentViewDialog';
-import { lineItemHasWindowCommitment } from '@/utils/subscription/subscription_line_item_commitment_helpers';
+import { lineItemHasCommitment } from '@/utils/subscription/subscription_line_item_commitment_helpers';
 interface Props {
 	data: LineItem[];
 	onEdit?: (lineItem: LineItem) => void;
@@ -51,6 +51,10 @@ interface ViewCommitmentDropdownProps {
 const ViewCommitmentDropdown: FC<ViewCommitmentDropdownProps> = ({ row, onView }) => {
 	const { t } = useTranslation('billing');
 	const [isOpen, setIsOpen] = useState(false);
+
+	if (!lineItemHasCommitment(row)) {
+		return null;
+	}
 
 	const handleClick = (e: React.MouseEvent) => {
 		e.preventDefault();
@@ -104,7 +108,7 @@ const LineItemDropdown: FC<LineItemDropdownProps> = ({
 }) => {
 	const { t } = useTranslation('billing');
 	const [isOpen, setIsOpen] = useState(false);
-	const showViewCommitment = !!onViewCommitment && lineItemHasWindowCommitment(row);
+	const showViewCommitment = !!onViewCommitment && lineItemHasCommitment(row);
 
 	const handleClick = (e: React.MouseEvent) => {
 		e.preventDefault();
