@@ -11,9 +11,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import IntegrationMappingApi, { IntegrationConfigItem, IntegrationMappingItem } from '@/api/IntegrationMappingApi';
 import { integrationCatalogSpecs } from '@/pages/insights-tools/integrations/integrationsData';
 import formatDate from '@/utils/common/format_date';
-import { useNavigate } from 'react-router';
-import { RouteNames } from '@/core/routes/Routes';
 import { CONNECTION_PROVIDER_TYPE } from '@/models/Connection';
+import PaymentApi from '@/api/PaymentApi';
 import { IntegrationEntityType } from '@/types/dto';
 
 const PROVIDER_ID_MAP: Record<string, string> = {
@@ -66,8 +65,6 @@ const IntegrationMappingCard: FC<IntegrationMappingCardProps> = ({
 	const { t } = useTranslation('common');
 	const { t: tCustomers } = useTranslation('customers');
 	const queryClient = useQueryClient();
-	const navigate = useNavigate();
-
 	const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
 	const [linkDialogOpen, setLinkDialogOpen] = useState(false);
 	const [linkTarget, setLinkTarget] = useState<IntegrationRow | null>(null);
@@ -151,6 +148,12 @@ const IntegrationMappingCard: FC<IntegrationMappingCardProps> = ({
 		onError: (error: Error) => {
 			toast.error(error.message || 'Failed to unlink integration');
 		},
+	});
+
+	const { mutate: setupMoyasarAutopay } = useMutation({
+		mutationFn: () => PaymentApi.getMoyasarSetupIntent(entityId, window.location.href),
+		onSuccess: (res) => window.open(res.checkout_url, '_blank'),
+		onError: (error: Error) => toast.error(error.message || 'Failed to start autopay setup'),
 	});
 
 	const handleLinkClick = useCallback((row: IntegrationRow) => {
@@ -278,7 +281,7 @@ const IntegrationMappingCard: FC<IntegrationMappingCardProps> = ({
 											onSelect={(e) => {
 												e.preventDefault();
 												setDropdownOpen(null);
-												navigate(`${RouteNames.moyasarCheckout}?customer_id=${encodeURIComponent(entityId)}`);
+												setupMoyasarAutopay();
 											}}
 											className='cursor-pointer'>
 											{tCustomers('tabPanels.information.setupAutopayMoyasar')}
@@ -322,7 +325,6 @@ const IntegrationMappingCard: FC<IntegrationMappingCardProps> = ({
 			handleSyncClick,
 			handleDelinkClick,
 			entityId,
-			navigate,
 			t,
 			tCustomers,
 		],
