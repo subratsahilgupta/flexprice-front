@@ -900,7 +900,8 @@
 			"infoDescription": "Alert when balance reaches info level",
 			"cancel": "Cancel",
 			"saving": "Saving...",
-			"saveChanges": "Save Changes"
+			"saveChanges": "Save Changes",
+			"statusBadgeLabel": "balance {{condition}} {{threshold}}"
 		},
 		"autoTopup": {
 			"dialogTitle": "Auto Top-Up Settings",

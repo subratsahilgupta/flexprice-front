@@ -776,7 +776,8 @@
 			"infoDescription": "تنبيه عند وصول الرصيد لمستوى معلومات",
 			"cancel": "إلغاء",
 			"saving": "جارٍ الحفظ...",
-			"saveChanges": "حفظ التغييرات"
+			"saveChanges": "حفظ التغييرات",
+			"statusBadgeLabel": "الرصيد {{condition}} {{threshold}}"
 		},
 		"autoTopup": {
 			"dialogTitle": "إعدادات التعبئة التلقائية",
