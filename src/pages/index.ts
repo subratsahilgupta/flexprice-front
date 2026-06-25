@@ -34,4 +34,3 @@ export * from './home';
 export * from './customer-portal';
 
 export * from './checkout';
-export * from './moyasar-checkout';

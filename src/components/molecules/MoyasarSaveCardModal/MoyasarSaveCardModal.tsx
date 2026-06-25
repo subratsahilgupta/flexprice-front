@@ -2,8 +2,9 @@ import { FC } from 'react';
 import { Button, Dialog } from '@/components/atoms';
 import { CreditCard } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { RouteNames } from '@/core/routes/Routes';
+import { useMutation } from '@tanstack/react-query';
+import PaymentApi from '@/api/PaymentApi';
+import toast from 'react-hot-toast';
 
 interface MoyasarSaveCardModalProps {
 	isOpen: boolean;
@@ -13,12 +14,17 @@ interface MoyasarSaveCardModalProps {
 
 const MoyasarSaveCardModal: FC<MoyasarSaveCardModalProps> = ({ isOpen, onOpenChange, customerId }) => {
 	const { t } = useTranslation('customers');
-	const navigate = useNavigate();
 
-	const handleSetupCard = () => {
-		onOpenChange(false);
-		navigate(`${RouteNames.moyasarCheckout}?customer_id=${encodeURIComponent(customerId)}`);
-	};
+	const { mutate: setupAutopay, isPending } = useMutation({
+		mutationFn: () => PaymentApi.getMoyasarSetupIntent(customerId, window.location.href),
+		onSuccess: (res) => {
+			onOpenChange(false);
+			window.open(res.checkout_url, '_blank');
+		},
+		onError: (err: Error) => {
+			toast.error(err.message || t('moyasarAutopay.toastInitFailed'));
+		},
+	});
 
 	return (
 		<Dialog
@@ -33,7 +39,7 @@ const MoyasarSaveCardModal: FC<MoyasarSaveCardModalProps> = ({ isOpen, onOpenCha
 			className='sm:max-w-[420px]'>
 			<div className='space-y-4 py-2'>
 				<p className='text-sm text-gray-600'>{t('moyasarAutopay.intro')}</p>
-				<Button className='w-full' onClick={handleSetupCard}>
+				<Button className='w-full' onClick={() => setupAutopay()} isLoading={isPending} disabled={isPending}>
 					{t('moyasarAutopay.setupCard')}
 				</Button>
 			</div>
