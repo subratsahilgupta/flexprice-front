@@ -31,6 +31,7 @@ export interface EntitlementSource {
 	readonly usage_limit: number | null;
 	readonly static_value: string | null;
 	readonly usage_reset_period: string | null;
+	readonly config_value?: Record<string, unknown> | null;
 	// Legacy fields for backward compatibility
 	readonly plan_id?: string;
 	readonly plan_name?: string;

@@ -1,4 +1,5 @@
 import { Button, Checkbox, Dialog, FormHeader, Input, Select, SelectFeature, Sheet, Spacer, Toggle } from '@/components/atoms';
+import { JsonEditor } from '@/components/molecules/JsonEditor';
 import { getFeatureIcon } from '@/components/atoms/SelectFeature/SelectFeature';
 import { AddChargesButton } from '@/components/organisms/PlanForm/SetupChargesSection';
 
@@ -30,6 +31,7 @@ interface Props {
 interface ValidationErrors {
 	usage_limit?: string;
 	static_value?: string;
+	config_value?: string;
 	usage_reset_period?: string;
 	is_enabled?: string;
 	general?: string;
@@ -107,8 +109,14 @@ const validateEntitlement = (
 		case FEATURE_TYPE.STATIC:
 			return validateStaticFeature(tempEntitlement, t);
 		case FEATURE_TYPE.BOOLEAN:
-			// Boolean features don't need additional validation
 			return {};
+		case FEATURE_TYPE.CONFIG: {
+			const cv = tempEntitlement.config_value;
+			if (!cv || Object.keys(cv).length === 0) {
+				return { config_value: t('entitlements.addDrawer.configValueRequired') };
+			}
+			return {};
+		}
 		default:
 			return { feature: t('entitlements.validation.invalidFeatureType') };
 	}
@@ -342,6 +350,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 				usage_reset_period: entitlement.usage_reset_period as ENTITLEMENT_USAGE_RESET_PERIOD | undefined,
 				is_soft_limit: entitlement.is_soft_limit,
 				static_value: entitlement.static_value,
+				config_value: entitlement.config_value ?? undefined,
 				entity_type: entityType,
 				entity_id: entityId,
 			}));
@@ -404,7 +413,8 @@ const AddEntitlementDrawer: FC<Props> = ({
 			feature: activeFeature,
 			feature_id: activeFeature.id,
 			feature_type: activeFeature.type,
-			is_enabled: activeFeature.type === FEATURE_TYPE.BOOLEAN ? true : undefined,
+			is_enabled: activeFeature.type === FEATURE_TYPE.BOOLEAN || activeFeature.type === FEATURE_TYPE.CONFIG ? true : undefined,
+			config_value: activeFeature.type === FEATURE_TYPE.CONFIG ? tempEntitlement.config_value : undefined,
 			entity_type: entityType,
 			entity_id: entityId || '',
 		};
@@ -412,6 +422,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 		setEntitlements((prev) => [...prev, newEntitlement]);
 		setTempEntitlement({});
 		setActiveFeature(null);
+		setShowSelect(true);
 		setErrors({});
 		setIsCalculatorOpen(false);
 	}, [activeFeature, validateCurrentEntitlement, alreadyAddedFeatureIds, tempEntitlement, entityType, entityId, t]);
@@ -596,6 +607,21 @@ const AddEntitlementDrawer: FC<Props> = ({
 											}));
 										}}
 									/>
+								</div>
+							)}
+
+							{/* config features */}
+							{activeFeature.type === FEATURE_TYPE.CONFIG && (
+								<div>
+									<Spacer height='12px' />
+									<JsonEditor
+										key={activeFeature.id}
+										value={(tempEntitlement.config_value as Record<string, unknown>) ?? null}
+										onChange={(parsed) => {
+											setTempEntitlement((prev) => ({ ...prev, config_value: parsed ?? undefined }));
+										}}
+									/>
+									{errors.config_value && <p className='text-xs text-red-500 mt-1'>{errors.config_value}</p>}
 								</div>
 							)}
 

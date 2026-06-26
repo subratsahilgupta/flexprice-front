@@ -25,6 +25,7 @@ export interface CreateFeatureRequest {
 	reporting_unit?: ReportingUnit;
 	alert_settings?: AlertSettings;
 	group_id?: string;
+	config_value?: Record<string, unknown>;
 }
 
 export interface UpdateFeatureRequest {
@@ -38,6 +39,7 @@ export interface UpdateFeatureRequest {
 	alert_settings?: AlertSettings;
 	/** Set to empty string to clear the group. */
 	group_id?: string;
+	config_value?: Record<string, unknown>;
 }
 
 // ============================================

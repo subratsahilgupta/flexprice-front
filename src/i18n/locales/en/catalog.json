@@ -839,6 +839,26 @@
 			"detailSep": ", "
 		}
 	},
+	"jsonEditor": {
+		"title": "Config Value (JSON)",
+		"showEditor": "Show Editor",
+		"hideEditor": "Hide Editor",
+		"validJson": "Valid JSON",
+		"errorInvalidJson": "Invalid JSON",
+		"errorMustBeObject": "Must be a JSON object",
+		"lines": "lines"
+	},
+	"configKeyValueEditor": {
+		"title": "Config Values",
+		"addRow": "Add",
+		"keyHeader": "Key",
+		"valueHeader": "Value",
+		"keyPlaceholder": "usage_limit",
+		"valuePlaceholder": "100",
+		"errorDuplicateKey": "Duplicate key: \"{{key}}\"",
+		"errorEmptyValue": "Value is required",
+		"errorEmptyKey": "Key is required"
+	},
 	"entitlements": {
 		"usageResetPeriod": {
 			"DAILY": "Daily",
@@ -888,7 +908,8 @@
 			"save": "Save",
 			"unlimitedDisplay": "Unlimited",
 			"calculatorAriaLabel": "Display value calculator",
-			"unitsFallback": "units"
+			"unitsFallback": "units",
+			"configValueRequired": "A valid JSON object is required for config features"
 		},
 		"displayCalculator": {
 			"titleFallback": "Display value",

@@ -14,7 +14,7 @@ import { BUCKET_SIZE, METER_AGGREGATION_TYPE, METER_USAGE_RESET_PERIOD } from '@
 import FeatureApi from '@/api/FeatureApi';
 import { CreateFeatureRequest, CreateMeterRequest } from '@/types/dto';
 import { useMutation } from '@tanstack/react-query';
-import { Gauge, SquareCheckBig, Wrench } from 'lucide-react';
+import { Gauge, Settings2, SquareCheckBig, Wrench } from 'lucide-react';
 import { useMemo, useState, useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router';
@@ -42,6 +42,12 @@ const FEATURE_TYPE_OPTIONS: SelectOption[] = [
 		description: 'Functionality that can be configured for a customer i.e. log retention period, support tier, etc.',
 		suffixIcon: <Wrench className='size-4' />,
 		value: FEATURE_TYPE.STATIC,
+	},
+	{
+		label: 'Config',
+		description: 'Structured key-value configuration delivered to a customer i.e. feature flags, limits map, environment settings.',
+		suffixIcon: <Settings2 className='size-4' />,
+		value: FEATURE_TYPE.CONFIG,
 	},
 ];
 
@@ -149,7 +155,7 @@ const FEATURE_SCHEMA = z.object({
 	name: z.string().nonempty('Feature name is required'),
 	description: z.string().optional(),
 	lookup_key: z.string().optional(),
-	type: z.enum([FEATURE_TYPE.BOOLEAN, FEATURE_TYPE.METERED, FEATURE_TYPE.STATIC]).optional(),
+	type: z.enum([FEATURE_TYPE.BOOLEAN, FEATURE_TYPE.METERED, FEATURE_TYPE.STATIC, FEATURE_TYPE.CONFIG]).optional(),
 	meter_id: z.string().optional(),
 	unit_singular: z.string().optional(),
 	unit_plural: z.string().optional(),
@@ -183,6 +189,7 @@ type FeatureFormData = Omit<CreateFeatureRequest, 'name' | 'type' | 'meter'> & {
 	name?: string;
 	type?: FEATURE_TYPE;
 	meter?: Partial<CreateMeterRequest>;
+	_rawConfigPairs?: Array<{ key: string; value: string }>;
 };
 
 type FeatureErrors = Partial<Record<keyof CreateFeatureRequest, string>>;

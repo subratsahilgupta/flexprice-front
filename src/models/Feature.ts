@@ -45,12 +45,14 @@ export interface Feature extends BaseModel {
 	readonly alert_settings?: AlertSettings;
 	readonly group_id?: string;
 	readonly group?: Group;
+	readonly config_value?: Record<string, unknown>;
 }
 
 export enum FEATURE_TYPE {
 	METERED = 'metered',
 	STATIC = 'static',
 	BOOLEAN = 'boolean',
+	CONFIG = 'config',
 }
 
 export default Feature;

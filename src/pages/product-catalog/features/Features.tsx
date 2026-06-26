@@ -147,6 +147,7 @@ const FeaturesPage = () => {
 			if (key === FEATURE_TYPE.STATIC) return t('features.listPage.typeChips.static');
 			if (key === FEATURE_TYPE.METERED) return t('features.listPage.typeChips.metered');
 			if (key === FEATURE_TYPE.BOOLEAN) return t('features.listPage.typeChips.boolean');
+			if (key === FEATURE_TYPE.CONFIG) return t('features.listPage.typeChips.config', { defaultValue: 'Config' });
 			return t('features.listPage.typeChips.unknown', { defaultValue: toSentenceCase(type) });
 		},
 		[t],
@@ -164,6 +165,8 @@ const FeaturesPage = () => {
 					return <Chip textColor='#1E40AF' bgColor='#DBEAFE' icon={addIcon ? icon : null} label={label} className='text-xs' />;
 				case FEATURE_TYPE.BOOLEAN:
 					return <Chip textColor='#166534' bgColor='#DCFCE7' icon={addIcon ? icon : null} label={label} className='text-xs' />;
+				case FEATURE_TYPE.CONFIG:
+					return <Chip textColor='#5B21B6' bgColor='#F5F3FF' icon={addIcon ? icon : null} label={label} className='text-xs' />;
 				default:
 					return <Chip textColor='#6B7280' bgColor='#F9FAFB' icon={addIcon ? icon : null} label={label} className='text-xs' />;
 			}
