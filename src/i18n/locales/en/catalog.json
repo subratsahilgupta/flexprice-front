@@ -637,6 +637,7 @@
 				"metered": "Metered",
 				"boolean": "Boolean",
 				"static": "Static",
+				"config": "Config",
 				"unknown": "Unknown"
 			},
 			"emptyCell": "—",

@@ -637,6 +637,7 @@
 				"metered": "مُقاس",
 				"boolean": "منطقي",
 				"static": "ثابت",
+				"config": "إعداد",
 				"unknown": "غير معروف"
 			},
 			"emptyCell": "—",
