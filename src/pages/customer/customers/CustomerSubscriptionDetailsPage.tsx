@@ -21,7 +21,7 @@ import { TAXRATE_ENTITY_TYPE } from '@/models/Tax';
 import TaxAssociationTable from '@/components/molecules/TaxAssociationTable';
 import CouponAssociationTable from '@/components/molecules/CouponAssociationTable/CouponAssociationTable';
 import { Subscription as SubscriptionType, SUBSCRIPTION_STATUS, SUBSCRIPTION_TYPE } from '@/models/Subscription';
-import { EXPAND } from '@/models';
+import { ENTITY_STATUS, EXPAND } from '@/models';
 import { DataType, FilterOperator } from '@/types/common/QueryBuilder';
 import { SubscriptionResponse } from '@/types/dto/Subscription';
 import { generateExpandQueryParams } from '@/utils/common/api_helper';
@@ -190,6 +190,7 @@ const CustomerSubscriptionDetailsPage: FC = () => {
 				limit: 100,
 				offset: 0,
 				expand: generateExpandQueryParams([EXPAND.PLAN, EXPAND.CUSTOMER]),
+				status: ENTITY_STATUS.PUBLISHED,
 			}),
 		enabled: !!subscription_id && !!subscriptionDetails,
 	});
