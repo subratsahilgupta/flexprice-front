@@ -5,23 +5,24 @@ import { Copy, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/atoms';
 import { cn } from '@/lib/utils';
+import { JsonObject } from '@/types/common';
 
 interface JsonEditorProps {
-	value: Record<string, unknown> | null | undefined;
-	onChange: (value: Record<string, unknown> | null, raw: string) => void;
+	value: JsonObject | null | undefined;
+	onChange: (value: JsonObject | null, raw: string) => void;
 }
 
 const EMPTY_TEMPLATE = '{\n  \n}';
 
 const formatJson = (obj: Record<string, unknown>): string => JSON.stringify(obj, null, 2);
 
-type ParseResult = { ok: true; value: Record<string, unknown> } | { ok: false; invalidJson: boolean };
+type ParseResult = { ok: true; value: JsonObject } | { ok: false; invalidJson: boolean };
 
 const tryParse = (text: string): ParseResult => {
 	try {
 		const parsed = JSON.parse(text);
 		if (typeof parsed === 'object' && !Array.isArray(parsed) && parsed !== null) {
-			return { ok: true, value: parsed as Record<string, unknown> };
+			return { ok: true, value: parsed as JsonObject };
 		}
 		return { ok: false, invalidJson: false };
 	} catch {
@@ -80,6 +81,22 @@ const getCaretOffset = (root: HTMLElement): number => {
 	pre.selectNodeContents(root);
 	pre.setEnd(range.endContainer, range.endOffset);
 	return pre.toString().length;
+};
+
+// Start and end character offsets of the current selection within the editable element.
+const getSelectionOffsets = (root: HTMLElement): { start: number; end: number } => {
+	const sel = window.getSelection();
+	if (!sel || sel.rangeCount === 0) return { start: 0, end: 0 };
+	const range = sel.getRangeAt(0);
+	const startRange = document.createRange();
+	startRange.selectNodeContents(root);
+	startRange.setEnd(range.startContainer, range.startOffset);
+	const start = startRange.toString().length;
+	const endRange = document.createRange();
+	endRange.selectNodeContents(root);
+	endRange.setEnd(range.endContainer, range.endOffset);
+	const end = endRange.toString().length;
+	return { start, end };
 };
 
 // Place the caret at the given character offset within the editable element.
@@ -169,9 +186,9 @@ export const JsonEditor: FC<JsonEditorProps> = ({ value, onChange }) => {
 		const el = editorRef.current;
 		if (!el) return;
 		const current = el.textContent ?? '';
-		const offset = getCaretOffset(el);
-		const next = current.slice(0, offset) + insert + current.slice(offset);
-		applyText(next, offset + insert.length);
+		const { start, end } = getSelectionOffsets(el);
+		const next = current.slice(0, start) + insert + current.slice(end);
+		applyText(next, start + insert.length);
 	};
 
 	// Keep Enter and Tab as plain text instead of letting the browser inject <div>/<br>.

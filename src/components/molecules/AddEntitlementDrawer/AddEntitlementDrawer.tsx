@@ -1,4 +1,5 @@
 import { Button, Checkbox, Dialog, FormHeader, Input, Select, SelectFeature, Sheet, Spacer, Toggle } from '@/components/atoms';
+import { JsonObject } from '@/types/common';
 import { JsonEditor } from '@/components/molecules/JsonEditor';
 import { getFeatureIcon } from '@/components/atoms/SelectFeature/SelectFeature';
 import { AddChargesButton } from '@/components/organisms/PlanForm/SetupChargesSection';
@@ -616,7 +617,7 @@ const AddEntitlementDrawer: FC<Props> = ({
 									<Spacer height='12px' />
 									<JsonEditor
 										key={activeFeature.id}
-										value={(tempEntitlement.config_value as Record<string, unknown>) ?? null}
+										value={(tempEntitlement.config_value as JsonObject) ?? null}
 										onChange={(parsed) => {
 											setTempEntitlement((prev) => ({ ...prev, config_value: parsed ?? undefined }));
 										}}
