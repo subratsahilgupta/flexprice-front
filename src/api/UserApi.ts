@@ -14,22 +14,26 @@ import type { TypedBackendFilter } from '@/types/formatters/QueryBuilder';
 export interface GetTenantMembersParams {
 	limit: number;
 	offset: number;
+	/** When true, returns users regardless of publish status (includes pending invites). */
+	includeAllStatuses?: boolean;
 }
 
 export class UserApi {
 	private static baseUrl = '/users';
 	private static v1UsersUrl = '/users';
 
-	/** Tenant members: type=user, status=published, with pagination */
+	/** Tenant members: type=user, optionally status=published, with pagination */
 	public static async getTenantMembers(params: GetTenantMembersParams): Promise<GetServiceAccountsResponse> {
-		const filters: TypedBackendFilter[] = [
-			{
-				field: 'status',
-				operator: FilterOperator.EQUAL,
-				data_type: DataType.STRING,
-				value: { string: 'published' },
-			},
-		];
+		const filters: TypedBackendFilter[] = params.includeAllStatuses
+			? []
+			: [
+					{
+						field: 'status',
+						operator: FilterOperator.EQUAL,
+						data_type: DataType.STRING,
+						value: { string: 'published' },
+					},
+				];
 		return await AxiosClient.post<GetServiceAccountsResponse>(`${this.baseUrl}/search`, {
 			limit: params.limit,
 			offset: params.offset,
