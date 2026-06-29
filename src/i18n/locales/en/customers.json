@@ -301,6 +301,7 @@
 			"expandAll": "Expand all",
 			"totalUsage": "Total Usage",
 			"totalCost": "Total Cost",
+			"cogs": "COGS",
 			"tableEmpty": "--"
 		},
 		"information": {
