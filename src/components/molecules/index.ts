@@ -163,6 +163,10 @@ export { FlatTabs, CustomTabs } from './Tabs';
 export { default as TestimonialCard } from './TestimonialCard/TestimonialCard';
 
 // Environment & Settings
+export { SettingsToggleRow } from './SettingsToggleRow';
+export type { SettingsToggleRowProps } from './SettingsToggleRow';
+export { OptionFilterPopover } from './OptionFilterPopover';
+export type { OptionFilterGroup, OptionFilterPopoverProps } from './OptionFilterPopover';
 export { default as EnvironmentSelector } from './EnvironmentSelector';
 export { default as SecretKeyDrawer } from './SecretKeyDrawer';
 export { default as UpdateTenantDrawer } from './Tenant/UpdateTenantDrawer';
