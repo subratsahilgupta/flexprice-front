@@ -154,6 +154,14 @@ const CustomerInformationTab = () => {
 			label: 'Email',
 			value: customer?.email || '--',
 		},
+		...(customer?.timezone?.trim()
+			? [
+					{
+						label: t('overview.labels.timezone'),
+						value: customer.timezone,
+					},
+				]
+			: []),
 		{
 			variant: 'divider',
 		},

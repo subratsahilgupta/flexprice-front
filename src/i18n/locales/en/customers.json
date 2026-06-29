@@ -67,6 +67,7 @@
 			"state": "State",
 			"city": "City",
 			"postalCode": "Postal Code",
+			"timezone": "Timezone",
 			"subscriptionAmount": "Subscription Amount",
 			"subscriptionStartDate": "Subscription Start Date"
 		},

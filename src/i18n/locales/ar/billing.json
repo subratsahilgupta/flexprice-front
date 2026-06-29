@@ -402,6 +402,7 @@
 			"billingCycle": "دورة الفوترة",
 			"startDate": "تاريخ البدء",
 			"currentPeriodEnd": "نهاية الفترة الحالية",
+			"timezone": "المنطقة الزمنية",
 			"commitmentAmount": "مبلغ الالتزام",
 			"overageFactor": "معامل الزيادة",
 			"parentSubscription": "الاشتراك الأب",

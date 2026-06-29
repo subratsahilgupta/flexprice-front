@@ -67,6 +67,7 @@
 			"state": "المحافظة",
 			"city": "المدينة",
 			"postalCode": "الرمز البريدي",
+			"timezone": "المنطقة الزمنية",
 			"subscriptionAmount": "مبلغ الاشتراك",
 			"subscriptionStartDate": "تاريخ بدء الاشتراك"
 		},
