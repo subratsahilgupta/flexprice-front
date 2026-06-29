@@ -743,7 +743,7 @@
 			"aggregationFieldButton": "Aggregation field",
 			"customExpression": "Custom Expression*",
 			"customExpressionPh": "ceil(duration_ms / 1000)",
-			"customExpressionHelp": "Write a CEL formula evaluated per event to compute the quantity. Variables are top-level property names on your events (e.g. duration_ms, tokens).\n\nAvailable functions: max(a, b), min(a, b), abs(x), ceil(x), floor(x), round(x), pow(x, y), sqrt(x), log(x).\n\nExamples:\n• input_tokens + output_tokens\n• ceil(duration_ms / 1000)\n• min(usage, quota)\n• max(cores * hours * rate, 0.01)",
+			"customExpressionHelp": "Write a CEL formula evaluated per event to compute the quantity. Variables are top-level property names on your events (e.g. duration_ms, tokens).\n\nAvailable functions: max(a, b), min(a, b), abs(x), ceil(x), floor(x), round(x), pow(x, y), sqrt(x), log(x).\n\nExamples:\n• input_tokens + output_tokens\n• ceil(duration_ms / 1000)\n• min(usage, quota)\n• max(cores * hours * rate, 0.01)\n\nOnly available for SUM, AVG, MAX and LATEST.",
 			"aggregationMultiplier": "Aggregation Multiplier*",
 			"aggregationMultiplierPh": "1",
 			"aggregationMultiplierHelp": "Specify the multiplier for the aggregation. e.g. 1.5, 0.25, or 1000.",
