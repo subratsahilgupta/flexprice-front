@@ -76,7 +76,6 @@ import {
 	// Webhooks pages
 	WebhookDashboardLazy,
 	// Settings pages
-	Billing as BillingPage,
 	SettingsDashboard,
 	// Insights tools pages
 	Integrations,
@@ -600,7 +599,7 @@ export const MainRouter: any = createBrowserRouter([
 			},
 			{
 				path: RouteNames.customerBilling,
-				element: <BillingPage />,
+				element: <Navigate to={`${RouteNames.settings}?tab=billing`} replace />,
 			},
 		],
 	},
