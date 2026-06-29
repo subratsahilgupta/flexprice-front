@@ -40,6 +40,56 @@ function buildCostByMeterId(costItems: CostAnalyticItem[]): Map<string, CostAnal
 	return costByMeterId;
 }
 
+function buildMeterTotals(usageItems: UsageAnalyticItem[]) {
+	const revenueByMeterId = new Map<string, number>();
+	const usageByMeterId = new Map<string, number>();
+	const rowCountByMeterId = new Map<string, number>();
+
+	for (const item of usageItems) {
+		if (!item.meter_id) {
+			continue;
+		}
+
+		const revenue = Number(item.total_cost) || 0;
+		const usage = Number(item.total_usage) || 0;
+
+		revenueByMeterId.set(item.meter_id, (revenueByMeterId.get(item.meter_id) ?? 0) + revenue);
+		usageByMeterId.set(item.meter_id, (usageByMeterId.get(item.meter_id) ?? 0) + usage);
+		rowCountByMeterId.set(item.meter_id, (rowCountByMeterId.get(item.meter_id) ?? 0) + 1);
+	}
+
+	return { revenueByMeterId, usageByMeterId, rowCountByMeterId };
+}
+
+/**
+ * Allocates a meter's total COGS across all usage rows for that meter.
+ * Prefers revenue share, then usage share, then equal split.
+ */
+function allocateMeterCogs(
+	item: UsageAnalyticItem,
+	meterCogs: number,
+	revenueByMeterId: Map<string, number>,
+	usageByMeterId: Map<string, number>,
+	rowCountByMeterId: Map<string, number>,
+): number {
+	const meterId = item.meter_id!;
+	const totalRevenue = revenueByMeterId.get(meterId) ?? 0;
+	const rowRevenue = Number(item.total_cost) || 0;
+
+	if (totalRevenue > 0) {
+		return meterCogs * (rowRevenue / totalRevenue);
+	}
+
+	const totalUsage = usageByMeterId.get(meterId) ?? 0;
+	const rowUsage = Number(item.total_usage) || 0;
+	if (totalUsage > 0) {
+		return meterCogs * (rowUsage / totalUsage);
+	}
+
+	const rowCount = rowCountByMeterId.get(meterId) ?? 1;
+	return meterCogs / rowCount;
+}
+
 /**
  * Joins cost analytics onto usage rows by `meter_id` and returns cost rows
  * whose meter is not present on any usage row.
@@ -50,7 +100,7 @@ export function mergeUsageAndCostAnalytics(
 ): MergeUsageAndCostAnalyticsResult {
 	const costByMeterId = buildCostByMeterId(costItems);
 	const usageMeterIds = new Set(usageItems.map((item) => item.meter_id).filter((id): id is string => Boolean(id)));
-	const assignedMeterIds = new Set<string>();
+	const { revenueByMeterId, usageByMeterId, rowCountByMeterId } = buildMeterTotals(usageItems);
 
 	const mergedUsageItems: MergedUsageAnalyticRow[] = usageItems.map((item) => {
 		const revenue = Number(item.total_cost) || 0;
@@ -60,12 +110,13 @@ export function mergeUsageAndCostAnalytics(
 		}
 
 		const matchedCost = costByMeterId.get(item.meter_id);
-		if (!matchedCost || assignedMeterIds.has(item.meter_id)) {
+		if (!matchedCost) {
 			return { ...item, cogs: null, margin: null };
 		}
 
-		assignedMeterIds.add(item.meter_id);
-		const cogs = parseCostAmount(matchedCost.total_cost);
+		const meterCogs = parseCostAmount(matchedCost.total_cost);
+		const cogs = allocateMeterCogs(item, meterCogs, revenueByMeterId, usageByMeterId, rowCountByMeterId);
+
 		return {
 			...item,
 			cogs,

@@ -10,12 +10,10 @@ import CostSheetApi from '@/api/CostSheetApi';
 import FeatureApi from '@/api/FeatureApi';
 import { Feature } from '@/models';
 import { GetUsageAnalyticsRequest, GetCostAnalyticsRequest } from '@/types';
-import { RedirectCell } from '@/components/molecules';
+import { RedirectCell, MetricCard, CostDataTable } from '@/components/molecules';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/molecules/Table/Table';
 import { UsageAnalyticItem, PRICE_ENTITY_TYPE } from '@/models';
-import { formatNumber } from '@/utils';
-import { MetricCard, CostDataTable } from '@/components/molecules';
-import { getCurrencySymbol } from '@/utils';
+import { formatNumber, formatCurrencyAmount, getCurrencySymbol } from '@/utils';
 import { PriceTooltip } from '@/components/molecules/PriceTooltip';
 import { Skeleton } from '@/components/ui';
 import { ENTITY_STATUS } from '@/models/base';
@@ -443,7 +441,7 @@ const CustomerAnalyticsTab = () => {
 					)} */}
 
 					{/* Usage Data Table */}
-					{mergedUsageItems.length > 0 && (
+					{filteredUsageData != null && (
 						<div className='!mt-10'>
 							<UsageDataTable items={mergedUsageItems} />
 						</div>
@@ -554,16 +552,7 @@ function renderRevenue(row: UsageAnalyticItem) {
 
 function renderCurrencyAmount(amount: number | null, currency?: string, options?: { showSign?: boolean }) {
 	if (amount == null || !currency) return '-';
-	const currencySymbol = getCurrencySymbol(currency);
-	const formatted = formatNumber(Math.abs(amount), 2);
-	const prefix = options?.showSign && amount < 0 ? '-' : '';
-	return (
-		<span>
-			{prefix}
-			{currencySymbol}
-			{formatted}
-		</span>
-	);
+	return <span>{formatCurrencyAmount(amount, currency, { showSign: options?.showSign })}</span>;
 }
 
 function renderCogs(row: MergedUsageAnalyticRow) {
