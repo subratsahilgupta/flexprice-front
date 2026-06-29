@@ -1,6 +1,7 @@
 export type {
 	CreateFeatureRequest,
 	UpdateFeatureRequest,
+	FeatureFormData,
 	FeatureResponse,
 	ListFeaturesResponse,
 	FeatureFilter,

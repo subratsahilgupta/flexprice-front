@@ -406,6 +406,12 @@
 			"creditGrants": "Credit Grants",
 			"entitlements": "Entitlements"
 		},
+		"entitlementsTab": {
+			"configSheet": {
+				"keysCount": "{{count}} keys",
+				"title": "Config Value"
+			}
+		},
 		"information": {
 			"loading": "Loading plan details...",
 			"planDetails": "Plan Details",
@@ -631,7 +637,8 @@
 			"filterTypes": {
 				"metered": "Metered",
 				"boolean": "Boolean",
-				"static": "Static"
+				"static": "Static",
+				"config": "Config"
 			},
 			"typeChips": {
 				"metered": "Metered",
@@ -858,7 +865,8 @@
 		"valuePlaceholder": "100",
 		"errorDuplicateKey": "Duplicate key: \"{{key}}\"",
 		"errorEmptyValue": "Value is required",
-		"errorEmptyKey": "Key is required"
+		"errorEmptyKey": "Key is required",
+		"removeRow": "Remove row"
 	},
 	"entitlements": {
 		"usageResetPeriod": {

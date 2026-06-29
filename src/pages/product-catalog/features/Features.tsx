@@ -114,6 +114,7 @@ const FeaturesPage = () => {
 					{ value: FEATURE_TYPE.METERED, label: t('features.listPage.filterTypes.metered') },
 					{ value: FEATURE_TYPE.BOOLEAN, label: t('features.listPage.filterTypes.boolean') },
 					{ value: FEATURE_TYPE.STATIC, label: t('features.listPage.filterTypes.static') },
+					{ value: FEATURE_TYPE.CONFIG, label: t('features.listPage.filterTypes.config') },
 				],
 			},
 			{

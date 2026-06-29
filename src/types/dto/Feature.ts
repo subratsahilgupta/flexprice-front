@@ -1,6 +1,7 @@
 import { Pagination, Feature, FEATURE_TYPE, Metadata, Meter, AlertSettings, ENTITY_STATUS } from '@/models';
 import { TypedBackendFilter, TypedBackendSort } from '../formatters/QueryBuilder';
 import { MeterFilter, CreateMeterRequest } from './Meter';
+import { JsonObject } from '../common';
 
 // ============================================
 // Feature Request Types
@@ -25,7 +26,7 @@ export interface CreateFeatureRequest {
 	reporting_unit?: ReportingUnit;
 	alert_settings?: AlertSettings;
 	group_id?: string;
-	config_value?: Record<string, unknown>;
+	config_value?: JsonObject;
 }
 
 export interface UpdateFeatureRequest {
@@ -39,8 +40,15 @@ export interface UpdateFeatureRequest {
 	alert_settings?: AlertSettings;
 	/** Set to empty string to clear the group. */
 	group_id?: string;
-	config_value?: Record<string, unknown>;
+	config_value?: JsonObject;
 }
+
+export type FeatureFormData = Omit<CreateFeatureRequest, 'name' | 'type' | 'meter'> & {
+	name?: string;
+	type?: FEATURE_TYPE;
+	meter?: Partial<CreateMeterRequest>;
+	_rawConfigPairs?: Array<{ key: string; value: string }>;
+};
 
 // ============================================
 // Feature Response Types

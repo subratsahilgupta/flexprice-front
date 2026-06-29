@@ -197,6 +197,7 @@
 			"static": "ثابت",
 			"metered": "مقياسي",
 			"boolean": "نعم/لا",
+			"config": "إعداد",
 			"dash": "—",
 			"usageProgressUnlimited": "{{usage}} / غير محدود"
 		},

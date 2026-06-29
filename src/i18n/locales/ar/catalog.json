@@ -406,6 +406,12 @@
 			"creditGrants": "منح الرصيد",
 			"entitlements": "الاستحقاقات"
 		},
+		"entitlementsTab": {
+			"configSheet": {
+				"keysCount": "{{count}} مفاتيح",
+				"title": "قيمة الإعداد"
+			}
+		},
 		"information": {
 			"loading": "جاري تحميل تفاصيل الخطة…",
 			"planDetails": "تفاصيل الخطة",
@@ -631,7 +637,8 @@
 			"filterTypes": {
 				"metered": "مُقاس",
 				"boolean": "منطقي",
-				"static": "ثابت"
+				"static": "ثابت",
+				"config": "إعداد"
 			},
 			"typeChips": {
 				"metered": "مُقاس",
@@ -858,7 +865,8 @@
 		"valuePlaceholder": "100",
 		"errorDuplicateKey": "مفتاح مكرر: \"{{key}}\"",
 		"errorEmptyValue": "القيمة مطلوبة",
-		"errorEmptyKey": "المفتاح مطلوب"
+		"errorEmptyKey": "المفتاح مطلوب",
+		"removeRow": "إزالة الصف"
 	},
 	"entitlements": {
 		"usageResetPeriod": {

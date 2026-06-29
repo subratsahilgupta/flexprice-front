@@ -60,7 +60,7 @@ const PlanEntitlementsTab = () => {
 				return (
 					<button
 						type='button'
-						onClick={() => openConfigSheet(entitlement.feature?.name ?? 'Config', cv ?? null)}
+						onClick={() => openConfigSheet(entitlement.feature?.name ?? t('catalog:features.listPage.typeChips.config'), cv ?? null)}
 						className='font-mono text-xs text-left text-muted-foreground rounded border border-transparent transition-all hover:border-border hover:shadow-sm hover:text-foreground max-w-md'
 						style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', wordBreak: 'break-all' }}>
 						{compact ?? t('common:labels.na')}
@@ -165,17 +165,10 @@ const PlanEntitlementsTab = () => {
 			/>
 
 			{/* Config value side sheet */}
-			<Sheet
-				isOpen={configSheet.open}
-				onOpenChange={(open) => setConfigSheet((s) => ({ ...s, open }))}
-				title={configSheet.name}
-				size='2xl'>
+			<Sheet isOpen={configSheet.open} onOpenChange={(open) => setConfigSheet((s) => ({ ...s, open }))} title={configSheet.name} size='2xl'>
 				<div className='flex flex-col h-full'>
-					<div className='space-y-3 px-6 pb-6 pt-0'>
-						<span className='block text-xs text-muted-foreground font-mono'>
-							{configSheet.value ? Object.keys(configSheet.value).length : 0} keys
-						</span>
-						<JsonCodeBlock value={configSheet.value ?? {}} title='Config Value' />
+					<div className='px-6 py-6'>
+						<JsonCodeBlock value={configSheet.value ?? {}} title={t('catalog:plans.entitlementsTab.configSheet.title')} />
 					</div>
 				</div>
 			</Sheet>

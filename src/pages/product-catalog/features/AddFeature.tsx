@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import { FEATURE_TYPE } from '@/models/Feature';
 import { BUCKET_SIZE, METER_AGGREGATION_TYPE, METER_USAGE_RESET_PERIOD } from '@/models/Meter';
 import FeatureApi from '@/api/FeatureApi';
-import { CreateFeatureRequest, CreateMeterRequest } from '@/types/dto';
+import { CreateFeatureRequest, CreateMeterRequest, FeatureFormData } from '@/types/dto';
 import { useMutation } from '@tanstack/react-query';
 import { Gauge, Settings2, SquareCheckBig, Wrench } from 'lucide-react';
 import { useMemo, useState, useCallback, useEffect } from 'react';
@@ -184,13 +184,6 @@ interface FeatureFormState {
 	showBucketSize: boolean;
 	showGroupBy: boolean;
 }
-
-type FeatureFormData = Omit<CreateFeatureRequest, 'name' | 'type' | 'meter'> & {
-	name?: string;
-	type?: FEATURE_TYPE;
-	meter?: Partial<CreateMeterRequest>;
-	_rawConfigPairs?: Array<{ key: string; value: string }>;
-};
 
 type FeatureErrors = Partial<Record<keyof CreateFeatureRequest, string>>;
 type MeterErrors = Partial<Record<keyof CreateMeterRequest | 'aggregation_type' | 'aggregation_field' | 'aggregation_multiplier', string>>;

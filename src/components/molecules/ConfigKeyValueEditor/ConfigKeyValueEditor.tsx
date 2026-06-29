@@ -42,10 +42,8 @@ export const ConfigKeyValueEditor: FC<ConfigKeyValueEditorProps> = ({ value, onC
 	const [pairs, setPairs] = useState<KVPair[]>(() => toKVPairs(value));
 
 	useEffect(() => {
-		if (Object.keys(value).length > 0) {
-			setPairs(toKVPairs(value));
-		}
-	}, []);
+		setPairs(toKVPairs(value));
+	}, [value]);
 
 	const updatePairs = (updated: KVPair[]) => {
 		setPairs(updated);
@@ -71,9 +69,13 @@ export const ConfigKeyValueEditor: FC<ConfigKeyValueEditorProps> = ({ value, onC
 
 			<div className='rounded-md border overflow-hidden'>
 				<div className='flex items-center bg-muted/50 px-3 py-2 border-b'>
-					<span className='flex-1 text-xs font-medium text-muted-foreground uppercase tracking-wide pl-1'>{t('configKeyValueEditor.keyHeader')}</span>
+					<span className='flex-1 text-xs font-medium text-muted-foreground uppercase tracking-wide pl-1'>
+						{t('configKeyValueEditor.keyHeader')}
+					</span>
 					<span className='w-6' />
-					<span className='flex-1 text-xs font-medium text-muted-foreground uppercase tracking-wide pl-1'>{t('configKeyValueEditor.valueHeader')}</span>
+					<span className='flex-1 text-xs font-medium text-muted-foreground uppercase tracking-wide pl-1'>
+						{t('configKeyValueEditor.valueHeader')}
+					</span>
 					<span className='w-8' />
 				</div>
 
@@ -99,6 +101,7 @@ export const ConfigKeyValueEditor: FC<ConfigKeyValueEditorProps> = ({ value, onC
 							</div>
 							<button
 								type='button'
+								aria-label={t('configKeyValueEditor.removeRow')}
 								onClick={() => removeRow(index)}
 								className='w-8 h-7 flex items-center justify-center rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors flex-shrink-0'>
 								<Trash2 className='size-3.5' />
