@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { User } from '@/models';
 import usePagination from '@/hooks/usePagination';
 import { formatDateShort } from '@/utils/common/helper_functions';
-import { Plus, Loader, Bot } from 'lucide-react';
+import { Plus, Loader, Bot, Trash2 } from 'lucide-react';
 import { useMemo, useState, useCallback } from 'react';
 // import { useMemo, useState } from 'react';
 import { toast } from 'react-hot-toast';
@@ -108,6 +108,8 @@ const ServiceAccountsPage = () => {
 						// edit={{ enabled: false }}
 						archive={{
 							enabled: true,
+							text: t('common:actions.delete'),
+							icon: <Trash2 className='h-4 w-4' />,
 						}}
 					/>
 				),
