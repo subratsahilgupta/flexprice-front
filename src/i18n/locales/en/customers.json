@@ -237,6 +237,7 @@
 		"billingCycle": "Billing cycle",
 		"commitmentPeriod": "Commitment Period",
 		"paymentTerms": "Payment terms",
+		"timezone": "Timezone",
 		"invoicingCustomer": "Invoicing Customer",
 		"parentCustomer": "Parent customer",
 		"commitmentLabel": "Commitment",

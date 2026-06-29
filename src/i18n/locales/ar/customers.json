@@ -236,6 +236,7 @@
 		"billingCycle": "دورة الفوترة",
 		"commitmentPeriod": "فترة الالتزام",
 		"paymentTerms": "شروط الدفع",
+		"timezone": "المنطقة الزمنية",
 		"invoicingCustomer": "عميل الفوترة",
 		"parentCustomer": "العميل الأصل",
 		"commitmentLabel": "الالتزام",
