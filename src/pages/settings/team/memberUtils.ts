@@ -9,6 +9,10 @@ export type SettingsMember = User & {
 export type MemberRoleFilter = 'all' | 'admin' | 'member';
 export type MemberStatusFilter = 'all' | 'joined' | 'pending';
 
+export function membersHaveStatus(members: SettingsMember[]): boolean {
+	return members.some((member) => member.status != null && member.status.trim() !== '');
+}
+
 export function isAdminMember(user: SettingsMember): boolean {
 	const role = user.roles?.[0]?.toLowerCase() ?? 'admin';
 	return role.includes('admin');
