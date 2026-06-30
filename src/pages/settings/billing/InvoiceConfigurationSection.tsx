@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { Card, CardHeader, Input, Loader, Select } from '@/components/atoms';
+import { Card, CardHeader, Input, Loader, Select, Button } from '@/components/atoms';
 import type { InvoiceConfig, InvoiceNumberFormat } from '@/types/dto/BillingSettings';
+import { getInvoiceConfigValidationErrorKey, normalizeInvoiceConfig, parseSequenceDigitsInput } from '@/types/dto/BillingSettings';
 import { useInvoiceConfiguration } from './useInvoiceConfiguration';
 import { buildInvoiceNumberPreview } from './invoicePreview';
 import SettingsFormActions from '../SettingsFormActions';
@@ -11,25 +12,63 @@ const DATE_FORMAT_OPTIONS: InvoiceNumberFormat[] = ['YYYYMM', 'YYYY', 'YYYYMMDD'
 
 const InvoiceConfigurationSection = () => {
 	const { t } = useTranslation(['settings', 'common']);
-	const { configuration, savedConfiguration, isLoading, updateConfiguration } = useInvoiceConfiguration();
+	const { configuration, isLoading, updateConfiguration, resetToDefaults } = useInvoiceConfiguration();
 	const [draft, setDraft] = useState<InvoiceConfig>(configuration);
+	const [suffixLengthInput, setSuffixLengthInput] = useState(String(configuration.suffix_length));
 
 	useEffect(() => {
 		setDraft(configuration);
+		setSuffixLengthInput(String(configuration.suffix_length));
 	}, [configuration]);
 
-	const preview = useMemo(() => buildInvoiceNumberPreview(draft), [draft]);
+	const preview = useMemo(() => {
+		const parsedSuffixLength = parseSequenceDigitsInput(suffixLengthInput);
+		return buildInvoiceNumberPreview({
+			...draft,
+			suffix_length: parsedSuffixLength ?? draft.suffix_length,
+		});
+	}, [draft, suffixLengthInput]);
 
 	const updateDraft = <K extends keyof InvoiceConfig>(key: K, value: InvoiceConfig[K]) => {
 		setDraft((prev) => ({ ...prev, [key]: value }));
 	};
 
 	const handleReset = () => {
-		setDraft(savedConfiguration);
+		resetToDefaults.mutate(undefined, {
+			onSuccess: () => toast.success(t('billing.invoiceConfiguration.resetSuccess')),
+			onError: () => toast.error(t('billing.invoiceConfiguration.resetError')),
+		});
+	};
+
+	const buildConfigForSave = (): InvoiceConfig => {
+		const parsedSuffixLength = parseSequenceDigitsInput(suffixLengthInput);
+		return {
+			...draft,
+			...(parsedSuffixLength !== null ? { suffix_length: parsedSuffixLength } : {}),
+		};
+	};
+
+	const normalizeSuffixLengthInput = () => {
+		const parsed = parseSequenceDigitsInput(suffixLengthInput);
+		const normalized = Math.min(10, Math.max(1, parsed ?? draft.suffix_length));
+		setSuffixLengthInput(String(normalized));
+		updateDraft('suffix_length', normalized);
 	};
 
 	const handleSave = () => {
-		updateConfiguration.mutate(draft, {
+		const configForSave = buildConfigForSave();
+		const validationErrorKey = getInvoiceConfigValidationErrorKey(configForSave);
+
+		if (validationErrorKey) {
+			toast.error(t(`billing.invoiceConfiguration.validation.${validationErrorKey}`));
+			return;
+		}
+
+		const normalized = normalizeInvoiceConfig(configForSave);
+		setDraft(normalized);
+		setSuffixLengthInput(String(normalized.suffix_length));
+
+		updateConfiguration.mutate(normalized, {
 			onSuccess: () => toast.success(t('billing.invoiceConfiguration.saveSuccess')),
 			onError: () => toast.error(t('billing.invoiceConfiguration.saveError')),
 		});
@@ -51,7 +90,15 @@ const InvoiceConfigurationSection = () => {
 						<p className='text-xs font-medium uppercase tracking-wide text-zinc-400'>{t('billing.invoiceConfiguration.previewLabel')}</p>
 						<div className='mt-3 flex items-center justify-between gap-4'>
 							<span className='font-mono text-xl font-medium text-gray-800'>{preview}</span>
-							<span className='shrink-0 text-sm font-medium text-gray-600'>{t('billing.invoiceConfiguration.nextInvoiceNumber')}</span>
+							<Button
+								type='button'
+								variant='outline'
+								size='sm'
+								className='shrink-0'
+								onClick={() => updateDraft('start_sequence', draft.start_sequence + 1)}
+								disabled={updateConfiguration.isPending}>
+								{t('billing.invoiceConfiguration.nextInvoiceNumber')}
+							</Button>
 						</div>
 					</div>
 
@@ -96,10 +143,13 @@ const InvoiceConfigurationSection = () => {
 						/>
 						<Input
 							label={t('billing.invoiceConfiguration.fields.sequenceDigits')}
-							type='number'
-							value={String(draft.suffix_length)}
-							variant='number'
-							onChange={(value) => updateDraft('suffix_length', Number(value || 1))}
+							min={1}
+							max={10}
+							inputMode='numeric'
+							value={suffixLengthInput}
+							variant='integer'
+							onChange={setSuffixLengthInput}
+							onBlur={normalizeSuffixLengthInput}
 							description={t('billing.invoiceConfiguration.hints.sequenceDigits')}
 							disabled={updateConfiguration.isPending}
 						/>
@@ -114,7 +164,12 @@ const InvoiceConfigurationSection = () => {
 						/>
 					</div>
 
-					<SettingsFormActions onReset={handleReset} onSave={handleSave} isSaving={updateConfiguration.isPending} disabled={isLoading} />
+					<SettingsFormActions
+						onReset={handleReset}
+						onSave={handleSave}
+						isSaving={updateConfiguration.isPending || resetToDefaults.isPending}
+						disabled={isLoading}
+					/>
 				</>
 			)}
 		</Card>

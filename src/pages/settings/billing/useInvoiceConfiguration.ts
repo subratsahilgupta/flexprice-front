@@ -5,12 +5,8 @@ import { SETTINGS_KEYS } from '../constants';
 import { settingsQueryKeys } from '../queryKeys';
 
 async function fetchInvoiceConfiguration(): Promise<InvoiceConfig> {
-	try {
-		const setting = await SettingsApi.getSettingByKey(SETTINGS_KEYS.INVOICE_CONFIG);
-		return parseInvoiceConfig(setting.value);
-	} catch {
-		return FALLBACK_INVOICE_CONFIG;
-	}
+	const setting = await SettingsApi.getSettingByKey(SETTINGS_KEYS.INVOICE_CONFIG);
+	return parseInvoiceConfig(setting.value);
 }
 
 export function useInvoiceConfiguration() {
@@ -24,8 +20,18 @@ export function useInvoiceConfiguration() {
 	const updateConfiguration = useMutation({
 		mutationFn: async (configuration: InvoiceConfig) => {
 			const payload = serializeInvoiceConfig(configuration);
-			await SettingsApi.updateSettingByKey(SETTINGS_KEYS.INVOICE_CONFIG, { value: payload });
-			return payload;
+			const setting = await SettingsApi.updateSettingByKey(SETTINGS_KEYS.INVOICE_CONFIG, { value: payload });
+			return parseInvoiceConfig(setting.value);
+		},
+		onSuccess: (configuration) => {
+			queryClient.setQueryData(settingsQueryKeys.invoiceConfig, configuration);
+		},
+	});
+
+	const resetToDefaults = useMutation({
+		mutationFn: async () => {
+			const setting = await SettingsApi.resetSettingToDefaults(SETTINGS_KEYS.INVOICE_CONFIG);
+			return parseInvoiceConfig(setting.value);
 		},
 		onSuccess: (configuration) => {
 			queryClient.setQueryData(settingsQueryKeys.invoiceConfig, configuration);
@@ -41,5 +47,6 @@ export function useInvoiceConfiguration() {
 		isError: query.isError,
 		refetch: query.refetch,
 		updateConfiguration,
+		resetToDefaults,
 	};
 }
