@@ -904,7 +904,7 @@ const AggregationSection = ({
 						onChange={handleAggregationExpressionChange}
 						label={t('catalog:features.form.customExpression')}
 						placeholder={t('catalog:features.form.customExpressionPh')}
-						description={t('catalog:features.form.customExpressionHelp')}
+						description={<span className='whitespace-pre-line'>{t('catalog:features.form.customExpressionHelp')}</span>}
 						error={meterErrors.aggregation_expression}
 					/>
 				)}
@@ -1047,7 +1047,11 @@ const AddFeaturePage = () => {
 							event_name: featureData.meter.event_name || '',
 							aggregation: {
 								type: featureData.meter.aggregation?.type || METER_AGGREGATION_TYPE.SUM,
-								field: featureData.meter.aggregation?.field || '',
+								// XOR with field — the toggle handler clears the inactive side,
+								// so at most one of these is populated at submit time.
+								...(featureData.meter.aggregation?.expression?.trim()
+									? { expression: featureData.meter.aggregation.expression.trim() }
+									: { field: featureData.meter.aggregation?.field || '' }),
 								multiplier: featureData.meter.aggregation?.multiplier,
 								bucket_size: aggregationSupportsBucketSize(featureData.meter.aggregation?.type)
 									? featureData.meter.aggregation?.bucket_size
