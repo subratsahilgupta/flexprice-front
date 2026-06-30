@@ -315,8 +315,9 @@ const SubscriptionEntitlementsSection: FC<SubscriptionEntitlementsSectionProps> 
 			if (!compact) return <span className='text-muted-foreground'>{tc('labels.na')}</span>;
 			return (
 				<button
-					className='font-mono text-xs text-muted-foreground line-clamp-3 max-w-xs text-left hover:text-foreground transition-colors'
-					title={compact}
+					type='button'
+					className='font-mono text-xs text-left text-muted-foreground rounded border border-transparent transition-all hover:border-border hover:shadow-sm hover:text-foreground max-w-md'
+					style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', wordBreak: 'break-all' }}
 					onClick={() => setConfigSheet({ open: true, name: row.feature?.name ?? '', value: cv ?? null })}>
 					{compact}
 				</button>
