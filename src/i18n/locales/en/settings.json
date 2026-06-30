@@ -40,9 +40,18 @@
 			"pending": "Pending"
 		},
 		"joinedPending": "Pending",
+		"addMember": {
+			"title": "Add member",
+			"description": "Invite a new team member by email.",
+			"emailLabel": "Email",
+			"emailPlaceholder": "user@example.com",
+			"addUser": "Add user"
+		},
 		"addUser": {
 			"title": "Add user",
 			"description": "Add a new user and generate login credentials.",
+			"nameLabel": "Name",
+			"namePlaceholder": "Jane Doe",
 			"emailLabel": "Email",
 			"emailPlaceholder": "user@example.com",
 			"submit": "Add user"
@@ -50,6 +59,8 @@
 		"invite": {
 			"title": "Invite user",
 			"description": "Invite a user by email and generate login credentials to share.",
+			"nameLabel": "Name",
+			"namePlaceholder": "Jane Doe",
 			"submit": "Invite user"
 		},
 		"credentials": {
@@ -95,6 +106,15 @@
 			"nextInvoiceNumber": "Next invoice number",
 			"saveSuccess": "Invoice configuration saved",
 			"saveError": "Failed to save invoice configuration",
+			"resetSuccess": "Invoice configuration reset to defaults",
+			"resetError": "Failed to reset invoice configuration",
+			"validation": {
+				"prefixRequired": "Prefix is required",
+				"timezoneRequired": "Timezone is required",
+				"invalidSequenceDigits": "Sequence digits must be a whole number",
+				"sequenceDigitsMin": "Sequence digits must be at least 1",
+				"sequenceDigitsMax": "Sequence digits cannot exceed 10"
+			},
 			"fields": {
 				"prefix": "Prefix",
 				"separator": "Separator",
@@ -182,6 +202,8 @@
 			"thresholdValue": "Threshold Value ({{currency}})",
 			"condition": "Condition",
 			"remove": "Remove",
+			"add": "Add",
+			"amountPlaceholder": "0.00",
 			"saveChanges": "Save changes",
 			"saveSuccess": "Wallet alert settings saved",
 			"saveError": "Failed to save wallet alert settings",
@@ -198,6 +220,19 @@
 			"conditions": {
 				"below": "Below",
 				"above": "Above"
+			},
+			"validation": {
+				"atLeastOneThreshold": "Please configure at least one threshold level when alerts are enabled",
+				"invalidCriticalThreshold": "Please enter a valid critical threshold value",
+				"invalidWarningThreshold": "Please enter a valid warning threshold value",
+				"invalidInfoThreshold": "Please enter a valid info threshold value",
+				"criticalRequiredForWarning": "A critical threshold is required when a warning threshold is set",
+				"warningMustBeLessThanCritical": "For \"Above\" alerts, the warning threshold must be less than the critical threshold",
+				"warningMustBeGreaterThanCritical": "For \"Below\" alerts, the warning threshold must be greater than the critical threshold",
+				"infoMustBeLessThanWarning": "For \"Above\" alerts, the info threshold must be less than the warning threshold",
+				"infoMustBeGreaterThanWarning": "For \"Below\" alerts, the info threshold must be greater than the warning threshold",
+				"infoMustBeLessThanCritical": "For \"Above\" alerts, the info threshold must be less than the critical threshold",
+				"infoMustBeGreaterThanCritical": "For \"Below\" alerts, the info threshold must be greater than the critical threshold"
 			}
 		}
 	},

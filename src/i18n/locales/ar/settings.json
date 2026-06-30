@@ -40,9 +40,18 @@
 			"pending": "قيد الانتظار"
 		},
 		"joinedPending": "قيد الانتظار",
+		"addMember": {
+			"title": "إضافة عضو",
+			"description": "ادعُ عضو فريق جديداً عبر البريد الإلكتروني.",
+			"emailLabel": "البريد الإلكتروني",
+			"emailPlaceholder": "user@example.com",
+			"addUser": "إضافة مستخدم"
+		},
 		"addUser": {
 			"title": "إضافة مستخدم",
 			"description": "أضف مستخدماً جديداً وأنشئ بيانات تسجيل الدخول.",
+			"nameLabel": "الاسم",
+			"namePlaceholder": "محمد أحمد",
 			"emailLabel": "البريد الإلكتروني",
 			"emailPlaceholder": "user@example.com",
 			"submit": "إضافة مستخدم"
@@ -50,6 +59,8 @@
 		"invite": {
 			"title": "دعوة مستخدم",
 			"description": "ادعُ مستخدماً عبر البريد الإلكتروني وأنشئ بيانات تسجيل الدخول للمشاركة.",
+			"nameLabel": "الاسم",
+			"namePlaceholder": "محمد أحمد",
 			"submit": "دعوة مستخدم"
 		},
 		"credentials": {
@@ -95,6 +106,15 @@
 			"nextInvoiceNumber": "رقم الفاتورة التالي",
 			"saveSuccess": "تم حفظ إعداد الفواتير",
 			"saveError": "فشل حفظ إعداد الفواتير",
+			"resetSuccess": "تمت إعادة إعداد الفواتير إلى القيم الافتراضية",
+			"resetError": "فشلت إعادة إعداد الفواتير إلى القيم الافتراضية",
+			"validation": {
+				"prefixRequired": "البادئة مطلوبة",
+				"timezoneRequired": "المنطقة الزمنية مطلوبة",
+				"invalidSequenceDigits": "يجب أن تكون أرقام التسلسل عدداً صحيحاً",
+				"sequenceDigitsMin": "يجب أن تكون أرقام التسلسل 1 على الأقل",
+				"sequenceDigitsMax": "لا يمكن أن تتجاوز أرقام التسلسل 10"
+			},
 			"fields": {
 				"prefix": "البادئة",
 				"separator": "الفاصل",
@@ -182,6 +202,8 @@
 			"thresholdValue": "قيمة العتبة ({{currency}})",
 			"condition": "الشرط",
 			"remove": "إزالة",
+			"add": "إضافة",
+			"amountPlaceholder": "0.00",
 			"saveChanges": "حفظ التغييرات",
 			"saveSuccess": "تم حفظ إعدادات تنبيه المحفظة",
 			"saveError": "فشل حفظ إعدادات تنبيه المحفظة",
@@ -198,6 +220,19 @@
 			"conditions": {
 				"below": "أقل من",
 				"above": "أكبر من"
+			},
+			"validation": {
+				"atLeastOneThreshold": "يرجى تكوين مستوى عتبة واحد على الأقل عند تفعيل التنبيهات",
+				"invalidCriticalThreshold": "يرجى إدخال قيمة عتبة حرجة صالحة",
+				"invalidWarningThreshold": "يرجى إدخال قيمة عتبة تحذير صالحة",
+				"invalidInfoThreshold": "يرجى إدخال قيمة عتبة معلومات صالحة",
+				"criticalRequiredForWarning": "عتبة حرجة مطلوبة عند تعيين عتبة تحذير",
+				"warningMustBeLessThanCritical": "لتنبيهات \"أكبر من\"، يجب أن تكون عتبة التحذير أقل من العتبة الحرجة",
+				"warningMustBeGreaterThanCritical": "لتنبيهات \"أقل من\"، يجب أن تكون عتبة التحذير أكبر من العتبة الحرجة",
+				"infoMustBeLessThanWarning": "لتنبيهات \"أكبر من\"، يجب أن تكون عتبة المعلومات أقل من عتبة التحذير",
+				"infoMustBeGreaterThanWarning": "لتنبيهات \"أقل من\"، يجب أن تكون عتبة المعلومات أكبر من عتبة التحذير",
+				"infoMustBeLessThanCritical": "لتنبيهات \"أكبر من\"، يجب أن تكون عتبة المعلومات أقل من العتبة الحرجة",
+				"infoMustBeGreaterThanCritical": "لتنبيهات \"أقل من\"، يجب أن تكون عتبة المعلومات أكبر من العتبة الحرجة"
 			}
 		}
 	},
