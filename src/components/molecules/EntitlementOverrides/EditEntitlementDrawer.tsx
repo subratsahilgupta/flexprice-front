@@ -5,6 +5,7 @@ import { FEATURE_TYPE } from '@/models';
 import { EntitlementOverrideRequest } from '@/types/dto/Subscription';
 import { JsonEditor } from '@/components/molecules/JsonEditor';
 import { JsonObject } from '@/types/common';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
 interface EditEntitlementDrawerProps {
@@ -58,9 +59,11 @@ const EditEntitlementDrawer: FC<EditEntitlementDrawerProps> = ({ isOpen, onOpenC
 			override.is_enabled = isEnabled;
 		} else if (entitlement.feature_type === FEATURE_TYPE.CONFIG) {
 			override.is_enabled = isEnabled;
-			if (configValue) {
-				override.config_value = configValue;
+			if (!configValue) {
+				toast.error(t('entitlements.addDrawer.configValueRequired'));
+				return;
 			}
+			override.config_value = configValue;
 		}
 
 		onSave(override);
