@@ -136,10 +136,16 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 			[enforceEnglishOnly],
 		);
 
+		const supportsSelectionRange = (element: HTMLInputElement) =>
+			typeof element.setSelectionRange === 'function' &&
+			!['number', 'date', 'time', 'month', 'week', 'datetime-local', 'range', 'color'].includes(element.type);
+
 		// Handle cursor position after formatting
 		React.useEffect(() => {
 			if (cursorPosition !== null && inputRef.current) {
-				inputRef.current.setSelectionRange(cursorPosition, cursorPosition);
+				if (supportsSelectionRange(inputRef.current)) {
+					inputRef.current.setSelectionRange(cursorPosition, cursorPosition);
+				}
 				setCursorPosition(null);
 			}
 		}, [cursorPosition]);
