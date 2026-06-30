@@ -5,30 +5,63 @@
 	},
 	"members": {
 		"roleAdmin": "مسؤول",
+		"roleMember": "عضو",
 		"errors": {
 			"userLimitReached": "تم بلوغ حد المستخدمين لهذه المنظمة.",
 			"userAlreadyExists": "يوجد مستخدم بهذا البريد الإلكتروني مسبقاً!",
 			"failedToAddUser": "فشل إضافة المستخدم",
-			"failedToLoadMembers": "فشل تحميل الأعضاء",
+			"failedToLoadUsers": "فشل تحميل المستخدمين",
 			"enterEmail": "أدخل عنوان بريد إلكتروني",
 			"emailInvalid": "يرجى إدخال بريد إلكتروني صالح",
 			"copyFailed": "تعذّر النسخ إلى الحافظة",
 			"loginLinkCopied": "تم نسخ رابط تسجيل الدخول – شاركه مع المستخدم بشكل آمن.",
 			"credentialsCopied": "تم نسخ بيانات الدخول إلى الحافظة.",
 			"credentialsDownloaded": "تم تنزيل بيانات الدخول.",
-			"loadError": "فشل تحميل الأعضاء. يُرجى المحاولة مرة أخرى."
+			"loadError": "فشل تحميل المستخدمين. يُرجى المحاولة مرة أخرى."
 		},
 		"columns": {
 			"email": "البريد الإلكتروني",
-			"role": "الدور"
+			"role": "الدور",
+			"joined": "تاريخ الانضمام"
 		},
-		"cardTitle": "الأعضاء",
+		"cardTitle": "المستخدمون",
+		"usersCount": "{{count}} مستخدمين",
+		"actions": {
+			"add": "إضافة",
+			"invite": "دعوة",
+			"remove": "إزالة"
+		},
+		"filters": {
+			"title": "تصفية المستخدمين",
+			"role": "الدور",
+			"status": "الحالة",
+			"all": "الكل",
+			"joined": "منضم",
+			"pending": "قيد الانتظار"
+		},
+		"joinedPending": "قيد الانتظار",
 		"addMember": {
 			"title": "إضافة عضو",
 			"description": "ادعُ عضو فريق جديداً عبر البريد الإلكتروني.",
 			"emailLabel": "البريد الإلكتروني",
 			"emailPlaceholder": "user@example.com",
 			"addUser": "إضافة مستخدم"
+		},
+		"addUser": {
+			"title": "إضافة مستخدم",
+			"description": "أضف مستخدماً جديداً وأنشئ بيانات تسجيل الدخول.",
+			"nameLabel": "الاسم",
+			"namePlaceholder": "محمد أحمد",
+			"emailLabel": "البريد الإلكتروني",
+			"emailPlaceholder": "user@example.com",
+			"submit": "إضافة مستخدم"
+		},
+		"invite": {
+			"title": "دعوة مستخدم",
+			"description": "ادعُ مستخدماً عبر البريد الإلكتروني وأنشئ بيانات تسجيل الدخول للمشاركة.",
+			"nameLabel": "الاسم",
+			"namePlaceholder": "محمد أحمد",
+			"submit": "دعوة مستخدم"
 		},
 		"credentials": {
 			"title": "بيانات تسجيل الدخول",
@@ -53,7 +86,155 @@
 		"tabs": {
 			"team": "الفريق"
 		},
-		"unitMembers": "أعضاء"
+		"unitUsers": "مستخدمين"
+	},
+	"organization": {
+		"title": "المنظمة",
+		"workspaceOwner": "مالك مساحة العمل",
+		"editOrganization": "تعديل المنظمة"
+	},
+	"billing": {
+		"tabs": {
+			"billing": "الفوترة"
+		},
+		"actions": {
+			"resetToDefaults": "إعادة التعيين إلى الافتراضي"
+		},
+		"invoiceConfiguration": {
+			"title": "إعداد الفواتير",
+			"previewLabel": "معاينة",
+			"nextInvoiceNumber": "رقم الفاتورة التالي",
+			"saveSuccess": "تم حفظ إعداد الفواتير",
+			"saveError": "فشل حفظ إعداد الفواتير",
+			"resetSuccess": "تمت إعادة إعداد الفواتير إلى القيم الافتراضية",
+			"resetError": "فشلت إعادة إعداد الفواتير إلى القيم الافتراضية",
+			"validation": {
+				"prefixRequired": "البادئة مطلوبة",
+				"timezoneRequired": "المنطقة الزمنية مطلوبة",
+				"invalidSequenceDigits": "يجب أن تكون أرقام التسلسل عدداً صحيحاً",
+				"sequenceDigitsMin": "يجب أن تكون أرقام التسلسل 1 على الأقل",
+				"sequenceDigitsMax": "لا يمكن أن تتجاوز أرقام التسلسل 10"
+			},
+			"fields": {
+				"prefix": "البادئة",
+				"separator": "الفاصل",
+				"dateFormat": "تنسيق التاريخ",
+				"timezone": "المنطقة الزمنية",
+				"startSequence": "بداية التسلسل",
+				"sequenceDigits": "أرقام التسلسل",
+				"paymentDueDays": "استحقاق الدفع (أيام بعد الإصدار)"
+			},
+			"hints": {
+				"prefix": "نص غير فارغ. مثال: INV، ACME، FP",
+				"separator": "حرف بين البادئة والتاريخ والتسلسل. اتركه فارغاً لعدم وجود فاصل.",
+				"timezone": "يُنصح باسم منطقة IANA (مثل Asia/Kolkata)",
+				"dateFormat": "أحد الخيارات: YYYYMM أو YYYY أو YYYYMMDD أو YYMMDD أو YY. يُستخدم في جزء التاريخ من رقم الفاتورة.",
+				"startSequence": "عدد صحيح ≥ 0. رقم البداية للتسلسل.",
+				"sequenceDigits": "1–10 أرقام مع حشو بالأصفار. مثال: 5 → 00001",
+				"paymentDueDays": "عدد صحيح ≥ 0. أيام بعد إنشاء الفاتورة لتحديد تاريخ الاستحقاق. الافتراضي: 1."
+			},
+			"dateFormats": {
+				"YYYYMM": "YYYYMM — 202506",
+				"YYYY": "YYYY — 2025",
+				"YYYYMMDD": "YYYYMMDD — 20250629",
+				"YYMMDD": "YYMMDD — 250629",
+				"YY": "YY — 25"
+			}
+		},
+		"subscriptionConfiguration": {
+			"title": "إعداد الاشتراكات",
+			"previewLabel": "معاينة الإعداد",
+			"saveSuccess": "تم حفظ إعداد الاشتراكات",
+			"saveError": "فشل حفظ إعداد الاشتراكات",
+			"preview": {
+				"triggerColumn": "المحفز",
+				"gracePeriodColumn": "فترة السماح",
+				"actionColumn": "الإجراء",
+				"triggerValue": "فاتورة غير مدفوعة بعد تاريخ الاستحقاق",
+				"gracePeriodValue": "{{count}} أيام",
+				"actionEnabled": "إلغاء الاشتراك",
+				"actionDisabled": "غير مفعّل"
+			},
+			"fields": {
+				"autoCancellation": "تفعيل الإلغاء التلقائي",
+				"gracePeriodDays": "فترة السماح",
+				"gracePeriodSuffix": "أيام بعد تاريخ الاستحقاق"
+			},
+			"hints": {
+				"autoCancellation": "إلغاء الاشتراكات المتأخرة تلقائياً",
+				"disabledState": "عند التفعيل، تُلغى الاشتراكات تلقائياً بعد فترة السماح.",
+				"gracePeriodDays": "الحد الأدنى يوم واحد. الافتراضي 3."
+			},
+			"infoCallout": {
+				"title": "ماذا يحدث عند التفعيل",
+				"description1": "يُلغى الاشتراك فوراً — وليس في نهاية الفترة",
+				"description2": "يُرسل webhook من نوع subscription.cancelled لمزامنة الأنظمة الأخرى",
+				"description3": "تُلغى منح الائتمان المستقبلية، وتُنشأ فاتورة نهائية للفترة الجزئية"
+			}
+		}
+	},
+	"customerPortal": {
+		"tabs": {
+			"customerPortal": "بوابة العملاء"
+		},
+		"portal": {
+			"title": "البوابة",
+			"description": "تحكم في الأقسام والتبويبات المرئية للعملاء في بوابة الخدمة الذاتية.",
+			"showInvoices": "إظهار الفواتير",
+			"showInvoicesDescription": "يمكن للعملاء عرض وتنزيل فواتيرهم",
+			"showWalletBalance": "إظهار رصيد المحفظة",
+			"showWalletBalanceDescription": "يمكن للعملاء رؤية رصيد الائتمان وسجل المعاملات",
+			"showUsage": "إظهار الاستخدام",
+			"showUsageDescription": "يمكن للعملاء عرض بيانات الاستخدام المقاسة لاشتراكهم",
+			"showSubscriptions": "إظهار الاشتراكات",
+			"showSubscriptionsDescription": "يمكن للعملاء عرض تفاصيل اشتراكهم النشط",
+			"saveSuccess": "تم حفظ إعدادات البوابة",
+			"saveError": "فشل حفظ إعدادات البوابة"
+		}
+	},
+	"alerts": {
+		"tabs": {
+			"alerts": "التنبيهات"
+		},
+		"walletAlerts": {
+			"title": "إعدادات تنبيه المحفظة",
+			"description": "راقب رصيد المحفظة مقابل العتبات المُعدّة",
+			"thresholdValue": "قيمة العتبة ({{currency}})",
+			"condition": "الشرط",
+			"remove": "إزالة",
+			"add": "إضافة",
+			"amountPlaceholder": "0.00",
+			"saveChanges": "حفظ التغييرات",
+			"saveSuccess": "تم حفظ إعدادات تنبيه المحفظة",
+			"saveError": "فشل حفظ إعدادات تنبيه المحفظة",
+			"levels": {
+				"critical": "حرج",
+				"warning": "تحذير",
+				"info": "معلومات"
+			},
+			"levelDescriptions": {
+				"critical": "تنبيه عند المستوى الحرج",
+				"warning": "تنبيه عند مستوى التحذير",
+				"info": "تنبيه عند مستوى المعلومات"
+			},
+			"conditions": {
+				"below": "أقل من",
+				"above": "أكبر من"
+			},
+			"validation": {
+				"atLeastOneThreshold": "يرجى تكوين مستوى عتبة واحد على الأقل عند تفعيل التنبيهات",
+				"invalidCriticalThreshold": "يرجى إدخال قيمة عتبة حرجة صالحة",
+				"invalidWarningThreshold": "يرجى إدخال قيمة عتبة تحذير صالحة",
+				"invalidInfoThreshold": "يرجى إدخال قيمة عتبة معلومات صالحة",
+				"criticalRequiredForWarning": "عتبة حرجة مطلوبة عند تعيين عتبة تحذير",
+				"warningMustBeLessThanCritical": "لتنبيهات \"أكبر من\"، يجب أن تكون عتبة التحذير أقل من العتبة الحرجة",
+				"warningMustBeGreaterThanCritical": "لتنبيهات \"أقل من\"، يجب أن تكون عتبة التحذير أكبر من العتبة الحرجة",
+				"infoMustBeLessThanWarning": "لتنبيهات \"أكبر من\"، يجب أن تكون عتبة المعلومات أقل من عتبة التحذير",
+				"infoMustBeGreaterThanWarning": "لتنبيهات \"أقل من\"، يجب أن تكون عتبة المعلومات أكبر من عتبة التحذير",
+				"infoMustBeLessThanCritical": "لتنبيهات \"أكبر من\"، يجب أن تكون عتبة المعلومات أقل من العتبة الحرجة",
+				"infoMustBeGreaterThanCritical": "لتنبيهات \"أقل من\"، يجب أن تكون عتبة المعلومات أكبر من العتبة الحرجة"
+			}
+		}
 	},
 	"billingPage": {
 		"errorFetchBilling": "خطأ في جلب تفاصيل الفوترة",

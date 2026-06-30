@@ -5,30 +5,63 @@
 	},
 	"members": {
 		"roleAdmin": "Admin",
+		"roleMember": "Member",
 		"errors": {
 			"userLimitReached": "User limit reached for this organization.",
 			"userAlreadyExists": "A user with this email already exists!",
 			"failedToAddUser": "Failed to add user",
-			"failedToLoadMembers": "Failed to load members",
+			"failedToLoadUsers": "Failed to load users",
 			"enterEmail": "Enter an email address",
 			"emailInvalid": "Please enter a valid email address",
 			"copyFailed": "Could not copy to clipboard",
 			"loginLinkCopied": "Login link copied – share it securely with the user.",
 			"credentialsCopied": "Credentials copied to clipboard.",
 			"credentialsDownloaded": "Credentials downloaded.",
-			"loadError": "Failed to load members. Please try again."
+			"loadError": "Failed to load users. Please try again."
 		},
 		"columns": {
 			"email": "Email",
-			"role": "Role"
+			"role": "Role",
+			"joined": "Joined"
 		},
-		"cardTitle": "Members",
+		"cardTitle": "Users",
+		"usersCount": "{{count}} users",
+		"actions": {
+			"add": "Add",
+			"invite": "Invite",
+			"remove": "Remove"
+		},
+		"filters": {
+			"title": "Filter users",
+			"role": "Role",
+			"status": "Status",
+			"all": "All",
+			"joined": "Joined",
+			"pending": "Pending"
+		},
+		"joinedPending": "Pending",
 		"addMember": {
 			"title": "Add member",
 			"description": "Invite a new team member by email.",
 			"emailLabel": "Email",
 			"emailPlaceholder": "user@example.com",
 			"addUser": "Add user"
+		},
+		"addUser": {
+			"title": "Add user",
+			"description": "Add a new user and generate login credentials.",
+			"nameLabel": "Name",
+			"namePlaceholder": "Jane Doe",
+			"emailLabel": "Email",
+			"emailPlaceholder": "user@example.com",
+			"submit": "Add user"
+		},
+		"invite": {
+			"title": "Invite user",
+			"description": "Invite a user by email and generate login credentials to share.",
+			"nameLabel": "Name",
+			"namePlaceholder": "Jane Doe",
+			"submit": "Invite user"
 		},
 		"credentials": {
 			"title": "Login Credentials",
@@ -53,7 +86,155 @@
 		"tabs": {
 			"team": "Team"
 		},
-		"unitMembers": "members"
+		"unitUsers": "users"
+	},
+	"organization": {
+		"title": "Organization",
+		"workspaceOwner": "Workspace owner",
+		"editOrganization": "Edit organization"
+	},
+	"billing": {
+		"tabs": {
+			"billing": "Billing"
+		},
+		"actions": {
+			"resetToDefaults": "Reset to defaults"
+		},
+		"invoiceConfiguration": {
+			"title": "Invoice configuration",
+			"previewLabel": "Preview",
+			"nextInvoiceNumber": "Next invoice number",
+			"saveSuccess": "Invoice configuration saved",
+			"saveError": "Failed to save invoice configuration",
+			"resetSuccess": "Invoice configuration reset to defaults",
+			"resetError": "Failed to reset invoice configuration",
+			"validation": {
+				"prefixRequired": "Prefix is required",
+				"timezoneRequired": "Timezone is required",
+				"invalidSequenceDigits": "Sequence digits must be a whole number",
+				"sequenceDigitsMin": "Sequence digits must be at least 1",
+				"sequenceDigitsMax": "Sequence digits cannot exceed 10"
+			},
+			"fields": {
+				"prefix": "Prefix",
+				"separator": "Separator",
+				"dateFormat": "Date format",
+				"timezone": "Timezone",
+				"startSequence": "Start sequence",
+				"sequenceDigits": "Sequence digits",
+				"paymentDueDays": "Payment due (days after issue)"
+			},
+			"hints": {
+				"prefix": "Non-empty string. E.g. INV, ACME, FP",
+				"separator": "Character between prefix, date, and sequence. Leave empty for no separator.",
+				"timezone": "IANA timezone name recommended (e.g. Asia/Kolkata)",
+				"dateFormat": "One of YYYYMM, YYYY, YYYYMMDD, YYMMDD, or YY. Used in the invoice number date segment.",
+				"startSequence": "Integer ≥ 0. Starting number for the sequence.",
+				"sequenceDigits": "1–10 digits, zero-padded. E.g. 5 → 00001",
+				"paymentDueDays": "Integer ≥ 0. Days after invoice creation to set due date. Default: 1."
+			},
+			"dateFormats": {
+				"YYYYMM": "YYYYMM — 202506",
+				"YYYY": "YYYY — 2025",
+				"YYYYMMDD": "YYYYMMDD — 20250629",
+				"YYMMDD": "YYMMDD — 250629",
+				"YY": "YY — 25"
+			}
+		},
+		"subscriptionConfiguration": {
+			"title": "Subscription configuration",
+			"previewLabel": "Configuration preview",
+			"saveSuccess": "Subscription configuration saved",
+			"saveError": "Failed to save subscription configuration",
+			"preview": {
+				"triggerColumn": "Trigger",
+				"gracePeriodColumn": "Grace period",
+				"actionColumn": "Action",
+				"triggerValue": "Invoice unpaid past due date",
+				"gracePeriodValue": "{{count}} days",
+				"actionEnabled": "Cancel subscription",
+				"actionDisabled": "Not enabled"
+			},
+			"fields": {
+				"autoCancellation": "Enable auto-cancellation",
+				"gracePeriodDays": "Grace period",
+				"gracePeriodSuffix": "days after due date"
+			},
+			"hints": {
+				"autoCancellation": "Cancel overdue subscriptions automatically",
+				"disabledState": "When enabled, subscriptions are cancelled automatically after the grace period.",
+				"gracePeriodDays": "Minimum 1 day. Default is 3."
+			},
+			"infoCallout": {
+				"title": "What happens when this triggers",
+				"description1": "Subscription is cancelled immediately - not at period end",
+				"description2": "A subscription.cancelled webhook fires so downstream systems stay in sync",
+				"description3": "Future credit grants are cancelled, a final invoice is generated for the partial period"
+			}
+		}
+	},
+	"customerPortal": {
+		"tabs": {
+			"customerPortal": "Customer Portal"
+		},
+		"portal": {
+			"title": "Portal",
+			"description": "Control which sections and tabs are visible to customers in the self-service portal.",
+			"showInvoices": "Show invoices",
+			"showInvoicesDescription": "Customers can view and download their invoices",
+			"showWalletBalance": "Show wallet balance",
+			"showWalletBalanceDescription": "Customers can see their credit balance and transaction history",
+			"showUsage": "Show usage",
+			"showUsageDescription": "Customers can view metered usage data for their subscription",
+			"showSubscriptions": "Show subscriptions",
+			"showSubscriptionsDescription": "Customers can view their active subscription details",
+			"saveSuccess": "Portal settings saved",
+			"saveError": "Failed to save portal settings"
+		}
+	},
+	"alerts": {
+		"tabs": {
+			"alerts": "Alerts"
+		},
+		"walletAlerts": {
+			"title": "Wallet Alert Settings",
+			"description": "Monitor wallet balance against configured thresholds",
+			"thresholdValue": "Threshold Value ({{currency}})",
+			"condition": "Condition",
+			"remove": "Remove",
+			"add": "Add",
+			"amountPlaceholder": "0.00",
+			"saveChanges": "Save changes",
+			"saveSuccess": "Wallet alert settings saved",
+			"saveError": "Failed to save wallet alert settings",
+			"levels": {
+				"critical": "Critical",
+				"warning": "Warning",
+				"info": "Info"
+			},
+			"levelDescriptions": {
+				"critical": "Alert at critical level",
+				"warning": "Alert at warning level",
+				"info": "Alert at info level"
+			},
+			"conditions": {
+				"below": "Below",
+				"above": "Above"
+			},
+			"validation": {
+				"atLeastOneThreshold": "Please configure at least one threshold level when alerts are enabled",
+				"invalidCriticalThreshold": "Please enter a valid critical threshold value",
+				"invalidWarningThreshold": "Please enter a valid warning threshold value",
+				"invalidInfoThreshold": "Please enter a valid info threshold value",
+				"criticalRequiredForWarning": "A critical threshold is required when a warning threshold is set",
+				"warningMustBeLessThanCritical": "For \"Above\" alerts, the warning threshold must be less than the critical threshold",
+				"warningMustBeGreaterThanCritical": "For \"Below\" alerts, the warning threshold must be greater than the critical threshold",
+				"infoMustBeLessThanWarning": "For \"Above\" alerts, the info threshold must be less than the warning threshold",
+				"infoMustBeGreaterThanWarning": "For \"Below\" alerts, the info threshold must be greater than the warning threshold",
+				"infoMustBeLessThanCritical": "For \"Above\" alerts, the info threshold must be less than the critical threshold",
+				"infoMustBeGreaterThanCritical": "For \"Below\" alerts, the info threshold must be greater than the critical threshold"
+			}
+		}
 	},
 	"billingPage": {
 		"errorFetchBilling": "Error fetching billing details",

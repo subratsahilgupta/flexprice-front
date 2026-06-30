@@ -60,7 +60,7 @@ export { default as Page } from './Page';
 
 export { default as Card, CardHeader } from './Card';
 
-export { default as ShortPagination } from './ShortPagination';
+export { default as ShortPagination, ShortPaginationControls } from './ShortPagination';
 
 export { default as Progress } from './Progress';
 
