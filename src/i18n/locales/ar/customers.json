@@ -67,6 +67,7 @@
 			"state": "المحافظة",
 			"city": "المدينة",
 			"postalCode": "الرمز البريدي",
+			"timezone": "المنطقة الزمنية",
 			"subscriptionAmount": "مبلغ الاشتراك",
 			"subscriptionStartDate": "تاريخ بدء الاشتراك"
 		},
@@ -197,6 +198,7 @@
 			"static": "ثابت",
 			"metered": "مقياسي",
 			"boolean": "نعم/لا",
+			"config": "إعداد",
 			"dash": "—",
 			"usageProgressUnlimited": "{{usage}} / غير محدود"
 		},
@@ -235,6 +237,7 @@
 		"billingCycle": "دورة الفوترة",
 		"commitmentPeriod": "فترة الالتزام",
 		"paymentTerms": "شروط الدفع",
+		"timezone": "المنطقة الزمنية",
 		"invoicingCustomer": "عميل الفوترة",
 		"parentCustomer": "العميل الأصل",
 		"commitmentLabel": "الالتزام",

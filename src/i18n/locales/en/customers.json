@@ -67,6 +67,7 @@
 			"state": "State",
 			"city": "City",
 			"postalCode": "Postal Code",
+			"timezone": "Timezone",
 			"subscriptionAmount": "Subscription Amount",
 			"subscriptionStartDate": "Subscription Start Date"
 		},
@@ -197,6 +198,7 @@
 			"static": "Static",
 			"metered": "Metered",
 			"boolean": "Boolean",
+			"config": "Config",
 			"dash": "--",
 			"usageProgressUnlimited": "{{usage}} / Unlimited"
 		},
@@ -236,6 +238,7 @@
 		"billingCycle": "Billing cycle",
 		"commitmentPeriod": "Commitment Period",
 		"paymentTerms": "Payment terms",
+		"timezone": "Timezone",
 		"invoicingCustomer": "Invoicing Customer",
 		"parentCustomer": "Parent customer",
 		"commitmentLabel": "Commitment",

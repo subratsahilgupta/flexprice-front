@@ -106,7 +106,7 @@ const EditSubscriptionEntitlementDrawer: FC<EditSubscriptionEntitlementDrawerPro
 				return;
 			}
 			values.static_value = staticValue;
-		} else if (entitlement.feature_type === FEATURE_TYPE.BOOLEAN) {
+		} else if (entitlement.feature_type === FEATURE_TYPE.BOOLEAN || entitlement.feature_type === FEATURE_TYPE.CONFIG) {
 			values.is_enabled = isEnabled;
 		}
 
@@ -208,7 +208,7 @@ const EditSubscriptionEntitlementDrawer: FC<EditSubscriptionEntitlementDrawerPro
 					</div>
 				)}
 
-				{entitlement.feature_type === FEATURE_TYPE.BOOLEAN && (
+				{(entitlement.feature_type === FEATURE_TYPE.BOOLEAN || entitlement.feature_type === FEATURE_TYPE.CONFIG) && (
 					<div className='space-y-2'>
 						<Label label={t('entitlements.editDrawer.enabledLabel')} />
 						<div className='flex items-center gap-2'>

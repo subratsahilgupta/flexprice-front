@@ -367,8 +367,7 @@ export interface CreateSubscriptionRequest {
 	// Proration behavior
 	proration_behavior?: SUBSCRIPTION_PRORATION_BEHAVIOR;
 
-	// Customer timezone
-	customer_timezone?: string;
+	timezone?: string;
 
 	// Entitlement overrides
 	override_entitlements?: EntitlementOverrideRequest[];

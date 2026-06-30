@@ -370,6 +370,16 @@ const CustomerSubscriptionDetailsPage: FC = () => {
 				</div>
 				<Spacer className='!my-4' />
 
+				{subscriptionDetails?.timezone?.trim() && (
+					<>
+						<div className='w-full flex justify-between items-center'>
+							<p className='text-[#71717A] text-sm'>{t('subscriptionDetail.timezone')}</p>
+							<p className='text-[#09090B] text-sm'>{subscriptionDetails.timezone}</p>
+						</div>
+						<Spacer className='!my-4' />
+					</>
+				)}
+
 				{subscriptionDetails?.invoicing_customer_id && (
 					<>
 						<div className='w-full flex justify-between items-center'>

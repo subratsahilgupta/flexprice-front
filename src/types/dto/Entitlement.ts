@@ -60,6 +60,7 @@ export interface CreateEntitlementRequest {
 	usage_reset_period?: ENTITLEMENT_USAGE_RESET_PERIOD;
 	is_soft_limit?: boolean;
 	static_value?: string;
+	config_value?: Record<string, unknown>;
 	entity_type: ENTITLEMENT_ENTITY_TYPE;
 	entity_id: string;
 	/** When overriding a plan/addon entitlement, links to the parent entitlement to replace (not stack). */
@@ -77,6 +78,7 @@ export interface UpdateEntitlementRequest {
 	usage_reset_period?: ENTITLEMENT_USAGE_RESET_PERIOD;
 	is_soft_limit?: boolean;
 	static_value?: string;
+	config_value?: Record<string, unknown>;
 	entity_type?: ENTITLEMENT_ENTITY_TYPE;
 	entity_id?: string;
 }
