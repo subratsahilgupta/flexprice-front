@@ -160,6 +160,9 @@ const BUCKET_SIZE_OPTIONS: SelectOption[] = [
 	},
 ];
 
+const aggregationSupportsBucketSize = (type?: METER_AGGREGATION_TYPE): boolean =>
+	type === METER_AGGREGATION_TYPE.SUM || type === METER_AGGREGATION_TYPE.MAX;
+
 // Validation schemas
 const FEATURE_SCHEMA = z.object({
 	name: z.string().nonempty('Feature name is required'),
@@ -718,18 +721,19 @@ const AggregationSection = ({
 	const { t } = useTranslation(['catalog', 'common']);
 	const handleAggregationTypeChange = useCallback(
 		(type: string) => {
-			const newType = type as METER_AGGREGATION_TYPE;
-			const stillSupportsExpression = EXPRESSION_SUPPORTED_TYPES.includes(newType);
+			const nextType = type as METER_AGGREGATION_TYPE;
+			const supportsBucketSize = aggregationSupportsBucketSize(nextType);
+			if (!supportsBucketSize) {
+				onUpdateFormState({ showBucketSize: false });
+			}
 			onUpdateFeature({
 				meter: {
 					...meter,
 					aggregation: {
 						...meter?.aggregation,
-						type: newType,
+						type: nextType,
 						field: meter?.aggregation?.field ?? '',
-						// Drop expression when switching to a type that can't carry one
-						// (e.g. COUNT, COUNT_UNIQUE, SUM_WITH_MULTIPLIER, WEIGHTED_SUM).
-						expression: stillSupportsExpression ? meter?.aggregation?.expression : '',
+						...(supportsBucketSize ? {} : { bucket_size: undefined }),
 					},
 				},
 			});
@@ -737,7 +741,7 @@ const AggregationSection = ({
 				onUpdateFormState({ showCustomExpression: false });
 			}
 		},
-		[onUpdateFeature, onUpdateFormState, meter, formState.showCustomExpression],
+		[onUpdateFeature, onUpdateFormState, meter],
 	);
 
 	const handleAggregationFieldChange = useCallback(
@@ -836,6 +840,19 @@ const AggregationSection = ({
 		[onUpdateFeature, meter],
 	);
 
+	const handleClearBucketSize = useCallback(() => {
+		onUpdateFormState({ showBucketSize: false });
+		onUpdateFeature({
+			meter: {
+				...meter,
+				aggregation: {
+					...(meter?.aggregation ?? { type: METER_AGGREGATION_TYPE.SUM }),
+					bucket_size: undefined,
+				},
+			},
+		});
+	}, [onUpdateFeature, onUpdateFormState, meter]);
+
 	const handleGroupByChange = useCallback(
 		(value: string) => {
 			onUpdateFeature({
@@ -851,11 +868,9 @@ const AggregationSection = ({
 		[onUpdateFeature, meter],
 	);
 
-	const aggType = meter?.aggregation?.type;
-	const supportsExpression = aggType ? EXPRESSION_SUPPORTED_TYPES.includes(aggType) : false;
-	const showExpressionInput = supportsExpression && formState.showCustomExpression;
-	const showFieldInput = aggType !== METER_AGGREGATION_TYPE.COUNT && !showExpressionInput;
-	const showMultiplierInput = aggType === METER_AGGREGATION_TYPE.SUM_WITH_MULTIPLIER;
+	const showFieldInput = meter?.aggregation?.type !== METER_AGGREGATION_TYPE.COUNT;
+	const showMultiplierInput = meter?.aggregation?.type === METER_AGGREGATION_TYPE.SUM_WITH_MULTIPLIER;
+	const supportsBucketSize = aggregationSupportsBucketSize(meter?.aggregation?.type);
 
 	return (
 		<>
@@ -907,7 +922,7 @@ const AggregationSection = ({
 
 				<div className='flex flex-col gap-2'>
 					<div className='flex flex-wrap items-center gap-2'>
-						{!formState.showBucketSize ? (
+						{supportsBucketSize && !formState.showBucketSize ? (
 							<AddChargesButton
 								label={t('catalog:features.form.bucketSizeButton')}
 								onClick={() => onUpdateFormState({ showBucketSize: true })}
@@ -927,15 +942,25 @@ const AggregationSection = ({
 							/>
 						) : null}
 					</div>
-					{formState.showBucketSize ? (
-						<Select
-							options={BUCKET_SIZE_OPTIONS}
-							onChange={handleWindowSizeChange}
-							label={t('catalog:features.form.bucketSize')}
-							placeholder=''
-							description={t('catalog:features.form.bucketSizeHelp')}
-							value={meter?.aggregation?.bucket_size || undefined}
-						/>
+					{supportsBucketSize && formState.showBucketSize ? (
+						<div className='space-y-1'>
+							<div className='flex items-center justify-between gap-2'>
+								<label className='text-sm font-medium text-gray-700'>{t('catalog:features.form.bucketSize')}</label>
+								<button
+									type='button'
+									onClick={handleClearBucketSize}
+									className='text-sm text-gray-500 hover:text-gray-800 underline-offset-2 hover:underline'>
+									{t('common:form.remove')}
+								</button>
+							</div>
+							<Select
+								options={BUCKET_SIZE_OPTIONS}
+								onChange={handleWindowSizeChange}
+								placeholder=''
+								description={t('catalog:features.form.bucketSizeHelp')}
+								value={meter?.aggregation?.bucket_size || undefined}
+							/>
+						</div>
 					) : null}
 					{meter?.aggregation?.type === METER_AGGREGATION_TYPE.MAX && formState.showGroupBy ? (
 						<Input
@@ -1024,7 +1049,9 @@ const AddFeaturePage = () => {
 								type: featureData.meter.aggregation?.type || METER_AGGREGATION_TYPE.SUM,
 								field: featureData.meter.aggregation?.field || '',
 								multiplier: featureData.meter.aggregation?.multiplier,
-								bucket_size: featureData.meter.aggregation?.bucket_size,
+								bucket_size: aggregationSupportsBucketSize(featureData.meter.aggregation?.type)
+									? featureData.meter.aggregation?.bucket_size
+									: undefined,
 								group_by: featureData.meter.aggregation?.group_by,
 							},
 							reset_usage: featureData.meter.reset_usage || METER_USAGE_RESET_PERIOD.BILLING_PERIOD,
