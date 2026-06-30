@@ -28,6 +28,7 @@ import {
 import JsonCodeBlock from '@/components/molecules/Events/JsonCodeBlock';
 import { API_DOCS_TAGS } from '@/constants/apiDocsTags';
 import { FilterOperator, DataType } from '@/types/common/QueryBuilder';
+import { JsonObject } from '@/types/common';
 import { FeatureAlertDialog } from '@/components/molecules/FeatureAlertDialog';
 
 // Models and types
@@ -106,7 +107,7 @@ const FeatureDetails = () => {
 	const { updateBreadcrumb } = useBreadcrumbsStore();
 	const [showAlertDialog, setShowAlertDialog] = useState(false);
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-	const [configSheet, setConfigSheet] = useState<{ open: boolean; name: string; value: Record<string, unknown> | null }>({
+	const [configSheet, setConfigSheet] = useState<{ open: boolean; name: string; value: JsonObject | null }>({
 		open: false,
 		name: '',
 		value: null,
@@ -254,7 +255,7 @@ const FeatureDetails = () => {
 						);
 					}
 					if (rowData.feature_type === FEATURE_TYPE.CONFIG) {
-						const cv = rowData.config_value as Record<string, unknown> | null | undefined;
+						const cv = rowData.config_value;
 						const compact = cv && Object.keys(cv).length > 0 ? JSON.stringify(cv) : null;
 						return (
 							<button

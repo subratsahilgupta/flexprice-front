@@ -36,6 +36,7 @@ import { Invoice } from '@/models/Invoice';
 import type { WalletTransaction } from '@/models/WalletTransaction';
 import { Coupon } from '@/models/Coupon';
 import Customer from '@/models/Customer';
+import { JsonObject } from '@/types/common';
 
 // Re-export existing enums for convenience
 export { BILLING_PERIOD } from '@/constants/constants';
@@ -801,6 +802,8 @@ export interface SubscriptionEntitlementEffective {
 	/** Present on EntitlementSource rows, not on aggregated entitlement */
 	static_value?: string;
 	is_soft_limit?: boolean;
+	config_value?: JsonObject | null;
+	id?: string;
 }
 
 export interface SubscriptionEntitlementFeature {

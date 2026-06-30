@@ -1,7 +1,9 @@
 import { FC, useEffect, useState } from 'react';
 import { Sheet, Label, Input, Button, Checkbox } from '@/components/atoms';
 import { Switch } from '@/components/ui/switch';
+import { JsonEditor } from '@/components/molecules/JsonEditor';
 import Feature, { FEATURE_TYPE } from '@/models/Feature';
+import { JsonObject } from '@/types/common';
 import { ENTITLEMENT_ENTITY_TYPE } from '@/models/Entitlement';
 import EntitlementApi from '@/api/EntitlementApi';
 import { useMutation } from '@tanstack/react-query';
@@ -35,6 +37,7 @@ const EditSubscriptionEntitlementDrawer: FC<EditSubscriptionEntitlementDrawerPro
 	const [isInfinite, setIsInfinite] = useState<boolean>(false);
 	const [staticValue, setStaticValue] = useState<string>('');
 	const [isEnabled, setIsEnabled] = useState<boolean>(true);
+	const [configValue, setConfigValue] = useState<JsonObject | null>(null);
 
 	useEffect(() => {
 		if (entitlement) {
@@ -45,6 +48,7 @@ const EditSubscriptionEntitlementDrawer: FC<EditSubscriptionEntitlementDrawerPro
 			setUsageLimit(isCurrentlyInfinite ? '' : currentLimit?.toString() || '');
 			setStaticValue(getEffectiveStaticValue(entitlement.entitlement) || '');
 			setIsEnabled(entitlement.entitlement?.is_enabled ?? true);
+			setConfigValue((entitlement.entitlement?.config_value as JsonObject) ?? null);
 		}
 	}, [entitlement]);
 
@@ -106,8 +110,15 @@ const EditSubscriptionEntitlementDrawer: FC<EditSubscriptionEntitlementDrawerPro
 				return;
 			}
 			values.static_value = staticValue;
-		} else if (entitlement.feature_type === FEATURE_TYPE.BOOLEAN || entitlement.feature_type === FEATURE_TYPE.CONFIG) {
+		} else if (entitlement.feature_type === FEATURE_TYPE.BOOLEAN) {
 			values.is_enabled = isEnabled;
+		} else if (entitlement.feature_type === FEATURE_TYPE.CONFIG) {
+			values.is_enabled = isEnabled;
+			if (!configValue) {
+				toast.error(t('entitlements.addDrawer.configValueRequired'));
+				return;
+			}
+			values.config_value = configValue ?? undefined;
 		}
 
 		saveOverride(values);
@@ -221,6 +232,13 @@ const EditSubscriptionEntitlementDrawer: FC<EditSubscriptionEntitlementDrawerPro
 								{originalEnabled ? t('entitlements.editDrawer.enabled') : t('entitlements.editDrawer.disabled')}
 							</div>
 						)}
+					</div>
+				)}
+
+				{entitlement.feature_type === FEATURE_TYPE.CONFIG && (
+					<div className='space-y-2'>
+						<Label label={t('catalog:jsonEditor.title')} />
+						<JsonEditor key={entitlement.entitlement?.id} value={configValue} onChange={(val) => setConfigValue(val)} />
 					</div>
 				)}
 
