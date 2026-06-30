@@ -111,6 +111,16 @@ const AGGREGATION_OPTIONS: SelectOption[] = [
 	},
 ];
 
+// Aggregation types that accept a CEL expression in place of a field.
+// Mirrors the backend's AggregationType.SupportsExpression() classifier
+// (internal/types/aggregation.go).
+const EXPRESSION_SUPPORTED_TYPES: METER_AGGREGATION_TYPE[] = [
+	METER_AGGREGATION_TYPE.SUM,
+	METER_AGGREGATION_TYPE.AVG,
+	METER_AGGREGATION_TYPE.MAX,
+	METER_AGGREGATION_TYPE.LATEST,
+];
+
 const BUCKET_SIZE_OPTIONS: SelectOption[] = [
 	{
 		label: 'Minute',
@@ -183,10 +193,13 @@ interface FeatureFormState {
 	showEventFilters: boolean;
 	showBucketSize: boolean;
 	showGroupBy: boolean;
+	showCustomExpression: boolean;
 }
 
 type FeatureErrors = Partial<Record<keyof CreateFeatureRequest, string>>;
-type MeterErrors = Partial<Record<keyof CreateMeterRequest | 'aggregation_type' | 'aggregation_field' | 'aggregation_multiplier', string>>;
+type MeterErrors = Partial<
+	Record<keyof CreateMeterRequest | 'aggregation_type' | 'aggregation_field' | 'aggregation_expression' | 'aggregation_multiplier', string>
+>;
 
 // Custom hook for feature form logic
 const useFeatureForm = () => {
@@ -201,6 +214,7 @@ const useFeatureForm = () => {
 		showEventFilters: false,
 		showBucketSize: false,
 		showGroupBy: false,
+		showCustomExpression: false,
 	});
 
 	const updateFeatureData = useCallback((updates: Partial<FeatureFormData>) => {
@@ -230,7 +244,7 @@ const useFeatureForm = () => {
 		return true;
 	}, []);
 
-	const validateMeter = useCallback((meterData: Partial<CreateMeterRequest> | undefined): boolean => {
+	const validateMeter = useCallback((meterData: Partial<CreateMeterRequest> | undefined, formState: FeatureFormState): boolean => {
 		if (!meterData) return false;
 
 		const errors: Record<string, string> = {};
@@ -243,9 +257,15 @@ const useFeatureForm = () => {
 			errors.aggregation_type = 'Aggregation type is required';
 		}
 
-		// Only validate field if aggregation type is not COUNT
+		// COUNT needs no per-event field/expression. For everything else, the
+		// user is either in "Aggregation Field" mode (default) or "Custom
+		// Expression" mode (toggled). Validate whichever input is currently shown.
 		if (meterData.aggregation?.type !== METER_AGGREGATION_TYPE.COUNT) {
-			if (!meterData.aggregation?.field?.trim()) {
+			if (formState.showCustomExpression) {
+				if (!meterData.aggregation?.expression?.trim()) {
+					errors.aggregation_expression = 'Custom expression is required';
+				}
+			} else if (!meterData.aggregation?.field?.trim()) {
 				errors.aggregation_field = 'Aggregation field is required for this aggregation type';
 			}
 		}
@@ -698,18 +718,26 @@ const AggregationSection = ({
 	const { t } = useTranslation(['catalog', 'common']);
 	const handleAggregationTypeChange = useCallback(
 		(type: string) => {
+			const newType = type as METER_AGGREGATION_TYPE;
+			const stillSupportsExpression = EXPRESSION_SUPPORTED_TYPES.includes(newType);
 			onUpdateFeature({
 				meter: {
 					...meter,
 					aggregation: {
 						...meter?.aggregation,
-						type: type as METER_AGGREGATION_TYPE,
+						type: newType,
 						field: meter?.aggregation?.field ?? '',
+						// Drop expression when switching to a type that can't carry one
+						// (e.g. COUNT, COUNT_UNIQUE, SUM_WITH_MULTIPLIER, WEIGHTED_SUM).
+						expression: stillSupportsExpression ? meter?.aggregation?.expression : '',
 					},
 				},
 			});
+			if (!stillSupportsExpression && formState.showCustomExpression) {
+				onUpdateFormState({ showCustomExpression: false });
+			}
 		},
-		[onUpdateFeature, meter],
+		[onUpdateFeature, onUpdateFormState, meter, formState.showCustomExpression],
 	);
 
 	const handleAggregationFieldChange = useCallback(
@@ -727,6 +755,39 @@ const AggregationSection = ({
 		},
 		[onUpdateFeature, meter],
 	);
+
+	const handleAggregationExpressionChange = useCallback(
+		(expression: string) => {
+			onUpdateFeature({
+				meter: {
+					...meter,
+					aggregation: {
+						...meter?.aggregation,
+						type: meter?.aggregation?.type || METER_AGGREGATION_TYPE.SUM,
+						expression,
+					},
+				},
+			});
+		},
+		[onUpdateFeature, meter],
+	);
+
+	// Toggling the Custom Expression / Aggregation Field button enforces XOR
+	// in the UI: the inactive side's value is cleared so we never POST both.
+	const toggleCustomExpression = useCallback(() => {
+		const next = !formState.showCustomExpression;
+		onUpdateFeature({
+			meter: {
+				...meter,
+				aggregation: {
+					...(meter?.aggregation ?? { type: METER_AGGREGATION_TYPE.SUM }),
+					field: next ? '' : (meter?.aggregation?.field ?? ''),
+					expression: next ? (meter?.aggregation?.expression ?? '') : '',
+				},
+			},
+		});
+		onUpdateFormState({ showCustomExpression: next });
+	}, [onUpdateFeature, onUpdateFormState, meter, formState.showCustomExpression]);
 
 	const [multiplierInput, setMultiplierInput] = useState(meter?.aggregation?.multiplier?.toString() || '');
 
@@ -790,8 +851,11 @@ const AggregationSection = ({
 		[onUpdateFeature, meter],
 	);
 
-	const showFieldInput = meter?.aggregation?.type !== METER_AGGREGATION_TYPE.COUNT;
-	const showMultiplierInput = meter?.aggregation?.type === METER_AGGREGATION_TYPE.SUM_WITH_MULTIPLIER;
+	const aggType = meter?.aggregation?.type;
+	const supportsExpression = aggType ? EXPRESSION_SUPPORTED_TYPES.includes(aggType) : false;
+	const showExpressionInput = supportsExpression && formState.showCustomExpression;
+	const showFieldInput = aggType !== METER_AGGREGATION_TYPE.COUNT && !showExpressionInput;
+	const showMultiplierInput = aggType === METER_AGGREGATION_TYPE.SUM_WITH_MULTIPLIER;
 
 	return (
 		<>
@@ -819,6 +883,17 @@ const AggregationSection = ({
 					/>
 				)}
 
+				{showExpressionInput && (
+					<Input
+						value={meter?.aggregation?.expression || ''}
+						onChange={handleAggregationExpressionChange}
+						label={t('catalog:features.form.customExpression')}
+						placeholder={t('catalog:features.form.customExpressionPh')}
+						description={t('catalog:features.form.customExpressionHelp')}
+						error={meterErrors.aggregation_expression}
+					/>
+				)}
+
 				{showMultiplierInput && (
 					<Input
 						value={multiplierInput}
@@ -840,6 +915,16 @@ const AggregationSection = ({
 						) : null}
 						{meter?.aggregation?.type === METER_AGGREGATION_TYPE.MAX && !formState.showGroupBy ? (
 							<AddChargesButton label={t('catalog:features.form.groupByButton')} onClick={() => onUpdateFormState({ showGroupBy: true })} />
+						) : null}
+						{supportsExpression ? (
+							<AddChargesButton
+								label={t(
+									formState.showCustomExpression
+										? 'catalog:features.form.aggregationFieldButton'
+										: 'catalog:features.form.customExpressionButton',
+								)}
+								onClick={toggleCustomExpression}
+							/>
 						) : null}
 					</div>
 					{formState.showBucketSize ? (
@@ -998,24 +1083,22 @@ const AddFeaturePage = () => {
 
 		// If type is metered, validate meter data
 		if (data.type === FEATURE_TYPE.METERED) {
-			if (!validateMeter(data.meter)) {
+			if (!validateMeter(data.meter, formState)) {
 				return;
 			}
 		}
 
 		createFeature(data);
-	}, [data, validateFeature, validateMeter, createFeature]);
+	}, [data, formState, validateFeature, validateMeter, createFeature]);
 
 	const isCtaDisabled = useMemo(() => {
-		return (
-			!data.name ||
-			!data.type ||
-			isPending ||
-			(data.type === FEATURE_TYPE.METERED &&
-				(!data.meter?.event_name ||
-					!data.meter?.aggregation?.type ||
-					(data.meter.aggregation.type !== METER_AGGREGATION_TYPE.COUNT && !data.meter.aggregation?.field)))
-		);
+		const agg = data.meter?.aggregation;
+		const meteredButMissingValue =
+			data.type === FEATURE_TYPE.METERED &&
+			(!data.meter?.event_name ||
+				!agg?.type ||
+				(agg.type !== METER_AGGREGATION_TYPE.COUNT && !agg?.field?.trim() && !agg?.expression?.trim()));
+		return !data.name || !data.type || isPending || meteredButMissingValue;
 	}, [data.name, data.type, data.meter, isPending]);
 
 	const isMeteredType = data.type === FEATURE_TYPE.METERED;
