@@ -3,6 +3,7 @@ import { BaseModel } from './base';
 export interface Meter extends BaseModel {
 	readonly aggregation: {
 		field: string;
+		expression?: string;
 		type: METER_AGGREGATION_TYPE;
 		multiplier?: number;
 		bucket_size?: BUCKET_SIZE;

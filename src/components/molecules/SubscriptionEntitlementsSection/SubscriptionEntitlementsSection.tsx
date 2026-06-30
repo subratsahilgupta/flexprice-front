@@ -2,8 +2,9 @@ import { FC, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { Plus, Trash2, Pencil, Info } from 'lucide-react';
-import { Button, Card, CardHeader, Chip, Dialog, NoDataCard } from '@/components/atoms';
+import { Button, Card, CardHeader, Chip, Dialog, NoDataCard, Sheet } from '@/components/atoms';
 import { FlexpriceTable, ColumnData, AddEntitlementDrawer, EditSubscriptionEntitlementDrawer } from '@/components/molecules';
+import JsonCodeBlock from '@/components/molecules/Events/JsonCodeBlock';
 import SubscriptionApi from '@/api/SubscriptionApi';
 import EntitlementApi from '@/api/EntitlementApi';
 import { FEATURE_TYPE } from '@/models/Feature';
@@ -21,6 +22,7 @@ import {
 	getPrimarySourceLabel,
 	getEffectiveStaticValue,
 } from '@/utils/subscription/subscriptionEntitlementHelpers';
+import { JsonObject } from '@/types/common';
 
 interface SubscriptionEntitlementsSectionProps {
 	subscriptionId: string;
@@ -37,6 +39,11 @@ const SubscriptionEntitlementsSection: FC<SubscriptionEntitlementsSectionProps> 
 	const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 	const [entitlementToDelete, setEntitlementToDelete] = useState<EnrichedSubscriptionEntitlement | null>(null);
+	const [configSheet, setConfigSheet] = useState<{ open: boolean; name: string; value: JsonObject | null }>({
+		open: false,
+		name: '',
+		value: null,
+	});
 	const queryClient = useQueryClient();
 
 	const invalidateEntitlements = () => {
@@ -171,6 +178,8 @@ const SubscriptionEntitlementsSection: FC<SubscriptionEntitlementsSectionProps> 
 				return <Chip label={tc('labels.boolean')} variant='success' />;
 			case 'static':
 				return <Chip label={tc('labels.static')} variant='warning' />;
+			case 'config':
+				return <Chip label={tc('labels.config')} variant='default' />;
 			default:
 				return <Chip label={featureType} variant='info' />;
 		}
@@ -296,6 +305,20 @@ const SubscriptionEntitlementsSection: FC<SubscriptionEntitlementsSectionProps> 
 						</TooltipProvider>
 					)}
 				</div>
+			);
+		}
+
+		if (featureType === FEATURE_TYPE.CONFIG) {
+			const cv = entitlementData?.config_value;
+			const compact = cv && Object.keys(cv).length > 0 ? JSON.stringify(cv) : null;
+			if (!compact) return <span className='text-muted-foreground'>{tc('labels.na')}</span>;
+			return (
+				<button
+					className='font-mono text-xs text-muted-foreground truncate max-w-xs block hover:text-foreground hover:underline text-left'
+					title={compact}
+					onClick={() => setConfigSheet({ open: true, name: row.feature?.name ?? '', value: cv! })}>
+					{compact}
+				</button>
 			);
 		}
 
@@ -504,6 +527,10 @@ const SubscriptionEntitlementsSection: FC<SubscriptionEntitlementsSectionProps> 
 					</div>
 				</div>
 			</Dialog>
+
+			<Sheet isOpen={configSheet.open} onOpenChange={(open) => setConfigSheet((s) => ({ ...s, open }))} title={configSheet.name} size='2xl'>
+				<div className='p-6'>{configSheet.value && <JsonCodeBlock value={configSheet.value} />}</div>
+			</Sheet>
 		</>
 	);
 };

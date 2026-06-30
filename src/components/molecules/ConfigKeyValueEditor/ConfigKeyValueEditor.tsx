@@ -3,6 +3,7 @@ import { Input } from '@/components/atoms';
 import { Plus, Trash2 } from 'lucide-react';
 import { FC, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { JsonObject } from '@/types/common';
 
 interface KVPairRaw {
 	key: string;
@@ -10,13 +11,13 @@ interface KVPairRaw {
 }
 
 interface ConfigKeyValueEditorProps {
-	value: Record<string, unknown>;
-	onChange: (value: Record<string, unknown>, rawPairs: KVPairRaw[]) => void;
+	value: JsonObject;
+	onChange: (value: JsonObject, rawPairs: KVPairRaw[]) => void;
 }
 
 type KVPair = KVPairRaw;
 
-const toKVPairs = (obj: Record<string, unknown>): KVPair[] => {
+const toKVPairs = (obj: JsonObject): KVPair[] => {
 	const pairs = Object.entries(obj).map(([key, val]) => ({
 		key,
 		value: typeof val === 'string' ? val : JSON.stringify(val),
@@ -24,8 +25,8 @@ const toKVPairs = (obj: Record<string, unknown>): KVPair[] => {
 	return pairs.length > 0 ? pairs : [{ key: '', value: '' }];
 };
 
-const fromKVPairs = (pairs: KVPair[]): Record<string, unknown> => {
-	const result: Record<string, unknown> = {};
+const fromKVPairs = (pairs: KVPair[]): JsonObject => {
+	const result: JsonObject = {};
 	for (const { key, value } of pairs) {
 		if (key.trim() === '') continue;
 		try {

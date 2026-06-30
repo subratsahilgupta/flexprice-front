@@ -1,5 +1,6 @@
 import { EntitlementResponse } from '@/types/dto/Entitlement';
 import { SubscriptionEntitlementFeature, SubscriptionEntitlementSource } from '@/types/dto/Subscription';
+import { JsonObject } from '@/types/common';
 
 export interface EnrichedSubscriptionEntitlement {
 	feature: SubscriptionEntitlementFeature['feature'];
@@ -99,6 +100,7 @@ export interface SubscriptionEntitlementOverrideValues {
 	usage_limit?: number | null;
 	static_value?: string;
 	is_enabled?: boolean;
+	config_value?: JsonObject;
 }
 
 /** Read effective static value from aggregated subscription entitlement payload. */
