@@ -45,6 +45,7 @@ const OptionFilterPopover = ({ ariaLabel, groups, activeFilterCount = 0, align =
 									<button
 										key={option.value}
 										type='button'
+										aria-pressed={group.value === option.value}
 										className={cn(FILTER_OPTION_CLASS, group.value === option.value && 'bg-zinc-100 font-medium text-zinc-900')}
 										onClick={() => group.onChange(option.value)}>
 										{option.label}
