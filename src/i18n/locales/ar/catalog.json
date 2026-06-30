@@ -769,6 +769,7 @@
 			"aggregationDetails": "تفاصيل التجميع",
 			"type": "النوع",
 			"value": "القيمة",
+			"customExpression": "تعبير مخصص",
 			"unitName": "اسم الوحدة",
 			"displayUnitName": "اسم وحدة العرض",
 			"usageReset": "إعادة ضبط الاستخدام ",

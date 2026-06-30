@@ -723,6 +723,7 @@ const AggregationSection = ({
 		(type: string) => {
 			const nextType = type as METER_AGGREGATION_TYPE;
 			const supportsBucketSize = aggregationSupportsBucketSize(nextType);
+			const stillSupportsExpression = EXPRESSION_SUPPORTED_TYPES.includes(nextType);
 			if (!supportsBucketSize) {
 				onUpdateFormState({ showBucketSize: false });
 			}
@@ -733,6 +734,7 @@ const AggregationSection = ({
 						...meter?.aggregation,
 						type: nextType,
 						field: meter?.aggregation?.field ?? '',
+						expression: stillSupportsExpression ? meter?.aggregation?.expression : '',
 						...(supportsBucketSize ? {} : { bucket_size: undefined }),
 					},
 				},
@@ -741,7 +743,7 @@ const AggregationSection = ({
 				onUpdateFormState({ showCustomExpression: false });
 			}
 		},
-		[onUpdateFeature, onUpdateFormState, meter],
+		[onUpdateFeature, onUpdateFormState, meter, formState.showCustomExpression],
 	);
 
 	const handleAggregationFieldChange = useCallback(
@@ -868,9 +870,12 @@ const AggregationSection = ({
 		[onUpdateFeature, meter],
 	);
 
-	const showFieldInput = meter?.aggregation?.type !== METER_AGGREGATION_TYPE.COUNT;
-	const showMultiplierInput = meter?.aggregation?.type === METER_AGGREGATION_TYPE.SUM_WITH_MULTIPLIER;
-	const supportsBucketSize = aggregationSupportsBucketSize(meter?.aggregation?.type);
+	const aggType = meter?.aggregation?.type;
+	const supportsExpression = aggType ? EXPRESSION_SUPPORTED_TYPES.includes(aggType) : false;
+	const showExpressionInput = supportsExpression && formState.showCustomExpression;
+	const showFieldInput = aggType !== METER_AGGREGATION_TYPE.COUNT && !showExpressionInput;
+	const showMultiplierInput = aggType === METER_AGGREGATION_TYPE.SUM_WITH_MULTIPLIER;
+	const supportsBucketSize = aggregationSupportsBucketSize(aggType);
 
 	return (
 		<>

@@ -769,6 +769,7 @@
 			"aggregationDetails": "Aggregation Details",
 			"type": "Type",
 			"value": "Value",
+				"customExpression": "Custom Expression",
 			"unitName": "Unit Name",
 			"displayUnitName": "Display Unit Name",
 			"usageReset": "Usage Reset ",

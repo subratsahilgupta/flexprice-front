@@ -460,8 +460,16 @@ const FeatureDetails = () => {
 											</span>
 										</div>
 										<div className='grid grid-cols-[200px_1fr] items-center'>
-											<span className='text-gray-500 text-sm'>{t('catalog:features.details.value')}</span>
-											<span className='text-gray-800 text-sm'>{data?.meter?.aggregation.field || t('common:labels.na')}</span>
+											<span className='text-gray-500 text-sm'>
+												{t(
+													data?.meter?.aggregation?.expression
+														? 'catalog:features.details.customExpression'
+														: 'catalog:features.details.value',
+												)}
+											</span>
+											<span className='text-gray-800 text-sm'>
+												{data?.meter?.aggregation?.expression || data?.meter?.aggregation?.field || t('common:labels.na')}
+											</span>
 										</div>
 
 										<div className='grid grid-cols-[200px_1fr] items-center'>
