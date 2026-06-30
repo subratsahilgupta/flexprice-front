@@ -118,7 +118,7 @@ const EditSubscriptionEntitlementDrawer: FC<EditSubscriptionEntitlementDrawerPro
 				toast.error(t('entitlements.addDrawer.configValueRequired'));
 				return;
 			}
-			values.config_value = configValue ?? undefined;
+			values.config_value = configValue;
 		}
 
 		saveOverride(values);
@@ -238,7 +238,11 @@ const EditSubscriptionEntitlementDrawer: FC<EditSubscriptionEntitlementDrawerPro
 				{entitlement.feature_type === FEATURE_TYPE.CONFIG && (
 					<div className='space-y-2'>
 						<Label label={t('catalog:jsonEditor.title')} />
-						<JsonEditor key={entitlement.entitlement?.id} value={configValue} onChange={(val) => setConfigValue(val)} />
+						<JsonEditor
+							key={entitlement.entitlement?.id ?? entitlement.feature_id}
+							value={configValue}
+							onChange={(val) => setConfigValue(val)}
+						/>
 					</div>
 				)}
 
