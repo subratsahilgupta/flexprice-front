@@ -368,6 +368,7 @@
 		"metered": "Metered",
 		"boolean": "Boolean",
 		"static": "Static",
+		"config": "Config",
 		"unknownFeature": "Unknown Feature",
 		"entitlementOverrideApplied": "Entitlement Override Applied",
 		"noEntitlementsAvailable": "No entitlements available",

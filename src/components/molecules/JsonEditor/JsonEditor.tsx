@@ -14,7 +14,7 @@ interface JsonEditorProps {
 
 const EMPTY_TEMPLATE = '{\n  \n}';
 
-const formatJson = (obj: Record<string, unknown>): string => JSON.stringify(obj, null, 2);
+const formatJson = (obj: JsonObject): string => JSON.stringify(obj, null, 2);
 
 type ParseResult = { ok: true; value: JsonObject } | { ok: false; invalidJson: boolean };
 
@@ -242,7 +242,7 @@ export const JsonEditor: FC<JsonEditorProps> = ({ value, onChange }) => {
 				spellCheck={false}
 				autoCorrect='off'
 				autoCapitalize='off'
-				className='block w-full outline-none overflow-auto min-h-64 max-h-96 p-4 font-fira-code text-sm'
+				className='block w-full outline-none overflow-auto min-h-[320px] max-h-[500px] p-4 font-fira-code text-sm'
 				style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', lineHeight: '20px', caretColor: '#c5e4fd', tabSize: 2 }}
 			/>
 

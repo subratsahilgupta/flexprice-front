@@ -16,17 +16,18 @@ import { Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { generateExpandQueryParams } from '@/utils/common/api_helper';
 import { useTranslation } from 'react-i18next';
+import { JsonObject } from '@/types/common';
 
 const PlanEntitlementsTab = () => {
 	const { t } = useTranslation(['catalog', 'common']);
 	const { planId } = useParams<{ planId: string }>();
 	const [drawerOpen, setDrawerOpen] = useState(false);
-	const [configSheet, setConfigSheet] = useState<{ open: boolean; name: string; value: Record<string, unknown> | null }>({
+	const [configSheet, setConfigSheet] = useState<{ open: boolean; name: string; value: JsonObject | null }>({
 		open: false,
 		name: '',
 		value: null,
 	});
-	const openConfigSheet = (name: string, value: Record<string, unknown> | null) => {
+	const openConfigSheet = (name: string, value: JsonObject | null) => {
 		setConfigSheet({ open: true, name, value });
 	};
 

@@ -363,6 +363,7 @@
 		"metered": "مقاس",
 		"boolean": "منطقي",
 		"static": "ثابت",
+		"config": "تهيئة",
 		"unknownFeature": "ميزة غير معروفة",
 		"entitlementOverrideApplied": "تم تطبيق تجاوز الاستحقاق",
 		"noEntitlementsAvailable": "لا توجد استحقاقات متاحة",
