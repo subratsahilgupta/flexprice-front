@@ -11,7 +11,6 @@ export function useTenantMembers() {
 			UserApi.getTenantMembers({
 				limit: 1000,
 				offset: 0,
-				includeAllStatuses: true,
 			}),
 	});
 

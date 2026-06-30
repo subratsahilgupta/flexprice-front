@@ -17,7 +17,7 @@ import {
 	ShortPaginationControls,
 	AddButton,
 } from '@/components/atoms';
-import { FlexpriceTable, OptionFilterPopover } from '@/components/molecules';
+import { FlexpriceTable, OptionFilterPopover, type OptionFilterGroup } from '@/components/molecules';
 import { UserApi } from '@/api/UserApi';
 import { useTranslation } from 'react-i18next';
 import { useTenantMembers } from './useTenantMembers';
@@ -26,6 +26,7 @@ import {
 	getMemberJoinedDate,
 	isAdminMember,
 	isPendingMember,
+	membersHaveStatus,
 	canDeleteUser,
 	type MemberRoleFilter,
 	type MemberStatusFilter,
@@ -47,7 +48,9 @@ function UsersSection() {
 	const [showPassword, setShowPassword] = useState(false);
 	const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
 
-	const activeFilterCount = (roleFilter !== 'all' ? 1 : 0) + (statusFilter !== 'all' ? 1 : 0);
+	const showMemberStatus = useMemo(() => membersHaveStatus(members as SettingsMember[]), [members]);
+
+	const activeFilterCount = (roleFilter !== 'all' ? 1 : 0) + (showMemberStatus && statusFilter !== 'all' ? 1 : 0);
 
 	const filteredMembers = useMemo(
 		() => filterMembers(members as SettingsMember[], roleFilter, statusFilter),
@@ -57,8 +60,8 @@ function UsersSection() {
 	const totalPages = Math.max(1, Math.ceil(filteredMembers.length / pageSize));
 	const showPagination = totalPages > 1 || page > 1;
 
-	const memberFilterGroups = useMemo(
-		() => [
+	const memberFilterGroups = useMemo((): OptionFilterGroup[] => {
+		const groups: OptionFilterGroup[] = [
 			{
 				id: 'role',
 				label: t('members.filters.role'),
@@ -70,7 +73,10 @@ function UsersSection() {
 					{ value: 'member' as const, label: t('members.roleMember') },
 				],
 			},
-			{
+		];
+
+		if (showMemberStatus) {
+			groups.push({
 				id: 'status',
 				label: t('members.filters.status'),
 				value: statusFilter,
@@ -80,10 +86,11 @@ function UsersSection() {
 					{ value: 'joined' as const, label: t('members.filters.joined') },
 					{ value: 'pending' as const, label: t('members.filters.pending') },
 				],
-			},
-		],
-		[roleFilter, statusFilter, t],
-	);
+			});
+		}
+
+		return groups;
+	}, [roleFilter, showMemberStatus, statusFilter, t]);
 
 	const paginatedMembers = useMemo(() => {
 		const start = (page - 1) * pageSize;
@@ -136,7 +143,7 @@ function UsersSection() {
 		setUserDialogOpen(false);
 	};
 
-	const handleSubmitUser = () => {
+	const handleAddUser = () => {
 		if (createUser.isPending) return;
 		const trimmed = email.trim();
 		setAddError(null);
@@ -154,6 +161,7 @@ function UsersSection() {
 			{
 				onSuccess: (res, variables) => {
 					closeUserDialog();
+					setEmail('');
 					setAddedUserEmail(variables.email);
 					setOneTimePassword(res.password);
 					setShowPassword(false);
@@ -246,7 +254,7 @@ function UsersSection() {
 		{
 			title: t('members.columns.joined'),
 			render: (row) => {
-				if (isPendingMember(row)) {
+				if (showMemberStatus && isPendingMember(row)) {
 					return <Chip label={t('members.joinedPending')} variant='warning' />;
 				}
 				const joinedDate = getMemberJoinedDate(row);
@@ -321,9 +329,12 @@ function UsersSection() {
 
 			<Dialog
 				isOpen={userDialogOpen}
-				onOpenChange={(open) => (open ? setUserDialogOpen(true) : closeUserDialog())}
-				title={t('members.invite.title')}
-				description={t('members.invite.description')}
+				onOpenChange={(open) => {
+					if (!open) closeUserDialog();
+					else setUserDialogOpen(true);
+				}}
+				title={t('members.addMember.title')}
+				description={t('members.addMember.description')}
 				titleClassName='text-lg font-semibold text-zinc-900'
 				descriptionClassName='text-sm text-zinc-500'
 				className='rounded-xl border border-gray-100 shadow-lg sm:max-w-[425px]'>
@@ -335,21 +346,21 @@ function UsersSection() {
 						</div>
 					)}
 					<div>
-						<label htmlFor='user-email' className='mb-1 block text-xs font-medium uppercase tracking-wide text-zinc-500'>
-							{t('members.addUser.emailLabel')}
+						<label htmlFor='member-email' className='mb-1 block text-xs font-medium uppercase tracking-wide text-zinc-500'>
+							{t('members.addMember.emailLabel')}
 						</label>
 						<div className='mb-4 flex items-center gap-2 rounded-md border border-gray-200 bg-white'>
 							<Mail className='ml-3 h-4 w-4 flex-shrink-0 text-zinc-400' />
 							<Input
-								id='user-email'
+								id='member-email'
 								type='email'
-								placeholder={t('members.addUser.emailPlaceholder')}
+								placeholder={t('members.addMember.emailPlaceholder')}
 								value={email}
 								onChange={(value) => setEmail(value)}
 								onKeyDown={(e) => {
 									if (e.key === 'Enter') {
 										e.preventDefault();
-										handleSubmitUser();
+										handleAddUser();
 									}
 								}}
 								autoFocus
@@ -358,8 +369,8 @@ function UsersSection() {
 						</div>
 					</div>
 					<div className='flex justify-end'>
-						<Button onClick={handleSubmitUser} disabled={createUser.isPending} isLoading={createUser.isPending}>
-							{t('members.invite.submit')}
+						<Button onClick={handleAddUser} disabled={createUser.isPending} isLoading={createUser.isPending}>
+							{t('members.addMember.addUser')}
 						</Button>
 					</div>
 				</div>
@@ -374,7 +385,7 @@ function UsersSection() {
 				<div className='mt-3 space-y-4'>
 					{addedUserEmail && (
 						<div>
-							<span className='text-xs font-medium uppercase tracking-wide text-zinc-500'>{t('members.addUser.emailLabel')}</span>
+							<span className='text-xs font-medium uppercase tracking-wide text-zinc-500'>{t('members.addMember.emailLabel')}</span>
 							<div className='mt-1 flex min-h-[40px] items-center gap-2 rounded-md border border-gray-200 bg-zinc-50 px-3 py-2'>
 								<Mail className='h-4 w-4 flex-shrink-0 text-zinc-400' />
 								<span className='min-w-0 flex-1 truncate text-sm text-zinc-900'>{addedUserEmail}</span>
