@@ -198,6 +198,7 @@
 			"static": "Static",
 			"metered": "Metered",
 			"boolean": "Boolean",
+			"config": "Config",
 			"dash": "--",
 			"usageProgressUnlimited": "{{usage}} / Unlimited"
 		},

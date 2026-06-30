@@ -406,6 +406,12 @@
 			"creditGrants": "منح الرصيد",
 			"entitlements": "الاستحقاقات"
 		},
+		"entitlementsTab": {
+			"configSheet": {
+				"keysCount": "{{count}} مفاتيح",
+				"title": "قيمة الإعداد"
+			}
+		},
 		"information": {
 			"loading": "جاري تحميل تفاصيل الخطة…",
 			"planDetails": "تفاصيل الخطة",
@@ -631,12 +637,14 @@
 			"filterTypes": {
 				"metered": "مُقاس",
 				"boolean": "منطقي",
-				"static": "ثابت"
+				"static": "ثابت",
+				"config": "إعداد"
 			},
 			"typeChips": {
 				"metered": "مُقاس",
 				"boolean": "منطقي",
 				"static": "ثابت",
+				"config": "إعداد",
 				"unknown": "غير معروف"
 			},
 			"emptyCell": "—",
@@ -839,6 +847,27 @@
 			"detailSep": "، "
 		}
 	},
+	"jsonEditor": {
+		"title": "قيمة الإعداد (JSON)",
+		"showEditor": "إظهار المحرر",
+		"hideEditor": "إخفاء المحرر",
+		"validJson": "JSON صالح",
+		"errorInvalidJson": "JSON غير صالح",
+		"errorMustBeObject": "يجب أن يكون كائن JSON",
+		"lines": "سطور"
+	},
+	"configKeyValueEditor": {
+		"title": "قيم الإعداد",
+		"addRow": "إضافة",
+		"keyHeader": "المفتاح",
+		"valueHeader": "القيمة",
+		"keyPlaceholder": "usage_limit",
+		"valuePlaceholder": "100",
+		"errorDuplicateKey": "مفتاح مكرر: \"{{key}}\"",
+		"errorEmptyValue": "القيمة مطلوبة",
+		"errorEmptyKey": "المفتاح مطلوب",
+		"removeRow": "إزالة الصف"
+	},
 	"entitlements": {
 		"usageResetPeriod": {
 			"DAILY": "يومي",
@@ -888,7 +917,8 @@
 			"save": "حفظ",
 			"unlimitedDisplay": "غير محدود",
 			"calculatorAriaLabel": "آلة حاسبة للقيمة المعروضة",
-			"unitsFallback": "وحدات"
+			"unitsFallback": "وحدات",
+			"configValueRequired": "كائن JSON صالح مطلوب لميزات الإعداد"
 		},
 		"displayCalculator": {
 			"titleFallback": "القيمة المعروضة",
