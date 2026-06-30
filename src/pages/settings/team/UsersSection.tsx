@@ -1,24 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { ColumnData } from '@/components/molecules/Table/Table';
-import { AlertTriangle, Copy, Download, Eye, EyeOff, Info, Link2, Lock, Mail, Trash2 } from 'lucide-react';
+import { AlertTriangle, Copy, Download, Eye, EyeOff, Info, Link2, Lock, Mail } from 'lucide-react';
 import { RouteNames } from '@/core/routes/Routes';
 import type { HttpRejectedError } from '@/core/axios/types';
 import { formatDateShort } from '@/utils/common/helper_functions';
-import {
-	Card,
-	CardHeader,
-	Loader,
-	Button,
-	Input,
-	Dialog,
-	Chip,
-	ActionButton,
-	ShortPaginationControls,
-	AddButton,
-} from '@/components/atoms';
+import { Card, CardHeader, Loader, Button, Input, Dialog, Chip, ShortPaginationControls, AddButton } from '@/components/atoms';
 import { FlexpriceTable, OptionFilterPopover, type OptionFilterGroup } from '@/components/molecules';
-import { UserApi } from '@/api/UserApi';
 import { useTranslation } from 'react-i18next';
 import { useTenantMembers } from './useTenantMembers';
 import {
@@ -27,7 +15,6 @@ import {
 	isAdminMember,
 	isPendingMember,
 	membersHaveStatus,
-	canDeleteUser,
 	type MemberRoleFilter,
 	type MemberStatusFilter,
 	type SettingsMember,
@@ -261,24 +248,6 @@ function UsersSection() {
 				return <span className='text-sm text-zinc-600'>{joinedDate ? formatDateShort(joinedDate) : '—'}</span>;
 			},
 		},
-		{
-			fieldVariant: 'interactive',
-			render: (row) =>
-				canDeleteUser(row) ? (
-					<ActionButton
-						id={row.id}
-						entityName={row.email || row.name || row.id}
-						deleteMutationFn={UserApi.deleteUser}
-						refetchQueryKey='settings'
-						edit={{ enabled: false }}
-						archive={{
-							enabled: true,
-							text: t('members.actions.remove'),
-							icon: <Trash2 className='h-4 w-4' />,
-						}}
-					/>
-				) : null,
-		},
 	];
 
 	return (
@@ -391,9 +360,13 @@ function UsersSection() {
 								<span className='min-w-0 flex-1 truncate text-sm text-zinc-900'>{addedUserEmail}</span>
 								<button
 									type='button'
-									onClick={() => {
-										navigator.clipboard.writeText(addedUserEmail);
-										toast.success(t('members.credentials.emailCopied'));
+									onClick={async () => {
+										try {
+											await navigator.clipboard.writeText(addedUserEmail);
+											toast.success(t('members.credentials.emailCopied'));
+										} catch {
+											toast.error(t('members.errors.copyFailed'));
+										}
 									}}
 									className='rounded p-1.5 text-zinc-500 hover:text-zinc-700'
 									title={t('members.credentials.copyEmail')}

@@ -80,13 +80,16 @@ const WalletAlertDialog: React.FC<WalletAlertDialogProps> = ({ open, alertSettin
 	const handleSave = async () => {
 		if (isSaving) return;
 
-		const settingsToSave = normalizeWalletAlertSettingsForSave(localAlertSettings);
-		const validationErrorKey = getWalletAlertValidationErrorKey(settingsToSave);
-
+		// Validate against the raw draft so invalid values (e.g. 'abc') produce
+		// the correct 'invalidXxxThreshold' error rather than 'atLeastOneThreshold'
+		// (normalization would silently drop NaN values before the validator sees them).
+		const validationErrorKey = getWalletAlertValidationErrorKey(localAlertSettings);
 		if (validationErrorKey) {
 			toast.error(t(`wallet.alerts.validation.${validationErrorKey}`));
 			return;
 		}
+
+		const settingsToSave = normalizeWalletAlertSettingsForSave(localAlertSettings);
 
 		try {
 			setIsSaving(true);

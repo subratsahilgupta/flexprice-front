@@ -14,7 +14,7 @@ export function membersHaveStatus(members: SettingsMember[]): boolean {
 }
 
 export function isAdminMember(user: SettingsMember): boolean {
-	const role = user.roles?.[0]?.toLowerCase() ?? 'admin';
+	const role = user.roles?.[0]?.toLowerCase() ?? 'member';
 	return role.includes('admin');
 }
 
