@@ -21,6 +21,7 @@ import {
 	enrichSubscriptionEntitlements,
 	getPrimarySourceLabel,
 	getEffectiveStaticValue,
+	getEffectiveConfigValue,
 } from '@/utils/subscription/subscriptionEntitlementHelpers';
 import { JsonObject } from '@/types/common';
 
@@ -309,14 +310,14 @@ const SubscriptionEntitlementsSection: FC<SubscriptionEntitlementsSectionProps> 
 		}
 
 		if (featureType === FEATURE_TYPE.CONFIG) {
-			const cv = entitlementData?.config_value;
+			const cv = getEffectiveConfigValue(row.sources);
 			const compact = cv && Object.keys(cv).length > 0 ? JSON.stringify(cv) : null;
 			if (!compact) return <span className='text-muted-foreground'>{tc('labels.na')}</span>;
 			return (
 				<button
-					className='font-mono text-xs text-muted-foreground truncate max-w-xs block hover:text-foreground hover:underline text-left'
+					className='font-mono text-xs text-muted-foreground line-clamp-3 max-w-xs text-left hover:text-foreground transition-colors'
 					title={compact}
-					onClick={() => setConfigSheet({ open: true, name: row.feature?.name ?? '', value: cv! })}>
+					onClick={() => setConfigSheet({ open: true, name: row.feature?.name ?? '', value: cv ?? null })}>
 					{compact}
 				</button>
 			);

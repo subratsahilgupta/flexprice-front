@@ -777,6 +777,7 @@ export interface EntitlementOverrideRequest {
 	usage_limit?: number | null;
 	static_value?: string;
 	is_enabled?: boolean;
+	config_value?: JsonObject;
 }
 
 // =============================================================================
@@ -790,6 +791,7 @@ export interface SubscriptionEntitlementSource {
 	usage_limit?: number | null;
 	static_value?: string;
 	is_enabled?: boolean;
+	config_value?: JsonObject | null;
 }
 
 export interface SubscriptionEntitlementEffective {
@@ -801,6 +803,9 @@ export interface SubscriptionEntitlementEffective {
 	/** Present on EntitlementSource rows, not on aggregated entitlement */
 	static_value?: string;
 	is_soft_limit?: boolean;
+	/** Aggregated config values array (backend field name: config_values) */
+	config_values?: JsonObject[];
+	/** Present on EntitlementSource rows */
 	config_value?: JsonObject | null;
 	id?: string;
 }

@@ -35,9 +35,9 @@ const tryParse = (text: string): ParseResult => {
 const COLORS = {
 	key: '#7fdbca',
 	string: '#addb67',
-	number: '#f78c6c',
-	boolean: '#ff5874',
-	null: '#7fdbca',
+	number: '#addb67',
+	boolean: '#addb67',
+	null: '#addb67',
 	punctuation: '#c792ea',
 };
 
@@ -243,7 +243,7 @@ export const JsonEditor: FC<JsonEditorProps> = ({ value, onChange }) => {
 				autoCorrect='off'
 				autoCapitalize='off'
 				className='block w-full outline-none overflow-auto min-h-[320px] max-h-[500px] p-4 font-fira-code text-sm'
-				style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', lineHeight: '20px', caretColor: '#c5e4fd', tabSize: 2 }}
+				style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', lineHeight: '20px', caretColor: '#c5e4fd', tabSize: 2, color: '#d6deeb' }}
 			/>
 
 			{/* Status bar — error or valid + line count */}
