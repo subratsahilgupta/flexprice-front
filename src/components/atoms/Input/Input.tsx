@@ -137,8 +137,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 		);
 
 		const supportsSelectionRange = (element: HTMLInputElement) =>
-			typeof element.setSelectionRange === 'function' &&
-			!['number', 'date', 'time', 'month', 'week', 'datetime-local', 'range', 'color'].includes(element.type);
+			typeof element.setSelectionRange === 'function' && ['text', 'search', 'url', 'tel', 'password', ''].includes(element.type ?? '');
 
 		// Handle cursor position after formatting
 		React.useEffect(() => {
