@@ -138,6 +138,23 @@
 		"details": {
 			"title": "تفاصيل جدول التكلفة",
 			"charges": "الرسوم",
+			"chargeCount": "{{count}} رسوم",
+			"searchCharges": "البحث في الرسوم...",
+			"noDescription": "لا يوجد وصف",
+			"noChargesSubtitle": "لم تُضف أي رسوم إلى جدول التكلفة بعد",
+			"columns": {
+				"feature": "الميزة",
+				"chargeType": "نوع الرسوم",
+				"billingTiming": "توقيت الفوترة",
+				"billingPeriod": "فترة الفوترة",
+				"value": "القيمة"
+			},
+			"fields": {
+				"costSheetName": "اسم جدول التكلفة",
+				"lookupKey": "مفتاح البحث",
+				"status": "الحالة",
+				"description": "الوصف"
+			},
 			"metadata": "البيانات الوصفية"
 		},
 		"toast": {

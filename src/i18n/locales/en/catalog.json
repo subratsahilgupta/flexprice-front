@@ -138,6 +138,23 @@
 		"details": {
 			"title": "Cost Sheet Details",
 			"charges": "Charges",
+			"chargeCount": "{{count}} charges",
+			"searchCharges": "Search charges...",
+			"noDescription": "No description",
+			"noChargesSubtitle": "No charges added to the cost sheet yet",
+			"columns": {
+				"feature": "Feature",
+				"chargeType": "Charge Type",
+				"billingTiming": "Billing Timing",
+				"billingPeriod": "Billing Period",
+				"value": "Value"
+			},
+			"fields": {
+				"costSheetName": "Cost Sheet Name",
+				"lookupKey": "Lookup Key",
+				"status": "Status",
+				"description": "Description"
+			},
 			"metadata": "Metadata"
 		},
 		"toast": {
@@ -769,7 +786,7 @@
 			"aggregationDetails": "Aggregation Details",
 			"type": "Type",
 			"value": "Value",
-				"customExpression": "Custom Expression",
+			"customExpression": "Custom Expression",
 			"unitName": "Unit Name",
 			"displayUnitName": "Display Unit Name",
 			"usageReset": "Usage Reset ",
