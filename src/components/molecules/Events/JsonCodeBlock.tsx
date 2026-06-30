@@ -34,7 +34,7 @@ const JsonCodeBlock: FC<JsonCodeBlockProps> = ({ value, title, onCopy, className
 				<p className='text-xs font-medium text-foreground'>{title || t('common:labels.payload')}</p>
 				<Button onClick={handleCopy} variant='ghost' size='sm' className={cn('h-7 transition-colors', copied && 'text-green-500')}>
 					{copied ? <Check size={12} className='me-1 text-green-500' /> : <Copy size={12} className='me-1' />}
-					<span className='text-xs'>{copied ? 'Copied' : t('common:actions.copy')}</span>
+					<span className='text-xs'>{copied ? t('common:actions.copied') : t('common:actions.copy')}</span>
 				</Button>
 			</div>
 			<div className='relative'>

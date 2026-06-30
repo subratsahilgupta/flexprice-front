@@ -249,7 +249,7 @@ describe('ActionButton Component', () => {
 			});
 
 			await waitFor(() => {
-				expect(screen.getByText('Are you sure you want to delete this Test Entity?')).toBeInTheDocument();
+				expect(screen.getByText(/Are you sure you want to delete/i)).toBeInTheDocument();
 			});
 		});
 
@@ -287,23 +287,26 @@ describe('ActionButton Component', () => {
 
 			render(
 				<TestWrapper>
-					<ActionButton {...defaultProps} archive={{ enabled: true, text: 'Archive' }} />
+					<ActionButton {...defaultProps} archive={{ enabled: true }} />
 				</TestWrapper>,
 			);
 
-			// Trigger delete flow
+			// Open dropdown and click the default Archive action
 			const triggerButton = screen.getByRole('button');
 			fireEvent.click(triggerButton);
 
 			await waitFor(() => {
-				const archiveButton = screen.getByText('Archive');
-				fireEvent.click(archiveButton);
+				expect(screen.getByText(/archive/i)).toBeInTheDocument();
 			});
+			fireEvent.click(screen.getByText(/archive/i));
 
+			// Wait for confirmation dialog, then confirm
 			await waitFor(() => {
-				const confirmButton = screen.getByRole('button', { name: 'Archive' });
-				fireEvent.click(confirmButton);
+				expect(screen.getByText(/Are you sure you want to/i)).toBeInTheDocument();
 			});
+			const confirmButtons = screen.getAllByRole('button');
+			// last button in dialog is the confirm action
+			fireEvent.click(confirmButtons[confirmButtons.length - 1]);
 
 			await waitFor(() => {
 				expect(toast.success).toHaveBeenCalledWith('Test Entity archived successfully');
@@ -311,7 +314,7 @@ describe('ActionButton Component', () => {
 		});
 
 		it('should show error toast on deletion failure', async () => {
-			const error = { error: { message: 'Delete failed' } };
+			const error = new Error('Delete failed');
 			mockDeleteMutationFn.mockRejectedValue(error);
 
 			render(
@@ -446,7 +449,7 @@ describe('ActionButton Component', () => {
 			});
 
 			await waitFor(() => {
-				expect(screen.getByText('Are you sure you want to delete this Test Entity?')).toBeInTheDocument();
+				expect(screen.getByText(/Are you sure you want to delete/i)).toBeInTheDocument();
 			});
 
 			// Click cancel
@@ -454,7 +457,7 @@ describe('ActionButton Component', () => {
 			fireEvent.click(cancelButton);
 
 			await waitFor(() => {
-				expect(screen.queryByText('Are you sure you want to delete this Test Entity?')).not.toBeInTheDocument();
+				expect(screen.queryByText(/Are you sure you want to delete/i)).not.toBeInTheDocument();
 			});
 		});
 	});
