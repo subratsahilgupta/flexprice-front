@@ -3,8 +3,9 @@ import { ApiDocsContent } from '@/components/molecules/ApiDocs/ApiDocs';
 import { API_DOCS_TAGS } from '@/constants/apiDocsTags';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { SvixProvider } from 'svix-react';
-import AppPortal from './AppPortal';
+import { AppPortal as SvixHostedPortal, SvixProvider } from 'svix-react';
+import 'svix-react/style.css';
+import CustomAppPortal from './AppPortal';
 import { EmptyPage } from '@/components/organisms';
 import useEnvironment from '@/hooks/useEnvironment';
 import { PREFETCH_REGISTRY, PrefetchQueryKey } from '@/config/prefetch';
@@ -73,29 +74,40 @@ const WebhookDashboard = () => {
 	}
 
 	const serverUrl = import.meta.env.VITE_SVIX_URL ?? '';
+	const url = data?.url;
+	const isHostedPortal = !!url && !url.includes('docs.svix.com');
 
-	if (!data?.token || !data?.app_id) {
-		// Enabled but missing token/app_id — treat as the disabled/empty state.
+	if (isHostedPortal) {
 		return (
 			<Page className='h-full w-full' heading={webhooksHeading}>
 				<ApiDocsContent tags={API_DOCS_TAGS.Webhooks} />
-				<EmptyPage
-					heading={webhooksHeading}
-					emptyStateCard={{
-						heading: t('developers:webhooks.disabled.heading'),
-						description: t('developers:webhooks.disabled.description'),
-					}}
-				/>
+				<SvixHostedPortal url={url} style={{ width: '100%', height: '100%', border: 'none' }} primaryColor='#000000' />
 			</Page>
 		);
 	}
 
+	if (data?.token && data?.app_id) {
+		return (
+			<Page className='h-full w-full' heading={webhooksHeading}>
+				<ApiDocsContent tags={API_DOCS_TAGS.Webhooks} />
+				<SvixProvider token={data.token} appId={data.app_id} options={{ serverUrl }}>
+					<CustomAppPortal />
+				</SvixProvider>
+			</Page>
+		);
+	}
+
+	// Enabled but neither a usable hosted URL nor token/app_id — treat as the disabled/empty state.
 	return (
 		<Page className='h-full w-full' heading={webhooksHeading}>
 			<ApiDocsContent tags={API_DOCS_TAGS.Webhooks} />
-			<SvixProvider token={data.token} appId={data.app_id} options={{ serverUrl }}>
-				<AppPortal />
-			</SvixProvider>
+			<EmptyPage
+				heading={webhooksHeading}
+				emptyStateCard={{
+					heading: t('developers:webhooks.disabled.heading'),
+					description: t('developers:webhooks.disabled.description'),
+				}}
+			/>
 		</Page>
 	);
 };

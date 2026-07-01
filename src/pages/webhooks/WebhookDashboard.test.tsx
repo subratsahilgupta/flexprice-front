@@ -4,6 +4,7 @@ import '@testing-library/jest-dom';
 
 vi.mock('svix-react', () => ({
 	SvixProvider: ({ children }: { children: React.ReactNode }) => <div data-testid='svix-provider'>{children}</div>,
+	AppPortal: ({ url }: { url: string }) => <div data-testid='svix-hosted-portal' data-url={url} />,
 	useEndpoints: () => ({
 		data: [],
 		loading: false,
@@ -42,15 +43,32 @@ vi.mock('@/components/molecules/ApiDocs/ApiDocs', () => ({ ApiDocsContent: () =>
 import WebhookDashboard from './WebhookDashboard';
 
 describe('WebhookDashboard', () => {
-	it('renders SvixProvider portal when svix enabled with token', () => {
-		mockData.mockReturnValue({ data: { svix_enabled: true, token: 'tok_123', app_id: 'tenant_env' }, isLoading: false, isError: false });
+	it('renders SvixProvider portal when svix enabled with token and no usable hosted url', () => {
+		mockData.mockReturnValue({
+			data: { svix_enabled: true, url: '', token: 'tok_123', app_id: 'tenant_env' },
+			isLoading: false,
+			isError: false,
+		});
 		render(<WebhookDashboard />);
 		expect(screen.getByTestId('svix-provider')).toBeInTheDocument();
+		expect(screen.queryByTestId('svix-hosted-portal')).not.toBeInTheDocument();
+	});
+
+	it('renders hosted AppPortal when svix enabled with a real hosted url', () => {
+		mockData.mockReturnValue({
+			data: { svix_enabled: true, url: 'https://app.svix.com/login#key=abc' },
+			isLoading: false,
+			isError: false,
+		});
+		render(<WebhookDashboard />);
+		expect(screen.getByTestId('svix-hosted-portal')).toBeInTheDocument();
+		expect(screen.queryByTestId('svix-provider')).not.toBeInTheDocument();
 	});
 
 	it('renders fallback when svix disabled', () => {
 		mockData.mockReturnValue({ data: { svix_enabled: false }, isLoading: false, isError: false });
 		render(<WebhookDashboard />);
 		expect(screen.queryByTestId('svix-provider')).not.toBeInTheDocument();
+		expect(screen.queryByTestId('svix-hosted-portal')).not.toBeInTheDocument();
 	});
 });
