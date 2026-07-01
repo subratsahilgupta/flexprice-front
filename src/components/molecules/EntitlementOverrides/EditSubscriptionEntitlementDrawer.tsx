@@ -13,6 +13,7 @@ import {
 	EnrichedSubscriptionEntitlement,
 	SubscriptionEntitlementOverrideValues,
 	getEffectiveStaticValue,
+	getEffectiveConfigValue,
 } from '@/utils/subscription/subscriptionEntitlementHelpers';
 
 interface EditSubscriptionEntitlementDrawerProps {
@@ -48,7 +49,7 @@ const EditSubscriptionEntitlementDrawer: FC<EditSubscriptionEntitlementDrawerPro
 			setUsageLimit(isCurrentlyInfinite ? '' : currentLimit?.toString() || '');
 			setStaticValue(getEffectiveStaticValue(entitlement.entitlement) || '');
 			setIsEnabled(entitlement.entitlement?.is_enabled ?? true);
-			setConfigValue((entitlement.entitlement?.config_value as JsonObject) ?? null);
+			setConfigValue(getEffectiveConfigValue(entitlement.sources));
 		}
 	}, [entitlement]);
 

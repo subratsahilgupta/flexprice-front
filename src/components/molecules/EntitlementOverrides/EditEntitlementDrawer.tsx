@@ -3,6 +3,9 @@ import { Sheet, Label, Input, Button, Checkbox } from '@/components/atoms';
 import { Switch } from '@/components/ui/switch';
 import { FEATURE_TYPE } from '@/models';
 import { EntitlementOverrideRequest } from '@/types/dto/Subscription';
+import { JsonEditor } from '@/components/molecules/JsonEditor';
+import { JsonObject } from '@/types/common';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
 interface EditEntitlementDrawerProps {
@@ -19,6 +22,7 @@ const EditEntitlementDrawer: FC<EditEntitlementDrawerProps> = ({ isOpen, onOpenC
 	const [isInfinite, setIsInfinite] = useState<boolean>(false);
 	const [staticValue, setStaticValue] = useState<string>('');
 	const [isEnabled, setIsEnabled] = useState<boolean>(true);
+	const [configValue, setConfigValue] = useState<JsonObject | null>(null);
 
 	useEffect(() => {
 		if (entitlement) {
@@ -29,6 +33,7 @@ const EditEntitlementDrawer: FC<EditEntitlementDrawerProps> = ({ isOpen, onOpenC
 			setUsageLimit(isCurrentlyInfinite ? '' : currentLimit?.toString() || '');
 			setStaticValue(entitlement.displayStaticValue || entitlement.static_value || '');
 			setIsEnabled(entitlement.displayIsEnabled ?? entitlement.is_enabled ?? true);
+			setConfigValue(((entitlement.displayConfigValue ?? entitlement.config_value) as JsonObject) ?? null);
 		}
 	}, [entitlement]);
 
@@ -52,6 +57,13 @@ const EditEntitlementDrawer: FC<EditEntitlementDrawerProps> = ({ isOpen, onOpenC
 			override.static_value = staticValue;
 		} else if (entitlement.feature_type === FEATURE_TYPE.BOOLEAN) {
 			override.is_enabled = isEnabled;
+		} else if (entitlement.feature_type === FEATURE_TYPE.CONFIG) {
+			override.is_enabled = isEnabled;
+			if (!configValue) {
+				toast.error(t('entitlements.addDrawer.configValueRequired'));
+				return;
+			}
+			override.config_value = configValue;
 		}
 
 		onSave(override);
@@ -153,7 +165,7 @@ const EditEntitlementDrawer: FC<EditEntitlementDrawerProps> = ({ isOpen, onOpenC
 					</div>
 				)}
 
-				{entitlement.feature_type === FEATURE_TYPE.BOOLEAN && (
+				{(entitlement.feature_type === FEATURE_TYPE.BOOLEAN || entitlement.feature_type === FEATURE_TYPE.CONFIG) && (
 					<div className='space-y-2'>
 						<Label label={t('entitlements.editDrawer.enabledLabel')} />
 						<div className='flex items-center gap-2'>
@@ -164,6 +176,13 @@ const EditEntitlementDrawer: FC<EditEntitlementDrawerProps> = ({ isOpen, onOpenC
 							{t('entitlements.editDrawer.originalBooleanPrefix')}{' '}
 							{entitlement.is_enabled ? t('entitlements.editDrawer.enabled') : t('entitlements.editDrawer.disabled')}
 						</div>
+					</div>
+				)}
+
+				{entitlement.feature_type === FEATURE_TYPE.CONFIG && (
+					<div className='space-y-2'>
+						<Label label={t('catalog:jsonEditor.title')} />
+						<JsonEditor key={entitlement.id ?? entitlement.feature_id} value={configValue} onChange={(val) => setConfigValue(val)} />
 					</div>
 				)}
 
