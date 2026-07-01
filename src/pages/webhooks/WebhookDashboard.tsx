@@ -5,8 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { AppPortal as SvixHostedPortal, SvixProvider } from 'svix-react';
 import 'svix-react/style.css';
-import CustomAppPortal from './AppPortal';
-import { EmptyPage } from '@/components/organisms';
+import { EmptyPage, WebhooksPortal } from '@/components/organisms';
 import useEnvironment from '@/hooks/useEnvironment';
 import { PREFETCH_REGISTRY, PrefetchQueryKey } from '@/config/prefetch';
 import { useTranslation } from 'react-i18next';
@@ -44,71 +43,72 @@ const WebhookDashboard = () => {
 				message: error?.message || t('developers:webhooks.unknownError'),
 			}),
 		);
+		// EmptyPage renders its own Page + heading, so it must not be nested inside another Page.
 		return (
-			<Page className='h-full w-full' heading={webhooksHeading}>
-				<ApiDocsContent tags={API_DOCS_TAGS.Webhooks} />
-				<EmptyPage
-					heading={webhooksHeading}
-					emptyStateCard={{
-						heading: t('developers:webhooks.emptyLoadFailed.heading'),
-						description: t('developers:webhooks.emptyLoadFailed.description'),
-					}}
-				/>
-			</Page>
+			<EmptyPage
+				heading={webhooksHeading}
+				tags={API_DOCS_TAGS.Webhooks}
+				emptyStateCard={{
+					heading: t('developers:webhooks.emptyLoadFailed.heading'),
+					description: t('developers:webhooks.emptyLoadFailed.description'),
+				}}
+			/>
 		);
 	}
 
 	if (!data?.svix_enabled) {
 		return (
-			<Page className='h-full w-full' heading={webhooksHeading}>
-				<ApiDocsContent tags={API_DOCS_TAGS.Webhooks} />
-				<EmptyPage
-					heading={webhooksHeading}
-					emptyStateCard={{
-						heading: t('developers:webhooks.disabled.heading'),
-						description: t('developers:webhooks.disabled.description'),
-					}}
-				/>
-			</Page>
-		);
-	}
-
-	const serverUrl = import.meta.env.VITE_SVIX_URL ?? '';
-	const url = data?.url;
-	const isHostedPortal = !!url && !url.includes('docs.svix.com');
-
-	if (isHostedPortal) {
-		return (
-			<Page className='h-full w-full' heading={webhooksHeading}>
-				<ApiDocsContent tags={API_DOCS_TAGS.Webhooks} />
-				<SvixHostedPortal url={url} style={{ width: '100%', height: '100%', border: 'none' }} primaryColor='#000000' />
-			</Page>
-		);
-	}
-
-	if (data?.token && data?.app_id) {
-		return (
-			<Page className='h-full w-full' heading={webhooksHeading}>
-				<ApiDocsContent tags={API_DOCS_TAGS.Webhooks} />
-				<SvixProvider token={data.token} appId={data.app_id} options={{ serverUrl }}>
-					<CustomAppPortal />
-				</SvixProvider>
-			</Page>
-		);
-	}
-
-	// Enabled but neither a usable hosted URL nor token/app_id — treat as the disabled/empty state.
-	return (
-		<Page className='h-full w-full' heading={webhooksHeading}>
-			<ApiDocsContent tags={API_DOCS_TAGS.Webhooks} />
 			<EmptyPage
 				heading={webhooksHeading}
+				tags={API_DOCS_TAGS.Webhooks}
 				emptyStateCard={{
 					heading: t('developers:webhooks.disabled.heading'),
 					description: t('developers:webhooks.disabled.description'),
 				}}
 			/>
-		</Page>
+		);
+	}
+
+	// VITE_SVIX_URL is only set when pointing at a self-hosted Svix instance — in that
+	// case the backend returns a token/app_id and we render our own portal against it.
+	// When unset (hosted Svix), the backend returns a hosted portal `url` instead and we
+	// fall back to Svix's own hosted iframe.
+	const serverUrl = import.meta.env.VITE_SVIX_URL ?? '';
+	const isSelfHosted = !!serverUrl;
+
+	if (isSelfHosted && data?.token && data?.app_id) {
+		return (
+			<Page className='h-full w-full' heading={webhooksHeading}>
+				<ApiDocsContent tags={API_DOCS_TAGS.Webhooks} />
+				<SvixProvider token={data.token} appId={data.app_id} options={{ serverUrl }}>
+					<WebhooksPortal />
+				</SvixProvider>
+			</Page>
+		);
+	}
+
+	const hostedUrl = data?.url;
+	const isHostedPortal = !isSelfHosted && !!hostedUrl;
+
+	if (isHostedPortal) {
+		return (
+			<Page className='h-full w-full' heading={webhooksHeading}>
+				<ApiDocsContent tags={API_DOCS_TAGS.Webhooks} />
+				<SvixHostedPortal url={hostedUrl} style={{ width: '100%', height: '100%', border: 'none' }} primaryColor='#000000' />
+			</Page>
+		);
+	}
+
+	// Enabled but neither a usable hosted URL nor self-hosted token/app_id — treat as the disabled/empty state.
+	return (
+		<EmptyPage
+			heading={webhooksHeading}
+			tags={API_DOCS_TAGS.Webhooks}
+			emptyStateCard={{
+				heading: t('developers:webhooks.disabled.heading'),
+				description: t('developers:webhooks.disabled.description'),
+			}}
+		/>
 	);
 };
 
