@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { Sheet, Label, Input, Button, Checkbox } from '@/components/atoms';
 import { Switch } from '@/components/ui/switch';
 import { JsonEditor } from '@/components/molecules/JsonEditor';
@@ -39,6 +39,13 @@ const EditSubscriptionEntitlementDrawer: FC<EditSubscriptionEntitlementDrawerPro
 	const [staticValue, setStaticValue] = useState<string>('');
 	const [isEnabled, setIsEnabled] = useState<boolean>(true);
 	const [configValue, setConfigValue] = useState<JsonObject | null>(null);
+	const [configInvalid, setConfigInvalid] = useState<boolean>(false);
+
+	const initialConfigValue = useMemo((): JsonObject | null => {
+		const raw = getEffectiveConfigValue(entitlement?.sources ?? []);
+		if (raw !== null && typeof raw === 'object' && !Array.isArray(raw)) return raw as JsonObject;
+		return null;
+	}, [entitlement]);
 
 	useEffect(() => {
 		if (entitlement) {
@@ -49,7 +56,8 @@ const EditSubscriptionEntitlementDrawer: FC<EditSubscriptionEntitlementDrawerPro
 			setUsageLimit(isCurrentlyInfinite ? '' : currentLimit?.toString() || '');
 			setStaticValue(getEffectiveStaticValue(entitlement.entitlement) || '');
 			setIsEnabled(entitlement.entitlement?.is_enabled ?? true);
-			setConfigValue(getEffectiveConfigValue(entitlement.sources));
+			setConfigValue(null);
+			setConfigInvalid(false);
 		}
 	}, [entitlement]);
 
@@ -114,12 +122,16 @@ const EditSubscriptionEntitlementDrawer: FC<EditSubscriptionEntitlementDrawerPro
 		} else if (entitlement.feature_type === FEATURE_TYPE.BOOLEAN) {
 			values.is_enabled = isEnabled;
 		} else if (entitlement.feature_type === FEATURE_TYPE.CONFIG) {
-			values.is_enabled = isEnabled;
-			if (!configValue) {
+			if (configInvalid) {
+				toast.error(t('jsonEditor.errorInvalidJson'));
+				return;
+			}
+			const effectiveConfigValue = configValue ?? initialConfigValue;
+			if (!effectiveConfigValue) {
 				toast.error(t('entitlements.addDrawer.configValueRequired'));
 				return;
 			}
-			values.config_value = configValue;
+			values.config_value = effectiveConfigValue;
 		}
 
 		saveOverride(values);
@@ -220,7 +232,7 @@ const EditSubscriptionEntitlementDrawer: FC<EditSubscriptionEntitlementDrawerPro
 					</div>
 				)}
 
-				{(entitlement.feature_type === FEATURE_TYPE.BOOLEAN || entitlement.feature_type === FEATURE_TYPE.CONFIG) && (
+				{entitlement.feature_type === FEATURE_TYPE.BOOLEAN && (
 					<div className='space-y-2'>
 						<Label label={t('entitlements.editDrawer.enabledLabel')} />
 						<div className='flex items-center gap-2'>
@@ -241,8 +253,11 @@ const EditSubscriptionEntitlementDrawer: FC<EditSubscriptionEntitlementDrawerPro
 						<Label label={t('catalog:jsonEditor.title')} />
 						<JsonEditor
 							key={entitlement.entitlement?.id ?? entitlement.feature_id}
-							value={configValue}
-							onChange={(val) => setConfigValue(val)}
+							value={initialConfigValue}
+							onChange={(val, raw) => {
+								setConfigValue(val);
+								setConfigInvalid(raw.trim() !== '' && raw.trim() !== '{}' && val === null);
+							}}
 						/>
 					</div>
 				)}
