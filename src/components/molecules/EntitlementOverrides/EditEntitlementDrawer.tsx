@@ -23,6 +23,7 @@ const EditEntitlementDrawer: FC<EditEntitlementDrawerProps> = ({ isOpen, onOpenC
 	const [staticValue, setStaticValue] = useState<string>('');
 	const [isEnabled, setIsEnabled] = useState<boolean>(true);
 	const [configValue, setConfigValue] = useState<JsonObject | null>(null);
+	const [configInvalid, setConfigInvalid] = useState<boolean>(false);
 
 	// Derived synchronously so JsonEditor always mounts with the correct value on first open
 	const initialConfigValue = useMemo((): JsonObject | null => {
@@ -41,6 +42,7 @@ const EditEntitlementDrawer: FC<EditEntitlementDrawerProps> = ({ isOpen, onOpenC
 			setStaticValue(entitlement.displayStaticValue || entitlement.static_value || '');
 			setIsEnabled(entitlement.displayIsEnabled ?? entitlement.is_enabled ?? true);
 			setConfigValue(null);
+			setConfigInvalid(false);
 		}
 	}, [entitlement]);
 
@@ -65,6 +67,10 @@ const EditEntitlementDrawer: FC<EditEntitlementDrawerProps> = ({ isOpen, onOpenC
 		} else if (entitlement.feature_type === FEATURE_TYPE.BOOLEAN) {
 			override.is_enabled = isEnabled;
 		} else if (entitlement.feature_type === FEATURE_TYPE.CONFIG) {
+			if (configInvalid) {
+				toast.error(t('jsonEditor.errorInvalidJson'));
+				return;
+			}
 			const effectiveConfigValue = configValue ?? initialConfigValue;
 			if (!effectiveConfigValue) {
 				toast.error(t('entitlements.addDrawer.configValueRequired'));
@@ -189,7 +195,14 @@ const EditEntitlementDrawer: FC<EditEntitlementDrawerProps> = ({ isOpen, onOpenC
 				{entitlement.feature_type === FEATURE_TYPE.CONFIG && (
 					<div className='space-y-2'>
 						<Label label={t('catalog:jsonEditor.title')} />
-						<JsonEditor key={entitlement.id ?? entitlement.feature_id} value={initialConfigValue} onChange={(val) => setConfigValue(val)} />
+						<JsonEditor
+							key={entitlement.id ?? entitlement.feature_id}
+							value={initialConfigValue}
+							onChange={(val, raw) => {
+								setConfigValue(val);
+								setConfigInvalid(raw.trim() !== '' && raw.trim() !== '{}' && val === null);
+							}}
+						/>
 					</div>
 				)}
 
