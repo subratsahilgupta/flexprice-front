@@ -25,10 +25,11 @@ const EditEntitlementDrawer: FC<EditEntitlementDrawerProps> = ({ isOpen, onOpenC
 	const [configValue, setConfigValue] = useState<JsonObject | null>(null);
 
 	// Derived synchronously so JsonEditor always mounts with the correct value on first open
-	const initialConfigValue = useMemo(
-		() => ((entitlement?.displayConfigValue ?? entitlement?.config_value) as JsonObject) ?? null,
-		[entitlement],
-	);
+	const initialConfigValue = useMemo((): JsonObject | null => {
+		const raw = entitlement?.displayConfigValue ?? entitlement?.config_value;
+		if (raw !== null && typeof raw === 'object' && !Array.isArray(raw)) return raw as JsonObject;
+		return null;
+	}, [entitlement]);
 
 	useEffect(() => {
 		if (entitlement) {
