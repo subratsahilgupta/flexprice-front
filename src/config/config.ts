@@ -56,6 +56,10 @@ interface IntercomConfig {
 	enabled: boolean;
 	appId: string;
 }
+interface ReoConfig {
+	enabled: boolean;
+	clientId: string;
+}
 interface RegionConfig {
 	indiaUrl: string;
 	usUrl: string;
@@ -149,6 +153,7 @@ export interface Config {
 	posthog: PosthogConfig;
 	paddle: PaddleConfig;
 	intercom: IntercomConfig;
+	reo: ReoConfig;
 	region: RegionConfig;
 	integrations: IntegrationsConfig;
 	restrictions: RestrictionsConfig;
@@ -201,6 +206,10 @@ export const config: Config = {
 	intercom: {
 		enabled: import.meta.env.VITE_INTERCOM_ENABLED === 'true',
 		appId: import.meta.env.VITE_INTERCOM_APP_ID ?? import.meta.env.VITE_APP_INTERCOM_APP_ID ?? '',
+	},
+	reo: {
+		enabled: import.meta.env.VITE_REO_ENABLED === 'true',
+		clientId: import.meta.env.VITE_REO_CLIENT_ID ?? '',
 	},
 	region: {
 		indiaUrl: import.meta.env.VITE_DASHBOARD_URL_INDIA ?? '',
