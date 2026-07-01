@@ -3,10 +3,9 @@ import { ApiDocsContent } from '@/components/molecules/ApiDocs/ApiDocs';
 import { API_DOCS_TAGS } from '@/constants/apiDocsTags';
 import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { AppPortal } from 'svix-react';
-import 'svix-react/style.css';
+import { SvixProvider } from 'svix-react';
+import AppPortal from './AppPortal';
 import { EmptyPage } from '@/components/organisms';
-import { useMemo } from 'react';
 import useEnvironment from '@/hooks/useEnvironment';
 import { PREFETCH_REGISTRY, PrefetchQueryKey } from '@/config/prefetch';
 import { useTranslation } from 'react-i18next';
@@ -24,21 +23,6 @@ const WebhookDashboard = () => {
 		gcTime: prefetch.gcTime,
 		enabled: !!envId,
 	});
-
-	const appPortalProps = useMemo(
-		() => ({
-			primaryColor: '#000000',
-			style: {
-				width: '100%',
-				height: '100%',
-				color: '#000000',
-				border: 'none',
-				backgroundColor: '#000000',
-			},
-			url: data?.url ?? '',
-		}),
-		[data?.url],
-	);
 
 	const webhooksHeading = t('common:nav.webhooks');
 
@@ -88,10 +72,30 @@ const WebhookDashboard = () => {
 		);
 	}
 
+	const serverUrl = import.meta.env.VITE_SVIX_URL ?? '';
+
+	if (!data?.token || !data?.app_id) {
+		// Enabled but missing token/app_id — treat as the disabled/empty state.
+		return (
+			<Page className='h-full w-full' heading={webhooksHeading}>
+				<ApiDocsContent tags={API_DOCS_TAGS.Webhooks} />
+				<EmptyPage
+					heading={webhooksHeading}
+					emptyStateCard={{
+						heading: t('developers:webhooks.disabled.heading'),
+						description: t('developers:webhooks.disabled.description'),
+					}}
+				/>
+			</Page>
+		);
+	}
+
 	return (
 		<Page className='h-full w-full' heading={webhooksHeading}>
 			<ApiDocsContent tags={API_DOCS_TAGS.Webhooks} />
-			<AppPortal {...appPortalProps} />
+			<SvixProvider token={data.token} appId={data.app_id} options={{ serverUrl }}>
+				<AppPortal />
+			</SvixProvider>
 		</Page>
 	);
 };
