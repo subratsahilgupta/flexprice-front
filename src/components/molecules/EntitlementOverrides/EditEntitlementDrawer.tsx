@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { Sheet, Label, Input, Button, Checkbox } from '@/components/atoms';
 import { Switch } from '@/components/ui/switch';
 import { FEATURE_TYPE } from '@/models';
@@ -24,6 +24,13 @@ const EditEntitlementDrawer: FC<EditEntitlementDrawerProps> = ({ isOpen, onOpenC
 	const [isEnabled, setIsEnabled] = useState<boolean>(true);
 	const [configValue, setConfigValue] = useState<JsonObject | null>(null);
 
+	// Derived synchronously so JsonEditor always mounts with the correct value on first open
+	const initialConfigValue = useMemo((): JsonObject | null => {
+		const raw = entitlement?.displayConfigValue ?? entitlement?.config_value;
+		if (raw !== null && typeof raw === 'object' && !Array.isArray(raw)) return raw as JsonObject;
+		return null;
+	}, [entitlement]);
+
 	useEffect(() => {
 		if (entitlement) {
 			const currentLimit = 'displayUsageLimit' in entitlement ? entitlement.displayUsageLimit : entitlement.usage_limit;
@@ -33,7 +40,7 @@ const EditEntitlementDrawer: FC<EditEntitlementDrawerProps> = ({ isOpen, onOpenC
 			setUsageLimit(isCurrentlyInfinite ? '' : currentLimit?.toString() || '');
 			setStaticValue(entitlement.displayStaticValue || entitlement.static_value || '');
 			setIsEnabled(entitlement.displayIsEnabled ?? entitlement.is_enabled ?? true);
-			setConfigValue(((entitlement.displayConfigValue ?? entitlement.config_value) as JsonObject) ?? null);
+			setConfigValue(null);
 		}
 	}, [entitlement]);
 
@@ -58,12 +65,12 @@ const EditEntitlementDrawer: FC<EditEntitlementDrawerProps> = ({ isOpen, onOpenC
 		} else if (entitlement.feature_type === FEATURE_TYPE.BOOLEAN) {
 			override.is_enabled = isEnabled;
 		} else if (entitlement.feature_type === FEATURE_TYPE.CONFIG) {
-			override.is_enabled = isEnabled;
-			if (!configValue) {
+			const effectiveConfigValue = configValue ?? initialConfigValue;
+			if (!effectiveConfigValue) {
 				toast.error(t('entitlements.addDrawer.configValueRequired'));
 				return;
 			}
-			override.config_value = configValue;
+			override.config_value = effectiveConfigValue;
 		}
 
 		onSave(override);
@@ -165,7 +172,7 @@ const EditEntitlementDrawer: FC<EditEntitlementDrawerProps> = ({ isOpen, onOpenC
 					</div>
 				)}
 
-				{(entitlement.feature_type === FEATURE_TYPE.BOOLEAN || entitlement.feature_type === FEATURE_TYPE.CONFIG) && (
+				{entitlement.feature_type === FEATURE_TYPE.BOOLEAN && (
 					<div className='space-y-2'>
 						<Label label={t('entitlements.editDrawer.enabledLabel')} />
 						<div className='flex items-center gap-2'>
@@ -182,7 +189,7 @@ const EditEntitlementDrawer: FC<EditEntitlementDrawerProps> = ({ isOpen, onOpenC
 				{entitlement.feature_type === FEATURE_TYPE.CONFIG && (
 					<div className='space-y-2'>
 						<Label label={t('catalog:jsonEditor.title')} />
-						<JsonEditor key={entitlement.id ?? entitlement.feature_id} value={configValue} onChange={(val) => setConfigValue(val)} />
+						<JsonEditor key={entitlement.id ?? entitlement.feature_id} value={initialConfigValue} onChange={(val) => setConfigValue(val)} />
 					</div>
 				)}
 
