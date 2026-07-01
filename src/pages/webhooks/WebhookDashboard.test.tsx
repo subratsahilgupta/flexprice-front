@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import '@testing-library/jest-dom';
 
 vi.mock('svix-react', () => ({
@@ -31,6 +31,17 @@ vi.mock('react-i18next', () => ({
 	useTranslation: () => ({ t: (key: string) => key }),
 }));
 
+vi.mock('@/components/organisms', async (importOriginal) => {
+	const actual = await importOriginal<typeof import('@/components/organisms')>();
+	return {
+		...actual,
+		WebhooksPortal: () => <div data-testid='webhooks-portal' />,
+		EmptyPage: ({ emptyStateCard }: { emptyStateCard?: { heading: string } }) => (
+			<div data-testid='empty-page'>{emptyStateCard?.heading}</div>
+		),
+	};
+});
+
 const mockData = vi.fn();
 vi.mock('@tanstack/react-query', async (importOriginal) => {
 	const actual = await importOriginal<typeof import('@tanstack/react-query')>();
@@ -43,7 +54,16 @@ vi.mock('@/components/molecules/ApiDocs/ApiDocs', () => ({ ApiDocsContent: () =>
 import WebhookDashboard from './WebhookDashboard';
 
 describe('WebhookDashboard', () => {
-	it('renders SvixProvider portal when svix enabled with token and no usable hosted url', () => {
+	beforeEach(() => {
+		vi.stubEnv('VITE_SVIX_URL', '');
+	});
+
+	afterEach(() => {
+		vi.unstubAllEnvs();
+	});
+
+	it('renders self-hosted WebhooksPortal when VITE_SVIX_URL is set with token and app_id', () => {
+		vi.stubEnv('VITE_SVIX_URL', 'https://svix.example.com');
 		mockData.mockReturnValue({
 			data: { svix_enabled: true, url: '', token: 'tok_123', app_id: 'tenant_env' },
 			isLoading: false,
@@ -51,10 +71,11 @@ describe('WebhookDashboard', () => {
 		});
 		render(<WebhookDashboard />);
 		expect(screen.getByTestId('svix-provider')).toBeInTheDocument();
+		expect(screen.getByTestId('webhooks-portal')).toBeInTheDocument();
 		expect(screen.queryByTestId('svix-hosted-portal')).not.toBeInTheDocument();
 	});
 
-	it('renders hosted AppPortal when svix enabled with a real hosted url', () => {
+	it('renders hosted AppPortal when VITE_SVIX_URL is unset and a hosted url is returned', () => {
 		mockData.mockReturnValue({
 			data: { svix_enabled: true, url: 'https://app.svix.com/login#key=abc' },
 			isLoading: false,
@@ -65,9 +86,27 @@ describe('WebhookDashboard', () => {
 		expect(screen.queryByTestId('svix-provider')).not.toBeInTheDocument();
 	});
 
+	it('prefers self-hosted portal over hosted url when VITE_SVIX_URL is set', () => {
+		vi.stubEnv('VITE_SVIX_URL', 'https://svix.example.com');
+		mockData.mockReturnValue({
+			data: {
+				svix_enabled: true,
+				url: 'https://app.svix.com/login#key=abc',
+				token: 'tok_123',
+				app_id: 'tenant_env',
+			},
+			isLoading: false,
+			isError: false,
+		});
+		render(<WebhookDashboard />);
+		expect(screen.getByTestId('webhooks-portal')).toBeInTheDocument();
+		expect(screen.queryByTestId('svix-hosted-portal')).not.toBeInTheDocument();
+	});
+
 	it('renders fallback when svix disabled', () => {
 		mockData.mockReturnValue({ data: { svix_enabled: false }, isLoading: false, isError: false });
 		render(<WebhookDashboard />);
+		expect(screen.getByTestId('empty-page')).toBeInTheDocument();
 		expect(screen.queryByTestId('svix-provider')).not.toBeInTheDocument();
 		expect(screen.queryByTestId('svix-hosted-portal')).not.toBeInTheDocument();
 	});
