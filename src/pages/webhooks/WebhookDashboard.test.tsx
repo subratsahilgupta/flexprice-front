@@ -23,6 +23,7 @@ vi.mock('svix-react', () => ({
 	}),
 	useEndpointFunctions: () => ({ deleteEndpoint: vi.fn(), updateEndpoint: vi.fn(), recoverEndpointMessages: vi.fn() }),
 	useEndpointSecret: () => ({ data: undefined, loading: false, error: undefined, reload: vi.fn() }),
+	useSvix: () => ({ svix: { endpoint: { create: vi.fn(), delete: vi.fn(), getSecret: vi.fn() } }, appId: 'x' }),
 }));
 
 vi.mock('react-i18next', () => ({
