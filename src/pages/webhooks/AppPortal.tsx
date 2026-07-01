@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useEndpoints, useNewEndpoint, useEndpointFunctions, useEndpointSecret } from 'svix-react';
+import { useEndpoints, useNewEndpoint, useEndpointFunctions, useEndpointSecret, useSvix } from 'svix-react';
 import type { EndpointOut } from 'svix';
 import { Button, Input, Loader } from '@/components/atoms';
 import toast from 'react-hot-toast';
@@ -58,6 +58,7 @@ export default function AppPortal() {
 	const { t } = useTranslation('developers');
 	const endpoints = useEndpoints();
 	const form = useNewEndpoint();
+	const { svix, appId } = useSvix();
 	const [submitting, setSubmitting] = useState(false);
 
 	if (endpoints.loading && !endpoints.data) {
@@ -79,16 +80,25 @@ export default function AppPortal() {
 					e.preventDefault();
 					if (!form.url.value) return;
 					setSubmitting(true);
-					const res = await form.createEndpoint();
-					setSubmitting(false);
-					if (res.error) {
+					try {
+						// ponytail: svix-react's useNewEndpoint always sends filterTypes: [],
+						// which Svix rejects as invalid. Build the payload ourselves and omit
+						// filterTypes entirely when no event types are selected (v1 has no
+						// picker, so this is always "subscribe to all events").
+						await svix.endpoint.create(appId, {
+							url: form.url.value,
+							description: form.description.value || undefined,
+							version: 1,
+						});
+						toast.success(t('webhooks.appPortal.addSuccess'));
+						form.url.setValue('');
+						form.description.setValue('');
+						endpoints.reload();
+					} catch {
 						toast.error(t('webhooks.appPortal.addFailed'));
-						return;
+					} finally {
+						setSubmitting(false);
 					}
-					toast.success(t('webhooks.appPortal.addSuccess'));
-					form.url.setValue('');
-					form.description.setValue('');
-					endpoints.reload();
 				}}>
 				<Input
 					label={t('webhooks.appPortal.urlLabel')}
