@@ -984,6 +984,7 @@
 			"tooltipUsageLimit": "Usage Limit: {{from}} → {{to}}",
 			"tooltipStaticValue": "Static Value: {{from}} → {{to}}",
 			"tooltipStatus": "Status: {{from}} → {{to}}",
+			"tooltipConfig": "Config value overridden for this subscription",
 			"valuePlaceholder": "--",
 			"perPeriodSuffix": " / {{period}}",
 			"featureTypeMetered": "Metered",
