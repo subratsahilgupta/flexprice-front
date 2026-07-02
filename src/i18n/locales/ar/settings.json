@@ -725,8 +725,7 @@
 			"redirectUrlHint": "العنوان بعد نجاح الدفع (اختياري)",
 			"webhookSecretPlaceholder": "pdl_ntfset_...",
 			"webhookIntro": "اضبط عنوان الويب هوك في لوحة Paddle:",
-			"webhookEventsIntro": "اشترك Events في Paddle:",
-			"webhookEventTransactionsCompleted": "transactions.completed"
+			"webhookEventsIntro": "اشترك Events في Paddle:"
 		},
 		"whop": {
 			"description": "اربط Flexprice بـ Whop لمزامنة الفواتير.",
