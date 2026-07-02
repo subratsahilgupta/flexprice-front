@@ -984,6 +984,7 @@
 			"tooltipUsageLimit": "حد الاستخدام: {{from}} → {{to}}",
 			"tooltipStaticValue": "القيمة الثابتة: {{from}} → {{to}}",
 			"tooltipStatus": "الحالة: {{from}} → {{to}}",
+			"tooltipConfig": "تم تجاوز قيمة التكوين لهذا الاشتراك",
 			"valuePlaceholder": "--",
 			"perPeriodSuffix": " / {{period}}",
 			"featureTypeMetered": "مقاس",
