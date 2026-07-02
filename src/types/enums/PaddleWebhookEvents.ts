@@ -4,7 +4,7 @@
  */
 export enum PaddleWebhookEvents {
 	// Transaction events
-	TRANSACTIONS_COMPLETED = 'transactions.completed',
+	TRANSACTIONS_COMPLETED = 'transaction.completed',
 
 	// Subscription events
 	SUBSCRIPTION_ACTIVATED = 'subscription.activated',
