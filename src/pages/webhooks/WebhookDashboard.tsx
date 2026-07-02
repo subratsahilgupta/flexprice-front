@@ -7,6 +7,7 @@ import { AppPortal as SvixHostedPortal, SvixProvider } from 'svix-react';
 import 'svix-react/style.css';
 import { EmptyPage, WebhooksPortal } from '@/components/organisms';
 import useEnvironment from '@/hooks/useEnvironment';
+import { config, WEBHOOK_PROVIDER } from '@/config/config';
 import { PREFETCH_REGISTRY, PrefetchQueryKey } from '@/config/prefetch';
 import { useTranslation } from 'react-i18next';
 
@@ -69,14 +70,12 @@ const WebhookDashboard = () => {
 		);
 	}
 
-	// VITE_SVIX_URL is only set when pointing at a self-hosted Svix instance — in that
-	// case the backend returns a token/app_id and we render our own portal against it.
-	// When unset (hosted Svix), the backend returns a hosted portal `url` instead and we
-	// fall back to Svix's own hosted iframe.
-	const serverUrl = import.meta.env.VITE_SVIX_URL ?? '';
-	const isSelfHosted = !!serverUrl;
+	// Custom provider (Flexprice or self-hosted Svix): backend returns token/app_id and we
+	// render our own portal. Hosted Svix (default): backend returns a hosted portal `url`.
+	const isCustomProvider = config.webhooks.provider === WEBHOOK_PROVIDER.Custom;
+	const serverUrl = config.webhooks.svixUrl;
 
-	if (isSelfHosted && data?.token && data?.app_id) {
+	if (isCustomProvider && data?.token && data?.app_id) {
 		return (
 			<Page className='h-full w-full' heading={webhooksHeading}>
 				<ApiDocsContent tags={API_DOCS_TAGS.Webhooks} />
@@ -88,7 +87,7 @@ const WebhookDashboard = () => {
 	}
 
 	const hostedUrl = data?.url;
-	const isHostedPortal = !isSelfHosted && !!hostedUrl;
+	const isHostedPortal = !isCustomProvider && !!hostedUrl;
 
 	if (isHostedPortal) {
 		return (
