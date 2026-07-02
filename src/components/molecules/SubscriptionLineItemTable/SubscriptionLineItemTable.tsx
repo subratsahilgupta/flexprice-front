@@ -6,9 +6,9 @@ import { ChargeValueCell, ColumnData, FlexpriceTable, TerminateLineItemModal, Dr
 import { PriceTooltip } from '@/components/molecules/PriceTooltip';
 import { LineItem, SUBSCRIPTION_LINE_ITEM_ENTITY_TYPE } from '@/models/Subscription';
 import { FC, useState, useCallback, useMemo } from 'react';
-import { Trash2, Pencil, Info, Eye, Tag, TicketX } from 'lucide-react';
+import { Trash2, Pencil, Info, Eye, Tag, TicketX, Copy } from 'lucide-react';
 import { ENTITY_STATUS } from '@/models/base';
-import { formatBillingPeriodForDisplay, getCurrencySymbol, getPriceTypeLabel } from '@/utils/common/helper_functions';
+import { copyToClipboard, formatBillingPeriodForDisplay, getCurrencySymbol, getPriceTypeLabel } from '@/utils/common/helper_functions';
 import { PRICE_ENTITY_TYPE, PRICE_STATUS } from '@/models/Price';
 import { formatDateTimeWithSecondsAndTimezone } from '@/utils/common/format_date';
 import LineItemWindowCommitmentViewDialog from '@/components/molecules/Subscription/LineItemWindowCommitmentViewDialog';
@@ -107,6 +107,7 @@ const LineItemDropdown: FC<LineItemDropdownProps> = ({
 	hasLinkedCoupon,
 }) => {
 	const { t } = useTranslation('billing');
+	const { t: tCommon } = useTranslation('common');
 	const [isOpen, setIsOpen] = useState(false);
 	const showViewCommitment = !!onViewCommitment && lineItemHasCommitment(row);
 
@@ -122,6 +123,25 @@ const LineItemDropdown: FC<LineItemDropdownProps> = ({
 				isOpen={isOpen}
 				onOpenChange={setIsOpen}
 				options={[
+					{
+						label: 'Copy line item ID',
+						icon: <Copy />,
+						onSelect: (e: Event) => {
+							e.preventDefault();
+							setIsOpen(false);
+							void copyToClipboard(row.id, tCommon('copyId.toastWithType', { type: 'Line item' }));
+						},
+					},
+					{
+						label: 'Copy price ID',
+						icon: <Copy />,
+						onSelect: (e: Event) => {
+							e.preventDefault();
+							setIsOpen(false);
+							void copyToClipboard(row.price_id, tCommon('copyId.toastWithType', { type: 'Price' }));
+						},
+						disabled: !row.price_id,
+					},
 					...(showViewCommitment
 						? [
 								{
