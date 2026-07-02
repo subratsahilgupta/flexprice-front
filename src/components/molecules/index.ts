@@ -191,3 +191,6 @@ export { default as ApiDocs, ApiDocsContent } from './ApiDocs';
 
 // Debug & Development
 export { default as DebugMenu } from './DebugMenu';
+
+// Webhooks
+export { EndpointsTable, AddEndpointForm, EventCatalogBrowser, MessageLogsTable, ActivityOverview } from './Webhooks';
