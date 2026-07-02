@@ -26,6 +26,11 @@ export enum AUTH_PROVIDER {
 	Supabase = 'supabase',
 }
 
+export enum WEBHOOK_PROVIDER {
+	Svix = 'svix',
+	Custom = 'custom',
+}
+
 interface AppConfig {
 	env: APP_ENV;
 	isProd: boolean;
@@ -70,6 +75,12 @@ interface IntegrationsConfig {
 }
 interface RestrictionsConfig {
 	rawEnvs: string;
+}
+
+export interface WebhooksConfig {
+	provider: WEBHOOK_PROVIDER;
+	/** Public origin of a self-hosted Svix API (browser-reachable). Empty when using hosted Svix. */
+	svixUrl: string;
 }
 
 interface FeaturesConfig {
@@ -164,6 +175,21 @@ export interface Config {
 	allowedLocales: Locale[];
 	typography: TypographyConfig;
 	features: FeaturesConfig;
+	webhooks: WebhooksConfig;
+}
+
+/**
+ * Resolves the active webhook portal provider from env.
+ * - `flexprice` → custom (Flexprice portal).
+ * - `svix` → hosted Svix (explicit default).
+ * - unset/empty → hosted Svix, unless VITE_SVIX_URL is set (then custom).
+ */
+export function resolveWebhookProvider(providerRaw?: string, svixUrl?: string): WEBHOOK_PROVIDER {
+	const provider = providerRaw?.trim().toLowerCase();
+	if (provider === 'flexprice') return WEBHOOK_PROVIDER.Custom;
+	if (provider === 'svix') return WEBHOOK_PROVIDER.Svix;
+	if (!provider && svixUrl?.trim()) return WEBHOOK_PROVIDER.Custom;
+	return WEBHOOK_PROVIDER.Svix;
 }
 
 function parseAppEnv(): APP_ENV {
@@ -175,6 +201,8 @@ function parseAppEnv(): APP_ENV {
 }
 
 const appEnv = parseAppEnv();
+
+const svixUrl = import.meta.env.VITE_SVIX_URL ?? '';
 
 export const config: Config = {
 	app: {
@@ -230,6 +258,10 @@ export const config: Config = {
 	typography: typographyConfig,
 	features: {
 		tenantFeatureAllowlist,
+	},
+	webhooks: {
+		provider: resolveWebhookProvider(import.meta.env.VITE_WEBHOOK_PROVIDER, svixUrl),
+		svixUrl,
 	},
 };
 

@@ -734,6 +734,8 @@ const AggregationSection = ({
 						...meter?.aggregation,
 						type: nextType,
 						field: meter?.aggregation?.field ?? '',
+						// Drop expression when switching to a type that can't carry one
+						// (e.g. COUNT, COUNT_UNIQUE, SUM_WITH_MULTIPLIER, WEIGHTED_SUM).
 						expression: stillSupportsExpression ? meter?.aggregation?.expression : '',
 						...(supportsBucketSize ? {} : { bucket_size: undefined }),
 					},

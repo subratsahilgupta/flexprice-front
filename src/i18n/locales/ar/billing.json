@@ -778,7 +778,20 @@
 			"cancel": "إلغاء",
 			"saving": "جارٍ الحفظ...",
 			"saveChanges": "حفظ التغييرات",
-			"statusBadgeLabel": "الرصيد {{condition}} {{threshold}}"
+			"statusBadgeLabel": "الرصيد {{condition}} {{threshold}}",
+			"validation": {
+				"atLeastOneThreshold": "يرجى تكوين مستوى عتبة واحد على الأقل عند تفعيل التنبيهات",
+				"invalidCriticalThreshold": "يرجى إدخال قيمة عتبة حرجة صالحة",
+				"invalidWarningThreshold": "يرجى إدخال قيمة عتبة تحذير صالحة",
+				"invalidInfoThreshold": "يرجى إدخال قيمة عتبة معلومات صالحة",
+				"criticalRequiredForWarning": "عتبة حرجة مطلوبة عند تعيين عتبة تحذير",
+				"warningMustBeLessThanCritical": "لتنبيهات \"أكبر من\"، يجب أن تكون عتبة التحذير أقل من العتبة الحرجة",
+				"warningMustBeGreaterThanCritical": "لتنبيهات \"أقل من\"، يجب أن تكون عتبة التحذير أكبر من العتبة الحرجة",
+				"infoMustBeLessThanWarning": "لتنبيهات \"أكبر من\"، يجب أن تكون عتبة المعلومات أقل من عتبة التحذير",
+				"infoMustBeGreaterThanWarning": "لتنبيهات \"أقل من\"، يجب أن تكون عتبة المعلومات أكبر من عتبة التحذير",
+				"infoMustBeLessThanCritical": "لتنبيهات \"أكبر من\"، يجب أن تكون عتبة المعلومات أقل من العتبة الحرجة",
+				"infoMustBeGreaterThanCritical": "لتنبيهات \"أقل من\"، يجب أن تكون عتبة المعلومات أكبر من العتبة الحرجة"
+			}
 		},
 		"autoTopup": {
 			"dialogTitle": "إعدادات التعبئة التلقائية",

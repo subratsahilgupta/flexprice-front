@@ -21,6 +21,7 @@ import {
 	enrichSubscriptionEntitlements,
 	getPrimarySourceLabel,
 	getEffectiveStaticValue,
+	getEffectiveConfigValue,
 } from '@/utils/subscription/subscriptionEntitlementHelpers';
 import { JsonObject } from '@/types/common';
 
@@ -309,16 +310,36 @@ const SubscriptionEntitlementsSection: FC<SubscriptionEntitlementsSectionProps> 
 		}
 
 		if (featureType === FEATURE_TYPE.CONFIG) {
-			const cv = entitlementData?.config_value;
+			const cv = getEffectiveConfigValue(row.sources);
 			const compact = cv && Object.keys(cv).length > 0 ? JSON.stringify(cv) : null;
 			if (!compact) return <span className='text-muted-foreground'>{tc('labels.na')}</span>;
 			return (
-				<button
-					className='font-mono text-xs text-muted-foreground truncate max-w-xs block hover:text-foreground hover:underline text-left'
-					title={compact}
-					onClick={() => setConfigSheet({ open: true, name: row.feature?.name ?? '', value: cv! })}>
-					{compact}
-				</button>
+				<div className='flex items-center gap-2'>
+					<button
+						type='button'
+						className='font-mono text-xs text-left text-muted-foreground rounded border border-transparent transition-all hover:border-border hover:shadow-sm hover:text-foreground max-w-md'
+						style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', wordBreak: 'break-all' }}
+						onClick={() => setConfigSheet({ open: true, name: row.feature?.name ?? '', value: cv ?? null })}>
+						{compact}
+					</button>
+					{row.isOverrideOfParent && (
+						<TooltipProvider delayDuration={0}>
+							<Tooltip>
+								<TooltipTrigger>
+									<Info className='h-4 w-4 text-orange-600 hover:text-orange-600 transition-colors duration-150' />
+								</TooltipTrigger>
+								<TooltipContent
+									sideOffset={5}
+									className='bg-white border border-gray-200 shadow-lg text-sm text-gray-900 px-4 py-3 rounded-[6px] max-w-[300px]'>
+									<div className='space-y-2'>
+										<div className='font-medium text-gray-900'>{t('entitlements.overridesTable.overrideAppliedTitle')}</div>
+										<div className='text-sm text-gray-600'>{t('entitlements.overridesTable.tooltipConfig')}</div>
+									</div>
+								</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
+					)}
+				</div>
 			);
 		}
 

@@ -110,3 +110,15 @@ export const getEffectiveStaticValue = (entitlement?: { static_values?: string[]
 	}
 	return entitlement?.static_value;
 };
+
+/**
+ * Read the effective config value for a CONFIG entitlement.
+ * Prefers the subscription-scoped source (override) over the plan source.
+ */
+export const getEffectiveConfigValue = (sources?: SubscriptionEntitlementSource[]): JsonObject | null => {
+	if (!sources?.length) return null;
+	const subSource = sources.find((s) => s.entity_type === 'subscription');
+	if (subSource?.config_value) return subSource.config_value;
+	const planSource = sources.find((s) => s.entity_type === 'plan');
+	return planSource?.config_value ?? null;
+};
