@@ -254,7 +254,13 @@
 		"toastFallback": "ID copied to clipboard",
 		"toastWithType": "{{type}} ID copied to clipboard",
 		"titleWithType": "Copy {{type}} ID",
-		"defaultEntityType": "ID"
+		"defaultEntityType": "ID",
+		"lineItemId": "Line item ID",
+		"priceId": "Price ID",
+		"entityTypes": {
+			"lineItem": "Line item",
+			"price": "Price"
+		}
 	},
 	"dateTime": {
 		"placeholderFormat": "MM/DD/YYYY hh:mm aa",

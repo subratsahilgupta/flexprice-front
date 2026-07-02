@@ -124,21 +124,21 @@ const LineItemDropdown: FC<LineItemDropdownProps> = ({
 				onOpenChange={setIsOpen}
 				options={[
 					{
-						label: 'Copy line item ID',
+						label: tCommon('copyId.lineItemId'),
 						icon: <Copy />,
 						onSelect: (e: Event) => {
 							e.preventDefault();
 							setIsOpen(false);
-							void copyToClipboard(row.id, tCommon('copyId.toastWithType', { type: 'Line item' }));
+							void copyToClipboard(row.id, tCommon('copyId.toastWithType', { type: tCommon('copyId.entityTypes.lineItem') }));
 						},
 					},
 					{
-						label: 'Copy price ID',
+						label: tCommon('copyId.priceId'),
 						icon: <Copy />,
 						onSelect: (e: Event) => {
 							e.preventDefault();
 							setIsOpen(false);
-							void copyToClipboard(row.price_id, tCommon('copyId.toastWithType', { type: 'Price' }));
+							void copyToClipboard(row.price_id, tCommon('copyId.toastWithType', { type: tCommon('copyId.entityTypes.price') }));
 						},
 						disabled: !row.price_id,
 					},
