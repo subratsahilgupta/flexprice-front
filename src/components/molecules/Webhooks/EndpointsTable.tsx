@@ -1,9 +1,10 @@
 import { FC, useState } from 'react';
 import { useEndpoints, useEndpointStats } from 'svix-react';
 import type { EndpointOut } from 'svix';
-import { AddButton, Button, Loader, NoDataCard } from '@/components/atoms';
+import { Rss } from 'lucide-react';
+import { AddButton, Button, Loader } from '@/components/atoms';
 import FlexpriceTable, { ColumnData } from '@/components/molecules/Table';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import AddEndpointForm from './AddEndpointForm';
 import EndpointDetail from './EndpointDetail';
 
@@ -86,21 +87,41 @@ const EndpointsTable: FC<Props> = ({ onViewEventCatalog }) => {
 		},
 	];
 
+	const hasEndpoints = (endpoints.data?.length ?? 0) > 0;
+
 	return (
 		<div className='flex flex-col gap-4'>
-			<div className='flex items-center justify-between'>
-				<h3 className='text-lg font-medium'>{t('webhooks.endpoints.heading')}</h3>
-				<AddButton label={t('webhooks.endpoints.addEndpoint')} onClick={() => setView('new')} />
-			</div>
+			{hasEndpoints && (
+				<div className='flex items-center justify-between'>
+					<h3 className='text-lg font-medium'>{t('webhooks.endpoints.heading')}</h3>
+					<AddButton label={t('webhooks.endpoints.addEndpoint')} onClick={() => setView('new')} />
+				</div>
+			)}
 
-			{endpoints.data?.length ? (
-				<FlexpriceTable columns={columns} data={endpoints.data} onRowClick={(row) => openDetail(row.id)} />
+			{hasEndpoints ? (
+				<FlexpriceTable columns={columns} data={endpoints.data!} onRowClick={(row) => openDetail(row.id)} />
 			) : (
-				<NoDataCard
-					title={t('webhooks.endpoints.empty.title')}
-					subtitle={t('webhooks.endpoints.empty.subtitle')}
-					cta={<AddButton label={t('webhooks.endpoints.addEndpoint')} onClick={() => setView('new')} />}
-				/>
+				<div className='flex flex-col items-center justify-center rounded-md border border-border bg-gray-50/50 py-16 px-6 text-center'>
+					<div className='mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-white border border-border'>
+						<Rss className='h-5 w-5 text-gray-500' />
+					</div>
+					<h3 className='text-base font-medium text-gray-900'>{t('webhooks.endpoints.empty.title')}</h3>
+					<p className='mt-2 pb-5 max-w-md text-sm text-gray-500'>
+						<Trans
+							i18nKey='developers:webhooks.endpoints.empty.subtitle'
+							components={{
+								link: (
+									<button
+										type='button'
+										className='font-medium text-gray-900 underline underline-offset-2 hover:text-gray-700'
+										onClick={onViewEventCatalog}
+									/>
+								),
+							}}
+						/>
+					</p>
+					<AddButton className='mt-6' label={t('webhooks.endpoints.addEndpoint')} onClick={() => setView('new')} />
+				</div>
 			)}
 
 			{(endpoints.hasPrevPage || endpoints.hasNextPage) && (
