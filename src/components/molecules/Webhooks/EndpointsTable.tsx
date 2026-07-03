@@ -1,11 +1,11 @@
 import { FC, useState } from 'react';
-import { useEndpoints, useEndpointFunctions, useEndpointSecret, useEndpointStats } from 'svix-react';
+import { useEndpoints, useEndpointStats } from 'svix-react';
 import type { EndpointOut } from 'svix';
 import { AddButton, Button, Loader, NoDataCard } from '@/components/atoms';
 import FlexpriceTable, { ColumnData } from '@/components/molecules/Table';
 import { useTranslation } from 'react-i18next';
-import toast from 'react-hot-toast';
 import AddEndpointForm from './AddEndpointForm';
+import EndpointDetail from './EndpointDetail';
 
 interface Props {
 	onViewEventCatalog: () => void;
@@ -23,7 +23,8 @@ const ErrorRateCell: FC<{ endpointId: string }> = ({ endpointId }) => {
 const EndpointsTable: FC<Props> = ({ onViewEventCatalog }) => {
 	const { t } = useTranslation(['developers', 'common']);
 	const endpoints = useEndpoints();
-	const [view, setView] = useState<'list' | 'new'>('list');
+	const [view, setView] = useState<'list' | 'new' | 'detail'>('list');
+	const [selectedEndpointId, setSelectedEndpointId] = useState<string | null>(null);
 
 	if (view === 'new') {
 		return (
@@ -34,6 +35,19 @@ const EndpointsTable: FC<Props> = ({ onViewEventCatalog }) => {
 					setView('list');
 				}}
 				onViewEventCatalog={onViewEventCatalog}
+			/>
+		);
+	}
+
+	if (view === 'detail' && selectedEndpointId) {
+		return (
+			<EndpointDetail
+				endpointId={selectedEndpointId}
+				onBack={() => setView('list')}
+				onDeleted={() => {
+					endpoints.reload();
+					setView('list');
+				}}
 			/>
 		);
 	}
@@ -50,10 +64,20 @@ const EndpointsTable: FC<Props> = ({ onViewEventCatalog }) => {
 		return <div className='p-4 text-sm text-red-600'>{t('webhooks.endpoints.loadFailed')}</div>;
 	}
 
+	const openDetail = (endpointId: string) => {
+		setSelectedEndpointId(endpointId);
+		setView('detail');
+	};
+
 	const columns: ColumnData<EndpointOut>[] = [
 		{
 			title: t('webhooks.endpoints.columns.endpoint'),
-			render: (row) => <EndpointCell endpoint={row} onDeleted={endpoints.reload} />,
+			render: (row) => (
+				<div className='min-w-0'>
+					<div className='truncate font-medium text-sm'>{row.url}</div>
+					{row.description && <div className='truncate text-xs text-gray-500'>{row.description}</div>}
+				</div>
+			),
 		},
 		{
 			title: t('webhooks.endpoints.columns.errorRate'),
@@ -70,7 +94,7 @@ const EndpointsTable: FC<Props> = ({ onViewEventCatalog }) => {
 			</div>
 
 			{endpoints.data?.length ? (
-				<FlexpriceTable columns={columns} data={endpoints.data} />
+				<FlexpriceTable columns={columns} data={endpoints.data} onRowClick={(row) => openDetail(row.id)} />
 			) : (
 				<NoDataCard
 					title={t('webhooks.endpoints.empty.title')}
@@ -89,64 +113,6 @@ const EndpointsTable: FC<Props> = ({ onViewEventCatalog }) => {
 					</Button>
 				</div>
 			)}
-		</div>
-	);
-};
-
-const EndpointCell: FC<{ endpoint: EndpointOut; onDeleted: () => void }> = ({ endpoint, onDeleted }) => {
-	const { t } = useTranslation(['developers', 'common']);
-	const { deleteEndpoint } = useEndpointFunctions(endpoint.id);
-	const secret = useEndpointSecret(endpoint.id);
-	const [showSecret, setShowSecret] = useState(false);
-	const [isDeleting, setIsDeleting] = useState(false);
-
-	const handleDelete = async (e: React.MouseEvent) => {
-		e.stopPropagation();
-		if (!window.confirm(t('webhooks.endpoints.deleteConfirm', { url: endpoint.url }))) return;
-		setIsDeleting(true);
-		try {
-			await deleteEndpoint();
-			toast.success(t('webhooks.endpoints.deleteSuccess'));
-			onDeleted();
-		} catch {
-			toast.error(t('webhooks.endpoints.deleteFailed'));
-		} finally {
-			setIsDeleting(false);
-		}
-	};
-
-	return (
-		<div className='min-w-0 flex flex-col gap-1.5 py-1'>
-			<div className='min-w-0'>
-				<div className='truncate font-medium text-sm'>{endpoint.url}</div>
-				{endpoint.description && <div className='truncate text-xs text-gray-500'>{endpoint.description}</div>}
-			</div>
-
-			{showSecret && (
-				<div className='break-all font-mono text-xs text-gray-600 bg-gray-50 border border-border rounded px-2 py-1'>
-					{secret.loading
-						? t('webhooks.endpoints.secret.loading')
-						: secret.error
-							? t('webhooks.endpoints.secret.loadFailed')
-							: secret.data?.key}
-				</div>
-			)}
-
-			<div className='flex gap-2'>
-				<Button
-					variant='outline'
-					size='sm'
-					onClick={(e) => {
-						e.stopPropagation();
-						setShowSecret((prev) => !prev);
-						if (!secret.data) secret.reload();
-					}}>
-					{showSecret ? t('webhooks.endpoints.secret.hide') : t('webhooks.endpoints.secret.reveal')}
-				</Button>
-				<Button variant='outline' size='sm' isLoading={isDeleting} onClick={handleDelete}>
-					{t('common:actions.delete')}
-				</Button>
-			</div>
 		</div>
 	);
 };
