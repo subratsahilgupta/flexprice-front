@@ -182,7 +182,9 @@
 				"hide": "Hide secret",
 				"loading": "Loading…",
 				"loadFailed": "Failed to load secret",
-				"masked": "••••••••••••"
+				"masked": "••••••••••••",
+				"copy": "Copy secret",
+				"copied": "Secret copied to clipboard"
 			},
 			"form": {
 				"newEndpointTitle": "New Endpoint",
@@ -213,6 +215,7 @@
 				"signingSecret": "Signing Secret",
 				"enableEndpoint": "Enable Endpoint",
 				"disableEndpoint": "Disable Endpoint",
+				"disabledBadge": "Disabled",
 				"enableSuccess": "Endpoint enabled",
 				"disableSuccess": "Endpoint disabled",
 				"toggleFailed": "Failed to update endpoint",
@@ -279,9 +282,9 @@
 				"heading": "Webhook Attempts",
 				"emptyTitle": "No attempts yet",
 				"empty": "No delivery attempts for this message yet.",
-				"columns": {
-					"url": "URL"
-				}
+				"httpResponseCode": "HTTP Response Code",
+				"response": "Response",
+				"webhookHeaders": "Webhook Headers"
 			}
 		},
 		"eventCatalog": {

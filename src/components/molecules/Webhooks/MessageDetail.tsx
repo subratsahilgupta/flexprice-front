@@ -1,11 +1,10 @@
 import { FC, useState } from 'react';
 import { useMessage, useMessageAttempts } from 'svix-react';
 import type { MessageAttemptOut } from 'svix';
-import { Loader, NoDataCard, Toggle } from '@/components/atoms';
+import { Button, Loader, NoDataCard, Toggle } from '@/components/atoms';
 import CodeBlock from '@/components/atoms/CodeBlock';
-import FlexpriceTable, { ColumnData } from '@/components/molecules/Table';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, ChevronDown, RefreshCw } from 'lucide-react';
 import formatDate from '@/utils/common/format_date';
 import {
 	AttemptStatusChip,
@@ -21,33 +20,66 @@ interface Props {
 	onBack: () => void;
 }
 
-const MessageDetail: FC<Props> = ({ messageId, backLabel, onBack }) => {
+const SVIX_ID_HEADER = 'svix-id';
+const SVIX_TIMESTAMP_HEADER = 'svix-timestamp';
+
+const DetailRow: FC<{ label: string; value: string; mono?: boolean }> = ({ label, value, mono = true }) => (
+	<div className='grid grid-cols-[180px_1fr] gap-4 py-3 border-b border-border last:border-b-0'>
+		<span className='text-xs font-medium tracking-wide text-gray-500 uppercase'>{label}</span>
+		<span className={mono ? 'font-mono text-sm text-gray-700 break-all' : 'text-sm text-gray-700 break-all'}>{value}</span>
+	</div>
+);
+
+const AttemptRow: FC<{ attempt: MessageAttemptOut; onReplayed: () => void }> = ({ attempt, onReplayed }) => {
 	const { t } = useTranslation('developers');
+	const [expanded, setExpanded] = useState(false);
+
+	return (
+		<div className='border border-border rounded-md overflow-hidden'>
+			<button
+				type='button'
+				className='w-full flex items-center gap-3 px-3 py-3 text-start hover:bg-gray-50'
+				onClick={() => setExpanded((e) => !e)}>
+				{expanded ? (
+					<ChevronDown className='w-4 h-4 shrink-0 text-gray-400' />
+				) : (
+					<ChevronRight className='w-4 h-4 shrink-0 text-gray-400' />
+				)}
+				<div className='w-28 shrink-0'>
+					<AttemptStatusChip status={attempt.status} />
+				</div>
+				<span className='flex-1 min-w-0 truncate font-mono text-xs text-gray-600'>{attempt.url}</span>
+				<span className='shrink-0 text-sm text-gray-500'>{formatDate(attempt.timestamp)}</span>
+				<div onClick={(e) => e.stopPropagation()}>
+					<AttemptReplayAction attempt={attempt} onReplayed={onReplayed} />
+				</div>
+			</button>
+			{expanded && (
+				<div className='px-3 pb-3 border-t border-border'>
+					<DetailRow label={t('webhooks.messages.attempts.httpResponseCode')} value={String(attempt.responseStatusCode)} />
+					{attempt.response && <DetailRow label={t('webhooks.messages.attempts.response')} value={attempt.response} />}
+					<div className='py-3'>
+						<span className='text-xs font-medium tracking-wide text-gray-500 uppercase'>
+							{t('webhooks.messages.attempts.webhookHeaders')}
+						</span>
+						<div className='mt-2 flex flex-col'>
+							<DetailRow label={SVIX_ID_HEADER} value={attempt.msgId} />
+							<DetailRow label={SVIX_TIMESTAMP_HEADER} value={String(Math.floor(new Date(attempt.timestamp).getTime() / 1000))} />
+						</div>
+					</div>
+				</div>
+			)}
+		</div>
+	);
+};
+
+const MessageDetail: FC<Props> = ({ messageId, backLabel, onBack }) => {
+	const { t } = useTranslation(['developers', 'common']);
 	const message = useMessage(messageId);
 	const [showRaw, setShowRaw] = useState(false);
 	const [filter, setFilter] = useState<AttemptStatusFilterKey>('all');
 	const activeFilter = ATTEMPT_STATUS_FILTERS.find((f) => f.key === filter) ?? ATTEMPT_STATUS_FILTERS[0];
 	const attempts = useMessageAttempts(messageId, { status: activeFilter.status });
-
-	const attemptColumns: ColumnData<MessageAttemptOut>[] = [
-		{
-			title: t('webhooks.endpoints.attempts.columns.status'),
-			render: (row) => <AttemptStatusChip status={row.status} />,
-		},
-		{
-			title: t('webhooks.messages.attempts.columns.url'),
-			render: (row) => <span className='truncate text-sm text-gray-600'>{row.url}</span>,
-		},
-		{
-			title: t('webhooks.endpoints.attempts.columns.timestamp'),
-			render: (row) => <span className='text-sm text-gray-500'>{formatDate(row.timestamp)}</span>,
-		},
-		{
-			title: t('webhooks.endpoints.attempts.columns.replay'),
-			align: 'right',
-			render: (row) => <AttemptReplayAction attempt={row} onReplayed={attempts.reload} />,
-		},
-	];
 
 	if (message.loading && !message.data) {
 		return (
@@ -94,10 +126,15 @@ const MessageDetail: FC<Props> = ({ messageId, backLabel, onBack }) => {
 				</div>
 			</div>
 
-			<div className='flex flex-col gap-3'>
+			<div className='flex flex-col gap-3 border-t border-border pt-6'>
 				<div className='flex items-center justify-between'>
 					<h4 className='text-sm font-medium'>{t('webhooks.messages.attempts.heading')}</h4>
-					<AttemptStatusFilters active={filter} onChange={setFilter} />
+					<div className='flex items-center gap-2'>
+						<Button variant='outline' size='icon' aria-label={t('common:actions.refresh')} onClick={() => attempts.reload()}>
+							<RefreshCw className='w-4 h-4' />
+						</Button>
+						<AttemptStatusFilters active={filter} onChange={setFilter} />
+					</div>
 				</div>
 
 				{attempts.loading && !attempts.data ? (
@@ -105,7 +142,11 @@ const MessageDetail: FC<Props> = ({ messageId, backLabel, onBack }) => {
 						<Loader />
 					</div>
 				) : attempts.data?.length ? (
-					<FlexpriceTable columns={attemptColumns} data={attempts.data} />
+					<div className='flex flex-col gap-2'>
+						{attempts.data.map((attempt) => (
+							<AttemptRow key={attempt.id} attempt={attempt} onReplayed={attempts.reload} />
+						))}
+					</div>
 				) : (
 					<NoDataCard title={t('webhooks.messages.attempts.emptyTitle')} subtitle={t('webhooks.messages.attempts.empty')} />
 				)}

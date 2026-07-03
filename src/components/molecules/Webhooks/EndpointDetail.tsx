@@ -1,12 +1,13 @@
 import { FC, useState } from 'react';
 import { useEndpoint, useEndpointFunctions, useEndpointSecret } from 'svix-react';
-import { ChevronRight, MoreVertical } from 'lucide-react';
+import { ChevronRight, MoreVertical, Eye, EyeOff, Copy } from 'lucide-react';
 import { Button, Loader } from '@/components/atoms';
 import DropdownMenu from '@/components/molecules/DropdownMenu';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import formatDate from '@/utils/common/format_date';
+import { copyToClipboard } from '@/utils/common/helper_functions';
 import EventTypePicker from './EventTypePicker';
 import EndpointOverviewTab from './EndpointOverviewTab';
 import EndpointTestingTab from './EndpointTestingTab';
@@ -70,10 +71,10 @@ const SubscribedEventsEditor: FC<{ endpointId: string; filterTypes: string[] | n
 					{t('common:actions.edit')}
 				</button>
 			</div>
-			<div className='flex flex-col gap-1 mt-1'>
+			<div className='flex flex-col gap-1 mt-1.5 max-h-56 overflow-y-auto'>
 				{filterTypes?.length ? (
 					filterTypes.map((name) => (
-						<span key={name} className='text-sm'>
+						<span key={name} className='text-sm font-mono text-xs text-gray-700'>
 							{name}
 						</span>
 					))
@@ -92,20 +93,38 @@ const SigningSecret: FC<{ endpointId: string }> = ({ endpointId }) => {
 
 	const maskedValue = t('webhooks.endpoints.secret.masked');
 	const revealedValue = secret.loading ? t('webhooks.endpoints.secret.loading') : (secret.data?.key ?? t('labels.missingValue'));
+	const displayValue = revealed ? revealedValue : maskedValue;
 
 	return (
 		<div>
 			<h4 className='text-sm font-medium text-gray-500'>{t('webhooks.endpoints.detail.signingSecret')}</h4>
-			<div className='flex items-center gap-2 mt-1'>
-				<span className='font-mono text-sm'>{revealed ? revealedValue : maskedValue}</span>
-				<button
-					className='text-sm text-gray-500 hover:text-gray-900'
+			<div className='flex items-center gap-1.5 mt-1.5'>
+				<span
+					className='min-w-0 flex-1 truncate font-mono text-xs bg-gray-50 border border-border rounded px-2 py-1.5'
+					title={displayValue}>
+					{displayValue}
+				</span>
+				<Button
+					variant='outline'
+					size='icon'
+					className='h-7 w-7 shrink-0'
+					aria-label={revealed ? t('webhooks.endpoints.secret.hide') : t('webhooks.endpoints.secret.reveal')}
 					onClick={() => {
 						setRevealed((r) => !r);
 						if (!secret.data) secret.reload();
 					}}>
-					{revealed ? t('webhooks.endpoints.secret.hide') : t('webhooks.endpoints.secret.reveal')}
-				</button>
+					{revealed ? <EyeOff className='w-3.5 h-3.5' /> : <Eye className='w-3.5 h-3.5' />}
+				</Button>
+				{revealed && secret.data?.key && (
+					<Button
+						variant='outline'
+						size='icon'
+						className='h-7 w-7 shrink-0'
+						aria-label={t('webhooks.endpoints.secret.copy')}
+						onClick={() => copyToClipboard(secret.data!.key, t('webhooks.endpoints.secret.copied'))}>
+						<Copy className='w-3.5 h-3.5' />
+					</Button>
+				)}
 			</div>
 		</div>
 	);
@@ -185,8 +204,15 @@ const EndpointDetail: FC<Props> = ({ endpointId, onBack, onDeleted }) => {
 				<span className='text-gray-900 font-medium truncate'>{data.id}</span>
 			</div>
 
-			<div className='flex items-center justify-between gap-4'>
-				<span className='truncate font-medium'>{data.url}</span>
+			<div className='flex items-center justify-between gap-4 pb-5 border-b border-border'>
+				<div className='min-w-0'>
+					<span className='truncate font-medium text-base'>{data.url}</span>
+					{data.disabled && (
+						<span className='ms-2 inline-flex items-center rounded px-1.5 py-0.5 text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200'>
+							{t('webhooks.endpoints.detail.disabledBadge')}
+						</span>
+					)}
+				</div>
 				<DropdownMenu
 					trigger={
 						<Button variant='outline' size='icon'>
@@ -203,19 +229,20 @@ const EndpointDetail: FC<Props> = ({ endpointId, onBack, onDeleted }) => {
 				/>
 			</div>
 
-			<div className='grid grid-cols-[1fr_260px] gap-8'>
-				<Tabs value={subTab} onValueChange={setSubTab}>
-					<TabsList className='bg-transparent border-b border-border w-full justify-start rounded-none space-x-1'>
-						{subTabs.map((tab) => (
-							<TabsTrigger
-								key={tab.value}
-								value={tab.value}
-								className='text-sm font-medium text-gray-500 px-3 py-2 rounded-none border-b-2 border-transparent data-[state=active]:text-gray-900 data-[state=active]:border-gray-900 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0'>
-								{tab.label}
-							</TabsTrigger>
-						))}
-					</TabsList>
-					<div className='mt-4'>
+			<Tabs value={subTab} onValueChange={setSubTab}>
+				<TabsList className='bg-transparent border-b border-border w-full justify-start rounded-none space-x-1'>
+					{subTabs.map((tab) => (
+						<TabsTrigger
+							key={tab.value}
+							value={tab.value}
+							className='text-sm font-medium text-gray-500 px-3 py-2 rounded-none border-b-2 border-transparent data-[state=active]:text-gray-900 data-[state=active]:border-gray-900 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0'>
+							{tab.label}
+						</TabsTrigger>
+					))}
+				</TabsList>
+
+				<div className='grid grid-cols-[1fr_260px] gap-8 mt-5'>
+					<div className='min-w-0'>
 						<TabsContent value='overview' className='mt-0'>
 							<EndpointOverviewTab endpoint={data} onUpdated={endpoint.reload} />
 						</TabsContent>
@@ -226,23 +253,27 @@ const EndpointDetail: FC<Props> = ({ endpointId, onBack, onDeleted }) => {
 							<EndpointAdvancedTab endpoint={data} onUpdated={endpoint.reload} />
 						</TabsContent>
 					</div>
-				</Tabs>
 
-				<div className='flex flex-col gap-4 pt-11'>
-					<div>
-						<h4 className='text-sm font-medium text-gray-500'>{t('webhooks.endpoints.detail.createdAt')}</h4>
-						<p className='text-sm mt-1'>{formatDate(data.createdAt)}</p>
+					<div className='flex flex-col gap-5'>
+						<div>
+							<h4 className='text-sm font-medium text-gray-500'>{t('webhooks.endpoints.detail.createdAt')}</h4>
+							<p className='text-sm mt-1'>{formatDate(data.createdAt)}</p>
+						</div>
+						<div>
+							<h4 className='text-sm font-medium text-gray-500'>{t('webhooks.endpoints.detail.updatedAt')}</h4>
+							<p className='text-sm mt-1'>{formatDate(data.updatedAt)}</p>
+						</div>
+						<div className='border-t border-border pt-5 flex flex-col gap-5'>
+							<SubscribedEventsEditor endpointId={data.id} filterTypes={data.filterTypes} url={data.url} onUpdated={endpoint.reload} />
+							<SigningSecret endpointId={data.id} />
+						</div>
 					</div>
-					<div>
-						<h4 className='text-sm font-medium text-gray-500'>{t('webhooks.endpoints.detail.updatedAt')}</h4>
-						<p className='text-sm mt-1'>{formatDate(data.updatedAt)}</p>
-					</div>
-					<SubscribedEventsEditor endpointId={data.id} filterTypes={data.filterTypes} url={data.url} onUpdated={endpoint.reload} />
-					<SigningSecret endpointId={data.id} />
 				</div>
-			</div>
+			</Tabs>
 
-			<MessageAttemptsSection endpointId={data.id} onSelectMessage={setSelectedMessageId} />
+			<div className='border-t border-border pt-6'>
+				<MessageAttemptsSection endpointId={data.id} onSelectMessage={setSelectedMessageId} />
+			</div>
 		</div>
 	);
 };
