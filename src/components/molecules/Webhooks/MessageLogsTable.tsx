@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { useMessages } from 'svix-react';
 import type { MessageOut } from 'svix';
 import { Button, Loader, NoDataCard } from '@/components/atoms';
@@ -6,10 +6,16 @@ import FlexpriceTable, { ColumnData } from '@/components/molecules/Table';
 import { useTranslation } from 'react-i18next';
 import formatDate from '@/utils/common/format_date';
 import { RefreshCw } from 'lucide-react';
+import MessageDetail from './MessageDetail';
 
 const MessageLogsTable: FC = () => {
 	const { t } = useTranslation(['developers', 'common']);
 	const messages = useMessages({ limit: 50 });
+	const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
+
+	if (selectedMessageId) {
+		return <MessageDetail messageId={selectedMessageId} backLabel={t('webhooks.logs.heading')} onBack={() => setSelectedMessageId(null)} />;
+	}
 
 	const columns: ColumnData<MessageOut>[] = [
 		{
@@ -45,7 +51,7 @@ const MessageLogsTable: FC = () => {
 			) : messages.error ? (
 				<div className='p-4 text-sm text-red-600'>{t('webhooks.logs.loadFailed')}</div>
 			) : messages.data?.length ? (
-				<FlexpriceTable columns={columns} data={messages.data} />
+				<FlexpriceTable columns={columns} data={messages.data} onRowClick={(row) => setSelectedMessageId(row.id)} />
 			) : (
 				<NoDataCard title={t('webhooks.logs.empty.title')} subtitle={t('webhooks.logs.empty.subtitle')} />
 			)}
