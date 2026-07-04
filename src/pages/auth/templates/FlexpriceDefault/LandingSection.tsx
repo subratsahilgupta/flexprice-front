@@ -2,7 +2,7 @@
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TestimonialCard } from '@/components/molecules';
-import { Testimonial } from '@/types';
+import { Testimonial, CustomerLogo } from '@/types';
 import { cn } from '@/lib/utils';
 import authBg from '../../../../../assets/toolright.jpg';
 
@@ -67,7 +67,7 @@ const testimonials: Testimonial[] = [
 	},
 ];
 
-const customerLogos: { src: string; heightClass?: string }[] = [
+const customerLogos: CustomerLogo[] = [
 	{ src: '/assets/company-logo/krutrim-logo 1.png' },
 	{ src: '/assets/company-logo/vapidarklogo.png', heightClass: 'h-[60%]' },
 	{ src: '/assets/company-logo/Simplismart logo.png' },
