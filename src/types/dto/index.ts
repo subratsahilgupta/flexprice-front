@@ -333,6 +333,7 @@ export { PaddleWebhookEvents, getDefaultPaddleWebhookEvents } from '../enums/Pad
 
 // Additional DTO types
 export type { Testimonial } from './Testimonial';
+export type { CustomerLogo } from './CustomerLogo';
 
 export type {
 	CreateGroupRequest,
