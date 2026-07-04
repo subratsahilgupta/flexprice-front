@@ -4,6 +4,7 @@ import { FlatTabs } from '@/components/molecules';
 import { TeamTab } from './team';
 import { BillingTab } from './billing';
 import { CustomerPortalTab } from './customer-portal';
+import { CustomerOnboardingTab } from './customer-onboarding';
 import { AlertsTab } from './alerts';
 
 const SettingsDashboard = () => {
@@ -28,6 +29,11 @@ const SettingsDashboard = () => {
 						value: 'customer-portal',
 						label: t('customerPortal.tabs.customerPortal'),
 						content: <CustomerPortalTab />,
+					},
+					{
+						value: 'customer-onboarding',
+						label: t('customerOnboarding.tabs.customerOnboarding'),
+						content: <CustomerOnboardingTab />,
 					},
 					{
 						value: 'alerts',
