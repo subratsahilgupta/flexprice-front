@@ -5,6 +5,7 @@ export interface CreateUserRequest {
 }
 
 export interface UpdateTenantPayload {
+	name: string;
 	billing_details: {
 		address: {
 			address_line1: string;
