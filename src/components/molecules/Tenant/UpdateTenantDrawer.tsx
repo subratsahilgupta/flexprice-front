@@ -5,10 +5,11 @@ import { useMutation } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { Country, State, City, IState } from 'country-state-city';
 import { z } from 'zod';
-import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { logger } from '@/utils/common/Logger';
 import { User } from '@/models/User';
 import { UserApi } from '@/api/UserApi';
+import { useUser as useUserContext } from '@/hooks/UserContext';
+import { mergeTenantUpdateIntoUser, refreshPersistedUserSession } from '@/utils/auth/refreshUserSession';
 
 // Types and Interfaces
 interface Address {
@@ -201,6 +202,7 @@ const getLocationOptions = (
 // Main Component
 const UpdateTenantDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) => {
 	const { t } = useTranslation('settings');
+	const { setUser } = useUserContext();
 	const [internalOpen, setInternalOpen] = useState(false);
 	const isControlled = open !== undefined && onOpenChange !== undefined;
 	const currentOpen = isControlled ? open : internalOpen;
@@ -265,8 +267,11 @@ const UpdateTenantDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) =>
 
 			return await UserApi.updateUser(payload);
 		},
-		onSuccess: async () => {
-			await refetchQueries(['user']);
+		onSuccess: async (tenantUpdate) => {
+			if (!data) return;
+
+			const updatedUser = mergeTenantUpdateIntoUser(data, tenantUpdate as Partial<User['tenant']>, formData);
+			await refreshPersistedUserSession(setUser, { user: updatedUser });
 			toast.success(t('tenant.toast.updated'));
 			toggleOpen();
 		},
