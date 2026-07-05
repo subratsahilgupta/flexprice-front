@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { isIncomingUserTenantNewer, persistUserToLocalStorage, readUserFromLocalStorage } from '@/utils/auth/userStorage';
+import { persistUserToLocalStorage, readUserFromLocalStorage } from '@/utils/auth/userStorage';
 
 interface UserProviderProps {
 	children: ReactNode;
@@ -21,14 +21,10 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 			return;
 		}
 
-		// The freshness guard only arbitrates what gets *persisted*; the caller's intent is
-		// always reflected in React state, even when a fresher copy already exists in storage.
-		const stored = readUserFromLocalStorage();
-		const resolved = stored && !isIncomingUserTenantNewer(next, stored) ? stored : next;
-		setUserState(resolved);
-		if (resolved === next) {
-			persistUserToLocalStorage(next);
-		}
+		// React state always reflects the caller's intent; persistence to localStorage is a
+		// best-effort side effect gated by the freshness guard and never blocks the state update.
+		setUserState(next);
+		persistUserToLocalStorage(next);
 	}, []);
 
 	useEffect(() => {
