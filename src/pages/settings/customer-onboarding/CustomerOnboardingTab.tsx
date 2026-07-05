@@ -3,8 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { PlanApi } from '@/api/PlanApi';
-import { Card, CardHeader, Input, Loader, Select } from '@/components/atoms';
-import { SettingsToggleRow } from '@/components/molecules';
+import { Card, FieldWithInfo, Input, Loader, Select } from '@/components/atoms';
+import { SettingsCardHeader, SettingsToggleRow } from '@/components/molecules';
 import { billingCycleOptions, currencyOptions, DEFAULT_CURRENCY_CODE } from '@/constants/constants';
 import { BILLING_CYCLE } from '@/models/Subscription';
 import { DataType, FilterOperator } from '@/types/common/QueryBuilder';
@@ -164,16 +164,28 @@ const CustomerOnboardingTab = () => {
 		});
 	};
 
+	const workflowTitle = t('customerOnboarding.workflow.title');
+	const walletTitle = t('customerOnboarding.workflow.wallet.title');
+	const subscriptionTitle = t('customerOnboarding.workflow.subscription.title');
+	const walletCurrencyLabel = t('customerOnboarding.workflow.wallet.currency');
+	const walletConversionRateLabel = t('customerOnboarding.workflow.wallet.conversionRate');
+	const subscriptionPlanLabel = t('customerOnboarding.workflow.subscription.plan');
+	const subscriptionBillingCycleLabel = t('customerOnboarding.workflow.subscription.billingCycle');
+	const subscriptionStartDateLabel = t('customerOnboarding.workflow.subscription.startDate');
+
 	return (
 		<Card variant='default' className='rounded-xl border border-gray-200 bg-white shadow-sm'>
-			<CardHeader title={t('customerOnboarding.workflow.title')} titleClassName='text-lg font-medium text-zinc-800' />
+			<SettingsCardHeader
+				title={workflowTitle}
+				titleClassName='text-lg font-medium text-zinc-800'
+				infoDescription={t('customerOnboarding.workflow.description')}
+				infoAriaLabel={t('info.ariaLabel', { field: workflowTitle })}
+			/>
 			{isLoading ? (
 				<Loader />
 			) : (
 				<>
-					<p className='text-sm text-zinc-500'>{t('customerOnboarding.workflow.description')}</p>
-
-					<div className='mt-4 rounded-lg border border-gray-200 bg-gray-50 p-4'>
+					<div className='rounded-lg border border-gray-200 bg-gray-50 p-4'>
 						<p className='text-xs font-medium uppercase tracking-wide text-zinc-400'>{t('customerOnboarding.workflow.summaryLabel')}</p>
 						<p className='mt-2 text-sm text-zinc-700'>
 							{configuredActionCount === 0
@@ -193,75 +205,97 @@ const CustomerOnboardingTab = () => {
 					<div className='mt-4 divide-y divide-gray-200'>
 						<div>
 							<SettingsToggleRow
-								label={t('customerOnboarding.workflow.wallet.title')}
+								label={walletTitle}
 								description={t('customerOnboarding.workflow.wallet.description')}
+								infoAriaLabel={t('info.ariaLabel', { field: walletTitle })}
 								checked={draft.walletEnabled}
 								disabled={isSaving}
 								onCheckedChange={(checked) => setDraft((prev) => ({ ...prev, walletEnabled: checked }))}
 							/>
 							{draft.walletEnabled ? (
 								<div className='grid grid-cols-1 gap-x-6 gap-y-5 pb-4 md:grid-cols-2'>
-									<Select
-										label={t('customerOnboarding.workflow.wallet.currency')}
-										value={draft.walletCurrency}
-										options={currencyOptions}
-										onChange={(value) => setDraft((prev) => ({ ...prev, walletCurrency: value || DEFAULT_CURRENCY_CODE }))}
+									<FieldWithInfo
+										label={walletCurrencyLabel}
 										description={t('customerOnboarding.workflow.wallet.currencyHint')}
-										disabled={isSaving}
-									/>
-									<Input
-										label={t('customerOnboarding.workflow.wallet.conversionRate')}
-										value={draft.walletConversionRate}
-										variant='number'
-										onChange={(value) => setDraft((prev) => ({ ...prev, walletConversionRate: value }))}
+										infoAriaLabel={t('info.ariaLabel', { field: walletCurrencyLabel })}
+										disabled={isSaving}>
+										<Select
+											value={draft.walletCurrency}
+											options={currencyOptions}
+											onChange={(value) => setDraft((prev) => ({ ...prev, walletCurrency: value || DEFAULT_CURRENCY_CODE }))}
+											disabled={isSaving}
+										/>
+									</FieldWithInfo>
+									<FieldWithInfo
+										label={walletConversionRateLabel}
 										description={t('customerOnboarding.workflow.wallet.conversionRateHint')}
-										disabled={isSaving}
-									/>
+										infoAriaLabel={t('info.ariaLabel', { field: walletConversionRateLabel })}
+										disabled={isSaving}>
+										<Input
+											value={draft.walletConversionRate}
+											variant='number'
+											onChange={(value) => setDraft((prev) => ({ ...prev, walletConversionRate: value }))}
+											disabled={isSaving}
+										/>
+									</FieldWithInfo>
 								</div>
 							) : null}
 						</div>
 
 						<div>
 							<SettingsToggleRow
-								label={t('customerOnboarding.workflow.subscription.title')}
+								label={subscriptionTitle}
 								description={t('customerOnboarding.workflow.subscription.description')}
+								infoAriaLabel={t('info.ariaLabel', { field: subscriptionTitle })}
 								checked={draft.subscriptionEnabled}
 								disabled={isSaving}
 								onCheckedChange={(checked) => setDraft((prev) => ({ ...prev, subscriptionEnabled: checked }))}
 							/>
 							{draft.subscriptionEnabled ? (
 								<div className='grid grid-cols-1 gap-x-6 gap-y-5 pb-4 md:grid-cols-2'>
-									<Select
-										label={t('customerOnboarding.workflow.subscription.plan')}
-										value={draft.subscriptionPlanId}
-										options={planOptions}
-										placeholder={t('customerOnboarding.workflow.subscription.planPlaceholder')}
-										noOptionsText={t('customerOnboarding.workflow.subscription.noPlans')}
-										onChange={(value) => setDraft((prev) => ({ ...prev, subscriptionPlanId: value }))}
+									<FieldWithInfo
+										label={subscriptionPlanLabel}
 										description={t('customerOnboarding.workflow.subscription.planHint')}
-										disabled={isSaving || arePlansLoading}
-									/>
-									<Select
-										label={t('customerOnboarding.workflow.subscription.billingCycle')}
-										value={draft.subscriptionBillingCycle}
-										options={billingCycleOptions}
-										onChange={(value) =>
-											setDraft((prev) => ({
-												...prev,
-												subscriptionBillingCycle: (value as BILLING_CYCLE) || BILLING_CYCLE.ANNIVERSARY,
-											}))
-										}
+										infoAriaLabel={t('info.ariaLabel', { field: subscriptionPlanLabel })}
+										disabled={isSaving || arePlansLoading}>
+										<Select
+											value={draft.subscriptionPlanId}
+											options={planOptions}
+											placeholder={t('customerOnboarding.workflow.subscription.planPlaceholder')}
+											noOptionsText={t('customerOnboarding.workflow.subscription.noPlans')}
+											onChange={(value) => setDraft((prev) => ({ ...prev, subscriptionPlanId: value }))}
+											disabled={isSaving || arePlansLoading}
+										/>
+									</FieldWithInfo>
+									<FieldWithInfo
+										label={subscriptionBillingCycleLabel}
 										description={t('customerOnboarding.workflow.subscription.billingCycleHint')}
-										disabled={isSaving}
-									/>
-									<Input
-										label={t('customerOnboarding.workflow.subscription.startDate')}
-										value={draft.subscriptionStartDate}
-										onChange={(value) => setDraft((prev) => ({ ...prev, subscriptionStartDate: value }))}
-										placeholder={t('customerOnboarding.workflow.subscription.startDatePlaceholder')}
+										infoAriaLabel={t('info.ariaLabel', { field: subscriptionBillingCycleLabel })}
+										disabled={isSaving}>
+										<Select
+											value={draft.subscriptionBillingCycle}
+											options={billingCycleOptions}
+											onChange={(value) =>
+												setDraft((prev) => ({
+													...prev,
+													subscriptionBillingCycle: (value as BILLING_CYCLE) || BILLING_CYCLE.ANNIVERSARY,
+												}))
+											}
+											disabled={isSaving}
+										/>
+									</FieldWithInfo>
+									<FieldWithInfo
+										label={subscriptionStartDateLabel}
 										description={t('customerOnboarding.workflow.subscription.startDateHint')}
-										disabled={isSaving}
-									/>
+										infoAriaLabel={t('info.ariaLabel', { field: subscriptionStartDateLabel })}
+										disabled={isSaving}>
+										<Input
+											value={draft.subscriptionStartDate}
+											onChange={(value) => setDraft((prev) => ({ ...prev, subscriptionStartDate: value }))}
+											placeholder={t('customerOnboarding.workflow.subscription.startDatePlaceholder')}
+											disabled={isSaving}
+										/>
+									</FieldWithInfo>
 								</div>
 							) : null}
 						</div>
