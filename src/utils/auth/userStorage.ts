@@ -10,8 +10,24 @@ function getTenantUpdatedAtMs(user: unknown): number | null {
 	return Number.isNaN(time) ? null : time;
 }
 
-/** Returns true when incoming should replace existing (missing timestamps always allow write). */
+/** A user/tenant identity, used to tell "a different login" apart from "a stale poll of the same session". */
+function getSessionIdentity(user: unknown): { userId?: string; tenantId?: string } {
+	const typed = user as { id?: string; tenant?: { id?: string } };
+	return { userId: typed?.id, tenantId: typed?.tenant?.id };
+}
+
+/**
+ * Returns true when incoming should replace existing. A different user or tenant (e.g. a new
+ * login on top of a previous session's cached data) always wins — the timestamp comparison
+ * below only arbitrates between two reads of the *same* session, not who is logged in.
+ */
 export function isIncomingUserTenantNewer(incoming: unknown, existing: unknown): boolean {
+	const incomingIdentity = getSessionIdentity(incoming);
+	const existingIdentity = getSessionIdentity(existing);
+	if (incomingIdentity.userId !== existingIdentity.userId || incomingIdentity.tenantId !== existingIdentity.tenantId) {
+		return true;
+	}
+
 	const existingTime = getTenantUpdatedAtMs(existing);
 	const incomingTime = getTenantUpdatedAtMs(incoming);
 
