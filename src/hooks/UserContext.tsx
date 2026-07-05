@@ -1,10 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import {
-	clearUserFromLocalStorage,
-	isIncomingUserTenantNewer,
-	persistUserToLocalStorage,
-	readUserFromLocalStorage,
-} from '@/utils/auth/userStorage';
+import { isIncomingUserTenantNewer, persistUserToLocalStorage, readUserFromLocalStorage } from '@/utils/auth/userStorage';
 
 interface UserProviderProps {
 	children: ReactNode;
@@ -16,10 +11,8 @@ interface UserContextProp {
 }
 const UserContext = createContext<UserContextProp>({} as UserContextProp);
 
-export { clearUserFromLocalStorage, isIncomingUserTenantNewer, persistUserToLocalStorage, readUserFromLocalStorage };
-
 export const UserProvider = ({ children }: UserProviderProps) => {
-	const [user, setUserState] = useState<any>({});
+	const [user, setUserState] = useState<any>(null);
 
 	const setUser = useCallback((next: any) => {
 		if (next == null) {
@@ -28,16 +21,18 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 			return;
 		}
 
-		if (persistUserToLocalStorage(next)) {
-			setUserState(next);
+		// The freshness guard only arbitrates what gets *persisted*; the caller's intent is
+		// always reflected in React state, even when a fresher copy already exists in storage.
+		const stored = readUserFromLocalStorage();
+		const resolved = stored && !isIncomingUserTenantNewer(next, stored) ? stored : next;
+		setUserState(resolved);
+		if (resolved === next) {
+			persistUserToLocalStorage(next);
 		}
 	}, []);
 
 	useEffect(() => {
-		const parsed = readUserFromLocalStorage();
-		if (parsed) {
-			setUserState(parsed);
-		}
+		setUserState(readUserFromLocalStorage());
 	}, []);
 
 	return <UserContext.Provider value={{ user, setUser }}>{children}</UserContext.Provider>;

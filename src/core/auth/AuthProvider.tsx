@@ -2,10 +2,9 @@ import React, { ReactNode, useEffect } from 'react';
 import { Navigate } from 'react-router';
 import { useUser } from '@/hooks/UserContext';
 import { PageLoader } from '@/components/atoms';
-import useUserhook, { USER_QUERY_KEY } from '@/hooks/useUser';
-import { queryClient } from '@/core/services/tanstack/ReactQueryProvider';
-import { isIncomingUserTenantNewer, readUserFromLocalStorage } from '@/utils/auth/userStorage';
-import type { User } from '@/models/User';
+import useUserhook from '@/hooks/useUser';
+import { refreshPersistedUserSession } from '@/utils/auth/refreshUserSession';
+import { logger } from '@/utils/common/Logger';
 
 interface AuthMiddlewareProps {
 	children: ReactNode;
@@ -17,22 +16,11 @@ const AuthMiddleware: React.FC<AuthMiddlewareProps> = ({ children }) => {
 
 	useEffect(() => {
 		if (!user) return;
-
-		const storedUser = readUserFromLocalStorage<User>();
-		const shouldUseStored = Boolean(storedUser && !isIncomingUserTenantNewer(user, storedUser));
-		const userToSync = shouldUseStored ? storedUser! : user;
-
-		if (shouldUseStored) {
-			queryClient.setQueriesData<User>({ queryKey: [USER_QUERY_KEY] }, storedUser!);
-		}
-
-		const currentUpdatedAt = userContext.user?.tenant?.updated_at;
-		if (currentUpdatedAt === userToSync.tenant?.updated_at && userContext.user?.tenant?.name === userToSync.tenant?.name) {
-			return;
-		}
-
-		userContext.setUser(userToSync);
-	}, [user, userContext]);
+		refreshPersistedUserSession(userContext.setUser, { user }).catch(logger.error);
+		// userContext is a fresh object every UserProvider render — only re-sync when the
+		// underlying query result actually changes.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [user]);
 
 	if (loading) {
 		return <PageLoader />;
