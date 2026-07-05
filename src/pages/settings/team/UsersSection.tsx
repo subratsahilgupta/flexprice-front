@@ -283,7 +283,7 @@ function UsersSection() {
 							<ShortPaginationControls
 								page={page}
 								onPageChange={setPage}
-								unit={t('members.unitUsers')}
+								unit={t('members.unitUsers', { count: filteredMembers.length })}
 								totalItems={filteredMembers.length}
 								pageSize={pageSize}
 							/>

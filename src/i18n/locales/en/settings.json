@@ -28,7 +28,8 @@
 			"joined": "Joined"
 		},
 		"cardTitle": "Users",
-		"usersCount": "{{count}} users",
+		"usersCount_one": "{{count}} user",
+		"usersCount_other": "{{count}} users",
 		"actions": {
 			"add": "Add",
 			"invite": "Invite",
@@ -89,7 +90,8 @@
 		"tabs": {
 			"team": "Team"
 		},
-		"unitUsers": "users"
+		"unitUsers_one": "user",
+		"unitUsers_other": "users"
 	},
 	"organization": {
 		"title": "Organization",

@@ -28,7 +28,11 @@
 			"joined": "تاريخ الانضمام"
 		},
 		"cardTitle": "المستخدمون",
-		"usersCount": "{{count}} مستخدمين",
+		"usersCount_one": "{{count}} مستخدم",
+		"usersCount_two": "{{count}} مستخدمان",
+		"usersCount_few": "{{count}} مستخدمين",
+		"usersCount_many": "{{count}} مستخدم",
+		"usersCount_other": "{{count}} مستخدم",
 		"actions": {
 			"add": "إضافة",
 			"invite": "دعوة",
@@ -89,7 +93,8 @@
 		"tabs": {
 			"team": "الفريق"
 		},
-		"unitUsers": "مستخدمين"
+		"unitUsers_one": "مستخدم",
+		"unitUsers_other": "مستخدمين"
 	},
 	"organization": {
 		"title": "المنظمة",
