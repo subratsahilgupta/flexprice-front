@@ -9,7 +9,7 @@ import { logger } from '@/utils/common/Logger';
 import { User } from '@/models/User';
 import { UserApi } from '@/api/UserApi';
 import { useUser as useUserContext } from '@/hooks/UserContext';
-import { mergeTenantUpdateIntoUser, refreshPersistedUserSession } from '@/utils/auth/refreshUserSession';
+import { refreshPersistedUserSession } from '@/utils/auth/refreshUserSession';
 
 // Types and Interfaces
 interface Address {
@@ -267,10 +267,17 @@ const UpdateTenantDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) =>
 
 			return await UserApi.updateUser(payload);
 		},
-		onSuccess: async (tenantUpdate) => {
+		onSuccess: async (updatedTenant) => {
 			if (!data) return;
 
-			const updatedUser = mergeTenantUpdateIntoUser(data, tenantUpdate as Partial<User['tenant']>, formData);
+			// UserApi.updateUser hits `tenants/update` and returns the updated Tenant (no id or
+			// timestamps), so it's merged into the previous `data` prop to rebuild a full User.
+			// The Tenant response has no `updated_at`, so we stamp one here — otherwise the
+			// freshness guard would keep comparing against the pre-edit timestamp forever.
+			const updatedUser: User = {
+				...data,
+				tenant: { ...data.tenant, ...updatedTenant, updated_at: new Date().toISOString() },
+			};
 			await refreshPersistedUserSession(setUser, { user: updatedUser });
 			toast.success(t('tenant.toast.updated'));
 			toggleOpen();
