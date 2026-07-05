@@ -3,6 +3,9 @@
 		"settings": "الإعدادات",
 		"billing": "الفوترة"
 	},
+	"info": {
+		"ariaLabel": "مزيد من المعلومات حول {{field}}"
+	},
 	"members": {
 		"roleAdmin": "مسؤول",
 		"roleMember": "عضو",
@@ -104,6 +107,7 @@
 			"title": "إعداد الفواتير",
 			"previewLabel": "معاينة",
 			"nextInvoiceNumber": "رقم الفاتورة التالي",
+			"infoAria": "مزيد من المعلومات حول {{field}}",
 			"saveSuccess": "تم حفظ إعداد الفواتير",
 			"saveError": "فشل حفظ إعداد الفواتير",
 			"resetSuccess": "تمت إعادة إعداد الفواتير إلى القيم الافتراضية",

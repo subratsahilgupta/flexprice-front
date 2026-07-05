@@ -3,6 +3,9 @@
 		"settings": "Settings",
 		"billing": "Billing"
 	},
+	"info": {
+		"ariaLabel": "More information about {{field}}"
+	},
 	"members": {
 		"roleAdmin": "Admin",
 		"roleMember": "Member",
@@ -104,6 +107,7 @@
 			"title": "Invoice configuration",
 			"previewLabel": "Preview",
 			"nextInvoiceNumber": "Next invoice number",
+			"infoAria": "More information about {{field}}",
 			"saveSuccess": "Invoice configuration saved",
 			"saveError": "Failed to save invoice configuration",
 			"resetSuccess": "Invoice configuration reset to defaults",
