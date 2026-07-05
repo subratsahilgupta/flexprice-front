@@ -1,117 +1,18 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { PlanApi } from '@/api/PlanApi';
 import { Card, FieldWithInfo, Input, Loader, Select } from '@/components/atoms';
 import { SettingsCardHeader, SettingsToggleRow } from '@/components/molecules';
 import { billingCycleOptions, currencyOptions, DEFAULT_CURRENCY_CODE } from '@/constants/constants';
 import { BILLING_CYCLE } from '@/models/Subscription';
-import { DataType, FilterOperator } from '@/types/common/QueryBuilder';
-import type { PlanResponse } from '@/types/dto';
-import {
-	CUSTOMER_ONBOARDING_WORKFLOW_TYPE,
-	getCustomerOnboardingValidationErrorKey,
-	type CreateSubscriptionOnboardingAction,
-	type CreateWalletOnboardingAction,
-	type CustomerOnboardingAction,
-	type CustomerOnboardingConfig,
-} from '@/types/dto/CustomerOnboarding';
+import { getCustomerOnboardingValidationErrorKey, type CustomerOnboardingDraft } from '@/types/dto/CustomerOnboarding';
 import SettingsFormActions from '../SettingsFormActions';
-import { settingsQueryKeys } from '../queryKeys';
-import { useCustomerOnboardingConfig } from './useCustomerOnboardingConfig';
-
-const COMMON_ACTIONS = new Set(['create_wallet', 'create_subscription']);
-const DEFAULT_CONVERSION_RATE = '1';
-
-interface CustomerOnboardingDraft {
-	walletEnabled: boolean;
-	walletCurrency: string;
-	walletConversionRate: string;
-	subscriptionEnabled: boolean;
-	subscriptionPlanId: string;
-	subscriptionBillingCycle: BILLING_CYCLE;
-	subscriptionStartDate: string;
-	advancedActions: CustomerOnboardingAction[];
-}
-
-function isWalletAction(action: CustomerOnboardingAction): action is CreateWalletOnboardingAction {
-	return action.action === 'create_wallet';
-}
-
-function isSubscriptionAction(action: CustomerOnboardingAction): action is CreateSubscriptionOnboardingAction {
-	return action.action === 'create_subscription';
-}
-
-function buildDraftFromConfig(config: CustomerOnboardingConfig): CustomerOnboardingDraft {
-	const walletAction = config.actions.find(isWalletAction);
-	const subscriptionAction = config.actions.find(isSubscriptionAction);
-
-	return {
-		walletEnabled: Boolean(walletAction),
-		walletCurrency: walletAction?.currency || DEFAULT_CURRENCY_CODE,
-		walletConversionRate: walletAction?.conversion_rate || DEFAULT_CONVERSION_RATE,
-		subscriptionEnabled: Boolean(subscriptionAction),
-		subscriptionPlanId: subscriptionAction?.plan_id || '',
-		subscriptionBillingCycle: subscriptionAction?.billing_cycle || BILLING_CYCLE.ANNIVERSARY,
-		subscriptionStartDate: subscriptionAction?.start_date || '',
-		advancedActions: config.actions.filter((action) => !COMMON_ACTIONS.has(action.action)),
-	};
-}
-
-function buildConfigFromDraft(draft: CustomerOnboardingDraft): CustomerOnboardingConfig {
-	const createCustomerActions = draft.advancedActions.filter((action) => action.action === 'create_customer');
-	const otherAdvancedActions = draft.advancedActions.filter((action) => action.action !== 'create_customer');
-	const actions: CustomerOnboardingAction[] = [...createCustomerActions];
-
-	if (draft.walletEnabled) {
-		actions.push({
-			action: 'create_wallet',
-			currency: draft.walletCurrency,
-			conversion_rate: draft.walletConversionRate,
-		});
-	}
-
-	if (draft.subscriptionEnabled) {
-		actions.push({
-			action: 'create_subscription',
-			plan_id: draft.subscriptionPlanId,
-			billing_cycle: draft.subscriptionBillingCycle,
-			...(draft.subscriptionStartDate.trim() ? { start_date: draft.subscriptionStartDate.trim() } : {}),
-		});
-	}
-
-	return {
-		workflow_type: CUSTOMER_ONBOARDING_WORKFLOW_TYPE,
-		actions: [...actions, ...otherAdvancedActions],
-	};
-}
-
-async function fetchPublishedPlans(): Promise<PlanResponse[]> {
-	const response = await PlanApi.getPlansByFilter({
-		limit: 1000,
-		offset: 0,
-		filters: [
-			{
-				field: 'status',
-				operator: FilterOperator.EQUAL,
-				data_type: DataType.STRING,
-				value: { string: 'published' },
-			},
-		],
-		sort: [],
-	});
-
-	return response.items;
-}
+import { buildConfigFromDraft, buildDraftFromConfig, useCustomerOnboardingConfig, usePublishedPlans } from './useCustomerOnboardingConfig';
 
 const CustomerOnboardingTab = () => {
 	const { t } = useTranslation(['settings', 'common']);
 	const { configuration, isLoading, updateConfiguration, resetToDefaults } = useCustomerOnboardingConfig();
-	const { data: plans = [], isLoading: arePlansLoading } = useQuery({
-		queryKey: settingsQueryKeys.customerOnboardingPlans,
-		queryFn: fetchPublishedPlans,
-	});
+	const { plans, isLoading: arePlansLoading } = usePublishedPlans();
 	const [draft, setDraft] = useState<CustomerOnboardingDraft>(() => buildDraftFromConfig(configuration));
 
 	useEffect(() => {

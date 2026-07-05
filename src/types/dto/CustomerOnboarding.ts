@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { BILLING_CYCLE } from '@/models/Subscription';
 
 export const CUSTOMER_ONBOARDING_WORKFLOW_TYPE = 'customer_onboarding' as const;
@@ -41,67 +42,79 @@ export const DEFAULT_CUSTOMER_ONBOARDING_CONFIG: CustomerOnboardingConfig = {
 	actions: [],
 };
 
-const BILLING_CYCLE_VALUES = new Set<string>(Object.values(BILLING_CYCLE));
+/** Editable draft form-state for the customer onboarding settings tab. */
+export interface CustomerOnboardingDraft {
+	walletEnabled: boolean;
+	walletCurrency: string;
+	walletConversionRate: string;
+	subscriptionEnabled: boolean;
+	subscriptionPlanId: string;
+	subscriptionBillingCycle: BILLING_CYCLE;
+	subscriptionStartDate: string;
+	advancedActions: CustomerOnboardingAction[];
+}
+
 const RFC3339_DATE_TIME_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/;
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-function readString(raw: Record<string, unknown>, key: string): string | undefined {
-	const value = raw[key];
-	if (value === undefined || value === null) return undefined;
-	return String(value);
-}
-
-function readBillingCycle(raw: Record<string, unknown>): BILLING_CYCLE | undefined {
-	const value = readString(raw, 'billing_cycle');
-	return value && BILLING_CYCLE_VALUES.has(value) ? (value as BILLING_CYCLE) : undefined;
-}
 
 function isValidIsoDateTime(value: string): boolean {
 	const trimmed = value.trim();
 	return RFC3339_DATE_TIME_REGEX.test(trimmed) && Number.isFinite(Date.parse(trimmed));
 }
 
-function parseAction(value: unknown): CustomerOnboardingAction | null {
-	if (!isRecord(value)) return null;
+/** Mirrors the old `readString`: stringifies any present value, but leaves missing/null as undefined. */
+const looseOptionalString = z.preprocess(
+	(value) => (value === undefined || value === null ? undefined : String(value)),
+	z.string().optional(),
+);
+const looseRequiredString = z.preprocess((value) => (value === undefined || value === null ? '' : String(value)), z.string());
+const looseBillingCycle = looseOptionalString.pipe(z.nativeEnum(BILLING_CYCLE).optional().catch(undefined));
 
-	const action = readString(value, 'action');
-	if (!action) return null;
+// `.passthrough()` keeps any extra/unrecognized fields on the action object intact, since
+// advanced (non-wallet/subscription) actions must round-trip untouched.
+const createWalletActionSchema = z
+	.object({
+		action: z.literal('create_wallet'),
+		currency: looseRequiredString,
+		conversion_rate: looseOptionalString,
+	})
+	.passthrough();
+
+const createSubscriptionActionSchema = z
+	.object({
+		action: z.literal('create_subscription'),
+		plan_id: looseRequiredString,
+		billing_cycle: looseBillingCycle,
+		start_date: looseOptionalString,
+	})
+	.passthrough();
+
+const genericActionSchema = z.object({ action: z.string() }).passthrough();
+
+function parseAction(value: unknown): CustomerOnboardingAction | null {
+	if (typeof value !== 'object' || value === null || Array.isArray(value)) return null;
+	const action = (value as Record<string, unknown>).action;
+	if (action === undefined || action === null) return null;
 
 	if (action === 'create_wallet') {
-		return {
-			...value,
-			action,
-			currency: readString(value, 'currency') ?? '',
-			...(readString(value, 'conversion_rate') ? { conversion_rate: readString(value, 'conversion_rate') } : {}),
-		};
+		const result = createWalletActionSchema.safeParse(value);
+		return result.success ? result.data : null;
 	}
 
 	if (action === 'create_subscription') {
-		const billingCycle = readBillingCycle(value);
-		return {
-			...value,
-			action,
-			plan_id: readString(value, 'plan_id') ?? '',
-			...(billingCycle ? { billing_cycle: billingCycle } : {}),
-			...(readString(value, 'start_date') ? { start_date: readString(value, 'start_date') } : {}),
-		};
+		const result = createSubscriptionActionSchema.safeParse(value);
+		return result.success ? result.data : null;
 	}
 
-	return {
-		...value,
-		action,
-	};
+	const result = genericActionSchema.safeParse({ ...value, action: String(action) });
+	return result.success ? result.data : null;
 }
 
 export function parseCustomerOnboardingConfig(value: unknown): CustomerOnboardingConfig {
-	if (!isRecord(value)) {
+	if (typeof value !== 'object' || value === null || Array.isArray(value)) {
 		return { ...DEFAULT_CUSTOMER_ONBOARDING_CONFIG };
 	}
 
-	const rawActions = Array.isArray(value.actions) ? value.actions : [];
+	const rawActions = Array.isArray((value as Record<string, unknown>).actions) ? (value as { actions: unknown[] }).actions : [];
 	const actions = rawActions.map(parseAction).filter((action): action is CustomerOnboardingAction => action !== null);
 
 	return {
