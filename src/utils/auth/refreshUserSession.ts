@@ -4,56 +4,30 @@ import { USER_QUERY_KEY } from '@/hooks/useUser';
 import type { User } from '@/models/User';
 import { isIncomingUserTenantNewer, persistUserToLocalStorage, readUserFromLocalStorage } from './userStorage';
 
-type TenantUpdate = User['tenant'];
-
-interface TenantFormFallback {
-	name: string;
-	billing_details: TenantUpdate['billing_details'];
-}
-
 interface RefreshPersistedUserSessionOptions {
 	user?: User;
 }
 
-export function mergeTenantUpdateIntoUser(currentUser: User, tenantUpdate: Partial<TenantUpdate>, formFallback?: TenantFormFallback): User {
-	return {
-		...currentUser,
-		tenant: {
-			...currentUser.tenant,
-			...tenantUpdate,
-			name: tenantUpdate.name ?? formFallback?.name ?? currentUser.tenant.name,
-			billing_details: {
-				...currentUser.tenant.billing_details,
-				...tenantUpdate.billing_details,
-				address: {
-					...currentUser.tenant.billing_details?.address,
-					...tenantUpdate.billing_details?.address,
-					...(formFallback?.billing_details?.address ?? {}),
-				},
-			},
-		},
-	};
-}
-
-/** Writes user to React Query + localStorage when tenant.updated_at is not older than stored data. */
+/**
+ * Reconciles a freshly-fetched/updated user with whatever is already persisted, then writes the
+ * winner to React Query + localStorage + the caller's React state — the single place that
+ * decides which copy wins, so callers (AuthProvider, UpdateTenantDrawer, login) don't each
+ * reimplement the freshness check themselves.
+ */
 export async function refreshPersistedUserSession(
 	setUser?: (user: User) => void,
 	options?: RefreshPersistedUserSessionOptions,
 ): Promise<User> {
 	const storedUser = readUserFromLocalStorage<User>();
 	const incomingUser = options?.user ?? (await UserApi.me());
+	const resolvedUser = storedUser && !isIncomingUserTenantNewer(incomingUser, storedUser) ? storedUser : incomingUser;
 
-	if (storedUser && !isIncomingUserTenantNewer(incomingUser, storedUser)) {
-		queryClient.setQueriesData<User>({ queryKey: [USER_QUERY_KEY] }, storedUser);
-		setUser?.(storedUser);
-		return storedUser;
+	if (resolvedUser === incomingUser) {
+		persistUserToLocalStorage(incomingUser);
 	}
 
-	queryClient.setQueriesData<User>({ queryKey: [USER_QUERY_KEY] }, incomingUser);
+	queryClient.setQueriesData<User>({ queryKey: [USER_QUERY_KEY] }, resolvedUser);
+	setUser?.(resolvedUser);
 
-	if (persistUserToLocalStorage(incomingUser)) {
-		setUser?.(incomingUser);
-	}
-
-	return incomingUser;
+	return resolvedUser;
 }
