@@ -4,6 +4,8 @@ import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { SETTINGS_MEMBERS_PAGE_SIZE } from '../constants';
 import { settingsQueryKeys } from '../queryKeys';
 
+const TEAM_MEMBERS_REFETCH_INTERVAL_MS = 30_000;
+
 export function useTenantMembers() {
 	const query = useQuery({
 		queryKey: settingsQueryKeys.teamMembersRoot(),
@@ -12,6 +14,9 @@ export function useTenantMembers() {
 				limit: 1000,
 				offset: 0,
 			}),
+		refetchOnMount: 'always',
+		refetchOnWindowFocus: true,
+		refetchInterval: TEAM_MEMBERS_REFETCH_INTERVAL_MS,
 	});
 
 	const createUser = useMutation({

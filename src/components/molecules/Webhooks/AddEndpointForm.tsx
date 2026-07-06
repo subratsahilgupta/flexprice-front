@@ -1,10 +1,10 @@
-import { FC, useMemo, useState } from 'react';
-import { useSvix, useEventTypes } from 'svix-react';
+import { FC, useState } from 'react';
+import { useSvix } from 'svix-react';
 import { ChevronRight } from 'lucide-react';
-import { Button, Checkbox, Input, Textarea } from '@/components/atoms';
+import { Button, Input, Textarea } from '@/components/atoms';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
-import { groupEventTypesByPrefix } from './eventTypeGroups';
+import EventTypePicker from './EventTypePicker';
 
 interface Props {
 	onBack: () => void;
@@ -15,29 +15,10 @@ interface Props {
 const AddEndpointForm: FC<Props> = ({ onBack, onCreated, onViewEventCatalog }) => {
 	const { t } = useTranslation(['developers', 'common']);
 	const { svix, appId } = useSvix();
-	const eventTypes = useEventTypes({ limit: 250 });
 	const [url, setUrl] = useState('');
 	const [description, setDescription] = useState('');
-	const [eventSearch, setEventSearch] = useState('');
 	const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
 	const [submitting, setSubmitting] = useState(false);
-
-	const groups = useMemo(() => groupEventTypesByPrefix(eventTypes.data ?? []), [eventTypes.data]);
-	const filteredGroups = useMemo(() => {
-		if (!eventSearch) return groups;
-		const query = eventSearch.toLowerCase();
-		return groups
-			.map((group) => ({ ...group, eventTypes: group.eventTypes.filter((e) => e.name.toLowerCase().includes(query)) }))
-			.filter((group) => group.eventTypes.length > 0 || group.name.toLowerCase().includes(query));
-	}, [groups, eventSearch]);
-
-	const toggleEvent = (name: string) => {
-		setSelectedEvents((prev) => (prev.includes(name) ? prev.filter((e) => e !== name) : [...prev, name]));
-	};
-
-	const toggleGroup = (groupEvents: string[], allSelected: boolean) => {
-		setSelectedEvents((prev) => (allSelected ? prev.filter((e) => !groupEvents.includes(e)) : [...new Set([...prev, ...groupEvents])]));
-	};
 
 	const handleSubmit = async () => {
 		if (!url) return;
@@ -97,35 +78,7 @@ const AddEndpointForm: FC<Props> = ({ onBack, onCreated, onViewEventCatalog }) =
 					</button>
 				</div>
 
-				<Input placeholder={t('webhooks.endpoints.form.searchEventsPlaceholder')} value={eventSearch} onChange={setEventSearch} />
-
-				<div className='border rounded-md divide-y divide-border max-h-80 overflow-y-auto'>
-					{filteredGroups.map((group) => {
-						const groupEventNames = group.eventTypes.map((e) => e.name);
-						const allSelected = groupEventNames.length > 0 && groupEventNames.every((name) => selectedEvents.includes(name));
-						return (
-							<div key={group.name} className='p-3'>
-								<Checkbox
-									id={`group-${group.name}`}
-									checked={allSelected}
-									onCheckedChange={() => toggleGroup(groupEventNames, allSelected)}
-									label={group.name}
-								/>
-								<div className='flex flex-col gap-2 mt-2 ms-6'>
-									{group.eventTypes.map((eventType) => (
-										<Checkbox
-											key={eventType.name}
-											id={`event-${eventType.name}`}
-											checked={selectedEvents.includes(eventType.name)}
-											onCheckedChange={() => toggleEvent(eventType.name)}
-											label={eventType.name}
-										/>
-									))}
-								</div>
-							</div>
-						);
-					})}
-				</div>
+				<EventTypePicker selected={selectedEvents} onChange={setSelectedEvents} />
 			</div>
 
 			<div className='flex gap-3'>

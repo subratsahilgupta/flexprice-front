@@ -166,6 +166,8 @@ export { default as TestimonialCard } from './TestimonialCard/TestimonialCard';
 // Environment & Settings
 export { SettingsToggleRow } from './SettingsToggleRow';
 export type { SettingsToggleRowProps } from './SettingsToggleRow';
+export { SettingsCardHeader } from './SettingsCardHeader';
+export type { SettingsCardHeaderProps } from './SettingsCardHeader';
 export { OptionFilterPopover } from './OptionFilterPopover';
 export type { OptionFilterGroup, OptionFilterPopoverProps } from './OptionFilterPopover';
 export { default as EnvironmentSelector } from './EnvironmentSelector';

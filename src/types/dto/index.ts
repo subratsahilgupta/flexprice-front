@@ -329,8 +329,11 @@ export { NomodWebhookEvents, getDefaultNomodWebhookEvents } from '../enums/Nomod
 
 export { QuickBooksWebhookEvents, getDefaultQuickBooksWebhookEvents } from '../enums/QuickBooksWebhookEvents';
 
+export { PaddleWebhookEvents, getDefaultPaddleWebhookEvents } from '../enums/PaddleWebhookEvents';
+
 // Additional DTO types
 export type { Testimonial } from './Testimonial';
+export type { CustomerLogo } from './CustomerLogo';
 
 export type {
 	CreateGroupRequest,

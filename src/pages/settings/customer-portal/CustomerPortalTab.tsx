@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { Card, CardHeader, Loader } from '@/components/atoms';
-import { SettingsToggleRow } from '@/components/molecules';
+import { Card, Loader } from '@/components/atoms';
+import { SettingsCardHeader, SettingsToggleRow } from '@/components/molecules';
 import type { PortalConfig } from '@/types/dto/PortalConfig';
 import SettingsFormActions from '../SettingsFormActions';
 import { applyPortalVisibility, getPortalVisibility, type PortalVisibility } from './portalVisibility';
@@ -34,18 +34,25 @@ const CustomerPortalTab = () => {
 		});
 	};
 
+	const portalTitle = t('customerPortal.portal.title');
+
 	return (
 		<Card variant='default' className='rounded-xl border border-gray-200 bg-white shadow-sm'>
-			<CardHeader title={t('customerPortal.portal.title')} titleClassName='text-lg font-medium text-zinc-800' />
+			<SettingsCardHeader
+				title={portalTitle}
+				titleClassName='text-lg font-medium text-zinc-800'
+				infoDescription={t('customerPortal.portal.description')}
+				infoAriaLabel={t('info.ariaLabel', { field: portalTitle })}
+			/>
 			{isLoading ? (
 				<Loader />
 			) : (
 				<>
-					<p className='text-sm text-zinc-500'>{t('customerPortal.portal.description')}</p>
 					<div className='mt-4 divide-y divide-gray-200'>
 						<SettingsToggleRow
 							label={t('customerPortal.portal.showInvoices')}
 							description={t('customerPortal.portal.showInvoicesDescription')}
+							infoAriaLabel={t('info.ariaLabel', { field: t('customerPortal.portal.showInvoices') })}
 							checked={visibility.showInvoices}
 							disabled={updateConfig.isPending}
 							onCheckedChange={(checked) => handleToggle('showInvoices', checked)}
@@ -53,6 +60,7 @@ const CustomerPortalTab = () => {
 						<SettingsToggleRow
 							label={t('customerPortal.portal.showWalletBalance')}
 							description={t('customerPortal.portal.showWalletBalanceDescription')}
+							infoAriaLabel={t('info.ariaLabel', { field: t('customerPortal.portal.showWalletBalance') })}
 							checked={visibility.showWalletBalance}
 							disabled={updateConfig.isPending}
 							onCheckedChange={(checked) => handleToggle('showWalletBalance', checked)}
@@ -60,6 +68,7 @@ const CustomerPortalTab = () => {
 						<SettingsToggleRow
 							label={t('customerPortal.portal.showUsage')}
 							description={t('customerPortal.portal.showUsageDescription')}
+							infoAriaLabel={t('info.ariaLabel', { field: t('customerPortal.portal.showUsage') })}
 							checked={visibility.showUsage}
 							disabled={updateConfig.isPending}
 							onCheckedChange={(checked) => handleToggle('showUsage', checked)}
@@ -67,6 +76,7 @@ const CustomerPortalTab = () => {
 						<SettingsToggleRow
 							label={t('customerPortal.portal.showSubscriptions')}
 							description={t('customerPortal.portal.showSubscriptionsDescription')}
+							infoAriaLabel={t('info.ariaLabel', { field: t('customerPortal.portal.showSubscriptions') })}
 							checked={visibility.showSubscriptions}
 							disabled={updateConfig.isPending}
 							onCheckedChange={(checked) => handleToggle('showSubscriptions', checked)}

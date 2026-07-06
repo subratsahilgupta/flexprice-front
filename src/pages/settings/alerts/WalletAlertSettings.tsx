@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, CardHeader, Loader } from '@/components/atoms';
-import { WalletAlertThresholdCard } from '@/components/molecules';
+import { Button, Card, Loader } from '@/components/atoms';
+import { SettingsCardHeader, WalletAlertThresholdCard } from '@/components/molecules';
 import type { WalletAlertThresholdCardLabels } from '@/components/molecules/WalletAlertThresholdCard';
 import { Switch } from '@/components/ui/switch';
 import { WalletAlertLevel, type WalletAlertSettings } from '@/models/Wallet';
@@ -54,13 +54,15 @@ const WalletAlertSettingsSection = () => {
 	};
 
 	const isDisabled = !draft.alert_enabled || updateSettings.isPending;
+	const alertsTitle = t('alerts.walletAlerts.title');
 
 	return (
 		<Card variant='default' noPadding className='rounded-xl border-gray-200 bg-white shadow-sm'>
 			<div className='px-6 pt-6'>
-				<CardHeader
-					title={t('alerts.walletAlerts.title')}
-					subtitle={t('alerts.walletAlerts.description')}
+				<SettingsCardHeader
+					title={alertsTitle}
+					infoDescription={t('alerts.walletAlerts.description')}
+					infoAriaLabel={t('info.ariaLabel', { field: alertsTitle })}
 					titleClassName='text-lg font-medium text-zinc-800'
 					className='mb-2'
 					cta={
@@ -68,7 +70,7 @@ const WalletAlertSettingsSection = () => {
 							checked={draft.alert_enabled ?? false}
 							onCheckedChange={(enabled) => setDraft((prev) => ({ ...prev, alert_enabled: enabled }))}
 							disabled={updateSettings.isPending}
-							aria-label={t('alerts.walletAlerts.title')}
+							aria-label={alertsTitle}
 						/>
 					}
 				/>
