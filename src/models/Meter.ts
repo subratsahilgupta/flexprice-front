@@ -44,4 +44,5 @@ export enum BUCKET_SIZE {
 	WindowSize12Hour = '12HOUR',
 	WindowSizeDay = 'DAY',
 	WindowSizeWeek = 'WEEK',
+	WindowSizeMonth = 'MONTH',
 }

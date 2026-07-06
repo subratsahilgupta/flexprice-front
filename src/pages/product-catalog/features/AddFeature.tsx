@@ -158,6 +158,10 @@ const BUCKET_SIZE_OPTIONS: SelectOption[] = [
 		label: 'Week',
 		value: BUCKET_SIZE.WindowSizeWeek,
 	},
+	{
+		label: 'Month',
+		value: BUCKET_SIZE.WindowSizeMonth,
+	},
 ];
 
 const aggregationSupportsBucketSize = (type?: METER_AGGREGATION_TYPE): boolean =>
