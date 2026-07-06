@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { Card, CardHeader, Input, Loader, Select, Button } from '@/components/atoms';
+import { Card, CardHeader, FieldWithInfo, Input, Loader, Select } from '@/components/atoms';
 import type { InvoiceConfig, InvoiceNumberFormat } from '@/types/dto/BillingSettings';
 import { getInvoiceConfigValidationErrorKey, normalizeInvoiceConfig, parseSequenceDigitsInput } from '@/types/dto/BillingSettings';
 import { useInvoiceConfiguration } from './useInvoiceConfiguration';
@@ -79,6 +79,16 @@ const InvoiceConfigurationSection = () => {
 		label: t(`billing.invoiceConfiguration.dateFormats.${format}`),
 	}));
 
+	const fieldLabels = {
+		prefix: t('billing.invoiceConfiguration.fields.prefix'),
+		separator: t('billing.invoiceConfiguration.fields.separator'),
+		dateFormat: t('billing.invoiceConfiguration.fields.dateFormat'),
+		timezone: t('billing.invoiceConfiguration.fields.timezone'),
+		startSequence: t('billing.invoiceConfiguration.fields.startSequence'),
+		sequenceDigits: t('billing.invoiceConfiguration.fields.sequenceDigits'),
+		paymentDueDays: t('billing.invoiceConfiguration.fields.paymentDueDays'),
+	};
+
 	return (
 		<Card variant='default' className='rounded-xl border border-gray-200 bg-white shadow-sm'>
 			<CardHeader title={t('billing.invoiceConfiguration.title')} titleClassName='text-lg font-medium text-zinc-800' />
@@ -88,80 +98,92 @@ const InvoiceConfigurationSection = () => {
 				<>
 					<div className='mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4'>
 						<p className='text-xs font-medium uppercase tracking-wide text-zinc-400'>{t('billing.invoiceConfiguration.previewLabel')}</p>
-						<div className='mt-3 flex items-center justify-between gap-4'>
+						<div className='mt-3 flex items-center justify-between gap-1'>
 							<span className='font-mono text-xl font-medium text-gray-800'>{preview}</span>
-							<Button
-								type='button'
-								variant='outline'
-								size='sm'
-								className='shrink-0'
-								onClick={() => updateDraft('start_sequence', draft.start_sequence + 1)}
-								disabled={updateConfiguration.isPending}>
-								{t('billing.invoiceConfiguration.nextInvoiceNumber')}
-							</Button>
+							<span className='text-sm font-medium text-zinc-600'>{t('billing.invoiceConfiguration.nextInvoiceNumber')}</span>
 						</div>
 					</div>
 
 					<div className='grid grid-cols-1 items-start gap-x-6 gap-y-5 md:grid-cols-2'>
-						<Input
-							label={t('billing.invoiceConfiguration.fields.prefix')}
-							value={draft.prefix}
-							onChange={(value) => updateDraft('prefix', value)}
+						<FieldWithInfo
+							label={fieldLabels.prefix}
 							description={t('billing.invoiceConfiguration.hints.prefix')}
-							disabled={updateConfiguration.isPending}
-						/>
-						<Input
-							label={t('billing.invoiceConfiguration.fields.separator')}
-							value={draft.separator}
-							onChange={(value) => updateDraft('separator', value)}
+							infoAriaLabel={t('info.ariaLabel', { field: fieldLabels.prefix })}
+							disabled={updateConfiguration.isPending}>
+							<Input value={draft.prefix} onChange={(value) => updateDraft('prefix', value)} disabled={updateConfiguration.isPending} />
+						</FieldWithInfo>
+						<FieldWithInfo
+							label={fieldLabels.separator}
 							description={t('billing.invoiceConfiguration.hints.separator')}
-							disabled={updateConfiguration.isPending}
-						/>
-						<Select
-							label={t('billing.invoiceConfiguration.fields.dateFormat')}
-							value={draft.format}
-							options={dateFormatOptions}
-							onChange={(value) => updateDraft('format', value as InvoiceNumberFormat)}
+							infoAriaLabel={t('info.ariaLabel', { field: fieldLabels.separator })}
+							disabled={updateConfiguration.isPending}>
+							<Input
+								value={draft.separator}
+								onChange={(value) => updateDraft('separator', value)}
+								disabled={updateConfiguration.isPending}
+							/>
+						</FieldWithInfo>
+						<FieldWithInfo
+							label={fieldLabels.dateFormat}
 							description={t('billing.invoiceConfiguration.hints.dateFormat')}
-							disabled={updateConfiguration.isPending}
-						/>
-						<Input
-							label={t('billing.invoiceConfiguration.fields.timezone')}
-							value={draft.timezone}
-							onChange={(value) => updateDraft('timezone', value)}
+							infoAriaLabel={t('info.ariaLabel', { field: fieldLabels.dateFormat })}
+							disabled={updateConfiguration.isPending}>
+							<Select
+								value={draft.format}
+								options={dateFormatOptions}
+								onChange={(value) => updateDraft('format', value as InvoiceNumberFormat)}
+								disabled={updateConfiguration.isPending}
+							/>
+						</FieldWithInfo>
+						<FieldWithInfo
+							label={fieldLabels.timezone}
 							description={t('billing.invoiceConfiguration.hints.timezone')}
-							disabled={updateConfiguration.isPending}
-						/>
-						<Input
-							label={t('billing.invoiceConfiguration.fields.startSequence')}
-							type='number'
-							value={String(draft.start_sequence)}
-							variant='number'
-							onChange={(value) => updateDraft('start_sequence', Number(value || 0))}
+							infoAriaLabel={t('info.ariaLabel', { field: fieldLabels.timezone })}
+							disabled={updateConfiguration.isPending}>
+							<Input value={draft.timezone} onChange={(value) => updateDraft('timezone', value)} disabled={updateConfiguration.isPending} />
+						</FieldWithInfo>
+						<FieldWithInfo
+							label={fieldLabels.startSequence}
 							description={t('billing.invoiceConfiguration.hints.startSequence')}
-							disabled={updateConfiguration.isPending}
-						/>
-						<Input
-							label={t('billing.invoiceConfiguration.fields.sequenceDigits')}
-							min={1}
-							max={10}
-							inputMode='numeric'
-							value={suffixLengthInput}
-							variant='integer'
-							onChange={setSuffixLengthInput}
-							onBlur={normalizeSuffixLengthInput}
+							infoAriaLabel={t('info.ariaLabel', { field: fieldLabels.startSequence })}
+							disabled={updateConfiguration.isPending}>
+							<Input
+								type='number'
+								value={String(draft.start_sequence)}
+								variant='number'
+								onChange={(value) => updateDraft('start_sequence', Number(value || 0))}
+								disabled={updateConfiguration.isPending}
+							/>
+						</FieldWithInfo>
+						<FieldWithInfo
+							label={fieldLabels.sequenceDigits}
 							description={t('billing.invoiceConfiguration.hints.sequenceDigits')}
-							disabled={updateConfiguration.isPending}
-						/>
-						<Input
-							label={t('billing.invoiceConfiguration.fields.paymentDueDays')}
-							type='number'
-							value={String(draft.due_date_days)}
-							variant='number'
-							onChange={(value) => updateDraft('due_date_days', Number(value || 0))}
+							infoAriaLabel={t('info.ariaLabel', { field: fieldLabels.sequenceDigits })}
+							disabled={updateConfiguration.isPending}>
+							<Input
+								min={1}
+								max={10}
+								inputMode='numeric'
+								value={suffixLengthInput}
+								variant='integer'
+								onChange={setSuffixLengthInput}
+								onBlur={normalizeSuffixLengthInput}
+								disabled={updateConfiguration.isPending}
+							/>
+						</FieldWithInfo>
+						<FieldWithInfo
+							label={fieldLabels.paymentDueDays}
 							description={t('billing.invoiceConfiguration.hints.paymentDueDays')}
-							disabled={updateConfiguration.isPending}
-						/>
+							infoAriaLabel={t('info.ariaLabel', { field: fieldLabels.paymentDueDays })}
+							disabled={updateConfiguration.isPending}>
+							<Input
+								type='number'
+								value={String(draft.due_date_days)}
+								variant='number'
+								onChange={(value) => updateDraft('due_date_days', Number(value || 0))}
+								disabled={updateConfiguration.isPending}
+							/>
+						</FieldWithInfo>
 					</div>
 
 					<SettingsFormActions

@@ -1,4 +1,4 @@
-import { Button, Input, Select } from '@/components/atoms';
+import { Button, InfoIcon, Input, Select } from '@/components/atoms';
 import type { WalletAlertThreshold } from '@/models/Wallet';
 import { cn } from '@/lib/utils';
 
@@ -43,9 +43,9 @@ const WalletAlertThresholdCard = ({
 	return (
 		<div className={cn('space-y-3 rounded-lg border bg-gray-50 p-4', disabled && 'opacity-50')}>
 			<div className='flex items-center justify-between gap-4'>
-				<div>
+				<div className='flex min-w-0 items-center gap-1.5'>
 					<label className='text-sm font-medium text-gray-900'>{labels.title}</label>
-					<p className='mt-0.5 text-xs text-gray-500'>{labels.description}</p>
+					<InfoIcon description={labels.description} ariaLabel={labels.title} disabled={disabled} />
 				</div>
 				{threshold ? (
 					<Button variant='ghost' size='sm' onClick={onRemove} disabled={disabled}>

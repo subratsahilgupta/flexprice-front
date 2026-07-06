@@ -84,4 +84,9 @@ export { default as ErrorBoundary } from './ErrorBoundary';
 
 export { default as Tooltip } from './Tooltip';
 
+export { InfoIcon } from './InfoIcon';
+export type { InfoIconProps } from './InfoIcon';
+export { FieldWithInfo } from './FieldWithInfo';
+export type { FieldWithInfoProps } from './FieldWithInfo';
+
 export { CopyIdButton } from './CopyIdButton';

@@ -3,6 +3,9 @@
 		"settings": "الإعدادات",
 		"billing": "الفوترة"
 	},
+	"info": {
+		"ariaLabel": "مزيد من المعلومات حول {{field}}"
+	},
 	"members": {
 		"roleAdmin": "مسؤول",
 		"roleMember": "عضو",
@@ -25,7 +28,11 @@
 			"joined": "تاريخ الانضمام"
 		},
 		"cardTitle": "المستخدمون",
-		"usersCount": "{{count}} مستخدمين",
+		"usersCount_one": "{{count}} مستخدم",
+		"usersCount_two": "{{count}} مستخدمان",
+		"usersCount_few": "{{count}} مستخدمين",
+		"usersCount_many": "{{count}} مستخدم",
+		"usersCount_other": "{{count}} مستخدم",
 		"actions": {
 			"add": "إضافة",
 			"invite": "دعوة",
@@ -86,7 +93,8 @@
 		"tabs": {
 			"team": "الفريق"
 		},
-		"unitUsers": "مستخدمين"
+		"unitUsers_one": "مستخدم",
+		"unitUsers_other": "مستخدمين"
 	},
 	"organization": {
 		"title": "المنظمة",
@@ -104,6 +112,7 @@
 			"title": "إعداد الفواتير",
 			"previewLabel": "معاينة",
 			"nextInvoiceNumber": "رقم الفاتورة التالي",
+			"infoAria": "مزيد من المعلومات حول {{field}}",
 			"saveSuccess": "تم حفظ إعداد الفواتير",
 			"saveError": "فشل حفظ إعداد الفواتير",
 			"resetSuccess": "تمت إعادة إعداد الفواتير إلى القيم الافتراضية",
@@ -190,6 +199,52 @@
 			"showSubscriptionsDescription": "يمكن للعملاء عرض تفاصيل اشتراكهم النشط",
 			"saveSuccess": "تم حفظ إعدادات البوابة",
 			"saveError": "فشل حفظ إعدادات البوابة"
+		}
+	},
+	"customerOnboarding": {
+		"tabs": {
+			"customerOnboarding": "تهيئة العملاء"
+		},
+		"workflow": {
+			"title": "تهيئة العملاء",
+			"description": "اضبط الإجراءات التي تعمل تلقائياً بعد إنشاء العميل. عند عدم وجود إجراءات، يتم تخطي التهيئة.",
+			"summaryLabel": "حالة سير العمل",
+			"noActionsConfigured": "لا توجد إجراءات تهيئة مضبوطة.",
+			"actionConfigured": "تم ضبط إجراء تهيئة واحد",
+			"actionsConfigured": "تم ضبط {{count}} إجراءات تهيئة",
+			"advancedActionsPreserved": "يتضمن هذا الإعداد إجراءات متقدمة غير قابلة للتعديل هنا. سيتم الاحتفاظ بها عند الحفظ.",
+			"selectedPlanUnavailable": "هذه الخطة محفوظة في سير العمل لكنها غير موجودة في قائمة الخطط المنشورة الحالية.",
+			"saveSuccess": "تم حفظ إعدادات تهيئة العملاء",
+			"saveError": "فشل حفظ إعدادات تهيئة العملاء",
+			"resetSuccess": "تمت إعادة تهيئة العملاء إلى القيم الافتراضية",
+			"resetError": "فشلت إعادة تهيئة العملاء",
+			"validation": {
+				"walletCurrencyRequired": "عملة المحفظة مطلوبة",
+				"walletConversionRateInvalid": "يجب أن يكون معدل التحويل أكبر من 0",
+				"subscriptionPlanRequired": "اختر خطة قبل تفعيل إنشاء الاشتراك",
+				"subscriptionStartDateInvalid": "يجب أن يكون تاريخ البدء بصيغة ISO datetime مثل 2026-07-04T00:00:00Z، أو اتركه فارغاً"
+			},
+			"wallet": {
+				"title": "إنشاء محفظة",
+				"description": "إنشاء محفظة لكل عميل جديد.",
+				"currency": "العملة",
+				"currencyHint": "عملة المحفظة التي سيتم إنشاؤها.",
+				"conversionRate": "معدل التحويل",
+				"conversionRateHint": "اختياري. القيمة الافتراضية 1 عند تركه فارغاً."
+			},
+			"subscription": {
+				"title": "إنشاء اشتراك",
+				"description": "إنشاء اشتراك لكل عميل جديد.",
+				"plan": "الخطة",
+				"planPlaceholder": "اختر خطة",
+				"noPlans": "لا توجد خطط منشورة",
+				"planHint": "الخطة التي سيتم اشتراك العملاء الجدد بها.",
+				"billingCycle": "دورة الفوترة",
+				"billingCycleHint": "Anniversary تفوتر نسبةً إلى تاريخ تسجيل العميل؛ Calendar يوافق فترات التقويم.",
+				"startDate": "تاريخ البدء",
+				"startDatePlaceholder": "2026-07-04T00:00:00Z",
+				"startDateHint": "طابع زمني RFC3339 اختياري. اتركه فارغاً لحذف start_date."
+			}
 		}
 	},
 	"alerts": {

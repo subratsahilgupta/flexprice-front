@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { Card, CardHeader, Input, Loader } from '@/components/atoms';
+import { Card, CardHeader, FieldWithInfo, Input, Loader } from '@/components/atoms';
 import { SettingsToggleRow } from '@/components/molecules';
 import { cn } from '@/lib/utils';
 import type { SubscriptionConfig } from '@/types/dto/BillingSettings';
@@ -48,6 +48,9 @@ const SubscriptionConfigurationSection = () => {
 		? t('billing.subscriptionConfiguration.preview.actionEnabled')
 		: t('billing.subscriptionConfiguration.preview.actionDisabled');
 
+	const autoCancellationLabel = t('billing.subscriptionConfiguration.fields.autoCancellation');
+	const gracePeriodDaysLabel = t('billing.subscriptionConfiguration.fields.gracePeriodDays');
+
 	return (
 		<Card variant='default' className='rounded-xl border border-gray-200 bg-white shadow-sm'>
 			<CardHeader title={t('billing.subscriptionConfiguration.title')} titleClassName='text-lg font-medium text-zinc-800' />
@@ -82,8 +85,13 @@ const SubscriptionConfigurationSection = () => {
 					</div>
 
 					<SettingsToggleRow
-						label={t('billing.subscriptionConfiguration.fields.autoCancellation')}
-						description={t('billing.subscriptionConfiguration.hints.autoCancellation')}
+						label={autoCancellationLabel}
+						description={
+							draft.auto_cancellation_enabled
+								? t('billing.subscriptionConfiguration.hints.autoCancellation')
+								: t('billing.subscriptionConfiguration.hints.disabledState')
+						}
+						infoAriaLabel={t('info.ariaLabel', { field: autoCancellationLabel })}
 						checked={draft.auto_cancellation_enabled}
 						disabled={updateConfiguration.isPending}
 						className='py-0'
@@ -92,27 +100,28 @@ const SubscriptionConfigurationSection = () => {
 
 					{draft.auto_cancellation_enabled ? (
 						<div className='mt-5 max-w-md'>
-							<Input
-								label={t('billing.subscriptionConfiguration.fields.gracePeriodDays')}
-								type='number'
-								value={gracePeriodInput}
-								variant='number'
-								suffix={t('billing.subscriptionConfiguration.fields.gracePeriodSuffix')}
-								onChange={setGracePeriodInput}
-								onBlur={() => {
-									const normalized = normalizeGracePeriodDays(gracePeriodInput);
-									setGracePeriodInput(String(normalized));
-									setDraft((prev) => ({ ...prev, grace_period_days: normalized }));
-								}}
+							<FieldWithInfo
+								label={gracePeriodDaysLabel}
 								description={t('billing.subscriptionConfiguration.hints.gracePeriodDays')}
-								disabled={updateConfiguration.isPending}
-							/>
+								infoAriaLabel={t('info.ariaLabel', { field: gracePeriodDaysLabel })}
+								disabled={updateConfiguration.isPending}>
+								<Input
+									type='number'
+									value={gracePeriodInput}
+									variant='number'
+									suffix={t('billing.subscriptionConfiguration.fields.gracePeriodSuffix')}
+									onChange={setGracePeriodInput}
+									onBlur={() => {
+										const normalized = normalizeGracePeriodDays(gracePeriodInput);
+										setGracePeriodInput(String(normalized));
+										setDraft((prev) => ({ ...prev, grace_period_days: normalized }));
+									}}
+									disabled={updateConfiguration.isPending}
+								/>
+							</FieldWithInfo>
 						</div>
 					) : (
-						<>
-							<hr className='my-4 border-gray-200' />
-							<p className='mt-3 text-sm text-zinc-400'>{t('billing.subscriptionConfiguration.hints.disabledState')}</p>
-						</>
+						<hr className='my-4 border-gray-200' />
 					)}
 
 					{draft.auto_cancellation_enabled ? (
