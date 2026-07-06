@@ -33,6 +33,11 @@ const SubscribedEventsEditor: FC<{ endpointId: string; filterTypes: string[] | n
 	const [selected, setSelected] = useState<string[]>(filterTypes ?? []);
 	const [isSaving, setIsSaving] = useState(false);
 
+	const handleCancel = () => {
+		setSelected(filterTypes ?? []);
+		setIsEditing(false);
+	};
+
 	const handleSave = async () => {
 		setIsSaving(true);
 		try {
@@ -55,7 +60,7 @@ const SubscribedEventsEditor: FC<{ endpointId: string; filterTypes: string[] | n
 					<Button size='sm' isLoading={isSaving} onClick={handleSave}>
 						{t('common:actions.save')}
 					</Button>
-					<Button size='sm' variant='outline' disabled={isSaving} onClick={() => setIsEditing(false)}>
+					<Button size='sm' variant='outline' disabled={isSaving} onClick={handleCancel}>
 						{t('common:actions.cancel')}
 					</Button>
 				</div>

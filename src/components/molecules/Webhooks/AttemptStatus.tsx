@@ -44,7 +44,7 @@ export const AttemptStatusChip: FC<{ status: MessageStatus }> = ({ status }) => 
 	if (status === MessageStatus.Fail) return <Chip variant='failed' label={t('webhooks.endpoints.attempts.status.failed')} />;
 	if (status === MessageStatus.Sending) return <Chip variant='info' label={t('webhooks.endpoints.attempts.status.sending')} />;
 	if (status === MessageStatus.Pending) return <Chip variant='warning' label={t('webhooks.endpoints.attempts.status.pending')} />;
-	return <Chip variant='default' label={t('webhooks.endpoints.attempts.status.pending')} />;
+	return <Chip variant='default' label={t('webhooks.endpoints.attempts.status.unknown')} />;
 };
 
 export const AttemptReplayAction: FC<{ attempt: MessageAttemptOut; onReplayed: () => void }> = ({ attempt, onReplayed }) => {
