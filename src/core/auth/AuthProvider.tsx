@@ -3,8 +3,6 @@ import { Navigate } from 'react-router';
 import { useUser } from '@/hooks/UserContext';
 import { PageLoader } from '@/components/atoms';
 import useUserhook from '@/hooks/useUser';
-import { refreshPersistedUserSession } from '@/utils/auth/refreshUserSession';
-import { logger } from '@/utils/common/Logger';
 
 interface AuthMiddlewareProps {
 	children: ReactNode;
@@ -15,12 +13,10 @@ const AuthMiddleware: React.FC<AuthMiddlewareProps> = ({ children }) => {
 	const { user, loading, error } = useUserhook();
 
 	useEffect(() => {
-		if (!user) return;
-		refreshPersistedUserSession(userContext.setUser, { user }).catch(logger.error);
-		// userContext is a fresh object every UserProvider render — only re-sync when the
-		// underlying query result actually changes.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [user]);
+		if (user) {
+			userContext.setUser(user);
+		}
+	}, [user, userContext]);
 
 	if (loading) {
 		return <PageLoader />;

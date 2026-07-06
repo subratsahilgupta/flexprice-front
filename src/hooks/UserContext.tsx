@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { persistUserToLocalStorage, readUserFromLocalStorage } from '@/utils/auth/userStorage';
+import { logger } from '@/utils/common/Logger';
 
 interface UserProviderProps {
 	children: ReactNode;
@@ -12,23 +12,34 @@ interface UserContextProp {
 const UserContext = createContext<UserContextProp>({} as UserContextProp);
 
 export const UserProvider = ({ children }: UserProviderProps) => {
-	const [user, setUserState] = useState<any>(null);
+	const [user, setUserState] = useState<any>({});
 
 	const setUser = useCallback((next: any) => {
-		if (next == null) {
-			setUserState(null);
-			persistUserToLocalStorage(null);
-			return;
-		}
-
-		// React state always reflects the caller's intent; persistence to localStorage is a
-		// best-effort side effect gated by the freshness guard and never blocks the state update.
 		setUserState(next);
-		persistUserToLocalStorage(next);
+		try {
+			if (next == null) {
+				localStorage.removeItem('user');
+			} else {
+				localStorage.setItem('user', JSON.stringify(next));
+			}
+		} catch (error) {
+			logger.error(error);
+		}
 	}, []);
 
 	useEffect(() => {
-		setUserState(readUserFromLocalStorage());
+		try {
+			const userData = localStorage.getItem('user');
+			if (userData) {
+				const parsed = JSON.parse(userData);
+				setUserState(parsed);
+			}
+		} catch (error) {
+			logger.error(error);
+			// Clear invalid user data but don't trigger logout to prevent infinite redirects
+			localStorage.removeItem('user');
+			setUserState(null);
+		}
 	}, []);
 
 	return <UserContext.Provider value={{ user, setUser }}>{children}</UserContext.Provider>;

@@ -1,5 +1,5 @@
 import { AxiosClient } from '@/core/axios/verbs';
-import { Tenant, User } from '@/models';
+import { User } from '@/models';
 import { CreateUserRequest, UpdateTenantPayload } from '@/types/dto';
 import {
 	CreateServiceAccountPayload,
@@ -102,11 +102,9 @@ export class UserApi {
 		return await AxiosClient.post<User>(this.baseUrl, data);
 	}
 
-	// Updates the current tenant (billing details, name, etc). Despite the method name, this
-	// hits `tenants/update` and returns the updated Tenant, not a User — same endpoint as
-	// TenantApi.updateTenant.
-	public static async updateUser(data: UpdateTenantPayload): Promise<Tenant> {
-		return await AxiosClient.put<Tenant, UpdateTenantPayload>(`tenants/update`, data);
+	// Update an existing user
+	public static async updateUser(data: UpdateTenantPayload): Promise<User> {
+		return await AxiosClient.put<User, UpdateTenantPayload>(`tenants/update`, data);
 	}
 
 	// Update a service account (name, metadata)

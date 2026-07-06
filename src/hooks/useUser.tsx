@@ -2,10 +2,6 @@ import { useQuery } from '@tanstack/react-query';
 import { UserApi } from '@/api/UserApi';
 import AuthService from '@/core/auth/AuthService';
 
-export const USER_QUERY_KEY = 'user' as const;
-
-export const getUserQueryKey = (token?: unknown) => [USER_QUERY_KEY, token] as const;
-
 const useUser = () => {
 	const tokenStr = AuthService.getAcessToken();
 
@@ -15,13 +11,15 @@ const useUser = () => {
 		error,
 		refetch,
 	} = useQuery({
-		queryKey: getUserQueryKey(tokenStr),
+		queryKey: ['user', tokenStr],
 		queryFn: async () => {
 			return await UserApi.me();
 		},
 		enabled: !!tokenStr,
 		retry: 4,
 		retryDelay: 1000,
+		// gcTime: 1000 * 60 * 5,
+		// staleTime: 1000 * 60 * 5,
 	});
 
 	return { user, loading, error, refetch };
