@@ -36,9 +36,7 @@ const AddEndpointForm: FC<Props> = ({ onBack, onCreated, onViewEventCatalog }) =
 	};
 
 	const toggleGroup = (groupEvents: string[], allSelected: boolean) => {
-		setSelectedEvents((prev) =>
-			allSelected ? prev.filter((e) => !groupEvents.includes(e)) : [...new Set([...prev, ...groupEvents])],
-		);
+		setSelectedEvents((prev) => (allSelected ? prev.filter((e) => !groupEvents.includes(e)) : [...new Set([...prev, ...groupEvents])]));
 	};
 
 	const handleSubmit = async () => {
@@ -99,11 +97,7 @@ const AddEndpointForm: FC<Props> = ({ onBack, onCreated, onViewEventCatalog }) =
 					</button>
 				</div>
 
-				<Input
-					placeholder={t('webhooks.endpoints.form.searchEventsPlaceholder')}
-					value={eventSearch}
-					onChange={setEventSearch}
-				/>
+				<Input placeholder={t('webhooks.endpoints.form.searchEventsPlaceholder')} value={eventSearch} onChange={setEventSearch} />
 
 				<div className='border rounded-md divide-y divide-border max-h-80 overflow-y-auto'>
 					{filteredGroups.map((group) => {
