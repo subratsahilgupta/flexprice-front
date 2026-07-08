@@ -75,7 +75,13 @@ export { default as InvoicePaymentsTable } from './InvoicePaymentsTable';
 
 // Credit & Payment Management
 export { CreditNoteTable, CreditNoteLineItemTable } from './CreditNoteTable';
-export { CreditGrantsTable, CreditGrantModal, SubscriptionCreditGrantTable, UpcomingCreditGrantApplicationsTable } from './CreditGrant';
+export {
+	CreditGrantsTable,
+	CreditGrantModal,
+	SubscriptionCreditGrantTable,
+	UpcomingCreditGrantApplicationsTable,
+	AddonCreditGrantsSection,
+} from './CreditGrant';
 export { default as RecordPaymentTopup } from './RecordPaymentTopup';
 
 // Wallet Management
