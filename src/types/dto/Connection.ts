@@ -88,6 +88,10 @@ export interface CreateConnectionPayload {
 				client_side_token?: string;
 		  }
 		| {
+				provider_type: CONNECTION_PROVIDER_TYPE.TABS;
+				api_key?: string;
+		  }
+		| {
 				api_key?: string;
 				webhook_secret?: string;
 		  };
