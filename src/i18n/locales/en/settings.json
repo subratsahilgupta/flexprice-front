@@ -796,6 +796,14 @@
 			"webhookIntroPrefix": "Register this URL in your Whop dashboard under Webhooks. Flexprice will listen for",
 			"webhookEventName": "invoice.paid",
 			"webhookIntroSuffix": "events to automatically mark invoices as paid."
+		},
+		"tabs": {
+			"description": "Configure your Tabs integration with the required credentials.",
+			"connectionPlaceholder": "e.g., Tabs Production, Tabs Test",
+			"connectionHint": "A friendly name to identify this Tabs connection",
+			"apiKeyPlaceholder": "Enter your Tabs API key",
+			"apiKeyHint": "Your Tabs API key (e.g., tabs_sk_...)",
+			"pushToTabs": "Push to Tabs"
 		}
 	},
 	"insightsTools": {
@@ -1204,6 +1212,22 @@
 							"paragraphs": [
 								"Register the Flexprice webhook URL in your Whop developer settings to receive invoice.paid events. When Whop fires this event, Flexprice automatically marks the corresponding invoice as paid and records the payment."
 							]
+						}
+					}
+				},
+				"tabs": {
+					"name": "Tabs",
+					"description": "Sync invoices to Tabs using your Tabs API key.",
+					"sections": {
+						"overview": {
+							"title": "Overview",
+							"paragraphs": [
+								"The Flexprice Tabs integration lets you push invoices directly to Tabs using your Tabs API key. Configure a connection name, API key, and invoice sync settings to get started."
+							]
+						},
+						"invoiceSync": {
+							"title": "Invoice Sync",
+							"paragraphs": ["When invoice sync is enabled, Flexprice automatically pushes finalized invoices to Tabs."]
 						}
 					}
 				}
