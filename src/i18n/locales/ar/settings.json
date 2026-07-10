@@ -799,6 +799,14 @@
 			"webhookIntroPrefix": "سجّل هذا العنوان في لوحة Whop ضمن Webhooks. سيتابع Flexprice",
 			"webhookEventName": "invoice.paid",
 			"webhookIntroSuffix": "لتحديث حالة الفاتورة تلقائياً عند الدفع."
+		},
+		"tabs": {
+			"description": "اضبط تكامل Tabs باستخدام بيانات الاعتماد المطلوبة.",
+			"connectionPlaceholder": "مثال: Tabs الإنتاج، Tabs الاختبار",
+			"connectionHint": "اسم ودي لتحديد اتصال Tabs هذا",
+			"apiKeyPlaceholder": "أدخل مفتاح Tabs API الخاص بك",
+			"apiKeyHint": "مفتاح Tabs API الخاص بك (مثال: tabs_sk_...)",
+			"pushToTabs": "دفع إلى Tabs"
 		}
 	},
 	"insightsTools": {
@@ -1136,6 +1144,22 @@
 						"webhooksPaddle": {
 							"title": "تكامل الويبهوك",
 							"paragraphs": ["استقبل إشعارات فورية عن أحداث الدفع عبر الويبهوك؛ اشترك في حدث transactions.completed لمتابعة حالة الدفع."]
+						}
+					}
+				},
+				"tabs": {
+					"name": "Tabs",
+					"description": "زامن الفواتير مع Tabs باستخدام مفتاح Tabs API الخاص بك.",
+					"sections": {
+						"overview": {
+							"title": "نظرة عامة",
+							"paragraphs": [
+								"يتيح تكامل Flexprice مع Tabs إرسال الفواتير مباشرة إلى Tabs باستخدام مفتاح Tabs API. اضبط اسم الاتصال ومفتاح API وإعدادات مزامنة الفواتير للبدء."
+							]
+						},
+						"invoiceSync": {
+							"title": "مزامنة الفواتير",
+							"paragraphs": ["عند تفعيل مزامنة الفواتير، يرسل Flexprice الفواتير المكتملة تلقائياً إلى Tabs."]
 						}
 					}
 				}

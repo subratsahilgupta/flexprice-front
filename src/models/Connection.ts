@@ -20,6 +20,7 @@ export enum CONNECTION_PROVIDER_TYPE {
 	MOYASAR = 'moyasar',
 	PADDLE = 'paddle',
 	WHOP = 'whop',
+	TABS = 'tabs',
 	// Add more providers as needed
 }
 
