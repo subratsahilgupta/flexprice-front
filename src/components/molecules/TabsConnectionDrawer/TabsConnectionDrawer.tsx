@@ -5,13 +5,23 @@ import { Switch } from '@/components/ui';
 import { useMutation } from '@tanstack/react-query';
 import ConnectionApi from '@/api/ConnectionApi';
 import toast from 'react-hot-toast';
-import { CONNECTION_PROVIDER_TYPE } from '@/models';
+import { CONNECTION_PROVIDER_TYPE, Connection } from '@/models';
+import { UpdateConnectionPayload } from '@/types/dto';
+
+interface TabsConnection extends Connection {
+	sync_config?: {
+		invoice?: {
+			inbound: boolean;
+			outbound: boolean;
+		};
+	};
+}
 
 interface TabsConnectionDrawerProps {
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;
-	connection?: any; // for editing
-	onSave: (connection: any) => void;
+	connection?: TabsConnection;
+	onSave: (connection: Connection) => void;
 }
 
 interface TabsFormData {
@@ -95,7 +105,6 @@ const TabsConnectionDrawer: FC<TabsConnectionDrawerProps> = ({ isOpen, onOpenCha
 				name: formData.name,
 				provider_type: CONNECTION_PROVIDER_TYPE.TABS,
 				encrypted_secret_data: {
-					provider_type: CONNECTION_PROVIDER_TYPE.TABS,
 					api_key: formData.api_key,
 				},
 				sync_config: {} as Record<string, { inbound: boolean; outbound: boolean }>,
@@ -123,20 +132,22 @@ const TabsConnectionDrawer: FC<TabsConnectionDrawerProps> = ({ isOpen, onOpenCha
 
 	const { mutate: updateConnection, isPending: isUpdating } = useMutation({
 		mutationFn: async () => {
-			const payload: any = {
+			const payload: Partial<UpdateConnectionPayload> = {
 				name: formData.name,
-				sync_config: {} as Record<string, { inbound: boolean; outbound: boolean }>,
+				sync_config: {},
 			};
 
 			// Only add invoice config if toggle is true
 			if (formData.sync_config.invoice) {
-				payload.sync_config.invoice = {
-					inbound: false,
-					outbound: true,
+				payload.sync_config = {
+					invoice: {
+						inbound: false,
+						outbound: true,
+					},
 				};
 			}
 
-			return await ConnectionApi.Update(connection.id, payload);
+			return await ConnectionApi.Update(connection!.id, payload);
 		},
 		onSuccess: (response) => {
 			toast.success(t('connection.toast.updated', { provider: TABS_PROVIDER }));
