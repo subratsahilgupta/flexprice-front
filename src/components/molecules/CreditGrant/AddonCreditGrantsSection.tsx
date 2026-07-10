@@ -1,5 +1,5 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button, Card, CardHeader, NoDataCard, Loader } from '@/components/atoms';
 import { Plus } from 'lucide-react';
 import { uniqueId } from 'lodash';
@@ -91,12 +91,17 @@ const AddonCreditGrantsSection = ({ addonId }: Props) => {
 		setCreditGrantModalOpen(false);
 	};
 
+	useEffect(() => {
+		if (isError) {
+			toast.error('Error loading credit grants');
+		}
+	}, [isError]);
+
 	if (isLoading) {
 		return <Loader />;
 	}
 
 	if (isError) {
-		toast.error('Error loading credit grants');
 		return null;
 	}
 
@@ -124,7 +129,7 @@ const AddonCreditGrantsSection = ({ addonId }: Props) => {
 					/>
 					<CreditGrantsTable
 						data={creditGrants}
-						onDelete={async () => {
+						onDelete={() => {
 							refetchQueries(['addonCreditGrants', addonId]);
 						}}
 						showEmptyRow
