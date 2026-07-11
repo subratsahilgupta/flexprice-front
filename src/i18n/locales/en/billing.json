@@ -992,6 +992,8 @@
 		"infoDescription": "Alert when spend reaches info level",
 		"cancel": "Cancel",
 		"saving": "Saving...",
-		"saveChanges": "Save Changes"
+		"saveChanges": "Save Changes",
+		"saveSuccess": "Alert settings saved successfully",
+		"saveError": "Failed to save alert settings"
 	}
 }

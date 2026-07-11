@@ -7,7 +7,7 @@ import { WalletAlertLevel, WalletAlertSettings } from '@/models/Wallet';
 import { getWalletAlertValidationErrorKey, normalizeWalletAlertSettingsForSave } from '@/utils/wallet/walletAlertUtils';
 import { ALERT_ENTITY_TYPE } from '@/models/AlertSetting';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import AlertSettingApi from '@/api/AlertSettingApi';
 import { logger } from '@/utils/common/Logger';
 
@@ -39,7 +39,6 @@ const EMPTY_CONFIG: WalletAlertSettings = {
 const AlertSettingsDialog: React.FC<AlertSettingsDialogProps> = ({ open, onClose, entityType, entityId, parentEntityId, currency }) => {
 	const { t } = useTranslation('billing');
 	const [localConfig, setLocalConfig] = useState<WalletAlertSettings>(EMPTY_CONFIG);
-	const [isSaving, setIsSaving] = useState(false);
 
 	const isLineItem = entityType === ALERT_ENTITY_TYPE.SUBSCRIPTION_LINE_ITEM;
 
@@ -121,7 +120,28 @@ const AlertSettingsDialog: React.FC<AlertSettingsDialogProps> = ({ open, onClose
 		};
 	};
 
-	const handleSave = async () => {
+	const { mutate: saveAlertSettings, isPending: isSaving } = useMutation({
+		mutationFn: (configToSave: WalletAlertSettings) =>
+			existingSetting
+				? AlertSettingApi.update(existingSetting.id, { config: configToSave })
+				: AlertSettingApi.create({
+						entity_type: entityType,
+						entity_id: entityId,
+						...(isLineItem ? { parent_entity_type: ALERT_ENTITY_TYPE.SUBSCRIPTION, parent_entity_id: parentEntityId } : {}),
+						config: configToSave,
+					}),
+		onSuccess: async () => {
+			toast.success(t('spendAlerts.saveSuccess'));
+			await refetch();
+			onClose();
+		},
+		onError: (e) => {
+			logger.error('Failed to save alert settings', e);
+			toast.error(t('spendAlerts.saveError'));
+		},
+	});
+
+	const handleSave = () => {
 		if (isSaving) return;
 
 		const validationErrorKey = getWalletAlertValidationErrorKey(localConfig);
@@ -130,29 +150,7 @@ const AlertSettingsDialog: React.FC<AlertSettingsDialogProps> = ({ open, onClose
 			return;
 		}
 
-		const configToSave = normalizeWalletAlertSettingsForSave(localConfig);
-
-		try {
-			setIsSaving(true);
-			if (existingSetting) {
-				await AlertSettingApi.update(existingSetting.id, { config: configToSave });
-			} else {
-				await AlertSettingApi.create({
-					entity_type: entityType,
-					entity_id: entityId,
-					...(isLineItem ? { parent_entity_type: ALERT_ENTITY_TYPE.SUBSCRIPTION, parent_entity_id: parentEntityId } : {}),
-					config: configToSave,
-				});
-			}
-			toast.success('Alert settings saved successfully');
-			await refetch();
-			onClose();
-		} catch (e) {
-			logger.error('Failed to save alert settings', e);
-			toast.error('Failed to save alert settings');
-		} finally {
-			setIsSaving(false);
-		}
+		saveAlertSettings(normalizeWalletAlertSettingsForSave(localConfig));
 	};
 
 	const handleClose = () => {
