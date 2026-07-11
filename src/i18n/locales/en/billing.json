@@ -970,5 +970,30 @@
 		"copied": "Copied!",
 		"copyLink": "Copy Link",
 		"close": "Close"
+	},
+	"spendAlerts": {
+		"remove": "Remove",
+		"add": "Add",
+		"thresholdValueLabel": "Threshold Value{{currencySuffix}}",
+		"amountPlaceholder": "0.00",
+		"conditionLabel": "Condition",
+		"conditionAbove": "Above",
+		"subscriptionDialogTitle": "Subscription Alert Settings",
+		"lineItemDialogTitle": "Line Item Alert Settings",
+		"enableTitle": "Enable Alerts",
+		"subscriptionEnableLabel": "Monitor total subscription spend against configured thresholds",
+		"lineItemEnableLabel": "Monitor this line item's spend against configured thresholds",
+		"enableDescription": "Get notified when spend crosses configured thresholds for the current billing period",
+		"criticalTitle": "Critical Threshold",
+		"criticalDescription": "Alert when spend reaches critical level",
+		"warningTitle": "Warning Threshold",
+		"warningDescription": "Alert when spend reaches warning level",
+		"infoTitle": "Info Threshold",
+		"infoDescription": "Alert when spend reaches info level",
+		"cancel": "Cancel",
+		"saving": "Saving...",
+		"saveChanges": "Save Changes",
+		"saveSuccess": "Alert settings saved successfully",
+		"saveError": "Failed to save alert settings"
 	}
 }
