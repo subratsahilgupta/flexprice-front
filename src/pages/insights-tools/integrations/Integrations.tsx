@@ -21,6 +21,7 @@ import ZohoBooksConnectionDrawer from '@/components/molecules/ZohoBooksConnectio
 import NomodConnectionDrawer from '@/components/molecules/NomodConnectionDrawer';
 import MoyasarConnectionDrawer from '@/components/molecules/MoyasarConnectionDrawer';
 import WhopConnectionDrawer from '@/components/molecules/WhopConnectionDrawer';
+import TabsConnectionDrawer from '@/components/molecules/TabsConnectionDrawer';
 import IntegrationDrawer from '@/components/molecules/IntegrationDrawer/IntegrationDrawer';
 
 /** UI preview only: shows one card in connected state without real API data. Set to `null` to turn off. */
@@ -293,6 +294,24 @@ const Integrations = () => {
 						/>
 					) : activeIntegration.id === CONNECTION_PROVIDER_TYPE.WHOP ? (
 						<WhopConnectionDrawer
+							isOpen={isDrawerOpen}
+							onOpenChange={(open) => {
+								setIsDrawerOpen(open);
+								if (!open) {
+									setEditingConnection(null);
+									setActiveIntegration(null);
+								}
+							}}
+							connection={editingConnection}
+							onSave={() => {
+								connectionQueries.forEach((q) => q.refetch?.());
+								setIsDrawerOpen(false);
+								setEditingConnection(null);
+								setActiveIntegration(null);
+							}}
+						/>
+					) : activeIntegration.id === CONNECTION_PROVIDER_TYPE.TABS ? (
+						<TabsConnectionDrawer
 							isOpen={isDrawerOpen}
 							onOpenChange={(open) => {
 								setIsDrawerOpen(open);

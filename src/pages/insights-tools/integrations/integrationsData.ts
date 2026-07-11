@@ -136,4 +136,11 @@ export const integrationCatalogSpecs: IntegrationCatalogSpec[] = [
 		type: 'available',
 		sectionKeys: ['overview', 'invoiceSync', 'webhooks'],
 	},
+	{
+		id: 'tabs',
+		logo: '/assets/logo/tabs.png',
+		tagKeys: ['payments', 'invoices'],
+		type: 'available',
+		sectionKeys: ['overview', 'invoiceSync'],
+	},
 ];
