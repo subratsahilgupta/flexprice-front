@@ -51,6 +51,7 @@
 			"title": "تفاصيل الإضافة",
 			"charges": "الرسوم",
 			"entitlements": "الاستحقاقات",
+			"creditGrants": "منح الرصيد",
 			"metadata": "البيانات الوصفية"
 		},
 		"subscriptionSheet": {

@@ -51,6 +51,7 @@
 			"title": "Addon Details",
 			"charges": "Charges",
 			"entitlements": "Entitlements",
+			"creditGrants": "Credit Grants",
 			"metadata": "Metadata"
 		},
 		"subscriptionSheet": {

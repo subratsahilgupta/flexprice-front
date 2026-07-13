@@ -970,5 +970,30 @@
 			"scheduledMessage": "سيُنهى {{name}} في {{date}}.",
 			"immediateMessage": "سيُنهى {{name}} فورًا."
 		}
+	},
+	"spendAlerts": {
+		"remove": "إزالة",
+		"add": "إضافة",
+		"thresholdValueLabel": "قيمة العتبة{{currencySuffix}}",
+		"amountPlaceholder": "0.00",
+		"conditionLabel": "الشرط",
+		"conditionAbove": "أعلى من",
+		"subscriptionDialogTitle": "إعدادات تنبيه الاشتراك",
+		"lineItemDialogTitle": "إعدادات تنبيه بند السطر",
+		"enableTitle": "تفعيل التنبيهات",
+		"subscriptionEnableLabel": "مراقبة إجمالي إنفاق الاشتراك مقارنة بالعتبات المضبوطة",
+		"lineItemEnableLabel": "مراقبة إنفاق بند السطر هذا مقارنة بالعتبات المضبوطة",
+		"enableDescription": "استلام إشعار عند تجاوز الإنفاق للعتبات المضبوطة خلال فترة الفوترة الحالية",
+		"criticalTitle": "عتبة حرجة",
+		"criticalDescription": "تنبيه عند وصول الإنفاق لمستوى حرج",
+		"warningTitle": "عتبة تحذير",
+		"warningDescription": "تنبيه عند وصول الإنفاق لمستوى تحذير",
+		"infoTitle": "عتبة معلومات",
+		"infoDescription": "تنبيه عند وصول الإنفاق لمستوى معلومات",
+		"cancel": "إلغاء",
+		"saving": "جارٍ الحفظ...",
+		"saveChanges": "حفظ التغييرات",
+		"saveSuccess": "تم حفظ إعدادات التنبيه بنجاح",
+		"saveError": "فشل حفظ إعدادات التنبيه"
 	}
 }

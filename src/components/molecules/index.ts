@@ -75,7 +75,13 @@ export { default as InvoicePaymentsTable } from './InvoicePaymentsTable';
 
 // Credit & Payment Management
 export { CreditNoteTable, CreditNoteLineItemTable } from './CreditNoteTable';
-export { CreditGrantsTable, CreditGrantModal, SubscriptionCreditGrantTable, UpcomingCreditGrantApplicationsTable } from './CreditGrant';
+export {
+	CreditGrantsTable,
+	CreditGrantModal,
+	SubscriptionCreditGrantTable,
+	UpcomingCreditGrantApplicationsTable,
+	AddonCreditGrantsSection,
+} from './CreditGrant';
 export { default as RecordPaymentTopup } from './RecordPaymentTopup';
 
 // Wallet Management
@@ -83,6 +89,7 @@ export { default as WalletTransactionsTable, AllWalletTransactionsTable } from '
 export { default as TopupCard } from './WalletTopupCard';
 export { default as DebitCard } from './WalletDebitCard';
 export { default as WalletAlertDialog } from './WalletAlertDialog';
+export { default as AlertSettingsDialog } from './AlertSettingsDialog';
 export { default as WalletAlertThresholdCard } from './WalletAlertThresholdCard';
 export { default as WalletAutoTopup } from './WalletAutoTopup';
 export { default as TerminateWalletModal } from './TerminateWalletModal';
