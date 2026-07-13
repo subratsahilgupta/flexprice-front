@@ -251,6 +251,7 @@
 		"notFoundBackToHome": "Back to Home"
 	},
 	"copyId": {
+		"genericLabel": "Copy ID",
 		"toastFallback": "ID copied to clipboard",
 		"toastWithType": "{{type}} ID copied to clipboard",
 		"titleWithType": "Copy {{type}} ID",

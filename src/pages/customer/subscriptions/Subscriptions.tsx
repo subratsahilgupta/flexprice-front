@@ -226,6 +226,7 @@ const SubscriptionsPage = () => {
 					return (
 						<ActionButton
 							id={row.id}
+							copyId={{ entityType: 'Subscription' }}
 							deleteMutationFn={async () => Promise.resolve()}
 							refetchQueryKey='fetchSubscriptions'
 							isArchiveDisabled={true}

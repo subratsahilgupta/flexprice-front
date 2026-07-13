@@ -233,6 +233,7 @@
 		"notFoundBackToHome": "العودة إلى الرئيسية"
 	},
 	"copyId": {
+		"genericLabel": "نسخ المعرّف",
 		"toastFallback": "تم نسخ المعرّف إلى الحافظة",
 		"toastWithType": "تم نسخ معرّف {{type}} إلى الحافظة",
 		"titleWithType": "نسخ معرّف {{type}}",
