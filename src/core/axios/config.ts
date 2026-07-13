@@ -45,7 +45,7 @@ axiosClient.interceptors.request.use(
 			config.headers.Authorization = `Bearer ${token}`;
 		}
 
-		const devToken = localStorage.getItem('x-dev-token');
+		const devToken = localStorage.getItem('x-api-key');
 		if (devToken) {
 			config.headers.Authorization = `Bearer ${devToken}`;
 		}
