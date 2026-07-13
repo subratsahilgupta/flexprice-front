@@ -11,7 +11,7 @@ import React, { useState, useMemo } from 'react';
 import SubscriptionApi from '@/api/SubscriptionApi';
 import { DatePicker, Label, Modal, Input, Button, FormHeader, Spacer, Select, Toggle } from '@/components/atoms';
 import { toast } from 'react-hot-toast';
-import DropdownMenu, { DropdownMenuOption } from '@/components/molecules/DropdownMenu/DropdownMenu';
+import DropdownMenu, { DropdownMenuOption, getCopyIdOption } from '@/components/molecules/DropdownMenu/DropdownMenu';
 import { AlertSettingsDialog } from '@/components/molecules';
 import { ALERT_ENTITY_TYPE } from '@/models/AlertSetting';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
@@ -27,6 +27,7 @@ interface Props {
 const SubscriptionActionButton: React.FC<Props> = ({ subscription }) => {
 	const navigate = useNavigate();
 	const { t } = useTranslation(['customers', 'common']);
+	const { t: tc } = useTranslation('common');
 	const [state, setState] = useState({
 		// isPauseModalOpen: false,
 		// isResumeModalOpen: false,
@@ -152,6 +153,7 @@ const SubscriptionActionButton: React.FC<Props> = ({ subscription }) => {
 	const readOnly = isInheritedSubscription(subscription);
 
 	const menuOptions: DropdownMenuOption[] = [
+		getCopyIdOption(subscription.id, tc, { entityType: 'Subscription' }),
 		...(isDraft
 			? [
 					{

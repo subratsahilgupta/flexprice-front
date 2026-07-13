@@ -90,6 +90,7 @@ const defaultProps = {
 describe('ActionButton Component', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
+		Object.assign(navigator, { clipboard: { writeText: vi.fn().mockResolvedValue(undefined) } });
 	});
 
 	describe('Basic Rendering', () => {
@@ -427,6 +428,77 @@ describe('ActionButton Component', () => {
 
 			await waitFor(() => {
 				expect(screen.getByText('Legacy Archive')).toBeInTheDocument();
+			});
+		});
+	});
+
+	describe('Copy ID Action', () => {
+		it('should not render Copy ID when copyId prop is omitted', async () => {
+			render(
+				<TestWrapper>
+					<ActionButton {...defaultProps} edit={{ enabled: true }} />
+				</TestWrapper>,
+			);
+
+			const triggerButton = screen.getByRole('button');
+			fireEvent.click(triggerButton);
+
+			await waitFor(() => {
+				expect(screen.getByText('Edit')).toBeInTheDocument();
+			});
+			expect(screen.queryByText('Copy ID')).not.toBeInTheDocument();
+		});
+
+		it('should render the generic "Copy ID" label and copy the id when no entityType is given', async () => {
+			render(
+				<TestWrapper>
+					<ActionButton {...defaultProps} copyId={{}} />
+				</TestWrapper>,
+			);
+
+			const triggerButton = screen.getByRole('button');
+			fireEvent.click(triggerButton);
+
+			await waitFor(() => {
+				const copyIdButton = screen.getByText('Copy ID');
+				fireEvent.click(copyIdButton);
+			});
+
+			expect(navigator.clipboard.writeText).toHaveBeenCalledWith('test-id');
+		});
+
+		it('should show an entity-specific toast message when entityType is given', async () => {
+			render(
+				<TestWrapper>
+					<ActionButton {...defaultProps} copyId={{ entityType: 'Plan' }} />
+				</TestWrapper>,
+			);
+
+			const triggerButton = screen.getByRole('button');
+			fireEvent.click(triggerButton);
+
+			await waitFor(() => {
+				const copyIdButton = screen.getByText('Copy ID');
+				fireEvent.click(copyIdButton);
+			});
+
+			await waitFor(() => {
+				expect(toast.success).toHaveBeenCalledWith('Plan ID copied to clipboard');
+			});
+		});
+
+		it('should render a custom label when provided', async () => {
+			render(
+				<TestWrapper>
+					<ActionButton {...defaultProps} copyId={{ label: 'Copy Plan ID' }} />
+				</TestWrapper>,
+			);
+
+			const triggerButton = screen.getByRole('button');
+			fireEvent.click(triggerButton);
+
+			await waitFor(() => {
+				expect(screen.getByText('Copy Plan ID')).toBeInTheDocument();
 			});
 		});
 	});

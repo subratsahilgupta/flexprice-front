@@ -98,6 +98,7 @@ const ServiceAccountsPage = () => {
 				render: (row: User) => (
 					<ActionButton
 						id={row.id}
+						copyId={{ entityType: 'Service Account' }}
 						entityName={row.name || row.id}
 						deleteMutationFn={async () => UserApi.deleteUser(row.id)}
 						refetchQueryKey='service-accounts'

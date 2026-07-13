@@ -3,7 +3,7 @@ import { Chip, Sheet } from '@/components/atoms';
 import { FlexpriceTable, ColumnData } from '@/components/molecules';
 import JsonCodeBlock from '@/components/molecules/Events/JsonCodeBlock';
 import { FEATURE_TYPE } from '@/models';
-import { Pencil, Info } from 'lucide-react';
+import { Pencil, Info, Copy } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui';
 import { BsThreeDotsVertical } from 'react-icons/bs';
@@ -11,6 +11,7 @@ import { EntitlementOverrideRequest } from '@/types/dto/Subscription';
 import { JsonObject } from '@/types/common';
 import EditEntitlementDrawer from './EditEntitlementDrawer';
 import { useTranslation } from 'react-i18next';
+import { copyToClipboard } from '@/utils/common/helper_functions';
 
 interface EntitlementOverridesTableProps {
 	entitlements: any[];
@@ -277,6 +278,15 @@ const EntitlementOverridesTable: FC<EntitlementOverridesTableProps> = ({ entitle
 								</button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align='end'>
+								<DropdownMenuItem
+									onSelect={(e) => {
+										e.preventDefault();
+										void copyToClipboard(row.id, tc('copyId.toastWithType', { type: 'Entitlement' }));
+									}}
+									className='flex gap-2 items-center cursor-pointer'>
+									<Copy className='h-4 w-4' />
+									<span>{tc('copyId.genericLabel')}</span>
+								</DropdownMenuItem>
 								<DropdownMenuItem
 									onSelect={(e) => {
 										e.preventDefault();
