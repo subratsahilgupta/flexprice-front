@@ -2,6 +2,7 @@
 
 interface ImportMetaEnv {
 	readonly VITE_DEPLOYMENT_REGION?: string;
+	readonly VITE_PLATFORM_CONFIG?: string;
 }
 
 declare const __APP_VERSION__: string;

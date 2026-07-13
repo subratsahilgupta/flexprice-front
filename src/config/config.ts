@@ -77,6 +77,84 @@ interface RestrictionsConfig {
 	rawEnvs: string;
 }
 
+export interface PlatformConfig {
+	api_reference: {
+		enabled: boolean;
+	};
+	sidebar_documentation: {
+		enabled: boolean;
+	};
+	guides: {
+		enabled: boolean;
+	};
+	onboarding: {
+		enabled: boolean;
+	};
+	contact_us: {
+		enabled: boolean;
+	};
+	production: {
+		enabled: boolean;
+	};
+}
+
+const PLATFORM_FEATURE_DEFAULTS = {
+	api_reference: true,
+	sidebar_documentation: true,
+	guides: true,
+	onboarding: true,
+	production: false,
+} as const;
+
+type PlatformFeatureKey = keyof typeof PLATFORM_FEATURE_DEFAULTS;
+
+interface PlatformConfigJson {
+	api_reference?: { enabled?: boolean };
+	sidebar_documentation?: { enabled?: boolean };
+	guides?: { enabled?: boolean };
+	onboarding?: { enabled?: boolean };
+	contact_us?: boolean | { enabled?: boolean };
+	production?: { enabled?: boolean };
+}
+
+function parsePlatformFeatureEnabled(parsed: PlatformConfigJson | undefined, key: PlatformFeatureKey): boolean {
+	const fromEnv = parsed?.[key]?.enabled;
+	if (typeof fromEnv === 'boolean') return fromEnv;
+	return PLATFORM_FEATURE_DEFAULTS[key];
+}
+
+function parseContactUsEnabled(parsed: PlatformConfigJson | undefined): boolean {
+	const raw = parsed?.contact_us;
+	if (raw === true) return true;
+	if (typeof raw === 'object' && raw !== null && raw.enabled === true) return true;
+	return false;
+}
+
+/** Parse `VITE_PLATFORM_CONFIG` JSON. Keys: api_reference, sidebar_documentation, guides, onboarding, contact_us. Omitted keys default to `enabled: true` (contact_us defaults to false). */
+export function parsePlatformConfig(rawPlatformConfig?: string): PlatformConfig {
+	let parsed: PlatformConfigJson | undefined;
+	const raw = rawPlatformConfig?.trim();
+
+	if (raw) {
+		try {
+			parsed = JSON.parse(raw) as PlatformConfigJson;
+		} catch {
+			// invalid JSON — use defaults for all features
+		}
+	}
+
+	return {
+		api_reference: { enabled: parsePlatformFeatureEnabled(parsed, 'api_reference') },
+		sidebar_documentation: { enabled: parsePlatformFeatureEnabled(parsed, 'sidebar_documentation') },
+		guides: { enabled: parsePlatformFeatureEnabled(parsed, 'guides') },
+		onboarding: { enabled: parsePlatformFeatureEnabled(parsed, 'onboarding') },
+		contact_us: { enabled: parseContactUsEnabled(parsed) },
+		production: { enabled: parsePlatformFeatureEnabled(parsed, 'production') },
+	};
+}
+
+const platformConfig = parsePlatformConfig(import.meta.env.VITE_PLATFORM_CONFIG);
+
 export interface WebhooksConfig {
 	provider: WEBHOOK_PROVIDER;
 	/** Public origin of a self-hosted Svix API (browser-reachable). Empty when using hosted Svix. */
@@ -174,6 +252,7 @@ export interface Config {
 	regions: RegionsConfig;
 	allowedLocales: Locale[];
 	typography: TypographyConfig;
+	platform: PlatformConfig;
 	features: FeaturesConfig;
 	webhooks: WebhooksConfig;
 }
@@ -256,6 +335,7 @@ export const config: Config = {
 	regions: regionsConfig,
 	allowedLocales: allowedLocalesConfig,
 	typography: typographyConfig,
+	platform: platformConfig,
 	features: {
 		tenantFeatureAllowlist,
 	},
