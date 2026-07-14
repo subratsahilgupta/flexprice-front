@@ -19,7 +19,6 @@ import { IntegrationEntityType } from '@/types/dto';
 const PROVIDER_ID_MAP: Record<string, string> = {
 	zoho_books: 'zoho',
 };
-
 const CONNECTION_DRIVEN_PROVIDERS: Record<string, IntegrationEntityType[]> = {
 	[CONNECTION_PROVIDER_TYPE.AWS_MARKETPLACE]: ['customer', 'subscription', 'plan'],
 };
