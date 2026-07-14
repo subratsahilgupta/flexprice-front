@@ -564,9 +564,7 @@
 			"copyIamPolicy": "IAM policy copied to clipboard",
 			"copyTrustPolicy": "Trust policy copied to clipboard",
 			"copyExternalId": "External ID copied to clipboard",
-			"copyAccountId": "Account ID copied to clipboard",
-			"securityNote": "Security Note",
-			"securityBody": "Flexprice never receives your AWS credentials. The role you create trusts only Flexprice's AWS account, scoped to the external ID above, and grants a single permission: aws-marketplace:BatchMeterUsage."
+			"copyAccountId": "Account ID copied to clipboard"
 		},
 		"validation": {
 			"nameRequired": "Connection name is required",
