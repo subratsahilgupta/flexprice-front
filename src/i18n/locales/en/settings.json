@@ -542,8 +542,36 @@
 		}
 	},
 	"connection": {
+		"awsMarketplace": {
+			"titleConnect": "Connect to AWS Marketplace",
+			"titleEdit": "Edit AWS Marketplace Connection",
+			"description": "Create an IAM role in your AWS account, then paste its Role ARN here. Flexprice verifies the role before saving.",
+			"connectionNameLabel": "Connection name",
+			"connectionNamePlaceholder": "e.g. AWS Marketplace",
+			"connectionNameHint": "A descriptive name for this connection.",
+			"step1Title": "1. Add the policies in your AWS account",
+			"step1Hint": "Create an IAM role, then copy each policy below into it. Expand to review the JSON before copying.",
+			"iamPolicyLabel": "IAM permission policy",
+			"trustPolicyLabel": "Trust policy",
+			"externalIdLabel": "External ID",
+			"externalIdHint": "A unique, per-connection identifier. It is already embedded in the trust policy above — you do not need to copy it separately.",
+			"accountIdLabel": "Flexprice AWS account ID",
+			"accountIdMissing": "Not configured. Set VITE_FLEXPRICE_AWS_ACCOUNT_ID so the trust policy can be generated.",
+			"step2Title": "2. Paste your Role ARN",
+			"roleArnLabel": "Role ARN",
+			"roleArnPlaceholder": "arn:aws:iam::123456789012:role/flexprice-marketplace-role",
+			"roleArnHint": "The ARN of the IAM role you created with the policies above.",
+			"copyIamPolicy": "IAM policy copied to clipboard",
+			"copyTrustPolicy": "Trust policy copied to clipboard",
+			"copyExternalId": "External ID copied to clipboard",
+			"copyAccountId": "Account ID copied to clipboard",
+			"securityNote": "Security Note",
+			"securityBody": "Flexprice never receives your AWS credentials. The role you create trusts only Flexprice's AWS account, scoped to the external ID above, and grants a single permission: aws-marketplace:BatchMeterUsage."
+		},
 		"validation": {
 			"nameRequired": "Connection name is required",
+			"roleArnRequired": "Role ARN is required",
+			"roleArnInvalid": "Enter a valid IAM role ARN (arn:aws:iam::<account-id>:role/<name>)",
 			"awsAccessKeyRequired": "AWS Access Key ID is required",
 			"awsSecretRequired": "AWS Secret Access Key is required",
 			"accessTokenRequired": "Access token is required",
@@ -911,7 +939,9 @@
 					"customerService": "Customer Service",
 					"accounting": "Accounting",
 					"payment": "Payment",
-					"invoiceCustomer": "Invoice Customer"
+					"invoiceCustomer": "Invoice Customer",
+					"marketplace": "Marketplace",
+					"usageMetering": "Usage Metering"
 				},
 				"mode": {
 					"test": "Test Mode"
@@ -1228,6 +1258,30 @@
 						"invoiceSync": {
 							"title": "Invoice Sync",
 							"paragraphs": ["When invoice sync is enabled, Flexprice automatically pushes finalized invoices to Tabs."]
+						}
+					}
+				},
+				"aws_marketplace": {
+					"name": "AWS Marketplace",
+					"description": "Report metered usage to AWS Marketplace so your AWS buyers are billed for what they consume.",
+					"sections": {
+						"overview": {
+							"title": "Overview",
+							"paragraphs": [
+								"Flexprice reports the usage you already meter to AWS Marketplace on your behalf. Connect the marketplace-metering IAM role from your own AWS account, and Flexprice takes care of sending BatchMeterUsage for each registered agreement."
+							]
+						},
+						"setup": {
+							"title": "Setup",
+							"paragraphs": [
+								"Create an IAM role in your AWS account using the IAM policy and trust policy shown in the connection panel. The trust policy grants Flexprice's AWS account permission to assume the role, scoped to a unique external ID. Paste the resulting Role ARN back into Flexprice and save — Flexprice verifies the role by assuming it before storing the connection."
+							]
+						},
+						"usageReporting": {
+							"title": "Usage Reporting",
+							"paragraphs": [
+								"Once connected, an hourly job aggregates usage per agreement and reports it to AWS via BatchMeterUsage, with a daily reconciliation pass as a backstop."
+							]
 						}
 					}
 				}

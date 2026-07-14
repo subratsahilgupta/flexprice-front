@@ -72,6 +72,8 @@ interface RegionConfig {
 }
 interface IntegrationsConfig {
 	googleSheetsWebAppUrl: string;
+	/** Flexprice's AWS account ID, injected into the AWS Marketplace trust-policy template. */
+	flexpriceAwsAccountId: string;
 }
 interface RestrictionsConfig {
 	rawEnvs: string;
@@ -325,6 +327,7 @@ export const config: Config = {
 	},
 	integrations: {
 		googleSheetsWebAppUrl: import.meta.env.VITE_GOOGLE_SHEETS_WEB_APP_URL ?? '',
+		flexpriceAwsAccountId: import.meta.env.VITE_FLEXPRICE_AWS_ACCOUNT_ID ?? '',
 	},
 	restrictions: {
 		rawEnvs: import.meta.env.VITE_RESTRICTED_ENVS ?? '',
