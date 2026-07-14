@@ -124,6 +124,7 @@ const PlanEntitlementsTab = () => {
 				return (
 					<ActionButton
 						id={row?.id}
+						copyId={{ entityType: 'Entitlement' }}
 						deleteMutationFn={async () => {
 							return await EntitlementApi.delete(row?.id);
 						}}

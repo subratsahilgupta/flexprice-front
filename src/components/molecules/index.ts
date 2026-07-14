@@ -155,7 +155,7 @@ export { MetadataModal } from './MetadataModal';
 // Form Controls & UI Components
 export { default as RectangleRadiogroup } from './RectangleRadiogroup';
 export type { RectangleRadiogroupOption } from './RectangleRadiogroup';
-export { default as DropdownMenu } from './DropdownMenu';
+export { default as DropdownMenu, getCopyIdOption } from './DropdownMenu';
 export type { DropdownMenuOption } from './DropdownMenu';
 export { ChargeValueCell } from './ChargeValueCell';
 
