@@ -73,7 +73,9 @@ const WebhookDashboard = () => {
 	// Custom provider (Flexprice or self-hosted Svix): backend returns token/app_id and we
 	// render our own portal. Hosted Svix (default): backend returns a hosted portal `url`.
 	const isCustomProvider = config.webhooks.provider === WEBHOOK_PROVIDER.Custom;
-	const serverUrl = config.webhooks.svixUrl;
+	// svix-react/svix only fall back to the token's regional API when serverUrl is undefined —
+	// an empty string is treated as a literal (relative) base URL and breaks region auto-detection.
+	const serverUrl = config.webhooks.svixUrl || undefined;
 
 	if (isCustomProvider && data?.token && data?.app_id) {
 		return (
