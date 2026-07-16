@@ -25,6 +25,16 @@ import { useTranslation } from 'react-i18next';
 
 const DEFAULT_ROW_LIMIT = 5;
 
+/**
+ * Resolves the committed quantity from a table-cell input string.
+ * Falls back to `minQuantity` only when the input doesn't parse to a
+ * number at all — a typed "0" must resolve to 0, not fall back.
+ */
+export function resolveQuantityFromInput(value: string, minQuantity: number): number {
+	const parsed = parseInt(value, 10);
+	return Number.isNaN(parsed) ? minQuantity : parsed;
+}
+
 type ChargeTableData = {
 	priceId: string;
 	charge: ReactNode;
@@ -158,7 +168,7 @@ const PriceQuantityCell: FC<PriceQuantityCellProps> = ({
 						onQuantityChange('');
 						return;
 					}
-					const quantity = parseInt(value, 10) || minQuantity;
+					const quantity = resolveQuantityFromInput(value, minQuantity);
 
 					if (quantity === minQuantity) {
 						const onlyQuantityOverride =
