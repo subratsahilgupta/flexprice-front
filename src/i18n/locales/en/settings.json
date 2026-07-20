@@ -542,8 +542,42 @@
 		}
 	},
 	"connection": {
+		"awsMarketplace": {
+			"titleConnect": "Connect your AWS Marketplace account",
+			"titleEdit": "Edit AWS Marketplace Connection",
+			"description": "Sync your AWS Marketplace customers, subscriptions, and billing data securely using an IAM role. Flexprice only accesses the permissions you explicitly grant, and verifies the connection before enabling sync.",
+			"connectionNameLabel": "Connection Name",
+			"connectionNameInfo": "Choose a name to help identify this AWS Marketplace connection inside your workspace.",
+			"connectionNamePlaceholder": "Production AWS Marketplace",
+			"connectionNameHint": "A descriptive name for this connection.",
+			"step1Title": "Step 1 — Create an IAM role in AWS",
+			"step1Hint": "Create a new IAM role in your AWS account using the policies below. They grant Flexprice only the permissions required to sync your AWS Marketplace subscriptions, customers, and billing information.",
+			"iamPolicyLabel": "Permissions Policy",
+			"iamPolicyInfo": "Specifies exactly what AWS Marketplace resources Flexprice can access.",
+			"trustPolicyLabel": "Trust Relationship",
+			"trustPolicyInfo": "Allows Flexprice to securely assume this IAM role using the External ID below.",
+			"externalIdLabel": "External ID",
+			"externalIdInfo": "This unique identifier protects against the Confused Deputy security issue by ensuring only your Flexprice workspace can assume this IAM role. You don't need to copy it separately — it's already included in the Trust Relationship above.",
+			"accountIdLabel": "Flexprice AWS account ID",
+			"accountIdInfo": "Flexprice's AWS account that your IAM role will trust. It's already included in the Trust Relationship above.",
+			"accountIdMissing": "Not configured. Set VITE_FLEXPRICE_AWS_ACCOUNT_ID so the trust policy can be generated.",
+			"step2Title": "Step 2 — Enter your IAM Role ARN",
+			"roleArnLabel": "Role ARN",
+			"roleArnInfo": "Paste the full ARN of the IAM role created in your AWS account. We'll verify that it can be assumed before saving.",
+			"roleArnPlaceholder": "arn:aws:iam::<AWS_ACCOUNT_ID>:role/flexprice-marketplace-role",
+			"roleArnHint": "We'll validate the role before saving the connection.",
+			"variablesTitle": "Variables",
+			"variablesHint": "Copy each value to fill the matching {VARIABLE} placeholder in the Trust Relationship above. The values stay hidden here and are only revealed once pasted.",
+			"infoAriaLabel": "More information",
+			"copyIamPolicy": "Permissions policy copied to clipboard",
+			"copyTrustPolicy": "Trust relationship copied to clipboard",
+			"copyExternalId": "External ID copied to clipboard",
+			"copyAccountId": "Account ID copied to clipboard"
+		},
 		"validation": {
 			"nameRequired": "Connection name is required",
+			"roleArnRequired": "Role ARN is required",
+			"roleArnInvalid": "Enter a valid IAM role ARN (arn:aws:iam::<account-id>:role/<name>)",
 			"awsAccessKeyRequired": "AWS Access Key ID is required",
 			"awsSecretRequired": "AWS Secret Access Key is required",
 			"accessTokenRequired": "Access token is required",
@@ -743,6 +777,12 @@
 			"publishableKey": "Publishable Key",
 			"publishableKeyPlaceholder": "pk_live_... or pk_test_...",
 			"publishableKeyHint": "Used to render the secure card form for autopay. Find it in your Moyasar dashboard.",
+			"successUrl": "Success URL",
+			"successUrlPlaceholder": "https://your-app.com/billing/success",
+			"successUrlHint": "URL customers are redirected to after a successful payment (optional)",
+			"cancelUrl": "Cancel URL",
+			"cancelUrlPlaceholder": "https://your-app.com/billing/cancel",
+			"cancelUrlHint": "URL customers are redirected to if they cancel the payment (optional)",
 			"webhookIntro": "Set up this webhook URL in your Moyasar dashboard to receive event notifications:",
 			"webhookEventsIntro": "Subscribe to these events in your Moyasar dashboard:",
 			"webhookEventPaymentPaid": "payment_paid",
@@ -911,7 +951,9 @@
 					"customerService": "Customer Service",
 					"accounting": "Accounting",
 					"payment": "Payment",
-					"invoiceCustomer": "Invoice Customer"
+					"invoiceCustomer": "Invoice Customer",
+					"marketplace": "Marketplace",
+					"usageMetering": "Usage Metering"
 				},
 				"mode": {
 					"test": "Test Mode"
@@ -1228,6 +1270,30 @@
 						"invoiceSync": {
 							"title": "Invoice Sync",
 							"paragraphs": ["When invoice sync is enabled, Flexprice automatically pushes finalized invoices to Tabs."]
+						}
+					}
+				},
+				"aws_marketplace": {
+					"name": "AWS Marketplace",
+					"description": "Report metered usage to AWS Marketplace so your AWS buyers are billed for what they consume.",
+					"sections": {
+						"overview": {
+							"title": "Overview",
+							"paragraphs": [
+								"Flexprice reports the usage you already meter to AWS Marketplace on your behalf. Connect the marketplace-metering IAM role from your own AWS account, and Flexprice takes care of sending BatchMeterUsage for each registered agreement."
+							]
+						},
+						"setup": {
+							"title": "Setup",
+							"paragraphs": [
+								"Create an IAM role in your AWS account using the IAM policy and trust policy shown in the connection panel. The trust policy grants Flexprice's AWS account permission to assume the role, scoped to a unique external ID. Paste the resulting Role ARN back into Flexprice and save — Flexprice verifies the role by assuming it before storing the connection."
+							]
+						},
+						"usageReporting": {
+							"title": "Usage Reporting",
+							"paragraphs": [
+								"Once connected, an hourly job aggregates usage per agreement and reports it to AWS via BatchMeterUsage, with a daily reconciliation pass as a backstop."
+							]
 						}
 					}
 				}

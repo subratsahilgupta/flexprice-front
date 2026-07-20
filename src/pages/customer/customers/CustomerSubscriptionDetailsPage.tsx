@@ -1,5 +1,5 @@
 import { Card, FormHeader, Page, Spacer, Chip } from '@/components/atoms';
-import { SubscriptionAddonsSection, UpcomingCreditGrantApplicationsTable } from '@/components/molecules';
+import { IntegrationMappingCard, SubscriptionAddonsSection, UpcomingCreditGrantApplicationsTable } from '@/components/molecules';
 import SubscriptionDetailChargesSection from '@/components/molecules/Subscription/SubscriptionDetailChargesSection';
 import FlexpriceTable, { ColumnData, RedirectCell } from '@/components/molecules/Table';
 import { SubscriptionPreviewLineItemTable } from '@/components/molecules/InvoiceLineItemTable';
@@ -450,6 +450,13 @@ const CustomerSubscriptionDetailsPage: FC = () => {
 				</div>
 				<Spacer className='!my-4' />
 			</Card>
+
+			{/* third-party integration mappings (e.g. AWS Marketplace license_arn) */}
+			{subscription_id && (
+				<div className='mt-8'>
+					<IntegrationMappingCard entityType='subscription' entityId={subscription_id} />
+				</div>
+			)}
 
 			{/* subscription schedule */}
 			{subscriptionDetails?.schedule?.phases?.length && subscriptionDetails?.schedule?.phases?.length > 0 && (
