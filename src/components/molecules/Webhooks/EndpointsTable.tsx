@@ -23,7 +23,9 @@ const ErrorRateCell: FC<{ endpointId: string }> = ({ endpointId }) => {
 
 const EndpointsTable: FC<Props> = ({ onViewEventCatalog }) => {
 	const { t } = useTranslation(['developers', 'common']);
-	const endpoints = useEndpoints();
+	// Explicit page size so the prev/next controls below actually paginate instead of
+	// rendering one ever-growing list (svix's default limit is large).
+	const endpoints = useEndpoints({ limit: 20 });
 	const [view, setView] = useState<'list' | 'new' | 'detail'>('list');
 	const [selectedEndpointId, setSelectedEndpointId] = useState<string | null>(null);
 

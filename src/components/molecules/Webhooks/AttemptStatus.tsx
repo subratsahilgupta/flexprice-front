@@ -47,9 +47,14 @@ export const AttemptStatusChip: FC<{ status: MessageStatus }> = ({ status }) => 
 	return <Chip variant='default' label={t('webhooks.endpoints.attempts.status.unknown')} />;
 };
 
-export const AttemptReplayAction: FC<{ attempt: MessageAttemptOut; onReplayed: () => void }> = ({ attempt, onReplayed }) => {
+export const AttemptReplayAction: FC<{ msgId: string; endpointId: string; onReplayed: () => void }> = ({
+	msgId,
+	endpointId,
+	onReplayed,
+}) => {
 	const { t } = useTranslation('developers');
-	const { resendAttempt } = useAttemptFunctions(attempt);
+	// useAttemptFunctions only reads `msgId` + `endpointId` off the attempt to POST the resend.
+	const { resendAttempt } = useAttemptFunctions({ msgId, endpointId } as MessageAttemptOut);
 	const [isResending, setIsResending] = useState(false);
 
 	return (

@@ -4,9 +4,9 @@ import type { MessageOut } from 'svix';
 import { Button, Loader, NoDataCard } from '@/components/atoms';
 import FlexpriceTable, { ColumnData } from '@/components/molecules/Table';
 import { useTranslation } from 'react-i18next';
-import formatDate from '@/utils/common/format_date';
 import { RefreshCw } from 'lucide-react';
 import MessageDetail from './MessageDetail';
+import WebhookTimestamp from './WebhookTimestamp';
 
 const MessageLogsTable: FC = () => {
 	const { t } = useTranslation(['developers', 'common']);
@@ -29,7 +29,7 @@ const MessageLogsTable: FC = () => {
 		{
 			title: t('webhooks.logs.columns.timestamp'),
 			align: 'right',
-			render: (row) => <span className='text-sm text-gray-500'>{formatDate(row.timestamp)}</span>,
+			render: (row) => <WebhookTimestamp value={row.timestamp} />,
 		},
 	];
 
