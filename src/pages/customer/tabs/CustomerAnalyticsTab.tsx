@@ -103,8 +103,12 @@ const CustomerAnalyticsTab = () => {
 			params.end_time = endDate.toISOString();
 		}
 
+		if (includeChildren) {
+			params.include_children = true;
+		}
+
 		return params;
-	}, [customer?.external_id, selectedFeatures, startDate, endDate]);
+	}, [customer?.external_id, selectedFeatures, startDate, endDate, includeChildren]);
 
 	// Debounced API parameters with 300ms delay
 	const [debouncedUsageParams, setDebouncedUsageParams] = useState<GetUsageAnalyticsRequest | null>(null);
