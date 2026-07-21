@@ -151,4 +151,12 @@ export const integrationCatalogSpecs: IntegrationCatalogSpec[] = [
 		type: 'available',
 		sectionKeys: ['overview', 'setup', 'usageReporting'],
 	},
+	{
+		id: 'gcp_marketplace',
+		logo: '/assets/logo/google-cloud.png',
+		docsUrl: 'https://docs.flexprice.io/integrations/gcp-marketplace/',
+		tagKeys: ['marketplace', 'usageMetering'],
+		type: 'available',
+		sectionKeys: ['overview', 'setup', 'usageReporting'],
+	},
 ];

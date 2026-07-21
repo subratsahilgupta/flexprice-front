@@ -574,6 +574,25 @@
 			"copyExternalId": "External ID copied to clipboard",
 			"copyAccountId": "Account ID copied to clipboard"
 		},
+		"gcpMarketplace": {
+			"titleConnect": "Connect to GCP Marketplace",
+			"titleEdit": "Edit GCP Marketplace Connection",
+			"description": "Run the setup script in your GCP project, then paste the resulting credentials JSON here. Flexprice verifies it before saving.",
+			"connectionNameLabel": "Connection name",
+			"connectionNamePlaceholder": "e.g. GCP Marketplace",
+			"connectionNameHint": "A descriptive name for this connection. Covers every product listed under the same GCP project.",
+			"step1Title": "1. Run this script in your GCP project's Cloud Shell",
+			"step1Hint": "It creates a Workload Identity Federation pool, a service account, and grants it exactly the permission needed to report usage. Expand to review before copying.",
+			"scriptLabel": "Setup script",
+			"copyScript": "Setup script copied to clipboard",
+			"accountIdMissing": "Not configured. Set VITE_FLEXPRICE_AWS_ACCOUNT_ID and VITE_FLEXPRICE_AWS_ROLE_NAME so the script can be generated.",
+			"step2Title": "2. Paste the credentials JSON the script produced",
+			"credentialsJsonLabel": "Credentials JSON",
+			"credentialsJsonPlaceholder": "{\"type\": \"external_account\", ...}",
+			"credentialsJsonHint": "The full contents of the file the script wrote (flexprice-gcp-creds.json)",
+			"credentialsJsonRequired": "Credentials JSON is required",
+			"credentialsJsonInvalid": "This doesn't look like a Workload Identity Federation credentials file — it must have \"type\": \"external_account\""
+		},
 		"validation": {
 			"nameRequired": "Connection name is required",
 			"roleArnRequired": "Role ARN is required",
@@ -1293,6 +1312,30 @@
 							"title": "Usage Reporting",
 							"paragraphs": [
 								"Once connected, an hourly job aggregates usage per agreement and reports it to AWS via BatchMeterUsage, with a daily reconciliation pass as a backstop."
+							]
+						}
+					}
+				},
+				"gcp_marketplace": {
+					"name": "GCP Marketplace",
+					"description": "Report metered usage to GCP Marketplace so your GCP buyers are billed for what they consume.",
+					"sections": {
+						"overview": {
+							"title": "Overview",
+							"paragraphs": [
+								"Flexprice reports the usage you already meter to GCP Marketplace on your behalf. Flexprice authenticates to your GCP project using Workload Identity Federation — no long-lived GCP key is ever stored — and sends the usage report for each registered entitlement."
+							]
+						},
+						"setup": {
+							"title": "Setup",
+							"paragraphs": [
+								"Run the setup script shown in the connection panel from your GCP project's Cloud Shell. It creates a workload identity pool trusting Flexprice's AWS identity and a service account scoped to report usage only. Paste the resulting credentials file back into Flexprice and save — Flexprice verifies the connection by exchanging it for a live token before storing it."
+							]
+						},
+						"usageReporting": {
+							"title": "Usage Reporting",
+							"paragraphs": [
+								"Once connected, a scheduled job aggregates usage per entitlement and reports it to GCP via the Service Control API's services.report."
 							]
 						}
 					}
