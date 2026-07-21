@@ -209,7 +209,7 @@ const EnvironmentSelector: React.FC<Props> = ({ disabled = false, className }) =
 									aria-label={t('environment.selector.renameAria', { name: option.label })}
 									onPointerDown={(e) => e.stopPropagation()}
 									onClick={(e) => handleEditClick(env, e)}
-									className='absolute right-1.5 top-1/2 -translate-y-1/2 p-1 rounded-[4px] text-muted-foreground hover:bg-accent hover:text-foreground opacity-60 hover:opacity-100 transition-opacity'>
+									className='absolute right-1.5 top-1/2 -translate-y-1/2 p-1 rounded-[4px] text-muted-foreground hover:bg-accent hover:text-foreground opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity'>
 									<Pencil className='h-3.5 w-3.5' />
 								</button>
 							</div>

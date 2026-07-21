@@ -5,7 +5,7 @@ import { Button, Loader, NoDataCard, Toggle } from '@/components/atoms';
 import CodeBlock from '@/components/atoms/CodeBlock';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, ChevronDown, RefreshCw } from 'lucide-react';
-import formatDate from '@/utils/common/format_date';
+import WebhookTimestamp from './WebhookTimestamp';
 import {
 	AttemptStatusChip,
 	AttemptReplayAction,
@@ -49,9 +49,11 @@ const AttemptRow: FC<{ attempt: MessageAttemptOut; onReplayed: () => void }> = (
 					<AttemptStatusChip status={attempt.status} />
 				</div>
 				<span className='flex-1 min-w-0 truncate font-mono text-xs text-gray-600'>{attempt.url}</span>
-				<span className='shrink-0 text-sm text-gray-500'>{formatDate(attempt.timestamp)}</span>
+				<span className='shrink-0'>
+					<WebhookTimestamp value={attempt.timestamp} />
+				</span>
 				<div onClick={(e) => e.stopPropagation()}>
-					<AttemptReplayAction attempt={attempt} onReplayed={onReplayed} />
+					<AttemptReplayAction msgId={attempt.msgId} endpointId={attempt.endpointId} onReplayed={onReplayed} />
 				</div>
 			</button>
 			{expanded && (
@@ -121,7 +123,9 @@ const MessageDetail: FC<Props> = ({ messageId, backLabel, onBack }) => {
 				<div className='flex flex-col gap-4'>
 					<div>
 						<h4 className='text-sm font-medium text-gray-500'>{t('webhooks.messages.createdAt')}</h4>
-						<p className='text-sm mt-1'>{formatDate(message.data.timestamp)}</p>
+						<p className='text-sm mt-1'>
+							<WebhookTimestamp value={message.data.timestamp} className='text-sm' />
+						</p>
 					</div>
 				</div>
 			</div>
