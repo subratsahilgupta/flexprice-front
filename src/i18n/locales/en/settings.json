@@ -218,6 +218,10 @@
 			"validation": {
 				"walletCurrencyRequired": "Wallet currency is required",
 				"walletConversionRateInvalid": "Wallet conversion rate must be greater than 0",
+				"walletInitialCreditsInvalid": "Initial credits must be a number greater than or equal to 0",
+				"walletCreditsExpirationIncomplete": "Set both expiration duration and unit, or leave both blank",
+				"walletCreditsExpirationInvalid": "Expiration duration must be a positive whole number with a valid unit",
+				"walletCreditsExpirationWithoutCredits": "Expiration can only be set when initial credits are greater than 0",
 				"subscriptionPlanRequired": "Select a plan before enabling subscription creation",
 				"subscriptionStartDateInvalid": "Start date must be an ISO datetime like 2026-07-04T00:00:00Z, or left blank"
 			},
@@ -227,7 +231,22 @@
 				"currency": "Currency",
 				"currencyHint": "Currency for the wallet that will be created.",
 				"conversionRate": "Conversion rate",
-				"conversionRateHint": "Optional. Defaults to 1 when left blank."
+				"conversionRateHint": "Optional. Defaults to 1 when left blank.",
+				"initialCredits": "Initial credits",
+				"initialCreditsHint": "Optional welcome free credits. Leave blank or 0 for no free credits.",
+				"initialCreditsPlaceholder": "0",
+				"expirationDuration": "Credits expiry duration",
+				"expirationDurationHint": "Optional. Leave both duration and unit blank for credits that never expire. If either is set, both are required.",
+				"expirationDurationPlaceholder": "30",
+				"expirationUnit": "Credits expiry unit",
+				"expirationUnitHint": "Optional. Leave both duration and unit blank for credits that never expire. If either is set, both are required.",
+				"expirationUnitPlaceholder": "Select unit",
+				"expirationUnits": {
+					"day": "Day",
+					"week": "Week",
+					"month": "Month",
+					"year": "Year"
+				}
 			},
 			"subscription": {
 				"title": "Create subscription",

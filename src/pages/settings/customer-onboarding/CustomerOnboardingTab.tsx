@@ -4,10 +4,18 @@ import { useTranslation } from 'react-i18next';
 import { Card, FieldWithInfo, Input, Loader, Select } from '@/components/atoms';
 import { SettingsCardHeader, SettingsToggleRow } from '@/components/molecules';
 import { billingCycleOptions, currencyOptions, DEFAULT_CURRENCY_CODE } from '@/constants/constants';
+import { CREDIT_GRANT_PERIOD_UNIT } from '@/models/CreditGrant';
 import { BILLING_CYCLE } from '@/models/Subscription';
 import { getCustomerOnboardingValidationErrorKey, type CustomerOnboardingDraft } from '@/types/dto/CustomerOnboarding';
 import SettingsFormActions from '../SettingsFormActions';
 import { buildConfigFromDraft, buildDraftFromConfig, useCustomerOnboardingConfig, usePublishedPlans } from './useCustomerOnboardingConfig';
+
+const CREDIT_EXPIRATION_UNIT_OPTIONS = [
+	{ value: CREDIT_GRANT_PERIOD_UNIT.DAYS, labelKey: 'day' as const },
+	{ value: CREDIT_GRANT_PERIOD_UNIT.WEEKS, labelKey: 'week' as const },
+	{ value: CREDIT_GRANT_PERIOD_UNIT.MONTHS, labelKey: 'month' as const },
+	{ value: CREDIT_GRANT_PERIOD_UNIT.YEARS, labelKey: 'year' as const },
+];
 
 const CustomerOnboardingTab = () => {
 	const { t } = useTranslation(['settings', 'common']);
@@ -21,6 +29,7 @@ const CustomerOnboardingTab = () => {
 
 	const isSaving = updateConfiguration.isPending || resetToDefaults.isPending;
 	const configuredActionCount = draft.advancedActions.length + (draft.walletEnabled ? 1 : 0) + (draft.subscriptionEnabled ? 1 : 0);
+	const showCreditsExpiry = Number(draft.walletInitialCreditsToLoad) > 0;
 
 	const planOptions = useMemo(() => {
 		const options = plans.map((plan) => ({
@@ -42,6 +51,15 @@ const CustomerOnboardingTab = () => {
 
 		return options;
 	}, [draft.subscriptionPlanId, plans, t]);
+
+	const creditExpirationUnitOptions = useMemo(
+		() =>
+			CREDIT_EXPIRATION_UNIT_OPTIONS.map(({ value, labelKey }) => ({
+				value,
+				label: t(`customerOnboarding.workflow.wallet.expirationUnits.${labelKey}`),
+			})),
+		[t],
+	);
 
 	const handleSave = () => {
 		const config = buildConfigFromDraft(draft);
@@ -70,6 +88,9 @@ const CustomerOnboardingTab = () => {
 	const subscriptionTitle = t('customerOnboarding.workflow.subscription.title');
 	const walletCurrencyLabel = t('customerOnboarding.workflow.wallet.currency');
 	const walletConversionRateLabel = t('customerOnboarding.workflow.wallet.conversionRate');
+	const walletInitialCreditsLabel = t('customerOnboarding.workflow.wallet.initialCredits');
+	const walletCreditsExpirationDurationLabel = t('customerOnboarding.workflow.wallet.expirationDuration');
+	const walletCreditsExpirationUnitLabel = t('customerOnboarding.workflow.wallet.expirationUnit');
 	const subscriptionPlanLabel = t('customerOnboarding.workflow.subscription.plan');
 	const subscriptionBillingCycleLabel = t('customerOnboarding.workflow.subscription.billingCycle');
 	const subscriptionStartDateLabel = t('customerOnboarding.workflow.subscription.startDate');
@@ -139,6 +160,75 @@ const CustomerOnboardingTab = () => {
 											disabled={isSaving}
 										/>
 									</FieldWithInfo>
+									<FieldWithInfo
+										label={walletInitialCreditsLabel}
+										description={t('customerOnboarding.workflow.wallet.initialCreditsHint')}
+										infoAriaLabel={t('info.ariaLabel', { field: walletInitialCreditsLabel })}
+										disabled={isSaving}>
+										<Input
+											value={draft.walletInitialCreditsToLoad}
+											variant='formatted-number'
+											formatOptions={{
+												allowDecimals: true,
+												allowNegative: false,
+												decimalSeparator: '.',
+												thousandSeparator: ',',
+											}}
+											placeholder={t('customerOnboarding.workflow.wallet.initialCreditsPlaceholder')}
+											onChange={(value) =>
+												setDraft((prev) => {
+													const creditsPositive = Number(value) > 0;
+													return {
+														...prev,
+														walletInitialCreditsToLoad: value,
+														...(!creditsPositive ? { walletCreditsExpirationDuration: '', walletCreditsExpirationDurationUnit: '' } : {}),
+													};
+												})
+											}
+											disabled={isSaving}
+										/>
+									</FieldWithInfo>
+									{showCreditsExpiry ? (
+										<>
+											<FieldWithInfo
+												label={walletCreditsExpirationDurationLabel}
+												description={t('customerOnboarding.workflow.wallet.expirationDurationHint')}
+												infoAriaLabel={t('info.ariaLabel', { field: walletCreditsExpirationDurationLabel })}
+												disabled={isSaving}>
+												<Input
+													value={draft.walletCreditsExpirationDuration}
+													variant='formatted-number'
+													formatOptions={{
+														allowDecimals: false,
+														allowNegative: false,
+														decimalSeparator: '.',
+														thousandSeparator: ',',
+													}}
+													placeholder={t('customerOnboarding.workflow.wallet.expirationDurationPlaceholder')}
+													onChange={(value) => setDraft((prev) => ({ ...prev, walletCreditsExpirationDuration: value }))}
+													disabled={isSaving}
+												/>
+											</FieldWithInfo>
+											<FieldWithInfo
+												label={walletCreditsExpirationUnitLabel}
+												description={t('customerOnboarding.workflow.wallet.expirationUnitHint')}
+												infoAriaLabel={t('info.ariaLabel', { field: walletCreditsExpirationUnitLabel })}
+												disabled={isSaving}>
+												<Select
+													value={draft.walletCreditsExpirationDurationUnit}
+													options={creditExpirationUnitOptions}
+													placeholder={t('customerOnboarding.workflow.wallet.expirationUnitPlaceholder')}
+													onChange={(value) =>
+														setDraft((prev) => ({
+															...prev,
+															walletCreditsExpirationDurationUnit: (value as CREDIT_GRANT_PERIOD_UNIT) || '',
+														}))
+													}
+													disabled={isSaving}
+												/>
+											</FieldWithInfo>
+										</>
+									) : null}
 								</div>
 							) : null}
 						</div>

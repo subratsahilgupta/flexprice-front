@@ -221,6 +221,10 @@
 			"validation": {
 				"walletCurrencyRequired": "عملة المحفظة مطلوبة",
 				"walletConversionRateInvalid": "يجب أن يكون معدل التحويل أكبر من 0",
+				"walletInitialCreditsInvalid": "يجب أن تكون الأرصدة الأولية رقماً أكبر من أو يساوي 0",
+				"walletCreditsExpirationIncomplete": "عيّن مدة الانتهاء والوحدة معاً، أو اتركهما فارغين",
+				"walletCreditsExpirationInvalid": "يجب أن تكون مدة الانتهاء عدداً صحيحاً موجباً مع وحدة صالحة",
+				"walletCreditsExpirationWithoutCredits": "يمكن تعيين الانتهاء فقط عندما تكون الأرصدة الأولية أكبر من 0",
 				"subscriptionPlanRequired": "اختر خطة قبل تفعيل إنشاء الاشتراك",
 				"subscriptionStartDateInvalid": "يجب أن يكون تاريخ البدء بصيغة ISO datetime مثل 2026-07-04T00:00:00Z، أو اتركه فارغاً"
 			},
@@ -230,7 +234,22 @@
 				"currency": "العملة",
 				"currencyHint": "عملة المحفظة التي سيتم إنشاؤها.",
 				"conversionRate": "معدل التحويل",
-				"conversionRateHint": "اختياري. القيمة الافتراضية 1 عند تركه فارغاً."
+				"conversionRateHint": "اختياري. القيمة الافتراضية 1 عند تركه فارغاً.",
+				"initialCredits": "الأرصدة الأولية",
+				"initialCreditsHint": "أرصدة ترحيبية مجانية اختيارية. اتركه فارغاً أو 0 لعدم إضافة أرصدة مجانية.",
+				"initialCreditsPlaceholder": "0",
+				"expirationDuration": "مدة انتهاء الأرصدة",
+				"expirationDurationHint": "اختياري. اترك المدة والوحدة فارغتين للأرصدة التي لا تنتهي. إذا تم تعيين أحدهما، فكلاهما مطلوب.",
+				"expirationDurationPlaceholder": "30",
+				"expirationUnit": "وحدة انتهاء الأرصدة",
+				"expirationUnitHint": "اختياري. اترك المدة والوحدة فارغتين للأرصدة التي لا تنتهي. إذا تم تعيين أحدهما، فكلاهما مطلوب.",
+				"expirationUnitPlaceholder": "اختر الوحدة",
+				"expirationUnits": {
+					"day": "يوم",
+					"week": "أسبوع",
+					"month": "شهر",
+					"year": "سنة"
+				}
 			},
 			"subscription": {
 				"title": "إنشاء اشتراك",
