@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import { Button, Input, Sheet, Spacer, Textarea } from '@/components/atoms';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import ConnectionApi from '@/api/ConnectionApi';
-import { CONNECTION_PROVIDER_TYPE } from '@/models';
+import { CONNECTION_PROVIDER_TYPE, Connection } from '@/models';
 import { CreateConnectionPayload } from '@/types/dto';
 import { config } from '@/config/config';
 import { copyToClipboard } from '@/utils/common/helper_functions';
@@ -16,8 +16,8 @@ import { cn } from '@/lib/utils';
 interface GcpMarketplaceConnectionDrawerProps {
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;
-	connection?: any; // for editing
-	onSave: (connection: any) => void;
+	connection?: Connection; // for editing
+	onSave: (connection: Connection) => void;
 }
 
 interface FormData {
@@ -197,7 +197,9 @@ const GcpMarketplaceConnectionDrawer: FC<GcpMarketplaceConnectionDrawerProps> = 
 	});
 
 	const { mutate: updateConnection, isPending: isUpdating } = useMutation({
-		mutationFn: async () => ConnectionApi.Update(connection.id, { name: formData.name.trim() }),
+		// Only invoked via handleSubmit's isEditMode branch below, which is exactly !!connection,
+		// so connection is guaranteed defined here.
+		mutationFn: async () => ConnectionApi.Update(connection!.id, { name: formData.name.trim() }),
 		onSuccess: (response) => {
 			toast.success(t('connection.toast.updated', { provider: 'GCP Marketplace' }));
 			onSave(response);

@@ -965,7 +965,9 @@
 					"customerService": "خدمة العملاء",
 					"accounting": "المحاسبة",
 					"payment": "الدفع",
-					"invoiceCustomer": "فاتورة العميل"
+					"invoiceCustomer": "فاتورة العميل",
+					"marketplace": "المتجر",
+					"usageMetering": "قياس الاستخدام"
 				},
 				"mode": {
 					"test": "وضع الاختبار"
@@ -1211,6 +1213,54 @@
 						"invoiceSync": {
 							"title": "مزامنة الفواتير",
 							"paragraphs": ["عند تفعيل مزامنة الفواتير، يرسل Flexprice الفواتير المكتملة تلقائياً إلى Tabs."]
+						}
+					}
+				},
+				"aws_marketplace": {
+					"name": "AWS Marketplace",
+					"description": "أبلغ عن الاستخدام المقاس إلى AWS Marketplace لتتم فوترة مشتري AWS حسب استهلاكهم.",
+					"sections": {
+						"overview": {
+							"title": "نظرة عامة",
+							"paragraphs": [
+								"يُبلغ Flexprice عن الاستخدام الذي تقيسه بالفعل إلى AWS Marketplace نيابة عنك. اربط دور IAM الخاص بالقياس من حساب AWS الخاص بك، ويتولى Flexprice إرسال BatchMeterUsage لكل اتفاقية مسجّلة."
+							]
+						},
+						"setup": {
+							"title": "الإعداد",
+							"paragraphs": [
+								"أنشئ دور IAM في حساب AWS الخاص بك باستخدام سياسة IAM وسياسة الثقة الموضحتين في لوحة الاتصال. تمنح سياسة الثقة حساب AWS الخاص بـ Flexprice صلاحية تولي الدور، مقيّدة بمعرّف خارجي فريد. الصق معرّف الدور (Role ARN) الناتج في Flexprice واحفظ — يتحقق Flexprice من الدور بتوليه قبل حفظ الاتصال."
+							]
+						},
+						"usageReporting": {
+							"title": "الإبلاغ عن الاستخدام",
+							"paragraphs": [
+								"بعد الاتصال، تُجمّع مهمة كل ساعة الاستخدام لكل اتفاقية وتُبلغ عنه إلى AWS عبر BatchMeterUsage، مع تمريرة مطابقة يومية كإجراء احتياطي."
+							]
+						}
+					}
+				},
+				"gcp_marketplace": {
+					"name": "GCP Marketplace",
+					"description": "أبلغ عن الاستخدام المقاس إلى GCP Marketplace لتتم فوترة مشتري GCP حسب استهلاكهم.",
+					"sections": {
+						"overview": {
+							"title": "نظرة عامة",
+							"paragraphs": [
+								"يُبلغ Flexprice عن الاستخدام الذي تقيسه بالفعل إلى GCP Marketplace نيابة عنك. يُصادق Flexprice على مشروع GCP الخاص بك باستخدام Workload Identity Federation — دون تخزين أي مفتاح GCP طويل الأمد — ويرسل تقرير الاستخدام لكل استحقاق (entitlement) مسجّل."
+							]
+						},
+						"setup": {
+							"title": "الإعداد",
+							"paragraphs": [
+								"شغّل نص الإعداد الموضح في لوحة الاتصال من Cloud Shell الخاص بمشروع GCP. يُنشئ تجمّع Workload Identity وحساب خدمة مقيّد بصلاحية الإبلاغ عن الاستخدام فقط. الصق ملف بيانات الاعتماد الناتج في Flexprice واحفظ — يتحقق Flexprice من الاتصال باستبداله برمز فعلي قبل حفظه."
+							]
+						},
+						"usageReporting": {
+							"title": "الإبلاغ عن الاستخدام",
+							"paragraphs": [
+								"بعد الاتصال، تُجمّع مهمة مجدولة الاستخدام لكل استحقاق وتُبلغ عنه إلى GCP عبر services.report الخاصة بـ Service Control API."
+							]
 						}
 					}
 				}
