@@ -23,15 +23,21 @@ interface AwsMarketplaceConnectionDrawerProps {
 interface FormData {
 	name: string;
 	role_arn: string;
+	region: string;
 }
 
 interface ValidationErrors {
 	name?: string;
 	role_arn?: string;
+	region?: string;
 }
 
 // arn:aws:iam::<12-digit-account>:role/<name>
 const ROLE_ARN_REGEX = /^arn:aws:iam::\d{12}:role\/.+$/;
+
+// AWS enables SaaS Marketplace metering in this region by default for every seller; sellers only
+// end up on a different region if they specifically requested one from AWS Marketplace.
+const DEFAULT_AWS_MARKETPLACE_REGION = 'us-east-1';
 
 /** On-screen mask for variable values (real value is only ever copied, never shown). */
 const MASKED_VALUE = '••••••••••••';
@@ -161,7 +167,7 @@ const AwsMarketplaceConnectionDrawer: FC<AwsMarketplaceConnectionDrawerProps> = 
 	const { t: tc } = useTranslation('common');
 	const isEditMode = !!connection;
 
-	const [formData, setFormData] = useState<FormData>({ name: '', role_arn: '' });
+	const [formData, setFormData] = useState<FormData>({ name: '', role_arn: '', region: DEFAULT_AWS_MARKETPLACE_REGION });
 	const [errors, setErrors] = useState<ValidationErrors>({});
 	const [externalId, setExternalId] = useState<string>('');
 
@@ -169,10 +175,10 @@ const AwsMarketplaceConnectionDrawer: FC<AwsMarketplaceConnectionDrawerProps> = 
 	useEffect(() => {
 		if (!isOpen) return;
 		if (connection) {
-			setFormData({ name: connection.name || '', role_arn: '' });
+			setFormData({ name: connection.name || '', role_arn: '', region: DEFAULT_AWS_MARKETPLACE_REGION });
 			setExternalId('');
 		} else {
-			setFormData({ name: '', role_arn: '' });
+			setFormData({ name: '', role_arn: '', region: DEFAULT_AWS_MARKETPLACE_REGION });
 			setExternalId(generateExternalId());
 		}
 		setErrors({});
@@ -204,6 +210,9 @@ const AwsMarketplaceConnectionDrawer: FC<AwsMarketplaceConnectionDrawerProps> = 
 			} else if (!ROLE_ARN_REGEX.test(formData.role_arn.trim())) {
 				newErrors.role_arn = t('connection.validation.roleArnInvalid');
 			}
+			if (!formData.region.trim()) {
+				newErrors.region = t('connection.validation.regionRequired');
+			}
 		}
 		setErrors(newErrors);
 		return Object.keys(newErrors).length === 0;
@@ -217,6 +226,9 @@ const AwsMarketplaceConnectionDrawer: FC<AwsMarketplaceConnectionDrawerProps> = 
 				encrypted_secret_data: {
 					role_arn: formData.role_arn.trim(),
 					external_id: externalId,
+				},
+				sync_config: {
+					aws_marketplace: { region: formData.region.trim() },
 				},
 			};
 			// Backend performs a live STS AssumeRole with this role_arn + external_id and only persists
@@ -327,7 +339,7 @@ const AwsMarketplaceConnectionDrawer: FC<AwsMarketplaceConnectionDrawerProps> = 
 							</div>
 						</div>
 
-						{/* Step 2 — the Role ARN the tenant gets back from AWS */}
+						{/* Step 2 — the Role ARN the tenant gets back from AWS, and their Marketplace region */}
 						<div className='space-y-3'>
 							<p className='text-sm font-medium text-foreground'>{t('connection.awsMarketplace.step2Title')}</p>
 							<FieldWithInfo
@@ -341,6 +353,18 @@ const AwsMarketplaceConnectionDrawer: FC<AwsMarketplaceConnectionDrawerProps> = 
 									onChange={(value) => handleChange('role_arn', value)}
 									error={errors.role_arn}
 									description={t('connection.awsMarketplace.roleArnHint')}
+								/>
+							</FieldWithInfo>
+							<FieldWithInfo
+								label={t('connection.awsMarketplace.regionLabel')}
+								description={t('connection.awsMarketplace.regionInfo')}
+								infoAriaLabel={t('connection.awsMarketplace.infoAriaLabel')}>
+								<Input
+									placeholder={t('connection.awsMarketplace.regionPlaceholder')}
+									value={formData.region}
+									onChange={(value) => handleChange('region', value)}
+									error={errors.region}
+									description={t('connection.awsMarketplace.regionHint')}
 								/>
 							</FieldWithInfo>
 						</div>
