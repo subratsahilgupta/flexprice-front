@@ -3,6 +3,7 @@ import SettingsApi from '@/api/SettingsApi';
 import { PlanApi } from '@/api/PlanApi';
 import { DEFAULT_CURRENCY_CODE } from '@/constants/constants';
 import { BILLING_CYCLE } from '@/models/Subscription';
+import { WALLET_TYPE } from '@/models/Wallet';
 import { DataType, FilterOperator } from '@/types/common/QueryBuilder';
 import type { PlanResponse } from '@/types/dto';
 import {
@@ -34,14 +35,18 @@ export function buildDraftFromConfig(config: CustomerOnboardingConfig): Customer
 	const walletAction = config.actions.find(isWalletAction);
 	const subscriptionAction = config.actions.find(isSubscriptionAction);
 	const expirationDuration = walletAction?.initial_credits_expiration_duration;
+	const expirationUnit = walletAction?.initial_credits_expiration_duration_unit || '';
+	const hasExpiry = expirationDuration !== undefined || Boolean(expirationUnit);
 
 	return {
 		walletEnabled: Boolean(walletAction),
+		walletType: walletAction?.wallet_type || WALLET_TYPE.PRE_PAID,
 		walletCurrency: walletAction?.currency || DEFAULT_CURRENCY_CODE,
 		walletConversionRate: walletAction?.conversion_rate || DEFAULT_CONVERSION_RATE,
 		walletInitialCreditsToLoad: walletAction?.initial_credits_to_load?.trim() || '',
+		walletCreditsExpireEnabled: hasExpiry,
 		walletCreditsExpirationDuration: expirationDuration !== undefined ? String(expirationDuration) : '',
-		walletCreditsExpirationDurationUnit: walletAction?.initial_credits_expiration_duration_unit || '',
+		walletCreditsExpirationDurationUnit: expirationUnit,
 		subscriptionEnabled: Boolean(subscriptionAction),
 		subscriptionPlanId: subscriptionAction?.plan_id || '',
 		subscriptionBillingCycle: subscriptionAction?.billing_cycle || BILLING_CYCLE.ANNIVERSARY,
@@ -62,6 +67,7 @@ export function buildConfigFromDraft(draft: CustomerOnboardingDraft): CustomerOn
 		const walletAction: CreateWalletOnboardingAction = {
 			action: 'create_wallet',
 			currency: draft.walletCurrency,
+			wallet_type: draft.walletType || WALLET_TYPE.PRE_PAID,
 			conversion_rate: draft.walletConversionRate,
 		};
 
@@ -70,11 +76,13 @@ export function buildConfigFromDraft(draft: CustomerOnboardingDraft): CustomerOn
 		if (creditsString !== '') {
 			walletAction.initial_credits_to_load = creditsString;
 		}
-		if (durationString !== '') {
-			walletAction.initial_credits_expiration_duration = Number(durationString);
-		}
-		if (unit) {
-			walletAction.initial_credits_expiration_duration_unit = unit;
+		if (draft.walletCreditsExpireEnabled) {
+			if (durationString !== '') {
+				walletAction.initial_credits_expiration_duration = Number(durationString);
+			}
+			if (unit) {
+				walletAction.initial_credits_expiration_duration_unit = unit;
+			}
 		}
 
 		actions.push(walletAction);

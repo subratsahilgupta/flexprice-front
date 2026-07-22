@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { CREDIT_GRANT_PERIOD_UNIT } from '@/models/CreditGrant';
 import { BILLING_CYCLE } from '@/models/Subscription';
+import { WALLET_TYPE } from '@/models/Wallet';
 
 export const CUSTOMER_ONBOARDING_WORKFLOW_TYPE = 'customer_onboarding' as const;
 
@@ -21,6 +22,7 @@ export interface CustomerOnboardingActionBase {
 export interface CreateWalletOnboardingAction extends CustomerOnboardingActionBase {
 	action: 'create_wallet';
 	currency: string;
+	wallet_type?: WALLET_TYPE;
 	conversion_rate?: string;
 	initial_credits_to_load?: string;
 	initial_credits_expiration_duration?: number;
@@ -49,9 +51,11 @@ export const DEFAULT_CUSTOMER_ONBOARDING_CONFIG: CustomerOnboardingConfig = {
 /** Editable draft form-state for the customer onboarding settings tab. */
 export interface CustomerOnboardingDraft {
 	walletEnabled: boolean;
+	walletType: WALLET_TYPE;
 	walletCurrency: string;
 	walletConversionRate: string;
 	walletInitialCreditsToLoad: string;
+	walletCreditsExpireEnabled: boolean;
 	walletCreditsExpirationDuration: string;
 	walletCreditsExpirationDurationUnit: CREDIT_GRANT_PERIOD_UNIT | '';
 	subscriptionEnabled: boolean;
@@ -83,6 +87,7 @@ const looseOptionalString = z.preprocess(
 );
 const looseRequiredString = z.preprocess((value) => (value === undefined || value === null ? '' : String(value)), z.string());
 const looseBillingCycle = looseOptionalString.pipe(z.nativeEnum(BILLING_CYCLE).optional().catch(undefined));
+const looseWalletType = looseOptionalString.pipe(z.nativeEnum(WALLET_TYPE).optional().catch(undefined));
 const looseOptionalNumber = z.preprocess((value) => {
 	if (value === undefined || value === null || value === '') return undefined;
 	if (typeof value === 'number') return value;
@@ -97,6 +102,7 @@ const createWalletActionSchema = z
 	.object({
 		action: z.literal('create_wallet'),
 		currency: looseRequiredString,
+		wallet_type: looseWalletType,
 		conversion_rate: looseOptionalString,
 		initial_credits_to_load: looseOptionalString,
 		initial_credits_expiration_duration: looseOptionalNumber,
@@ -163,6 +169,7 @@ export function normalizeCustomerOnboardingConfig(config: CustomerOnboardingConf
 				return {
 					action: walletAction.action,
 					currency: walletAction.currency.trim().toUpperCase(),
+					wallet_type: walletAction.wallet_type || WALLET_TYPE.PRE_PAID,
 					...(walletAction.conversion_rate?.trim() ? { conversion_rate: walletAction.conversion_rate.trim() } : {}),
 					...(hasCredits ? { initial_credits_to_load: String(walletAction.initial_credits_to_load).trim() } : {}),
 					...(hasExpiry

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { CREDIT_GRANT_PERIOD_UNIT } from '@/models/CreditGrant';
 import { BILLING_CYCLE } from '@/models/Subscription';
+import { WALLET_TYPE } from '@/models/Wallet';
 import {
 	DEFAULT_CUSTOMER_ONBOARDING_CONFIG,
 	getCustomerOnboardingValidationErrorKey,
@@ -28,6 +29,20 @@ describe('parseCustomerOnboardingConfig', () => {
 			actions: [{ action: 'create_wallet', currency: 'USD', conversion_rate: '1.5' }],
 		});
 		expect(result.actions).toEqual([{ action: 'create_wallet', currency: 'USD', conversion_rate: '1.5' }]);
+	});
+
+	it('parses wallet_type when present', () => {
+		const result = parseCustomerOnboardingConfig({
+			actions: [{ action: 'create_wallet', currency: 'USD', wallet_type: 'POST_PAID' }],
+		});
+		expect(result.actions).toEqual([{ action: 'create_wallet', currency: 'USD', wallet_type: WALLET_TYPE.POST_PAID }]);
+	});
+
+	it('drops an invalid wallet_type', () => {
+		const result = parseCustomerOnboardingConfig({
+			actions: [{ action: 'create_wallet', currency: 'USD', wallet_type: 'UNKNOWN' }],
+		});
+		expect(result.actions).toEqual([{ action: 'create_wallet', currency: 'USD' }]);
 	});
 
 	it('parses wallet initial credits and relative expiry fields', () => {
@@ -105,7 +120,7 @@ describe('parseCustomerOnboardingConfig', () => {
 });
 
 describe('normalizeCustomerOnboardingConfig', () => {
-	it('omits zero credits and incomplete expiry', () => {
+	it('omits zero credits and incomplete expiry, and defaults wallet_type to PRE_PAID', () => {
 		const result = normalizeCustomerOnboardingConfig({
 			workflow_type: CUSTOMER_ONBOARDING_WORKFLOW_TYPE,
 			actions: [
@@ -123,7 +138,29 @@ describe('normalizeCustomerOnboardingConfig', () => {
 			{
 				action: 'create_wallet',
 				currency: 'USD',
+				wallet_type: WALLET_TYPE.PRE_PAID,
 				conversion_rate: '1',
+			},
+		]);
+	});
+
+	it('keeps an explicit wallet_type', () => {
+		const result = normalizeCustomerOnboardingConfig({
+			workflow_type: CUSTOMER_ONBOARDING_WORKFLOW_TYPE,
+			actions: [
+				{
+					action: 'create_wallet',
+					currency: 'USD',
+					wallet_type: WALLET_TYPE.POST_PAID,
+				},
+			],
+		});
+
+		expect(result.actions).toEqual([
+			{
+				action: 'create_wallet',
+				currency: 'USD',
+				wallet_type: WALLET_TYPE.POST_PAID,
 			},
 		]);
 	});
@@ -146,6 +183,7 @@ describe('normalizeCustomerOnboardingConfig', () => {
 			{
 				action: 'create_wallet',
 				currency: 'USD',
+				wallet_type: WALLET_TYPE.PRE_PAID,
 				initial_credits_to_load: '100',
 				initial_credits_expiration_duration: 30,
 				initial_credits_expiration_duration_unit: CREDIT_GRANT_PERIOD_UNIT.DAYS,
@@ -169,6 +207,7 @@ describe('normalizeCustomerOnboardingConfig', () => {
 			{
 				action: 'create_wallet',
 				currency: 'USD',
+				wallet_type: WALLET_TYPE.PRE_PAID,
 				initial_credits_to_load: '25.5',
 			},
 		]);
