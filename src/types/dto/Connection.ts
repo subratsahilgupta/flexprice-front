@@ -121,6 +121,9 @@ export interface CreateConnectionPayload {
 			inbound: boolean;
 			outbound: boolean;
 		};
+		aws_marketplace?: {
+			region: string;
+		};
 	};
 }
 
