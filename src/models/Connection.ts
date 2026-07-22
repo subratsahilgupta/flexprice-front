@@ -23,6 +23,7 @@ export enum CONNECTION_PROVIDER_TYPE {
 	WHOP = 'whop',
 	TABS = 'tabs',
 	AWS_MARKETPLACE = 'aws_marketplace',
+	GCP_MARKETPLACE = 'gcp_marketplace',
 	// Add more providers as needed
 }
 

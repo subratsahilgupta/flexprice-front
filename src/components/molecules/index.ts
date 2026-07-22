@@ -189,6 +189,7 @@ export { default as MoyasarConnectionDrawer } from './MoyasarConnectionDrawer';
 export { default as PaddleConnectionDrawer } from './PaddleConnectionDrawer';
 export { default as TabsConnectionDrawer } from './TabsConnectionDrawer';
 export { default as AwsMarketplaceConnectionDrawer } from './AwsMarketplaceConnectionDrawer';
+export { default as GcpMarketplaceConnectionDrawer } from './GcpMarketplaceConnectionDrawer';
 
 // Import & Export
 export { default as ImportFileDrawer } from './ImportFileDrawer';

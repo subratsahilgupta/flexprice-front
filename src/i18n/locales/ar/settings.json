@@ -221,16 +221,46 @@
 			"validation": {
 				"walletCurrencyRequired": "عملة المحفظة مطلوبة",
 				"walletConversionRateInvalid": "يجب أن يكون معدل التحويل أكبر من 0",
+				"walletInitialCreditsInvalid": "يجب أن تكون الأرصدة الأولية رقماً أكبر من أو يساوي 0",
+				"walletCreditsExpirationIncomplete": "عيّن مدة الانتهاء والوحدة معاً عند تفعيل انتهاء الأرصدة",
+				"walletCreditsExpirationInvalid": "يجب أن تكون مدة الانتهاء عدداً صحيحاً موجباً مع وحدة صالحة",
+				"walletCreditsExpirationWithoutCredits": "يمكن تعيين الانتهاء فقط عندما تكون الأرصدة الأولية أكبر من 0",
 				"subscriptionPlanRequired": "اختر خطة قبل تفعيل إنشاء الاشتراك",
 				"subscriptionStartDateInvalid": "يجب أن يكون تاريخ البدء بصيغة ISO datetime مثل 2026-07-04T00:00:00Z، أو اتركه فارغاً"
 			},
 			"wallet": {
 				"title": "إنشاء محفظة",
 				"description": "إنشاء محفظة لكل عميل جديد.",
+				"type": "نوع المحفظة",
+				"typeHint": "المحافظ مسبقة الدفع تخصم من الرصيد؛ المحافظ لاحقة الدفع تُسوّى على الفواتير.",
+				"typePlaceholder": "اختر نوع المحفظة",
+				"types": {
+					"prePaid": "مسبقة الدفع",
+					"prePaidHint": "يشحن العملاء الأرصدة مسبقاً. يُخصم الاستخدام من رصيد فوري.",
+					"postPaid": "لاحقة الدفع",
+					"postPaidHint": "تُطبّق الأرصدة على الفواتير في نهاية دورة الفوترة."
+				},
 				"currency": "العملة",
 				"currencyHint": "عملة المحفظة التي سيتم إنشاؤها.",
 				"conversionRate": "معدل التحويل",
-				"conversionRateHint": "اختياري. القيمة الافتراضية 1 عند تركه فارغاً."
+				"conversionRateHint": "اختياري. القيمة الافتراضية 1 عند تركه فارغاً.",
+				"initialCredits": "الأرصدة الأولية",
+				"initialCreditsHint": "أرصدة ترحيبية مجانية اختيارية. اتركه فارغاً أو 0 لعدم إضافة أرصدة مجانية.",
+				"initialCreditsPlaceholder": "0",
+				"expireCredits": "انتهاء الأرصدة",
+				"expireCreditsHint": "عند الإيقاف، لا تنتهي الأرصدة الترحيبية. عند التفعيل، عيّن مدة ووحدة نسبيتين.",
+				"expirationDuration": "مدة انتهاء الأرصدة",
+				"expirationDurationHint": "المدة بعد المنح قبل انتهاء الأرصدة الترحيبية. مطلوبة مع الوحدة عند تفعيل الانتهاء.",
+				"expirationDurationPlaceholder": "30",
+				"expirationUnit": "وحدة انتهاء الأرصدة",
+				"expirationUnitHint": "وحدة مدة الانتهاء. مطلوبة مع المدة عند تفعيل الانتهاء.",
+				"expirationUnitPlaceholder": "اختر الوحدة",
+				"expirationUnits": {
+					"day": "يوم",
+					"week": "أسبوع",
+					"month": "شهر",
+					"year": "سنة"
+				}
 			},
 			"subscription": {
 				"title": "إنشاء اشتراك",
@@ -545,8 +575,71 @@
 		}
 	},
 	"connection": {
+		"awsMarketplace": {
+			"titleConnect": "الاتصال بـ AWS Marketplace",
+			"titleEdit": "تعديل اتصال AWS Marketplace",
+			"description": "أنشئ دور IAM في حساب AWS الخاص بك، ثم الصق معرّف الدور (Role ARN) هنا. يتحقق Flexprice من الدور قبل الحفظ.",
+			"connectionNameLabel": "اسم الاتصال",
+			"connectionNameInfo": "اختر اسماً يساعد على تمييز اتصال AWS Marketplace هذا داخل مساحة عملك.",
+			"connectionNamePlaceholder": "مثال: AWS Marketplace",
+			"connectionNameHint": "اسم وصفي لهذا الاتصال.",
+			"step1Title": "١. أضف السياسات في حساب AWS الخاص بك",
+			"step1Hint": "أنشئ دور IAM، ثم انسخ كل سياسة أدناه إليه. وسّع لمراجعة JSON قبل النسخ.",
+			"iamPolicyLabel": "سياسة صلاحيات IAM",
+			"iamPolicyInfo": "تحدد بالضبط موارد AWS Marketplace التي يمكن لـ Flexprice الوصول إليها.",
+			"trustPolicyLabel": "سياسة الثقة",
+			"trustPolicyInfo": "تتيح لـ Flexprice تولي دور IAM هذا بأمان باستخدام المعرّف الخارجي أدناه.",
+			"externalIdLabel": "المعرّف الخارجي (External ID)",
+			"externalIdInfo": "يحمي هذا المعرّف الفريد من مشكلة الوكيل المخادع (Confused Deputy) عبر ضمان أن مساحة عمل Flexprice الخاصة بك فقط يمكنها تولي دور IAM هذا. لا حاجة لنسخه بشكل منفصل — فهو مضمّن بالفعل في سياسة الثقة أعلاه.",
+			"accountIdLabel": "معرّف حساب AWS الخاص بـ Flexprice",
+			"accountIdInfo": "حساب AWS الخاص بـ Flexprice الذي سيثق به دور IAM الخاص بك. وهو مضمّن بالفعل في سياسة الثقة أعلاه.",
+			"accountIdMissing": "غير مُهيّأ. اضبط VITE_FLEXPRICE_AWS_ACCOUNT_ID لتتمكن من توليد سياسة الثقة.",
+			"step2Title": "٢. الصق معرّف الدور (Role ARN)",
+			"roleArnLabel": "معرّف الدور (Role ARN)",
+			"roleArnInfo": "الصق معرّف الدور (ARN) الكامل للدور الذي أنشأته في حساب AWS الخاص بك. سنتحقق من إمكانية تولّيه قبل الحفظ.",
+			"roleArnPlaceholder": "arn:aws:iam::123456789012:role/flexprice-marketplace-role",
+			"roleArnHint": "معرّف دور IAM الذي أنشأته بالسياسات أعلاه.",
+			"variablesTitle": "المتغيرات",
+			"variablesHint": "انسخ كل قيمة لملء العنصر النائب {VARIABLE} المطابق في سياسة الثقة أعلاه. تبقى القيم مخفية هنا ولا تظهر إلا بعد لصقها.",
+			"infoAriaLabel": "مزيد من المعلومات",
+			"copyIamPolicy": "تم نسخ سياسة IAM إلى الحافظة",
+			"copyTrustPolicy": "تم نسخ سياسة الثقة إلى الحافظة",
+			"copyExternalId": "تم نسخ المعرّف الخارجي إلى الحافظة",
+			"copyAccountId": "تم نسخ معرّف الحساب إلى الحافظة"
+		},
+		"gcpMarketplace": {
+			"titleConnect": "الاتصال بـ GCP Marketplace",
+			"titleEdit": "تعديل اتصال GCP Marketplace",
+			"description": "شغّل نص الإعداد (setup script) في مشروع GCP الخاص بك، ثم الصق ملف بيانات الاعتماد (credentials JSON) الناتج هنا. يتحقق Flexprice منه قبل الحفظ.",
+			"connectionNameLabel": "اسم الاتصال",
+			"connectionNameInfo": "اختر اسماً يساعد على تمييز اتصال GCP Marketplace هذا داخل مساحة عملك.",
+			"connectionNamePlaceholder": "مثال: GCP Marketplace",
+			"connectionNameHint": "اسم وصفي لهذا الاتصال. يغطي كل المنتجات المدرجة ضمن نفس مشروع GCP.",
+			"step1Title": "١. شغّل هذا النص في Cloud Shell الخاص بمشروع GCP",
+			"step1Hint": "ينشئ تجمّع Workload Identity Federation وحساب خدمة، ويمنحه بالضبط الصلاحية اللازمة للإبلاغ عن الاستخدام. وسّع للمراجعة قبل النسخ.",
+			"scriptLabel": "نص الإعداد",
+			"scriptInfo": "ينشئ تجمّع ومزوّد Workload Identity Federation وحساب خدمة في مشروع GCP الخاص بك، مقتصراً على الإبلاغ عن الاستخدام فقط.",
+			"copyScript": "تم نسخ نص الإعداد إلى الحافظة",
+			"variablesTitle": "المتغيرات",
+			"variablesHint": "انسخ كل قيمة لملء العنصر النائب {VARIABLE} المطابق في نص الإعداد أعلاه. تبقى القيم مخفية هنا ولا تظهر إلا بعد لصقها.",
+			"accountIdInfo": "حساب AWS الخاص بـ Flexprice الذي يثق به مزوّد Workload Identity Federation الخاص بك. وهو مضمّن بالفعل في نص الإعداد أعلاه.",
+			"roleNameInfo": "اسم دور AWS الذي يتحقق منه شرط سمة (attribute condition) مزوّد Workload Identity Federation الخاص بك. وهو مضمّن بالفعل في نص الإعداد أعلاه.",
+			"copyAccountId": "تم نسخ معرّف الحساب إلى الحافظة",
+			"copyRoleName": "تم نسخ اسم الدور إلى الحافظة",
+			"infoAriaLabel": "مزيد من المعلومات",
+			"accountIdMissing": "غير مُهيّأ. اضبط VITE_FLEXPRICE_AWS_ACCOUNT_ID و VITE_FLEXPRICE_AWS_ROLE_NAME لتوليد النص.",
+			"step2Title": "٢. الصق بيانات الاعتماد JSON الناتجة عن النص",
+			"credentialsJsonLabel": "بيانات الاعتماد JSON",
+			"credentialsJsonInfo": "ملف بيانات الاعتماد الذي أنشأه النص. يستخدمه Flexprice للمصادقة في مشروع GCP الخاص بك دون تخزين مفتاح طويل الأمد.",
+			"credentialsJsonPlaceholder": "{\"type\": \"external_account\", ...}",
+			"credentialsJsonHint": "المحتوى الكامل للملف الذي أنشأه النص (flexprice-gcp-creds.json) — وليس مفتاح حساب خدمة.",
+			"credentialsJsonRequired": "بيانات الاعتماد JSON مطلوبة",
+			"credentialsJsonInvalid": "هذا لا يبدو ملف بيانات اعتماد Workload Identity Federation — يجب أن يحتوي على \"type\": \"external_account\""
+		},
 		"validation": {
 			"nameRequired": "اسم الاتصال مطلوب",
+			"roleArnRequired": "معرّف الدور (Role ARN) مطلوب",
+			"roleArnInvalid": "أدخل معرّف دور IAM صالحاً (arn:aws:iam::<account-id>:role/<name>)",
 			"awsAccessKeyRequired": "معرّف AWS Access Key مطلوب",
 			"awsSecretRequired": "مفتاح AWS Secret مطلوب",
 			"accessTokenRequired": "رمز الوصول مطلوب",
@@ -920,7 +1013,9 @@
 					"customerService": "خدمة العملاء",
 					"accounting": "المحاسبة",
 					"payment": "الدفع",
-					"invoiceCustomer": "فاتورة العميل"
+					"invoiceCustomer": "فاتورة العميل",
+					"marketplace": "المتجر",
+					"usageMetering": "قياس الاستخدام"
 				},
 				"mode": {
 					"test": "وضع الاختبار"
@@ -1166,6 +1261,54 @@
 						"invoiceSync": {
 							"title": "مزامنة الفواتير",
 							"paragraphs": ["عند تفعيل مزامنة الفواتير، يرسل Flexprice الفواتير المكتملة تلقائياً إلى Tabs."]
+						}
+					}
+				},
+				"aws_marketplace": {
+					"name": "AWS Marketplace",
+					"description": "أبلغ عن الاستخدام المقاس إلى AWS Marketplace لتتم فوترة مشتري AWS حسب استهلاكهم.",
+					"sections": {
+						"overview": {
+							"title": "نظرة عامة",
+							"paragraphs": [
+								"يُبلغ Flexprice عن الاستخدام الذي تقيسه بالفعل إلى AWS Marketplace نيابة عنك. اربط دور IAM الخاص بالقياس من حساب AWS الخاص بك، ويتولى Flexprice إرسال BatchMeterUsage لكل اتفاقية مسجّلة."
+							]
+						},
+						"setup": {
+							"title": "الإعداد",
+							"paragraphs": [
+								"أنشئ دور IAM في حساب AWS الخاص بك باستخدام سياسة IAM وسياسة الثقة الموضحتين في لوحة الاتصال. تمنح سياسة الثقة حساب AWS الخاص بـ Flexprice صلاحية تولي الدور، مقيّدة بمعرّف خارجي فريد. الصق معرّف الدور (Role ARN) الناتج في Flexprice واحفظ — يتحقق Flexprice من الدور بتوليه قبل حفظ الاتصال."
+							]
+						},
+						"usageReporting": {
+							"title": "الإبلاغ عن الاستخدام",
+							"paragraphs": [
+								"بعد الاتصال، تُجمّع مهمة كل ساعة الاستخدام لكل اتفاقية وتُبلغ عنه إلى AWS عبر BatchMeterUsage، مع تمريرة مطابقة يومية كإجراء احتياطي."
+							]
+						}
+					}
+				},
+				"gcp_marketplace": {
+					"name": "GCP Marketplace",
+					"description": "أبلغ عن الاستخدام المقاس إلى GCP Marketplace لتتم فوترة مشتري GCP حسب استهلاكهم.",
+					"sections": {
+						"overview": {
+							"title": "نظرة عامة",
+							"paragraphs": [
+								"يُبلغ Flexprice عن الاستخدام الذي تقيسه بالفعل إلى GCP Marketplace نيابة عنك. يُصادق Flexprice على مشروع GCP الخاص بك باستخدام Workload Identity Federation — دون تخزين أي مفتاح GCP طويل الأمد — ويرسل تقرير الاستخدام لكل استحقاق (entitlement) مسجّل."
+							]
+						},
+						"setup": {
+							"title": "الإعداد",
+							"paragraphs": [
+								"شغّل نص الإعداد الموضح في لوحة الاتصال من Cloud Shell الخاص بمشروع GCP. يُنشئ تجمّع Workload Identity وحساب خدمة مقيّد بصلاحية الإبلاغ عن الاستخدام فقط. الصق ملف بيانات الاعتماد الناتج في Flexprice واحفظ — يتحقق Flexprice من الاتصال باستبداله برمز فعلي قبل حفظه."
+							]
+						},
+						"usageReporting": {
+							"title": "الإبلاغ عن الاستخدام",
+							"paragraphs": [
+								"بعد الاتصال، تُجمّع مهمة مجدولة الاستخدام لكل استحقاق وتُبلغ عنه إلى GCP عبر services.report الخاصة بـ Service Control API."
+							]
 						}
 					}
 				}
