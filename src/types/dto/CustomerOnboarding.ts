@@ -1,5 +1,7 @@
 import { z } from 'zod';
+import { CREDIT_GRANT_PERIOD_UNIT } from '@/models/CreditGrant';
 import { BILLING_CYCLE } from '@/models/Subscription';
+import { WALLET_TYPE } from '@/models/Wallet';
 
 export const CUSTOMER_ONBOARDING_WORKFLOW_TYPE = 'customer_onboarding' as const;
 
@@ -20,7 +22,11 @@ export interface CustomerOnboardingActionBase {
 export interface CreateWalletOnboardingAction extends CustomerOnboardingActionBase {
 	action: 'create_wallet';
 	currency: string;
+	wallet_type?: WALLET_TYPE;
 	conversion_rate?: string;
+	initial_credits_to_load?: string;
+	initial_credits_expiration_duration?: number;
+	initial_credits_expiration_duration_unit?: CREDIT_GRANT_PERIOD_UNIT;
 }
 
 export interface CreateSubscriptionOnboardingAction extends CustomerOnboardingActionBase {
@@ -45,8 +51,13 @@ export const DEFAULT_CUSTOMER_ONBOARDING_CONFIG: CustomerOnboardingConfig = {
 /** Editable draft form-state for the customer onboarding settings tab. */
 export interface CustomerOnboardingDraft {
 	walletEnabled: boolean;
+	walletType: WALLET_TYPE;
 	walletCurrency: string;
 	walletConversionRate: string;
+	walletInitialCreditsToLoad: string;
+	walletCreditsExpireEnabled: boolean;
+	walletCreditsExpirationDuration: string;
+	walletCreditsExpirationDurationUnit: CREDIT_GRANT_PERIOD_UNIT | '';
 	subscriptionEnabled: boolean;
 	subscriptionPlanId: string;
 	subscriptionBillingCycle: BILLING_CYCLE;
@@ -55,10 +66,18 @@ export interface CustomerOnboardingDraft {
 }
 
 const RFC3339_DATE_TIME_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/;
+const CREDIT_GRANT_PERIOD_UNIT_VALUES = new Set<string>(Object.values(CREDIT_GRANT_PERIOD_UNIT));
 
 function isValidIsoDateTime(value: string): boolean {
 	const trimmed = value.trim();
 	return RFC3339_DATE_TIME_REGEX.test(trimmed) && Number.isFinite(Date.parse(trimmed));
+}
+
+function parseCreditsAmount(value: string | undefined): number | null {
+	const trimmed = value?.trim() ?? '';
+	if (!trimmed) return null;
+	const amount = Number(trimmed);
+	return Number.isFinite(amount) ? amount : Number.NaN;
 }
 
 /** Mirrors the old `readString`: stringifies any present value, but leaves missing/null as undefined. */
@@ -68,6 +87,14 @@ const looseOptionalString = z.preprocess(
 );
 const looseRequiredString = z.preprocess((value) => (value === undefined || value === null ? '' : String(value)), z.string());
 const looseBillingCycle = looseOptionalString.pipe(z.nativeEnum(BILLING_CYCLE).optional().catch(undefined));
+const looseWalletType = looseOptionalString.pipe(z.nativeEnum(WALLET_TYPE).optional().catch(undefined));
+const looseOptionalNumber = z.preprocess((value) => {
+	if (value === undefined || value === null || value === '') return undefined;
+	if (typeof value === 'number') return value;
+	const parsed = Number(value);
+	return Number.isFinite(parsed) ? parsed : value;
+}, z.number().optional().catch(undefined));
+const looseCreditsExpirationUnit = looseOptionalString.pipe(z.nativeEnum(CREDIT_GRANT_PERIOD_UNIT).optional().catch(undefined));
 
 // `.passthrough()` keeps any extra/unrecognized fields on the action object intact, since
 // advanced (non-wallet/subscription) actions must round-trip untouched.
@@ -75,7 +102,11 @@ const createWalletActionSchema = z
 	.object({
 		action: z.literal('create_wallet'),
 		currency: looseRequiredString,
+		wallet_type: looseWalletType,
 		conversion_rate: looseOptionalString,
+		initial_credits_to_load: looseOptionalString,
+		initial_credits_expiration_duration: looseOptionalNumber,
+		initial_credits_expiration_duration_unit: looseCreditsExpirationUnit,
 	})
 	.passthrough();
 
@@ -129,10 +160,24 @@ export function normalizeCustomerOnboardingConfig(config: CustomerOnboardingConf
 		actions: config.actions.map((action) => {
 			if (action.action === 'create_wallet') {
 				const walletAction = action as CreateWalletOnboardingAction;
+				const creditsAmount = parseCreditsAmount(walletAction.initial_credits_to_load);
+				const hasCredits = creditsAmount !== null && Number.isFinite(creditsAmount) && creditsAmount > 0;
+				const duration = walletAction.initial_credits_expiration_duration;
+				const unit = walletAction.initial_credits_expiration_duration_unit;
+				const hasExpiry = hasCredits && duration !== undefined && unit !== undefined;
+
 				return {
 					action: walletAction.action,
 					currency: walletAction.currency.trim().toUpperCase(),
+					wallet_type: walletAction.wallet_type || WALLET_TYPE.PRE_PAID,
 					...(walletAction.conversion_rate?.trim() ? { conversion_rate: walletAction.conversion_rate.trim() } : {}),
+					...(hasCredits ? { initial_credits_to_load: String(walletAction.initial_credits_to_load).trim() } : {}),
+					...(hasExpiry
+						? {
+								initial_credits_expiration_duration: duration,
+								initial_credits_expiration_duration_unit: unit,
+							}
+						: {}),
 				};
 			}
 
@@ -154,6 +199,10 @@ export function normalizeCustomerOnboardingConfig(config: CustomerOnboardingConf
 export type CustomerOnboardingValidationErrorKey =
 	| 'walletCurrencyRequired'
 	| 'walletConversionRateInvalid'
+	| 'walletInitialCreditsInvalid'
+	| 'walletCreditsExpirationIncomplete'
+	| 'walletCreditsExpirationInvalid'
+	| 'walletCreditsExpirationWithoutCredits'
 	| 'subscriptionPlanRequired'
 	| 'subscriptionStartDateInvalid';
 
@@ -165,6 +214,25 @@ export function getCustomerOnboardingValidationErrorKey(config: CustomerOnboardi
 			if (walletAction.conversion_rate?.trim()) {
 				const conversionRate = Number(walletAction.conversion_rate);
 				if (!Number.isFinite(conversionRate) || conversionRate <= 0) return 'walletConversionRateInvalid';
+			}
+
+			const creditsAmount = parseCreditsAmount(walletAction.initial_credits_to_load);
+			if (creditsAmount !== null && (!Number.isFinite(creditsAmount) || creditsAmount < 0)) {
+				return 'walletInitialCreditsInvalid';
+			}
+			const hasPositiveCredits = creditsAmount !== null && Number.isFinite(creditsAmount) && creditsAmount > 0;
+
+			const hasDuration = walletAction.initial_credits_expiration_duration !== undefined;
+			const hasUnit = walletAction.initial_credits_expiration_duration_unit !== undefined;
+			if (hasDuration !== hasUnit) return 'walletCreditsExpirationIncomplete';
+
+			if (hasDuration && hasUnit) {
+				const duration = walletAction.initial_credits_expiration_duration;
+				const unit = walletAction.initial_credits_expiration_duration_unit;
+				if (!Number.isInteger(duration) || (duration as number) <= 0 || !CREDIT_GRANT_PERIOD_UNIT_VALUES.has(unit as string)) {
+					return 'walletCreditsExpirationInvalid';
+				}
+				if (!hasPositiveCredits) return 'walletCreditsExpirationWithoutCredits';
 			}
 		}
 

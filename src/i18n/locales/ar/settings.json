@@ -221,16 +221,46 @@
 			"validation": {
 				"walletCurrencyRequired": "عملة المحفظة مطلوبة",
 				"walletConversionRateInvalid": "يجب أن يكون معدل التحويل أكبر من 0",
+				"walletInitialCreditsInvalid": "يجب أن تكون الأرصدة الأولية رقماً أكبر من أو يساوي 0",
+				"walletCreditsExpirationIncomplete": "عيّن مدة الانتهاء والوحدة معاً عند تفعيل انتهاء الأرصدة",
+				"walletCreditsExpirationInvalid": "يجب أن تكون مدة الانتهاء عدداً صحيحاً موجباً مع وحدة صالحة",
+				"walletCreditsExpirationWithoutCredits": "يمكن تعيين الانتهاء فقط عندما تكون الأرصدة الأولية أكبر من 0",
 				"subscriptionPlanRequired": "اختر خطة قبل تفعيل إنشاء الاشتراك",
 				"subscriptionStartDateInvalid": "يجب أن يكون تاريخ البدء بصيغة ISO datetime مثل 2026-07-04T00:00:00Z، أو اتركه فارغاً"
 			},
 			"wallet": {
 				"title": "إنشاء محفظة",
 				"description": "إنشاء محفظة لكل عميل جديد.",
+				"type": "نوع المحفظة",
+				"typeHint": "المحافظ مسبقة الدفع تخصم من الرصيد؛ المحافظ لاحقة الدفع تُسوّى على الفواتير.",
+				"typePlaceholder": "اختر نوع المحفظة",
+				"types": {
+					"prePaid": "مسبقة الدفع",
+					"prePaidHint": "يشحن العملاء الأرصدة مسبقاً. يُخصم الاستخدام من رصيد فوري.",
+					"postPaid": "لاحقة الدفع",
+					"postPaidHint": "تُطبّق الأرصدة على الفواتير في نهاية دورة الفوترة."
+				},
 				"currency": "العملة",
 				"currencyHint": "عملة المحفظة التي سيتم إنشاؤها.",
 				"conversionRate": "معدل التحويل",
-				"conversionRateHint": "اختياري. القيمة الافتراضية 1 عند تركه فارغاً."
+				"conversionRateHint": "اختياري. القيمة الافتراضية 1 عند تركه فارغاً.",
+				"initialCredits": "الأرصدة الأولية",
+				"initialCreditsHint": "أرصدة ترحيبية مجانية اختيارية. اتركه فارغاً أو 0 لعدم إضافة أرصدة مجانية.",
+				"initialCreditsPlaceholder": "0",
+				"expireCredits": "انتهاء الأرصدة",
+				"expireCreditsHint": "عند الإيقاف، لا تنتهي الأرصدة الترحيبية. عند التفعيل، عيّن مدة ووحدة نسبيتين.",
+				"expirationDuration": "مدة انتهاء الأرصدة",
+				"expirationDurationHint": "المدة بعد المنح قبل انتهاء الأرصدة الترحيبية. مطلوبة مع الوحدة عند تفعيل الانتهاء.",
+				"expirationDurationPlaceholder": "30",
+				"expirationUnit": "وحدة انتهاء الأرصدة",
+				"expirationUnitHint": "وحدة مدة الانتهاء. مطلوبة مع المدة عند تفعيل الانتهاء.",
+				"expirationUnitPlaceholder": "اختر الوحدة",
+				"expirationUnits": {
+					"day": "يوم",
+					"week": "أسبوع",
+					"month": "شهر",
+					"year": "سنة"
+				}
 			},
 			"subscription": {
 				"title": "إنشاء اشتراك",
