@@ -72,8 +72,11 @@ interface RegionConfig {
 }
 interface IntegrationsConfig {
 	googleSheetsWebAppUrl: string;
-	/** Flexprice's AWS account ID, injected into the AWS Marketplace trust-policy template. */
+	/** Flexprice's AWS account ID, injected into the AWS Marketplace trust-policy template, and into
+	 * the GCP Marketplace WIF setup script. */
 	flexpriceAwsAccountId: string;
+	/** Flexprice's AWS IAM role name, injected into the GCP Marketplace WIF setup script. */
+	flexpriceAwsRoleName: string;
 }
 interface RestrictionsConfig {
 	rawEnvs: string;
@@ -328,6 +331,7 @@ export const config: Config = {
 	integrations: {
 		googleSheetsWebAppUrl: import.meta.env.VITE_GOOGLE_SHEETS_WEB_APP_URL ?? '',
 		flexpriceAwsAccountId: import.meta.env.VITE_FLEXPRICE_AWS_ACCOUNT_ID ?? '',
+		flexpriceAwsRoleName: import.meta.env.VITE_FLEXPRICE_AWS_ROLE_NAME ?? '',
 	},
 	restrictions: {
 		rawEnvs: import.meta.env.VITE_RESTRICTED_ENVS ?? '',
