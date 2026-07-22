@@ -73,10 +73,12 @@ export function buildConfigFromDraft(draft: CustomerOnboardingDraft): CustomerOn
 
 		// Include raw values when present so validation can catch incomplete/invalid cases;
 		// normalizeCustomerOnboardingConfig is the final filter for the save payload.
+		const creditsPositive = creditsString !== '' && Number(creditsString) > 0;
 		if (creditsString !== '') {
 			walletAction.initial_credits_to_load = creditsString;
 		}
-		if (draft.walletCreditsExpireEnabled) {
+		// Only map expiry when credits are positive so hidden draft values don't create save traps.
+		if (creditsPositive && draft.walletCreditsExpireEnabled) {
 			if (durationString !== '') {
 				walletAction.initial_credits_expiration_duration = Number(durationString);
 			}
