@@ -4,7 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import { Highlight, themes } from 'prism-react-renderer';
 import { ChevronDown, Copy } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { Button, Input, Sheet, Spacer, Textarea } from '@/components/atoms';
+import { Button, FieldWithInfo, InfoIcon, Input, Sheet, Spacer, Textarea } from '@/components/atoms';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import ConnectionApi from '@/api/ConnectionApi';
 import { CONNECTION_PROVIDER_TYPE, Connection } from '@/models';
@@ -30,8 +30,12 @@ interface ValidationErrors {
 	credentials_json?: string;
 }
 
-/** Six-step gcloud script the tenant runs in Cloud Shell against their own GCP project. Flexprice's
- * account id and role name are pre-filled; the tenant fills in the three GCP-side placeholders.
+/** On-screen mask for variable values (real value is only ever copied, never shown). */
+const MASKED_VALUE = '••••••••••••';
+
+/** Six-step gcloud script the tenant runs in Cloud Shell against their own GCP project. Rendered
+ * twice: once with `{VARIABLE}` placeholders for on-screen display, once with the real values for
+ * the clipboard, so the tenant only ever sees the real IDs after pasting.
  * Mirrors design doc FLE-981 §5.3 command-by-command. */
 const buildSetupScript = (flexpriceAwsAccountId: string, flexpriceAwsRoleName: string): string =>
 	`GCP_PROJECT_ID="your-gcp-project-id"
@@ -67,33 +71,44 @@ gcloud iam service-accounts add-iam-policy-binding \\
   --member="principalSet://iam.googleapis.com/projects/$GCP_PROJECT_NUMBER/locations/global/workloadIdentityPools/flexprice-pool/attribute.account/$FLEXPRICE_AWS_ACCOUNT_ID" \\
   --project="$GCP_PROJECT_ID"
 
-# 6. Generate the credentials JSON — paste its contents below
+# 6. Generate the credentials JSON
 gcloud iam workload-identity-pools create-cred-config \\
   "projects/$GCP_PROJECT_NUMBER/locations/global/workloadIdentityPools/flexprice-pool/providers/flexprice-provider" \\
   --service-account="$SA_ID@$GCP_PROJECT_ID.iam.gserviceaccount.com" \\
   --aws --output-file="flexprice-gcp-creds.json"
 `;
 
-/** Collapsed-by-default code viewer with a copy control that works without expanding. */
-const CodeBlock: FC<{ label: string; code: string; copyToast: string; language?: string }> = ({
-	label,
-	code,
-	copyToast,
-	language = 'bash',
-}) => {
+/**
+ * Collapsed-by-default code viewer with a copy control that works without expanding.
+ * `code` is what's shown on screen; `copyCode` (when given) is what lands on the clipboard — so the
+ * masked `{VARIABLE}` view can be displayed while the real values are copied.
+ */
+const CodeBlock: FC<{
+	label: string;
+	info?: string;
+	infoAriaLabel?: string;
+	code: string;
+	copyCode?: string;
+	copyToast: string;
+	language?: string;
+}> = ({ label, info, infoAriaLabel, code, copyCode, copyToast, language = 'bash' }) => {
 	const { t: tc } = useTranslation('common');
 	const [open, setOpen] = useState(false);
+	const clipboardText = copyCode ?? code;
 
 	return (
 		<Collapsible open={open} onOpenChange={setOpen} className='rounded-lg border border-gray-200 overflow-hidden'>
 			<div className='flex items-center justify-between bg-gray-50 px-4 py-2'>
-				<CollapsibleTrigger asChild>
-					<button type='button' className='flex items-center gap-2 text-sm font-medium text-foreground'>
-						<ChevronDown className={cn('size-4 transition-transform', open && 'rotate-180')} />
-						{label}
-					</button>
-				</CollapsibleTrigger>
-				<Button type='button' variant='ghost' size='sm' className='h-7' onClick={() => copyToClipboard(code, copyToast)}>
+				<div className='flex items-center gap-1'>
+					<CollapsibleTrigger asChild>
+						<button type='button' className='flex items-center gap-2 text-sm font-medium text-foreground'>
+							<ChevronDown className={cn('size-4 transition-transform', open && 'rotate-180')} />
+							{label}
+						</button>
+					</CollapsibleTrigger>
+					{info && <InfoIcon description={info} ariaLabel={infoAriaLabel ?? label} />}
+				</div>
+				<Button type='button' variant='ghost' size='sm' className='h-7' onClick={() => copyToClipboard(clipboardText, copyToast)}>
 					<Copy size={12} className='me-1' />
 					<span className='text-xs'>{tc('actions.copy')}</span>
 				</Button>
@@ -114,6 +129,40 @@ const CodeBlock: FC<{ label: string; code: string; copyToast: string; language?:
 				</Highlight>
 			</CollapsibleContent>
 		</Collapsible>
+	);
+};
+
+/** One variable row: shows the variable name (masked value), copies the real value on click. */
+const VariableCopyRow: FC<{ name: string; value: string; copyToast: string; info?: string; infoAriaLabel?: string }> = ({
+	name,
+	value,
+	copyToast,
+	info,
+	infoAriaLabel,
+}) => {
+	const { t: tc } = useTranslation('common');
+	return (
+		<div className='flex items-center justify-between gap-2 px-3 py-2'>
+			<div className='min-w-0'>
+				<div className='flex items-center gap-1'>
+					<p className='text-xs font-medium text-foreground font-fira-code'>{name}</p>
+					{info && <InfoIcon description={info} ariaLabel={infoAriaLabel ?? name} />}
+				</div>
+				<p className='text-sm tracking-widest text-gray-400 select-none' aria-hidden>
+					{MASKED_VALUE}
+				</p>
+			</div>
+			<Button
+				type='button'
+				variant='ghost'
+				size='sm'
+				className='h-7 shrink-0'
+				disabled={!value}
+				onClick={() => copyToClipboard(value, copyToast)}>
+				<Copy size={12} className='me-1' />
+				<span className='text-xs'>{tc('actions.copy')}</span>
+			</Button>
+		</div>
 	);
 };
 
@@ -138,7 +187,9 @@ const GcpMarketplaceConnectionDrawer: FC<GcpMarketplaceConnectionDrawerProps> = 
 		setErrors({});
 	}, [connection, isOpen]);
 
-	const setupScript = useMemo(
+	// Shown on screen: masked variables. Copied to clipboard: the real account ID + role name.
+	const setupScriptDisplay = useMemo(() => buildSetupScript('{FLEXPRICE_AWS_ACCOUNT_ID}', '{FLEXPRICE_AWS_ROLE_NAME}'), []);
+	const setupScriptCopy = useMemo(
 		() => buildSetupScript(flexpriceAwsAccountId || '{FLEXPRICE_AWS_ACCOUNT_ID}', flexpriceAwsRoleName || '{FLEXPRICE_AWS_ROLE_NAME}'),
 		[flexpriceAwsAccountId, flexpriceAwsRoleName],
 	);
@@ -229,14 +280,18 @@ const GcpMarketplaceConnectionDrawer: FC<GcpMarketplaceConnectionDrawerProps> = 
 			description={t('connection.gcpMarketplace.description')}
 			size='lg'>
 			<div className='space-y-6 mt-9'>
-				<Input
+				<FieldWithInfo
 					label={t('connection.gcpMarketplace.connectionNameLabel')}
-					placeholder={t('connection.gcpMarketplace.connectionNamePlaceholder')}
-					value={formData.name}
-					onChange={(value) => handleChange('name', value)}
-					error={errors.name}
-					description={t('connection.gcpMarketplace.connectionNameHint')}
-				/>
+					description={t('connection.gcpMarketplace.connectionNameInfo')}
+					infoAriaLabel={t('connection.gcpMarketplace.infoAriaLabel')}>
+					<Input
+						placeholder={t('connection.gcpMarketplace.connectionNamePlaceholder')}
+						value={formData.name}
+						onChange={(value) => handleChange('name', value)}
+						error={errors.name}
+						description={t('connection.gcpMarketplace.connectionNameHint')}
+					/>
+				</FieldWithInfo>
 
 				{!isEditMode && (
 					<>
@@ -249,9 +304,34 @@ const GcpMarketplaceConnectionDrawer: FC<GcpMarketplaceConnectionDrawerProps> = 
 
 							<CodeBlock
 								label={t('connection.gcpMarketplace.scriptLabel')}
-								code={setupScript}
+								info={t('connection.gcpMarketplace.scriptInfo')}
+								infoAriaLabel={t('connection.gcpMarketplace.infoAriaLabel')}
+								code={setupScriptDisplay}
+								copyCode={setupScriptCopy}
 								copyToast={t('connection.gcpMarketplace.copyScript')}
 							/>
+
+							{/* Variables — copy the real values without revealing them on screen */}
+							<div>
+								<p className='text-sm font-medium text-foreground'>{t('connection.gcpMarketplace.variablesTitle')}</p>
+								<p className='text-xs text-gray-500 mt-1 mb-2'>{t('connection.gcpMarketplace.variablesHint')}</p>
+								<div className='rounded-lg border border-gray-200 divide-y divide-gray-200'>
+									<VariableCopyRow
+										name='FLEXPRICE_AWS_ACCOUNT_ID'
+										value={flexpriceAwsAccountId}
+										copyToast={t('connection.gcpMarketplace.copyAccountId')}
+										info={t('connection.gcpMarketplace.accountIdInfo')}
+										infoAriaLabel={t('connection.gcpMarketplace.infoAriaLabel')}
+									/>
+									<VariableCopyRow
+										name='FLEXPRICE_AWS_ROLE_NAME'
+										value={flexpriceAwsRoleName}
+										copyToast={t('connection.gcpMarketplace.copyRoleName')}
+										info={t('connection.gcpMarketplace.roleNameInfo')}
+										infoAriaLabel={t('connection.gcpMarketplace.infoAriaLabel')}
+									/>
+								</div>
+							</div>
 
 							{(!flexpriceAwsAccountId || !flexpriceAwsRoleName) && (
 								<p className='text-xs text-amber-600'>{t('connection.gcpMarketplace.accountIdMissing')}</p>
@@ -261,15 +341,19 @@ const GcpMarketplaceConnectionDrawer: FC<GcpMarketplaceConnectionDrawerProps> = 
 						{/* Step 2 — the credentials JSON the tenant gets back from that script */}
 						<div className='space-y-3'>
 							<p className='text-sm font-medium text-foreground'>{t('connection.gcpMarketplace.step2Title')}</p>
-							<Textarea
+							<FieldWithInfo
 								label={t('connection.gcpMarketplace.credentialsJsonLabel')}
-								placeholder={t('connection.gcpMarketplace.credentialsJsonPlaceholder')}
-								value={formData.credentials_json}
-								onChange={(value) => handleChange('credentials_json', value)}
-								error={errors.credentials_json}
-								description={t('connection.gcpMarketplace.credentialsJsonHint')}
-								textAreaClassName='font-fira-code text-xs min-h-[10rem]'
-							/>
+								description={t('connection.gcpMarketplace.credentialsJsonInfo')}
+								infoAriaLabel={t('connection.gcpMarketplace.infoAriaLabel')}>
+								<Textarea
+									placeholder={t('connection.gcpMarketplace.credentialsJsonPlaceholder')}
+									value={formData.credentials_json}
+									onChange={(value) => handleChange('credentials_json', value)}
+									error={errors.credentials_json}
+									description={t('connection.gcpMarketplace.credentialsJsonHint')}
+									textAreaClassName='font-fira-code text-xs min-h-[10rem]'
+								/>
+							</FieldWithInfo>
 						</div>
 					</>
 				)}
