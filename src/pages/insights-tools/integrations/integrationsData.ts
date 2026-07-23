@@ -146,7 +146,7 @@ export const integrationCatalogSpecs: IntegrationCatalogSpec[] = [
 	{
 		id: 'aws_marketplace',
 		logo: '/assets/logo/Marketplace-AWS.png',
-		docsUrl: 'https://docs.flexprice.io/integrations/aws-marketplace/',
+		docsUrl: 'https://docs.flexprice.io/integrations/marketplace-integration/aws/connection-setup',
 		tagKeys: ['marketplace', 'usageMetering'],
 		type: 'available',
 		sectionKeys: ['overview', 'setup', 'usageReporting'],
@@ -154,7 +154,7 @@ export const integrationCatalogSpecs: IntegrationCatalogSpec[] = [
 	{
 		id: 'gcp_marketplace',
 		logo: '/assets/logo/google-cloud.png',
-		docsUrl: 'https://docs.flexprice.io/integrations/gcp-marketplace/',
+		docsUrl: 'https://docs.flexprice.io/integrations/marketplace-integration/gcp/connection-setup',
 		tagKeys: ['marketplace', 'usageMetering'],
 		type: 'available',
 		sectionKeys: ['overview', 'setup', 'usageReporting'],
