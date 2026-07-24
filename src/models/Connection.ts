@@ -24,6 +24,7 @@ export enum CONNECTION_PROVIDER_TYPE {
 	TABS = 'tabs',
 	AWS_MARKETPLACE = 'aws_marketplace',
 	GCP_MARKETPLACE = 'gcp_marketplace',
+	AZURE_MARKETPLACE = 'azure_marketplace',
 	// Add more providers as needed
 }
 
