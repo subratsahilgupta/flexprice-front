@@ -116,6 +116,11 @@ const SignupForm: React.FC<SignupFormProps> = ({ switchTab }) => {
 	};
 
 	const handleSignup = async () => {
+		if (!config.platform.signup.enabled) {
+			toast.error(t('signupDisabled'));
+			navigate('/auth');
+			return;
+		}
 		// Validate form
 		if (!validateForm()) {
 			return;

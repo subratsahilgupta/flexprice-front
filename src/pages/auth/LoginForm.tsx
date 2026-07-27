@@ -151,12 +151,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ switchTab }) => {
 				</>
 			)}
 
-			<p className='mt-6 text-center text-sm text-gray-600'>
-				{t('noAccount')}{' '}
-				<button onClick={() => switchTab(AuthTab.SIGNUP)} className='text-grey-600 underline font-medium'>
-					{t('links.signUp')}
-				</button>
-			</p>
+			{config.platform.signup.enabled && (
+				<p className='mt-6 text-center text-sm text-gray-600'>
+					{t('noAccount')}{' '}
+					<button onClick={() => switchTab(AuthTab.SIGNUP)} className='text-grey-600 underline font-medium'>
+						{t('links.signUp')}
+					</button>
+				</p>
+			)}
 		</>
 	);
 };
