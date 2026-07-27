@@ -12,6 +12,8 @@ import { CreateConnectionPayload } from '@/types/dto';
 import { config } from '@/config/config';
 import { copyToClipboard } from '@/utils/common/helper_functions';
 import { cn } from '@/lib/utils';
+import useUser from '@/hooks/useUser';
+import useEnvironment from '@/hooks/useEnvironment';
 
 interface AwsMarketplaceConnectionDrawerProps {
 	isOpen: boolean;
@@ -42,13 +44,12 @@ const DEFAULT_AWS_MARKETPLACE_REGION = 'us-east-1';
 /** On-screen mask for variable values (real value is only ever copied, never shown). */
 const MASKED_VALUE = '••••••••••••';
 
-/** A fresh, unique external ID per connection attempt — guards the confused-deputy risk on AssumeRole. */
-const generateExternalId = (): string => {
-	const rand =
-		typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-			? crypto.randomUUID()
-			: `${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`;
-	return `flexprice-mp-${rand}`;
+/**
+ * Deterministic STS ExternalId scoped to the current tenant + environment.
+ * Replaces a random UUID so the same org/env always gets a stable AssumeRole condition.
+ */
+export const generateExternalId = (tenantId: string, environmentId: string): string => {
+	return `${tenantId}-${environmentId}`;
 };
 
 /** IAM permission policy — identical for every tenant. `BatchMeterUsage` is not resource-scopable. */
@@ -165,13 +166,15 @@ const VariableCopyRow: FC<{ name: string; value: string; copyToast: string; info
 const AwsMarketplaceConnectionDrawer: FC<AwsMarketplaceConnectionDrawerProps> = ({ isOpen, onOpenChange, connection, onSave }) => {
 	const { t } = useTranslation('settings');
 	const { t: tc } = useTranslation('common');
+	const { user } = useUser();
+	const { activeEnvironment } = useEnvironment();
 	const isEditMode = !!connection;
 
 	const [formData, setFormData] = useState<FormData>({ name: '', role_arn: '', region: DEFAULT_AWS_MARKETPLACE_REGION });
 	const [errors, setErrors] = useState<ValidationErrors>({});
 	const [externalId, setExternalId] = useState<string>('');
 
-	// Reset form and mint a fresh external ID each time the drawer opens for a new connection.
+	// Reset form and set ExternalId from tenant + environment when opening a new connection.
 	useEffect(() => {
 		if (!isOpen) return;
 		if (connection) {
@@ -179,10 +182,12 @@ const AwsMarketplaceConnectionDrawer: FC<AwsMarketplaceConnectionDrawerProps> = 
 			setExternalId('');
 		} else {
 			setFormData({ name: '', role_arn: '', region: DEFAULT_AWS_MARKETPLACE_REGION });
-			setExternalId(generateExternalId());
+			const tenantId = user?.tenant?.id;
+			const environmentId = activeEnvironment?.id;
+			setExternalId(tenantId && environmentId ? generateExternalId(tenantId, environmentId) : '');
 		}
 		setErrors({});
-	}, [connection, isOpen]);
+	}, [connection, isOpen, user?.tenant?.id, activeEnvironment?.id]);
 
 	const flexpriceAwsAccountId = config.integrations.flexpriceAwsAccountId;
 
@@ -263,6 +268,10 @@ const AwsMarketplaceConnectionDrawer: FC<AwsMarketplaceConnectionDrawerProps> = 
 		if (isEditMode) {
 			updateConnection();
 		} else {
+			if (!externalId.trim()) {
+				toast.error(t('connection.toast.failedToCreate'));
+				return;
+			}
 			createConnection();
 		}
 	};
