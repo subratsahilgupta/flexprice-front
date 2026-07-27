@@ -10,6 +10,7 @@ import LoginForm from '../../LoginForm';
 import SignupForm from '../../SignupForm';
 import ForgotPasswordForm from '../../ForgotPasswordForm';
 import ResetPasswordForm from '../../ResetPasswordForm';
+import { config } from '@/config/config';
 
 const SLACK_COMMUNITY_URL = 'https://join.slack.com/t/flexpricecommunity/shared_invite/zt-39uat51l0-n8JmSikHZP~bHJNXladeaQ';
 
@@ -22,10 +23,12 @@ const FlexpriceDefault: React.FC<FlexpriceDefaultProps> = ({ currentTab, switchT
 	const { t } = useTranslation('auth');
 	const { logo, name } = useBrand();
 
+	const signupEnabled = config.platform.signup.enabled;
+
 	const renderForm = () => {
 		switch (currentTab) {
 			case AuthTab.SIGNUP:
-				return <SignupForm switchTab={switchTab} />;
+				return signupEnabled ? <SignupForm switchTab={switchTab} /> : <LoginForm switchTab={switchTab} />;
 			case AuthTab.FORGOT_PASSWORD:
 				return <ForgotPasswordForm switchTab={switchTab} />;
 			case AuthTab.RESET_PASSWORD:
@@ -52,7 +55,7 @@ const FlexpriceDefault: React.FC<FlexpriceDefaultProps> = ({ currentTab, switchT
 						<div className='flex justify-center mb-4'>
 							<img src={logo} alt={`${name} Logo`} className='h-12' />
 						</div>
-						{currentTab === AuthTab.SIGNUP && (
+						{signupEnabled && currentTab === AuthTab.SIGNUP && (
 							<>
 								<h2 className='text-3xl font-medium text-center text-gray-800 mb-2'>{t('createAccount.heading')}</h2>
 								<p className='text-center text-gray-600 mb-10'>{t('createAccount.subheading', { brandName: name })}</p>
@@ -61,7 +64,7 @@ const FlexpriceDefault: React.FC<FlexpriceDefaultProps> = ({ currentTab, switchT
 								</div>
 							</>
 						)}
-						{currentTab === AuthTab.LOGIN && (
+						{(currentTab === AuthTab.LOGIN || (!signupEnabled && currentTab === AuthTab.SIGNUP)) && (
 							<>
 								<h2 className='text-3xl font-medium text-center text-gray-800 mb-3'>{t('login.heading')}</h2>
 								<p className='text-center text-gray-600 mb-10'>{t('login.subheading')}</p>
