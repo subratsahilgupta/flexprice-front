@@ -223,7 +223,23 @@
 				"walletCreditsExpirationInvalid": "Expiration duration must be a positive whole number with a valid unit",
 				"walletCreditsExpirationWithoutCredits": "Expiration can only be set when initial credits are greater than 0",
 				"subscriptionPlanRequired": "Select a plan before enabling subscription creation",
-				"subscriptionStartDateInvalid": "Start date must be an ISO datetime like 2026-07-04T00:00:00Z, or left blank"
+				"subscriptionStartDateInvalid": "Start date must be an ISO datetime like 2026-07-04T00:00:00Z, or left blank",
+				"customWorkflowNameRequired": "Each custom workflow needs a name",
+				"customWorkflowNameInvalid": "Custom workflow names must be 100 characters or fewer",
+				"customWorkflowNameDuplicate": "Custom workflow names must be unique"
+			},
+			"customWorkflows": {
+				"title": "Custom workflows",
+				"description": "Optional named workflows which can be used to trigger different onboarding flows for different customers.",
+				"empty": "No custom workflows yet.",
+				"add": "Add custom workflow",
+				"remove": "Remove custom workflow",
+				"name": "Name",
+				"nameHint": "Used as the workflow name. Up to 100 characters.",
+				"namePlaceholder": "Enterprise trial",
+				"untitled": "Untitled workflow",
+				"noActionsSummary": "No actions enabled",
+				"advancedCount": "{{count}} advanced action(s) preserved"
 			},
 			"wallet": {
 				"title": "Create wallet",
@@ -636,6 +652,35 @@
 			"credentialsJsonHint": "The full contents of the file the script wrote (flexprice-gcp-creds.json)",
 			"credentialsJsonRequired": "Credentials JSON is required",
 			"credentialsJsonInvalid": "This doesn't look like a Workload Identity Federation credentials file — it must have \"type\": \"external_account\""
+		},
+		"azureMarketplace": {
+			"titleConnect": "Connect to Azure Marketplace",
+			"titleEdit": "Edit Azure Marketplace Connection",
+			"description": "Sync your Azure Marketplace subscriptions and usage using an Entra ID app registered in your own tenant. Flexprice verifies the credentials before saving.",
+			"connectionNameLabel": "Connection name",
+			"connectionNameInfo": "Choose a name to help identify this Azure Marketplace connection inside your workspace.",
+			"connectionNamePlaceholder": "e.g. Azure Marketplace",
+			"connectionNameHint": "A descriptive name for this connection.",
+			"infoAriaLabel": "More information",
+			"step1Title": "Step 1. Register an app in your Microsoft Entra ID tenant",
+			"step1Hint": "Create an app registration in your own Microsoft Entra ID tenant and grant it access to your SaaS Marketplace resources.",
+			"technicalConfigWarning": "Use the same Entra tenant ID and application ID that you specified in the Partner Center Technical Configuration page of each offer you want usage reported for.",
+			"step2Title": "Step 2. Enter the app credentials",
+			"tenantIdLabel": "Tenant ID",
+			"tenantIdInfo": "The directory (tenant) ID of the Microsoft Entra ID tenant where the app is registered.",
+			"tenantIdPlaceholder": "Enter tenant ID",
+			"tenantIdHint": "Found on the app registration overview page in Azure.",
+			"tenantIdRequired": "Tenant ID is required",
+			"clientIdLabel": "Client ID",
+			"clientIdInfo": "The application (client) ID of the registered app.",
+			"clientIdPlaceholder": "Enter client ID",
+			"clientIdHint": "Found on the app registration overview page in Azure.",
+			"clientIdRequired": "Client ID is required",
+			"clientSecretLabel": "Client secret",
+			"clientSecretInfo": "A client secret generated for the app. Flexprice encrypts it and uses it only to request an access token.",
+			"clientSecretPlaceholder": "Enter client secret",
+			"clientSecretHint": "Generated under Certificates and secrets on the app registration.",
+			"clientSecretRequired": "Client secret is required"
 		},
 		"validation": {
 			"nameRequired": "Connection name is required",
@@ -1382,6 +1427,30 @@
 							"title": "Usage Reporting",
 							"paragraphs": [
 								"Once connected, a scheduled job aggregates usage per entitlement and reports it to GCP via the Service Control API's services.report."
+							]
+						}
+					}
+				},
+				"azure_marketplace": {
+					"name": "Azure Marketplace",
+					"description": "Report metered usage to Azure Marketplace so your Azure buyers are billed for what they consume.",
+					"sections": {
+						"overview": {
+							"title": "Overview",
+							"paragraphs": [
+								"Flexprice reports the usage you already meter to Azure Marketplace on your behalf. Connect an Entra ID app registered in your own Azure tenant, and Flexprice sends the usage event for each registered subscription."
+							]
+						},
+						"setup": {
+							"title": "Setup",
+							"paragraphs": [
+								"Register an app in your own Microsoft Entra ID tenant and generate a client secret for it. Make sure this app's tenant ID and application ID are entered on the Technical Configuration page of every offer you want usage reported for. Paste the tenant ID, client ID, and client secret back into Flexprice and save. Flexprice verifies the credentials by requesting an access token before storing the connection."
+							]
+						},
+						"usageReporting": {
+							"title": "Usage Reporting",
+							"paragraphs": [
+								"Once connected, a scheduled job reports usage per subscription to Azure Marketplace's usage event API."
 							]
 						}
 					}

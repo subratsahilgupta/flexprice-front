@@ -97,6 +97,13 @@ export interface CreateConnectionPayload {
 				credentials_json?: string;
 		  }
 		| {
+				// Azure Marketplace: the tenant's own Entra app credentials, generated in their own
+				// Azure AD tenant and pasted here.
+				tenant_id?: string;
+				client_id?: string;
+				client_secret?: string;
+		  }
+		| {
 				api_key?: string;
 				webhook_secret?: string;
 		  };

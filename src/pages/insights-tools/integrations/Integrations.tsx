@@ -24,6 +24,7 @@ import WhopConnectionDrawer from '@/components/molecules/WhopConnectionDrawer';
 import TabsConnectionDrawer from '@/components/molecules/TabsConnectionDrawer';
 import AwsMarketplaceConnectionDrawer from '@/components/molecules/AwsMarketplaceConnectionDrawer';
 import GcpMarketplaceConnectionDrawer from '@/components/molecules/GcpMarketplaceConnectionDrawer';
+import AzureMarketplaceConnectionDrawer from '@/components/molecules/AzureMarketplaceConnectionDrawer';
 import IntegrationDrawer from '@/components/molecules/IntegrationDrawer/IntegrationDrawer';
 
 /** UI preview only: shows one card in connected state without real API data. Set to `null` to turn off. */
@@ -350,6 +351,24 @@ const Integrations = () => {
 						/>
 					) : activeIntegration.id === CONNECTION_PROVIDER_TYPE.GCP_MARKETPLACE ? (
 						<GcpMarketplaceConnectionDrawer
+							isOpen={isDrawerOpen}
+							onOpenChange={(open) => {
+								setIsDrawerOpen(open);
+								if (!open) {
+									setEditingConnection(null);
+									setActiveIntegration(null);
+								}
+							}}
+							connection={editingConnection}
+							onSave={() => {
+								connectionQueries.forEach((q) => q.refetch?.());
+								setIsDrawerOpen(false);
+								setEditingConnection(null);
+								setActiveIntegration(null);
+							}}
+						/>
+					) : activeIntegration.id === CONNECTION_PROVIDER_TYPE.AZURE_MARKETPLACE ? (
+						<AzureMarketplaceConnectionDrawer
 							isOpen={isDrawerOpen}
 							onOpenChange={(open) => {
 								setIsDrawerOpen(open);
