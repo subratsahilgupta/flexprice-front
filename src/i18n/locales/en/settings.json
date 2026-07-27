@@ -681,6 +681,7 @@
 			"updated": "{{provider}} connection updated successfully",
 			"failedToCreate": "Failed to create connection",
 			"failedToUpdate": "Failed to update connection",
+			"externalIdUnavailable": "Unable to create connection — tenant or environment is missing",
 			"webhookUrlCopied": "Webhook URL copied to clipboard!",
 			"redirectUriCopied": "Redirect URI copied to clipboard!",
 			"failedOAuth": "Failed to initiate OAuth",
