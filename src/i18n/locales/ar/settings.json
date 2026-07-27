@@ -684,6 +684,7 @@
 			"updated": "تم تحديث اتصال {{provider}} بنجاح",
 			"failedToCreate": "فشل إنشاء الاتصال",
 			"failedToUpdate": "فشل تحديث الاتصال",
+			"externalIdUnavailable": "تعذّر إنشاء الاتصال — معرّف المستأجر أو البيئة غير متوفر",
 			"webhookUrlCopied": "تم نسخ عنوان الويب هوك!",
 			"redirectUriCopied": "تم نسخ عنوان إعادة التوجيه!",
 			"failedOAuth": "فشل بدء OAuth",

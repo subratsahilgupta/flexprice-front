@@ -49,7 +49,7 @@ const MASKED_VALUE = '••••••••••••';
  * Replaces a random UUID so the same org/env always gets a stable AssumeRole condition.
  */
 export const generateExternalId = (tenantId: string, environmentId: string): string => {
-	return `${tenantId}-${environmentId}`;
+	return `${tenantId}_${environmentId}`;
 };
 
 /** IAM permission policy — identical for every tenant. `BatchMeterUsage` is not resource-scopable. */
@@ -269,7 +269,7 @@ const AwsMarketplaceConnectionDrawer: FC<AwsMarketplaceConnectionDrawerProps> = 
 			updateConnection();
 		} else {
 			if (!externalId.trim()) {
-				toast.error(t('connection.toast.failedToCreate'));
+				toast.error(t('connection.toast.externalIdUnavailable'));
 				return;
 			}
 			createConnection();
