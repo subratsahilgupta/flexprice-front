@@ -159,4 +159,12 @@ export const integrationCatalogSpecs: IntegrationCatalogSpec[] = [
 		type: 'available',
 		sectionKeys: ['overview', 'setup', 'usageReporting'],
 	},
+	{
+		id: 'azure_marketplace',
+		logo: '/assets/logo/Azure.png',
+		docsUrl: 'https://docs.flexprice.io/integrations/marketplace-integration/azure/connection-setup',
+		tagKeys: ['marketplace', 'usageMetering'],
+		type: 'available',
+		sectionKeys: ['overview', 'setup', 'usageReporting'],
+	},
 ];
