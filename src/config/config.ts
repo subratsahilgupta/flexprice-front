@@ -101,6 +101,9 @@ export interface PlatformConfig {
 	production: {
 		enabled: boolean;
 	};
+	signup: {
+		enabled: boolean;
+	};
 }
 
 const PLATFORM_FEATURE_DEFAULTS = {
@@ -109,6 +112,7 @@ const PLATFORM_FEATURE_DEFAULTS = {
 	guides: true,
 	onboarding: true,
 	production: false,
+	signup: false,
 } as const;
 
 type PlatformFeatureKey = keyof typeof PLATFORM_FEATURE_DEFAULTS;
@@ -120,6 +124,7 @@ interface PlatformConfigJson {
 	onboarding?: { enabled?: boolean };
 	contact_us?: boolean | { enabled?: boolean };
 	production?: { enabled?: boolean };
+	signup?: { enabled?: boolean };
 }
 
 function parsePlatformFeatureEnabled(parsed: PlatformConfigJson | undefined, key: PlatformFeatureKey): boolean {
@@ -135,7 +140,7 @@ function parseContactUsEnabled(parsed: PlatformConfigJson | undefined): boolean 
 	return false;
 }
 
-/** Parse `VITE_PLATFORM_CONFIG` JSON. Keys: api_reference, sidebar_documentation, guides, onboarding, contact_us. Omitted keys default to `enabled: true` (contact_us defaults to false). */
+/** Parse `VITE_PLATFORM_CONFIG` JSON. Keys: api_reference, sidebar_documentation, guides, onboarding, contact_us, production, signup. Omitted keys default to `enabled: true` (contact_us, production, signup default to false). */
 export function parsePlatformConfig(rawPlatformConfig?: string): PlatformConfig {
 	let parsed: PlatformConfigJson | undefined;
 	const raw = rawPlatformConfig?.trim();
@@ -155,6 +160,7 @@ export function parsePlatformConfig(rawPlatformConfig?: string): PlatformConfig 
 		onboarding: { enabled: parsePlatformFeatureEnabled(parsed, 'onboarding') },
 		contact_us: { enabled: parseContactUsEnabled(parsed) },
 		production: { enabled: parsePlatformFeatureEnabled(parsed, 'production') },
+		signup: { enabled: parsePlatformFeatureEnabled(parsed, 'signup') },
 	};
 }
 

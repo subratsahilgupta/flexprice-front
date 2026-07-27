@@ -7,11 +7,13 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { buildSignupMetadata, getPersistedSignupMetadata } from '@/utils/auth/signupMetadata';
+import { config } from '@/config/config';
 
 const SignupConfirmation = () => {
 	const userContext = useUser();
 	const navigate = useNavigate();
 	const { t } = useTranslation('auth');
+	const signupEnabled = config.platform.signup.enabled;
 
 	const { mutate, isPending } = useMutation({
 		mutationFn: async () => {
@@ -27,8 +29,16 @@ const SignupConfirmation = () => {
 			const user = await supabase.auth.getUser();
 			userContext.setUser(user.data.user);
 
+			// Existing Google users land here after OAuth — always allow login through.
 			if (user.data.user?.app_metadata.tenant_id) {
 				navigate('/');
+				return;
+			}
+
+			if (!signupEnabled) {
+				await supabase.auth.signOut();
+				toast.error(t('signupDisabled'));
+				navigate('/auth');
 				return;
 			}
 
