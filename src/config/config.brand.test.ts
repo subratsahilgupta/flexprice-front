@@ -206,7 +206,7 @@ describe('parsePlatformConfig', () => {
 		expect(result.onboarding.enabled).toBe(true);
 		expect(result.contact_us.enabled).toBe(false);
 		expect(result.production.enabled).toBe(false);
-		expect(result.signup.enabled).toBe(false);
+		expect(result.signup.enabled).toBe(true);
 	});
 
 	it('applies per-feature overrides from VITE_PLATFORM_CONFIG JSON', async () => {
@@ -235,7 +235,7 @@ describe('parsePlatformConfig', () => {
 		expect(result.guides.enabled).toBe(true);
 		expect(result.onboarding.enabled).toBe(true);
 		expect(result.contact_us.enabled).toBe(false);
-		expect(result.signup.enabled).toBe(false);
+		expect(result.signup.enabled).toBe(true);
 	});
 
 	it('enables contact_us from boolean or enabled object', async () => {
@@ -252,10 +252,10 @@ describe('parsePlatformConfig', () => {
 		expect(parsePlatformConfig('{"guides":{"enabled":false}}').production.enabled).toBe(false);
 	});
 
-	it('enables signup only when explicitly set', async () => {
+	it('disables signup only when explicitly set to false', async () => {
 		const { parsePlatformConfig } = await import('./config');
 		expect(parsePlatformConfig('{"signup":{"enabled":true}}').signup.enabled).toBe(true);
 		expect(parsePlatformConfig('{"signup":{"enabled":false}}').signup.enabled).toBe(false);
-		expect(parsePlatformConfig('{"guides":{"enabled":false}}').signup.enabled).toBe(false);
+		expect(parsePlatformConfig('{"guides":{"enabled":false}}').signup.enabled).toBe(true);
 	});
 });

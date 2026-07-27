@@ -112,7 +112,7 @@ const PLATFORM_FEATURE_DEFAULTS = {
 	guides: true,
 	onboarding: true,
 	production: false,
-	signup: false,
+	signup: true,
 } as const;
 
 type PlatformFeatureKey = keyof typeof PLATFORM_FEATURE_DEFAULTS;
@@ -140,7 +140,7 @@ function parseContactUsEnabled(parsed: PlatformConfigJson | undefined): boolean 
 	return false;
 }
 
-/** Parse `VITE_PLATFORM_CONFIG` JSON. Keys: api_reference, sidebar_documentation, guides, onboarding, contact_us, production, signup. Omitted keys default to `enabled: true` (contact_us, production, signup default to false). */
+/** Parse `VITE_PLATFORM_CONFIG` JSON. Keys: api_reference, sidebar_documentation, guides, onboarding, contact_us, production, signup. Omitted keys default to `enabled: true` (contact_us and production default to false). */
 export function parsePlatformConfig(rawPlatformConfig?: string): PlatformConfig {
 	let parsed: PlatformConfigJson | undefined;
 	const raw = rawPlatformConfig?.trim();
