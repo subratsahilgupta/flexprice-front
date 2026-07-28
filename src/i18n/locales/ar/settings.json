@@ -656,6 +656,35 @@
 			"credentialsJsonRequired": "بيانات الاعتماد JSON مطلوبة",
 			"credentialsJsonInvalid": "هذا لا يبدو ملف بيانات اعتماد Workload Identity Federation — يجب أن يحتوي على \"type\": \"external_account\""
 		},
+		"azureMarketplace": {
+			"titleConnect": "الاتصال بـ Azure Marketplace",
+			"titleEdit": "تعديل اتصال Azure Marketplace",
+			"description": "زامن اشتراكات واستخدام Azure Marketplace باستخدام تطبيق Entra ID مُسجّل في مستأجرك (tenant) الخاص. يتحقق Flexprice من بيانات الاعتماد قبل الحفظ.",
+			"connectionNameLabel": "اسم الاتصال",
+			"connectionNameInfo": "اختر اسماً يساعد على تمييز اتصال Azure Marketplace هذا داخل مساحة عملك.",
+			"connectionNamePlaceholder": "مثال: Azure Marketplace",
+			"connectionNameHint": "اسم وصفي لهذا الاتصال.",
+			"infoAriaLabel": "مزيد من المعلومات",
+			"step1Title": "١. سجّل تطبيقاً في مستأجر Microsoft Entra ID الخاص بك",
+			"step1Hint": "أنشئ تسجيل تطبيق (app registration) في مستأجر Microsoft Entra ID الخاص بك وامنحه الوصول إلى موارد SaaS Marketplace الخاصة بك.",
+			"technicalConfigWarning": "استخدم نفس معرّف مستأجر Entra ومعرّف التطبيق اللذين حدّدتهما في صفحة Technical Configuration في Partner Center لكل عرض (offer) تريد الإبلاغ عن استخدامه.",
+			"step2Title": "٢. أدخل بيانات اعتماد التطبيق",
+			"tenantIdLabel": "معرّف المستأجر",
+			"tenantIdInfo": "معرّف الدليل (المستأجر) لمستأجر Microsoft Entra ID الذي سُجّل فيه التطبيق.",
+			"tenantIdPlaceholder": "أدخل معرّف المستأجر",
+			"tenantIdHint": "تجده في صفحة نظرة عامة على تسجيل التطبيق في Azure.",
+			"tenantIdRequired": "معرّف المستأجر مطلوب",
+			"clientIdLabel": "معرّف العميل",
+			"clientIdInfo": "معرّف التطبيق (العميل) للتطبيق المُسجّل.",
+			"clientIdPlaceholder": "أدخل معرّف العميل",
+			"clientIdHint": "تجده في صفحة نظرة عامة على تسجيل التطبيق في Azure.",
+			"clientIdRequired": "معرّف العميل مطلوب",
+			"clientSecretLabel": "سر العميل",
+			"clientSecretInfo": "سر عميل (client secret) مُولّد للتطبيق. يشفّره Flexprice ويستخدمه فقط لطلب رمز وصول.",
+			"clientSecretPlaceholder": "أدخل سر العميل",
+			"clientSecretHint": "يُولَّد ضمن Certificates and secrets في تسجيل التطبيق.",
+			"clientSecretRequired": "سر العميل مطلوب"
+		},
 		"validation": {
 			"nameRequired": "اسم الاتصال مطلوب",
 			"roleArnRequired": "معرّف الدور (Role ARN) مطلوب",
@@ -1330,6 +1359,30 @@
 							"title": "الإبلاغ عن الاستخدام",
 							"paragraphs": [
 								"بعد الاتصال، تُجمّع مهمة مجدولة الاستخدام لكل استحقاق وتُبلغ عنه إلى GCP عبر services.report الخاصة بـ Service Control API."
+							]
+						}
+					}
+				},
+				"azure_marketplace": {
+					"name": "Azure Marketplace",
+					"description": "أبلغ عن الاستخدام المقاس إلى Azure Marketplace لتتم فوترة مشتري Azure حسب استهلاكهم.",
+					"sections": {
+						"overview": {
+							"title": "نظرة عامة",
+							"paragraphs": [
+								"يُبلغ Flexprice عن الاستخدام الذي تقيسه بالفعل إلى Azure Marketplace نيابة عنك. اربط تطبيق Entra ID مُسجّلاً في مستأجر Azure الخاص بك، ويرسل Flexprice حدث الاستخدام (usage event) لكل اشتراك مسجّل."
+							]
+						},
+						"setup": {
+							"title": "الإعداد",
+							"paragraphs": [
+								"سجّل تطبيقاً في مستأجر Microsoft Entra ID الخاص بك وولّد له سر عميل (client secret). تأكد من إدخال معرّف المستأجر ومعرّف التطبيق الخاصين بهذا التطبيق في صفحة Technical Configuration لكل عرض (offer) تريد الإبلاغ عن استخدامه. الصق معرّف المستأجر ومعرّف العميل وسر العميل في Flexprice واحفظ. يتحقق Flexprice من بيانات الاعتماد بطلب رمز وصول قبل تخزين الاتصال."
+							]
+						},
+						"usageReporting": {
+							"title": "الإبلاغ عن الاستخدام",
+							"paragraphs": [
+								"بعد الاتصال، تُبلغ مهمة مجدولة عن الاستخدام لكل اشتراك إلى واجهة برمجة تطبيقات حدث الاستخدام (usage event API) في Azure Marketplace."
 							]
 						}
 					}

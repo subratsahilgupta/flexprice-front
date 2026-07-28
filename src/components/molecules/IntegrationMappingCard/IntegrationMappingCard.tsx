@@ -22,6 +22,7 @@ const PROVIDER_ID_MAP: Record<string, string> = {
 const CONNECTION_DRIVEN_PROVIDERS: Record<string, IntegrationEntityType[]> = {
 	[CONNECTION_PROVIDER_TYPE.AWS_MARKETPLACE]: ['customer', 'subscription', 'plan'],
 	[CONNECTION_PROVIDER_TYPE.GCP_MARKETPLACE]: ['customer', 'subscription', 'plan'],
+	[CONNECTION_PROVIDER_TYPE.AZURE_MARKETPLACE]: ['customer', 'subscription', 'plan'],
 };
 
 const providerLogoMap = new Map(integrationCatalogSpecs.map((spec) => [spec.id, spec.logo]));
