@@ -24,20 +24,25 @@ function Calendar({ className, classNames, showOutsideDays = true, timezone, onT
 		<div className='flex flex-col'>
 			<DayPicker
 				showOutsideDays={showOutsideDays}
-				className={cn('p-3', className)}
+				className={cn('p-3 relative', className)}
 				classNames={{
 					months: 'flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0',
 					month: 'space-y-4',
 					month_caption: 'flex justify-center pt-1 relative items-center',
 					caption_label: 'text-sm font-medium',
 					nav: 'space-x-1 flex items-center',
+					// `nav` renders as a sibling of `month`/`month_caption` (not nested inside it) in
+					// react-day-picker v10, so the buttons anchor to the calendar root (`relative` above,
+					// on the DayPicker's own className) rather than to `month_caption` — pin `top`
+					// explicitly rather than relying on the absolute-positioning "static position"
+					// fallback, which put them on top of the day grid instead of the caption row.
 					button_previous: cn(
 						buttonVariants({ variant: 'outline' }),
-						'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute left-1',
+						'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute left-1 top-3',
 					),
 					button_next: cn(
 						buttonVariants({ variant: 'outline' }),
-						'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute right-1',
+						'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute right-1 top-3',
 					),
 					month_grid: 'w-full border-collapse space-y-1',
 					weekdays: 'flex',

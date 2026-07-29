@@ -1,4 +1,4 @@
-import { FC, useMemo } from 'react';
+import { FC, useMemo, useState } from 'react';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { Button, Input, Select as AtomSelect, type SelectOption } from '@/components/atoms';
 import { Switch } from '@/components/ui';
@@ -41,6 +41,8 @@ interface Props {
 	currencySymbol?: string;
 	currency?: string;
 	bucketDefaults?: CommitmentTimeBucketDefaults;
+	/** Highlight empty/invalid required fields — set true after a failed save attempt. */
+	showErrors?: boolean;
 }
 
 function formatTwoDigits(value: number): string {
@@ -70,13 +72,33 @@ interface TimeUnitSelectProps {
 	disabled?: boolean;
 	ariaLabel: string;
 	hasError?: boolean;
+	/** Unique id for this dropdown, used to keep only one time dropdown open at a time. */
+	id: string;
+	openId: string | null;
+	onOpenIdChange: (id: string | null) => void;
 }
 
-const TimeUnitSelect: FC<TimeUnitSelectProps> = ({ value, allowedValues, placeholder, onChange, disabled, ariaLabel, hasError }) => {
+const TimeUnitSelect: FC<TimeUnitSelectProps> = ({
+	value,
+	allowedValues,
+	placeholder,
+	onChange,
+	disabled,
+	ariaLabel,
+	hasError,
+	id,
+	openId,
+	onOpenIdChange,
+}) => {
 	const isUnset = value === UNSET_TIME_VALUE;
 
 	return (
-		<Select value={isUnset ? undefined : String(value)} onValueChange={(next) => onChange(parseInt(next, 10))} disabled={disabled}>
+		<Select
+			value={isUnset ? undefined : String(value)}
+			onValueChange={(next) => onChange(parseInt(next, 10))}
+			disabled={disabled}
+			open={openId === id}
+			onOpenChange={(open) => onOpenIdChange(open ? id : null)}>
 			<SelectTrigger
 				aria-label={ariaLabel}
 				className={cn(
@@ -109,6 +131,10 @@ interface TimePointInputProps {
 	minutePlaceholder: string;
 	disabled?: boolean;
 	hasError?: boolean;
+	/** Unique id prefix for this Start/End input, used to keep only one time dropdown open at a time. */
+	idPrefix: string;
+	openId: string | null;
+	onOpenIdChange: (id: string | null) => void;
 }
 
 const TimePointInput: FC<TimePointInputProps> = ({
@@ -122,11 +148,17 @@ const TimePointInput: FC<TimePointInputProps> = ({
 	minutePlaceholder,
 	disabled,
 	hasError,
+	idPrefix,
+	openId,
+	onOpenIdChange,
 }) => (
 	<div className='flex w-fit shrink-0 flex-col gap-2'>
 		<span className='text-xs font-medium text-gray-600'>{label}</span>
 		<div className='flex flex-nowrap items-center gap-0'>
 			<TimeUnitSelect
+				id={`${idPrefix}-hour`}
+				openId={openId}
+				onOpenIdChange={onOpenIdChange}
 				value={value.hour}
 				allowedValues={hourValues}
 				placeholder={hourPlaceholder}
@@ -137,6 +169,9 @@ const TimePointInput: FC<TimePointInputProps> = ({
 			/>
 			<span className='shrink-0 px-0.5 text-xs font-medium text-gray-300'>:</span>
 			<TimeUnitSelect
+				id={`${idPrefix}-minute`}
+				openId={openId}
+				onOpenIdChange={onOpenIdChange}
 				value={minutesEnabled ? value.minute : value.hour === UNSET_TIME_VALUE ? UNSET_TIME_VALUE : 0}
 				allowedValues={minuteValues}
 				placeholder={minutePlaceholder}
@@ -158,8 +193,11 @@ const CommitmentTimeBucketsEditor: FC<Props> = ({
 	currencySymbol,
 	currency,
 	bucketDefaults,
+	showErrors = false,
 }) => {
 	const { t } = useTranslation(['billing', 'common', 'catalog']);
+	// Shared across all bucket rows so opening any time dropdown closes any other that's open.
+	const [openTimeDropdownId, setOpenTimeDropdownId] = useState<string | null>(null);
 	const constraints = useMemo(() => getCommitmentTimeBucketConstraints(bucketSize), [bucketSize]);
 	const { minutesEnabled } = constraints;
 	const hourValues = useMemo(() => buildCommitmentTimeValues(23, constraints.hourStep), [constraints.hourStep]);
@@ -267,6 +305,21 @@ const CommitmentTimeBucketsEditor: FC<Props> = ({
 									? t('billing:commitmentConfig.errors.hourStep', { step: constraints.hourStep })
 									: null;
 
+						const overageNum = parseFloat(row.overage_factor ?? '');
+						const hasTier = row.bucket_tiers?.some((tier) => tier.unit_amount.trim());
+						const commitmentValueError =
+							showErrors && !row.commitment_value?.trim() ? t('billing:commitmentConfig.timeBuckets.errors.fieldRequired') : undefined;
+						const overageFactorError =
+							showErrors && (!Number.isFinite(overageNum) || overageNum < 1)
+								? t('billing:commitmentConfig.timeBuckets.errors.overageRequired')
+								: undefined;
+						const bucketAmountError =
+							showErrors && !isTiered && !row.bucket_amount?.trim()
+								? t('billing:commitmentConfig.timeBuckets.errors.priceRequired')
+								: undefined;
+						const tiersError =
+							showErrors && isTiered && !hasTier ? t('billing:commitmentConfig.timeBuckets.errors.tiersRequired') : undefined;
+
 						return (
 							<div key={index} className='rounded-lg border border-gray-200 bg-gray-50/40 p-4'>
 								<div className='mb-4 flex items-center justify-between gap-3'>
@@ -275,7 +328,13 @@ const CommitmentTimeBucketsEditor: FC<Props> = ({
 									</span>
 									<button
 										type='button'
-										onClick={() => onChange(buckets.filter((_, i) => i !== index))}
+										onClick={() => {
+											// openTimeDropdownId is keyed by array index, not a stable row id — removing a
+											// row shifts every later index down, so a stale id would otherwise keep (or
+											// wrongly reopen) a dropdown on whichever row ends up at that index next.
+											setOpenTimeDropdownId(null);
+											onChange(buckets.filter((_, i) => i !== index));
+										}}
 										disabled={disabled}
 										className='rounded-md p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50'
 										aria-label={t('billing:commitmentConfig.timeBuckets.removeBucket')}>
@@ -285,6 +344,9 @@ const CommitmentTimeBucketsEditor: FC<Props> = ({
 
 								<div className='flex flex-nowrap items-end gap-3'>
 									<TimePointInput
+										idPrefix={`${index}-start`}
+										openId={openTimeDropdownId}
+										onOpenIdChange={setOpenTimeDropdownId}
 										label={t('billing:commitmentConfig.timeBuckets.startLabel')}
 										value={row.start}
 										onChange={(start) => updateRow(index, { start })}
@@ -297,6 +359,9 @@ const CommitmentTimeBucketsEditor: FC<Props> = ({
 										hasError={startTimeError}
 									/>
 									<TimePointInput
+										idPrefix={`${index}-end`}
+										openId={openTimeDropdownId}
+										onOpenIdChange={setOpenTimeDropdownId}
 										label={t('billing:commitmentConfig.timeBuckets.endLabel')}
 										value={row.end}
 										onChange={(end) => updateRow(index, { end })}
@@ -338,6 +403,7 @@ const CommitmentTimeBucketsEditor: FC<Props> = ({
 											suffix={rowCommitmentType === CommitmentType.AMOUNT ? currencySymbol : undefined}
 											disabled={disabled}
 											className='w-full'
+											error={commitmentValueError}
 										/>
 										<p className='text-xs text-gray-500'>
 											{rowCommitmentType === CommitmentType.QUANTITY
@@ -369,6 +435,7 @@ const CommitmentTimeBucketsEditor: FC<Props> = ({
 										placeholder={overagePlaceholder}
 										disabled={disabled}
 										className='w-full'
+										error={overageFactorError}
 									/>
 									<p className='text-xs text-gray-500'>{t('billing:commitmentConfig.overageFactorHint')}</p>
 								</div>
@@ -389,23 +456,40 @@ const CommitmentTimeBucketsEditor: FC<Props> = ({
 									<div className='space-y-1'>
 										<label className='text-xs font-medium text-gray-600'>{t('billing:commitmentConfig.timeBuckets.bucketAmount')}</label>
 										{isTiered ? (
-											<div className='flex h-10 w-full items-center rounded-[6px] border border-input bg-muted/30 px-3 text-sm text-muted-foreground'>
+											<div
+												className={cn(
+													'flex h-10 w-full items-center rounded-[6px] border bg-muted/30 px-3 text-sm text-muted-foreground',
+													tiersError ? 'border-red-500' : 'border-input',
+												)}>
 												{tieredSectionLabel}
 											</div>
 										) : (
 											<Input
 												type='formatted-number'
 												value={row.bucket_amount ?? ''}
-												onChange={(value) => updateRow(index, { bucket_amount: value })}
+												onChange={(value) =>
+													updateRow(index, {
+														bucket_amount: value,
+														// Default overage to 1 the first time a price override is entered, so
+														// users aren't blocked by "incomplete" validation on a field that
+														// would otherwise silently default to 1 at save time anyway.
+														...(value.trim() && !row.overage_factor?.trim() ? { overage_factor: '1' } : {}),
+													})
+												}
 												placeholder={t('billing:commitmentConfig.timeBuckets.bucketAmountPlaceholder')}
 												suffix={currencySymbol}
 												disabled={disabled}
 												className='w-full'
+												error={bucketAmountError}
 											/>
 										)}
-										<p className='text-xs text-gray-500'>
-											{isTiered ? tieredPriceHint : t('billing:commitmentConfig.timeBuckets.bucketAmountHint')}
-										</p>
+										{isTiered && tiersError ? (
+											<p className='text-xs text-red-500'>{tiersError}</p>
+										) : (
+											<p className='text-xs text-gray-500'>
+												{isTiered ? tieredPriceHint : t('billing:commitmentConfig.timeBuckets.bucketAmountHint')}
+											</p>
+										)}
 									</div>
 									{isPackage && (
 										<div className='space-y-1'>
