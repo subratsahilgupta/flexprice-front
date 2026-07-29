@@ -437,7 +437,10 @@
 		},
 		"pricing": {
 			"noWidget": "لا يوجد عنصر واجهة للتسعير",
-			"widgetsPageTitle": "عناصر التسعير"
+			"widgetsPageTitle": "عناصر التسعير",
+			"selectBillingPeriod": "اختر فترة الفوترة",
+			"selectCurrency": "اختر العملة",
+			"fetchError": "خطأ في جلب الخطط"
 		},
 		"organisms": {
 			"chargeLabels": {
