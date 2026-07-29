@@ -1,5 +1,6 @@
 import { Dialog as ShadcnDialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
+import { hasRegisteredOpenModals, registerModalOpen } from '@/lib/modal-scroll-lock';
 import React, { FC, ReactNode, useEffect } from 'react';
 
 interface Props {
@@ -34,6 +35,13 @@ const Dialog: FC<Props> = ({
 	showCloseButton = true,
 	interactiveContent = false,
 }) => {
+	// Register while open so the safety net below (and every other Dialog/Sheet instance) knows
+	// not to clear the shared body lock while this one is still legitimately open.
+	useEffect(() => {
+		if (!isOpen) return;
+		return registerModalOpen();
+	}, [isOpen]);
+
 	// Radix's scroll lock (react-remove-scroll) is expected to release document.body's
 	// overflow/pointer-events once this dialog's close transition finishes. When this Dialog
 	// closes while nested inside another modal (e.g. opened from a page that also has a Select or
@@ -43,6 +51,7 @@ const Dialog: FC<Props> = ({
 	useEffect(() => {
 		if (isOpen) return;
 		const timer = window.setTimeout(() => {
+			if (hasRegisteredOpenModals()) return;
 			const anyOverlayOpen = document.querySelector('[role="dialog"][data-state="open"], [data-radix-popper-content-wrapper]');
 			if (anyOverlayOpen) return;
 			if (document.body.style.pointerEvents === 'none') document.body.style.pointerEvents = '';

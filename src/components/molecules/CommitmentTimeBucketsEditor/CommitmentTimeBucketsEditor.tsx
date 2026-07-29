@@ -328,7 +328,13 @@ const CommitmentTimeBucketsEditor: FC<Props> = ({
 									</span>
 									<button
 										type='button'
-										onClick={() => onChange(buckets.filter((_, i) => i !== index))}
+										onClick={() => {
+											// openTimeDropdownId is keyed by array index, not a stable row id — removing a
+											// row shifts every later index down, so a stale id would otherwise keep (or
+											// wrongly reopen) a dropdown on whichever row ends up at that index next.
+											setOpenTimeDropdownId(null);
+											onChange(buckets.filter((_, i) => i !== index));
+										}}
 										disabled={disabled}
 										className='rounded-md p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50'
 										aria-label={t('billing:commitmentConfig.timeBuckets.removeBucket')}>

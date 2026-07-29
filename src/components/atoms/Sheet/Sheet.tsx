@@ -1,6 +1,7 @@
 import { FC, ReactNode, useRef, useEffect, useState, cloneElement, isValidElement } from 'react';
 import { Sheet as ShadcnSheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
+import { hasRegisteredOpenModals, registerModalOpen } from '@/lib/modal-scroll-lock';
 import { useLocaleStore } from '@/store/useLocaleStore';
 import { Direction } from '@/config/branding';
 
@@ -46,6 +47,13 @@ const Sheet: FC<Props> = ({ children, trigger, description, title, isOpen, onOpe
 		}
 	}, [isOpen, children]);
 
+	// Register while open so the safety net below (and every other Dialog/Sheet instance) knows
+	// not to clear the shared body lock while this one is still legitimately open.
+	useEffect(() => {
+		if (!isOpen) return;
+		return registerModalOpen();
+	}, [isOpen]);
+
 	// Radix's scroll lock (react-remove-scroll) is expected to release document.body's
 	// overflow/pointer-events once this sheet's close transition finishes. When this Sheet closes
 	// while nested inside/alongside another modal (a Dialog, Select, or Popover opened from within
@@ -55,6 +63,7 @@ const Sheet: FC<Props> = ({ children, trigger, description, title, isOpen, onOpe
 	useEffect(() => {
 		if (isOpen) return;
 		const timer = window.setTimeout(() => {
+			if (hasRegisteredOpenModals()) return;
 			const anyOverlayOpen = document.querySelector('[role="dialog"][data-state="open"], [data-radix-popper-content-wrapper]');
 			if (anyOverlayOpen) return;
 			if (document.body.style.pointerEvents === 'none') document.body.style.pointerEvents = '';
