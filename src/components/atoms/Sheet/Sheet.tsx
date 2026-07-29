@@ -46,6 +46,23 @@ const Sheet: FC<Props> = ({ children, trigger, description, title, isOpen, onOpe
 		}
 	}, [isOpen, children]);
 
+	// Radix's scroll lock (react-remove-scroll) is expected to release document.body's
+	// overflow/pointer-events once this sheet's close transition finishes. When this Sheet closes
+	// while nested inside/alongside another modal (a Dialog, Select, or Popover opened from within
+	// it), that release can race and get skipped — the lock stays stuck even though nothing is
+	// visibly open, leaving the rest of the page unscrollable. As a safety net, once we transition
+	// to closed, verify nothing else is still holding a lock and clear it.
+	useEffect(() => {
+		if (isOpen) return;
+		const timer = window.setTimeout(() => {
+			const anyOverlayOpen = document.querySelector('[role="dialog"][data-state="open"], [data-radix-popper-content-wrapper]');
+			if (anyOverlayOpen) return;
+			if (document.body.style.pointerEvents === 'none') document.body.style.pointerEvents = '';
+			if (document.body.style.overflow === 'hidden') document.body.style.overflow = '';
+		}, 350);
+		return () => window.clearTimeout(timer);
+	}, [isOpen]);
+
 	// Process children to replace mt-4 with mt-9 if scrollable, or wrap in div with mt-9
 	const processChildren = (node: ReactNode): ReactNode => {
 		if (!isScrollable) {

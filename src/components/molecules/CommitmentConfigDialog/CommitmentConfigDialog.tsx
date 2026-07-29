@@ -313,6 +313,7 @@ const CommitmentConfigDialog: FC<CommitmentConfigDialogProps> = ({
 						currencySymbol={currencySymbol}
 						currency={price.currency}
 						bucketDefaults={bucketDefaults}
+						showErrors={commitmentErrorTarget === 'banner'}
 					/>
 				)}
 

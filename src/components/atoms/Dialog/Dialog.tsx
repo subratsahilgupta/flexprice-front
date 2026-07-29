@@ -1,6 +1,6 @@
 import { Dialog as ShadcnDialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
-import React, { FC, ReactNode } from 'react';
+import React, { FC, ReactNode, useEffect } from 'react';
 
 interface Props {
 	isOpen: boolean;
@@ -34,6 +34,23 @@ const Dialog: FC<Props> = ({
 	showCloseButton = true,
 	interactiveContent = false,
 }) => {
+	// Radix's scroll lock (react-remove-scroll) is expected to release document.body's
+	// overflow/pointer-events once this dialog's close transition finishes. When this Dialog
+	// closes while nested inside another modal (e.g. opened from a page that also has a Select or
+	// another Dialog open), that release can race and get skipped — the lock stays stuck even
+	// though nothing is visibly open, leaving the rest of the page unscrollable. As a safety net,
+	// once we transition to closed, verify nothing else is still holding a lock and clear it.
+	useEffect(() => {
+		if (isOpen) return;
+		const timer = window.setTimeout(() => {
+			const anyOverlayOpen = document.querySelector('[role="dialog"][data-state="open"], [data-radix-popper-content-wrapper]');
+			if (anyOverlayOpen) return;
+			if (document.body.style.pointerEvents === 'none') document.body.style.pointerEvents = '';
+			if (document.body.style.overflow === 'hidden') document.body.style.overflow = '';
+		}, 350);
+		return () => window.clearTimeout(timer);
+	}, [isOpen]);
+
 	return (
 		<ShadcnDialog open={isOpen} onOpenChange={onOpenChange}>
 			<DialogContent
