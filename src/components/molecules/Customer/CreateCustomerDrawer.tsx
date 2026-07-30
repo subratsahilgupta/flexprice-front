@@ -73,11 +73,15 @@ const CreateCustomerDrawer: FC<Props> = ({ data, onOpenChange, open, trigger }) 
 	}, [data]);
 
 	const currentOpen = isControlled ? open : uiState.internalOpen;
-	const toggleOpen = (open?: boolean) => {
+	// Radix passes the intended next-open value here (e.g. from onOpenChange/dismiss handlers).
+	// It must be used as-is rather than blindly toggled — a blind toggle drops out of sync with
+	// Radix's own state the moment it's called for any reason other than a simple trigger click.
+	const toggleOpen = (nextOpen?: boolean) => {
+		const value = nextOpen ?? !currentOpen;
 		if (isControlled) {
-			onOpenChange?.(open ?? false);
+			onOpenChange?.(value);
 		} else {
-			updateUIState({ internalOpen: !uiState.internalOpen });
+			updateUIState({ internalOpen: value });
 		}
 	};
 
