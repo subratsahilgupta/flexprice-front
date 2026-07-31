@@ -5,7 +5,7 @@ import InvoiceApi from '@/api/InvoiceApi';
 import CustomerApi from '@/api/CustomerApi';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams, useOutletContext } from 'react-router';
-import { Invoice as InvoiceModel } from '@/models/Invoice';
+import { InvoiceListItem } from '@/types/dto';
 import { RouteNames } from '@/core/routes/Routes';
 import { useMemo } from 'react';
 import Customer from '@/models/Customer';
@@ -62,7 +62,7 @@ const CustomerInvoiceTab = () => {
 
 	const { isArchived } = useOutletContext<{ isArchived: boolean }>();
 
-	const handleShowDetails = (invoice: InvoiceModel) => {
+	const handleShowDetails = (invoice: InvoiceListItem) => {
 		navigate(`${invoice.id}`);
 	};
 

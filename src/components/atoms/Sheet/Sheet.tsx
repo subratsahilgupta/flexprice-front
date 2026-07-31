@@ -1,7 +1,7 @@
 import { FC, ReactNode, useRef, useEffect, useState, useCallback, cloneElement, isValidElement } from 'react';
 import { Sheet as ShadcnSheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
-import { hasRegisteredOpenModals, registerModalOpen } from '@/lib/modal-scroll-lock';
+import { hasRegisteredOpenModals, hasOpenOverlayInDom, registerModalOpen } from '@/lib/modal-scroll-lock';
 import { useLocaleStore } from '@/store/useLocaleStore';
 import { Direction } from '@/config/branding';
 
@@ -90,8 +90,7 @@ const Sheet: FC<Props> = ({ children, trigger, description, title, isOpen, onOpe
 		if (isOpen) return;
 		const timer = window.setTimeout(() => {
 			if (hasRegisteredOpenModals()) return;
-			const anyOverlayOpen = document.querySelector('[role="dialog"][data-state="open"], [data-radix-popper-content-wrapper]');
-			if (anyOverlayOpen) return;
+			if (hasOpenOverlayInDom()) return;
 			if (document.body.style.pointerEvents === 'none') document.body.style.pointerEvents = '';
 			if (document.body.style.overflow === 'hidden') document.body.style.overflow = '';
 		}, 350);

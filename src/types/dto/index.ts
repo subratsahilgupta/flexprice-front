@@ -138,6 +138,8 @@ export type {
 
 export type {
 	GetInvoicesResponse,
+	GetInvoicesListResponse,
+	InvoiceListItem,
 	InvoiceFilter,
 	UpdatePaymentStatusPayload,
 	UpdateInvoiceStatusPayload,
