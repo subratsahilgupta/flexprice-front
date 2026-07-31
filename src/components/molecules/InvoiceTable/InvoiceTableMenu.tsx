@@ -11,6 +11,7 @@ import InvoiceStatusModal from './InvoiceStatusModal';
 import InvoicePaymentStatusModal from './InvoicePaymentStatusModal';
 import { useNavigate } from 'react-router';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
+import { refetchInvoiceQueries } from '@/core/services/tanstack/queryKeys';
 import { PAYMENT_DESTINATION_TYPE } from '@/models/Payment';
 import { PAYMENT_STATUS } from '@/constants';
 import { RouteNames } from '@/core/routes/Routes';
@@ -29,9 +30,7 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 		},
 		onSuccess: () => {
 			toast.success('Communication triggered');
-			refetchQueries(['fetchInvoice', data.id]);
-			refetchQueries(['fetchInvoices']);
-			refetchQueries(['invoice', data.customer_id]);
+			void refetchInvoiceQueries();
 		},
 		onError: (error: Error) => {
 			toast.error(error.message || 'Unable to trigger communication');
@@ -50,15 +49,30 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 		},
 	});
 
+	const { mutateAsync: downloadInvoiceCsvAsync, isPending: isCsvDownloadPending } = useMutation({
+		mutationFn: async (invoice: Invoice) => {
+			const fullInvoice = invoice.line_items?.length ? invoice : await InvoiceApi.getInvoiceById(invoice.id);
+			return InvoiceApi.downloadInvoiceCsv(fullInvoice);
+		},
+		onSuccess: (rows) => {
+			if (rows === 0) {
+				toast.error('No billable line items to export');
+			} else {
+				toast.success('Invoice CSV downloaded');
+			}
+		},
+		onError: (error: Error) => {
+			toast.error(error.message || 'Unable to download invoice CSV');
+		},
+	});
+
 	const { mutate: recalculateInvoice, isPending: isRecalculating } = useMutation({
 		mutationFn: async (invoice_id: string) => {
 			return await InvoiceApi.recalculateInvoice(invoice_id);
 		},
 		onSuccess: () => {
 			toast.success('Invoice recalculation has been triggered. The replacement invoice will be available once the process completes.');
-			refetchQueries(['fetchInvoice', data.id]);
-			refetchQueries(['fetchInvoices']);
-			refetchQueries(['invoice', data.customer_id]);
+			void refetchInvoiceQueries();
 		},
 		onError: (error: Error) => {
 			toast.error(error.message || 'Unable to recalculate invoice');
@@ -167,10 +181,8 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 		},
 	];
 	const handlePaymentSuccess = () => {
-		refetchQueries(['fetchInvoice', data.id]);
-		refetchQueries(['payments', data.id]);
-		refetchQueries(['fetchInvoices']);
-		refetchQueries(['invoice', data.customer_id]);
+		void refetchInvoiceQueries();
+		void refetchQueries(['payments', data.id]);
 	};
 	return (
 		<div>
@@ -179,14 +191,8 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 				onOpenChange={setIsDownloadFormatOpen}
 				isPdfPending={isPdfDownloadPending}
 				onSelectPdf={() => downloadInvoicePdfAsync(data.id)}
-				onSelectCsv={() => {
-					const rows = InvoiceApi.downloadInvoiceCsv(data);
-					if (rows === 0) {
-						toast.error('No billable line items to export');
-					} else {
-						toast.success('Invoice CSV downloaded');
-					}
-				}}
+				onSelectCsv={() => void downloadInvoiceCsvAsync(data)}
+				isCsvPending={isCsvDownloadPending}
 			/>
 			<InvoiceStatusModal
 				invoice={state.activeInvoice}
