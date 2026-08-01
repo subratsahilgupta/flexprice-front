@@ -1,6 +1,6 @@
 import { Button, CheckboxRadioGroupItem, FormHeader, Modal, Select, Spacer, Input, Textarea } from '@/components/atoms';
 import { refetchInvoiceQueries } from '@/core/services/tanstack/queryKeys';
-import { Invoice } from '@/models/Invoice';
+import { InvoiceListItem } from '@/types/dto';
 import InvoiceApi from '@/api/InvoiceApi';
 import { useMutation } from '@tanstack/react-query';
 import { FC, useEffect, useState } from 'react';
@@ -22,7 +22,7 @@ const ALLOWED_PAYMENT_STATUSES_FOR_VOID = [
 interface InvoiceStatusProps {
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;
-	invoice?: Invoice;
+	invoice?: InvoiceListItem;
 }
 
 /**

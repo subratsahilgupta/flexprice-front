@@ -14,11 +14,26 @@ let openCount = 0;
 
 export function registerModalOpen(): () => void {
 	openCount += 1;
+	let released = false;
 	return () => {
+		if (released) return;
+		released = true;
 		openCount = Math.max(0, openCount - 1);
 	};
 }
 
 export function hasRegisteredOpenModals(): boolean {
 	return openCount > 0;
+}
+
+/**
+ * DOM-level fallback used alongside the counter above: catches overlays that don't (or can't)
+ * call registerModalOpen — e.g. a Radix AlertDialog (role="alertdialog", not "dialog") or a
+ * Popover/Select dropdown portaled outside any Dialog/Sheet. Extend this selector, not the call
+ * sites, when a new overlay type needs to participate in the safety net.
+ */
+const OPEN_OVERLAY_SELECTOR = '[role="dialog"][data-state="open"], [role="alertdialog"][data-state="open"], [data-radix-popper-content-wrapper]';
+
+export function hasOpenOverlayInDom(): boolean {
+	return !!document.querySelector(OPEN_OVERLAY_SELECTOR);
 }

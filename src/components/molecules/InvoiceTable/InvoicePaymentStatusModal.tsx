@@ -1,6 +1,7 @@
 import { Button, CheckboxRadioGroupItem, FormHeader, Modal, Select, Spacer } from '@/components/atoms';
 import { refetchInvoiceQueries } from '@/core/services/tanstack/queryKeys';
-import { Invoice, INVOICE_STATUS } from '@/models/Invoice';
+import { INVOICE_STATUS } from '@/models/Invoice';
+import { InvoiceListItem } from '@/types/dto';
 import InvoiceApi from '@/api/InvoiceApi';
 import { useMutation } from '@tanstack/react-query';
 import { FC, useEffect, useMemo, useState } from 'react';
@@ -10,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 interface Props {
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;
-	invoice?: Invoice;
+	invoice?: InvoiceListItem;
 }
 
 /**

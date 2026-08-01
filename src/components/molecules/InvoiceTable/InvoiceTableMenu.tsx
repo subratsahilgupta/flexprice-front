@@ -1,4 +1,5 @@
 import { Invoice, INVOICE_STATUS, INVOICE_TYPE } from '@/models/Invoice';
+import { InvoiceListItem } from '@/types/dto';
 import { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DropdownMenu, RecordPaymentTopup } from '..';
@@ -17,7 +18,7 @@ import { PAYMENT_STATUS } from '@/constants';
 import { RouteNames } from '@/core/routes/Routes';
 
 interface Props {
-	data: Invoice;
+	data: InvoiceListItem;
 }
 
 const InvoiceTableMenu: FC<Props> = ({ data }) => {
@@ -50,8 +51,8 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 	});
 
 	const { mutateAsync: downloadInvoiceCsvAsync, isPending: isCsvDownloadPending } = useMutation({
-		mutationFn: async (invoice: Invoice) => {
-			const fullInvoice = invoice.line_items?.length ? invoice : await InvoiceApi.getInvoiceById(invoice.id);
+		mutationFn: async (invoice: InvoiceListItem) => {
+			const fullInvoice: Invoice = invoice.line_items?.length ? (invoice as Invoice) : await InvoiceApi.getInvoiceById(invoice.id);
 			return InvoiceApi.downloadInvoiceCsv(fullInvoice);
 		},
 		onSuccess: (rows) => {
@@ -85,7 +86,7 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 		isPaymentModalOpen: boolean;
 		isStatusModalOpen: boolean;
 		isRecordPaymentDrawerOpen: boolean;
-		activeInvoice?: Invoice;
+		activeInvoice?: InvoiceListItem;
 	}>({
 		isPaymentModalOpen: false,
 		isStatusModalOpen: false,
@@ -191,7 +192,9 @@ const InvoiceTableMenu: FC<Props> = ({ data }) => {
 				onOpenChange={setIsDownloadFormatOpen}
 				isPdfPending={isPdfDownloadPending}
 				onSelectPdf={() => downloadInvoicePdfAsync(data.id)}
-				onSelectCsv={() => void downloadInvoiceCsvAsync(data)}
+				onSelectCsv={() => {
+					void downloadInvoiceCsvAsync(data).catch(() => undefined);
+				}}
 				isCsvPending={isCsvDownloadPending}
 			/>
 			<InvoiceStatusModal

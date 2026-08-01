@@ -307,7 +307,10 @@ const CommitmentConfigDialog: FC<CommitmentConfigDialogProps> = ({
 				{showTimeBucketEditor && (
 					<CommitmentTimeBucketsEditor
 						buckets={timeBuckets}
-						onChange={setTimeBuckets}
+						onChange={(nextBuckets) => {
+							setTimeBuckets(nextBuckets);
+							if (commitmentErrorTarget === 'banner') clearValidation();
+						}}
 						bucketSize={price.meter?.aggregation?.bucket_size}
 						defaultCommitmentType={commitmentType}
 						currencySymbol={currencySymbol}
