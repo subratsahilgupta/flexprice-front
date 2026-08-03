@@ -1,6 +1,6 @@
 import { Dialog as ShadcnDialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
-import { hasRegisteredOpenModals, registerModalOpen } from '@/lib/modal-scroll-lock';
+import { hasRegisteredOpenModals, hasOpenOverlayInDom, registerModalOpen } from '@/lib/modal-scroll-lock';
 import React, { FC, ReactNode, useEffect } from 'react';
 
 interface Props {
@@ -52,8 +52,7 @@ const Dialog: FC<Props> = ({
 		if (isOpen) return;
 		const timer = window.setTimeout(() => {
 			if (hasRegisteredOpenModals()) return;
-			const anyOverlayOpen = document.querySelector('[role="dialog"][data-state="open"], [data-radix-popper-content-wrapper]');
-			if (anyOverlayOpen) return;
+			if (hasOpenOverlayInDom()) return;
 			if (document.body.style.pointerEvents === 'none') document.body.style.pointerEvents = '';
 			if (document.body.style.overflow === 'hidden') document.body.style.overflow = '';
 		}, 350);

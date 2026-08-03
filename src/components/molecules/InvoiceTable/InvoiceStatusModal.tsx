@@ -1,6 +1,6 @@
 import { Button, CheckboxRadioGroupItem, FormHeader, Modal, Select, Spacer, Input, Textarea } from '@/components/atoms';
-import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
-import { Invoice } from '@/models/Invoice';
+import { refetchInvoiceQueries } from '@/core/services/tanstack/queryKeys';
+import { InvoiceListItem } from '@/types/dto';
 import InvoiceApi from '@/api/InvoiceApi';
 import { useMutation } from '@tanstack/react-query';
 import { FC, useEffect, useState } from 'react';
@@ -22,7 +22,7 @@ const ALLOWED_PAYMENT_STATUSES_FOR_VOID = [
 interface InvoiceStatusProps {
 	isOpen: boolean;
 	onOpenChange: (open: boolean) => void;
-	invoice?: Invoice;
+	invoice?: InvoiceListItem;
 }
 
 /**
@@ -90,9 +90,7 @@ const InvoiceStatusModal: FC<InvoiceStatusProps> = ({ isOpen, onOpenChange, invo
 		},
 		async onSuccess() {
 			toast.success('Invoice status updated successfully');
-			await refetchQueries(['fetchInvoices']);
-			await refetchQueries(['fetchInvoice']);
-			await refetchQueries(['invoice']);
+			await refetchInvoiceQueries();
 		},
 		onError: (error: Error) => {
 			toast.error(error.message || 'Failed to update invoice status');
