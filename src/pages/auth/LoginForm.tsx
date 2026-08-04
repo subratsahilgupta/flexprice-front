@@ -103,6 +103,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ switchTab }) => {
 					id='email'
 					name='email'
 					type='email'
+					autoComplete='username'
 					label={t('fields.email')}
 					placeholder={t('fields.emailPlaceholder')}
 					required
@@ -112,7 +113,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ switchTab }) => {
 
 				<div>
 					<div className='flex justify-between items-center mb-1'>
-						<label htmlFor='password' className='block text-sm font-medium text-gray-700'>
+						<label htmlFor='password' className='block text-sm font-medium text-content-secondary'>
 							{t('fields.password')}
 						</label>
 						<button type='button' onClick={() => switchTab(AuthTab.FORGOT_PASSWORD)} className='text-sm text-grey-600 hover:underline'>
@@ -122,6 +123,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ switchTab }) => {
 					<Input
 						id='password'
 						name='password'
+						autoComplete='current-password'
 						type={showPassword ? 'text' : 'password'}
 						suffix={
 							<span onClick={() => setShowPassword(!showPassword)} className='cursor-pointer'>
@@ -143,16 +145,16 @@ const LoginForm: React.FC<LoginFormProps> = ({ switchTab }) => {
 			{config.app.env !== APP_ENV.SelfHosted && (
 				<>
 					<div className='flex items-center justify-center my-6'>
-						<div className='flex-1 h-px bg-gray-200'></div>
-						<span className='mx-4 text-sm text-gray-500'>{t('divider')}</span>
-						<div className='flex-1 h-px bg-gray-200'></div>
+						<div className='flex-1 h-px bg-surface-strong'></div>
+						<span className='mx-4 text-sm text-content-muted'>{t('divider')}</span>
+						<div className='flex-1 h-px bg-surface-strong'></div>
 					</div>
 					<GoogleSignin />
 				</>
 			)}
 
 			{config.platform.signup.enabled && (
-				<p className='mt-6 text-center text-sm text-gray-600'>
+				<p className='mt-6 text-center text-sm text-content-tertiary'>
 					{t('noAccount')}{' '}
 					<button onClick={() => switchTab(AuthTab.SIGNUP)} className='text-grey-600 underline font-medium'>
 						{t('links.signUp')}

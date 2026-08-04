@@ -56,7 +56,7 @@ const CustomerUsageTable: FC<Props> = ({ data, allowRedirect = true }) => {
 								: usageRow.total_limit
 									? formatAmount(usageRow.total_limit?.toString())
 									: t('usageTable.unlimitedLabel')}
-							<span className='text-[#64748B] text-sm font-normal font-sans'>{t('usageTable.units')}</span>
+							<span className='text-content-slate-muted text-sm font-normal font-sans'>{t('usageTable.units')}</span>
 						</span>
 					);
 				case FEATURE_TYPE.BOOLEAN:
@@ -119,7 +119,7 @@ const CustomerUsageTable: FC<Props> = ({ data, allowRedirect = true }) => {
 					const displayContent = (
 						<span>
 							{entityName}
-							{additionalCount > 0 && <span className='text-[#64748B] text-sm ms-1'>+{additionalCount}</span>}
+							{additionalCount > 0 && <span className='text-content-slate-muted text-sm ms-1'>+{additionalCount}</span>}
 						</span>
 					);
 
@@ -174,16 +174,17 @@ const CustomerUsageTable: FC<Props> = ({ data, allowRedirect = true }) => {
 								})}
 								value={0}
 								className='h-[6px]'
-								indicatorColor='bg-blue-600'
-								backgroundColor='bg-blue-200'
+								indicatorColor='bg-info'
+								backgroundColor='bg-info-line'
 							/>
 						);
 					}
 
 					const value = Math.ceil((usage / limit) * 100);
-					const indicatorColor = value >= 100 ? 'bg-gradient-to-r from-red-600 to-red-400' : 'bg-gradient-to-r from-[#6167d9] to-[#2563eb]';
+					const indicatorColor =
+						value >= 100 ? 'bg-gradient-to-r from-danger to-danger-soft' : 'bg-gradient-to-r from-accent-indigo-soft to-info';
 
-					const backgroundColor = value >= 100 ? 'bg-red-50' : 'bg-blue-200';
+					const backgroundColor = value >= 100 ? 'bg-danger-muted' : 'bg-info-line';
 
 					return (
 						<Progress
