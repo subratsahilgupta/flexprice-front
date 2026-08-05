@@ -802,6 +802,47 @@ div[data-hot-toast-container] {
 	color: transparent;
 	animation: analyzing-prompt-shimmer 2.2s ease-in-out infinite;
 }
+/*
+ * View Transitions for the header theme toggle.
+ *
+ * The wipe is declared here rather than driven from JS with element.animate(). Doing it in script
+ * means the default animation has to be switched off first, so if the WAAPI call fails to attach for
+ * any reason there is no animation left at all and the theme just snaps. As a keyframe the browser
+ * owns it, and JS only has to hand over an origin.
+ *
+ * --theme-wipe-x/y are set to the centre of the toggle before the transition starts; the fallbacks
+ * make an un-anchored transition wipe from the middle rather than break.
+ */
+::view-transition-old(root) {
+	animation: none;
+	z-index: 1;
+}
+
+::view-transition-new(root) {
+	/* The new theme sits on top and is revealed; the old one underneath never moves. */
+	z-index: 2147483646;
+	mix-blend-mode: normal;
+	animation: theme-wipe 480ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes theme-wipe {
+	from {
+		clip-path: circle(0% at var(--theme-wipe-x, 50%) var(--theme-wipe-y, 50%));
+	}
+	to {
+		/* 150% of the viewport diagonal always clears the furthest corner from any origin. */
+		clip-path: circle(150% at var(--theme-wipe-x, 50%) var(--theme-wipe-y, 50%));
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	::view-transition-group(*),
+	::view-transition-old(*),
+	::view-transition-new(*) {
+		animation: none !important;
+	}
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.analyzing-prompt-shimmer {
 		animation: none;
