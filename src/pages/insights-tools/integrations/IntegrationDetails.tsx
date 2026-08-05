@@ -108,22 +108,31 @@ const IntegrationDetails = () => {
 		<Page>
 			<ApiDocsContent tags={API_DOCS_TAGS.Integrations} />
 			<div className={cn('border rounded-[6px] p-4 flex items-center shadow-sm', !integration.premium && 'cursor-pointer')}>
-				<div className='size-20 flex items-center justify-center bg-gray-100 rounded-[6px]'>
-					<img src={integration.logo} alt={integration.name} className='size-10 object-contain' />
+				<div className='size-20 flex items-center justify-center bg-surface-shell rounded-[6px]'>
+					{/* Brands whose mark is a deep navy ship a dark variant; the rest read fine on either
+					    surface and reuse the one logo. `hidden` means only the shown image is fetched. */}
+					<img
+						src={integration.logo}
+						alt={integration.name}
+						className={cn('size-10 object-contain', integration.logoDark && 'dark:hidden')}
+					/>
+					{integration.logoDark && (
+						<img src={integration.logoDark} alt={integration.name} className='size-10 hidden object-contain dark:block' />
+					)}
 				</div>
 				<div className='ml-4 flex-1'>
 					<div className='flex items-center justify-between w-full'>
 						<h3 className='font-semibold text-lg'>{integration.name}</h3>
 						{integration.premium && (
-							<div className='absolute top-2 right-2 bg-[#FEF08A] text-[#D97706] text-xs !font-semibold px-2 py-1 rounded-[6px] !opacity-55'>
+							<div className='absolute top-2 right-2 bg-accent-yellow-muted text-warning text-xs !font-semibold px-2 py-1 rounded-[6px] !opacity-55'>
 								{t('insightsTools.integrations.comingSoon')}
 							</div>
 						)}
 					</div>
-					<p className='text-gray-500 text-sm'>{integration.description}</p>
+					<p className='text-content-muted text-sm'>{integration.description}</p>
 					<div className='mt-2 flex items-center gap-2'>
 						{integration.tags.map((tag, idx) => (
-							<span key={idx} className='text-xs bg-gray-200 px-2 py-1 rounded-[6px]'>
+							<span key={idx} className='text-xs bg-surface-strong px-2 py-1 rounded-[6px]'>
 								{tag}
 							</span>
 						))}
@@ -276,8 +285,8 @@ const IntegrationDetails = () => {
 							return (
 								<div key={idx} className='flex items-center justify-between text-sm p-3 border-b last:border-b-0'>
 									<div>
-										<p className='text-gray-900 font-medium'>{item.name}</p>
-										<p className='text-xs text-gray-500 capitalize'>
+										<p className='text-content font-medium'>{item.name}</p>
+										<p className='text-xs text-content-muted capitalize'>
 											{item.connection_status} • {item.provider_type}
 										</p>
 									</div>
@@ -307,7 +316,7 @@ const IntegrationDetails = () => {
 					<div key={idx} className='mt-4'>
 						<FormHeader variant='form-component-title' title={infoItem.title}></FormHeader>
 						{infoItem.description.map((desc, descIdx) => (
-							<p key={descIdx} className='text-gray-500 text-sm mt-1'>
+							<p key={descIdx} className='text-content-muted text-sm mt-1'>
 								{desc}
 							</p>
 						))}
@@ -319,7 +328,7 @@ const IntegrationDetails = () => {
 			<Dialog
 				title={t('insightsTools.integrations.deleteConnectionConfirmTitle', { name: connectionToDelete?.name ?? '' })}
 				description={t('insightsTools.integrations.deleteConnectionIrreversible')}
-				titleClassName='text-lg font-normal text-gray-800'
+				titleClassName='text-lg font-normal text-content-heading'
 				isOpen={isDeleteDialogOpen}
 				onOpenChange={setIsDeleteDialogOpen}
 				showCloseButton={false}>

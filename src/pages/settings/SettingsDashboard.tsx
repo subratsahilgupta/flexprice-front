@@ -6,14 +6,15 @@ import { BillingTab } from './billing';
 import { CustomerPortalTab } from './customer-portal';
 import { CustomerOnboardingTab } from './customer-onboarding';
 import { AlertsTab } from './alerts';
+import { AppearanceTab } from './appearance';
 
 const SettingsDashboard = () => {
 	const { t } = useTranslation(['settings', 'common']);
 
 	return (
-		<Page heading={t('page.settings')} documentTitle={t('page.settings')} headingClassName='font-semibold text-2xl text-zinc-900'>
+		<Page heading={t('page.settings')} documentTitle={t('page.settings')} headingClassName='font-semibold text-2xl text-content-zinc-bold'>
 			<FlatTabs
-				className='[&_.border-b]:border-gray-200'
+				className='[&_.border-b]:border-line'
 				tabs={[
 					{
 						value: 'team',
@@ -39,6 +40,11 @@ const SettingsDashboard = () => {
 						value: 'alerts',
 						label: t('alerts.tabs.alerts'),
 						content: <AlertsTab />,
+					},
+					{
+						value: 'appearance',
+						label: t('appearance.tabs.appearance'),
+						content: <AppearanceTab />,
 					},
 				]}
 				defaultValue='team'
