@@ -115,6 +115,10 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 						title: t('sidebar.nav.exports'),
 						url: RouteNames.exports,
 					},
+					{
+						title: t('sidebar.nav.usageSyncs'),
+						url: RouteNames.usageSyncs,
+					},
 				],
 			},
 			{

@@ -1072,6 +1072,36 @@
 			"taskRunsHeading": "تشغيل المهام",
 			"backToExportDetails": "العودة إلى تفاصيل التصدير"
 		},
+		"usageSyncs": {
+			"pageHeading": "مزامنات الاستخدام",
+			"paginationUnit": "سجلات الاستخدام",
+			"notSynced": "لم تتم المزامنة بعد",
+			"entityName": "سجل الاستخدام",
+			"errors": {
+				"fetchFailed": "فشل تحميل سجلات الاستخدام"
+			},
+			"columns": {
+				"subscription": "الاشتراك",
+				"customer": "العميل",
+				"plan": "الخطة",
+				"amount": "المبلغ",
+				"currency": "العملة",
+				"periodStart": "بداية الفترة",
+				"periodEnd": "نهاية الفترة",
+				"syncs": "المزامنات"
+			},
+			"providers": {
+				"awsMarketplace": "أمازون ماركت بليس",
+				"gcpMarketplace": "جوجل كلاود ماركت بليس",
+				"azureMarketplace": "أزور ماركت بليس"
+			},
+			"drawer": {
+				"title": "المزامنات",
+				"empty": "لم تتم المزامنة بعد.",
+				"synced": "تمت المزامنة",
+				"skipped": "تم التخطي"
+			}
+		},
 		"integrations": {
 			"writeDeniedTooltip": "ليس لديك صلاحية إدارة الاتصالات. اطلب الوصول من مسؤول المستأجر.",
 			"pageHeading": "التكاملات",

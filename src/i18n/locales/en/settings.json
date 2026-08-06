@@ -1066,6 +1066,36 @@
 			"taskRunsHeading": "Task Runs",
 			"backToExportDetails": "Back to Export Details"
 		},
+		"usageSyncs": {
+			"pageHeading": "Usage Syncs",
+			"paginationUnit": "usage records",
+			"notSynced": "Not synced yet",
+			"entityName": "Usage Record",
+			"errors": {
+				"fetchFailed": "Failed to load usage records"
+			},
+			"columns": {
+				"subscription": "Subscription",
+				"customer": "Customer",
+				"plan": "Plan",
+				"amount": "Amount",
+				"currency": "Currency",
+				"periodStart": "Period Start",
+				"periodEnd": "Period End",
+				"syncs": "Syncs"
+			},
+			"providers": {
+				"awsMarketplace": "AWS Marketplace",
+				"gcpMarketplace": "GCP Marketplace",
+				"azureMarketplace": "Azure Marketplace"
+			},
+			"drawer": {
+				"title": "Syncs",
+				"empty": "Not synced yet.",
+				"synced": "Synced",
+				"skipped": "Skipped"
+			}
+		},
 		"integrations": {
 			"writeDeniedTooltip": "You don't have permission to manage connections. Ask a tenant admin for access.",
 			"pageHeading": "Integrations",
