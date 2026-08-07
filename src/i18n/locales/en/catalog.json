@@ -527,7 +527,8 @@
 					"displayName": "Display name",
 					"amount": "Amount",
 					"billingPeriod": "Billing period"
-				}
+				},
+				"showExpired": "Show expired"
 			}
 		}
 	},

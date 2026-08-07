@@ -527,7 +527,8 @@
 					"displayName": "اسم العرض",
 					"amount": "المبلغ",
 					"billingPeriod": "فترة الفوترة"
-				}
+				},
+				"showExpired": "إظهار المنتهية الصلاحية"
 			}
 		}
 	},

@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useState, useMemo, useEffect } from 'react';
-import { Button, Card, CardHeader, Chip, Tooltip, Loader } from '@/components/atoms';
+import { Button, Card, CardHeader, Chip, Tooltip, Loader, Checkbox } from '@/components/atoms';
 import {
 	FlexpriceTable,
 	ColumnData,
@@ -251,6 +251,7 @@ const PlanPriceTable: FC<PlanChargesTableProps> = ({ plan, onPriceUpdate }) => {
 	const [isPriceDialogOpen, setIsPriceDialogOpen] = useState(false);
 	const [selectedPriceForDetailsEdit, setSelectedPriceForDetailsEdit] = useState<Price | null>(null);
 	const [isDetailsDrawerOpen, setIsDetailsDrawerOpen] = useState(false);
+	const [showExpiredPrices, setShowExpiredPrices] = useState(false);
 
 	// ===== MUTATIONS =====
 	const { mutateAsync: deletePrice, isPending: isDeletingPrice } = useMutation({
@@ -355,14 +356,14 @@ const PlanPriceTable: FC<PlanChargesTableProps> = ({ plan, onPriceUpdate }) => {
 	const searchFiltersSignature = useMemo(() => JSON.stringify(searchFilters), [searchFilters]);
 
 	const { data: searchData, isLoading: isSearchLoading } = useQuery<SearchPricesResponse>({
-		queryKey: ['planChargesSearch', plan.id, searchFilters, searchSorts, page, limit],
+		queryKey: ['planChargesSearch', plan.id, searchFilters, searchSorts, page, limit, showExpiredPrices],
 		queryFn: () =>
 			PriceApi.searchPrices({
 				entity_ids: [plan.id],
 				entity_type: PRICE_ENTITY_TYPE.PLAN,
 				filters: searchFilters.length > 0 ? searchFilters : undefined,
 				sorts: searchSorts.length > 0 ? searchSorts : undefined,
-				allow_expired_prices: true,
+				allow_expired_prices: showExpiredPrices,
 				limit,
 				offset,
 			}),
@@ -373,7 +374,7 @@ const PlanPriceTable: FC<PlanChargesTableProps> = ({ plan, onPriceUpdate }) => {
 	resetPageRef.current = resetPage;
 	useEffect(() => {
 		resetPageRef.current();
-	}, [searchFiltersSignature]);
+	}, [searchFiltersSignature, showExpiredPrices]);
 
 	// Use search API response directly (no client-side filter/sort)
 	const tableItems = searchData?.items || [];
@@ -544,8 +545,14 @@ const PlanPriceTable: FC<PlanChargesTableProps> = ({ plan, onPriceUpdate }) => {
 						sortOptions={chargeSortOptions}
 						selectedSorts={sorts}
 						onSortChange={setSorts}
-						debounceTime={300}
-					/>
+						debounceTime={300}>
+						<Checkbox
+							id='plan-charges-show-expired'
+							checked={showExpiredPrices}
+							onCheckedChange={setShowExpiredPrices}
+							label={t('catalog:plans.organisms.planPriceTable.showExpired')}
+						/>
+					</QueryBuilder>
 				</div>
 				{isSearchLoading ? (
 					<div className='flex items-center justify-center py-12'>
