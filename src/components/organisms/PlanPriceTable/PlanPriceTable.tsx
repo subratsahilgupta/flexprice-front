@@ -38,9 +38,10 @@ const CHARGE_FILTER_FIELD = {
 	CHARGE_TYPE: 'charge_type',
 	CURRENCY: 'currency',
 	BILLING_PERIOD: 'billing_period',
-	/** Client-only pseudo-field: toggles `allow_expired_prices` on the request instead of being
-	 * sent as a backend filter (the backend has no such field) — stripped out in `searchFilters`. */
-	SHOW_EXPIRED: 'show_expired',
+	/** Client-only pseudo-field: presence (Status = Active) sets `allow_expired_prices: false` on the
+	 * request; removing the filter shows expired prices too. Never sent as a backend filter (the
+	 * backend has no such field) — stripped out in `searchFilters`. */
+	STATUS: 'status',
 } as const;
 
 const PLAN_CHARGES_PAGE_SIZE = 10;
@@ -238,10 +239,11 @@ const chargeFilterOptions: FilterField[] = [
 		dataType: DataType.NUMBER,
 	},
 	{
-		field: CHARGE_FILTER_FIELD.SHOW_EXPIRED,
-		label: 'Show expired',
-		fieldType: FilterFieldType.SWITCH,
+		field: CHARGE_FILTER_FIELD.STATUS,
+		label: 'Status',
+		fieldType: FilterFieldType.SELECT,
 		operators: [FilterOperator.EQUAL],
+		options: [{ value: 'active', label: 'Active' }],
 		dataType: DataType.STRING,
 	},
 ];
@@ -338,10 +340,11 @@ const PlanPriceTable: FC<PlanChargesTableProps> = ({ plan, onPriceUpdate }) => {
 			},
 			{ id: 'plan-amount', field: CHARGE_FILTER_FIELD.AMOUNT, operator: FilterOperator.EQUAL, valueString: '', dataType: DataType.NUMBER },
 			{
-				id: 'plan-show-expired',
-				field: CHARGE_FILTER_FIELD.SHOW_EXPIRED,
+				id: 'plan-status',
+				field: CHARGE_FILTER_FIELD.STATUS,
 				operator: FilterOperator.EQUAL,
-				valueBoolean: false,
+				valueString: 'active',
+				dataType: DataType.STRING,
 			},
 		],
 		[],
@@ -364,16 +367,12 @@ const PlanPriceTable: FC<PlanChargesTableProps> = ({ plan, onPriceUpdate }) => {
 		prefix: PAGINATION_PREFIX.PLAN_CHARGES,
 	});
 
-	// SHOW_EXPIRED is a client-only pseudo-filter (toggles the request-level `allow_expired_prices`
-	// flag) — pull its value out and exclude it from what's sent as a backend `filters` condition.
-	const showExpiredPrices = useMemo(
-		() => filters.find((f) => f.field === CHARGE_FILTER_FIELD.SHOW_EXPIRED)?.valueBoolean ?? false,
-		[filters],
-	);
-	const searchFilters = useMemo(
-		() => sanitizeFilterConditions(filters.filter((f) => f.field !== CHARGE_FILTER_FIELD.SHOW_EXPIRED)),
-		[filters],
-	);
+	// STATUS is a client-only pseudo-filter ("Status = Active") that maps to the request-level
+	// `allow_expired_prices` flag instead of being sent as a backend filter condition — present
+	// (Active) means active-only; removing the filter (via the standard remove-filter control)
+	// shows expired prices too.
+	const showExpiredPrices = useMemo(() => !filters.some((f) => f.field === CHARGE_FILTER_FIELD.STATUS), [filters]);
+	const searchFilters = useMemo(() => sanitizeFilterConditions(filters.filter((f) => f.field !== CHARGE_FILTER_FIELD.STATUS)), [filters]);
 	const searchSorts = useMemo(() => sanitizeSortConditions(sorts), [sorts]);
 
 	// Stable signature so we only reset page when filter values change, not when resetPage reference changes (e.g. after setPage(2))
