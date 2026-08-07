@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useState, useMemo, useEffect } from 'react';
-import { Button, Card, CardHeader, Chip, Tooltip, Loader, Checkbox } from '@/components/atoms';
+import { Button, Card, CardHeader, Chip, Tooltip, Loader } from '@/components/atoms';
 import {
 	FlexpriceTable,
 	ColumnData,
@@ -38,6 +38,9 @@ const CHARGE_FILTER_FIELD = {
 	CHARGE_TYPE: 'charge_type',
 	CURRENCY: 'currency',
 	BILLING_PERIOD: 'billing_period',
+	/** Client-only pseudo-field: toggles `allow_expired_prices` on the request instead of being
+	 * sent as a backend filter (the backend has no such field) — stripped out in `searchFilters`. */
+	SHOW_EXPIRED: 'show_expired',
 } as const;
 
 const PLAN_CHARGES_PAGE_SIZE = 10;
@@ -234,6 +237,13 @@ const chargeFilterOptions: FilterField[] = [
 		operators: [FilterOperator.EQUAL, FilterOperator.GREATER_THAN, FilterOperator.LESS_THAN],
 		dataType: DataType.NUMBER,
 	},
+	{
+		field: CHARGE_FILTER_FIELD.SHOW_EXPIRED,
+		label: 'Show expired',
+		fieldType: FilterFieldType.SWITCH,
+		operators: [FilterOperator.EQUAL],
+		dataType: DataType.STRING,
+	},
 ];
 
 const chargeSortOptions = [
@@ -251,7 +261,6 @@ const PlanPriceTable: FC<PlanChargesTableProps> = ({ plan, onPriceUpdate }) => {
 	const [isPriceDialogOpen, setIsPriceDialogOpen] = useState(false);
 	const [selectedPriceForDetailsEdit, setSelectedPriceForDetailsEdit] = useState<Price | null>(null);
 	const [isDetailsDrawerOpen, setIsDetailsDrawerOpen] = useState(false);
-	const [showExpiredPrices, setShowExpiredPrices] = useState(false);
 
 	// ===== MUTATIONS =====
 	const { mutateAsync: deletePrice, isPending: isDeletingPrice } = useMutation({
@@ -328,6 +337,12 @@ const PlanPriceTable: FC<PlanChargesTableProps> = ({ plan, onPriceUpdate }) => {
 				dataType: DataType.STRING,
 			},
 			{ id: 'plan-amount', field: CHARGE_FILTER_FIELD.AMOUNT, operator: FilterOperator.EQUAL, valueString: '', dataType: DataType.NUMBER },
+			{
+				id: 'plan-show-expired',
+				field: CHARGE_FILTER_FIELD.SHOW_EXPIRED,
+				operator: FilterOperator.EQUAL,
+				valueBoolean: false,
+			},
 		],
 		[],
 	);
@@ -349,7 +364,16 @@ const PlanPriceTable: FC<PlanChargesTableProps> = ({ plan, onPriceUpdate }) => {
 		prefix: PAGINATION_PREFIX.PLAN_CHARGES,
 	});
 
-	const searchFilters = useMemo(() => sanitizeFilterConditions(filters), [filters]);
+	// SHOW_EXPIRED is a client-only pseudo-filter (toggles the request-level `allow_expired_prices`
+	// flag) — pull its value out and exclude it from what's sent as a backend `filters` condition.
+	const showExpiredPrices = useMemo(
+		() => filters.find((f) => f.field === CHARGE_FILTER_FIELD.SHOW_EXPIRED)?.valueBoolean ?? false,
+		[filters],
+	);
+	const searchFilters = useMemo(
+		() => sanitizeFilterConditions(filters.filter((f) => f.field !== CHARGE_FILTER_FIELD.SHOW_EXPIRED)),
+		[filters],
+	);
 	const searchSorts = useMemo(() => sanitizeSortConditions(sorts), [sorts]);
 
 	// Stable signature so we only reset page when filter values change, not when resetPage reference changes (e.g. after setPage(2))
@@ -545,14 +569,8 @@ const PlanPriceTable: FC<PlanChargesTableProps> = ({ plan, onPriceUpdate }) => {
 						sortOptions={chargeSortOptions}
 						selectedSorts={sorts}
 						onSortChange={setSorts}
-						debounceTime={300}>
-						<Checkbox
-							id='plan-charges-show-expired'
-							checked={showExpiredPrices}
-							onCheckedChange={setShowExpiredPrices}
-							label={t('catalog:plans.organisms.planPriceTable.showExpired')}
-						/>
-					</QueryBuilder>
+						debounceTime={300}
+					/>
 				</div>
 				{isSearchLoading ? (
 					<div className='flex items-center justify-center py-12'>
