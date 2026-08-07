@@ -68,7 +68,7 @@ export type {
 	DownloadTaskFileResponse,
 } from './Task';
 
-export type { UsageRecordFilter, ListUsageRecordsResponse } from './UsageRecord';
+export type { UsageRecordFilter, ListUsageRecordsResponse, UsageSyncsPage } from './UsageRecord';
 
 export type { SignupData, LoginData, LocalUser } from './Auth';
 

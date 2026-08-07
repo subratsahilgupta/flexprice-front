@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, ReactNode, useState } from 'react';
 import { Highlight, themes } from 'prism-react-renderer';
 import { Copy, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 interface JsonCodeBlockProps {
 	value: unknown;
-	title?: string;
+	title?: ReactNode;
 	onCopy?: () => void;
 	className?: string;
 }

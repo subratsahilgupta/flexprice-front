@@ -1075,7 +1075,7 @@
 		"usageSyncs": {
 			"pageHeading": "مزامنات الاستخدام",
 			"paginationUnit": "سجلات الاستخدام",
-			"notSynced": "لم تتم المزامنة بعد",
+			"notSynced": "لا توجد مزامنات بعد",
 			"entityName": "سجل الاستخدام",
 			"errors": {
 				"fetchFailed": "فشل تحميل سجلات الاستخدام"
@@ -1090,14 +1090,20 @@
 				"periodEnd": "نهاية الفترة",
 				"syncs": "المزامنات"
 			},
-			"providers": {
-				"awsMarketplace": "أمازون ماركت بليس",
-				"gcpMarketplace": "جوجل كلاود ماركت بليس",
-				"azureMarketplace": "أزور ماركت بليس"
+			"filterLabels": {
+				"customerId": "معرف العميل",
+				"subscriptionId": "معرف الاشتراك",
+				"periodStart": "بداية الفترة",
+				"periodEnd": "نهاية الفترة"
+			},
+			"sortLabels": {
+				"createdAt": "تاريخ الإنشاء",
+				"periodStart": "بداية الفترة",
+				"periodEnd": "نهاية الفترة"
 			},
 			"drawer": {
 				"title": "المزامنات",
-				"empty": "لم تتم المزامنة بعد.",
+				"empty": "لا توجد مزامنات بعد.",
 				"synced": "تمت المزامنة",
 				"skipped": "تم التخطي"
 			}

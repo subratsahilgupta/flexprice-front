@@ -1069,7 +1069,7 @@
 		"usageSyncs": {
 			"pageHeading": "Usage Syncs",
 			"paginationUnit": "usage records",
-			"notSynced": "Not synced yet",
+			"notSynced": "No syncs yet",
 			"entityName": "Usage Record",
 			"errors": {
 				"fetchFailed": "Failed to load usage records"
@@ -1084,14 +1084,20 @@
 				"periodEnd": "Period End",
 				"syncs": "Syncs"
 			},
-			"providers": {
-				"awsMarketplace": "AWS Marketplace",
-				"gcpMarketplace": "GCP Marketplace",
-				"azureMarketplace": "Azure Marketplace"
+			"filterLabels": {
+				"customerId": "Customer ID",
+				"subscriptionId": "Subscription ID",
+				"periodStart": "Period Start",
+				"periodEnd": "Period End"
+			},
+			"sortLabels": {
+				"createdAt": "Created At",
+				"periodStart": "Period Start",
+				"periodEnd": "Period End"
 			},
 			"drawer": {
 				"title": "Syncs",
-				"empty": "Not synced yet.",
+				"empty": "No syncs yet.",
 				"synced": "Synced",
 				"skipped": "Skipped"
 			}

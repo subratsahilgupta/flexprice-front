@@ -1,98 +1,58 @@
-import { ActionButton, Loader, Page, ShortPagination } from '@/components/atoms';
-import { ColumnData, FlexpriceTable, RedirectCell } from '@/components/molecules';
+import { ActionButton, Button, Loader, Page, ShortPagination } from '@/components/atoms';
+import { ColumnData, FlexpriceTable, QueryBuilder, RedirectCell } from '@/components/molecules';
+import { ErrorState } from '@/components/organisms/QueryableDataArea';
 import usePagination from '@/hooks/usePagination';
-import UsageRecordApi from '@/api/UsageRecordApi';
-import CustomerApi from '@/api/CustomerApi';
-import { PlanApi } from '@/api/PlanApi';
+import useFilterSortingWithPersistence from '@/hooks/useFilterSortingWithPersistence';
+import { usePaginationReset } from '@/hooks/usePaginationReset';
+import { useUsageSyncs } from '@/hooks/useUsageSyncs';
 import { RouteNames } from '@/core/routes/Routes';
 import { UsageRecord } from '@/models';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import { formatDateTime } from '@/utils/common/format_date';
-import { keepPreviousData, useQueries, useQuery } from '@tanstack/react-query';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import toast from 'react-hot-toast';
 import UsageRecordSyncsDrawer from './UsageRecordSyncsDrawer';
 import { MARKETPLACE_LOGO, getProviderLabel } from './marketplaceProviders';
+import {
+	getUsageSyncsFilterOptions,
+	getUsageSyncsSortOptions,
+	getUsageSyncsInitialSorts,
+	usageSyncsInitialFilters,
+} from './usageSyncsQueryConfig';
 
 const USAGE_SYNCS_PAGE_SIZE = 10;
 
-interface CommittedPage {
-	items: UsageRecord[];
-	customerNameById: Record<string, string>;
-	planNameById: Record<string, string>;
-	total: number;
-}
-
 const UsageSyncs = () => {
 	const { t } = useTranslation('settings');
-	const { limit, offset, page } = usePagination({ initialLimit: USAGE_SYNCS_PAGE_SIZE });
+	const { limit, offset, page, reset } = usePagination({ initialLimit: USAGE_SYNCS_PAGE_SIZE });
 	const [activeRecord, setActiveRecord] = useState<UsageRecord | null>(null);
 	const [drawerOpen, setDrawerOpen] = useState(false);
 
-	const { data, error } = useQuery({
-		queryKey: ['usageRecords', page],
-		queryFn: () => UsageRecordApi.searchUsageRecords({ limit, offset }),
-		placeholderData: keepPreviousData,
+	const usageSyncsQueryBuilderConfig = useMemo(
+		() => ({
+			filterOptions: getUsageSyncsFilterOptions(t),
+			sortOptions: getUsageSyncsSortOptions(t),
+			initialSorts: getUsageSyncsInitialSorts(t),
+		}),
+		[t],
+	);
+
+	const { filters, sorts, setFilters, setSorts, sanitizedFilters, sanitizedSorts } = useFilterSortingWithPersistence({
+		initialFilters: usageSyncsInitialFilters,
+		initialSorts: usageSyncsQueryBuilderConfig.initialSorts,
+		debounceTime: 300,
+		persistenceKey: 'usageRecords',
 	});
 
-	useEffect(() => {
-		if (error) {
-			toast.error(t('insightsTools.usageSyncs.errors.fetchFailed'));
-		}
-	}, [error, t]);
+	usePaginationReset(reset, sanitizedFilters, sanitizedSorts);
 
-	const pageItems = useMemo(() => data?.items ?? [], [data]);
-
-	const uniqueCustomerIds = useMemo(() => [...new Set(pageItems.map((item) => item.customer_id).filter(Boolean))], [pageItems]);
-	const uniquePlanIds = useMemo(() => [...new Set(pageItems.map((item) => item.plan_id).filter(Boolean))], [pageItems]);
-
-	const customerQueries = useQueries({
-		queries: uniqueCustomerIds.map((id) => ({
-			queryKey: ['usageSyncsCustomerName', id],
-			queryFn: () => CustomerApi.getCustomerById(id),
-			enabled: !!id,
-		})),
-	});
-	const planQueries = useQueries({
-		queries: uniquePlanIds.map((id) => ({
-			queryKey: ['usageSyncsPlanName', id],
-			queryFn: () => PlanApi.getPlanById(id),
-			enabled: !!id,
-		})),
-	});
-
-	const namesLoading = customerQueries.some((q) => q.isLoading) || planQueries.some((q) => q.isLoading);
-
-	const customerNameById = useMemo(() => {
-		const map: Record<string, string> = {};
-		uniqueCustomerIds.forEach((id, index) => {
-			const name = customerQueries[index]?.data?.name;
-			if (name) map[id] = name;
-		});
-		return map;
-	}, [uniqueCustomerIds, customerQueries]);
-
-	const planNameById = useMemo(() => {
-		const map: Record<string, string> = {};
-		uniquePlanIds.forEach((id, index) => {
-			const name = planQueries[index]?.data?.name;
-			if (name) map[id] = name;
-		});
-		return map;
-	}, [uniquePlanIds, planQueries]);
-
-	// The table only ever renders a fully-resolved snapshot: records plus every customer/plan
-	// name they reference. Committing atomically here — instead of rendering raw IDs and letting
-	// names pop in once their lookups resolve — is what prevents the visible flicker; the old
-	// page's (already fully-resolved) snapshot stays on screen until the new one is complete.
-	const [committed, setCommitted] = useState<CommittedPage | null>(null);
-
-	useEffect(() => {
-		if (!data || namesLoading) return;
-		setCommitted({ items: pageItems, customerNameById, planNameById, total: data.pagination.total ?? 0 });
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [data, namesLoading]);
+	const {
+		page: committed,
+		isLoading,
+		isError,
+		error,
+		refetch,
+	} = useUsageSyncs({ limit, offset, page, filters: sanitizedFilters, sort: sanitizedSorts });
 
 	const columns: ColumnData<UsageRecord>[] = useMemo(
 		() => [
@@ -200,17 +160,33 @@ const UsageSyncs = () => {
 		<Page heading={t('insightsTools.usageSyncs.pageHeading')}>
 			<UsageRecordSyncsDrawer record={activeRecord} isOpen={drawerOpen} onOpenChange={setDrawerOpen} />
 
+			<QueryBuilder
+				filterOptions={usageSyncsQueryBuilderConfig.filterOptions}
+				filters={filters}
+				onFilterChange={setFilters}
+				sortOptions={usageSyncsQueryBuilderConfig.sortOptions}
+				selectedSorts={sorts}
+				onSortChange={setSorts}
+			/>
+
 			<div>
-				{committed === null ? (
+				{isError ? (
+					<div className='flex flex-col items-center gap-4 min-h-[420px] justify-center'>
+						<ErrorState error={error} />
+						<Button variant='outline' onClick={() => refetch()}>
+							{t('common:actions.retry')}
+						</Button>
+					</div>
+				) : isLoading ? (
 					<div className='min-h-[420px]'>
 						<Loader />
 					</div>
 				) : (
 					<>
-						<FlexpriceTable data={committed.items} columns={columns} showEmptyRow />
+						<FlexpriceTable data={committed?.items ?? []} columns={columns} showEmptyRow />
 						<ShortPagination
 							unit={t('insightsTools.usageSyncs.paginationUnit')}
-							totalItems={committed.total}
+							totalItems={committed?.total ?? 0}
 							pageSize={USAGE_SYNCS_PAGE_SIZE}
 						/>
 					</>

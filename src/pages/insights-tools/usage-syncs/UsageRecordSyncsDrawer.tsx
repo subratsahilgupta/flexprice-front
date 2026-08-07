@@ -3,7 +3,7 @@ import { Chip, Sheet } from '@/components/atoms';
 import { JsonCodeBlock } from '@/components/molecules/Events';
 import { UsageRecord } from '@/models';
 import { useTranslation } from 'react-i18next';
-import { getProviderLabel } from './marketplaceProviders';
+import { MARKETPLACE_LOGO, getProviderLabel } from './marketplaceProviders';
 
 interface Props {
 	record: UsageRecord | null;
@@ -26,18 +26,22 @@ const UsageRecordSyncsDrawer: FC<Props> = ({ record, isOpen, onOpenChange }) => 
 				{syncEntries.length === 0 ? (
 					<p className='text-sm text-gray-500'>{t('insightsTools.usageSyncs.drawer.empty')}</p>
 				) : (
-					syncEntries.map(([provider, entry]) => (
-						<div key={provider} className='space-y-2'>
-							<div className='flex items-center gap-2'>
-								<span className='text-sm font-medium text-foreground'>{getProviderLabel(t, provider)}</span>
-								<Chip
-									variant={entry.skipped ? 'warning' : 'success'}
-									label={entry.skipped ? t('insightsTools.usageSyncs.drawer.skipped') : t('insightsTools.usageSyncs.drawer.synced')}
-								/>
+					syncEntries.map(([provider, entry]) => {
+						const label = getProviderLabel(t, provider);
+						const logo = MARKETPLACE_LOGO[provider];
+						return (
+							<div key={provider} className='space-y-2'>
+								<div className='flex items-center gap-2'>
+									<span className='text-sm font-medium text-foreground'>{label}</span>
+									<Chip
+										variant={entry.skipped ? 'warning' : 'success'}
+										label={entry.skipped ? t('insightsTools.usageSyncs.drawer.skipped') : t('insightsTools.usageSyncs.drawer.synced')}
+									/>
+								</div>
+								<JsonCodeBlock value={entry} title={logo ? <img src={logo} alt={label} className='h-4 w-4 object-contain' /> : label} />
 							</div>
-							<JsonCodeBlock value={entry} title={getProviderLabel(t, provider)} />
-						</div>
-					))
+						);
+					})
 				)}
 			</div>
 		</Sheet>
