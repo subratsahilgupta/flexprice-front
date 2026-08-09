@@ -17,6 +17,16 @@ const EN_USAGE_WIDGETS = {
 	marginPercent: 'Margin %',
 	cpm: 'CPM',
 	trendTitle: 'Usage Trend',
+	breakdownTitle: 'Usage Breakdown',
+	feature: 'Feature',
+	totalUsage: 'Total Usage',
+	totalCost: 'Total Cost',
+	noGroup: 'No group',
+	expandAllAria: 'Expand all',
+	collapseAllAria: 'Collapse all',
+	unknownRow: 'Unknown',
+	cellEmDash: '—',
+	cellEmpty: '--',
 };
 
 export const useUsageT = createBundledT('common', { usageWidgets: EN_USAGE_WIDGETS }).useBoundT;

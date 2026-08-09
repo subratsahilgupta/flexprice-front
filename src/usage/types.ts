@@ -60,3 +60,24 @@ export interface UsageTrendChartProps {
 	isLoading?: boolean;
 	className?: string;
 }
+
+// ── UsageBreakdown ──────────────────────────────────────────────────────────
+
+export interface UsageBreakdownRow {
+	id: string;
+	name: string;
+	groupId?: string;
+	groupName?: string;
+	totalUsage: number;
+	totalUsageDisplay?: string;
+	unit?: string;
+	totalCost: number;
+	currency?: string;
+}
+
+export interface UsageBreakdownProps {
+	rows: UsageBreakdownRow[];
+	label?: string;
+	isLoading?: boolean;
+	className?: string;
+}

@@ -7,7 +7,7 @@ import type { CustomerUsage, UsageAnalyticItem } from '@/models';
 import type { GetDetailedCostAnalyticsResponse } from '@/types/dto/Cost';
 import type { CustomAnalyticItem } from '@/types/dto/Events';
 import type { MetricCardsConfig, UsageGraphConfig } from '@/types/dto/PortalConfig';
-import type { UsageQuotaItem, MetricCardItem, UsageTrendSeries } from './types';
+import type { UsageQuotaItem, MetricCardItem, UsageTrendSeries, UsageBreakdownRow } from './types';
 
 /** Metered-usage entitlements only — static/boolean entitlements have no quota to show. */
 export function adaptUsageQuotaItems(usageData: CustomerUsage[]): UsageQuotaItem[] {
@@ -84,4 +84,32 @@ export function adaptUsageTrendSeries(
 		name: item.name || item.event_name || '',
 		points: (item.points ?? []).map((p) => ({ timestamp: p.timestamp, usage: p.usage })),
 	}));
+}
+
+// ── UsageBreakdown ──────────────────────────────────────────────────────────
+
+export function adaptUsageBreakdownRows(items: UsageAnalyticItem[]): UsageBreakdownRow[] {
+	return (items ?? []).map((row, index) => {
+		const group = row.group ?? row.feature?.group ?? row.price?.group;
+		const unitLabel = row.reporting_unit
+			? Number(row.total_usage) === 1
+				? (row.reporting_unit.unit_singular ?? row.reporting_unit.unit_plural ?? '')
+				: (row.reporting_unit.unit_plural ?? row.reporting_unit.unit_singular ?? '')
+			: row.unit
+				? Number(row.total_usage) === 1
+					? row.unit
+					: (row.unit_plural ?? row.unit)
+				: undefined;
+		return {
+			id: row.feature_id || row.price_id || row.meter_id || String(index),
+			name: row.name || row.feature?.name || row.event_name || '',
+			groupId: group?.id,
+			groupName: group?.name,
+			totalUsage: Number(row.total_usage) || 0,
+			totalUsageDisplay: row.total_usage_display || undefined,
+			unit: unitLabel,
+			totalCost: Number(row.total_cost) || 0,
+			currency: row.currency,
+		};
+	});
 }

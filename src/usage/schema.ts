@@ -7,7 +7,7 @@
 // and surface issues via `onValidationError`. Mirrors `src/pricing/schema.ts`.
 import { z } from 'zod';
 import { createNormalizer, type NormalizerIssue } from '@/lib/exportable/validation';
-import type { UsageQuotaItem, MetricCardItem, UsageTrendSeries } from './types';
+import type { UsageQuotaItem, MetricCardItem, UsageTrendSeries, UsageBreakdownRow } from './types';
 
 const nullishToString = z.preprocess((v) => (v == null ? '' : v), z.coerce.string()).catch('');
 
@@ -81,4 +81,26 @@ const usageTrendNormalizer = createNormalizer<UsageTrendSeries>(UsageTrendSeries
 
 export function normalizeUsageTrendSeries(input: unknown, onValidationError?: (issue: NormalizerIssue) => void): UsageTrendSeries[] {
 	return usageTrendNormalizer.normalizeMany(input, onValidationError ?? devWarn('usage trend series'));
+}
+
+// ── UsageBreakdown ──────────────────────────────────────────────────────────
+
+export const UsageBreakdownRowSchema = z
+	.object({
+		id: nullishToString,
+		name: nullishToString,
+		groupId: z.coerce.string().optional(),
+		groupName: z.coerce.string().optional(),
+		totalUsage: z.coerce.number().catch(0),
+		totalUsageDisplay: z.coerce.string().optional(),
+		unit: z.coerce.string().optional(),
+		totalCost: z.coerce.number().catch(0),
+		currency: z.coerce.string().optional(),
+	})
+	.passthrough();
+
+const usageBreakdownNormalizer = createNormalizer<UsageBreakdownRow>(UsageBreakdownRowSchema);
+
+export function normalizeUsageBreakdownRows(input: unknown, onValidationError?: (issue: NormalizerIssue) => void): UsageBreakdownRow[] {
+	return usageBreakdownNormalizer.normalizeMany(input, onValidationError ?? devWarn('usage breakdown row'));
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { normalizeUsageQuotaItems, normalizeMetricCardItems, normalizeUsageTrendSeries } from './schema';
+import { normalizeUsageQuotaItems, normalizeMetricCardItems, normalizeUsageTrendSeries, normalizeUsageBreakdownRows } from './schema';
 
 describe('normalizeUsageQuotaItems', () => {
 	it('coerces valid input through unchanged', () => {
@@ -45,5 +45,19 @@ describe('normalizeUsageTrendSeries', () => {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const result = normalizeUsageTrendSeries([{ id: 'feat_1', name: 'X' }] as any);
 		expect(result[0].points).toEqual([]);
+	});
+});
+
+describe('normalizeUsageBreakdownRows', () => {
+	it('coerces valid input through unchanged', () => {
+		const input = [{ id: 'feat_1', name: 'API Calls', totalUsage: 10, totalCost: 5 }];
+		expect(normalizeUsageBreakdownRows(input)).toEqual(input);
+	});
+
+	it('coerces non-numeric usage/cost to 0 instead of throwing', () => {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const result = normalizeUsageBreakdownRows([{ id: 'feat_1', name: 'X', totalUsage: 'oops', totalCost: null }] as any);
+		expect(result[0].totalUsage).toBe(0);
+		expect(result[0].totalCost).toBe(0);
 	});
 });

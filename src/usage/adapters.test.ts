@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { FEATURE_TYPE } from '@/models/Feature';
-import { adaptUsageQuotaItems, adaptMetricCards, adaptUsageTrendSeries } from './adapters';
+import { adaptUsageQuotaItems, adaptMetricCards, adaptUsageTrendSeries, adaptUsageBreakdownRows } from './adapters';
 
 describe('adaptUsageQuotaItems', () => {
 	it('keeps only metered entitlements and maps limit/unlimited', () => {
@@ -138,5 +138,44 @@ describe('adaptUsageTrendSeries', () => {
 	it('applies an exclude_list filter', () => {
 		const result = adaptUsageTrendSeries(items, { feature_filter_mode: 'exclude_list', feature_ids: ['feat_1'] });
 		expect(result.map((s) => s.id)).toEqual(['feat_2']);
+	});
+});
+
+describe('adaptUsageBreakdownRows', () => {
+	it('maps group, usage display, and cost fields', () => {
+		const result = adaptUsageBreakdownRows([
+			{
+				feature_id: 'feat_1',
+				name: 'API Calls',
+				group: { id: 'grp_1', name: 'Core' },
+				total_usage: 1234,
+				total_usage_display: '1,234',
+				unit: 'call',
+				unit_plural: 'calls',
+				total_cost: 12.5,
+				currency: 'USD',
+			},
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		] as any);
+		expect(result).toEqual([
+			{
+				id: 'feat_1',
+				name: 'API Calls',
+				groupId: 'grp_1',
+				groupName: 'Core',
+				totalUsage: 1234,
+				totalUsageDisplay: '1,234',
+				unit: 'calls',
+				totalCost: 12.5,
+				currency: 'USD',
+			},
+		]);
+	});
+
+	it('leaves group fields undefined when the row has no group', () => {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const result = adaptUsageBreakdownRows([{ feature_id: 'feat_2', name: 'Storage', total_usage: 0, total_cost: 0 }] as any);
+		expect(result[0].groupId).toBeUndefined();
+		expect(result[0].groupName).toBeUndefined();
 	});
 });
