@@ -5,15 +5,15 @@ import { SubscriptionResponse } from '@/types/dto/Subscription';
 import { CustomerUsage } from '@/models';
 import { Loader } from '@/components/atoms';
 
-// Lazy-load widgets — unused widgets don't bloat the bundle
+// Lazy-load widgets — unused widgets don't bloat the bundle.
 const SubscriptionsWidget = lazy(() => import('./widgets/SubscriptionsWidget'));
-const CurrentUsageWidget = lazy(() => import('./widgets/CurrentUsageWidget'));
-const UsageGraphWidget = lazy(() => import('./widgets/UsageGraphWidget'));
-const UsageBreakdownWidget = lazy(() => import('./widgets/UsageBreakdownWidget'));
+const UsageQuotaContainer = lazy(() => import('@/usage/containers/UsageQuotaContainer'));
+const UsageTrendChartContainer = lazy(() => import('@/usage/containers/UsageTrendChartContainer'));
+const UsageBreakdownContainer = lazy(() => import('@/usage/containers/UsageBreakdownContainer'));
 const InvoicesWidget = lazy(() => import('./widgets/InvoicesWidget'));
 const WalletBalanceWidget = lazy(() => import('./widgets/WalletBalanceWidget'));
 const WalletTransactionsWidget = lazy(() => import('./widgets/WalletTransactionsWidget'));
-const MetricCardsWidget = lazy(() => import('./widgets/MetricCardsWidget'));
+const MetricCardsContainer = lazy(() => import('@/usage/containers/MetricCardsContainer'));
 
 const FallbackLoader = () => (
 	<div className='py-12'>
@@ -48,15 +48,19 @@ const TabRenderer = ({ tab, subscriptions = [], usageData = [], analyticsParams 
 	return (
 		<Suspense fallback={<FallbackLoader />}>
 			{tab.type === 'subscriptions' && <SubscriptionsWidget subscriptions={subscriptions} label={tab.label} />}
-			{tab.type === 'current_usage' && <CurrentUsageWidget usageData={usageData} label={tab.label} />}
+			{tab.type === 'current_usage' && <UsageQuotaContainer usageData={usageData} label={tab.label} />}
 			{tab.type === 'usage_graph' && (
-				<UsageGraphWidget config={tab.usage_graph ?? DEFAULT_USAGE_GRAPH_CONFIG} analyticsParams={analyticsParams} label={tab.label} />
+				<UsageTrendChartContainer
+					config={tab.usage_graph ?? DEFAULT_USAGE_GRAPH_CONFIG}
+					analyticsParams={analyticsParams}
+					label={tab.label}
+				/>
 			)}
-			{tab.type === 'usage_breakdown' && <UsageBreakdownWidget analyticsParams={analyticsParams} label={tab.label} />}
+			{tab.type === 'usage_breakdown' && <UsageBreakdownContainer analyticsParams={analyticsParams} label={tab.label} />}
 			{tab.type === 'invoices' && <InvoicesWidget />}
 			{tab.type === 'wallet_balance' && <WalletBalanceWidget />}
 			{tab.type === 'wallet_transactions' && <WalletTransactionsWidget />}
-			{tab.type === 'metric_cards' && <MetricCardsWidget analyticsParams={analyticsParams} config={tab.metric_cards} />}
+			{tab.type === 'metric_cards' && <MetricCardsContainer analyticsParams={analyticsParams} config={tab.metric_cards} />}
 		</Suspense>
 	);
 };
