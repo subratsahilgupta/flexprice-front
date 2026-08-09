@@ -51,6 +51,7 @@ describe('normalizeCreditTransactions', () => {
 	it('normalizes a null currency to undefined, not the string "null"', () => {
 		const result = normalizeCreditTransactions([
 			{ id: 't1', type: 'credit', amount: 1, creditAmount: 1, reason: 'X', createdAt: '', currency: null },
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		] as any);
 		expect(result[0].currency).toBeUndefined();
 	});
@@ -58,6 +59,7 @@ describe('normalizeCreditTransactions', () => {
 	it('falls back an invalid type to credit', () => {
 		const result = normalizeCreditTransactions([
 			{ id: 't1', type: 'bogus', amount: 1, creditAmount: 1, reason: 'X', createdAt: '' },
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		] as any);
 		expect(result[0].type).toBe('credit');
 	});
