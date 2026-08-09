@@ -11,8 +11,8 @@ const UsageQuotaContainer = lazy(() => import('@/usage/containers/UsageQuotaCont
 const UsageTrendChartContainer = lazy(() => import('@/usage/containers/UsageTrendChartContainer'));
 const UsageBreakdownContainer = lazy(() => import('@/usage/containers/UsageBreakdownContainer'));
 const InvoicesWidget = lazy(() => import('./widgets/InvoicesWidget'));
-const WalletBalanceWidget = lazy(() => import('./widgets/WalletBalanceWidget'));
-const WalletTransactionsWidget = lazy(() => import('./widgets/WalletTransactionsWidget'));
+const CreditBalanceContainer = lazy(() => import('@/credits/containers/CreditBalanceContainer'));
+const CreditHistoryContainer = lazy(() => import('@/credits/containers/CreditHistoryContainer'));
 const MetricCardsContainer = lazy(() => import('@/usage/containers/MetricCardsContainer'));
 
 const FallbackLoader = () => (
@@ -58,8 +58,8 @@ const TabRenderer = ({ tab, subscriptions = [], usageData = [], analyticsParams 
 			)}
 			{tab.type === 'usage_breakdown' && <UsageBreakdownContainer analyticsParams={analyticsParams} label={tab.label} />}
 			{tab.type === 'invoices' && <InvoicesWidget />}
-			{tab.type === 'wallet_balance' && <WalletBalanceWidget />}
-			{tab.type === 'wallet_transactions' && <WalletTransactionsWidget />}
+			{tab.type === 'wallet_balance' && <CreditBalanceContainer />}
+			{tab.type === 'wallet_transactions' && <CreditHistoryContainer />}
 			{tab.type === 'metric_cards' && <MetricCardsContainer analyticsParams={analyticsParams} config={tab.metric_cards} />}
 		</Suspense>
 	);
