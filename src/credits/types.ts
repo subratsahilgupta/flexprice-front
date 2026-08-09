@@ -35,6 +35,7 @@ export interface CreditTransaction {
 	createdAt: string;
 	expiryDate?: string;
 	priority?: number;
+	transactionStatus?: string;
 }
 
 export interface CreditWalletOption {

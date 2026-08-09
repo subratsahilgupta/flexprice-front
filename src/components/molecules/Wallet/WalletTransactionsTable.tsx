@@ -22,14 +22,19 @@ const WalletTransactionsTable: FC<Props> = ({ data }) => {
 			amount,
 			currency,
 			className,
+			status,
 		}: {
 			type: string;
 			amount: number;
 			currency?: string;
 			className?: string;
+			status?: string;
 		}) => {
+			const isPending = status?.toLowerCase() === 'pending';
+			const colorClass = isPending ? 'text-accent-yellow-brand' : type === 'credit' ? 'text-accent-teal-brand' : 'text-content-zinc-bold';
+
 			return (
-				<span className={cn(type === 'credit' ? 'text-accent-teal-brand ' : 'text-content-zinc-bold ', className)}>
+				<span className={cn(colorClass, className)}>
 					{type === 'credit' ? '+' : '-'}
 					{amount}
 					{currency ? ` ${getCurrencySymbol(currency)}` : ` ${t('payments.transactions.creditsSuffix')}`}
@@ -87,8 +92,19 @@ const WalletTransactionsTable: FC<Props> = ({ data }) => {
 				render: (rowData) => {
 					return (
 						<span className='flex flex-col justify-center items-end'>
-							{formatAmountEl({ type: rowData.type, amount: rowData.amount, currency: rowData.currency, className: TX_AMOUNT_PRIMARY })}
-							{formatAmountEl({ type: rowData.type, amount: rowData.credit_amount, className: TX_AMOUNT_SECONDARY })}
+							{formatAmountEl({
+								type: rowData.type,
+								amount: rowData.amount,
+								currency: rowData.currency,
+								className: TX_AMOUNT_PRIMARY,
+								status: rowData.transaction_status,
+							})}
+							{formatAmountEl({
+								type: rowData.type,
+								amount: rowData.credit_amount,
+								className: TX_AMOUNT_SECONDARY,
+								status: rowData.transaction_status,
+							})}
 						</span>
 					);
 				},

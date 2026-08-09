@@ -65,6 +65,7 @@ export const CreditTransactionSchema = z
 		createdAt: nullishToString,
 		expiryDate: nullishToOptionalString,
 		priority: nullishToOptionalNumber,
+		transactionStatus: nullishToOptionalString,
 	})
 	.passthrough();
 

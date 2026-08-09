@@ -52,4 +52,22 @@ describe('CreditHistory', () => {
 		);
 		expect(screen.getByRole('combobox')).toBeInTheDocument();
 	});
+
+	it('renders the translated fallback name for an unnamed wallet, not a blank option', () => {
+		render(
+			<CreditHistory
+				transactions={TRANSACTIONS}
+				wallets={[
+					{ id: 'w1', label: 'Main' },
+					{ id: 'w2', label: '' },
+				]}
+				selectedWalletId='w2'
+				page={1}
+				pageSize={10}
+				totalItems={1}
+				onPageChange={vi.fn()}
+			/>,
+		);
+		expect(screen.getByText('Wallet w2')).toBeInTheDocument();
+	});
 });

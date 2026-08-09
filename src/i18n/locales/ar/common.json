@@ -551,6 +551,7 @@
 			"closed": "مغلق"
 		},
 		"transactionHistory": "سجل المعاملات",
+		"transactionsUnit": "معاملات",
 		"noTransactionsTitle": "لا توجد معاملات",
 		"noTransactionsDescription": "سيظهر سجل معاملاتك هنا",
 		"fallbackWalletName": "محفظة {{id}}"

@@ -1,7 +1,7 @@
 // src/credits/components/CreditHistory.tsx
 import { useMemo } from 'react';
 import { Card, Select } from '@/components/atoms';
-import { ShortPaginationControls } from '@/components/atoms/ShortPagination/ShortPagination';
+import { ShortPaginationControls } from '@/components/atoms/ShortPagination/ShortPaginationControls';
 // Imported by direct file path rather than the `@/components/molecules` barrel: the barrel's
 // `WalletTransactionsTable` export actually resolves to `./Wallet/index.ts`'s `default`, which is
 // `CustomerWalletTransactionsTable` (a different, unrelated component) — NOT the
@@ -76,7 +76,7 @@ const CreditHistory = ({
 		metadata: {},
 		reference_id: '',
 		reference_type: '',
-		transaction_status: '',
+		transaction_status: tx.transactionStatus ?? '',
 		wallet_id: '',
 	}));
 
@@ -86,7 +86,7 @@ const CreditHistory = ({
 				<Select
 					value={selectedWalletId || ''}
 					onChange={(value) => onSelectWallet?.(value)}
-					options={wallets.map((w) => ({ value: w.id, label: w.label }))}
+					options={wallets.map((w) => ({ value: w.id, label: w.label || t('creditWidgets.fallbackWalletName', { id: w.id.slice(0, 8) }) }))}
 					className='w-full max-w-xs'
 				/>
 			)}
@@ -104,7 +104,7 @@ const CreditHistory = ({
 								onPageChange={onPageChange}
 								totalItems={totalItems}
 								pageSize={pageSize}
-								unit={t('creditWidgets.transactionHistory')}
+								unit={t('creditWidgets.transactionsUnit')}
 							/>
 						</>
 					) : (

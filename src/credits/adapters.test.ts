@@ -25,8 +25,10 @@ describe('adaptCreditBalance', () => {
 	it('prefers realtime balance data over the wallet snapshot', () => {
 		const result = adaptCreditBalance(WALLET, {
 			currency: 'EUR',
-			balance: '150.75',
-			credit_balance: '300',
+			balance: '999',
+			credit_balance: '999',
+			real_time_balance: '150.75',
+			real_time_credit_balance: '300',
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} as any);
 		expect(result).toEqual({ id: 'wallet_1', name: 'Main Wallet', status: 'active', creditBalance: 300, balance: 150.75, currency: 'EUR' });
@@ -86,6 +88,7 @@ describe('adaptCreditTransactions', () => {
 				createdAt: '2026-01-01T00:00:00Z',
 				expiryDate: '2026-06-01T00:00:00Z',
 				priority: 1,
+				transactionStatus: 'completed',
 			},
 		]);
 	});

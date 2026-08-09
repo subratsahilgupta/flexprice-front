@@ -24,6 +24,7 @@ const EN_CREDIT_WIDGETS = {
 	'status.frozen': 'Frozen',
 	'status.closed': 'Closed',
 	transactionHistory: 'Transaction History',
+	transactionsUnit: 'Transactions',
 	noTransactionsTitle: 'No transactions',
 	noTransactionsDescription: 'Your transaction history will appear here',
 	fallbackWalletName: 'Wallet {{id}}',

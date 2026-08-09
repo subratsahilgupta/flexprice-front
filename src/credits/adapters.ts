@@ -21,8 +21,8 @@ export function adaptCreditBalance(wallet: WalletResponse, realtime?: RealtimeWa
 		id: wallet.id,
 		name: wallet.name,
 		status: STATUS_MAP[wallet.wallet_status] ?? 'active',
-		creditBalance: Number(realtime?.credit_balance ?? wallet.credit_balance ?? 0),
-		balance: Number(realtime?.balance ?? wallet.balance ?? 0),
+		creditBalance: Number(realtime?.real_time_credit_balance ?? wallet.credit_balance ?? 0),
+		balance: Number(realtime?.real_time_balance ?? wallet.balance ?? 0),
 		currency: realtime?.currency || wallet.currency || 'USD',
 	};
 }
@@ -40,6 +40,7 @@ export function adaptCreditTransactions(items: WalletTransaction[]): CreditTrans
 		createdAt: tx.created_at,
 		expiryDate: tx.expiry_date || undefined,
 		priority: tx.priority,
+		transactionStatus: tx.transaction_status,
 	}));
 }
 

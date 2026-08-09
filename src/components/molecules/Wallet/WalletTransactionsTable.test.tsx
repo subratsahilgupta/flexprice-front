@@ -38,4 +38,61 @@ describe('WalletTransactionsTable', () => {
 		);
 		expect(screen.getByText('Free Credits Added')).toBeInTheDocument();
 	});
+
+	it("colors a pending transaction amber (regression test: this table must match CustomerWalletTransactionsTable's coloring)", () => {
+		const { container } = render(
+			<WalletTransactionsTable
+				data={[
+					{
+						amount: 50,
+						balance_after: 150,
+						balance_before: 100,
+						created_at: '2026-01-01T00:00:00Z',
+						description: '',
+						id: 'tx_pending',
+						metadata: {},
+						reference_id: '',
+						reference_type: '',
+						transaction_status: 'pending',
+						type: 'credit',
+						wallet_id: 'w1',
+						credit_amount: 50,
+						transaction_reason: WALLET_TRANSACTION_REASON.FREE_CREDIT_GRANT,
+						expiry_date: '',
+						currency: 'USD',
+					},
+				]}
+			/>,
+		);
+		expect(container.querySelector('.text-accent-yellow-brand')).not.toBeNull();
+	});
+
+	it('colors a completed credit transaction teal, not amber', () => {
+		const { container } = render(
+			<WalletTransactionsTable
+				data={[
+					{
+						amount: 50,
+						balance_after: 150,
+						balance_before: 100,
+						created_at: '2026-01-01T00:00:00Z',
+						description: '',
+						id: 'tx_completed',
+						metadata: {},
+						reference_id: '',
+						reference_type: '',
+						transaction_status: 'completed',
+						type: 'credit',
+						wallet_id: 'w1',
+						credit_amount: 50,
+						transaction_reason: WALLET_TRANSACTION_REASON.FREE_CREDIT_GRANT,
+						expiry_date: '',
+						currency: 'USD',
+					},
+				]}
+			/>,
+		);
+		expect(container.querySelector('.text-accent-yellow-brand')).toBeNull();
+		expect(container.querySelector('.text-accent-teal-brand')).not.toBeNull();
+	});
 });
