@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { formatCompactNumber } from '@/utils';
 import { GetUsageAnalyticsResponse } from '@/types/dto';
 import { UsageAnalyticItem } from '@/models/Analytics';
-import { useTranslation } from 'react-i18next';
+import { useCustomerUsageChartT } from './CustomerUsageChart.i18n';
 
 // Configuration constants - adjust these values as needed
 const MAX_LEGEND_ITEMS = 5;
@@ -92,7 +92,7 @@ interface CustomerUsageChartProps {
 }
 
 export const CustomerUsageChart: React.FC<CustomerUsageChartProps> = ({ data, title, description, className, primaryColor }) => {
-	const { t } = useTranslation('common');
+	const t = useCustomerUsageChartT();
 	// Process the data for chart display
 	const { chartData, seriesConfig, seriesIds } = normalizeUsageData(data.items, (seriesIndex) =>
 		t('customerCharts.seriesFallback', { index: seriesIndex + 1 }),

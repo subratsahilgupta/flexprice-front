@@ -16,6 +16,7 @@ const EN_USAGE_WIDGETS = {
 	margin: 'Margin',
 	marginPercent: 'Margin %',
 	cpm: 'CPM',
+	trendTitle: 'Usage Trend',
 };
 
 export const useUsageT = createBundledT('common', { usageWidgets: EN_USAGE_WIDGETS }).useBoundT;

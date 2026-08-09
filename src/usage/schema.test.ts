@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { normalizeUsageQuotaItems, normalizeMetricCardItems } from './schema';
+import { normalizeUsageQuotaItems, normalizeMetricCardItems, normalizeUsageTrendSeries } from './schema';
 
 describe('normalizeUsageQuotaItems', () => {
 	it('coerces valid input through unchanged', () => {
@@ -32,5 +32,18 @@ describe('normalizeMetricCardItems', () => {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const result = normalizeMetricCardItems([{ id: 'x', titleKey: 'not-a-real-key', value: 5 }] as any);
 		expect(result[0].titleKey).toBe('custom');
+	});
+});
+
+describe('normalizeUsageTrendSeries', () => {
+	it('coerces valid input through unchanged', () => {
+		const input = [{ id: 'feat_1', name: 'API Calls', points: [{ timestamp: '2026-01-01T00:00:00Z', usage: 10 }] }];
+		expect(normalizeUsageTrendSeries(input)).toEqual(input);
+	});
+
+	it('defaults a missing points array to []', () => {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const result = normalizeUsageTrendSeries([{ id: 'feat_1', name: 'X' }] as any);
+		expect(result[0].points).toEqual([]);
 	});
 });

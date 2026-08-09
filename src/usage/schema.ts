@@ -7,7 +7,7 @@
 // and surface issues via `onValidationError`. Mirrors `src/pricing/schema.ts`.
 import { z } from 'zod';
 import { createNormalizer, type NormalizerIssue } from '@/lib/exportable/validation';
-import type { UsageQuotaItem, MetricCardItem } from './types';
+import type { UsageQuotaItem, MetricCardItem, UsageTrendSeries } from './types';
 
 const nullishToString = z.preprocess((v) => (v == null ? '' : v), z.coerce.string()).catch('');
 
@@ -54,4 +54,31 @@ const metricCardsNormalizer = createNormalizer<MetricCardItem>(MetricCardItemSch
 
 export function normalizeMetricCardItems(input: unknown, onValidationError?: (issue: NormalizerIssue) => void): MetricCardItem[] {
 	return metricCardsNormalizer.normalizeMany(input, onValidationError ?? devWarn('metric card item'));
+}
+
+// ── UsageTrendChart ──────────────────────────────────────────────────────────
+
+const usageTrendPointSchema = z
+	.object({
+		timestamp: nullishToString,
+		usage: z.coerce.number().catch(0),
+	})
+	.passthrough();
+
+export const UsageTrendSeriesSchema = z
+	.object({
+		id: nullishToString,
+		name: nullishToString,
+		points: z
+			.array(usageTrendPointSchema)
+			.optional()
+			.catch(() => [])
+			.transform((v) => v ?? []),
+	})
+	.passthrough();
+
+const usageTrendNormalizer = createNormalizer<UsageTrendSeries>(UsageTrendSeriesSchema);
+
+export function normalizeUsageTrendSeries(input: unknown, onValidationError?: (issue: NormalizerIssue) => void): UsageTrendSeries[] {
+	return usageTrendNormalizer.normalizeMany(input, onValidationError ?? devWarn('usage trend series'));
 }

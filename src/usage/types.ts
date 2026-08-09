@@ -40,3 +40,23 @@ export interface MetricCardsProps {
 	isLoading?: boolean;
 	className?: string;
 }
+
+// ── UsageTrendChart ──────────────────────────────────────────────────────────
+
+export interface UsageTrendPoint {
+	timestamp: string;
+	usage: number;
+}
+
+export interface UsageTrendSeries {
+	id: string;
+	name: string;
+	points: UsageTrendPoint[];
+}
+
+export interface UsageTrendChartProps {
+	series: UsageTrendSeries[];
+	label?: string;
+	isLoading?: boolean;
+	className?: string;
+}

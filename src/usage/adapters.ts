@@ -3,11 +3,11 @@
 // unit-testable. Containers call these to turn API responses into the usage widgets' typed
 // presentational models. Mirrors `src/pricing/adapters.ts`.
 import { FEATURE_TYPE } from '@/models/Feature';
-import type { CustomerUsage } from '@/models';
+import type { CustomerUsage, UsageAnalyticItem } from '@/models';
 import type { GetDetailedCostAnalyticsResponse } from '@/types/dto/Cost';
 import type { CustomAnalyticItem } from '@/types/dto/Events';
-import type { MetricCardsConfig } from '@/types/dto/PortalConfig';
-import type { UsageQuotaItem, MetricCardItem } from './types';
+import type { MetricCardsConfig, UsageGraphConfig } from '@/types/dto/PortalConfig';
+import type { UsageQuotaItem, MetricCardItem, UsageTrendSeries } from './types';
 
 /** Metered-usage entitlements only — static/boolean entitlements have no quota to show. */
 export function adaptUsageQuotaItems(usageData: CustomerUsage[]): UsageQuotaItem[] {
@@ -63,4 +63,25 @@ export function adaptMetricCards(
 		}
 	}
 	return items;
+}
+
+// ── UsageTrendChart ──────────────────────────────────────────────────────────
+
+/** Applies the portal's feature_filter_mode config, then maps to the decoupled series shape. */
+export function adaptUsageTrendSeries(
+	items: UsageAnalyticItem[],
+	config: Pick<UsageGraphConfig, 'feature_filter_mode' | 'feature_ids'>,
+): UsageTrendSeries[] {
+	const { feature_filter_mode, feature_ids } = config;
+	let filtered = items ?? [];
+	if (feature_filter_mode === 'include_list' && feature_ids?.length) {
+		filtered = filtered.filter((item) => feature_ids.includes(item.feature_id));
+	} else if (feature_filter_mode === 'exclude_list' && feature_ids?.length) {
+		filtered = filtered.filter((item) => !feature_ids.includes(item.feature_id));
+	}
+	return filtered.map((item, index) => ({
+		id: item.source || item.feature_id || `series-${index}`,
+		name: item.name || item.event_name || '',
+		points: (item.points ?? []).map((p) => ({ timestamp: p.timestamp, usage: p.usage })),
+	}));
 }

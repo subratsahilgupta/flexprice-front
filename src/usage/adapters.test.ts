@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { FEATURE_TYPE } from '@/models/Feature';
-import { adaptUsageQuotaItems, adaptMetricCards } from './adapters';
+import { adaptUsageQuotaItems, adaptMetricCards, adaptUsageTrendSeries } from './adapters';
 
 describe('adaptUsageQuotaItems', () => {
 	it('keeps only metered entitlements and maps limit/unlimited', () => {
@@ -107,5 +107,36 @@ describe('adaptMetricCards', () => {
 
 	it('returns [] when nothing is enabled or costData is missing', () => {
 		expect(adaptMetricCards(undefined, [], { show_custom_metrics: false, show_revenue_metric: true, show_cost_metrics: true })).toEqual([]);
+	});
+});
+
+describe('adaptUsageTrendSeries', () => {
+	const items = [
+		{
+			feature_id: 'feat_1',
+			source: 'feat_1',
+			name: 'API Calls',
+			points: [{ timestamp: '2026-01-01T00:00:00Z', usage: 10, cost: 1, event_count: 5 }],
+		},
+		{ feature_id: 'feat_2', source: 'feat_2', name: 'Storage', points: [] },
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	] as any;
+
+	it('maps items to series with no filtering when mode is all', () => {
+		const result = adaptUsageTrendSeries(items, { feature_filter_mode: 'all' });
+		expect(result).toEqual([
+			{ id: 'feat_1', name: 'API Calls', points: [{ timestamp: '2026-01-01T00:00:00Z', usage: 10 }] },
+			{ id: 'feat_2', name: 'Storage', points: [] },
+		]);
+	});
+
+	it('applies an include_list filter', () => {
+		const result = adaptUsageTrendSeries(items, { feature_filter_mode: 'include_list', feature_ids: ['feat_1'] });
+		expect(result.map((s) => s.id)).toEqual(['feat_1']);
+	});
+
+	it('applies an exclude_list filter', () => {
+		const result = adaptUsageTrendSeries(items, { feature_filter_mode: 'exclude_list', feature_ids: ['feat_1'] });
+		expect(result.map((s) => s.id)).toEqual(['feat_2']);
 	});
 });
