@@ -23,6 +23,8 @@ export default createLibConfig({
 		'src/pricing/**/*.tsx',
 		'src/usage/**/*.ts',
 		'src/usage/**/*.tsx',
+		'src/credits/**/*.ts',
+		'src/credits/**/*.tsx',
 	],
 	tsconfigPath: 'tsconfig.flexprice-ui.json',
 });

@@ -25,6 +25,12 @@ export default {
 		'./src/components/atoms/Select/**/*.{ts,tsx}',
 		'./src/components/atoms/Input/**/*.{ts,tsx}',
 		'./src/components/atoms/Label/**/*.{ts,tsx}',
+		// Credits widgets + the shared atoms/molecules/ui they render.
+		'./src/credits/**/*.{ts,tsx}',
+		'./src/components/molecules/Wallet/WalletTransactionsTable.tsx',
+		'./src/components/molecules/Wallet/WalletTransactionsTable.i18n.ts',
+		'./src/components/atoms/ShortPagination/**/*.{ts,tsx}',
+		'./src/components/atoms/Chip/**/*.{ts,tsx}',
 	]),
 	// Tailwind's Preflight base reset must not ship into a consumer's page — it would reset the
 	// host's own margins, headings, borders, etc. The library instead scopes its own minimal reset

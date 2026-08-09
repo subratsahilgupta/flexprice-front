@@ -17,8 +17,10 @@ export * from '@/pricing/lib';
 // ── Usage widgets ────────────────────────────────────────────────────────────
 export * from '@/usage/lib';
 
+// ── Credits widgets ──────────────────────────────────────────────────────────
+export * from '@/credits/lib';
+
 // ── Future components (uncomment as they become exportable) ───────────────────
 // export * from '@/checkout/lib';
-// export * from '@/credits/lib';
 // export * from '@/invoices/lib';
 // export * from '@/subscriptions/lib';
