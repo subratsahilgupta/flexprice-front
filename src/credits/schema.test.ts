@@ -49,7 +49,6 @@ describe('normalizeCreditTransactions', () => {
 	});
 
 	it('normalizes a null currency to undefined, not the string "null"', () => {
-		 
 		const result = normalizeCreditTransactions([
 			{ id: 't1', type: 'credit', amount: 1, creditAmount: 1, reason: 'X', createdAt: '', currency: null },
 		] as any);
@@ -57,7 +56,6 @@ describe('normalizeCreditTransactions', () => {
 	});
 
 	it('falls back an invalid type to credit', () => {
-		 
 		const result = normalizeCreditTransactions([
 			{ id: 't1', type: 'bogus', amount: 1, creditAmount: 1, reason: 'X', createdAt: '' },
 		] as any);

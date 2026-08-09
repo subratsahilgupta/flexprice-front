@@ -91,7 +91,6 @@ describe('adaptCreditTransactions', () => {
 	});
 
 	it('treats any non-debit type as credit, and leaves an empty expiry_date undefined', () => {
-		 
 		const result = adaptCreditTransactions([
 			{ id: 'tx_2', type: 'debit', amount: 5, credit_amount: 5, created_at: '', transaction_reason: 'X', expiry_date: '' },
 		] as any);
