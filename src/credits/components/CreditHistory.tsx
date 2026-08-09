@@ -1,6 +1,7 @@
 // src/credits/components/CreditHistory.tsx
 import { useMemo } from 'react';
-import { Card, Select } from '@/components/atoms';
+import Card from '@/components/atoms/Card/Card';
+import Select from '@/components/atoms/Select/Select';
 import { ShortPaginationControls } from '@/components/atoms/ShortPagination/ShortPaginationControls';
 // Imported by direct file path rather than the `@/components/molecules` barrel: the barrel's
 // `WalletTransactionsTable` export actually resolves to `./Wallet/index.ts`'s `default`, which is

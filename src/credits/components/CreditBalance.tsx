@@ -1,5 +1,6 @@
 // src/credits/components/CreditBalance.tsx
-import { Card, Chip } from '@/components/atoms';
+import Card from '@/components/atoms/Card/Card';
+import Chip from '@/components/atoms/Chip/Chip';
 import { formatAmount } from '@/components/atoms/Input/Input';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import { Wallet as WalletIcon } from 'lucide-react';
