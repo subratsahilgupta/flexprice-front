@@ -517,6 +517,27 @@
 		"recurring": "متكرر",
 		"previewBooleanNotIncluded": "{{name}} غير مشمول"
 	},
+	"usageWidgets": {
+		"quotaTitle": "حصة الاستخدام",
+		"unknownFeature": "ميزة غير معروفة",
+		"unlimited": "غير محدود",
+		"revenue": "الإيرادات",
+		"cost": "التكلفة",
+		"margin": "الهامش",
+		"marginPercent": "الهامش %",
+		"cpm": "CPM",
+		"trendTitle": "اتجاه الاستخدام",
+		"breakdownTitle": "تفصيل الاستخدام",
+		"feature": "الميزة",
+		"totalUsage": "إجمالي الاستخدام",
+		"totalCost": "إجمالي التكلفة",
+		"noGroup": "بلا مجموعة",
+		"expandAllAria": "توسيع الكل",
+		"collapseAllAria": "طي الكل",
+		"unknownRow": "غير معروف",
+		"cellEmDash": "—",
+		"cellEmpty": "--"
+	},
 	"taxAssociation": {
 		"dialogTitle": "ربط سعر ضريبي",
 		"taxRateRequired": "سعر الضريبة مطلوب",

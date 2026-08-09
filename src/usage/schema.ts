@@ -10,6 +10,9 @@ import { createNormalizer, type NormalizerIssue } from '@/lib/exportable/validat
 import type { UsageQuotaItem, MetricCardItem, UsageTrendSeries, UsageBreakdownRow } from './types';
 
 const nullishToString = z.preprocess((v) => (v == null ? '' : v), z.coerce.string()).catch('');
+// Optional string fields: `null`/`undefined` must both leave the field unset, not coerce to the
+// literal string "null" — `z.coerce.string().optional()` alone only short-circuits on `undefined`.
+const nullishToOptionalString = z.preprocess((v) => (v == null ? undefined : v), z.coerce.string().optional());
 
 function devWarn(label: string) {
 	return (issue: NormalizerIssue) => {
@@ -41,9 +44,9 @@ export const MetricCardItemSchema = z
 	.object({
 		id: nullishToString,
 		titleKey: z.enum(['revenue', 'cost', 'margin', 'marginPercent', 'cpm', 'custom']).catch('custom'),
-		customLabel: z.coerce.string().optional(),
+		customLabel: nullishToOptionalString,
 		value: z.coerce.number().catch(0),
-		currency: z.coerce.string().optional(),
+		currency: nullishToOptionalString,
 		isPercent: z.coerce.boolean().optional(),
 		showChangeIndicator: z.coerce.boolean().optional(),
 		isNegative: z.coerce.boolean().optional(),
@@ -89,13 +92,13 @@ export const UsageBreakdownRowSchema = z
 	.object({
 		id: nullishToString,
 		name: nullishToString,
-		groupId: z.coerce.string().optional(),
-		groupName: z.coerce.string().optional(),
+		groupId: nullishToOptionalString,
+		groupName: nullishToOptionalString,
 		totalUsage: z.coerce.number().catch(0),
-		totalUsageDisplay: z.coerce.string().optional(),
-		unit: z.coerce.string().optional(),
+		totalUsageDisplay: nullishToOptionalString,
+		unit: nullishToOptionalString,
 		totalCost: z.coerce.number().catch(0),
-		currency: z.coerce.string().optional(),
+		currency: nullishToOptionalString,
 	})
 	.passthrough();
 

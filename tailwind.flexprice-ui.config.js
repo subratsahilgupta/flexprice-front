@@ -26,5 +26,8 @@ export default {
 		'./src/components/atoms/Input/**/*.{ts,tsx}',
 		'./src/components/atoms/Label/**/*.{ts,tsx}',
 	]),
+	// Tailwind's Preflight base reset must not ship into a consumer's page — it would reset the
+	// host's own margins, headings, borders, etc. The library instead scopes its own minimal reset
+	// under the `.flexprice-ui` wrapper class (see `src/exportable/styles.css`).
 	corePlugins: { preflight: false },
 };

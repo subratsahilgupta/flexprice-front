@@ -33,6 +33,13 @@ describe('normalizeMetricCardItems', () => {
 		const result = normalizeMetricCardItems([{ id: 'x', titleKey: 'not-a-real-key', value: 5 }] as any);
 		expect(result[0].titleKey).toBe('custom');
 	});
+
+	it('normalizes a null optional string field (currency) to undefined instead of the literal string "null"', () => {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const result = normalizeMetricCardItems([{ id: 'x', titleKey: 'revenue', value: 5, currency: null }] as any);
+		expect(result[0].currency).toBeUndefined();
+		expect(result[0].currency).not.toBe('null');
+	});
 });
 
 describe('normalizeUsageTrendSeries', () => {
@@ -59,5 +66,27 @@ describe('normalizeUsageBreakdownRows', () => {
 		const result = normalizeUsageBreakdownRows([{ id: 'feat_1', name: 'X', totalUsage: 'oops', totalCost: null }] as any);
 		expect(result[0].totalUsage).toBe(0);
 		expect(result[0].totalCost).toBe(0);
+	});
+
+	it('normalizes null optional string fields (groupName, groupId, unit, currency, totalUsageDisplay) to undefined instead of the literal string "null"', () => {
+		const result = normalizeUsageBreakdownRows([
+			{
+				id: 'feat_1',
+				name: 'X',
+				totalUsage: 10,
+				totalCost: 5,
+				groupId: null,
+				groupName: null,
+				unit: null,
+				currency: null,
+				totalUsageDisplay: null,
+			},
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		] as any);
+		expect(result[0].groupId).toBeUndefined();
+		expect(result[0].groupName).toBeUndefined();
+		expect(result[0].unit).toBeUndefined();
+		expect(result[0].currency).toBeUndefined();
+		expect(result[0].totalUsageDisplay).toBeUndefined();
 	});
 });
