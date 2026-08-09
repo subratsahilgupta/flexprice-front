@@ -20,3 +20,23 @@ export interface UsageQuotaProps {
 	label?: string;
 	className?: string;
 }
+
+// ── MetricCards ──────────────────────────────────────────────────────────────
+
+export interface MetricCardItem {
+	id: string;
+	titleKey: 'revenue' | 'cost' | 'margin' | 'marginPercent' | 'cpm' | 'custom';
+	/** Only set when `titleKey` is `'custom'` — the item's own name from the API. */
+	customLabel?: string;
+	value: number;
+	currency?: string;
+	isPercent?: boolean;
+	showChangeIndicator?: boolean;
+	isNegative?: boolean;
+}
+
+export interface MetricCardsProps {
+	metrics: MetricCardItem[];
+	isLoading?: boolean;
+	className?: string;
+}

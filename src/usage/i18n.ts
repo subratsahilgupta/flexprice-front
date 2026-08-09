@@ -11,6 +11,11 @@ const EN_USAGE_WIDGETS = {
 	quotaTitle: 'Usage Quota',
 	unknownFeature: 'Unknown Feature',
 	unlimited: 'Unlimited',
+	revenue: 'Revenue',
+	cost: 'Cost',
+	margin: 'Margin',
+	marginPercent: 'Margin %',
+	cpm: 'CPM',
 };
 
 export const useUsageT = createBundledT('common', { usageWidgets: EN_USAGE_WIDGETS }).useBoundT;

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { FEATURE_TYPE } from '@/models/Feature';
-import { adaptUsageQuotaItems } from './adapters';
+import { adaptUsageQuotaItems, adaptMetricCards } from './adapters';
 
 describe('adaptUsageQuotaItems', () => {
 	it('keeps only metered entitlements and maps limit/unlimited', () => {
@@ -54,5 +54,58 @@ describe('adaptUsageQuotaItems', () => {
 		expect(adaptUsageQuotaItems([])).toEqual([]);
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		expect(adaptUsageQuotaItems(undefined as any)).toEqual([]);
+	});
+});
+
+describe('adaptMetricCards', () => {
+	const costData = {
+		cost_analytics: [],
+		total_revenue: '1000',
+		total_cost: '400',
+		margin: '600',
+		margin_percent: '60',
+		roi: '1.5',
+		roi_percent: '150',
+		currency: 'USD',
+		start_time: '2026-01-01',
+		end_time: '2026-01-31',
+	};
+
+	it('includes revenue + cost + margin cards when enabled', () => {
+		const result = adaptMetricCards(costData, [], { show_custom_metrics: false, show_revenue_metric: true, show_cost_metrics: true });
+		expect(result).toEqual([
+			{ id: 'revenue', titleKey: 'revenue', value: 1000, currency: 'USD' },
+			{ id: 'cost', titleKey: 'cost', value: 400, currency: 'USD' },
+			{ id: 'margin', titleKey: 'margin', value: 600, currency: 'USD', showChangeIndicator: true, isNegative: false },
+			{ id: 'margin-percent', titleKey: 'marginPercent', value: 60, isPercent: true, showChangeIndicator: true, isNegative: false },
+		]);
+	});
+
+	it('maps the revenue-per-minute custom metric to the cpm title key with currency', () => {
+		const result = adaptMetricCards(
+			costData,
+			[{ id: 'revenue-per-minute', name: 'revenue-per-minute', feature_name: 'Revenue per minute', value: '0.12', type: 'currency' }],
+			{ show_custom_metrics: true, show_revenue_metric: false, show_cost_metrics: false },
+		);
+		expect(result).toEqual([
+			{ id: 'revenue-per-minute', titleKey: 'cpm', customLabel: 'revenue-per-minute', value: 0.12, currency: 'USD' },
+		]);
+	});
+
+	it('maps a plain custom metric to the custom title key with no currency', () => {
+		const result = adaptMetricCards(
+			costData,
+			[{ id: 'active-calls', name: 'Active Calls', feature_name: 'Active Calls', value: '42', type: 'count' }],
+			{
+				show_custom_metrics: true,
+				show_revenue_metric: false,
+				show_cost_metrics: false,
+			},
+		);
+		expect(result).toEqual([{ id: 'active-calls', titleKey: 'custom', customLabel: 'Active Calls', value: 42, currency: undefined }]);
+	});
+
+	it('returns [] when nothing is enabled or costData is missing', () => {
+		expect(adaptMetricCards(undefined, [], { show_custom_metrics: false, show_revenue_metric: true, show_cost_metrics: true })).toEqual([]);
 	});
 });

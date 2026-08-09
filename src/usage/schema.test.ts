@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { normalizeUsageQuotaItems } from './schema';
+import { normalizeUsageQuotaItems, normalizeMetricCardItems } from './schema';
 
 describe('normalizeUsageQuotaItems', () => {
 	it('coerces valid input through unchanged', () => {
@@ -19,5 +19,18 @@ describe('normalizeUsageQuotaItems', () => {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const result = normalizeUsageQuotaItems([{ id: 'f1', name: 'X', currentUsage: 'oops', limit: null, isUnlimited: 'yes' }] as any);
 		expect(result).toEqual([{ id: 'f1', name: 'X', currentUsage: 0, limit: null, isUnlimited: true }]);
+	});
+});
+
+describe('normalizeMetricCardItems', () => {
+	it('coerces valid input through unchanged', () => {
+		const input = [{ id: 'revenue', titleKey: 'revenue' as const, value: 100, currency: 'USD' }];
+		expect(normalizeMetricCardItems(input)).toEqual(input);
+	});
+
+	it('falls back an unknown titleKey to custom', () => {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const result = normalizeMetricCardItems([{ id: 'x', titleKey: 'not-a-real-key', value: 5 }] as any);
+		expect(result[0].titleKey).toBe('custom');
 	});
 });

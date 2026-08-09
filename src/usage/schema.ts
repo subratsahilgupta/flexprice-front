@@ -7,7 +7,7 @@
 // and surface issues via `onValidationError`. Mirrors `src/pricing/schema.ts`.
 import { z } from 'zod';
 import { createNormalizer, type NormalizerIssue } from '@/lib/exportable/validation';
-import type { UsageQuotaItem } from './types';
+import type { UsageQuotaItem, MetricCardItem } from './types';
 
 const nullishToString = z.preprocess((v) => (v == null ? '' : v), z.coerce.string()).catch('');
 
@@ -33,4 +33,25 @@ const usageQuotaNormalizer = createNormalizer<UsageQuotaItem>(UsageQuotaItemSche
 
 export function normalizeUsageQuotaItems(input: unknown, onValidationError?: (issue: NormalizerIssue) => void): UsageQuotaItem[] {
 	return usageQuotaNormalizer.normalizeMany(input, onValidationError ?? devWarn('usage quota item'));
+}
+
+// ── MetricCards ──────────────────────────────────────────────────────────────
+
+export const MetricCardItemSchema = z
+	.object({
+		id: nullishToString,
+		titleKey: z.enum(['revenue', 'cost', 'margin', 'marginPercent', 'cpm', 'custom']).catch('custom'),
+		customLabel: z.coerce.string().optional(),
+		value: z.coerce.number().catch(0),
+		currency: z.coerce.string().optional(),
+		isPercent: z.coerce.boolean().optional(),
+		showChangeIndicator: z.coerce.boolean().optional(),
+		isNegative: z.coerce.boolean().optional(),
+	})
+	.passthrough();
+
+const metricCardsNormalizer = createNormalizer<MetricCardItem>(MetricCardItemSchema);
+
+export function normalizeMetricCardItems(input: unknown, onValidationError?: (issue: NormalizerIssue) => void): MetricCardItem[] {
+	return metricCardsNormalizer.normalizeMany(input, onValidationError ?? devWarn('metric card item'));
 }
