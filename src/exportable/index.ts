@@ -14,7 +14,11 @@ import './styles.css';
 // ── Pricing widget ───────────────────────────────────────────────────────────
 export * from '@/pricing/lib';
 
+// ── Usage widgets ────────────────────────────────────────────────────────────
+export * from '@/usage/lib';
+
 // ── Future components (uncomment as they become exportable) ───────────────────
 // export * from '@/checkout/lib';
-// export * from '@/customer-portal/lib';
-// export * from '@/usage/lib';
+// export * from '@/credits/lib';
+// export * from '@/invoices/lib';
+// export * from '@/subscriptions/lib';
