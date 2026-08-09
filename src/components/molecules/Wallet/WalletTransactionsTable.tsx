@@ -4,7 +4,7 @@ import { WALLET_TRANSACTION_REASON } from '@/models/Wallet';
 import { WalletTransaction } from '@/models/WalletTransaction';
 import { formatDateShort, getCurrencySymbol } from '@/utils/common/helper_functions';
 import { FC, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useWalletTransactionsTableT } from './WalletTransactionsTable.i18n';
 
 const TX_AMOUNT_PRIMARY = 'text-base font-medium';
 const TX_AMOUNT_SECONDARY = 'text-sm';
@@ -14,7 +14,7 @@ interface Props {
 }
 
 const WalletTransactionsTable: FC<Props> = ({ data }) => {
-	const { t } = useTranslation('billing');
+	const t = useWalletTransactionsTableT();
 
 	const columnData: ColumnData<WalletTransaction>[] = useMemo(() => {
 		const formatAmountEl = ({

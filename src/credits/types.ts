@@ -22,3 +22,37 @@ export interface CreditBalanceProps {
 	isLoading?: boolean;
 	className?: string;
 }
+
+// ── CreditHistory ────────────────────────────────────────────────────────────
+
+export interface CreditTransaction {
+	id: string;
+	type: 'credit' | 'debit';
+	amount: number;
+	creditAmount: number;
+	currency?: string;
+	reason: string;
+	createdAt: string;
+	expiryDate?: string;
+	priority?: number;
+}
+
+export interface CreditWalletOption {
+	id: string;
+	label: string;
+}
+
+export interface CreditHistoryProps {
+	transactions: CreditTransaction[];
+	/** Only rendered as a selector when there's more than one entry. */
+	wallets?: CreditWalletOption[];
+	selectedWalletId?: string;
+	onSelectWallet?: (walletId: string) => void;
+	/** Fully controlled pagination — no router dependency. See this plan's Global Constraints. */
+	page: number;
+	pageSize: number;
+	totalItems: number;
+	onPageChange: (page: number) => void;
+	isLoading?: boolean;
+	className?: string;
+}

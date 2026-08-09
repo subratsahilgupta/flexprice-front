@@ -554,7 +554,11 @@
 			"active": "Active",
 			"frozen": "Frozen",
 			"closed": "Closed"
-		}
+		},
+		"transactionHistory": "Transaction History",
+		"noTransactionsTitle": "No transactions",
+		"noTransactionsDescription": "Your transaction history will appear here",
+		"fallbackWalletName": "Wallet {{id}}"
 	},
 	"taxAssociation": {
 		"dialogTitle": "Link Tax Rate",

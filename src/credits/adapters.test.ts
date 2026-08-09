@@ -1,7 +1,7 @@
 // src/credits/adapters.test.ts
 import { describe, it, expect } from 'vitest';
-import { WALLET_STATUS } from '@/models/Wallet';
-import { adaptCreditBalance } from './adapters';
+import { WALLET_STATUS, WALLET_TRANSACTION_REASON } from '@/models/Wallet';
+import { adaptCreditBalance, adaptCreditTransactions, adaptWalletOptions } from './adapters';
 
 const WALLET = {
 	id: 'wallet_1',
@@ -48,5 +48,74 @@ describe('adaptCreditBalance', () => {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const result = adaptCreditBalance({ ...WALLET, currency: '' } as any);
 		expect(result.currency).toBe('USD');
+	});
+});
+
+describe('adaptCreditTransactions', () => {
+	it('maps transaction fields', () => {
+		const result = adaptCreditTransactions([
+			{
+				id: 'tx_1',
+				amount: 100,
+				balance_after: 200,
+				balance_before: 100,
+				created_at: '2026-01-01T00:00:00Z',
+				description: '',
+				metadata: {},
+				reference_id: '',
+				reference_type: '',
+				transaction_status: 'completed',
+				type: 'credit',
+				wallet_id: 'w1',
+				credit_amount: 90,
+				transaction_reason: WALLET_TRANSACTION_REASON.FREE_CREDIT_GRANT,
+				expiry_date: '2026-06-01T00:00:00Z',
+				priority: 1,
+				currency: 'USD',
+			},
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		] as any);
+		expect(result).toEqual([
+			{
+				id: 'tx_1',
+				type: 'credit',
+				amount: 100,
+				creditAmount: 90,
+				currency: 'USD',
+				reason: WALLET_TRANSACTION_REASON.FREE_CREDIT_GRANT,
+				createdAt: '2026-01-01T00:00:00Z',
+				expiryDate: '2026-06-01T00:00:00Z',
+				priority: 1,
+			},
+		]);
+	});
+
+	it('treats any non-debit type as credit, and leaves an empty expiry_date undefined', () => {
+		 
+		const result = adaptCreditTransactions([
+			{ id: 'tx_2', type: 'debit', amount: 5, credit_amount: 5, created_at: '', transaction_reason: 'X', expiry_date: '' },
+		] as any);
+		expect(result[0].type).toBe('debit');
+		expect(result[0].expiryDate).toBeUndefined();
+	});
+
+	it('returns [] for empty/undefined input', () => {
+		expect(adaptCreditTransactions([])).toEqual([]);
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		expect(adaptCreditTransactions(undefined as any)).toEqual([]);
+	});
+});
+
+describe('adaptWalletOptions', () => {
+	it('maps wallets to id/label options', () => {
+		const result = adaptWalletOptions([
+			{ id: 'w1', name: 'Main' },
+			{ id: 'w2', name: '' },
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		] as any);
+		expect(result).toEqual([
+			{ id: 'w1', label: 'Main' },
+			{ id: 'w2', label: '' },
+		]);
 	});
 });

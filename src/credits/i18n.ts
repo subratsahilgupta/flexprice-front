@@ -23,6 +23,10 @@ const EN_CREDIT_WIDGETS = {
 	'status.active': 'Active',
 	'status.frozen': 'Frozen',
 	'status.closed': 'Closed',
+	transactionHistory: 'Transaction History',
+	noTransactionsTitle: 'No transactions',
+	noTransactionsDescription: 'Your transaction history will appear here',
+	fallbackWalletName: 'Wallet {{id}}',
 };
 
 export const useCreditsT = createBundledT('common', { creditWidgets: EN_CREDIT_WIDGETS }).useBoundT;

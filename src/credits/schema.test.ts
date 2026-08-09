@@ -1,6 +1,6 @@
 // src/credits/schema.test.ts
 import { describe, it, expect } from 'vitest';
-import { normalizeCreditBalanceData } from './schema';
+import { normalizeCreditBalanceData, normalizeCreditTransactions } from './schema';
 
 describe('normalizeCreditBalanceData', () => {
 	it('coerces valid input through unchanged', () => {
@@ -39,5 +39,28 @@ describe('normalizeCreditBalanceData', () => {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const result = normalizeCreditBalanceData({ name: 'X', status: 'active', creditBalance: 1, balance: 1, currency: 'USD' } as any);
 		expect(result.id).toBe('');
+	});
+});
+
+describe('normalizeCreditTransactions', () => {
+	it('coerces valid input through unchanged', () => {
+		const input = [{ id: 't1', type: 'credit' as const, amount: 10, creditAmount: 10, reason: 'X', createdAt: '2026-01-01' }];
+		expect(normalizeCreditTransactions(input)).toEqual(input);
+	});
+
+	it('normalizes a null currency to undefined, not the string "null"', () => {
+		 
+		const result = normalizeCreditTransactions([
+			{ id: 't1', type: 'credit', amount: 1, creditAmount: 1, reason: 'X', createdAt: '', currency: null },
+		] as any);
+		expect(result[0].currency).toBeUndefined();
+	});
+
+	it('falls back an invalid type to credit', () => {
+		 
+		const result = normalizeCreditTransactions([
+			{ id: 't1', type: 'bogus', amount: 1, creditAmount: 1, reason: 'X', createdAt: '' },
+		] as any);
+		expect(result[0].type).toBe('credit');
 	});
 });

@@ -6,7 +6,8 @@
 import { WALLET_STATUS } from '@/models/Wallet';
 import type { WalletResponse } from '@/types/dto/Wallet';
 import type { RealtimeWalletBalance } from '@/models/WalletBalance';
-import type { CreditBalanceData } from './types';
+import type { WalletTransaction } from '@/models/WalletTransaction';
+import type { CreditBalanceData, CreditTransaction, CreditWalletOption } from './types';
 
 const STATUS_MAP: Record<WALLET_STATUS, CreditBalanceData['status']> = {
 	[WALLET_STATUS.ACTIVE]: 'active',
@@ -24,4 +25,24 @@ export function adaptCreditBalance(wallet: WalletResponse, realtime?: RealtimeWa
 		balance: Number(realtime?.balance ?? wallet.balance ?? 0),
 		currency: realtime?.currency || wallet.currency || 'USD',
 	};
+}
+
+// ── CreditHistory ────────────────────────────────────────────────────────────
+
+export function adaptCreditTransactions(items: WalletTransaction[]): CreditTransaction[] {
+	return (items ?? []).map((tx) => ({
+		id: tx.id,
+		type: tx.type === 'debit' ? 'debit' : 'credit',
+		amount: Number(tx.amount) || 0,
+		creditAmount: Number(tx.credit_amount) || 0,
+		currency: tx.currency,
+		reason: tx.transaction_reason,
+		createdAt: tx.created_at,
+		expiryDate: tx.expiry_date || undefined,
+		priority: tx.priority,
+	}));
+}
+
+export function adaptWalletOptions(wallets: WalletResponse[]): CreditWalletOption[] {
+	return (wallets ?? []).map((w) => ({ id: w.id, label: w.name || '' }));
 }

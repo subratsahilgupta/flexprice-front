@@ -549,7 +549,11 @@
 			"active": "نشط",
 			"frozen": "مجمّد",
 			"closed": "مغلق"
-		}
+		},
+		"transactionHistory": "سجل المعاملات",
+		"noTransactionsTitle": "لا توجد معاملات",
+		"noTransactionsDescription": "سيظهر سجل معاملاتك هنا",
+		"fallbackWalletName": "محفظة {{id}}"
 	},
 	"taxAssociation": {
 		"dialogTitle": "ربط سعر ضريبي",
