@@ -538,6 +538,19 @@
 		"cellEmDash": "—",
 		"cellEmpty": "--"
 	},
+	"creditWidgets": {
+		"defaultName": "محفظة",
+		"balance": "الرصيد",
+		"credits": "أرصدة",
+		"valueSuffix": "قيمة",
+		"emptyTitle": "لا توجد محفظة",
+		"emptyDescription": "لم يتم إعداد محفظة لهذا الحساب",
+		"status": {
+			"active": "نشط",
+			"frozen": "مجمّد",
+			"closed": "مغلق"
+		}
+	},
 	"taxAssociation": {
 		"dialogTitle": "ربط سعر ضريبي",
 		"taxRateRequired": "سعر الضريبة مطلوب",
