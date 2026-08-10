@@ -22,11 +22,21 @@
  * Minimal reset, scoped to the widget subtree only (Tailwind Preflight is disabled for this
  * build so the package never resets a host page's styles). Covers what the components rely on:
  * border-box sizing, neutral borders, and neutral form controls.
+ *
+ * Scoped via `:where(.flexprice-ui)`, not `.flexprice-ui`: `:where()` always contributes ZERO
+ * specificity, so `:where(.flexprice-ui) button` has the same specificity as a bare `button` —
+ * exactly what real Tailwind Preflight uses. Without `:where()`, the `.flexprice-ui` prefix
+ * raises these selectors above single-class utilities like `.bg-surface` or `.border-line-slate`
+ * (a *class* + a *type* beats a lone *class*), so components' own Tailwind classes would lose to
+ * this reset regardless of source order — verified live: buttons rendered fully transparent and
+ * cards had zero-width borders despite `bg-surface`/`border` classes being present. (Note:
+ * `@layer` was tried first and doesn't work here — this build's PostCSS pipeline strips `@layer`
+ * from the compiled output entirely, so it provided no real cascade-layer isolation.)
  */
-.flexprice-ui,
-.flexprice-ui *,
-.flexprice-ui *::before,
-.flexprice-ui *::after {
+:where(.flexprice-ui),
+:where(.flexprice-ui) *,
+:where(.flexprice-ui) *::before,
+:where(.flexprice-ui) *::after {
 	box-sizing: border-box;
 	border-width: 0;
 	border-style: solid;
@@ -40,21 +50,21 @@
  * headers, which render white-on-white. Components style their own backgrounds, so the
  * neutral default here is `transparent`.
  */
-.flexprice-ui button,
-.flexprice-ui [type='button'],
-.flexprice-ui [type='reset'],
-.flexprice-ui [type='submit'] {
+:where(.flexprice-ui) button,
+:where(.flexprice-ui) [type='button'],
+:where(.flexprice-ui) [type='reset'],
+:where(.flexprice-ui) [type='submit'] {
 	-webkit-appearance: button;
 	background-color: transparent;
 	background-image: none;
 	cursor: pointer;
 }
 
-.flexprice-ui button,
-.flexprice-ui input,
-.flexprice-ui optgroup,
-.flexprice-ui select,
-.flexprice-ui textarea {
+:where(.flexprice-ui) button,
+:where(.flexprice-ui) input,
+:where(.flexprice-ui) optgroup,
+:where(.flexprice-ui) select,
+:where(.flexprice-ui) textarea {
 	font-family: inherit;
 	font-feature-settings: inherit;
 	font-variation-settings: inherit;
@@ -67,7 +77,7 @@
 	padding: 0;
 }
 
-.flexprice-ui :disabled {
+:where(.flexprice-ui) :disabled {
 	cursor: default;
 }
 
