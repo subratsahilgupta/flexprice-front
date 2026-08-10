@@ -1,3 +1,5 @@
+import { useRef, useEffect, useCallback } from 'react';
+
 /**
  * Shared ownership count for the Dialog/Sheet scroll-lock safety net (see Dialog.tsx / Sheet.tsx).
  *
@@ -32,8 +34,69 @@ export function hasRegisteredOpenModals(): boolean {
  * Popover/Select dropdown portaled outside any Dialog/Sheet. Extend this selector, not the call
  * sites, when a new overlay type needs to participate in the safety net.
  */
-const OPEN_OVERLAY_SELECTOR = '[role="dialog"][data-state="open"], [role="alertdialog"][data-state="open"], [data-radix-popper-content-wrapper]';
+const OPEN_OVERLAY_SELECTOR =
+	'[role="dialog"][data-state="open"], [role="alertdialog"][data-state="open"], [data-radix-popper-content-wrapper]';
 
 export function hasOpenOverlayInDom(): boolean {
 	return !!document.querySelector(OPEN_OVERLAY_SELECTOR);
+}
+
+const PORTALED_OVERLAY_SELECTOR = [
+	'[data-radix-popper-content-wrapper]',
+	'[data-radix-select-content]',
+	'[data-radix-menu-content]',
+	'[data-radix-dropdown-menu-content]',
+	'[data-radix-popover-content]',
+].join(', ');
+
+const isPortaledOverlayTarget = (target: EventTarget | null) => target instanceof Element && !!target.closest(PORTALED_OVERLAY_SELECTOR);
+
+const hasOpenPortaledOverlay = () => !!document.querySelector(PORTALED_OVERLAY_SELECTOR);
+
+/**
+ * Non-modal Sheets/Dialogs (see useSheetOutsideDismissGuards below) still dismiss on outside
+ * click via Radix's dismissable layer even though `modal={false}` disables pointer-event
+ * blocking. Without this guard, clicking a portaled Select/Popover/Combobox nested inside the
+ * sheet/dialog reads as an "outside" click to Radix's layer and closes the sheet/dialog out from
+ * under the dropdown mid-interaction.
+ */
+export function useSheetOutsideDismissGuards(enabled = true) {
+	const suppressDismissRef = useRef(false);
+
+	useEffect(() => {
+		if (!enabled) {
+			suppressDismissRef.current = false;
+			return;
+		}
+
+		// Capture before nested dismissable layers unmount open dropdowns.
+		const onPointerDownCapture = () => {
+			if (!hasOpenPortaledOverlay()) return;
+			suppressDismissRef.current = true;
+			// Backup clear if this gesture never hits the outside handlers (e.g. click inside the sheet/dialog).
+			window.setTimeout(() => {
+				suppressDismissRef.current = false;
+			}, 100);
+		};
+
+		document.addEventListener('pointerdown', onPointerDownCapture, true);
+		return () => document.removeEventListener('pointerdown', onPointerDownCapture, true);
+	}, [enabled]);
+
+	const preventOutsideDismiss = useCallback((event: Event) => {
+		if (isPortaledOverlayTarget(event.target) || suppressDismissRef.current || hasOpenPortaledOverlay()) {
+			event.preventDefault();
+			suppressDismissRef.current = false;
+		}
+	}, []);
+
+	const preventFocusOutsideDismiss = useCallback((event: Event) => {
+		event.preventDefault();
+	}, []);
+
+	return {
+		onPointerDownOutside: preventOutsideDismiss,
+		onInteractOutside: preventOutsideDismiss,
+		onFocusOutside: preventFocusOutsideDismiss,
+	};
 }
