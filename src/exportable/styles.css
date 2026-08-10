@@ -5,9 +5,14 @@
  * It ships the theme tokens (light + dark) the components rely on, plus only the Tailwind
  * utilities actually used by the pricing components (scoped via tailwind.flexprice-ui.config.js).
  *
- * Theme it by overriding these CSS variables on the `.flexprice-ui` element (values are HSL
- * channels, matching the tokens defined below), e.g.:
- *   .flexprice-ui { --primary: 243 75% 59%; --radius: 12px; }
+ * Theme it by overriding these CSS variables with a selector that matches `.flexprice-ui`
+ * itself — the tokens are declared on that element, so an override on an *ancestor* loses
+ * the cascade and silently does nothing. Values are HSL channels. e.g.:
+ *   .my-app .flexprice-ui { --primary: 243 75% 59%; }
+ *
+ * Note: `--radius` and `--brand` are declared below for parity with the app theme, but the
+ * library build resolves Tailwind's radius scale to literals, so overriding `--radius` has no
+ * effect on the emitted utilities. `--primary` is the live accent hook.
  */
 @tailwind base;
 @tailwind components;
@@ -16,7 +21,7 @@
 /*
  * Minimal reset, scoped to the widget subtree only (Tailwind Preflight is disabled for this
  * build so the package never resets a host page's styles). Covers what the components rely on:
- * border-box sizing and neutral borders.
+ * border-box sizing, neutral borders, and neutral form controls.
  */
 .flexprice-ui,
 .flexprice-ui *,
@@ -26,6 +31,44 @@
 	border-width: 0;
 	border-style: solid;
 	border-color: hsl(var(--border));
+}
+
+/*
+ * Form controls. Without Preflight, a bare `<button>` keeps the UA's `buttonface`
+ * background (#efefef in Chrome) and the UA font. That is invisible on a light page but
+ * paints as a solid near-white block in dark mode — see UsageBreakdown's sortable column
+ * headers, which render white-on-white. Components style their own backgrounds, so the
+ * neutral default here is `transparent`.
+ */
+.flexprice-ui button,
+.flexprice-ui [type='button'],
+.flexprice-ui [type='reset'],
+.flexprice-ui [type='submit'] {
+	-webkit-appearance: button;
+	background-color: transparent;
+	background-image: none;
+	cursor: pointer;
+}
+
+.flexprice-ui button,
+.flexprice-ui input,
+.flexprice-ui optgroup,
+.flexprice-ui select,
+.flexprice-ui textarea {
+	font-family: inherit;
+	font-feature-settings: inherit;
+	font-variation-settings: inherit;
+	font-size: 100%;
+	font-weight: inherit;
+	line-height: inherit;
+	letter-spacing: inherit;
+	color: inherit;
+	margin: 0;
+	padding: 0;
+}
+
+.flexprice-ui :disabled {
+	cursor: default;
 }
 
 /* Theme tokens are scoped to the widget wrapper (not :root), so they can't leak onto host UI. */

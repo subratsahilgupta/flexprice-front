@@ -1,4 +1,4 @@
-// Library build for @flexprice/flexprice-ui (the umbrella package of all exportable components).
+// Library build for @flexprice/ui (the umbrella package of all exportable components).
 //
 // Run: `npm run build:ui`. Emits an installable React UI package (ESM + UMD + CSS + types) into
 // packages/flexprice-ui/dist. React is externalized (peer dependency); everything the components

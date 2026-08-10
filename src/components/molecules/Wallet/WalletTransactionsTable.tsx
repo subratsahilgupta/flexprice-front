@@ -1,4 +1,4 @@
-import FlexpriceTable, { ColumnData } from '@/components/molecules/Table';
+import FlexpriceTable, { ColumnData } from '@/components/molecules/Table/Table';
 import { cn } from '@/lib/utils';
 import { WALLET_TRANSACTION_REASON } from '@/models/Wallet';
 import { WalletTransaction } from '@/models/WalletTransaction';

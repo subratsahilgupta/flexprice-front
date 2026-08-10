@@ -1,7 +1,7 @@
 // src/components/molecules/Wallet/WalletTransactionsTable.i18n.ts
 //
 // Bundled i18n so WalletTransactionsTable renders real English out-of-the-box when reused by
-// exportable components (e.g. @flexprice/flexprice-ui's CreditHistory) — WITHOUT overriding a
+// exportable components (e.g. @flexprice/ui's CreditHistory) — WITHOUT overriding a
 // host app that has its own i18n. Mirrors `src/components/molecules/CustomerUsageChart.i18n.ts`.
 // Namespace is `'billing'` (not `'common'`) to match WalletTransactionsTable's existing
 // `useTranslation('billing')` call — the host-i18n handoff only works if the namespace matches

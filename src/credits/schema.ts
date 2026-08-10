@@ -23,7 +23,7 @@ const nullishToCurrency = z.preprocess((v) => (v == null || v === '' ? 'USD' : v
 
 function devWarn(label: string) {
 	return (issue: NormalizerIssue) => {
-		if (import.meta.env?.DEV) console.warn(`[@flexprice/flexprice-ui] invalid ${label} dropped/normalized:`, issue);
+		if (import.meta.env?.DEV) console.warn(`[@flexprice/ui] invalid ${label} dropped/normalized:`, issue);
 	};
 }
 
