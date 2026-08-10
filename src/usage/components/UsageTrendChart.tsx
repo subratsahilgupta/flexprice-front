@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
-import { Card } from '@/components/atoms';
+// Direct file import, NOT the '@/components/atoms' barrel — see UsageQuota.tsx for why.
+import Card from '@/components/atoms/Card/Card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { CustomerUsageChart } from '@/components/molecules';
+// Direct file import, NOT the `@/components/molecules` barrel — see MetricCards.tsx for why.
+import CustomerUsageChart from '@/components/molecules/CustomerUsageChart';
 import type { GetUsageAnalyticsResponse } from '@/types/dto';
 import { cn } from '@/lib/utils';
 import { useUsageT } from '../i18n';

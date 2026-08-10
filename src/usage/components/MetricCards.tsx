@@ -1,5 +1,10 @@
 import { useMemo } from 'react';
-import { MetricCard } from '@/components/molecules';
+// Direct file import, NOT the `@/components/molecules` barrel: that barrel also re-exports
+// `TaxTable`, which imports `@/core/routes/Routes` for a route-name constant — pulling the
+// entire dashboard router (and every lazy-loaded page behind it) into this exported widget's
+// bundle. Verified via a full static-reachability trace after a real npm-consumer build blew up
+// to 17MB / pulled in unrelated dashboard pages (WebhookDashboard, InvoicesWidget, SubscriptionsWidget).
+import MetricCard from '@/components/molecules/MetricCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { useUsageT } from '../i18n';

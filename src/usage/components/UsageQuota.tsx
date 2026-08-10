@@ -1,5 +1,9 @@
 import { useMemo } from 'react';
-import { Card, Progress } from '@/components/atoms';
+// Direct file imports, NOT the '@/components/atoms' barrel — that barrel also re-exports
+// ErrorBoundary, which imports '@/core/routes/Routes' and drags the whole dashboard router (and
+// every lazy-loaded page behind it) into this exported widget's bundle.
+import Card from '@/components/atoms/Card/Card';
+import Progress from '@/components/atoms/Progress/Progress';
 import { formatAmount } from '@/components/atoms/Input/Input';
 import { cn } from '@/lib/utils';
 import { useUsageT } from '../i18n';

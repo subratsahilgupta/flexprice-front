@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronDown, ChevronUp, ChevronsUpDown } from 'lucide-react';
-import { Card } from '@/components/atoms';
+// Direct file import, NOT the '@/components/atoms' barrel — see UsageQuota.tsx for why.
+import Card from '@/components/atoms/Card/Card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/molecules/Table/Table';
 import { formatNumber, getCurrencySymbol } from '@/utils';
 import { cn } from '@/lib/utils';
