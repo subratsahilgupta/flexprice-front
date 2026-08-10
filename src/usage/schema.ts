@@ -13,6 +13,15 @@ const nullishToString = z.preprocess((v) => (v == null ? '' : v), z.coerce.strin
 // Optional string fields: `null`/`undefined` must both leave the field unset, not coerce to the
 // literal string "null" — `z.coerce.string().optional()` alone only short-circuits on `undefined`.
 const nullishToOptionalString = z.preprocess((v) => (v == null ? undefined : v), z.coerce.string().optional());
+// `z.coerce.boolean()` runs values through the JS `Boolean()` constructor, so any non-empty
+// string — including the literal `"false"` — coerces to `true`. Parse `"true"`/`"false"` strings
+// explicitly instead; any other input still passes through to a real boolean or `.catch()`.
+const looseBoolean = z.preprocess((v) => {
+	if (typeof v !== 'string') return v;
+	if (v.toLowerCase() === 'true') return true;
+	if (v.toLowerCase() === 'false') return false;
+	return v;
+}, z.boolean());
 
 function devWarn(label: string) {
 	return (issue: NormalizerIssue) => {
@@ -28,7 +37,7 @@ export const UsageQuotaItemSchema = z
 		name: nullishToString,
 		currentUsage: z.coerce.number().catch(0),
 		limit: z.coerce.number().nullable().catch(null),
-		isUnlimited: z.coerce.boolean().catch(false),
+		isUnlimited: looseBoolean.catch(false),
 	})
 	.passthrough();
 
@@ -47,9 +56,9 @@ export const MetricCardItemSchema = z
 		customLabel: nullishToOptionalString,
 		value: z.coerce.number().catch(0),
 		currency: nullishToOptionalString,
-		isPercent: z.coerce.boolean().optional(),
-		showChangeIndicator: z.coerce.boolean().optional(),
-		isNegative: z.coerce.boolean().optional(),
+		isPercent: looseBoolean.optional().catch(undefined),
+		showChangeIndicator: looseBoolean.optional().catch(undefined),
+		isNegative: looseBoolean.optional().catch(undefined),
 	})
 	.passthrough();
 

@@ -25,4 +25,18 @@ describe('UsageBreakdown', () => {
 		const { container } = render(<UsageBreakdown rows={[]} isLoading />);
 		expect(container.querySelector('.animate-pulse')).not.toBeNull();
 	});
+
+	it('renders a non-numeric totalUsageDisplay as-is instead of "NaN"', () => {
+		render(<UsageBreakdown rows={[{ id: 'feat_1', name: 'API Calls', totalUsage: 0, totalCost: 0, totalUsageDisplay: 'N/A' }]} />);
+		expect(screen.getByText('N/A')).toBeInTheDocument();
+		expect(screen.queryByText(/NaN/)).not.toBeInTheDocument();
+	});
+
+	it('exposes aria-expanded and a focus-visible ring on an expandable group header row', () => {
+		render(<UsageBreakdown rows={ROWS} />);
+		const groupRow = screen.getByText('Core').closest('[role="button"]');
+		expect(groupRow).toHaveAttribute('aria-expanded');
+		expect(groupRow?.className).toContain('focus-visible:ring-2');
+		expect(groupRow?.className).not.toContain('focus:outline-none');
+	});
 });

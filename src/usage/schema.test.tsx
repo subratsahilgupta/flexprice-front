@@ -18,7 +18,27 @@ describe('normalizeUsageQuotaItems', () => {
 	it('coerces malformed numeric fields instead of throwing', () => {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const result = normalizeUsageQuotaItems([{ id: 'f1', name: 'X', currentUsage: 'oops', limit: null, isUnlimited: 'yes' }] as any);
-		expect(result).toEqual([{ id: 'f1', name: 'X', currentUsage: 0, limit: null, isUnlimited: true }]);
+		// 'yes' isn't a recognized boolean string — falls back to false rather than the JS
+		// `Boolean("yes")` truthy-string coercion.
+		expect(result).toEqual([{ id: 'f1', name: 'X', currentUsage: 0, limit: null, isUnlimited: false }]);
+	});
+
+	it('parses explicit "true"/"false" strings instead of JS-truthy-coercing every non-empty string', () => {
+		// Regression: `z.coerce.boolean()` runs input through the JS `Boolean()` constructor, so
+		// the literal string "false" — e.g. a serialized boolean from an external consumer — used
+		// to coerce to `true`.
+		const result = normalizeUsageQuotaItems([
+			{ id: 'f1', name: 'A', currentUsage: 1, limit: 10, isUnlimited: 'false' },
+			{ id: 'f2', name: 'B', currentUsage: 1, limit: 10, isUnlimited: 'true' },
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		] as any);
+		expect(result[0].isUnlimited).toBe(false);
+		expect(result[1].isUnlimited).toBe(true);
+	});
+
+	it('treats a zero limit as finite, not absent', () => {
+		const result = normalizeUsageQuotaItems([{ id: 'f1', name: 'X', currentUsage: 0, limit: 0, isUnlimited: false }]);
+		expect(result[0].limit).toBe(0);
 	});
 });
 
@@ -39,6 +59,16 @@ describe('normalizeMetricCardItems', () => {
 		const result = normalizeMetricCardItems([{ id: 'x', titleKey: 'revenue', value: 5, currency: null }] as any);
 		expect(result[0].currency).toBeUndefined();
 		expect(result[0].currency).not.toBe('null');
+	});
+
+	it('parses explicit "true"/"false" strings for isPercent/showChangeIndicator/isNegative', () => {
+		const result = normalizeMetricCardItems([
+			{ id: 'x', titleKey: 'marginPercent', value: 5, isPercent: 'false', showChangeIndicator: 'true', isNegative: 'false' },
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		] as any);
+		expect(result[0].isPercent).toBe(false);
+		expect(result[0].showChangeIndicator).toBe(true);
+		expect(result[0].isNegative).toBe(false);
 	});
 });
 

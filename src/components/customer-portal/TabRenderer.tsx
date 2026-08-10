@@ -44,7 +44,7 @@ interface TabRendererProps {
  * Maps tab.type to the correct lazily-loaded widget.
  * analyticsParams is always passed from SectionContent (which owns the date filter state).
  */
-const TabRenderer = ({ tab, subscriptions = [], usageData = [], analyticsParams }: TabRendererProps) => {
+const TabRenderer = ({ tab, subscriptions = [], usageData, analyticsParams }: TabRendererProps) => {
 	return (
 		<Suspense fallback={<FallbackLoader />}>
 			{tab.type === 'subscriptions' && <SubscriptionsWidget subscriptions={subscriptions} label={tab.label} />}

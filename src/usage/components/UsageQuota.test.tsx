@@ -22,6 +22,17 @@ describe('UsageQuota', () => {
 		expect(screen.getByText('Usage Quota')).toBeInTheDocument();
 	});
 
+	it('treats a zero limit as finite, not unlimited', () => {
+		render(<UsageQuota items={[{ id: 'f1', name: 'Zero Quota', currentUsage: 0, limit: 0, isUnlimited: false }]} />);
+		// "0 / 0" — a real, finite zero-limit quota — not "0 / Unlimited".
+		expect(screen.getByText(/^0\s*\/\s*0$/)).toBeInTheDocument();
+	});
+
+	it('marks a zero-limit quota as over-limit once any usage exists', () => {
+		const { container } = render(<UsageQuota items={[{ id: 'f1', name: 'Zero Quota', currentUsage: 5, limit: 0, isUnlimited: false }]} />);
+		expect(container.querySelector('.bg-destructive')).toBeInTheDocument();
+	});
+
 	it('renders nothing for an empty item list', () => {
 		const { container } = render(<UsageQuota items={[]} />);
 		expect(container).toBeEmptyDOMElement();

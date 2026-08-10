@@ -52,8 +52,7 @@ describe('adaptUsageQuotaItems', () => {
 
 	it('returns [] for empty/undefined input', () => {
 		expect(adaptUsageQuotaItems([])).toEqual([]);
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		expect(adaptUsageQuotaItems(undefined as any)).toEqual([]);
+		expect(adaptUsageQuotaItems(undefined)).toEqual([]);
 	});
 });
 

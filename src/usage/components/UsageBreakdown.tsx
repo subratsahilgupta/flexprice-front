@@ -20,8 +20,12 @@ interface GroupBucket {
 
 function renderUsageCell(row: UsageBreakdownRow) {
 	const useDisplayValue = row.totalUsageDisplay != null && row.totalUsageDisplay !== '';
-	const displayNum = useDisplayValue ? Number(parseFloat(row.totalUsageDisplay!.replace(/,/g, ''))) : row.totalUsage;
-	const formatted = useDisplayValue ? formatNumber(displayNum, displayNum % 1 === 0 ? 0 : 2) : formatNumber(row.totalUsage);
+	const displayNum = useDisplayValue ? parseFloat(row.totalUsageDisplay!.replace(/,/g, '')) : row.totalUsage;
+	// A non-numeric totalUsageDisplay (e.g. "N/A") must never format to the literal string "NaN" —
+	// render the raw display value (or fall back to the numeric totalUsage) instead.
+	const formatted = Number.isFinite(displayNum)
+		? formatNumber(displayNum, displayNum % 1 === 0 ? 0 : 2)
+		: (row.totalUsageDisplay ?? formatNumber(row.totalUsage));
 	return (
 		<span>
 			{formatted}
@@ -177,6 +181,7 @@ const UsageBreakdown = ({ rows: rawRows, label, isLoading = false, className }: 
 										<TableRow
 											role='button'
 											tabIndex={0}
+											aria-expanded={bucket.items.length > 0 ? isExpanded : undefined}
 											onClick={() => bucket.items.length > 0 && toggleGroup(bucket.groupKey)}
 											onKeyDown={(e) => {
 												if ((e.key === 'Enter' || e.key === ' ') && bucket.items.length > 0) {
@@ -185,7 +190,7 @@ const UsageBreakdown = ({ rows: rawRows, label, isLoading = false, className }: 
 												}
 											}}
 											className={cn(
-												'h-10 align-middle border-b border-line cursor-pointer outline-none focus:outline-none',
+												'h-10 align-middle border-b border-line cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset',
 												bucket.items.length === 0 && 'border-b-0 cursor-default',
 											)}>
 											<TableCell className='ps-3 py-2.5 align-middle'>

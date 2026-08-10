@@ -23,15 +23,23 @@ const UsageQuota = ({ items: rawItems, label, className }: UsageQuotaProps) => {
 			</div>
 			<div className='p-6 space-y-4'>
 				{items.map((item) => {
-					const percentage = item.limit ? Math.min(Math.ceil((item.currentUsage / item.limit) * 100), 100) : 0;
-					const isOverLimit = !!item.limit && item.currentUsage > item.limit;
+					// `item.limit` truthiness would treat a real 0 limit (e.g. a zero-quota entitlement)
+					// as absent — check `null` explicitly so zero stays a finite, over-limit-capable quota.
+					const hasFiniteLimit = !item.isUnlimited && item.limit !== null;
+					const percentage =
+						hasFiniteLimit && item.limit! > 0
+							? Math.min(Math.ceil((item.currentUsage / item.limit!) * 100), 100)
+							: item.currentUsage > 0
+								? 100
+								: 0;
+					const isOverLimit = hasFiniteLimit && item.currentUsage > item.limit!;
 					return (
 						<div key={item.id} className='space-y-2'>
 							<div className='flex items-center justify-between'>
 								<span className='text-sm text-content'>{item.name || t('usageWidgets.unknownFeature')}</span>
 								<span className='text-sm text-content-secondary'>
 									{formatAmount(item.currentUsage.toString())}
-									{item.limit ? ` / ${formatAmount(item.limit.toString())}` : ` / ${t('usageWidgets.unlimited')}`}
+									{hasFiniteLimit ? ` / ${formatAmount(item.limit!.toString())}` : ` / ${t('usageWidgets.unlimited')}`}
 								</span>
 							</div>
 							<Progress

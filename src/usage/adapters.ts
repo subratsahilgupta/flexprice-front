@@ -10,7 +10,7 @@ import type { MetricCardsConfig, UsageGraphConfig } from '@/types/dto/PortalConf
 import type { UsageQuotaItem, MetricCardItem, UsageTrendSeries, UsageBreakdownRow } from './types';
 
 /** Metered-usage entitlements only — static/boolean entitlements have no quota to show. */
-export function adaptUsageQuotaItems(usageData: CustomerUsage[]): UsageQuotaItem[] {
+export function adaptUsageQuotaItems(usageData: CustomerUsage[] | undefined): UsageQuotaItem[] {
 	return (usageData ?? [])
 		.filter((item) => item.feature?.type === FEATURE_TYPE.METERED)
 		.map((item, index) => ({
