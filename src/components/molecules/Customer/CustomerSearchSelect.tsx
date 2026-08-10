@@ -99,11 +99,14 @@ const CustomerSearchSelect: React.FC<CustomerSearchSelectProps> = ({
 		return items;
 	};
 
+	const excludeIdsForKey = excludeId ? (Array.isArray(excludeId) ? excludeId : [excludeId]) : [];
+
 	return (
 		<AsyncSearchableSelect<Customer>
 			{...props}
 			search={{
 				searchFn,
+				queryKeyPrefix: ['customer', limit, excludeIdsForKey.slice().sort().join(','), selfCustomer?.id, includeNoneOption],
 				placeholder: resolvedPlaceholder,
 			}}
 			extractors={{
