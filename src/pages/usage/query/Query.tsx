@@ -197,10 +197,6 @@ const QueryPage: React.FC = () => {
 		onError: (error: Error) => toast.error(error.message || 'Error fetching usage data'),
 	});
 
-	const resetFilters = () => {
-		setFilters(initialFilters);
-	};
-
 	// Fetch usage when filters change
 	useEffect(() => {
 		if (apiParams.meter_id) {
@@ -257,7 +253,7 @@ const QueryPage: React.FC = () => {
 						options={windowSizeOptions.map((option) => ({ label: option.label, value: option.value }))}
 					/>
 				</div>
-				<Button variant='outline' onClick={resetFilters}>
+				<Button variant='outline' onClick={() => fetchUsage()}>
 					<RefreshCw />
 				</Button>
 			</div>

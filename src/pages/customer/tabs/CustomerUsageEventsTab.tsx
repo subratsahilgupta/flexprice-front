@@ -243,11 +243,6 @@ const CustomerUsageEventsTab = () => {
 		fetchEvents(undefined);
 	};
 
-	const resetFilters = () => {
-		setFilters(initialFilters);
-		refetchEvents();
-	};
-
 	// Reset pagination when filters change
 	useEffect(() => {
 		reset();
@@ -296,7 +291,7 @@ const CustomerUsageEventsTab = () => {
 					onSortChange={setSorts}
 					selectedSorts={sorts}
 				/>
-				<Button variant='outline' onClick={resetFilters}>
+				<Button variant='outline' onClick={refetchEvents}>
 					<RefreshCw />
 				</Button>
 			</div>

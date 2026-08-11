@@ -242,6 +242,15 @@ const EventsPage: React.FC = () => {
 		setPropertyFilters([]);
 	};
 
+	// Re-fetch with the currently applied filters, unlike resetFilters which clears them - the
+	// standalone refresh button should refresh data, not reset the user's filter selections.
+	const refreshEvents = () => {
+		setEvents([]);
+		setIterLastKey(undefined);
+		setHasMore(true);
+		fetchEvents(undefined, true);
+	};
+
 	// Reset pagination when filters change
 	useEffect(() => {
 		reset();
@@ -274,7 +283,7 @@ const EventsPage: React.FC = () => {
 					}}
 					onFilterPopoverReset={resetFilters}
 				/>
-				<Button variant='outline' onClick={resetFilters}>
+				<Button variant='outline' onClick={refreshEvents}>
 					<RefreshCw />
 				</Button>
 			</div>
