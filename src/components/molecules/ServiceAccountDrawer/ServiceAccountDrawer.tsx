@@ -32,8 +32,8 @@ const ServiceAccountDrawer: FC<Props> = ({ isOpen, onOpenChange, data }) => {
 		isLoading: isLoadingRoles,
 		isError: isRolesError,
 	} = useQuery<RbacRole[]>({
-		queryKey: ['rbac-roles'],
-		queryFn: () => RbacApi.getAllRoles(),
+		queryKey: ['rbac-roles', 'service_account'],
+		queryFn: () => RbacApi.getAllRoles('service_account'),
 		enabled: isOpen && !isEditMode,
 		retry: false,
 	});
