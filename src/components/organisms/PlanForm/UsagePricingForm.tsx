@@ -58,6 +58,27 @@ interface TieredPrice {
 	flat_amount: string;
 }
 
+/**
+ * Only a non-last tier's up_to should ever be null - VolumeTieredPricingForm renders that as ∞,
+ * which is only meaningful for the true last tier. Backend data should already guarantee this,
+ * but normalize defensively on load anyway: a stray null on a non-last tier (e.g. from an older
+ * client/API path) would otherwise render as unbounded on a row that isn't actually last. The
+ * last tier's own up_to is left as-is (it may legitimately be a finite boundary, not just null).
+ */
+const normalizeTiers = (tiers: TieredPrice[]): PriceTier[] =>
+	tiers.map((tier, index) => {
+		const isLast = index === tiers.length - 1;
+		if (isLast) {
+			return { from: tier.from, up_to: tier.up_to, unit_amount: tier.unit_amount, flat_amount: tier.flat_amount };
+		}
+		return {
+			from: tier.from,
+			up_to: tier.up_to === null ? (tiers[index + 1]?.from ?? tier.from) : tier.up_to,
+			unit_amount: tier.unit_amount,
+			flat_amount: tier.flat_amount,
+		};
+	});
+
 // TODO: Remove disabled once the feature is released
 export const billingModels: SelectOption[] = [
 	{
@@ -188,14 +209,7 @@ const UsagePricingForm: FC<Props> = ({
 					unit: price.transform_quantity?.divide_by?.toString() || '',
 				});
 			} else if (price.billing_model === BILLING_MODEL.TIERED && Array.isArray(price.tiers)) {
-				setTieredPrices(
-					(price.tiers as unknown as TieredPrice[]).map((tier) => ({
-						from: tier.from,
-						up_to: tier.up_to,
-						unit_amount: tier.unit_amount,
-						flat_amount: tier.flat_amount,
-					})),
-				);
+				setTieredPrices(normalizeTiers(price.tiers as unknown as TieredPrice[]));
 
 				// Set the appropriate billing model based on tier_mode
 				if (price.tier_mode === TIER_MODE.SLAB) {
@@ -289,8 +303,21 @@ const UsagePricingForm: FC<Props> = ({
 					}
 				}
 
+				// Every non-last tier must have a real numeric boundary - VolumeTieredPricingForm allows
+				// the field to sit empty transiently while the user is retyping it (backspace, then
+				// digits), so an empty string can still be here if they navigate away before finishing.
+				const isLastTier = i === tieredPrices.length - 1;
+				if (!isLastTier && typeof tier.up_to !== 'number') {
+					setInputErrors((prev) => ({
+						...prev,
+						tieredModelError: `Up to value is required for tier ${i + 1}`,
+					}));
+					toast.error(`Up to value is required for tier ${i + 1}`);
+					return false;
+				}
+
 				// Validate tier ranges
-				if (tier.up_to !== null) {
+				if (typeof tier.up_to === 'number') {
 					if (tier.from > tier.up_to) {
 						setInputErrors((prev) => ({
 							...prev,
