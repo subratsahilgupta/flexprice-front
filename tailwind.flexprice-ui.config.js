@@ -1,4 +1,4 @@
-// Scoped Tailwind config for the @flexprice/flexprice-ui library build.
+// Scoped Tailwind config for the @flexprice/ui library build.
 //
 // Reuses the app's theme (tokens, radii, fonts) but only scans the files the exported components
 // actually render, so the emitted `style.css` stays lean. When a new component becomes exportable,

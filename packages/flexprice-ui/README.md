@@ -62,11 +62,17 @@ Or build the `Plan` objects yourself — see the exported `Plan` / `Feature` typ
 
 ## Theming
 
-Override the CSS variables on a wrapping element. Add `class="dark"` for dark mode.
+Override the CSS variables with a selector that matches `.flexprice-ui` itself — the tokens are
+declared on that element, so an override on an *ancestor* loses the cascade and silently does
+nothing. Add `class="dark"` for dark mode.
 
 ```css
-.my-pricing { --brand: 243 75% 59%; --radius: 12px; }
+.my-pricing .flexprice-ui { --primary: 243 75% 59%; }
 ```
+
+`--radius` and `--brand` exist for parity with the app theme, but the library build resolves
+Tailwind's radius scale to literals, so overriding `--radius` has no effect on the emitted
+utilities. `--primary` is the live accent hook.
 
 ## Dark mode
 

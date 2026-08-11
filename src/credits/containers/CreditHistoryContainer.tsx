@@ -19,8 +19,15 @@ interface CreditHistoryContainerProps {
 
 const CreditHistoryContainer = ({ className }: CreditHistoryContainerProps) => {
 	const { t } = useTranslation('customer-portal');
-	const { page, setPage, limit, offset } = usePagination({ prefix: PAGINATION_PREFIX.WALLET_TRANSACTIONS });
+	const { page, setPage, limit, offset, reset: resetPage } = usePagination({ prefix: PAGINATION_PREFIX.WALLET_TRANSACTIONS });
 	const [selectedWalletId, setSelectedWalletId] = useState<string>('');
+
+	// A page number valid for the previous wallet can be out of range (or just wrong) for the
+	// newly selected one — its transaction list has its own, independent total.
+	const handleSelectWallet = (walletId: string) => {
+		setSelectedWalletId(walletId);
+		resetPage();
+	};
 
 	const {
 		data: wallets,
@@ -61,7 +68,7 @@ const CreditHistoryContainer = ({ className }: CreditHistoryContainerProps) => {
 			transactions={transactions}
 			wallets={walletOptions}
 			selectedWalletId={activeWallet?.id}
-			onSelectWallet={setSelectedWalletId}
+			onSelectWallet={handleSelectWallet}
 			page={page}
 			pageSize={limit}
 			totalItems={transactionsData?.pagination?.total ?? 0}

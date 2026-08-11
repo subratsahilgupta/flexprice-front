@@ -20,9 +20,15 @@ const EN_CREDIT_WIDGETS = {
 	valueSuffix: 'value',
 	emptyTitle: 'No wallet',
 	emptyDescription: 'No wallet has been set up for this account',
-	'status.active': 'Active',
-	'status.frozen': 'Frozen',
-	'status.closed': 'Closed',
+	// Nested, not flat dot-notation keys: the component looks these up as
+	// `t('creditWidgets.status.${status}')`, and i18next's default keySeparator ('.') resolves
+	// that as a nested path (creditWidgets -> status -> active), not a literal flat key named
+	// "status.active".
+	status: {
+		active: 'Active',
+		frozen: 'Frozen',
+		closed: 'Closed',
+	},
 	transactionHistory: 'Transaction History',
 	transactionsUnit: 'Transactions',
 	noTransactionsTitle: 'No transactions',

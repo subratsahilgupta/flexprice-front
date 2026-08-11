@@ -177,4 +177,21 @@ describe('adaptUsageBreakdownRows', () => {
 		expect(result[0].groupId).toBeUndefined();
 		expect(result[0].groupName).toBeUndefined();
 	});
+
+	it('picks singular/plural off the converted display value, not the raw metered total', () => {
+		// A conversion_rate can make raw total_usage=1000 display as "1" — the unit shown must
+		// agree with what's on screen, not the underlying raw count.
+		const result = adaptUsageBreakdownRows([
+			{
+				feature_id: 'feat_1',
+				name: 'Storage',
+				total_usage: 1000,
+				total_usage_display: '1',
+				reporting_unit: { unit_singular: 'GB', unit_plural: 'GBs' },
+				total_cost: 5,
+			},
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		] as any);
+		expect(result[0].unit).toBe('GB');
+	});
 });

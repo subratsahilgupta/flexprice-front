@@ -91,12 +91,18 @@ export function adaptUsageTrendSeries(
 export function adaptUsageBreakdownRows(items: UsageAnalyticItem[]): UsageBreakdownRow[] {
 	return (items ?? []).map((row, index) => {
 		const group = row.group ?? row.feature?.group ?? row.price?.group;
+		// Singular/plural must key off the value actually shown, not the raw metered total: when
+		// `reporting_unit.conversion_rate` is set, `total_usage_display` can read "1" while raw
+		// `total_usage` is e.g. 1000 — plural would be wrong for what the user sees.
+		const displayQuantity =
+			row.total_usage_display != null ? parseFloat(row.total_usage_display.replace(/,/g, '')) : Number(row.total_usage);
+		const isSingular = Number.isFinite(displayQuantity) ? displayQuantity === 1 : Number(row.total_usage) === 1;
 		const unitLabel = row.reporting_unit
-			? Number(row.total_usage) === 1
+			? isSingular
 				? (row.reporting_unit.unit_singular ?? row.reporting_unit.unit_plural ?? '')
 				: (row.reporting_unit.unit_plural ?? row.reporting_unit.unit_singular ?? '')
 			: row.unit
-				? Number(row.total_usage) === 1
+				? isSingular
 					? row.unit
 					: (row.unit_plural ?? row.unit)
 				: undefined;

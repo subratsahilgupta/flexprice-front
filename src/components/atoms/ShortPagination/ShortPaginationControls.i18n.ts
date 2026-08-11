@@ -7,6 +7,8 @@ const EN_PAGINATION = {
 	page: 'Page {{current}} of {{total}}',
 	showingRange: 'Showing {{start}} to {{end}} of {{total}} {{unit}}',
 	unitItems: 'items',
+	previous: 'Previous',
+	next: 'Next',
 };
 
 export const usePaginationT = createBundledT('common', { pagination: EN_PAGINATION }).useBoundT;

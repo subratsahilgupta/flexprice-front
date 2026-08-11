@@ -47,6 +47,7 @@ export const ShortPaginationControls = ({
 					type='button'
 					variant='outline'
 					size='icon'
+					aria-label={t('pagination.previous')}
 					onClick={() => handlePageChange(clampedPage - 1)}
 					disabled={clampedPage === 1}
 					className={cn('size-8', clampedPage === 1 && 'cursor-not-allowed text-content-disabled')}>
@@ -59,6 +60,7 @@ export const ShortPaginationControls = ({
 					type='button'
 					variant='outline'
 					size='icon'
+					aria-label={t('pagination.next')}
 					onClick={() => handlePageChange(clampedPage + 1)}
 					disabled={clampedPage === totalPages}
 					className={cn('size-8', clampedPage === totalPages && 'cursor-not-allowed text-content-disabled')}>
