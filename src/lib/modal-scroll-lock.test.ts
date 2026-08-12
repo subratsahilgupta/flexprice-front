@@ -16,7 +16,7 @@ describe('modal-scroll-lock', () => {
 		expect(hasRegisteredOpenModals()).toBe(false);
 	});
 
-	it('calling the same release twice does not double-decrement another modal\'s registration', () => {
+	it("calling the same release twice does not double-decrement another modal's registration", () => {
 		const releaseA = registerModalOpen();
 		const releaseB = registerModalOpen();
 

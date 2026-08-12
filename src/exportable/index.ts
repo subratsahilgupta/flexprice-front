@@ -1,6 +1,6 @@
-// @flexprice/flexprice-ui — THE PUBLISHED PACKAGE ENTRY (umbrella).
+// @flexprice/ui — THE PUBLISHED PACKAGE ENTRY (umbrella).
 //
-// `npm i @flexprice/flexprice-ui` gives a consumer every exportable Flexprice UI component from
+// `npm i @flexprice/ui` gives a consumer every exportable Flexprice UI component from
 // one import. Today that's the pricing widget; as more components are made exportable, add one
 // line here (e.g. `export * from '@/checkout/lib';`) and its content globs to
 // tailwind.flexprice-ui.config.js — nothing else changes.
@@ -14,7 +14,13 @@ import './styles.css';
 // ── Pricing widget ───────────────────────────────────────────────────────────
 export * from '@/pricing/lib';
 
+// ── Usage widgets ────────────────────────────────────────────────────────────
+export * from '@/usage/lib';
+
+// ── Credits widgets ──────────────────────────────────────────────────────────
+export * from '@/credits/lib';
+
 // ── Future components (uncomment as they become exportable) ───────────────────
 // export * from '@/checkout/lib';
-// export * from '@/customer-portal/lib';
-// export * from '@/usage/lib';
+// export * from '@/invoices/lib';
+// export * from '@/subscriptions/lib';

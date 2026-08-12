@@ -34,12 +34,26 @@ export function createBundledT<N extends string>(namespace: N, resources: Record
 		// keep the host translator. `i18n.languages` is that ordered chain; fall back to the single
 		// language (or resolvedLanguage) if it's unavailable.
 		const chain = i18n?.languages ?? [i18n?.resolvedLanguage ?? i18n?.language].filter(Boolean);
-		const hostCanServe =
+		const hostCanServeNamespace =
 			!!i18n &&
 			i18n.isInitialized &&
 			typeof i18n.hasResourceBundle === 'function' &&
 			chain.some((lng) => i18n.hasResourceBundle(lng as string, namespace));
-		return hostCanServe ? (t as TFunction<N>) : fallbackT;
+		if (!hostCanServeNamespace) return fallbackT;
+
+		// The host has *a* `namespace` bundle, but that check is namespace-level, not per-key — a
+		// widget's keys can be missing from a host locale file that predates the widget (or was
+		// never updated). Resolve per key instead of trusting the host wholesale, so a missing key
+		// falls back to the bundled English default rather than rendering raw, e.g. "usageWidgets.quotaTitle".
+		const mergedT = ((...args: Parameters<TFunction<N>>) => {
+			const [key, options] = args;
+			const hostHasKey =
+				typeof i18n.exists === 'function'
+					? i18n.exists(key as string, { ns: namespace, ...(typeof options === 'object' ? options : {}) })
+					: true;
+			return hostHasKey ? t(...args) : fallbackT(...args);
+		}) as TFunction<N>;
+		return mergedT;
 	}
 
 	return { useBoundT };

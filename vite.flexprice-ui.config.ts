@@ -1,4 +1,4 @@
-// Library build for @flexprice/flexprice-ui (the umbrella package of all exportable components).
+// Library build for @flexprice/ui (the umbrella package of all exportable components).
 //
 // Run: `npm run build:ui`. Emits an installable React UI package (ESM + UMD + CSS + types) into
 // packages/flexprice-ui/dist. React is externalized (peer dependency); everything the components
@@ -16,6 +16,15 @@ export default createLibConfig({
 	outDir: 'packages/flexprice-ui/dist',
 	tailwindConfig: 'tailwind.flexprice-ui.config.js',
 	// dts follows the umbrella entry into each feature's lib.ts — include every exportable source.
-	dtsInclude: ['src/exportable/**/*.ts', 'src/exportable/**/*.tsx', 'src/pricing/**/*.ts', 'src/pricing/**/*.tsx'],
+	dtsInclude: [
+		'src/exportable/**/*.ts',
+		'src/exportable/**/*.tsx',
+		'src/pricing/**/*.ts',
+		'src/pricing/**/*.tsx',
+		'src/usage/**/*.ts',
+		'src/usage/**/*.tsx',
+		'src/credits/**/*.ts',
+		'src/credits/**/*.tsx',
+	],
 	tsconfigPath: 'tsconfig.flexprice-ui.json',
 });

@@ -6,7 +6,7 @@
 //   • a data-connected container (PricingContainer) for the dashboard / API-backed use,
 //   • presentational types and the pure DTO→Plan adapters.
 //
-// The published package (@flexprice/flexprice-ui) does NOT ship the container — its entry is the
+// The published package (@flexprice/ui) does NOT ship the container — its entry is the
 // UI-only `./lib.ts`, aggregated by `src/exportable/index.ts`.
 
 // Prop-only UI (no fetching / auth / routing)

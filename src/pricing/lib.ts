@@ -1,6 +1,6 @@
 // Pricing widget — FEATURE public surface (presentational only).
 //
-// Aggregated into the published package via `src/exportable/index.ts` (@flexprice/flexprice-ui).
+// Aggregated into the published package via `src/exportable/index.ts` (@flexprice/ui).
 // It exposes ONLY prop-only UI + pure helpers, so the published bundle never drags in the
 // dashboard's data layer (axios/auth/router/react-query). "Bring your own data": fetch plans
 // however you like, map them to `Plan` (via the exported adapters, or build the shape yourself),
