@@ -72,6 +72,7 @@ const CustomerUsageEventsTab = () => {
 	const [loading, setLoading] = useState(false);
 	const [iterLastKey, setIterLastKey] = useState<string | undefined>(undefined);
 	const observer = useRef<IntersectionObserver | null>(null);
+	const requestIdRef = useRef(0);
 
 	const sortingOptions: SortOption[] = useMemo(
 		() => [
@@ -195,10 +196,16 @@ const CustomerUsageEventsTab = () => {
 		};
 	}, [sanitizedFilters, customer?.external_id]);
 
-	// Fetch events from API
+	// Fetch events from API. `force` bypasses the in-flight guard so a filter change or manual
+	// refresh always supersedes a stale in-flight pagination request instead of being dropped by
+	// it - without it, refetchEvents (called right after setHasMore(true)) would still see the
+	// pre-update hasMore/loading values from this closure, since React state updates are async.
 	const fetchEvents = useCallback(
-		async (iterLastKey?: string) => {
-			if (!hasMore || loading || !customer?.external_id) return;
+		async (iterLastKey?: string, force = false) => {
+			// external_id is a hard precondition (not an in-flight guard), so force never bypasses it.
+			if (!customer?.external_id) return;
+			if (!force && (!hasMore || loading)) return;
+			const requestId = ++requestIdRef.current;
 			setLoading(true);
 			try {
 				const response = await EventsApi.getRawEvents({
@@ -206,6 +213,8 @@ const CustomerUsageEventsTab = () => {
 					page_size: 10,
 					...apiParams,
 				});
+
+				if (requestIdRef.current !== requestId) return;
 
 				if (response.events) {
 					setEvents((prevEvents) => (iterLastKey ? [...prevEvents, ...response.events] : response.events));
@@ -215,7 +224,7 @@ const CustomerUsageEventsTab = () => {
 			} catch (error) {
 				logger.error('Error fetching events:', error);
 			} finally {
-				setLoading(false);
+				if (requestIdRef.current === requestId) setLoading(false);
 			}
 		},
 		[apiParams, hasMore, loading, customer?.external_id],
@@ -237,15 +246,14 @@ const CustomerUsageEventsTab = () => {
 	);
 
 	const refetchEvents = () => {
+		// Disconnect the pagination observer first: it holds the pre-refresh iterLastKey in its
+		// closure, and if it fires after this forced refresh starts, it would append a stale page
+		// onto the freshly-refreshed first page.
+		observer.current?.disconnect();
 		setEvents([]);
 		setIterLastKey(undefined);
 		setHasMore(true);
-		fetchEvents(undefined);
-	};
-
-	const resetFilters = () => {
-		setFilters(initialFilters);
-		refetchEvents();
+		fetchEvents(undefined, true);
 	};
 
 	// Reset pagination when filters change
@@ -256,10 +264,11 @@ const CustomerUsageEventsTab = () => {
 	// Refetch events when filters change
 	useEffect(() => {
 		if (!customer?.external_id) return;
+		observer.current?.disconnect();
 		setEvents([]);
 		setIterLastKey(undefined);
 		setHasMore(true);
-		fetchEvents(undefined);
+		fetchEvents(undefined, true);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [apiParams]);
 
@@ -296,7 +305,7 @@ const CustomerUsageEventsTab = () => {
 					onSortChange={setSorts}
 					selectedSorts={sorts}
 				/>
-				<Button variant='outline' onClick={resetFilters}>
+				<Button variant='outline' onClick={refetchEvents}>
 					<RefreshCw />
 				</Button>
 			</div>

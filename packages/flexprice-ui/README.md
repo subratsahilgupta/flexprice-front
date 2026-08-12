@@ -1,24 +1,24 @@
-# @flexprice/flexprice-ui
+# @flexprice/ui
 
-Drop-in **React** components for pricing pages, extracted from the Flexprice dashboard so your
-app renders the exact same pricing UI. **Bring your own data** — the components are purely
-presentational (no fetching, no auth, no routing).
+Drop-in **React** components extracted from the Flexprice dashboard, so your app renders the
+exact same UI: pricing, usage, and credits widgets. **Bring your own data** — the components are
+purely presentational (no fetching, no auth, no routing).
 
 ## Install
 
 ```bash
-npm install @flexprice/flexprice-ui
+npm install @flexprice/ui
 ```
 
-`react` and `react-dom` (v18) are peer dependencies.
+`react` and `react-dom` (v18 or v19) are peer dependencies.
 
 ## Usage
 
 Import the stylesheet once (ships the theme tokens + only the utilities the widget uses):
 
 ```tsx
-import '@flexprice/flexprice-ui/style.css';
-import { PricingTable, PricingCard, type Plan } from '@flexprice/flexprice-ui';
+import '@flexprice/ui/style.css';
+import { PricingTable, PricingCard, type Plan } from '@flexprice/ui';
 ```
 
 ### `PricingTable` — the full grid
@@ -53,20 +53,54 @@ The `plans` prop is the presentational `Plan` shape (decoupled from the Flexpric
 fetch raw Flexprice plans/prices/entitlements, map them with the exported adapters:
 
 ```ts
-import { adaptPlanToCard, filterAndSortPlans } from '@flexprice/flexprice-ui';
+import { adaptPlanToCard, filterAndSortPlans } from '@flexprice/ui';
 
 const cards = filterAndSortPlans(plansWithData, 'USD', 'MONTHLY').map((p) => adaptPlanToCard(p, grants));
 ```
 
 Or build the `Plan` objects yourself — see the exported `Plan` / `Feature` types.
 
+## Usage widgets
+
+`UsageQuota`, `MetricCards`, `UsageTrendChart`, and `UsageBreakdown` render usage/cost analytics.
+Each takes a presentational prop shape (`UsageQuotaItem`, `MetricCardItem`, `UsageTrendSeries`,
+`UsageBreakdownRow`) — map your own data to these, or use the exported adapters
+(`adaptUsageQuotaItems`, `adaptMetricCards`, `adaptUsageTrendSeries`, `adaptUsageBreakdownRows`)
+against raw Flexprice API responses. `normalizeUsageQuotaItems` and friends are a runtime safety
+net you can call on untrusted/BYO data before rendering.
+
+```tsx
+import { UsageQuota, adaptUsageQuotaItems } from '@flexprice/ui';
+
+<UsageQuota items={adaptUsageQuotaItems(customerUsageFromApi)} />;
+```
+
+## Credits widgets
+
+`CreditBalance` and `CreditHistory` render wallet balance and transaction history. They take
+`CreditBalanceData` / `CreditTransaction[]` — map your own data, or use `adaptCreditBalance`,
+`adaptCreditTransactions`, and `adaptWalletOptions` against raw Flexprice wallet responses.
+`normalizeCreditBalanceData` and `normalizeCreditTransactions` are the same runtime safety net.
+
+```tsx
+import { CreditBalance, adaptCreditBalance } from '@flexprice/ui';
+
+<CreditBalance wallet={adaptCreditBalance(walletFromApi)} />;
+```
+
 ## Theming
 
-Override the CSS variables on a wrapping element. Add `class="dark"` for dark mode.
+Override the CSS variables with a selector that matches `.flexprice-ui` itself — the tokens are
+declared on that element, so an override on an *ancestor* loses the cascade and silently does
+nothing. Add `class="dark"` for dark mode.
 
 ```css
-.my-pricing { --brand: 243 75% 59%; --radius: 12px; }
+.my-pricing .flexprice-ui { --primary: 243 75% 59%; }
 ```
+
+`--radius` and `--brand` exist for parity with the app theme, but the library build resolves
+Tailwind's radius scale to literals, so overriding `--radius` has no effect on the emitted
+utilities. `--primary` is the live accent hook.
 
 ## Dark mode
 

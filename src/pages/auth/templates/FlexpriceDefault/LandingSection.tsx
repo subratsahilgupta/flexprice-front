@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { TestimonialCard } from '@/components/molecules';
 import { Testimonial, CustomerLogo } from '@/types';
 import { cn } from '@/lib/utils';
-import authBg from '../../../../../assets/toolright.jpg';
-import authBgDark from '../../../../../assets/onboardingdark.jpg';
+import authBg from '../../../../../assets/fortoolfinal.jpg';
+import authBgDark from '../../../../../assets/authdark.png';
 
 const testimonials: Testimonial[] = [
 	{
@@ -109,9 +109,8 @@ const LandingSection: React.FC = () => {
 		<section className='relative w-full min-h-full flex-1 pt-14 pb-12 flex flex-col items-center justify-center'>
 			{/*
 			 * Two photo layers rather than one image swapped in JS: `hidden` keeps the browser from
-			 * fetching the layer it will not show, so each theme pays for exactly one of these — which
-			 * matters, because the dark photo is ~6x the weight of the light one. It also means the
-			 * correct photo is there on first paint, with no flash while a store rehydrates.
+			 * fetching the layer it will not show, so each theme pays for exactly one of these.
+			 * Light auth uses fortoolfinal; dark uses authdark. Onboarding keeps side.png / sidedark.
 			 */}
 			<div
 				aria-hidden
@@ -131,7 +130,7 @@ const LandingSection: React.FC = () => {
 			<h2 className='relative text-[28px] font-normal text-zinc-950 dark:text-zinc-50 mb-[44px] text-center'>
 				{t('landing.defaultTagline')}
 			</h2>
-			<div className='relative flex justify-center items-center w-full max-w-7xl h-[340px] mb-10'>
+			<div className='relative flex justify-center items-center w-full max-w-7xl h-[340px] mb-6'>
 				<div ref={scrollRef} className='w-full overflow-x-hidden' style={{ height: 320 }}>
 					<div className='flex gap-x-7 w-max'>
 						{cards.map((card, idx) => (
@@ -156,7 +155,7 @@ const LandingSection: React.FC = () => {
 					</div>
 				</div>
 			</div>
-			<div className='relative w-full flex flex-col items-center mt-8'>
+			<div className='relative w-full flex flex-col items-center mt-4'>
 				<div className='text-center text-black dark:text-zinc-50 font-medium mb-14 text-lg'>{t('landing.trustedBy')}</div>
 				<div className='w-full max-w-3xl grid grid-cols-3 grid-rows-2 gap-y-12 gap-x-10 justify-items-center items-center'>
 					{customerLogos.map((logo) => (

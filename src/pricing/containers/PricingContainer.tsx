@@ -1,6 +1,7 @@
 import { FC, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Loader, Select } from '@/components/atoms';
+import Loader from '@/components/atoms/Loader/Loader';
+import Select from '@/components/atoms/Select/Select';
 import usePagination from '@/hooks/usePagination';
 import type { CreditGrant } from '@/models';
 import { usePricingData } from '../hooks/usePricingData';
