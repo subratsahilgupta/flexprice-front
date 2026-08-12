@@ -17,6 +17,7 @@ interface GroupBucket {
 	groupKey: string;
 	groupName: string;
 	items: UsageBreakdownRow[];
+	aggregate: number;
 }
 
 function renderUsageCell(row: UsageBreakdownRow) {
@@ -70,15 +71,20 @@ const UsageBreakdown = ({ rows: rawRows, label, isLoading = false, className }: 
 		for (const row of sortedRows) {
 			const groupKey = row.groupId ?? UNGROUPED_KEY;
 			const groupName = row.groupName ?? t('usageWidgets.noGroup');
-			if (!map.has(groupKey)) map.set(groupKey, { groupKey, groupName, items: [] });
-			map.get(groupKey)!.items.push(row);
+			if (!map.has(groupKey)) map.set(groupKey, { groupKey, groupName, items: [], aggregate: 0 });
+			const bucket = map.get(groupKey)!;
+			bucket.items.push(row);
+			bucket.aggregate += row[sortField];
 		}
 		const ungrouped = map.get(UNGROUPED_KEY)?.items ?? [];
+		// Groups sort by the same field/direction the row-level sort uses — each header shows an
+		// aggregate for that field, so "Sort: Cost" should reorder which group is on top, too.
+		const mult = sortDirection === 'asc' ? 1 : -1;
 		const grouped = Array.from(map.values())
 			.filter((b) => b.groupKey !== UNGROUPED_KEY)
-			.sort((a, b) => a.groupName.localeCompare(b.groupName));
+			.sort((a, b) => (a.aggregate - b.aggregate) * mult || a.groupName.localeCompare(b.groupName));
 		return { groupedBuckets: grouped, ungroupedItems: ungrouped };
-	}, [sortedRows, t]);
+	}, [sortedRows, sortField, sortDirection, t]);
 
 	useEffect(() => {
 		if (groupedBuckets.length > 0 && !hasInitializedExpand.current) {

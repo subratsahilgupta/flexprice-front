@@ -32,6 +32,20 @@ describe('UsageBreakdown', () => {
 		expect(screen.queryByText(/NaN/)).not.toBeInTheDocument();
 	});
 
+	// Regression: group buckets used to always sort alphabetically, ignoring the selected
+	// cost/usage sort — so "Sort: Cost" reordered rows within a group but never which group led.
+	it('sorts groups themselves by the selected field, not just alphabetically', () => {
+		const rows = [
+			{ id: 'a', name: 'Low cost row', groupId: 'grp_alpha', groupName: 'Alpha', totalUsage: 1, totalCost: 1 },
+			{ id: 'b', name: 'High cost row', groupId: 'grp_zeta', groupName: 'Zeta', totalUsage: 1, totalCost: 1000 },
+		];
+		render(<UsageBreakdown rows={rows} />);
+		const headers = screen.getAllByText(/^(Alpha|Zeta)$/).map((el) => el.textContent);
+		// Default sort is cost, descending — Zeta (cost 1000) must lead Alpha (cost 1) despite
+		// "Alpha" sorting first alphabetically.
+		expect(headers).toEqual(['Zeta', 'Alpha']);
+	});
+
 	it('exposes aria-expanded and a focus-visible ring on an expandable group header row', () => {
 		render(<UsageBreakdown rows={ROWS} />);
 		const groupRow = screen.getByText('Core').closest('[role="button"]');
