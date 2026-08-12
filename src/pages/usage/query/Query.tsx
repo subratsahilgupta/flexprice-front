@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Button, Page, Select } from '@/components/atoms';
 import { ApiDocsContent, QueryBuilder } from '@/components/molecules';
 import { API_DOCS_TAGS } from '@/constants/apiDocsTags';
@@ -84,6 +84,9 @@ const QueryPage: React.FC = () => {
 	const [selectedMeter, setSelectedMeter] = useState<string | undefined>(undefined);
 	const [selectedFeature, setSelectedFeature] = useState<Feature | undefined>(undefined);
 	const [windowSize, setWindowSize] = useState<string>('MINUTE');
+	// Guards against the refresh button racing the filter-change effect (or another refresh): a
+	// slower response for older params could otherwise overwrite usageData after a newer one lands.
+	const requestIdRef = useRef(0);
 
 	const windowSizeOptions = useMemo(() => WINDOW_SIZE_KEYS.map((value) => ({ value, label: t(`usage.query.windowSizes.${value}`) })), [t]);
 
@@ -171,6 +174,8 @@ const QueryPage: React.FC = () => {
 	const { mutate: fetchUsage, isPending } = useMutation({
 		mutationKey: ['fetchUsage', apiParams],
 		mutationFn: async () => {
+			const requestId = ++requestIdRef.current;
+
 			if (!apiParams.meter_id) {
 				throw new Error('Meter ID is required');
 			}
@@ -189,9 +194,11 @@ const QueryPage: React.FC = () => {
 				payload.end_time = getNext24HoursDate(new Date(apiParams.end_time)).toISOString();
 			}
 
-			return await EventsApi.getUsageByMeter(payload);
+			const data = await EventsApi.getUsageByMeter(payload);
+			return { requestId, data };
 		},
-		onSuccess: (data) => {
+		onSuccess: ({ requestId, data }) => {
+			if (requestId !== requestIdRef.current) return; // a newer request has since started
 			setUsageData(data);
 		},
 		onError: (error: Error) => toast.error(error.message || 'Error fetching usage data'),
