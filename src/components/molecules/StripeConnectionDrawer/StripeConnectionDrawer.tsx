@@ -35,6 +35,7 @@ interface StripeFormData {
 		plan: boolean; // pull from Stripe
 		subscription: boolean; // pull from Stripe
 		invoice: boolean; // push to Stripe
+		price: boolean; // push to Stripe
 	};
 }
 
@@ -51,6 +52,7 @@ const StripeConnectionDrawer: FC<StripeConnectionDrawerProps> = ({ isOpen, onOpe
 			plan: false, // pull from Stripe
 			subscription: false, // pull from Stripe
 			invoice: false, // push to Stripe
+			price: false, // push to Stripe
 		},
 	});
 	const [errors, setErrors] = useState<Record<string, string>>({});
@@ -96,6 +98,7 @@ const StripeConnectionDrawer: FC<StripeConnectionDrawerProps> = ({ isOpen, onOpe
 					plan: legacySyncConfig?.plan?.inbound || false,
 					subscription: legacySyncConfig?.subscription?.inbound || false,
 					invoice: legacySyncConfig?.invoice?.outbound || false,
+					price: legacySyncConfig?.price?.outbound || false,
 				};
 
 				setFormData({
@@ -113,6 +116,7 @@ const StripeConnectionDrawer: FC<StripeConnectionDrawerProps> = ({ isOpen, onOpe
 						plan: false,
 						subscription: false,
 						invoice: false,
+						price: false,
 					},
 				});
 			}
@@ -180,6 +184,10 @@ const StripeConnectionDrawer: FC<StripeConnectionDrawerProps> = ({ isOpen, onOpe
 						inbound: false,
 						outbound: formData.sync_config.invoice,
 					},
+					price: {
+						inbound: false,
+						outbound: formData.sync_config.price,
+					},
 				},
 			};
 
@@ -211,6 +219,10 @@ const StripeConnectionDrawer: FC<StripeConnectionDrawerProps> = ({ isOpen, onOpe
 					invoice: {
 						inbound: false,
 						outbound: formData.sync_config.invoice,
+					},
+					price: {
+						inbound: false,
+						outbound: formData.sync_config.price,
 					},
 				},
 			};
@@ -309,6 +321,15 @@ const StripeConnectionDrawer: FC<StripeConnectionDrawerProps> = ({ isOpen, onOpe
 								<p className='text-xs text-content-muted'>{t('integrations.stripe.pushToStripe')}</p>
 							</div>
 							<Switch checked={formData.sync_config.invoice} onCheckedChange={(checked) => handleSyncConfigChange('invoice', checked)} />
+						</div>
+
+						{/* Prices */}
+						<div className='flex items-center justify-between p-3 bg-surface border border-line rounded-lg'>
+							<div>
+								<label className='text-sm font-medium text-content-secondary'>{t('integrations.stripe.labels.prices')}</label>
+								<p className='text-xs text-content-muted'>{t('integrations.stripe.pushToStripe')}</p>
+							</div>
+							<Switch checked={formData.sync_config.price} onCheckedChange={(checked) => handleSyncConfigChange('price', checked)} />
 						</div>
 
 						{/* Subscriptions */}

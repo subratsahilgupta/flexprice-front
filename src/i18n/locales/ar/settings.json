@@ -1493,6 +1493,7 @@
 			"labels": {
 				"plans": "الخطط",
 				"invoices": "الفواتير",
+				"prices": "الأسعار",
 				"subscriptions": "الاشتراكات"
 			},
 			"toast": {
