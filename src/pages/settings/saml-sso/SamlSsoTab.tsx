@@ -91,7 +91,17 @@ const SamlSsoTab = () => {
 		// Re-read first and refuse rather than clobber; the administrator sees the
 		// current values and decides what to do with them.
 		const latest = await refetch();
-		if (latest.data && !isSameSamlConfig(latest.data, config)) {
+
+		// A failed refetch resolves with the cached data still attached, so the
+		// comparison below would find it unchanged and let the save through — the
+		// stale-overwrite this check exists to prevent. Without a confirmed read
+		// there is nothing to compare against, so refuse.
+		if (latest.isError || !latest.data) {
+			toast.error(t('saml.config.saveError'));
+			return;
+		}
+
+		if (!isSameSamlConfig(latest.data, config)) {
 			setDraft(latest.data);
 			toast.error(t('saml.config.saveConflict'));
 			return;

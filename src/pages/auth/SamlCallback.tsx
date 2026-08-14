@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { PageLoader } from '@/components/atoms';
 import { RouteNames } from '@/core/routes/Routes';
+import { SSO_PENDING_KEY } from './SamlSignin';
 
 /**
  * Landing page for a completed SAML login.
@@ -37,6 +38,23 @@ const SamlCallback = () => {
 		const token = fragment.get('token');
 		if (!token) {
 			setError(t('sso.missingToken'));
+			return;
+		}
+
+		// Only accept a token for a login this tab actually started. This route is
+		// public and stores whatever it is handed, so without this check anyone
+		// could send a victim `/auth/callback#token=<their own token>` and have the
+		// victim's dashboard adopt the attacker's session — everything the victim
+		// then did would happen inside the attacker's account, including anything
+		// they typed or uploaded.
+		//
+		// The marker is cleared either way, so a token cannot be replayed into a
+		// second tab by reusing the same URL.
+		const pending = sessionStorage.getItem(SSO_PENDING_KEY);
+		sessionStorage.removeItem(SSO_PENDING_KEY);
+		if (!pending) {
+			window.history.replaceState(null, '', window.location.pathname);
+			setError(t('sso.unsolicitedToken'));
 			return;
 		}
 

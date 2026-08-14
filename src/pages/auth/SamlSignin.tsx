@@ -16,6 +16,19 @@ import { config } from '@/config/config';
  */
 export const SSO_TENANT_PARAM = 'sso';
 
+/**
+ * sessionStorage key marking that this browser tab started an SSO login.
+ *
+ * The callback stores whatever token it is handed, and it is a public route: without this, anyone
+ * could send a victim `/auth/callback#token=<attacker's token>` and have the victim's dashboard
+ * adopt the attacker's session, so everything the victim then did would happen in the attacker's
+ * account. Requiring a marker this tab set itself means a fragment arriving unprompted is refused.
+ *
+ * sessionStorage rather than localStorage: it is per tab and cleared when the tab closes, so an
+ * abandoned login does not leave the callback armed indefinitely.
+ */
+export const SSO_PENDING_KEY = 'saml_login_pending';
+
 interface SamlSigninProps {
 	tenantId: string;
 }
@@ -56,6 +69,10 @@ const SamlSignin = ({ tenantId }: SamlSigninProps) => {
 		} finally {
 			setIsStarting(false);
 		}
+
+		// Mark that this tab started the flow, so the callback can tell a token it
+		// asked for from one someone sent it.
+		sessionStorage.setItem(SSO_PENDING_KEY, tenantId);
 
 		// Deliberately a full page navigation: the browser must carry its own
 		// session to the identity provider, and it is the browser the assertion is

@@ -69,7 +69,7 @@ const HarnessInner = ({ initialFilters, initialSorts }: { initialFilters: Filter
 
 	// Mirrors QueryableDataArea's intentional pattern: reset only when filters/sorts change,
 	// not when `reset` is recreated due to a page change.
-	 
+
 	useEffect(() => {
 		reset();
 	}, [hook.filters, hook.sorts]);
