@@ -44,8 +44,12 @@ export function useSamlConfig() {
 			}
 			return config;
 		},
-		onSuccess: (config) => {
-			queryClient.setQueryData(settingsQueryKeys.samlConfig, config);
+		onSuccess: () => {
+			// Refetch rather than writing the submitted values into the cache.
+			// `active` is decided by Flexprice and ignored on write, so the
+			// submitted object is not what is now stored — seeding the cache with
+			// it would show an approval state the server never reported.
+			queryClient.invalidateQueries({ queryKey: settingsQueryKeys.samlConfig });
 		},
 	});
 

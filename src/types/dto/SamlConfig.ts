@@ -37,18 +37,34 @@ export const DEFAULT_SAML_CONFIG: SamlConfig = {
 	enforce_sso: false,
 };
 
-/** Merges a tenant's saved config on top of defaults; any field absent from the saved value falls back. */
+/** The setting value arrives as `any`, so each field is checked rather than trusted. A value of the
+ * wrong type would otherwise reach the form as-is and be written back on the next save — turning a
+ * malformed stored value into a permanent one. Anything unusable falls back to the default. */
+function asString(value: unknown, fallback: string): string {
+	return typeof value === 'string' ? value : fallback;
+}
+
+function asBoolean(value: unknown, fallback: boolean): boolean {
+	return typeof value === 'boolean' ? value : fallback;
+}
+
 export function mergeSamlConfig(defaults: SamlConfig, saved: Partial<SamlConfig> | null | undefined): SamlConfig {
-	if (!saved) return defaults;
+	if (!saved || typeof saved !== 'object') return defaults;
+
+	// `default_role` is checked against the roles this form can actually offer: the backend refuses
+	// super_admin, and an unrecognised role would leave the select with no matching option.
+	const savedRole = saved.default_role as unknown;
+	const default_role = SAML_DEFAULT_ROLES.includes(savedRole as SamlDefaultRole) ? (savedRole as SamlDefaultRole) : defaults.default_role;
+
 	return {
-		enabled: saved.enabled ?? defaults.enabled,
-		idp_entity_id: saved.idp_entity_id ?? defaults.idp_entity_id,
-		idp_sso_url: saved.idp_sso_url ?? defaults.idp_sso_url,
-		idp_certificate: saved.idp_certificate ?? defaults.idp_certificate,
-		email_attribute: saved.email_attribute ?? defaults.email_attribute,
-		default_role: (saved.default_role as SamlDefaultRole | undefined) ?? defaults.default_role,
-		active: saved.active ?? defaults.active,
-		enforce_sso: saved.enforce_sso ?? defaults.enforce_sso,
+		enabled: asBoolean(saved.enabled, defaults.enabled),
+		idp_entity_id: asString(saved.idp_entity_id, defaults.idp_entity_id),
+		idp_sso_url: asString(saved.idp_sso_url, defaults.idp_sso_url),
+		idp_certificate: asString(saved.idp_certificate, defaults.idp_certificate),
+		email_attribute: asString(saved.email_attribute, defaults.email_attribute),
+		default_role,
+		active: asBoolean(saved.active, defaults.active),
+		enforce_sso: asBoolean(saved.enforce_sso, defaults.enforce_sso),
 	};
 }
 
