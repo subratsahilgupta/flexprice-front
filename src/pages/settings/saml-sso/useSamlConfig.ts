@@ -62,7 +62,12 @@ export function useSamlConfig() {
 		// does not offer it and when the caller may not administer it — reading
 		// the configuration is super-admin-only, so anyone else would find an
 		// empty tab they can do nothing with.
-		isAvailable: !query.isLoading && !isSamlDisabled && !isForbidden,
+		//
+		// Any other failure hides it too. The form falls back to defaults when
+		// the read fails, so a 500 would otherwise show SSO as disabled and
+		// unconfigured for a tenant where it is live — and saving from that state
+		// would overwrite the real configuration with empty values.
+		isAvailable: !query.isLoading && !query.isError,
 		refetch: query.refetch,
 		updateConfig,
 	};

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, Copy } from 'lucide-react';
+import { AlertTriangle, Copy, Info } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { Button, Card, Chip, Input, Loader, Select, Textarea } from '@/components/atoms';
@@ -7,7 +7,7 @@ import { SettingsCardHeader, SettingsToggleRow } from '@/components/molecules';
 import { useUser as useUserContext } from '@/hooks/UserContext';
 import { config as appConfig } from '@/config/config';
 import { copyToClipboard } from '@/utils/common/helper_functions';
-import { SAML_DEFAULT_ROLES, isValidIdpSsoUrl, type SamlConfig, type SamlDefaultRole } from '@/types/dto/SamlConfig';
+import { SAML_DEFAULT_ROLES, isSameSamlConfig, isValidIdpSsoUrl, type SamlConfig, type SamlDefaultRole } from '@/types/dto/SamlConfig';
 import SettingsFormActions from '../SettingsFormActions';
 import { SamlDisabledError, useSamlConfig } from './useSamlConfig';
 
@@ -60,7 +60,7 @@ const ROLE_LABEL_KEYS: Record<SamlDefaultRole, string> = {
 const SamlSsoTab = () => {
 	const { t } = useTranslation(['settings', 'common']);
 	const { user } = useUserContext();
-	const { config, isLoading, isForbidden, updateConfig } = useSamlConfig();
+	const { config, isLoading, isForbidden, updateConfig, refetch } = useSamlConfig();
 	const [draft, setDraft] = useState<SamlConfig>(config);
 	const [errors, setErrors] = useState<FormErrors>({});
 
@@ -80,10 +80,22 @@ const SamlSsoTab = () => {
 		setErrors({});
 	};
 
-	const handleSave = () => {
+	const handleSave = async () => {
 		const validationErrors = validateDraft(draft, t);
 		setErrors(validationErrors);
 		if (Object.keys(validationErrors).length > 0) return;
+
+		// The whole configuration is sent, so a save built on a stale read would
+		// silently overwrite whatever another administrator changed in the
+		// meantime — including the certificate and the identity provider URL.
+		// Re-read first and refuse rather than clobber; the administrator sees the
+		// current values and decides what to do with them.
+		const latest = await refetch();
+		if (latest.data && !isSameSamlConfig(latest.data, config)) {
+			setDraft(latest.data);
+			toast.error(t('saml.config.saveConflict'));
+			return;
+		}
 
 		updateConfig.mutate(draft, {
 			onSuccess: () => {
@@ -241,6 +253,15 @@ const SamlSsoTab = () => {
 							textAreaClassName='min-h-[180px] font-mono text-xs'
 							onChange={(value) => setDraft((prev) => ({ ...prev, idp_certificate: value }))}
 						/>
+
+						{/* Stated next to the certificate field because that is where someone looks for it. The
+						    certificate below is the identity provider's public one; Flexprice holds no key of its
+						    own, so an identity provider configured to require signed requests or encrypted
+						    assertions will reject every login, and the error would not say why. */}
+						<div className='flex items-start gap-2 rounded-md border border-line bg-surface-subtle p-3'>
+							<Info className='mt-0.5 h-4 w-4 shrink-0 text-content-zinc-muted' />
+							<p className='text-sm text-content-zinc-muted'>{t('saml.config.unsupportedSigning')}</p>
+						</div>
 
 						<Input
 							label={t('saml.config.emailAttribute')}

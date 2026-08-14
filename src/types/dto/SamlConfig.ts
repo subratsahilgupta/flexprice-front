@@ -78,3 +78,22 @@ export function isValidIdpSsoUrl(value: string): boolean {
 	const loopbackHosts = ['localhost', '127.0.0.1', '::1', '[::1]'];
 	return loopbackHosts.includes(url.hostname);
 }
+
+/**
+ * Whether two configurations hold the same values.
+ *
+ * Used before a save to notice that someone else changed the configuration since it was loaded.
+ * `active` is excluded: it is Flexprice's approval flag, granted out of band, and a change to it
+ * is not an edit this administrator would be overwriting.
+ */
+export function isSameSamlConfig(a: SamlConfig, b: SamlConfig): boolean {
+	return (
+		a.enabled === b.enabled &&
+		a.enforce_sso === b.enforce_sso &&
+		a.idp_entity_id === b.idp_entity_id &&
+		a.idp_sso_url === b.idp_sso_url &&
+		a.idp_certificate === b.idp_certificate &&
+		a.email_attribute === b.email_attribute &&
+		a.default_role === b.default_role
+	);
+}
