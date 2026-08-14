@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { PageLoader } from '@/components/atoms';
 import { RouteNames } from '@/core/routes/Routes';
-import { SSO_PENDING_KEY } from './SamlSignin';
+import { SSO_PENDING_KEY, SSO_STATE_KEY } from './SamlSignin';
 
 /**
  * Landing page for a completed SAML login.
@@ -70,6 +70,19 @@ const SamlCallback = () => {
 		// which defeats the whole guard. The backend always sends it.
 		const callbackTenant = fragment.get('tenant_id');
 		if (!callbackTenant || callbackTenant !== pending) {
+			window.history.replaceState(null, '', window.location.pathname);
+			setError(t('sso.unsolicitedToken'));
+			return;
+		}
+
+		// The nonce ties the response to this specific login, which the tenant
+		// alone cannot: every login to a tenant carries the same tenant. It went
+		// out as SAML RelayState and comes back with the assertion, so a token
+		// from any other login — including one an attacker starts and completes
+		// themselves — does not carry it.
+		const expectedState = sessionStorage.getItem(SSO_STATE_KEY);
+		sessionStorage.removeItem(SSO_STATE_KEY);
+		if (!expectedState || fragment.get('state') !== expectedState) {
 			window.history.replaceState(null, '', window.location.pathname);
 			setError(t('sso.unsolicitedToken'));
 			return;
