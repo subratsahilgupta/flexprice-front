@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import toast from 'react-hot-toast';
 import { Button } from '@/components/atoms';
 import { config } from '@/config/config';
 
@@ -28,15 +30,46 @@ interface SamlSigninProps {
  */
 const SamlSignin = ({ tenantId }: SamlSigninProps) => {
 	const { t } = useTranslation('auth');
+	const [isStarting, setIsStarting] = useState(false);
 
-	const handleSamlLogin = () => {
+	const handleSamlLogin = async () => {
 		const base = config.api.baseUrl.replace(/\/$/, '');
-		window.location.href = `${base}/auth/saml/${encodeURIComponent(tenantId)}/login`;
+		const loginUrl = `${base}/auth/saml/${encodeURIComponent(tenantId)}/login`;
+
+		// Ask before navigating. The endpoint answers 404 when SSO is not live for
+		// this tenant — not configured, not enabled, or not yet approved — and a
+		// bare navigation would land the browser on the API's JSON error body with
+		// no way back. `manual` keeps the browser from following the redirect on
+		// this request, so a live endpoint is reported as an opaque response
+		// rather than being consumed here.
+		setIsStarting(true);
+		try {
+			const probe = await fetch(loginUrl, { method: 'GET', redirect: 'manual' });
+			if (probe.status === 404) {
+				toast.error(t('sso.notAvailable'));
+				return;
+			}
+		} catch {
+			// A network or CORS failure says nothing about whether SSO works, so
+			// fall through to the navigation rather than refusing a login that
+			// might well succeed.
+		} finally {
+			setIsStarting(false);
+		}
+
+		// Deliberately a full page navigation: the browser must carry its own
+		// session to the identity provider, and it is the browser the assertion is
+		// posted back through.
+		window.location.href = loginUrl;
 	};
 
 	return (
 		<div>
-			<Button onClick={handleSamlLogin} variant='outline' className='w-full mb-6 flex items-center justify-center gap-2 h-11'>
+			<Button
+				onClick={handleSamlLogin}
+				variant='outline'
+				isLoading={isStarting}
+				className='w-full mb-6 flex items-center justify-center gap-2 h-11'>
 				{t('buttons.continueWithSso')}
 			</Button>
 		</div>
