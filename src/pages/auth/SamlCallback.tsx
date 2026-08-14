@@ -65,8 +65,11 @@ const SamlCallback = () => {
 		// would have that token adopted because a marker existed. Comparing the
 		// tenant closes that — the callback now only completes the login this tab
 		// actually started.
+		// Required, not optional. Treating a missing tenant as "nothing to check"
+		// let an attacker skip the comparison by simply leaving it out of the URL,
+		// which defeats the whole guard. The backend always sends it.
 		const callbackTenant = fragment.get('tenant_id');
-		if (callbackTenant && callbackTenant !== pending) {
+		if (!callbackTenant || callbackTenant !== pending) {
 			window.history.replaceState(null, '', window.location.pathname);
 			setError(t('sso.unsolicitedToken'));
 			return;
