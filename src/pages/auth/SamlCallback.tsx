@@ -25,7 +25,13 @@ const SamlCallback = () => {
 		if (hasProcessed.current) return;
 		hasProcessed.current = true;
 
-		const token = searchParams.get('token');
+		// The backend returns the token in the URL fragment, not the query string:
+		// a fragment is never sent to a server, so it stays out of proxy and CDN
+		// access logs and out of the Referer header of every later request. The
+		// query string is still read as a fallback so a session that started
+		// against an older backend still completes.
+		const fragment = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+		const token = fragment.get('token') ?? searchParams.get('token');
 		if (!token) {
 			setError(t('sso.missingToken'));
 			return;
@@ -38,13 +44,15 @@ const SamlCallback = () => {
 			'token',
 			JSON.stringify({
 				token,
-				user_id: searchParams.get('user_id') ?? undefined,
-				tenant_id: searchParams.get('tenant_id') ?? undefined,
+				user_id: fragment.get('user_id') ?? searchParams.get('user_id') ?? undefined,
+				tenant_id: fragment.get('tenant_id') ?? searchParams.get('tenant_id') ?? undefined,
 			}),
 		);
 
-		// replace: true so the token is not left in history, where it would be
-		// recoverable with the back button after a logout.
+		// Clear the fragment before navigating. replace: true keeps the token out
+		// of history, where it would otherwise be recoverable with the back button
+		// after a logout, and the token is already stored by this point.
+		window.history.replaceState(null, '', window.location.pathname);
 		navigate(RouteNames.home, { replace: true });
 	}, [searchParams, navigate, t]);
 
