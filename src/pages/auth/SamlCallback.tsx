@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router';
+import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { PageLoader } from '@/components/atoms';
 import { RouteNames } from '@/core/routes/Routes';
@@ -13,7 +13,6 @@ import { RouteNames } from '@/core/routes/Routes';
  */
 const SamlCallback = () => {
 	const { t } = useTranslation('auth');
-	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
 	const [error, setError] = useState<string | null>(null);
 	// Runs once: React 18 mounts effects twice in development, and the second
@@ -25,13 +24,17 @@ const SamlCallback = () => {
 		if (hasProcessed.current) return;
 		hasProcessed.current = true;
 
-		// The backend returns the token in the URL fragment, not the query string:
-		// a fragment is never sent to a server, so it stays out of proxy and CDN
-		// access logs and out of the Referer header of every later request. The
-		// query string is still read as a fallback so a session that started
-		// against an older backend still completes.
+		// Read only from the URL fragment. A fragment is never sent to a server, so
+		// it stays out of the access logs of every proxy and CDN in the path and
+		// out of the Referer header of every later request; a query parameter
+		// reaches all of those, and this token is valid for thirty days.
+		//
+		// Deliberately no query-string fallback. The backend that puts the token in
+		// the fragment ships with this change, so the only thing a fallback could
+		// accept is a token that had already travelled somewhere it should not
+		// have — and accepting it would keep that path alive indefinitely.
 		const fragment = new URLSearchParams(window.location.hash.replace(/^#/, ''));
-		const token = fragment.get('token') ?? searchParams.get('token');
+		const token = fragment.get('token');
 		if (!token) {
 			setError(t('sso.missingToken'));
 			return;
@@ -44,8 +47,8 @@ const SamlCallback = () => {
 			'token',
 			JSON.stringify({
 				token,
-				user_id: fragment.get('user_id') ?? searchParams.get('user_id') ?? undefined,
-				tenant_id: fragment.get('tenant_id') ?? searchParams.get('tenant_id') ?? undefined,
+				user_id: fragment.get('user_id') ?? undefined,
+				tenant_id: fragment.get('tenant_id') ?? undefined,
 			}),
 		);
 
@@ -54,7 +57,7 @@ const SamlCallback = () => {
 		// after a logout, and the token is already stored by this point.
 		window.history.replaceState(null, '', window.location.pathname);
 		navigate(RouteNames.home, { replace: true });
-	}, [searchParams, navigate, t]);
+	}, [navigate, t]);
 
 	if (error) {
 		return (
