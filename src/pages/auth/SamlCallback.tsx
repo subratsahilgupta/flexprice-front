@@ -58,15 +58,34 @@ const SamlCallback = () => {
 			return;
 		}
 
+		// The marker holds the tenant the login was started for, and it has to
+		// match. A marker that only proved "some login began" would still accept a
+		// token for a different tenant: an attacker who gets the victim to click
+		// Sign in with SSO, then to open a link carrying the attacker's own token,
+		// would have that token adopted because a marker existed. Comparing the
+		// tenant closes that — the callback now only completes the login this tab
+		// actually started.
+		const callbackTenant = fragment.get('tenant_id');
+		if (callbackTenant && callbackTenant !== pending) {
+			window.history.replaceState(null, '', window.location.pathname);
+			setError(t('sso.unsolicitedToken'));
+			return;
+		}
+
 		// Same shape the password login writes, so everything downstream — the
 		// axios client, useUser, logout — treats an SSO session identically. Only
 		// `token` is read for authentication; the user is loaded from /users/me.
+		//
+		// The tenant comes from the marker this tab set, never from the fragment:
+		// the fragment is attacker-supplied, and storing a tenant from it would
+		// record an identity the login never established. `user_id` is omitted
+		// for the same reason — nothing downstream reads it, and the user is
+		// loaded from /users/me against the token itself.
 		localStorage.setItem(
 			'token',
 			JSON.stringify({
 				token,
-				user_id: fragment.get('user_id') ?? undefined,
-				tenant_id: fragment.get('tenant_id') ?? undefined,
+				tenant_id: pending,
 			}),
 		);
 
