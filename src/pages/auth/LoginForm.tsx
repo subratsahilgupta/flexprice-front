@@ -10,6 +10,7 @@ import AuthApi from '@/api/AuthApi';
 import { config, APP_ENV } from '@/config/config';
 import { RouteNames } from '@/core/routes/Routes';
 import GoogleSignin from './GoogleSignin';
+import SamlSignin, { SSO_TENANT_PARAM } from './SamlSignin';
 import { AuthTab } from './authTabs';
 import { useTranslation } from 'react-i18next';
 
@@ -26,6 +27,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ switchTab }) => {
 	const [password, setPassword] = useState('');
 	const [showPassword, setShowPassword] = useState(false);
 	const [loading, setLoading] = useState(false);
+	// Read straight from the URL rather than held in state: the prefill effect
+	// below rewrites the query string, and a stale copy would make the SSO button
+	// disappear mid-visit.
+	const ssoTenantId = searchParams.get(SSO_TENANT_PARAM)?.trim();
 
 	// Prefill from query params (e.g. shared login link); then strip params from URL
 	useEffect(() => {
@@ -150,6 +155,22 @@ const LoginForm: React.FC<LoginFormProps> = ({ switchTab }) => {
 						<div className='flex-1 h-px bg-surface-strong'></div>
 					</div>
 					<GoogleSignin />
+				</>
+			)}
+
+			{/* SAML single sign-on. Shown only when the link names a tenant: SSO is
+			    configured per tenant, so without one there is no identity provider
+			    to send the browser to, and an always-visible button would fail for
+			    everyone who arrived at /login directly. Self-hosted only, since the
+			    Supabase path does not use the backend's SAML endpoints. */}
+			{config.app.env === APP_ENV.SelfHosted && ssoTenantId && (
+				<>
+					<div className='flex items-center justify-center my-6'>
+						<div className='flex-1 h-px bg-surface-strong'></div>
+						<span className='mx-4 text-sm text-content-muted'>{t('divider')}</span>
+						<div className='flex-1 h-px bg-surface-strong'></div>
+					</div>
+					<SamlSignin tenantId={ssoTenantId} />
 				</>
 			)}
 
