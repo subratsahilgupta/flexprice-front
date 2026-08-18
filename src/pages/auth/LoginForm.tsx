@@ -161,9 +161,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ switchTab }) => {
 			{/* SAML single sign-on. Shown only when the link names a tenant: SSO is
 			    configured per tenant, so without one there is no identity provider
 			    to send the browser to, and an always-visible button would fail for
-			    everyone who arrived at /login directly. Self-hosted only, since the
-			    Supabase path does not use the backend's SAML endpoints. */}
-			{config.app.env === APP_ENV.SelfHosted && ssoTenantId && (
+			    everyone who arrived at /login directly.
+
+			    Deliberately not restricted by environment. SAML is a per-tenant
+			    feature, so a hosted deployment backed by Supabase may still serve
+			    tenants that sign in through an identity provider; gating the button
+			    on the deployment hid SSO from every such tenant. The button is
+			    still safe to offer on a tenant that has not set SSO up: SamlSignin
+			    asks the endpoint first and reports it as unavailable on a 404. */}
+			{ssoTenantId && (
 				<>
 					<div className='flex items-center justify-center my-6'>
 						<div className='flex-1 h-px bg-surface-strong'></div>
