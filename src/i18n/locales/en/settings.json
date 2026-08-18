@@ -1535,6 +1535,7 @@
 			"labels": {
 				"plans": "Plans",
 				"invoices": "Invoices",
+				"prices": "Prices",
 				"subscriptions": "Subscriptions"
 			},
 			"toast": {

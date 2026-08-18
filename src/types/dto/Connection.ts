@@ -127,6 +127,10 @@ export interface CreateConnectionPayload {
 			inbound: boolean;
 			outbound: boolean;
 		};
+		price?: {
+			inbound: boolean;
+			outbound: boolean;
+		};
 		deal?: {
 			inbound: boolean;
 			outbound: boolean;
@@ -162,6 +166,10 @@ export interface UpdateConnectionPayload {
 			outbound: boolean;
 		};
 		invoice?: {
+			inbound: boolean;
+			outbound: boolean;
+		};
+		price?: {
 			inbound: boolean;
 			outbound: boolean;
 		};
