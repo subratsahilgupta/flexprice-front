@@ -528,6 +528,7 @@
 		}
 	},
 	"taxes": {
+		"writeDeniedTooltip": "You don't have permission to manage tax rates. Ask a tenant admin for access.",
 		"title": "Taxes",
 		"empty": "No taxes found",
 		"taxRateDetails": "Tax Rate Details",

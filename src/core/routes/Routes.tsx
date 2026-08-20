@@ -431,10 +431,12 @@ export const MainRouter: any = createBrowserRouter([
 					{
 						path: RouteNames.taxes,
 						element: <TaxPage />,
+						handle: requirePermission('tax', 'read'),
 					},
 					{
 						path: `${RouteNames.taxes}/:taxrateId`,
 						element: <TaxrateDetailsPage />,
+						handle: requirePermission('tax', 'read'),
 					},
 					{
 						path: RouteNames.invoices,
