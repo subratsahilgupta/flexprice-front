@@ -407,6 +407,7 @@ export const MainRouter: any = createBrowserRouter([
 					{
 						path: RouteNames.customers,
 						element: <CustomerPage />,
+						handle: requirePermission('customer', 'read'),
 					},
 					{
 						path: RouteNames.subscriptions,
@@ -467,6 +468,7 @@ export const MainRouter: any = createBrowserRouter([
 					{
 						path: `${RouteNames.customers}/:id`,
 						element: <CustomerProfilePage />,
+						handle: requirePermission('customer', 'read'),
 						children: [
 							{
 								path: '',
@@ -510,6 +512,11 @@ export const MainRouter: any = createBrowserRouter([
 							{
 								path: 'invoice/:invoice_id',
 								element: <CustomerInvoiceDetailsPage />,
+								// Route-sibling of /billing/invoices, not a descendant — needs its own
+								// handle rather than relying on that route's `invoice` requirement.
+								// RouteGuard requires every handle in the matched chain, so this still
+								// combines with the parent customer-profile route's `customer:read`.
+								handle: requirePermission('invoice', 'read'),
 							},
 							{
 								path: 'invoice/:invoice_id/credit-note',
