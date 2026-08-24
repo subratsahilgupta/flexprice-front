@@ -7,10 +7,15 @@ import type { PortalConfig } from '@/types/dto/PortalConfig';
 import SettingsFormActions from '../SettingsFormActions';
 import { applyPortalVisibility, getPortalVisibility, type PortalVisibility } from './portalVisibility';
 import { useCustomerPortalConfig } from './useCustomerPortalConfig';
+import { useCurrentUserPermissions } from '@/hooks/useCurrentUserPermissions';
 
 const CustomerPortalTab = () => {
 	const { t } = useTranslation(['settings', 'common']);
 	const { config, isLoading, updateConfig } = useCustomerPortalConfig();
+	const { can, isSuperAdmin } = useCurrentUserPermissions();
+	// Backed by SettingsApi (a generic settings key), whose PUT/DELETE the backend restricts
+	// to Super Admin regardless of portal:write — see SamlSsoTab's own settings-gating note.
+	const canWritePortal = can('portal', 'write') && isSuperAdmin;
 	const [draftConfig, setDraftConfig] = useState<PortalConfig>(config);
 
 	useEffect(() => {
@@ -84,7 +89,13 @@ const CustomerPortalTab = () => {
 							onCheckedChange={(checked) => handleToggle('showSubscriptions', checked)}
 						/>
 					</div>
-					<SettingsFormActions onReset={handleReset} onSave={handleSave} isSaving={updateConfig.isPending} disabled={isLoading} />
+					<SettingsFormActions
+						onReset={handleReset}
+						onSave={handleSave}
+						isSaving={updateConfig.isPending}
+						disabled={isLoading || !canWritePortal}
+						disabledReason={canWritePortal ? undefined : t('superAdmin.writeDeniedTooltip')}
+					/>
 				</>
 			)}
 		</Card>

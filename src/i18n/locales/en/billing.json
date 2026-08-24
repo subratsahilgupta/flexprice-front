@@ -136,6 +136,8 @@
 	},
 	"creditNotes": {
 		"title": "Credit Notes",
+		"writeDeniedTooltip": "You don't have permission to create credit notes. Ask a tenant admin for access.",
+		"addCreditNote": "Add Credit Note",
 		"empty": "No credit notes found",
 		"toast": {
 			"fetchListError": "Error fetching credit notes"
@@ -255,6 +257,7 @@
 			},
 			"inheritedReadOnlyTooltip": "Inherited subscriptions are read-only. Make changes on the parent subscription.",
 			"cancelAction": "Cancel",
+			"writeDeniedTooltip": "You don't have permission to manage subscriptions. Ask a tenant admin for access.",
 			"entityNameForActions": "Subscription"
 		},
 		"empty": "No subscriptions found",
@@ -527,6 +530,7 @@
 		}
 	},
 	"taxes": {
+		"writeDeniedTooltip": "You don't have permission to manage tax rates. Ask a tenant admin for access.",
 		"title": "Taxes",
 		"empty": "No taxes found",
 		"taxRateDetails": "Tax Rate Details",
