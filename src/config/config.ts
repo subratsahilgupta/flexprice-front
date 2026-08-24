@@ -61,7 +61,7 @@ interface IntercomConfig {
 interface PylonConfig {
 	enabled: boolean;
 	appId: string;
-	/** Fetch a signed JWT from POST /users/chat/verify and let it carry identity. */
+	/** When true, fetch HMAC email hash from the backend and pass it as Pylon `email_hash`. */
 	identityVerificationEnabled: boolean;
 }
 interface ReoConfig {
