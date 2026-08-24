@@ -760,7 +760,7 @@ const AggregationSection = ({
 					aggregation: {
 						...meter?.aggregation,
 						type: meter?.aggregation?.type || METER_AGGREGATION_TYPE.SUM,
-						field,
+						field: field.trim(),
 					},
 				},
 			});
@@ -1075,7 +1075,7 @@ const AddFeaturePage = () => {
 								// so at most one of these is populated at submit time.
 								...(featureData.meter.aggregation?.expression?.trim()
 									? { expression: featureData.meter.aggregation.expression.trim() }
-									: { field: featureData.meter.aggregation?.field || '' }),
+									: { field: featureData.meter.aggregation?.field?.trim() || '' }),
 								multiplier: featureData.meter.aggregation?.multiplier,
 								bucket_size: aggregationSupportsBucketSize(featureData.meter.aggregation?.type)
 									? featureData.meter.aggregation?.bucket_size
