@@ -1,5 +1,5 @@
 // React imports
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Outlet, useNavigate, useParams, useLocation } from 'react-router';
 
 // Third-party libraries
@@ -85,11 +85,15 @@ const PlanDetailsPage = () => {
 				limit: 1,
 				offset: 0,
 				sort: [],
+				expand: 'price_sync_status',
 			});
 			return response.items[0] ?? null;
 		},
 		enabled: !!planId,
 	});
+
+	const isFullySynced = planData?.price_sync_status?.synced ?? false;
+	const unsyncedCount = planData?.price_sync_status?.unsynced_subscription_count ?? 0;
 
 	const { data: syncWorkflowsData } = useQuery({
 		queryKey: ['planSyncWorkflows', planId],
@@ -116,6 +120,24 @@ const PlanDetailsPage = () => {
 	);
 	const latestRun = planRuns[0];
 	const isSyncRunning = latestRun?.status === 'Running';
+	const isTerminalSyncStatus = latestRun?.status === 'Completed' || latestRun?.status === 'Failed';
+
+	// Refetch plan data after a sync we started reaches a terminal workflow status —
+	// including when the first poll is already Completed and never passed through Running.
+	// Also refetch if a run that was already Running when this page loaded later finishes.
+	const wasSyncRunning = useRef(isSyncRunning);
+	const awaitingPlanRefresh = useRef(false);
+	const workflowKeyWhenSyncStarted = useRef<string | undefined>(undefined);
+	useEffect(() => {
+		const finishedObservedRun = wasSyncRunning.current && !isSyncRunning;
+		const finishedStartedRun =
+			awaitingPlanRefresh.current && isTerminalSyncStatus && latestRun?.run_id !== workflowKeyWhenSyncStarted.current;
+		if (finishedObservedRun || finishedStartedRun) {
+			awaitingPlanRefresh.current = false;
+			void queryClient.invalidateQueries({ queryKey: ['fetchPlan', planId] });
+		}
+		wasSyncRunning.current = isSyncRunning;
+	}, [isSyncRunning, isTerminalSyncStatus, latestRun?.run_id, planId, queryClient]);
 
 	const { mutate: archivePlan } = useMutation({
 		mutationFn: async () => {
@@ -134,6 +156,8 @@ const PlanDetailsPage = () => {
 		mutationFn: () => PlanApi.synchronizePlanPricesWithSubscription(planId!),
 		onSuccess: () => {
 			toast.success('Sync has been started and will take up to 1 hour to complete.');
+			awaitingPlanRefresh.current = true;
+			workflowKeyWhenSyncStarted.current = latestRun?.run_id;
 			void queryClient.invalidateQueries({ queryKey: ['planSyncWorkflows', planId] });
 		},
 		onError: (error: Error) => {
@@ -233,16 +257,23 @@ const PlanDetailsPage = () => {
 					<TooltipProvider delayDuration={0}>
 						<Tooltip>
 							<TooltipTrigger asChild>
-								<span className='inline-block'>
+								<span className='relative inline-block'>
 									<Button
 										onClick={() => syncPlan()}
-										disabled={isSyncing || isSyncRunning || !canWritePlan}
+										disabled={isSyncing || isSyncRunning || !canWritePlan || isFullySynced}
 										isLoading={isSyncing}
 										variant='outline'
 										className='flex gap-2'>
 										<RefreshCw />
 										Sync Usage Charges
 									</Button>
+									{unsyncedCount > 0 && (
+										<span
+											className='absolute -right-1.5 -top-1.5 z-10 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-medium text-destructive-foreground pointer-events-none'
+											aria-label={t('plans.detailsPage.unsyncedCountAria', { count: unsyncedCount })}>
+											{unsyncedCount > 99 ? '99+' : unsyncedCount}
+										</span>
+									)}
 								</span>
 							</TooltipTrigger>
 							<TooltipContent>
@@ -260,6 +291,10 @@ const PlanDetailsPage = () => {
 										</button>
 										.
 									</span>
+								) : isFullySynced ? (
+									<span className='text-sm'>All subscriptions are already in sync with this plan's prices.</span>
+								) : unsyncedCount > 0 ? (
+									<span className='text-sm'>{t('plans.detailsPage.unsyncedCountTooltip', { count: unsyncedCount })}</span>
 								) : latestRun?.status === 'Completed' ? (
 									<span className='text-sm'>Sync completed. You can sync again.</span>
 								) : latestRun?.status === 'Failed' ? (
