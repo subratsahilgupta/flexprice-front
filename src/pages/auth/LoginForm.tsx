@@ -10,7 +10,7 @@ import AuthApi from '@/api/AuthApi';
 import { config, APP_ENV } from '@/config/config';
 import { RouteNames } from '@/core/routes/Routes';
 import GoogleSignin from './GoogleSignin';
-import SamlSignin, { SSO_TENANT_PARAM } from './SamlSignin';
+import SamlSignin, { SSO_TENANT_PARAM, resolveSsoTenantId } from './SamlSignin';
 import { AuthTab } from './authTabs';
 import { useTranslation } from 'react-i18next';
 
@@ -30,7 +30,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ switchTab }) => {
 	// Read straight from the URL rather than held in state: the prefill effect
 	// below rewrites the query string, and a stale copy would make the SSO button
 	// disappear mid-visit.
-	const ssoTenantId = searchParams.get(SSO_TENANT_PARAM)?.trim();
+	const ssoTenantId = resolveSsoTenantId(searchParams.get(SSO_TENANT_PARAM), import.meta.env.VITE_SSO_TENANT_ID as string | undefined);
 
 	// Prefill from query params (e.g. shared login link); then strip params from URL
 	useEffect(() => {
