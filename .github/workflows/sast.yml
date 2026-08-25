@@ -1,0 +1,43 @@
+# SAST (Static Application Security Testing) — Semgrep
+#
+# PHASE 1: SOFT-FAIL. Findings are reported but do NOT block merge.
+# Phase 2 will flip this to BLOCKING on high-confidence rules once the
+# baseline of existing findings has been triaged.
+#
+# Secret scanning is intentionally NOT included here — GitGuardian owns secrets.
+
+name: SAST
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  security-events: write # upload-sarif writes to the code-scanning API
+
+jobs:
+  semgrep:
+    name: Semgrep
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Semgrep
+        run: pip install semgrep
+
+      - name: Run Semgrep (soft-fail)
+        run: |
+          semgrep scan \
+            --config p/default \
+            --config p/typescript \
+            --config p/react \
+            --metrics=off \
+            --sarif --output semgrep.sarif || true
+
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        continue-on-error: true
+        if: always() && hashFiles('semgrep.sarif') != ''
+        with:
+          sarif_file: semgrep.sarif
