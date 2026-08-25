@@ -13,6 +13,7 @@ on:
 
 permissions:
   contents: read
+  security-events: write # upload-sarif writes to the code-scanning API
 
 jobs:
   semgrep:
