@@ -31,7 +31,7 @@ export interface UseUsageSyncsResult {
 
 export function useUsageSyncs({ limit, offset, page, filters = [], sort = [] }: UseUsageSyncsArgs): UseUsageSyncsResult {
 	const { data, isError, error, refetch } = useQuery({
-		queryKey: ['usageRecords', page, filters, sort],
+		queryKey: ['usageRecords', limit, offset, page, filters, sort],
 		queryFn: () => UsageRecordApi.searchUsageRecords({ limit, offset, filters, sort }),
 		placeholderData: keepPreviousData,
 	});
@@ -43,7 +43,12 @@ export function useUsageSyncs({ limit, offset, page, filters = [], sort = [] }: 
 
 	// Bulk-resolve names in two requests total, not one per row: an uncached page of 10 records
 	// used to fire up to 20 individual getById calls before the table could render.
-	const { data: customersData, isLoading: isLoadingCustomers } = useQuery({
+	const {
+		data: customersData,
+		isLoading: isLoadingCustomers,
+		isError: isErrorCustomers,
+		error: errorCustomers,
+	} = useQuery({
 		queryKey: ['usageSyncsCustomerNames', uniqueCustomerIds],
 		queryFn: () =>
 			CustomerApi.getCustomersByFilters({
@@ -56,7 +61,12 @@ export function useUsageSyncs({ limit, offset, page, filters = [], sort = [] }: 
 		enabled: uniqueCustomerIds.length > 0,
 	});
 
-	const { data: plansData, isLoading: isLoadingPlans } = useQuery({
+	const {
+		data: plansData,
+		isLoading: isLoadingPlans,
+		isError: isErrorPlans,
+		error: errorPlans,
+	} = useQuery({
 		queryKey: ['usageSyncsPlanNames', uniquePlanIds],
 		queryFn: () =>
 			PlanApi.getPlansByFilter({
@@ -69,6 +79,10 @@ export function useUsageSyncs({ limit, offset, page, filters = [], sort = [] }: 
 	});
 
 	const namesLoading = (uniqueCustomerIds.length > 0 && isLoadingCustomers) || (uniquePlanIds.length > 0 && isLoadingPlans);
+	// A failed name lookup leaves customersData/plansData undefined forever - without this, namesLoading
+	// goes false (isLoading is false once a query errors) and the commit effect below would fire with an
+	// incomplete name map instead of surfacing the failure.
+	const namesFailed = (uniqueCustomerIds.length > 0 && isErrorCustomers) || (uniquePlanIds.length > 0 && isErrorPlans);
 
 	const customerNameById = useMemo(() => {
 		const map: Record<string, string> = {};
@@ -92,16 +106,16 @@ export function useUsageSyncs({ limit, offset, page, filters = [], sort = [] }: 
 	const [committed, setCommitted] = useState<UsageSyncsPage | null>(null);
 
 	useEffect(() => {
-		if (!data || namesLoading) return;
-		setCommitted({ items, customerNameById, planNameById, total: data.pagination.total ?? 0 });
+		if (!data || namesLoading || namesFailed) return;
+		setCommitted({ items, customerNameById, planNameById, total: data.pagination?.total ?? 0 });
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [data, namesLoading]);
+	}, [data, namesLoading, namesFailed]);
 
 	return {
 		page: committed,
-		isLoading: committed === null && !isError,
-		isError,
-		error,
+		isLoading: committed === null && !isError && !namesFailed,
+		isError: isError || namesFailed,
+		error: error ?? errorCustomers ?? errorPlans,
 		refetch,
 	};
 }
