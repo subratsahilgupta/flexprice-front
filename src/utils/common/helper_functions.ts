@@ -1,5 +1,6 @@
-import { BILLING_PERIOD } from '@/constants/constants';
+import { BILLING_PERIOD, priceBucketSizeOptions } from '@/constants/constants';
 import { BILLING_MODEL, Price, PRICE_TYPE } from '@/models/Price';
+import { BUCKET_SIZE } from '@/models/Meter';
 import { getAllISOCodes } from 'iso-country-currency';
 import { v4 as uuidv4 } from 'uuid';
 import toast from 'react-hot-toast';
@@ -99,6 +100,12 @@ export const getPriceTypeLabel = (type: string | PRICE_TYPE | undefined): string
 		default:
 			return '--';
 	}
+};
+
+/** Human label for a price/meter bucket_size (e.g. "HOUR" -> "Hour"), or null when unbucketed. */
+export const getBucketSizeLabel = (bucketSize?: BUCKET_SIZE | string | null): string | null => {
+	if (!bucketSize) return null;
+	return priceBucketSizeOptions.find((option) => option.value === bucketSize)?.label ?? String(bucketSize);
 };
 
 export const toSentenceCase = (str: string): string => {
