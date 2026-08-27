@@ -17,14 +17,16 @@ export function validateResponseItems<T>(itemSchema: z.ZodType<T>, raw: unknown,
 		.passthrough()
 		.safeParse(raw);
 	if (!envelope.success) {
-		if (import.meta.env?.DEV) console.warn(`[${label}] response is not a paginated { items: [] } shape`, envelope.error.issues);
+		// Keep the format string constant and pass `label` as a substitution value - interpolating
+		// it directly would let a stray %-specifier in a future dynamic label forge the logged output.
+		if (import.meta.env?.DEV) console.warn('[%s] response is not a paginated { items: [] } shape', label, envelope.error.issues);
 		return [];
 	}
 	const out: T[] = [];
 	for (const item of envelope.data.items) {
 		const result = itemSchema.safeParse(item);
 		if (result.success) out.push(result.data);
-		else if (import.meta.env?.DEV) console.warn(`[${label}] dropped invalid item`, result.error.issues);
+		else if (import.meta.env?.DEV) console.warn('[%s] dropped invalid item', label, result.error.issues);
 	}
 	return out;
 }
