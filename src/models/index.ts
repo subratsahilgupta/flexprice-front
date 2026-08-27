@@ -118,6 +118,9 @@ export type { Pagination } from './Pagination';
 export type { Payment, Attempt } from './Payment';
 export { PAYMENT_METHOD_TYPE, PAYMENT_DESTINATION_TYPE } from './Payment';
 
+// UsageRecord
+export type { UsageRecord, UsageRecordSyncEntry } from './UsageRecord';
+
 // Plan
 export type { Plan, PlanPriceSyncStatus } from './Plan';
 

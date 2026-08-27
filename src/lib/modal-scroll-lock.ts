@@ -80,14 +80,22 @@ export function useSheetOutsideDismissGuards(enabled = true) {
 		const onPointerDownCapture = () => {
 			if (!hasOpenPortaledOverlay()) return;
 			suppressDismissRef.current = true;
-			// Backup clear if this gesture never hits the outside handlers (e.g. click inside the sheet/dialog).
-			window.setTimeout(() => {
-				suppressDismissRef.current = false;
-			}, 100);
+		};
+		// Backup clear if this gesture never hits the outside handlers (e.g. click inside the
+		// sheet/dialog) - tied to the end of *this* pointer gesture rather than a fixed delay, so
+		// suppression can never linger into a later, unrelated click and swallow a real dismiss.
+		const clearSuppression = () => {
+			suppressDismissRef.current = false;
 		};
 
 		document.addEventListener('pointerdown', onPointerDownCapture, true);
-		return () => document.removeEventListener('pointerdown', onPointerDownCapture, true);
+		document.addEventListener('pointerup', clearSuppression, true);
+		document.addEventListener('pointercancel', clearSuppression, true);
+		return () => {
+			document.removeEventListener('pointerdown', onPointerDownCapture, true);
+			document.removeEventListener('pointerup', clearSuppression, true);
+			document.removeEventListener('pointercancel', clearSuppression, true);
+		};
 	}, [enabled]);
 
 	const preventOutsideDismiss = useCallback((event: Event) => {
