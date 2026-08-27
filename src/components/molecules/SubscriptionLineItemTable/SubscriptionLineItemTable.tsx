@@ -16,7 +16,14 @@ import { ALERT_ENTITY_TYPE } from '@/models/AlertSetting';
 import { FC, useState, useCallback, useMemo } from 'react';
 import { Trash2, Pencil, Info, Eye, Tag, TicketX, Copy, Bell } from 'lucide-react';
 import { ENTITY_STATUS } from '@/models/base';
-import { copyToClipboard, formatBillingPeriodForDisplay, getCurrencySymbol, getPriceTypeLabel } from '@/utils/common/helper_functions';
+import {
+	copyToClipboard,
+	formatBillingPeriodForDisplay,
+	getBucketSizeLabel,
+	getCurrencySymbol,
+	getPriceTypeLabel,
+} from '@/utils/common/helper_functions';
+import { resolveBucketSize } from '@/utils/common/commitment_helpers';
 import { PRICE_ENTITY_TYPE, PRICE_STATUS, PRICE_TYPE } from '@/models/Price';
 import { formatDateTimeWithSecondsAndTimezone } from '@/utils/common/format_date';
 import LineItemWindowCommitmentViewDialog from '@/components/molecules/Subscription/LineItemWindowCommitmentViewDialog';
@@ -530,6 +537,13 @@ const SubscriptionLineItemTable: FC<Props> = ({
 			{
 				title: 'Billing Period',
 				render: (row) => formatBillingPeriodForDisplay(row.billing_period),
+			},
+			{
+				title: 'Bucket Size',
+				render: (row) => {
+					const label = getBucketSizeLabel(resolveBucketSize(row.price));
+					return label ? <Chip label={label} variant='default' /> : <span className='text-content-muted'>{t('labels.na')}</span>;
+				},
 			},
 			...(hasMultipleEntityTypes
 				? [

@@ -108,7 +108,7 @@ export {
 } from './Invoice';
 
 // Meter
-export type { Meter } from './Meter';
+export type { Meter, PriceBucketSize } from './Meter';
 export { METER_USAGE_RESET_PERIOD, METER_AGGREGATION_TYPE, BUCKET_SIZE } from './Meter';
 
 // Pagination
@@ -117,6 +117,9 @@ export type { Pagination } from './Pagination';
 // Payment
 export type { Payment, Attempt } from './Payment';
 export { PAYMENT_METHOD_TYPE, PAYMENT_DESTINATION_TYPE } from './Payment';
+
+// UsageRecord
+export type { UsageRecord, UsageRecordSyncEntry } from './UsageRecord';
 
 // Plan
 export type { Plan, PlanPriceSyncStatus } from './Plan';

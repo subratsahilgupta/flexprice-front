@@ -1066,6 +1066,43 @@
 			"taskRunsHeading": "Task Runs",
 			"backToExportDetails": "Back to Export Details"
 		},
+		"usageSyncs": {
+			"pageHeading": "Usage Syncs",
+			"paginationUnit": "usage records",
+			"notSynced": "No syncs yet",
+			"entityName": "Usage Record",
+			"emptyDescription": "No usage records yet. Connect a cloud marketplace and link a subscription to start seeing usage syncs.",
+			"errors": {
+				"fetchFailed": "Failed to load usage records"
+			},
+			"columns": {
+				"subscription": "Subscription",
+				"customer": "Customer",
+				"plan": "Plan",
+				"amount": "Amount",
+				"currency": "Currency",
+				"periodStart": "Period Start",
+				"periodEnd": "Period End",
+				"syncs": "Syncs"
+			},
+			"filterLabels": {
+				"customerId": "Customer ID",
+				"subscriptionId": "Subscription ID",
+				"periodStart": "Period Start",
+				"periodEnd": "Period End"
+			},
+			"sortLabels": {
+				"createdAt": "Created At",
+				"periodStart": "Period Start",
+				"periodEnd": "Period End"
+			},
+			"drawer": {
+				"title": "Syncs",
+				"empty": "No syncs yet.",
+				"synced": "Synced",
+				"skipped": "Skipped"
+			}
+		},
 		"integrations": {
 			"writeDeniedTooltip": "You don't have permission to manage connections. Ask a tenant admin for access.",
 			"pageHeading": "Integrations",

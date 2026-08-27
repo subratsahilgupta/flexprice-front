@@ -4,8 +4,9 @@ import { ColumnData, FlexpriceTable, LineItemCoupon } from '@/components/molecul
 import PriceOverrideDialog from '@/components/molecules/PriceOverrideDialog/PriceOverrideDialog';
 import CommitmentConfigDialog from '@/components/molecules/CommitmentConfigDialog';
 import { Price, PRICE_TYPE, PRICE_UNIT_TYPE } from '@/models';
+import type { PriceBucketSize } from '@/models/Meter';
 import { ChevronDownIcon, ChevronUpIcon, Copy, Pencil, RotateCcw, Tag, Target, Trash2 } from 'lucide-react';
-import { FormHeader, DecimalUsageInput, AddButton } from '@/components/atoms';
+import { FormHeader, DecimalUsageInput, AddButton, Chip } from '@/components/atoms';
 import { ChargeValueCell } from '@/components/molecules';
 import { capitalize } from 'es-toolkit';
 import { Coupon } from '@/models';
@@ -16,10 +17,11 @@ import { ExtendedPriceOverride } from '@/utils';
 import { LineItemCommitmentConfig } from '@/types/dto/LineItemCommitmentConfig';
 import type { CommitmentTimeBucket } from '@/types/dto/CommitmentTimeBucket';
 import type { AddedSubscriptionLineItem } from './AddSubscriptionChargeDialog';
-import { getCurrencySymbol, copyToClipboard } from '@/utils/common/helper_functions';
+import { getCurrencySymbol, copyToClipboard, getBucketSizeLabel } from '@/utils/common/helper_functions';
 import { formatBillingPeriodForPrice } from '@/utils/common/helper_functions';
+import { resolveBucketSize } from '@/utils/common/commitment_helpers';
 import { formatAmount } from '@/components/atoms/Input/Input';
-import { BILLING_PERIOD } from '@/constants/constants';
+import { BILLING_PERIOD, BUCKET_SIZE_NONE } from '@/constants/constants';
 import { isOneTimePlanPrice } from '@/utils/subscription/planPricesForSubscriptionUi';
 import { useTranslation } from 'react-i18next';
 
@@ -41,7 +43,25 @@ type ChargeTableData = {
 	quantity: ReactNode;
 	price: ReactNode;
 	invoice_cadence: string;
+	bucketSize: ReactNode;
 	actions?: ReactNode;
+};
+
+/**
+ * Price-then-meter bucket resolution for added line items. The request type only
+ * carries meter_id, but items round-tripped from existing line items can carry a
+ * meter object at runtime — same fallback order as resolveBucketSize.
+ */
+const resolveAddedItemBucketSize = (item: AddedSubscriptionLineItem): PriceBucketSize | string | undefined => {
+	const priceWithMeter = item.price as
+		| (typeof item.price & { meter?: { aggregation?: { bucket_size?: PriceBucketSize | string | null } } })
+		| undefined;
+	return priceWithMeter?.bucket_size ?? priceWithMeter?.meter?.aggregation?.bucket_size ?? undefined;
+};
+
+const bucketSizeCell = (bucketSize: ReturnType<typeof resolveBucketSize> | PriceBucketSize | undefined, naLabel: string): ReactNode => {
+	const label = getBucketSizeLabel(bucketSize);
+	return label ? <Chip label={label} variant='default' /> : <span className='text-content-muted'>{naLabel}</span>;
 };
 
 interface PriceActionMenuProps {
@@ -274,6 +294,7 @@ const SubscriptionPriceTable: FC<Props> = ({
 			},
 			{ fieldName: 'quantity', title: t('organisms.subscriptionPriceTable.colQuantity') },
 			{ fieldName: 'price', title: t('organisms.subscriptionPriceTable.colPrice') },
+			{ fieldName: 'bucketSize', title: t('organisms.subscriptionPriceTable.colBucketSize') },
 			{
 				fieldName: 'actions',
 				title: '',
@@ -347,6 +368,14 @@ const SubscriptionPriceTable: FC<Props> = ({
 				),
 				price: <ChargeValueCell data={price} appliedCoupon={appliedCoupon} priceOverride={isOverridden ? override : undefined} />,
 				invoice_cadence: price.invoice_cadence,
+				bucketSize: bucketSizeCell(
+					isOverridden && override?.bucket_size !== undefined
+						? override.bucket_size === BUCKET_SIZE_NONE
+							? undefined
+							: override.bucket_size
+						: (resolveBucketSize(price) ?? undefined),
+					t('common:labels.na'),
+				),
 				actions: (
 					<PriceActionMenu
 						price={price}
@@ -383,6 +412,7 @@ const SubscriptionPriceTable: FC<Props> = ({
 			quantity: <span>{item.quantity ?? 1}</span>,
 			price: <span>{formatAddedLineItemPrice(item, currency)}</span>,
 			invoice_cadence: item.price?.invoice_cadence ?? '--',
+			bucketSize: bucketSizeCell(resolveAddedItemBucketSize(item), t('common:labels.na')),
 			actions:
 				onRemoveAddedCharge || onEditAddedCharge ? (
 					<OptionsDropdownMenu

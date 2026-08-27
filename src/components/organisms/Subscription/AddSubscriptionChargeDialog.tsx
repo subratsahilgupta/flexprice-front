@@ -25,7 +25,6 @@ import {
 	sanitizeSubscriptionLineItemForApi,
 	subscriptionChargeCommitmentFromLineItem,
 } from '@/utils/subscription/subscription_line_item_commitment_helpers';
-import { useMeterForCommitment } from '@/hooks/useMeterForCommitment';
 import { useTranslation } from 'react-i18next';
 
 export type { AddedSubscriptionLineItem };
@@ -113,13 +112,16 @@ const AddSubscriptionChargeDialog: React.FC<AddSubscriptionChargeDialogProps> = 
 	const [price, setPrice] = useState<Partial<InternalPrice>>(() => getEmptyPrice(defaultCurrency, defaultBillingPeriod, defaultStartDate));
 	const [commitmentState, setCommitmentState] = useState<SubscriptionChargeCommitmentState>(DEFAULT_SUBSCRIPTION_CHARGE_COMMITMENT_STATE);
 	const [selectedMeterId, setSelectedMeterId] = useState<string | undefined>();
+	const [selectedMeterBucketSize, setSelectedMeterBucketSize] = useState<string | undefined>();
 
 	const meterId = selectedMeterId ?? price.meter_id;
-	const { meter } = useMeterForCommitment(meterId);
+	// Price-then-meter: legacy usage prices may carry no bucket_size while their meter does.
+	const effectiveBucketSize = price.bucket_size ?? selectedMeterBucketSize;
 
 	const resetForm = useCallback(() => {
 		setSelectedChargeType(null);
 		setSelectedMeterId(undefined);
+		setSelectedMeterBucketSize(undefined);
 		setCommitmentState(DEFAULT_SUBSCRIPTION_CHARGE_COMMITMENT_STATE);
 	}, []);
 
@@ -136,6 +138,9 @@ const AddSubscriptionChargeDialog: React.FC<AddSubscriptionChargeDialogProps> = 
 			);
 			setCommitmentState(subscriptionChargeCommitmentFromLineItem(initialItem));
 			setSelectedMeterId(initialItem.price?.meter_id);
+			// The line-item request shape carries no meter object; edit mode relies on
+			// the price-level bucket_size (present whenever the charge was bucketed).
+			setSelectedMeterBucketSize(undefined);
 		} else {
 			resetForm();
 			setPrice(getEmptyPrice(defaultCurrency, defaultBillingPeriod, defaultStartDate));
@@ -170,7 +175,10 @@ const AddSubscriptionChargeDialog: React.FC<AddSubscriptionChargeDialogProps> = 
 			let finalRequest = request;
 
 			if (isUsage) {
-				const commitmentError = applyWindowCommitmentToLineItem(finalRequest, commitmentState, partial, meter);
+				const commitmentError = applyWindowCommitmentToLineItem(finalRequest, commitmentState, {
+					...partial,
+					bucket_size: partial.bucket_size ?? selectedMeterBucketSize,
+				});
 				if (commitmentError) {
 					toast.error(formatWindowCommitmentError(commitmentError.error, t));
 					return;
@@ -178,7 +186,7 @@ const AddSubscriptionChargeDialog: React.FC<AddSubscriptionChargeDialogProps> = 
 				finalRequest = sanitizeSubscriptionLineItemForApi(
 					finalRequest,
 					(partial.currency ?? defaultCurrency ?? 'usd').toLowerCase(),
-					meter,
+					partial.bucket_size ?? selectedMeterBucketSize,
 				);
 			}
 
@@ -189,7 +197,7 @@ const AddSubscriptionChargeDialog: React.FC<AddSubscriptionChargeDialogProps> = 
 				// Keep dialog open so the user can fix and retry.
 			}
 		},
-		[commitmentState, defaultCurrency, meter, onOpenChange, onSave, t],
+		[commitmentState, defaultCurrency, onOpenChange, onSave, selectedMeterBucketSize, t],
 	);
 
 	const handleAdd = useCallback((partial: Partial<InternalPrice>) => buildAndSave(partial, uniqueId('sub_')), [buildAndSave]);
@@ -248,7 +256,10 @@ const AddSubscriptionChargeDialog: React.FC<AddSubscriptionChargeDialogProps> = 
 					onDeleteClicked={() => onOpenChange(false)}
 					entityType={PRICE_ENTITY_TYPE.SUBSCRIPTION}
 					entityId={subscriptionId}
-					onMeterChange={(feature) => setSelectedMeterId(feature?.meter_id)}
+					onMeterChange={(feature) => {
+						setSelectedMeterId(feature?.meter_id);
+						setSelectedMeterBucketSize(feature?.meter?.aggregation?.bucket_size ?? undefined);
+					}}
 					isSaving={isSaving}
 					formFooter={
 						<SubscriptionChargeCommitmentSection
@@ -258,6 +269,7 @@ const AddSubscriptionChargeDialog: React.FC<AddSubscriptionChargeDialogProps> = 
 							value={commitmentState}
 							onChange={setCommitmentState}
 							sourcePrice={price}
+							sourceBucketSize={effectiveBucketSize}
 							disabled={isSaving}
 						/>
 					}
