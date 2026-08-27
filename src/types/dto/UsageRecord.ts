@@ -22,15 +22,3 @@ export interface ListUsageRecordsResponse {
 	items: UsageRecord[];
 	pagination: Pagination;
 }
-
-/**
- * A fully-resolved usage-syncs page: records plus every customer/plan name they reference.
- * `useUsageSyncs` only ever hands this out as one atomic unit — never records with names still
- * loading — so the table never has to render (or flicker past) a partially-resolved row.
- */
-export interface UsageSyncsPage {
-	items: UsageRecord[];
-	customerNameById: Record<string, string>;
-	planNameById: Record<string, string>;
-	total: number;
-}

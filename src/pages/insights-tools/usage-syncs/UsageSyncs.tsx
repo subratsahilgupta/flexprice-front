@@ -1,15 +1,16 @@
-import { ActionButton, Button, Loader, Page, ShortPagination } from '@/components/atoms';
-import { ColumnData, FlexpriceTable, QueryBuilder, RedirectCell } from '@/components/molecules';
-import { ErrorState } from '@/components/organisms/QueryableDataArea';
-import usePagination from '@/hooks/usePagination';
-import useFilterSortingWithPersistence from '@/hooks/useFilterSortingWithPersistence';
-import { usePaginationReset } from '@/hooks/usePaginationReset';
-import { useUsageSyncs } from '@/hooks/useUsageSyncs';
+import { ActionButton, Page } from '@/components/atoms';
+import { ColumnData, RedirectCell } from '@/components/molecules';
+import { QueryableDataArea } from '@/components/organisms';
+import UsageRecordApi from '@/api/UsageRecordApi';
+import CustomerApi from '@/api/CustomerApi';
+import { PlanApi } from '@/api/PlanApi';
 import { RouteNames } from '@/core/routes/Routes';
 import { UsageRecord } from '@/models';
+import { FilterOperator, DataType } from '@/types/common/QueryBuilder';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import { formatDateTime } from '@/utils/common/format_date';
-import { useMemo, useState } from 'react';
+import { validateResponseItems, usageRecordItemSchema } from '@/hooks/usageRecordSchemas';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import UsageRecordSyncsDrawer from './UsageRecordSyncsDrawer';
 import { MARKETPLACE_LOGO, getProviderLabel } from './marketplaceProviders';
@@ -22,39 +23,72 @@ import {
 
 const USAGE_SYNCS_PAGE_SIZE = 10;
 
+/** Usage record with customer/plan names resolved in the fetch (same pattern as EnrichedInvoice). */
+type EnrichedUsageRecord = UsageRecord & {
+	customer_name?: string;
+	plan_name?: string;
+};
+
+async function fetchCustomerNames(ids: string[]): Promise<Record<string, string>> {
+	if (ids.length === 0) return {};
+	const res = await CustomerApi.getCustomersByFilters({
+		customer_ids: ids,
+		limit: ids.length,
+		offset: 0,
+		filters: [],
+		sort: [],
+	});
+	const map: Record<string, string> = {};
+	res.items?.forEach((c) => {
+		map[c.id] = c.name;
+	});
+	return map;
+}
+
+async function fetchPlanNames(ids: string[]): Promise<Record<string, string>> {
+	if (ids.length === 0) return {};
+	const res = await PlanApi.getPlansByFilter({
+		filters: [{ field: 'id', operator: FilterOperator.IN, data_type: DataType.ARRAY, value: { array: ids } }],
+		limit: ids.length,
+		offset: 0,
+		sort: [],
+	});
+	const map: Record<string, string> = {};
+	res.items?.forEach((p) => {
+		map[p.id] = p.name;
+	});
+	return map;
+}
+
 const UsageSyncs = () => {
 	const { t } = useTranslation('settings');
-	const { limit, offset, page, reset } = usePagination({ initialLimit: USAGE_SYNCS_PAGE_SIZE });
 	const [activeRecord, setActiveRecord] = useState<UsageRecord | null>(null);
 	const [drawerOpen, setDrawerOpen] = useState(false);
 
-	const usageSyncsQueryBuilderConfig = useMemo(
-		() => ({
-			filterOptions: getUsageSyncsFilterOptions(t),
-			sortOptions: getUsageSyncsSortOptions(t),
-			initialSorts: getUsageSyncsInitialSorts(t),
-		}),
-		[t],
-	);
+	const filterOptions = useMemo(() => getUsageSyncsFilterOptions(t), [t]);
+	const sortOptions = useMemo(() => getUsageSyncsSortOptions(t), [t]);
+	const initialSorts = useMemo(() => getUsageSyncsInitialSorts(t), [t]);
 
-	const { filters, sorts, setFilters, setSorts, sanitizedFilters, sanitizedSorts } = useFilterSortingWithPersistence({
-		initialFilters: usageSyncsInitialFilters,
-		initialSorts: usageSyncsQueryBuilderConfig.initialSorts,
-		debounceTime: 300,
-		persistenceKey: 'usageRecords',
-	});
+	const enrichedFetchFn = useCallback(async (params: { limit: number; offset: number; filters: unknown[]; sort: unknown[] }) => {
+		const result = await UsageRecordApi.searchUsageRecords({
+			limit: params.limit,
+			offset: params.offset,
+			filters: params.filters as never,
+			sort: params.sort as never,
+		});
+		const rawItems = validateResponseItems(usageRecordItemSchema, result, 'usageRecords') as unknown as UsageRecord[];
+		const customerIds = [...new Set(rawItems.map((item) => item.customer_id).filter(Boolean))];
+		const planIds = [...new Set(rawItems.map((item) => item.plan_id).filter(Boolean))];
+		const [customerNameById, planNameById] = await Promise.all([fetchCustomerNames(customerIds), fetchPlanNames(planIds)]);
+		const items: EnrichedUsageRecord[] = rawItems.map((item) => ({
+			...item,
+			customer_name: customerNameById[item.customer_id],
+			plan_name: planNameById[item.plan_id],
+		}));
+		return { items, pagination: result.pagination };
+	}, []);
 
-	usePaginationReset(reset, sanitizedFilters, sanitizedSorts);
-
-	const {
-		page: committed,
-		isLoading,
-		isError,
-		error,
-		refetch,
-	} = useUsageSyncs({ limit, offset, page, filters: sanitizedFilters, sort: sanitizedSorts });
-
-	const columns: ColumnData<UsageRecord>[] = useMemo(
+	const columns: ColumnData<EnrichedUsageRecord>[] = useMemo(
 		() => [
 			{
 				title: t('insightsTools.usageSyncs.columns.subscription'),
@@ -68,9 +102,7 @@ const UsageSyncs = () => {
 				title: t('insightsTools.usageSyncs.columns.customer'),
 				render: (row) => (
 					<RedirectCell redirectUrl={`${RouteNames.customers}/${row.customer_id}`}>
-						<span className='truncate max-w-[160px] inline-block align-bottom'>
-							{committed?.customerNameById[row.customer_id] || row.customer_external_id}
-						</span>
+						<span className='truncate max-w-[160px] inline-block align-bottom'>{row.customer_name || row.customer_external_id}</span>
 					</RedirectCell>
 				),
 			},
@@ -78,7 +110,7 @@ const UsageSyncs = () => {
 				title: t('insightsTools.usageSyncs.columns.plan'),
 				render: (row) => (
 					<RedirectCell redirectUrl={`${RouteNames.plan}/${row.plan_id}`}>
-						<span className='truncate max-w-[160px] inline-block align-bottom'>{committed?.planNameById[row.plan_id] || row.plan_id}</span>
+						<span className='truncate max-w-[160px] inline-block align-bottom'>{row.plan_name || row.plan_id}</span>
 					</RedirectCell>
 				),
 			},
@@ -139,6 +171,7 @@ const UsageSyncs = () => {
 			},
 			{
 				fieldVariant: 'interactive',
+				hideOnEmpty: true,
 				render: (row) => (
 					<ActionButton
 						id={row.id}
@@ -153,45 +186,47 @@ const UsageSyncs = () => {
 				),
 			},
 		],
-		[t, committed],
+		[t],
 	);
 
 	return (
 		<Page heading={t('insightsTools.usageSyncs.pageHeading')}>
 			<UsageRecordSyncsDrawer record={activeRecord} isOpen={drawerOpen} onOpenChange={setDrawerOpen} />
 
-			<QueryBuilder
-				filterOptions={usageSyncsQueryBuilderConfig.filterOptions}
-				filters={filters}
-				onFilterChange={setFilters}
-				sortOptions={usageSyncsQueryBuilderConfig.sortOptions}
-				selectedSorts={sorts}
-				onSortChange={setSorts}
+			<QueryableDataArea<EnrichedUsageRecord>
+				queryConfig={{
+					filterOptions,
+					sortOptions,
+					initialFilters: usageSyncsInitialFilters,
+					initialSorts,
+					debounceTime: 300,
+					filterPersistenceKey: 'usageRecords',
+				}}
+				dataConfig={{
+					queryKey: 'usageRecords',
+					fetchFn: enrichedFetchFn,
+					probeFetchFn: async (params) =>
+						UsageRecordApi.searchUsageRecords({
+							...params,
+							limit: 1,
+							offset: 0,
+							filters: [],
+							sort: [],
+						}),
+				}}
+				tableConfig={{
+					columns,
+					showEmptyRow: true,
+				}}
+				paginationConfig={{
+					unit: t('insightsTools.usageSyncs.paginationUnit'),
+					initialLimit: USAGE_SYNCS_PAGE_SIZE,
+				}}
+				emptyStateConfig={{
+					heading: t('insightsTools.usageSyncs.pageHeading'),
+					description: t('insightsTools.usageSyncs.emptyDescription'),
+				}}
 			/>
-
-			<div>
-				{isError ? (
-					<div className='flex flex-col items-center gap-4 min-h-[420px] justify-center'>
-						<ErrorState error={error} />
-						<Button variant='outline' onClick={() => refetch()}>
-							{t('common:actions.retry')}
-						</Button>
-					</div>
-				) : isLoading ? (
-					<div className='min-h-[420px]'>
-						<Loader />
-					</div>
-				) : (
-					<>
-						<FlexpriceTable data={committed?.items ?? []} columns={columns} showEmptyRow />
-						<ShortPagination
-							unit={t('insightsTools.usageSyncs.paginationUnit')}
-							totalItems={committed?.total ?? 0}
-							pageSize={USAGE_SYNCS_PAGE_SIZE}
-						/>
-					</>
-				)}
-			</div>
 		</Page>
 	);
 };

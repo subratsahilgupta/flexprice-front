@@ -1071,6 +1071,7 @@
 			"paginationUnit": "usage records",
 			"notSynced": "No syncs yet",
 			"entityName": "Usage Record",
+			"emptyDescription": "No usage records yet. Connect a cloud marketplace and link a subscription to start seeing usage syncs.",
 			"errors": {
 				"fetchFailed": "Failed to load usage records"
 			},
