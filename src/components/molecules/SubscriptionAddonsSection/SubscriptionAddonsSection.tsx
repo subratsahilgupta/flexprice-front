@@ -2,7 +2,7 @@ import { FC, useState, useMemo, useCallback, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TFunction } from 'i18next';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
-import { Trash2, Copy } from 'lucide-react';
+import { Settings2, Trash2, Copy } from 'lucide-react';
 import { Button, Card, CardHeader, Chip, DatePicker, Dialog, AddButton, Select, Tooltip, NoDataCard } from '@/components/atoms';
 import { FlexpriceTable, ColumnData } from '@/components/molecules';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -17,7 +17,9 @@ import { Price, PRICE_TYPE } from '@/models/Price';
 import { getCurrentPriceAmount } from '@/utils/common/price_override_helpers';
 import { getTotalPayableTextWithCoupons } from '@/utils/common/helper_functions';
 import toast from 'react-hot-toast';
+import { cn } from '@/lib/utils';
 import AddAddonDialog from './AddAddonDialog';
+import ConfigureAddonDialog from './ConfigureAddonDialog';
 import { formatDateTimeWithSecondsAndTimezone } from '@/utils/common/format_date';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
 import { useCurrentUserPermissions } from '@/hooks/useCurrentUserPermissions';
@@ -151,10 +153,11 @@ const SubscriptionAddonsSection: FC<SubscriptionAddonsSectionProps> = ({
 	subscriptionCurrentPeriodStart,
 	subscriptionCurrentPeriodEnd,
 }) => {
-	const { t } = useTranslation('common');
+	const { t } = useTranslation(['common', 'billing']);
 	const { can } = useCurrentUserPermissions();
 	const canWriteAddon = can('addon', 'write');
 	const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+	const [addonToConfigure, setAddonToConfigure] = useState<AddonAssociationResponse | null>(null);
 	const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
 	const [addonToCancel, setAddonToCancel] = useState<AddonAssociationResponse | null>(null);
 	const [effectiveEndDate, setEffectiveEndDate] = useState<Date | undefined>(undefined);
@@ -331,6 +334,21 @@ const SubscriptionAddonsSection: FC<SubscriptionAddonsSectionProps> = ({
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align='end'>
 									<DropdownMenuItem
+										disabled={hasEndDate || !canWriteAddon}
+										onSelect={(e) => {
+											if (hasEndDate || !canWriteAddon) return;
+											e.preventDefault();
+											setDropdownOpen(null);
+											setAddonToConfigure(row);
+										}}
+										className={cn(
+											'flex gap-2 items-center cursor-pointer',
+											(hasEndDate || !canWriteAddon) && 'opacity-50 cursor-not-allowed',
+										)}>
+										<Settings2 className='h-4 w-4' />
+										<span>{t('billing:subscriptions.configure')}</span>
+									</DropdownMenuItem>
+									<DropdownMenuItem
 										onSelect={(e) => {
 											e.preventDefault();
 											void copyToClipboard(row.id, t('copyId.toastWithType', { type: 'Addon' }));
@@ -346,7 +364,10 @@ const SubscriptionAddonsSection: FC<SubscriptionAddonsSectionProps> = ({
 											e.preventDefault();
 											handleCancel(row);
 										}}
-										className={`flex gap-2 items-center cursor-pointer text-danger ${hasEndDate || !canWriteAddon ? 'opacity-50 cursor-not-allowed' : ''}`}>
+										className={cn(
+											'flex gap-2 items-center cursor-pointer text-danger',
+											(hasEndDate || !canWriteAddon) && 'opacity-50 cursor-not-allowed',
+										)}>
 										<Trash2 className='h-4 w-4' />
 										<span>{t('actions.cancel')}</span>
 									</DropdownMenuItem>
@@ -406,6 +427,18 @@ const SubscriptionAddonsSection: FC<SubscriptionAddonsSectionProps> = ({
 					currentPeriodEndIso={subscriptionDetails?.current_period_end}
 				/>
 			)}
+
+			<ConfigureAddonDialog
+				isOpen={!!addonToConfigure}
+				onOpenChange={(open) => {
+					if (!open) setAddonToConfigure(null);
+				}}
+				subscriptionId={subscriptionId}
+				association={addonToConfigure}
+				currentPeriodStart={subscriptionDetails?.current_period_start}
+				currentPeriodEnd={subscriptionDetails?.current_period_end}
+				readOnly={readOnly}
+			/>
 
 			{/* Cancel Addon Dialog */}
 			<Dialog

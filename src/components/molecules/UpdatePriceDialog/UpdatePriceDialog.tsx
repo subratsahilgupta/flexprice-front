@@ -2,6 +2,7 @@ import { FC, useState, useEffect, useMemo } from 'react';
 import { Dialog } from '@/components/atoms';
 import { Input, Button, Select, SelectOption, DatePicker } from '@/components/atoms';
 import { Price, BILLING_MODEL, TIER_MODE, CreatePriceTier, TransformQuantity, PRICE_TYPE, PRICE_UNIT_TYPE } from '@/models/Price';
+import { PriceBucketSize } from '@/models/Meter';
 import { formatAmount, removeFormatting } from '@/components/atoms/Input/Input';
 import { getCurrencySymbol } from '@/utils/common/helper_functions';
 import VolumeTieredPricingForm from '@/components/organisms/PlanForm/VolumeTieredPricingForm';
@@ -9,8 +10,10 @@ import { useMutation } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { PriceApi } from '@/api/PriceApi';
 import { UpdatePriceRequest } from '@/types/dto';
+import { BUCKET_SIZE_NONE, priceBucketSizeOptions } from '@/constants/constants';
 import { formatDateTimeWithSecondsAndTimezone } from '@/utils/common/format_date';
 import { PremiumFeatureIcon } from '../PremiumFeature/PremiumFeature';
+import { useMeterForCommitment } from '@/hooks/useMeterForCommitment';
 import { useTranslation } from 'react-i18next';
 
 interface UpdatePriceDialogProps {
@@ -43,6 +46,14 @@ const UpdatePriceDialog: FC<UpdatePriceDialogProps> = ({ isOpen, onOpenChange, p
 		divide_by: 1,
 	});
 	const [effectiveFrom, setEffectiveFrom] = useState<Date | undefined>(undefined);
+	const [overrideBucketSize, setOverrideBucketSize] = useState<PriceBucketSize | ''>(
+		(price.bucket_size as PriceBucketSize | undefined) ?? '',
+	);
+	// The API rejects a price defining its own bucket_size when the meter already carries one
+	// ("meter already defines a bucket size") - disable the override instead of surfacing that as a 400.
+	// The price may embed only meter_id, so fetch the meter when aggregation data is missing.
+	const { meter: resolvedMeter } = useMeterForCommitment(price.meter_id, price.meter ?? null);
+	const meterBucketSize = price.meter?.aggregation?.bucket_size ?? resolvedMeter?.aggregation?.bucket_size;
 
 	// Detect price unit type
 	const isCustomPriceUnit = price.price_unit_type === PRICE_UNIT_TYPE.CUSTOM;
@@ -102,6 +113,7 @@ const UpdatePriceDialog: FC<UpdatePriceDialogProps> = ({ isOpen, onOpenChange, p
 
 			setOverrideTransformQuantity(price.transform_quantity || { divide_by: 1, round: 'up' });
 			setEffectiveFrom(undefined);
+			setOverrideBucketSize((price.bucket_size as PriceBucketSize | undefined) ?? '');
 		}
 	}, [isOpen, price, isCustomPriceUnit]);
 
@@ -166,6 +178,12 @@ const UpdatePriceDialog: FC<UpdatePriceDialogProps> = ({ isOpen, onOpenChange, p
 				...overrideTransformQuantity,
 				divide_by: overrideQuantity || overrideTransformQuantity.divide_by,
 			};
+		}
+
+		// Bucket size override - send BUCKET_SIZE_NONE to explicitly clear, omit to leave unchanged
+		const originalBucketSize = price.bucket_size ?? '';
+		if (overrideBucketSize !== originalBucketSize) {
+			updateData.bucket_size = overrideBucketSize || BUCKET_SIZE_NONE;
 		}
 
 		// Include effective_from if provided
@@ -256,13 +274,16 @@ const UpdatePriceDialog: FC<UpdatePriceDialogProps> = ({ isOpen, onOpenChange, p
 			}
 		}
 
+		const bucketSizeChanged = overrideBucketSize !== (price.bucket_size ?? '');
+
 		return (
 			amountChanged ||
 			overrideQuantity !== undefined ||
 			billingModelChanged ||
 			tiersChanged ||
 			overrideTransformQuantity !== undefined ||
-			effectiveFrom !== undefined
+			effectiveFrom !== undefined ||
+			bucketSizeChanged
 		);
 	};
 
@@ -317,6 +338,20 @@ const UpdatePriceDialog: FC<UpdatePriceDialogProps> = ({ isOpen, onOpenChange, p
 								onChange={(value) => setOverrideBillingModel(value as BILLING_MODEL)}
 								options={billingModelOptions}
 								placeholder={t('priceDialogs.selectBillingModel')}
+							/>
+						</div>
+					)}
+
+					{price.type === PRICE_TYPE.USAGE && (
+						<div className='space-y-2'>
+							<label className='text-sm font-medium text-content-secondary'>{t('priceDialogs.bucketSize')}</label>
+							<Select
+								value={overrideBucketSize}
+								onChange={(value) => setOverrideBucketSize(value as PriceBucketSize)}
+								options={priceBucketSizeOptions}
+								placeholder={t('priceDialogs.bucketSizePlaceholder')}
+								disabled={!!meterBucketSize}
+								description={meterBucketSize ? t('priceDialogs.bucketSizeSetOnMeter', { bucketSize: meterBucketSize }) : undefined}
 							/>
 						</div>
 					)}

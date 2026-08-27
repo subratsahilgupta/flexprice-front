@@ -375,7 +375,8 @@
 			"columns": {
 				"charge": "Charge",
 				"type": "Type",
-				"commitment": "Commitment"
+				"commitment": "Commitment",
+				"price": "Price"
 			},
 			"chargeFallback": "Charge",
 			"commitmentNotAvailable": "Not available",
@@ -458,6 +459,11 @@
 			"selectTaxRatePlaceholder": "Select a tax rate",
 			"effectiveDateOptional": "Effective Date (optional)",
 			"pickDate": "Pick a date"
+		},
+		"configureAddonDialog": {
+			"title": "Configure Addon",
+			"empty": "No charges found for this addon.",
+			"loadError": "Could not load this addon’s charges."
 		}
 	},
 	"payments": {
@@ -686,7 +692,7 @@
 		"addCharge": {
 			"selectMeterForBuckets": "Select a metered feature to configure window commitment time buckets.",
 			"loadingMeter": "Loading meter details…",
-			"meterNotSupported": "This meter does not support window commitment. Configure a bucket size on the meter first."
+			"meterNotSupported": "This charge does not support window commitment. Configure a bucket size on the price first."
 		},
 		"timeBuckets": {
 			"bucketCount": "{{count}} time bucket(s)",

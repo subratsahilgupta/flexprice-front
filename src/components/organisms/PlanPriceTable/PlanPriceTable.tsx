@@ -9,7 +9,7 @@ import {
 	UpdatePriceDetailsDrawer,
 	QueryBuilder,
 } from '@/components/molecules';
-import { Price, Plan, PRICE_STATUS, PRICE_ENTITY_TYPE, PRICE_TYPE, INVOICE_CADENCE } from '@/models';
+import { Price, Plan, PRICE_STATUS, PRICE_ENTITY_TYPE, PRICE_TYPE, INVOICE_CADENCE, EXPAND } from '@/models';
 import { PriceUnit } from '@/models/PriceUnit';
 import { Plus, Trash2, Pencil, FileText, Copy } from 'lucide-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -22,6 +22,8 @@ import { ChargeValueCell } from '@/components/molecules';
 import { Dialog } from '@/components/ui';
 import { DeletePriceRequest } from '@/types/dto';
 import { formatDateTimeWithSecondsAndTimezone } from '@/utils/common/format_date';
+import { getBucketSizeLabel } from '@/utils/common/helper_functions';
+import { resolveBucketSize } from '@/utils/common/commitment_helpers';
 import useFilterSorting from '@/hooks/useFilterSorting';
 import { FilterField, FilterFieldType, FilterOperator, DataType, SortDirection, FilterCondition } from '@/types/common/QueryBuilder';
 import { sanitizeFilterConditions, sanitizeSortConditions } from '@/types/formatters/QueryBuilder';
@@ -405,6 +407,8 @@ const PlanPriceTable: FC<PlanChargesTableProps> = ({ plan, onPriceUpdate }) => {
 				filters: searchFilters.length > 0 ? searchFilters : undefined,
 				sorts: searchSorts.length > 0 ? searchSorts : undefined,
 				allow_expired_prices: showExpiredPrices,
+				// Legacy prices carry the bucket on the meter; expand it so bucket-size display and edit guards resolve.
+				expand: EXPAND.METERS,
 				limit,
 				offset,
 			}),
@@ -482,6 +486,13 @@ const PlanPriceTable: FC<PlanChargesTableProps> = ({ plan, onPriceUpdate }) => {
 			{
 				title: 'Billing Period',
 				render: (row) => <span>{formatBillingPeriod(row.billing_period as string)}</span>,
+			},
+			{
+				title: 'Bucket Size',
+				render: (row) => {
+					const label = getBucketSizeLabel(resolveBucketSize(row));
+					return label ? <Chip label={label} variant='default' /> : <span className='text-content-muted'>{t('common:labels.na')}</span>;
+				},
 			},
 			{
 				title: 'Status',

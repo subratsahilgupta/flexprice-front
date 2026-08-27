@@ -115,7 +115,10 @@ const AddSubscriptionChargeDialog: React.FC<AddSubscriptionChargeDialogProps> = 
 	const [selectedMeterId, setSelectedMeterId] = useState<string | undefined>();
 
 	const meterId = selectedMeterId ?? price.meter_id;
+	// Features from SelectFeature often carry only meter_id — fetch the meter so
+	// price-then-meter bucket resolution works for legacy meter-bucketed prices.
 	const { meter } = useMeterForCommitment(meterId);
+	const effectiveBucketSize = price.bucket_size ?? meter?.aggregation?.bucket_size;
 
 	const resetForm = useCallback(() => {
 		setSelectedChargeType(null);
@@ -170,7 +173,10 @@ const AddSubscriptionChargeDialog: React.FC<AddSubscriptionChargeDialogProps> = 
 			let finalRequest = request;
 
 			if (isUsage) {
-				const commitmentError = applyWindowCommitmentToLineItem(finalRequest, commitmentState, partial, meter);
+				const commitmentError = applyWindowCommitmentToLineItem(finalRequest, commitmentState, {
+					...partial,
+					bucket_size: partial.bucket_size ?? meter?.aggregation?.bucket_size,
+				});
 				if (commitmentError) {
 					toast.error(formatWindowCommitmentError(commitmentError.error, t));
 					return;
@@ -178,8 +184,17 @@ const AddSubscriptionChargeDialog: React.FC<AddSubscriptionChargeDialogProps> = 
 				finalRequest = sanitizeSubscriptionLineItemForApi(
 					finalRequest,
 					(partial.currency ?? defaultCurrency ?? 'usd').toLowerCase(),
-					meter,
+					partial.bucket_size ?? meter?.aggregation?.bucket_size,
 				);
+				// Carry the meter bucket on the pending item so the added-charges table can
+				// display it (the API payload strips `price.meter` before sending).
+				const meterBucketSize = meter?.aggregation?.bucket_size;
+				if (finalRequest.price && !finalRequest.price.bucket_size && meterBucketSize) {
+					finalRequest = {
+						...finalRequest,
+						price: { ...finalRequest.price, meter: { aggregation: { bucket_size: meterBucketSize } } } as typeof finalRequest.price,
+					};
+				}
 			}
 
 			try {
@@ -258,6 +273,7 @@ const AddSubscriptionChargeDialog: React.FC<AddSubscriptionChargeDialogProps> = 
 							value={commitmentState}
 							onChange={setCommitmentState}
 							sourcePrice={price}
+							sourceBucketSize={effectiveBucketSize}
 							disabled={isSaving}
 						/>
 					}

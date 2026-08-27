@@ -5,7 +5,7 @@ import SidebarNav, { NavItem } from './SidebarMenu';
 import FlexpriceSidebarFooter from './SidebarFooter';
 import { RouteNames } from '@/core/routes/Routes';
 import { EnvironmentSelector } from '@/components/molecules';
-import { Settings, Landmark, Layers2, CodeXml, Puzzle, GalleryHorizontalEnd, Home, BarChart3 } from 'lucide-react';
+import { Landmark, Layers2, CodeXml, Puzzle, GalleryHorizontalEnd, Home, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLocaleStore } from '@/store/useLocaleStore';
 import { Direction } from '@/config/branding';
@@ -101,23 +101,6 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 				: []),
 
 			{
-				title: t('sidebar.nav.tools'),
-				url: RouteNames.exports,
-				icon: Settings,
-				items: [
-					// Imports tab hidden from the sidebar for now — keep the entry (and its route)
-					// around so it's a one-line uncomment to bring back.
-					// {
-					// 	title: t('sidebar.nav.imports'),
-					// 	url: RouteNames.bulkImports,
-					// },
-					{
-						title: t('sidebar.nav.exports'),
-						url: RouteNames.exports,
-					},
-				],
-			},
-			{
 				title: t('sidebar.nav.developers'),
 				url: RouteNames.events,
 				icon: CodeXml,
@@ -137,6 +120,14 @@ const AppSidebar: React.FC<React.ComponentProps<typeof Sidebar>> = ({ ...props }
 					{
 						title: t('sidebar.nav.webhooks'),
 						url: RouteNames.webhooks,
+					},
+					{
+						title: t('sidebar.nav.exports'),
+						url: RouteNames.exports,
+					},
+					{
+						title: t('sidebar.nav.usageSyncs'),
+						url: RouteNames.usageSyncs,
 					},
 					{
 						title: t('sidebar.nav.workflows'),

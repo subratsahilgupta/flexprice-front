@@ -7,7 +7,8 @@ import SelectGroup from './SelectGroup';
 import { Group } from '@/models/Group';
 import Feature, { FEATURE_TYPE } from '@/models/Feature';
 import { formatBillingPeriodForPrice, getCurrencySymbol } from '@/utils/common/helper_functions';
-import { billlingPeriodOptions, currencyOptions } from '@/constants/constants';
+import { billlingPeriodOptions, currencyOptions, priceBucketSizeOptions } from '@/constants/constants';
+import { PriceBucketSize } from '@/models/Meter';
 import VolumeTieredPricingForm from './VolumeTieredPricingForm';
 import { InternalPrice } from './SetupChargesSection';
 import UsageChargePreview from './UsageChargePreview';
@@ -20,6 +21,7 @@ import FeatureApi from '@/api/FeatureApi';
 import { ENTITY_STATUS } from '@/models/base';
 import { CurrencyPriceUnitSelector } from '@/components/molecules';
 import { CurrencyPriceUnitSelection, isPriceUnitOption } from '@/types/common';
+import { useMeterForCommitment } from '@/hooks/useMeterForCommitment';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -139,6 +141,15 @@ const UsagePricingForm: FC<Props> = ({
 		price: '',
 	});
 	const [startDate, setStartDate] = useState<Date | undefined>(price.start_date ? new Date(price.start_date) : undefined);
+	const [bucketSize, setBucketSize] = useState<PriceBucketSize | ''>((price.bucket_size as PriceBucketSize | undefined) ?? '');
+	// The API rejects a price-level bucket_size when the selected meter already defines one -
+	// disable the selector and drop any stale price-level choice instead of sending both.
+	// Features from SelectFeature often carry only meter_id, so fetch the meter when needed.
+	const { meter: resolvedMeter } = useMeterForCommitment(selectedFeature?.meter_id, selectedFeature?.meter ?? null);
+	const meterBucketSize = selectedFeature?.meter?.aggregation?.bucket_size ?? resolvedMeter?.aggregation?.bucket_size;
+	useEffect(() => {
+		if (meterBucketSize) setBucketSize('');
+	}, [meterBucketSize]);
 
 	const [errors, setErrors] = useState<Partial<Record<keyof Price, any>>>({});
 	const [inputErrors, setInputErrors] = useState({
@@ -205,6 +216,7 @@ const UsagePricingForm: FC<Props> = ({
 			setDisplayName(price.display_name || '');
 			setBillingPeriod(normalizeUsageBillingPeriod(price.billing_period));
 			setStartDate(price.start_date ? new Date(price.start_date) : undefined);
+			setBucketSize((price.bucket_size as PriceBucketSize | undefined) ?? '');
 
 			if (price.billing_model === BILLING_MODEL.FLAT_FEE) {
 				setFlatFee(price.amount || '');
@@ -429,6 +441,7 @@ const UsagePricingForm: FC<Props> = ({
 			group_id: groupId,
 			start_date: startDate ? startDate.toISOString() : undefined,
 			display_name: displayName || selectedFeature?.name || '',
+			bucket_size: meterBucketSize ? undefined : bucketSize || undefined,
 		};
 
 		let finalPrice: Partial<Price>;
@@ -576,6 +589,21 @@ const UsagePricingForm: FC<Props> = ({
 				label={t('catalog:plans.organisms.usageForm.billingModel')}
 				error={errors.billing_model}
 				placeholder={t('catalog:plans.organisms.usageForm.billingModelPlaceholder')}
+			/>
+			<Spacer height='8px' />
+
+			<Select
+				value={bucketSize}
+				options={priceBucketSizeOptions}
+				onChange={(value) => setBucketSize(value as PriceBucketSize)}
+				label={t('catalog:plans.organisms.usageForm.bucketSize')}
+				placeholder={t('catalog:plans.organisms.usageForm.bucketSizePlaceholder')}
+				disabled={!!meterBucketSize}
+				description={
+					meterBucketSize
+						? t('catalog:priceDialogs.bucketSizeSetOnMeter', { bucketSize: meterBucketSize })
+						: t('catalog:plans.organisms.usageForm.bucketSizeDescription')
+				}
 			/>
 			<Spacer height='8px' />
 
