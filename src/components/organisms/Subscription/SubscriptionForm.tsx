@@ -1023,12 +1023,14 @@ const SubscriptionForm = ({
 				<div className='mt-6 pt-6 border-t border-line'>
 					<div className='space-y-4'>
 						<FormHeader className='mb-0' title={t('organisms.subscriptionForm.entitlements')} variant='sub-header' />
-						<EntitlementOverridesTable
-							entitlements={allEntitlements}
-							overrides={state.entitlementOverrides}
-							onOverrideChange={handleEntitlementOverride}
-							onOverrideReset={handleEntitlementOverrideReset}
-						/>
+						<div className='rounded-[6px] border border-line-strong'>
+							<EntitlementOverridesTable
+								entitlements={allEntitlements}
+								overrides={state.entitlementOverrides}
+								onOverrideChange={handleEntitlementOverride}
+								onOverrideReset={handleEntitlementOverrideReset}
+							/>
+						</div>
 					</div>
 				</div>
 			)}

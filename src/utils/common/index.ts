@@ -25,7 +25,6 @@ export {
 	getCommitmentConfig,
 	validateCommitment,
 	formatCommitmentSummary,
-	resolveBucketSize,
 	supportsWindowCommitment,
 	supportsCommitmentTimeBuckets,
 	isHourBucketSize,

@@ -6,7 +6,6 @@ export type { FilterField, FilterCondition } from './QueryBuilder';
 
 // Common interface types
 export type { Filters } from './Filters';
-export type { ChargeActionHandlers } from './ChargeActions';
 
 export type JsonValue = string | number | boolean | null | JsonObject | JsonValue[];
 export type JsonObject = { [key: string]: JsonValue };

@@ -293,7 +293,6 @@
 			"tools": "الأدوات",
 			"imports": "الاستيراد",
 			"exports": "التصدير",
-			"usageSyncs": "مزامنات الاستخدام",
 			"developers": "المطورون",
 			"eventsDebugger": "مصحح الأحداث",
 			"apiKeys": "مفاتيح API",
@@ -611,10 +610,7 @@
 		"commitmentUsageOnlyHint": "يمكن تهيئة الالتزامات فقط للرسوم المعتمدة على الاستخدام.",
 		"saveChanges": "حفظ التغييرات",
 		"submitAddAddon": "إضافة إضافة",
-		"chargeFallbackLabel": "رسوم",
-		"columnPrice": "السعر",
-		"labelStartDate": "تاريخ البدء (اختياري)",
-		"placeholderStartDate": "اختر تاريخ البدء"
+		"chargeFallbackLabel": "رسوم"
 	},
 	"priceTooltip": {
 		"volumeTierPricing": "تسعير الشرائح بالحجم",
@@ -780,7 +776,6 @@
 		"tools": "الأدوات",
 		"imports": "الاستيراد",
 		"exports": "التصدير",
-		"usageSyncs": "مزامنات الاستخدام",
 		"developers": "المطورون",
 		"eventsDebugger": "مصحح الأحداث",
 		"apiKeys": "مفاتيح API",

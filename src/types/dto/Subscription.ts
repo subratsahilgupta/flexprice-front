@@ -26,10 +26,9 @@ import {
 	PRICE_TYPE,
 	PRICE_UNIT_TYPE,
 	INVOICE_CADENCE,
-	PriceBucketSize,
 } from '@/models';
 import { PriceUnitConfig, PriceResponse } from '@/types/dto/Price';
-import { BILLING_PERIOD, BUCKET_SIZE_NONE } from '@/constants/constants';
+import { BILLING_PERIOD } from '@/constants/constants';
 import { QueryFilter, TimeRangeFilter } from './base';
 import { AddAddonToSubscriptionRequest, ADDON_CADENCE, ADDON_PRORATION_BEHAVIOR } from './Addon';
 export { ADDON_CADENCE as AddonCadence, ADDON_PRORATION_BEHAVIOR as ProrationBehavior } from './Addon';
@@ -449,10 +448,6 @@ export interface OverrideLineItemRequest {
 
 	// PriceUnitTiers are the tiers for the price unit (for CUSTOM type, TIERED billing model)
 	price_unit_tiers?: CreatePriceTier[];
-
-	/** Windows usage into fixed-size buckets before aggregation, overriding the plan price for this
-	 * subscription (USAGE prices only). Omit to inherit the plan price's bucket_size unchanged. */
-	bucket_size?: PriceBucketSize;
 }
 
 /** Request to update a subscription (PUT /subscriptions/:id). Omitted fields are unchanged; send "" or null to clear where supported. */
@@ -560,8 +555,6 @@ export interface AddAddonRequest {
 	proration_behavior?: ADDON_PRORATION_BEHAVIOR;
 	metadata?: Metadata;
 	line_item_commitments?: LineItemCommitmentsMap;
-	// Per-price overrides for this addon's prices (price_id must belong to the addon).
-	override_line_items?: OverrideLineItemRequest[];
 }
 
 export interface RemoveAddonRequest {
@@ -626,8 +619,6 @@ export interface SubscriptionPriceCreateRequest {
 	end_date?: string;
 	display_name?: string;
 	min_quantity?: number;
-	/** Windows usage into fixed-size buckets before aggregation (USAGE prices only). Omit for no bucketing. */
-	bucket_size?: PriceBucketSize;
 }
 
 export interface CreateSubscriptionLineItemRequest {
@@ -664,9 +655,6 @@ export interface UpdateSubscriptionLineItemRequest {
 	price_unit_amount?: string;
 	price_unit_tiers?: CreatePriceTier[];
 	proration_behavior?: ADDON_PRORATION_BEHAVIOR;
-	/** Same new-price/end-date-old-price semantics as UpdatePriceRequest.bucket_size - re-fetch after
-	 * a successful update instead of patching in place. BUCKET_SIZE_NONE removes bucketing. */
-	bucket_size?: PriceBucketSize | typeof BUCKET_SIZE_NONE;
 	// Commitment fields
 	commitment_amount?: number;
 	commitment_quantity?: number;

@@ -89,7 +89,6 @@ import {
 	ExportManagement,
 	ExportDetails,
 	TaskRunsPage,
-	UsageSyncs,
 	QuickBooksOAuthCallback,
 	DashboardPage,
 	CustomerPortalWrapper,
@@ -188,7 +187,6 @@ export const RouteNames = {
 	s3ExportManagement: '/tools/exports/s3/:connectionId/export',
 	s3ExportDetails: '/tools/exports/s3/:connectionId/export/:exportId',
 	s3TaskRuns: '/tools/exports/s3/:connectionId/export/:exportId/runs',
-	usageSyncs: '/tools/usage-syncs',
 
 	// footer
 	onboarding: '/onboarding',
@@ -651,10 +649,6 @@ export const MainRouter: any = createBrowserRouter([
 						path: RouteNames.exports,
 						element: <Exports />,
 						handle: requirePermission('task', 'read'),
-					},
-					{
-						path: RouteNames.usageSyncs,
-						element: <UsageSyncs />,
 					},
 					{
 						path: RouteNames.s3Exports,

@@ -1,26 +1,14 @@
-import { AddAddonToSubscriptionRequest, AddonResponse } from '@/types/dto/Addon';
-import { OverrideLineItemRequest } from '@/types/dto/Subscription';
+import { AddAddonToSubscriptionRequest } from '@/types/dto/Addon';
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Button, DatePicker } from '@/components/atoms';
+import { Button } from '@/components/atoms';
 import Dialog from '@/components/atoms/Dialog';
 import { useQuery } from '@tanstack/react-query';
 import AddonApi from '@/api/AddonApi';
 import { Select } from '@/components/atoms';
 import { toSentenceCase } from '@/utils/common/helper_functions';
 import { ColumnData, FlexpriceTable } from '@/components/molecules';
-import { BILLING_MODEL, Price, PRICE_TYPE, TIER_MODE } from '@/models/Price';
+import { Price, PRICE_TYPE } from '@/models/Price';
 import { BILLING_PERIOD } from '@/constants/constants';
-import {
-	ExtendedPriceOverride,
-	getLineItemOverrides,
-	removePriceOverride,
-	updatePriceOverride,
-} from '@/utils/common/price_override_helpers';
-import PriceOverrideDialog from '@/components/molecules/PriceOverrideDialog/PriceOverrideDialog';
-import ChargeValueCell from '@/components/molecules/ChargeValueCell/ChargeValueCell';
-import { DropdownMenu as UiDropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { BsThreeDots } from 'react-icons/bs';
-import { Pencil, RotateCcw, Target } from 'lucide-react';
 import { LineItemCommitmentConfig, LineItemCommitmentsMap } from '@/types/dto/LineItemCommitmentConfig';
 import CommitmentConfigDialog from '@/components/molecules/CommitmentConfigDialog';
 import { formatCommitmentSummary } from '@/utils/common/commitment_helpers';
@@ -47,27 +35,6 @@ type AddonChargeRow = {
 	price: Price;
 };
 
-/** Rehydrate the ExtendedPriceOverride map from a stored backend-shaped override array (edit mode). */
-const backendOverridesToMap = (items?: OverrideLineItemRequest[]): Record<string, ExtendedPriceOverride> => {
-	const map: Record<string, ExtendedPriceOverride> = {};
-	(items ?? []).forEach((o) => {
-		const isSlab = o.billing_model === BILLING_MODEL.TIERED && o.tier_mode === TIER_MODE.SLAB;
-		map[o.price_id] = {
-			price_id: o.price_id,
-			...(o.amount !== undefined ? { amount: String(o.amount) } : {}),
-			...(o.quantity !== undefined ? { quantity: o.quantity } : {}),
-			...(o.billing_model ? { billing_model: isSlab ? ('SLAB_TIERED' as const) : o.billing_model } : {}),
-			...(o.tier_mode && !isSlab ? { tier_mode: o.tier_mode } : {}),
-			...(o.tiers ? { tiers: o.tiers } : {}),
-			...(o.transform_quantity ? { transform_quantity: o.transform_quantity } : {}),
-			...(o.bucket_size ? { bucket_size: o.bucket_size } : {}),
-			...(o.price_unit_amount ? { price_unit_amount: o.price_unit_amount } : {}),
-			...(o.price_unit_tiers ? { price_unit_tiers: o.price_unit_tiers } : {}),
-		};
-	});
-	return map;
-};
-
 const SubscriptionAddonModal: React.FC<Props> = ({
 	data,
 	isOpen,
@@ -78,15 +45,12 @@ const SubscriptionAddonModal: React.FC<Props> = ({
 	billingPeriod,
 	currency,
 }) => {
-	const { t } = useTranslation(['common', 'customers']);
+	const { t } = useTranslation('common');
 	const [formData, setFormData] = useState<Partial<AddAddonToSubscriptionRequest>>({});
 	const [errors, setErrors] = useState<FormErrors>({});
-	const [selectedAddonDetails, setSelectedAddonDetails] = useState<AddonResponse | null>(null);
+	const [selectedAddonDetails, setSelectedAddonDetails] = useState<any>(null);
 	const [selectedCommitmentPrice, setSelectedCommitmentPrice] = useState<Price | null>(null);
 	const [isCommitmentDialogOpen, setIsCommitmentDialogOpen] = useState(false);
-	const [overriddenPrices, setOverriddenPrices] = useState<Record<string, ExtendedPriceOverride>>({});
-	const [selectedOverridePrice, setSelectedOverridePrice] = useState<Price | null>(null);
-	const [isOverrideDialogOpen, setIsOverrideDialogOpen] = useState(false);
 
 	// Fetch available addons - include all addons even if they have no charges
 	const { data: addons = [] } = useQuery({
@@ -108,9 +72,8 @@ const SubscriptionAddonModal: React.FC<Props> = ({
 					line_item_commitments: data.line_item_commitments || {},
 				});
 				// Find addon details for editing
-				const addonDetails = addons.find((addon) => addon.id === data.addon_id) ?? null;
+				const addonDetails = addons.find((addon) => addon.id === data.addon_id);
 				setSelectedAddonDetails(addonDetails);
-				setOverriddenPrices(backendOverridesToMap(data.override_line_items));
 			} else {
 				setFormData({
 					...getEmptyAddon(),
@@ -118,10 +81,7 @@ const SubscriptionAddonModal: React.FC<Props> = ({
 					line_item_commitments: {},
 				});
 				setSelectedAddonDetails(null);
-				setOverriddenPrices({});
 			}
-			setSelectedOverridePrice(null);
-			setIsOverrideDialogOpen(false);
 			setErrors({});
 		}
 	}, [isOpen, data, getEmptyAddon, addons]);
@@ -139,11 +99,6 @@ const SubscriptionAddonModal: React.FC<Props> = ({
 		};
 	}, [formData, t]);
 
-	const selectedAddonPrices = useMemo(
-		() => filterAddonPricesForSubscription((selectedAddonDetails?.prices as Price[]) || [], billingPeriod, currency),
-		[selectedAddonDetails, billingPeriod, currency],
-	);
-
 	const handleSave = useCallback(() => {
 		const validation = validateForm();
 
@@ -156,21 +111,18 @@ const SubscriptionAddonModal: React.FC<Props> = ({
 
 		const commitments = (formData.line_item_commitments || {}) as LineItemCommitmentsMap;
 		const hasCommitments = Object.keys(commitments).length > 0;
-		const override_line_items = getLineItemOverrides(selectedAddonPrices, overriddenPrices);
 		const addonData: AddAddonToSubscriptionRequest = {
 			addon_id: formData.addon_id!,
 			start_date: formData.start_date,
 			metadata: formData.metadata || {},
 			line_item_commitments: hasCommitments ? commitments : undefined,
-			override_line_items: override_line_items.length > 0 ? override_line_items : undefined,
 		};
 
 		onSave(addonData);
 		setFormData(getEmptyAddon());
 		setSelectedAddonDetails(null);
-		setOverriddenPrices({});
 		onOpenChange(false);
-	}, [formData, validateForm, onSave, getEmptyAddon, onOpenChange, selectedAddonPrices, overriddenPrices]);
+	}, [formData, validateForm, onSave, getEmptyAddon, onOpenChange]);
 
 	const handleCancel = useCallback(() => {
 		setFormData({});
@@ -181,10 +133,8 @@ const SubscriptionAddonModal: React.FC<Props> = ({
 
 	const handleAddonSelect = useCallback(
 		(addonId: string) => {
-			const addonDetails = addons.find((addon) => addon.id === addonId) ?? null;
+			const addonDetails = addons.find((addon) => addon.id === addonId);
 			setSelectedAddonDetails(addonDetails);
-			// Reset overrides when switching addons to avoid leaking price IDs across addons
-			setOverriddenPrices({});
 			setFormData((prev) => ({
 				...prev,
 				addon_id: addonId,
@@ -199,6 +149,11 @@ const SubscriptionAddonModal: React.FC<Props> = ({
 		[addons, errors.addon_id],
 	);
 
+	const selectedAddonPrices = useMemo(
+		() => filterAddonPricesForSubscription((selectedAddonDetails?.prices as Price[]) || [], billingPeriod, currency),
+		[selectedAddonDetails, billingPeriod, currency],
+	);
+
 	const commitmentMap = useMemo(() => {
 		return ((formData.line_item_commitments || {}) as LineItemCommitmentsMap) || {};
 	}, [formData.line_item_commitments]);
@@ -207,19 +162,6 @@ const SubscriptionAddonModal: React.FC<Props> = ({
 		if (price.type !== PRICE_TYPE.USAGE) return;
 		setSelectedCommitmentPrice(price);
 		setIsCommitmentDialogOpen(true);
-	}, []);
-
-	const handleConfigurePrice = useCallback((price: Price) => {
-		setSelectedOverridePrice(price);
-		setIsOverrideDialogOpen(true);
-	}, []);
-
-	const handlePriceOverride = useCallback((priceId: string, override: Partial<ExtendedPriceOverride>) => {
-		setOverriddenPrices((prev) => updatePriceOverride(priceId, prev, override));
-	}, []);
-
-	const handleResetOverride = useCallback((priceId: string) => {
-		setOverriddenPrices((prev) => removePriceOverride(priceId, prev));
 	}, []);
 
 	const setCommitmentForPrice = useCallback((priceId: string, config: LineItemCommitmentConfig | null) => {
@@ -259,10 +201,6 @@ const SubscriptionAddonModal: React.FC<Props> = ({
 				render: (row) => <span>{toSentenceCase(row.price.type || t('labels.na'))}</span>,
 			},
 			{
-				title: t('subscriptionAddon.columnPrice'),
-				render: (row) => <ChargeValueCell data={row.price} priceOverride={overriddenPrices[row.price.id]} />,
-			},
-			{
 				title: t('subscriptionAddon.columnCommitment'),
 				render: (row) => {
 					if (row.price.type !== PRICE_TYPE.USAGE) {
@@ -276,47 +214,21 @@ const SubscriptionAddonModal: React.FC<Props> = ({
 				fieldVariant: 'interactive',
 				hideOnEmpty: true,
 				title: '',
-				width: 60,
+				width: 140,
 				align: 'right',
 				render: (row) => {
-					const isOverridden = overriddenPrices[row.price.id] !== undefined;
-					const hasCommitment = commitmentMap[row.price.id] !== undefined;
-					const canConfigureCommitment = row.price.type === PRICE_TYPE.USAGE;
+					const canConfigure = row.price.type === PRICE_TYPE.USAGE;
+					if (!canConfigure) return null;
+					const hasConfig = commitmentMap[row.price.id] !== undefined;
 					return (
-						<UiDropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<button type='button' aria-label={t('subscriptionAddon.configure')}>
-									<BsThreeDots className='text-base size-4' />
-								</button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align='end' className='w-48'>
-								<DropdownMenuItem onClick={() => handleConfigurePrice(row.price)}>
-									<Pencil className='me-2 h-4 w-4' />
-									{isOverridden
-										? t('customers:organisms.subscriptionPriceTable.editOverride')
-										: t('customers:organisms.subscriptionPriceTable.overridePrice')}
-								</DropdownMenuItem>
-								{isOverridden && (
-									<DropdownMenuItem onClick={() => handleResetOverride(row.price.id)}>
-										<RotateCcw className='me-2 h-4 w-4' />
-										{t('customers:organisms.subscriptionPriceTable.resetOverride')}
-									</DropdownMenuItem>
-								)}
-								{canConfigureCommitment && (
-									<DropdownMenuItem onClick={() => handleConfigureCommitment(row.price)}>
-										<Target className='me-2 h-4 w-4' />
-										{hasCommitment
-											? t('customers:organisms.subscriptionPriceTable.editCommitment')
-											: t('customers:organisms.subscriptionPriceTable.configureCommitment')}
-									</DropdownMenuItem>
-								)}
-							</DropdownMenuContent>
-						</UiDropdownMenu>
+						<Button variant='outline' onClick={() => handleConfigureCommitment(row.price)} type='button'>
+							{hasConfig ? t('subscriptionAddon.edit') : t('subscriptionAddon.configure')}
+						</Button>
 					);
 				},
 			},
 		],
-		[commitmentMap, handleConfigureCommitment, handleConfigurePrice, handleResetOverride, overriddenPrices, t],
+		[commitmentMap, handleConfigureCommitment, t],
 	);
 
 	// const handleDateChange = useCallback(
@@ -384,31 +296,28 @@ const SubscriptionAddonModal: React.FC<Props> = ({
 					</div>
 				)}
 
-				{/* Start date. The backend accepts no end date on an addon attach — an addon ends via
-				    onetime cadence (period end) or a later cancellation with an effective date. */}
-				{formData.addon_id && (
-					<div className='grid grid-cols-2 gap-4'>
+				{/* TODO: Add start and end date */}
+				{/* Start and End Date on same line */}
+				{/* <div className='grid grid-cols-2 gap-4'>
+					<div className='space-y-2'>
 						<DatePicker
-							label={t('subscriptionAddon.labelStartDate')}
-							placeholder={t('subscriptionAddon.placeholderStartDate')}
+							label='Start Date'
+							placeholder='Select start date'
 							date={formData.start_date ? new Date(formData.start_date) : undefined}
-							setDate={(date) => setFormData((prev) => ({ ...prev, start_date: date?.toISOString() }))}
+							setDate={(date) => handleDateChange('start_date', date)}
 						/>
 					</div>
-				)}
+					<div className='space-y-2'>
+						<DatePicker
+							label='End Date'
+							placeholder='Select end date'
+							date={formData.end_date ? new Date(formData.end_date) : undefined}
+							setDate={(date) => handleDateChange('end_date', date)}
+						/>
+						{errors.end_date && <p className='text-sm text-danger-bright'>{errors.end_date}</p>}
+					</div>
+				</div> */}
 			</div>
-
-			{/* Price Override Dialog */}
-			{selectedOverridePrice && (
-				<PriceOverrideDialog
-					isOpen={isOverrideDialogOpen}
-					onOpenChange={setIsOverrideDialogOpen}
-					price={selectedOverridePrice}
-					onPriceOverride={handlePriceOverride}
-					onResetOverride={handleResetOverride}
-					overriddenPrices={overriddenPrices}
-				/>
-			)}
 
 			{/* Commitment Configuration Dialog */}
 			{selectedCommitmentPrice && (
