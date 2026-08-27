@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { FC, useMemo } from 'react';
-import { Card, CardHeader, AddButton, NoDataCard, ShortPagination, Spacer } from '@/components/atoms';
+import { Card, AddButton, NoDataCard, ShortPagination, Spacer } from '@/components/atoms';
 import SubscriptionLineItemTable from '@/components/molecules/SubscriptionLineItemTable/SubscriptionLineItemTable';
 import { QueryBuilder } from '@/components/molecules/QueryBuilder';
 import type { LineItem, SubscriptionCommitmentInfo, SubscriptionPhase } from '@/models/Subscription';
@@ -127,23 +127,16 @@ const SubscriptionEditChargesSection: FC<SubscriptionEditChargesSectionProps> = 
 
 	return (
 		<Card variant='notched'>
-			{/* CardHeader keeps the heading typography and spacing identical to sibling sections. */}
-			<CardHeader
-				title={t('labels.charges')}
-				cta={
-					<QueryBuilder
-						filterOptions={SUBSCRIPTION_EDIT_LINE_ITEM_FILTER_OPTIONS}
-						filters={filters}
-						onFilterChange={setFilters}
-						sortOptions={SUBSCRIPTION_EDIT_LINE_ITEM_SORT_OPTIONS}
-						selectedSorts={sorts}
-						onSortChange={setSorts}
-						debounceTime={300}
-						className='!mb-0'>
-						{onAddCharge ? <AddButton onClick={onAddCharge} disabled={addDisabled} /> : null}
-					</QueryBuilder>
-				}
-			/>
+			<QueryBuilder
+				filterOptions={SUBSCRIPTION_EDIT_LINE_ITEM_FILTER_OPTIONS}
+				filters={filters}
+				onFilterChange={setFilters}
+				sortOptions={SUBSCRIPTION_EDIT_LINE_ITEM_SORT_OPTIONS}
+				selectedSorts={sorts}
+				onSortChange={setSorts}
+				debounceTime={300}>
+				{onAddCharge ? <AddButton onClick={onAddCharge} disabled={addDisabled} /> : null}
+			</QueryBuilder>
 			<SubscriptionLineItemTable
 				data={lineItems}
 				isLoading={isLoading}

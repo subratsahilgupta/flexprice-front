@@ -1072,43 +1072,6 @@
 			"taskRunsHeading": "تشغيل المهام",
 			"backToExportDetails": "العودة إلى تفاصيل التصدير"
 		},
-		"usageSyncs": {
-			"pageHeading": "مزامنات الاستخدام",
-			"paginationUnit": "سجلات الاستخدام",
-			"notSynced": "لا توجد مزامنات بعد",
-			"entityName": "سجل الاستخدام",
-			"emptyDescription": "لا توجد سجلات استخدام بعد. اربط سوقًا سحابيًا واربط اشتراكًا لبدء رؤية مزامنات الاستخدام.",
-			"errors": {
-				"fetchFailed": "فشل تحميل سجلات الاستخدام"
-			},
-			"columns": {
-				"subscription": "الاشتراك",
-				"customer": "العميل",
-				"plan": "الخطة",
-				"amount": "المبلغ",
-				"currency": "العملة",
-				"periodStart": "بداية الفترة",
-				"periodEnd": "نهاية الفترة",
-				"syncs": "المزامنات"
-			},
-			"filterLabels": {
-				"customerId": "معرف العميل",
-				"subscriptionId": "معرف الاشتراك",
-				"periodStart": "بداية الفترة",
-				"periodEnd": "نهاية الفترة"
-			},
-			"sortLabels": {
-				"createdAt": "تاريخ الإنشاء",
-				"periodStart": "بداية الفترة",
-				"periodEnd": "نهاية الفترة"
-			},
-			"drawer": {
-				"title": "المزامنات",
-				"empty": "لا توجد مزامنات بعد.",
-				"synced": "تمت المزامنة",
-				"skipped": "تم التخطي"
-			}
-		},
 		"integrations": {
 			"writeDeniedTooltip": "ليس لديك صلاحية إدارة الاتصالات. اطلب الوصول من مسؤول المستأجر.",
 			"pageHeading": "التكاملات",
