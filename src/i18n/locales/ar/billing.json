@@ -966,6 +966,7 @@
 		"saveCommitment": "حفظ الالتزام",
 		"updateCommitment": "تحديث الالتزام",
 		"billingPeriodLabels": {
+			"DAILY": "يومي",
 			"MONTHLY": "شهري",
 			"QUARTERLY": "ربع سنوي",
 			"HALF_YEARLY": "نصف سنوي",
