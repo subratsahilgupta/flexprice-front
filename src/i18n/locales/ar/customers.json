@@ -485,6 +485,7 @@
 			"commitmentAmount": "مبلغ الالتزام",
 			"commitmentAmountPlaceholder": "مثال: ‎$100.00",
 			"commitmentPeriod": "فترة الالتزام",
+			"commitmentDaily": "يومي",
 			"commitmentMonthly": "شهري",
 			"commitmentQuarterly": "ربع سنوي",
 			"commitmentHalfYearly": "نصف سنوي",

@@ -61,6 +61,7 @@ const SubscriptionChargeCommitmentSection: FC<Props> = ({
 
 	const commitmentDurationOptions = useMemo(
 		() => [
+			{ label: t('commitmentConfig.billingPeriodLabels.DAILY'), value: BILLING_PERIOD.DAILY },
 			{ label: t('commitmentConfig.billingPeriodLabels.MONTHLY'), value: BILLING_PERIOD.MONTHLY },
 			{ label: t('commitmentConfig.billingPeriodLabels.QUARTERLY'), value: BILLING_PERIOD.QUARTERLY },
 			{ label: t('commitmentConfig.billingPeriodLabels.HALF_YEARLY'), value: BILLING_PERIOD.HALF_YEARLY },
