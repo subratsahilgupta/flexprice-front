@@ -750,6 +750,7 @@
 		"saveCommitment": "Save Commitment",
 		"updateCommitment": "Update Commitment",
 		"billingPeriodLabels": {
+			"DAILY": "Daily",
 			"MONTHLY": "Monthly",
 			"QUARTERLY": "Quarterly",
 			"HALF_YEARLY": "Half-Yearly",

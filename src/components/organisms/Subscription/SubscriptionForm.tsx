@@ -891,6 +891,7 @@ const SubscriptionForm = ({
 							label={t('organisms.subscriptionForm.commitmentPeriod')}
 							value={state.commitmentDuration}
 							options={[
+								{ label: t('organisms.subscriptionForm.commitmentDaily'), value: 'DAILY' },
 								{ label: t('organisms.subscriptionForm.commitmentMonthly'), value: 'MONTHLY' },
 								{ label: t('organisms.subscriptionForm.commitmentQuarterly'), value: 'QUARTERLY' },
 								{ label: t('organisms.subscriptionForm.commitmentHalfYearly'), value: 'HALF_YEARLY' },
