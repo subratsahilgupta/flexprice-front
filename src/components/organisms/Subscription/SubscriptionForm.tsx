@@ -857,8 +857,9 @@ const SubscriptionForm = ({
 						</div>
 					)}
 
-					{/* Subscription Level Discounts */}
-					<div className='mt-6'>
+					{/* Subscription Level Discounts — divider above so it reads as a peer section
+					    to Charges (and separates from the Also-available sub-section under Charges). */}
+					<div className='mt-6 pt-6 border-t border-line'>
 						<SubscriptionDiscountTable
 							coupon={state.linkedCoupon}
 							onChange={(coupon) => setState((prev) => ({ ...prev, linkedCoupon: coupon }))}

@@ -84,11 +84,18 @@ const AdditionalPlanPricesSection: FC<Props> = ({ groups, optedInKeys, onToggle,
 	if (groups.length === 0) return null;
 
 	return (
-		<div className='space-y-3'>
-			<div>
-				<FormHeader title={t('organisms.additionalPlanPrices.title')} variant='sub-header' />
-				<p className='text-xs text-content-muted mt-1'>{t('organisms.additionalPlanPrices.explainer')}</p>
-			</div>
+		<div>
+			{/* form-component-title uses the smaller subsection-title typography so this
+			    section reads as a sub-header under Charges, not a peer to it. Title and
+			    explainer sit tightly together; a wider gap sits between the explainer
+			    and the table below, and the wrapper adds room below the table before
+			    the next section. */}
+			<FormHeader
+				variant='form-component-title'
+				title={t('organisms.additionalPlanPrices.title')}
+				subtitle={t('organisms.additionalPlanPrices.explainer')}
+				className='mb-3'
+			/>
 			<div className='rounded-[6px] border border-line-strong'>
 				<div style={{ overflow: 'hidden' }}>
 					<FlexpriceTable columns={columns} data={rows} />
