@@ -1,5 +1,6 @@
 import type { Price } from '@/models/Price';
 import { BILLING_PERIOD } from '@/constants/constants';
+import { isCadenceCompatible } from './cadenceCompatibility';
 
 /** Plan/catalog price is a one-time charge (backend: billing_period ONETIME). */
 export function isOneTimePlanPrice(price: { billing_period: string | BILLING_PERIOD }): boolean {
@@ -7,20 +8,21 @@ export function isOneTimePlanPrice(price: { billing_period: string | BILLING_PER
 }
 
 /**
- * Prices shown on subscription create/edit for a chosen recurring billing period and currency:
- * recurring prices for that period, plus all one-time plan prices in the same currency.
+ * Prices shown on subscription create/edit for a chosen subscription cadence and currency:
+ * every price whose billing cadence evenly divides the subscription cadence (same-cadence
+ * and finer-cadence prices, per backend PR #2699 fan-out rules), plus all one-time plan
+ * prices in the same currency.
  */
 export function filterPlanPricesForSubscriptionCharges(
 	prices: Price[],
 	selectedRecurringPeriod: BILLING_PERIOD,
 	currency: string,
+	selectedRecurringPeriodCount: number = 1,
 ): Price[] {
-	const periodKey = selectedRecurringPeriod.toUpperCase();
 	const currencyLower = currency.toLowerCase();
 	return prices.filter((p) => {
 		if (p.currency.toLowerCase() !== currencyLower) return false;
-		if (isOneTimePlanPrice(p)) return true;
-		return p.billing_period.toUpperCase() === periodKey;
+		return isCadenceCompatible(selectedRecurringPeriod, selectedRecurringPeriodCount, p.billing_period, p.billing_period_count);
 	});
 }
 

@@ -22,7 +22,7 @@ import { formatBillingPeriodForPrice } from '@/utils/common/helper_functions';
 import { resolveBucketSize } from '@/utils/common/commitment_helpers';
 import { formatAmount } from '@/components/atoms/Input/Input';
 import { BILLING_PERIOD, BUCKET_SIZE_NONE } from '@/constants/constants';
-import { isOneTimePlanPrice } from '@/utils/subscription/planPricesForSubscriptionUi';
+import { cadenceFanoutCount, isCadenceCompatible } from '@/utils/subscription/cadenceCompatibility';
 import { useTranslation } from 'react-i18next';
 
 const DEFAULT_ROW_LIMIT = 5;
@@ -312,8 +312,7 @@ const SubscriptionPriceTable: FC<Props> = ({
 			filtered = filtered.filter((p) => p.currency.toLowerCase() === currency.toLowerCase());
 		}
 		if (billingPeriod) {
-			const periodKey = billingPeriod.toUpperCase();
-			filtered = filtered.filter((p) => isOneTimePlanPrice(p) || p.billing_period.toUpperCase() === periodKey);
+			filtered = filtered.filter((p) => isCadenceCompatible(billingPeriod, 1, p.billing_period, p.billing_period_count));
 		}
 		return filtered;
 	}, [data, billingPeriod, currency]);
@@ -345,12 +344,16 @@ const SubscriptionPriceTable: FC<Props> = ({
 			const isOverridden = overriddenPrices[price.id] !== undefined;
 			const appliedCoupon = lineItemCoupons[price.id];
 			const override = overriddenPrices[price.id];
+			const fanout = billingPeriod ? cadenceFanoutCount(billingPeriod, 1, price.billing_period, price.billing_period_count) : null;
 
 			return {
 				priceId: price.id,
 				charge: (
 					<div>
 						<div>{price.display_name || price.meter?.name || t('organisms.subscriptionPriceTable.chargeFallback')}</div>
+						{fanout != null && fanout > 1 && (
+							<div className='text-xs text-content-muted mt-0.5'>{t('organisms.subscriptionPriceTable.fanoutHint', { count: fanout })}</div>
+						)}
 					</div>
 				),
 				quantity: (

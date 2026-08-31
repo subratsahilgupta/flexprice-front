@@ -514,7 +514,8 @@
 			"colPrice": "Price",
 			"colBucketSize": "Bucket Size",
 			"editAdded": "Edit",
-			"deleteAdded": "Delete"
+			"deleteAdded": "Delete",
+			"fanoutHint": "Bills as {{count}} line items per subscription invoice"
 		},
 		"subscriptionTable": {
 			"planModifiedAria": "Plan modified",

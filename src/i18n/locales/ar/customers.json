@@ -536,7 +536,8 @@
 			"colPrice": "السعر",
 			"colBucketSize": "حجم الدفعة",
 			"editAdded": "تعديل",
-			"deleteAdded": "حذف"
+			"deleteAdded": "حذف",
+			"fanoutHint": "يتم إصداره كـ {{count}} بنود لكل فاتورة اشتراك"
 		},
 		"subscriptionTable": {
 			"planModifiedAria": "تم تعديل الخطة",
