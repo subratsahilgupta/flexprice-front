@@ -11,6 +11,8 @@ import { ImportTask } from '@/models/ImportTask';
 import { toSentenceCase } from '@/utils/common/helper_functions';
 import toast from 'react-hot-toast';
 import { refetchQueries } from '@/core/services/tanstack/ReactQueryProvider';
+import useUser from '@/hooks/useUser';
+import { useEnvironment } from '@/hooks/useEnvironment';
 
 interface Props {
 	isOpen: boolean;
@@ -79,6 +81,17 @@ const getSampleFileUrl = (tab: string): string => {
 	}
 };
 
+// Map backend 400 messages from the csvbox import endpoint to friendly copy.
+// The backend surfaces two specific strings we want to distinguish; anything
+// else falls through to the caller's generic error.
+const getCsvImportErrorKey = (message: string | undefined): string | null => {
+	if (!message) return null;
+	const m = message.toLowerCase();
+	if (m.includes('csv imports are not configured')) return 'import.errors.notConfigured';
+	if (m.includes('invalid upload_id')) return 'import.errors.invalidUploadId';
+	return null;
+};
+
 const getTaskStatusChips = (status: string, t: (k: string) => string) => {
 	const mapStatusChips = (s: string) => {
 		if (s === 'COMPLETED') return t('import.taskStatus.successful');
@@ -130,9 +143,18 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 	const [entityType, setEntityType] = useState<SelectOption>();
 	const [uploadedTaskDetails, setuploadedTaskDetails] = useState<ImportTask>();
 
+	const { user } = useUser();
+	const { activeEnvironment } = useEnvironment();
+	const tenantId = user?.tenant?.id;
+	const environmentId = activeEnvironment?.id;
+	// Backend derives the S3 key from `{upload_id}_{customer_id}.csv`, where
+	// customer_id must be `<tenant>__<env>` (double underscore). Anything else
+	// makes the upload undownloadable on the backend.
+	const csvBoxCustomerId = tenantId && environmentId ? `${tenantId}__${environmentId}` : '';
+
 	const csvBoxKey = useMemo(
-		() => `${entityType?.value ? getLicenseKey(entityType.value) : ''}-${JSON.stringify(entityType?.label)}`,
-		[entityType],
+		() => `${entityType?.value ? getLicenseKey(entityType.value) : ''}-${JSON.stringify(entityType?.label)}-${csvBoxCustomerId}`,
+		[entityType, csvBoxCustomerId],
 	);
 
 	const [errors, seterrors] = useState({
@@ -149,12 +171,15 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 		// error,
 	} = useMutation({
 		mutationFn: async (data?: Partial<ImportMeta>) => {
+			const meta = data ?? uploadedFile;
+			const importId = meta?.import_id;
 			return await TaskApi.addTask({
 				entity_type: entityType?.value || '',
 				file_type: fileTypeOptions[0].value,
-				file_url: (data?.raw_file ?? uploadedFile?.raw_file) || '',
 				task_type: taskTypeOptions[0].value,
-				file_name: (data?.original_filename ?? uploadedFile?.original_filename) || '',
+				file_provider: 'csvbox',
+				upload_id: importId != null ? String(importId) : '',
+				file_name: meta?.original_filename || '',
 			});
 		},
 		onSuccess: async () => {
@@ -163,7 +188,8 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 			await refetchQueries('importTasks');
 		},
 		onError: (error: Error) => {
-			toast.error(error.message || t('common:toast.genericError'));
+			const mappedKey = getCsvImportErrorKey(error.message);
+			toast.error(mappedKey ? t(mappedKey) : error.message || t('common:toast.genericError'));
 		},
 	});
 
@@ -326,7 +352,7 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 								<div className='space-y-4'>
 									<CSVBoxButton
 										key={csvBoxKey}
-										user='user_id'
+										user={csvBoxCustomerId}
 										onImport={(data: boolean, meta: ImportMeta) => {
 											setUploadedFile(meta);
 											if (data) {
@@ -337,21 +363,30 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 											}
 										}}
 										licenseKey={getLicenseKey(entityType?.value || '')}
-										render={(launch, isLoading) => (
-											<div onClick={launch} className='cursor-pointer'>
-												<div className='space-y-1 w-full flex flex-col'>
-													{/* Label */}
-													<label className={cn(' block text-sm font-medium', 'text-content-zinc')}>{t('import.importFileLabel')}</label>
-													<div aria-disabled={isLoading} className={cn(isLoading && 'text-content-zinc-muted')}>
-														<button className={'p-2 border border-line-zinc rounded-lg py-2 px-4 w-full'}>
-															<p className='font-medium text-sm flex gap-2 items-center justify-start'>{t('import.chooseFile')}</p>
-														</button>
+										render={(launch, isLoading) => {
+											const disabled = isLoading || !csvBoxCustomerId;
+											return (
+												<div
+													onClick={() => {
+														if (!csvBoxCustomerId) return;
+														launch();
+													}}
+													className={cn(!csvBoxCustomerId ? 'cursor-not-allowed' : 'cursor-pointer')}>
+													<div className='space-y-1 w-full flex flex-col'>
+														{/* Label */}
+														<label className={cn(' block text-sm font-medium', 'text-content-zinc')}>{t('import.importFileLabel')}</label>
+														<div aria-disabled={disabled} className={cn(disabled && 'text-content-zinc-muted')}>
+															<button disabled={disabled} className={'p-2 border border-line-zinc rounded-lg py-2 px-4 w-full'}>
+																<p className='font-medium text-sm flex gap-2 items-center justify-start'>{t('import.chooseFile')}</p>
+															</button>
+														</div>
+														<p className={cn('text-sm', 'text-muted-foreground')}>{t('import.maxFileSizeHint')}</p>
+														{!csvBoxCustomerId && <p className='text-sm text-destructive'>{t('import.errors.missingTenantOrEnv')}</p>}
+														{errors.file && <p className='text-sm text-destructive'>{errors.file}</p>}
 													</div>
-													<p className={cn('text-sm', 'text-muted-foreground')}>{t('import.maxFileSizeHint')}</p>
-													{errors.file && <p className='text-sm text-destructive'>{errors.file}</p>}
 												</div>
-											</div>
-										)}
+											);
+										}}
 									/>
 									<div className='card !px-4 !py-3 border flex  items-start mb-2 gap-3'>
 										<div className='py-1'>
@@ -437,29 +472,38 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 						)}
 
 						{uploadedTaskDetails && uploadedTaskDetails.task_status === 'FAILED' && (
-							<div className='flex gap-2 items-center'>
-								<Button
-									onClick={() => {
-										window.open(uploadedTaskDetails.file_url || uploadedFile?.raw_file, '_blank');
-									}}
-									variant={'outline'}
-									className='flex gap-2 items-center'>
-									{t('common:labels.downloadCsv')}
-								</Button>
-								<Button
-									onClick={() => {
-										if (taskId && uploadedTaskDetails) {
+							<div className='flex flex-col gap-2'>
+								{uploadedTaskDetails.error_summary && (
+									<p className='text-sm text-destructive'>
+										{/download/i.test(uploadedTaskDetails.error_summary)
+											? t('import.errors.downloadFailedHint')
+											: uploadedTaskDetails.error_summary}
+									</p>
+								)}
+								<div className='flex gap-2 items-center'>
+									{uploadedTaskDetails.file_url && (
+										<Button
+											onClick={() => {
+												window.open(uploadedTaskDetails.file_url || uploadedFile?.raw_file, '_blank');
+											}}
+											variant={'outline'}
+											className='flex gap-2 items-center'>
+											{t('common:labels.downloadCsv')}
+										</Button>
+									)}
+									<Button
+										onClick={() => {
+											// Reset local state so the CSV Box widget re-opens for a fresh upload.
+											// The backend derives the S3 key from upload_id, so we can't blindly
+											// resubmit a failed task's file_url like the legacy flow did.
+											setuploadedTaskDetails(undefined);
+											setUploadedFile(undefined);
 											setEntityType(importTypeOptions.find((option) => option.value === uploadedTaskDetails.entity_type));
-											setUploadedFile({
-												original_filename: uploadedTaskDetails.file_name,
-												raw_file: uploadedTaskDetails.file_url,
-											});
-											addTask(uploadedFile);
-										}
-									}}
-									className='flex gap-2 items-center'>
-									{t('common:labels.tryAgain')}
-								</Button>
+										}}
+										className='flex gap-2 items-center'>
+										{t('common:labels.tryAgain')}
+									</Button>
+								</div>
 							</div>
 						)}
 						{/* <div className='border rounded-md border-destructive text-destructive p-4 mt-4 flex gap-3 items-start fonts-sans text-sm'>

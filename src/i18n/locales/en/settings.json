@@ -485,6 +485,12 @@
 			"uploadSuccess": "{{filename}} uploaded successfully",
 			"uploadFailed": "{{filename}} upload failed"
 		},
+		"errors": {
+			"notConfigured": "Import is not enabled for this environment. Please contact support.",
+			"invalidUploadId": "Something went wrong wiring up the uploader. Please refresh and try again.",
+			"missingTenantOrEnv": "Waiting for your tenant and environment to load…",
+			"downloadFailedHint": "We couldn't read the uploaded file. This usually happens if you clicked Import before the upload finished. Please try again."
+		},
 		"importFileLabel": "Import file",
 		"chooseFile": "Choose File to Upload"
 	},
