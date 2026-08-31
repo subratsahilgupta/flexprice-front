@@ -14,9 +14,7 @@ export function createSupportChatAdapter(provider: SupportChatProvider, flow: Su
 		case SupportChatProvider.Pylon:
 			return createPylonAdapter(
 				config.pylon.appId,
-				config.pylon.identityVerificationEnabled
-					? async () => (await SupportChatApi.getIdentityToken())?.token ?? ''
-					: undefined,
+				config.pylon.identityVerificationEnabled ? async () => (await SupportChatApi.getIdentityToken())?.token ?? '' : undefined,
 			);
 	}
 }
