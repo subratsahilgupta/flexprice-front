@@ -368,7 +368,7 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 											return (
 												<div
 													onClick={() => {
-														if (!csvBoxCustomerId) return;
+														if (disabled) return;
 														launch();
 													}}
 													className={cn(!csvBoxCustomerId ? 'cursor-not-allowed' : 'cursor-pointer')}>
