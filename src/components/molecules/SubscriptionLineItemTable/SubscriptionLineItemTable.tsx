@@ -582,7 +582,7 @@ const SubscriptionLineItemTable: FC<Props> = ({
 					const isSubscriptionOverride =
 						row.price.entity_type === PRICE_ENTITY_TYPE.SUBSCRIPTION && row.entity_type === SUBSCRIPTION_LINE_ITEM_ENTITY_TYPE.PLAN;
 					return (
-						<div className='flex items-center gap-2'>
+						<div className='flex min-w-0 items-center gap-2'>
 							<ChargeValueCell data={row.price} />
 							{isSubscriptionOverride && <PriceTooltip data={row.price} isSubscriptionOverride={true} />}
 						</div>
