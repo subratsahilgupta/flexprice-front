@@ -194,12 +194,18 @@ const SubscriptionForm = ({
 	// Prices in the main "Charges" table = primary partition + every additional price whose
 	// cadence key was opted in. Merged rows go through the existing SubscriptionPriceTable
 	// override / commitment / coupon flows unchanged.
+	//
+	// In phase mode (phases.length > 0) opt-in cadences are ignored: the create payload's
+	// phases branch does not send include_price_ids, so any opted-in additional prices
+	// would silently drop at submit. Return only the primary partition so what the UI shows
+	// (in PhaseList and elsewhere) matches what actually gets sent.
 	const currentPrices = useMemo(() => {
+		if (phases.length > 0) return pricePartition.primary;
 		if (state.optedInAdditionalCadences.length === 0) return pricePartition.primary;
 		const optedSet = new Set(state.optedInAdditionalCadences);
 		const optedIn = pricePartition.additional.filter((p) => optedSet.has(cadenceKey(p.billing_period, p.billing_period_count)));
 		return [...pricePartition.primary, ...optedIn];
-	}, [pricePartition, state.optedInAdditionalCadences]);
+	}, [pricePartition, state.optedInAdditionalCadences, phases.length]);
 
 	const hasFixedSubscriptionChargePrice = useMemo(() => {
 		if (!selectedPlanPrices?.items?.length) return false;
@@ -362,6 +368,9 @@ const SubscriptionForm = ({
 			linkedCoupon: null,
 			lineItemCoupons: {},
 			inheritanceCustomers: [],
+			// Reset cadence opt-ins so the new plan's additional prices require fresh consent
+			// rather than silently attaching just because the cadence key happens to match.
+			optedInAdditionalCadences: [],
 		}));
 	};
 
@@ -837,7 +846,9 @@ const SubscriptionForm = ({
 						/>
 					</div>
 
-					{additionalCadenceGroups.length > 0 && (
+					{/* Hidden in phase mode — the phases branch of the create payload does not
+					    send include_price_ids, so any opt-in here would silently drop at submit. */}
+					{phases.length === 0 && additionalCadenceGroups.length > 0 && (
 						<div className='mt-6'>
 							<AdditionalPlanPricesSection
 								groups={additionalCadenceGroups}

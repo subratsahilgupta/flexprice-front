@@ -101,7 +101,9 @@ export function groupAdditionalPricesByCadence(additional: Price[]): AdditionalC
 	const groups = new Map<string, AdditionalCadenceGroup>();
 	for (const p of additional) {
 		const period = String(p.billing_period).toUpperCase() as BILLING_PERIOD;
-		const count = p.billing_period_count ?? 1;
+		// Match cadenceKey's normalization: coerce zero/negative counts to 1 so the group's
+		// count agrees with its key (defensive against unexpected backend values).
+		const count = Math.max(1, p.billing_period_count ?? 1);
 		const key = cadenceKey(period, count);
 		const existing = groups.get(key);
 		if (existing) {
