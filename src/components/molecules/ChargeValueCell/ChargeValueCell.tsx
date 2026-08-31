@@ -344,8 +344,10 @@ const ChargeValueCell: FC<Props> = ({ data, appliedCoupon, priceOverride }) => {
 
 	const couponLabel = appliedCoupon ? formatCouponName(appliedCoupon) : t('catalog:chargeValue.noCouponApplied');
 
+	const priceDisplay = formatPriceDisplay(displayData);
+
 	return (
-		<div className='flex items-center gap-2'>
+		<div className='flex min-w-0 items-center gap-2'>
 			{discountInfo ? (
 				<DiscountedPriceDisplay
 					originalAmount={discountInfo.originalAmount}
@@ -354,7 +356,9 @@ const ChargeValueCell: FC<Props> = ({ data, appliedCoupon, priceOverride }) => {
 					couponName={couponLabel}
 				/>
 			) : (
-				<div>{formatPriceDisplay(displayData)}</div>
+				<div className='min-w-0 truncate' title={priceDisplay}>
+					{priceDisplay}
+				</div>
 			)}
 
 			{hasOverrides && !isTiered && overriddenNormalized && (
