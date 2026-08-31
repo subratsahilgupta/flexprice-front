@@ -152,6 +152,7 @@ const PhaseForm: React.FC<PhaseFormProps> = ({
 					<SubscriptionPriceTable
 						data={prices}
 						billingPeriod={billingPeriod}
+						billingPeriodCount={1}
 						currency={currency}
 						onPriceOverride={overridePrice}
 						onResetOverride={resetOverride}
