@@ -352,7 +352,10 @@ const ImportFileDrawer: FC<Props> = ({ isOpen, onOpenChange, taskId }) => {
 								<div className='space-y-4'>
 									<CSVBoxButton
 										key={csvBoxKey}
-										user={csvBoxCustomerId}
+										// Object form matches CSV Box's docs. The bare-string form is accepted by
+										// their postMessage bridge but stalls the destination-push stage on staging
+										// (the "Uploading Data (n/n)" screen never advances). Object form works.
+										user={{ user_id: csvBoxCustomerId }}
 										onImport={(data: boolean, meta: ImportMeta) => {
 											setUploadedFile(meta);
 											if (data) {
