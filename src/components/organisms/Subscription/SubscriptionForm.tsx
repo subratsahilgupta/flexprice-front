@@ -786,6 +786,7 @@ const SubscriptionForm = ({
 						<SubscriptionPriceTable
 							data={currentPrices}
 							billingPeriod={state.billingPeriod}
+							billingPeriodCount={1}
 							currency={state.currency}
 							onPriceOverride={overridePrice}
 							onResetOverride={resetOverride}

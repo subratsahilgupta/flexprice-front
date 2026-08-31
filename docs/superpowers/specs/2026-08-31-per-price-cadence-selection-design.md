@@ -96,15 +96,45 @@ compatible.
 
 ### Backend field this depends on
 
-`CreateSubscriptionRequest` needs `include_price_ids?: string[]` (or
-symmetrically `exclude_price_ids?: string[]`). Backend filter at
+`CreateSubscriptionRequest` needs `include_price_ids?: *[]string` (a
+nullable slice, not a plain `[]string`). Backend filter at
 `internal/ee/service/subscription.go:3949` intersects the
-compatible-price set with `include_price_ids` when present. When
-omitted, current auto-attach behavior stands.
+compatible-price set with `include_price_ids` **only when the field
+is present (non-nil)**. The nullable slice is what preserves the
+three-value contract on the wire.
 
-Frontend maps:
-- No exclusions → omit the field (unchanged wire behavior).
-- Any exclusions → send `include_price_ids = compatible_ids \ excluded`.
+**Wire contract (three values, distinct semantics):**
+
+| Wire value | Meaning | JSON |
+|---|---|---|
+| Omitted / `null` | Auto-attach every compatible price (unchanged pre-#2699 behavior) | `{}` or `{"include_price_ids": null}` |
+| Empty array `[]` | Attach *no* plan prices; only extras via `line_items` | `{"include_price_ids": []}` |
+| Subset `[p1, p2, …]` | Attach exactly the intersection of {compatible} ∩ {list}; unknown IDs are 400 | `{"include_price_ids": ["price_1"]}` |
+
+**Backend contract tests (in backend repo, not this PR).** The DTO
+should ship with tests that exercise each row of that table against
+the plan-attach filter:
+
+1. Omitted → subscription's line-items match every compatible price
+   on the plan.
+2. `[]` → subscription has zero plan-price line items (extras from
+   `line_items` still attach if present).
+3. Subset with one compatible id → exactly that price attaches; other
+   compatible prices are not attached.
+4. Subset containing an incompatible id → 400 with a clear error
+   naming the offending id and the sub cadence it did not divide.
+5. Subset containing an unknown price id → 400.
+6. Subset containing the id of a compatible price *and* an
+   incompatible id → 400 (all-or-nothing; do not silently drop).
+
+**Frontend maps to the wire:**
+- User made no exclusions → omit the field entirely (preserves
+  today's auto-attach; safe if the field ever gets removed).
+- User excluded every compatible price → send `include_price_ids: []`.
+- User excluded some → send `include_price_ids = compatible_ids \ excluded`.
+- Never send `null` explicitly — omit instead. Same semantics; smaller
+  payload; keeps the DTO forward-compatible if the backend later
+  distinguishes `null` from missing.
 
 ### Why we did not ship checkboxes now
 
