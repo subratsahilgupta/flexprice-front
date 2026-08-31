@@ -1,6 +1,6 @@
 import { FC, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import SubscriptionApi from '@/api/SubscriptionApi';
 import { Card, CardHeader, ShortPagination, Spacer } from '@/components/atoms';
 import { QueryBuilder } from '@/components/molecules/QueryBuilder';
@@ -63,6 +63,11 @@ const SubscriptionDetailChargesSection: FC<Props> = ({ subscriptionId, customerI
 				sort: sanitizedSorts.length ? sanitizedSorts : undefined,
 			}),
 		enabled: !!subscriptionId && !!customerId && !!currentPeriodStart,
+		// Keep the previous page's data (and total) visible while the next page is in flight.
+		// Without this, `data` briefly goes undefined on every page change (queryKey changes,
+		// nothing cached yet), totalLineItems collapses to 0, and ShortPagination's self-clamp
+		// effect immediately snaps the page back to 1 before the new page's response arrives.
+		placeholderData: keepPreviousData,
 	});
 
 	const lineItems = useMemo(() => (lineItemsResponse?.items ?? []).map(subscriptionLineItemListItemToLineItem), [lineItemsResponse?.items]);
