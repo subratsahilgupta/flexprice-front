@@ -394,6 +394,16 @@ export interface CreateSubscriptionRequest {
 
 	/** Optional threshold for auto-invoice behavior (typically usage-only plans). Omit when not used. */
 	auto_invoice_threshold?: number;
+
+	/**
+	 * Authoritative list of plan prices to attach to this subscription.
+	 *  - Omitted: backend attaches its default set (exact-cadence + ONETIME).
+	 *  - Empty array: no plan prices attach (extras still come from `line_items`).
+	 *  - Non-empty: exactly these ids (intersected server-side with the plan's compatible-price set).
+	 * Frontend sends this field only when the user opted in additional-cadence prices via the
+	 * "Also available on this plan" section; in that case it sends the full list (primary + opted-in).
+	 */
+	include_price_ids?: string[];
 }
 
 export interface SubscriptionPhaseCreateRequest {

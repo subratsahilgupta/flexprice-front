@@ -517,6 +517,10 @@
 			"deleteAdded": "Delete",
 			"fanoutHint": "Bills as {{count}} line items per subscription invoice"
 		},
+		"additionalPlanPrices": {
+			"title": "Also available on this plan",
+			"explainer": "These prices bill more frequently than your subscription cadence. Add them to include them on this subscription's invoices."
+		},
 		"subscriptionTable": {
 			"planModifiedAria": "Plan modified",
 			"hierarchyColumn": "Hierarchy",

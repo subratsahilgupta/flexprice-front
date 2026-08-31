@@ -29,10 +29,13 @@ describe('billingPeriodMonths', () => {
 });
 
 describe('isCadenceCompatible', () => {
-	it('ONETIME items are always compatible', () => {
-		expect(isCadenceCompatible(BILLING_PERIOD.QUARTERLY, 1, BILLING_PERIOD.ONETIME, 1)).toBe(true);
-		expect(isCadenceCompatible(BILLING_PERIOD.MONTHLY, 1, BILLING_PERIOD.ONETIME, 1)).toBe(true);
-		expect(isCadenceCompatible(BILLING_PERIOD.DAILY, 1, BILLING_PERIOD.ONETIME, 1)).toBe(true);
+	it('ONETIME on either side is NOT compatible on the recurring scale (matches backend contract)', () => {
+		// Callers that want the "ONETIME is always valid" attach rule must special-case it
+		// before invoking — see partitionPricesForSubscription / backend filterValidPricesForSubscription.
+		expect(isCadenceCompatible(BILLING_PERIOD.QUARTERLY, 1, BILLING_PERIOD.ONETIME, 1)).toBe(false);
+		expect(isCadenceCompatible(BILLING_PERIOD.MONTHLY, 1, BILLING_PERIOD.ONETIME, 1)).toBe(false);
+		expect(isCadenceCompatible(BILLING_PERIOD.DAILY, 1, BILLING_PERIOD.ONETIME, 1)).toBe(false);
+		expect(isCadenceCompatible(BILLING_PERIOD.ONETIME, 1, BILLING_PERIOD.MONTHLY, 1)).toBe(false);
 	});
 
 	it('same-cadence pairs are compatible', () => {
@@ -89,8 +92,9 @@ describe('cadenceFanoutCount', () => {
 		expect(cadenceFanoutCount(BILLING_PERIOD.QUARTERLY, 1, BILLING_PERIOD.QUARTERLY, 1)).toBe(1);
 	});
 
-	it('returns 1 for ONETIME items', () => {
-		expect(cadenceFanoutCount(BILLING_PERIOD.QUARTERLY, 1, BILLING_PERIOD.ONETIME, 1)).toBe(1);
+	it('returns null for ONETIME on either side (callers must short-circuit ONETIME)', () => {
+		expect(cadenceFanoutCount(BILLING_PERIOD.QUARTERLY, 1, BILLING_PERIOD.ONETIME, 1)).toBeNull();
+		expect(cadenceFanoutCount(BILLING_PERIOD.ONETIME, 1, BILLING_PERIOD.MONTHLY, 1)).toBeNull();
 	});
 
 	it('returns fan-out count when item is finer than sub', () => {
