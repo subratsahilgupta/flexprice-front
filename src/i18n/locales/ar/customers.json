@@ -539,6 +539,10 @@
 			"deleteAdded": "حذف",
 			"fanoutHint": "يتم إصداره كـ {{count}} بنود لكل فاتورة اشتراك"
 		},
+		"additionalPlanPrices": {
+			"title": "متوفر أيضاً في هذه الخطة",
+			"explainer": "تُحتسب هذه الأسعار بمعدل أكثر تكراراً من دورة اشتراكك. أضفها لتضمينها في فواتير هذا الاشتراك."
+		},
 		"subscriptionTable": {
 			"planModifiedAria": "تم تعديل الخطة",
 			"hierarchyColumn": "التسلسل",

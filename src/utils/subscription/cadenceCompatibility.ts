@@ -16,14 +16,17 @@ export function billingPeriodMonths(period: BILLING_PERIOD | string, count: numb
 }
 
 /**
- * Mirrors backend types.IsCadenceCompatible: a line-item price is compatible with a
- * subscription's cadence when the line item bills at the same or finer rhythm that
- * evenly divides the subscription window. Backend fans out the finer item into N
+ * Mirrors backend `types.IsCadenceCompatible` exactly: reports whether a line-item cadence
+ * (itemPeriod × itemCount) equals or strictly divides a subscription cadence
+ * (subPeriod × subCount) on the recurring scale. Backend fans out the finer item into N
  * line items per invoice (e.g. monthly price on a quarterly sub → 3 line items).
  *
- *  - ONETIME items are always compatible.
- *  - DAILY/WEEKLY require exact period + count match (no integer month division).
- *  - Month-based items: subMonths % itemMonths === 0.
+ *  - Returns **false** if either side is ONETIME. ONETIME is not on the recurring scale;
+ *    callers that want the "ONETIME is always valid" attach rule must handle it before
+ *    invoking this primitive (see backend `filterValidPricesForSubscription`).
+ *  - Same period AND same count is always compatible (covers DAILY×N / WEEKLY×N where
+ *    month math does not apply).
+ *  - Otherwise both sides must reduce to positive months and `subMonths % itemMonths === 0`.
  */
 export function isCadenceCompatible(
 	subPeriod: BILLING_PERIOD | string,
@@ -31,18 +34,13 @@ export function isCadenceCompatible(
 	itemPeriod: BILLING_PERIOD | string,
 	itemCount: number | undefined,
 ): boolean {
-	const itemKey = String(itemPeriod).toUpperCase();
-	if (itemKey === BILLING_PERIOD.ONETIME) return true;
-
 	const subKey = String(subPeriod).toUpperCase();
+	const itemKey = String(itemPeriod).toUpperCase();
+	if (subKey === BILLING_PERIOD.ONETIME || itemKey === BILLING_PERIOD.ONETIME) return false;
+
 	const sc = Math.max(1, subCount ?? 1);
 	const ic = Math.max(1, itemCount ?? 1);
-
-	const daily = BILLING_PERIOD.DAILY;
-	const weekly = BILLING_PERIOD.WEEKLY;
-	if (itemKey === daily || itemKey === weekly || subKey === daily || subKey === weekly) {
-		return subKey === itemKey && sc === ic;
-	}
+	if (subKey === itemKey && sc === ic) return true;
 
 	const subMonths = billingPeriodMonths(subKey, sc);
 	const itemMonths = billingPeriodMonths(itemKey, ic);
@@ -51,8 +49,10 @@ export function isCadenceCompatible(
 }
 
 /**
- * Line-item cycles per subscription invoice window (1 for same-cadence and ONETIME).
- * Returns null when the pair is not compatible.
+ * Line-item cycles per subscription invoice window for a compatible pair (1 for
+ * same-cadence pairs). Returns null when the pair is not compatible on the recurring
+ * scale — including ONETIME on either side (callers should short-circuit ONETIME
+ * before invoking, since ONETIME line items produce a single charge, not a fan-out).
  */
 export function cadenceFanoutCount(
 	subPeriod: BILLING_PERIOD | string,
@@ -61,8 +61,6 @@ export function cadenceFanoutCount(
 	itemCount: number | undefined,
 ): number | null {
 	if (!isCadenceCompatible(subPeriod, subCount, itemPeriod, itemCount)) return null;
-	const itemKey = String(itemPeriod).toUpperCase();
-	if (itemKey === BILLING_PERIOD.ONETIME) return 1;
 	const subMonths = billingPeriodMonths(subPeriod, subCount);
 	const itemMonths = billingPeriodMonths(itemPeriod, itemCount);
 	if (subMonths == null || itemMonths == null || itemMonths === 0) return 1;

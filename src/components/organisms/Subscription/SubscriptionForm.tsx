@@ -60,8 +60,10 @@ import { generateExpandQueryParams } from '@/utils/common/api_helper';
 import {
 	filterPlanPricesForSubscriptionCharges,
 	isOneTimePlanPrice,
+	partitionPricesForSubscription,
 	uniqueRecurringBillingPeriodsFromPrices,
 } from '@/utils/subscription/planPricesForSubscriptionUi';
+import AdditionalPlanPricesSection from './AdditionalPlanPricesSection';
 import { Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -171,15 +173,22 @@ const SubscriptionForm = ({
 	// Fetch plan prices via shared hook (same cache key + canonical active filter as CreateCustomerSubscriptionPage)
 	const { data: selectedPlanPrices } = usePlanPrices(state.selectedPlan);
 
-	// Current prices for subscription-level and phase management (hook already returns only active prices).
-	// Includes plan one-time (ONETIME) prices for the selected currency regardless of recurring billing period.
-	const currentPrices = useMemo(
+	// Split plan prices into what attaches by default (exact cadence + ONETIME) vs. what
+	// the user can opt into via the "Also available on this plan" section (compatible but
+	// finer cadence). Backend now attaches partition.primary by default; sending
+	// include_price_ids on submit enumerates the full selection (primary + opted-in).
+	const pricePartition = useMemo(
 		() =>
 			selectedPlanPrices?.items
-				? filterPlanPricesForSubscriptionCharges(selectedPlanPrices.items, state.billingPeriod, state.currency)
-				: [],
+				? partitionPricesForSubscription(selectedPlanPrices.items, state.billingPeriod, 1, state.currency)
+				: { primary: [], additional: [] },
 		[selectedPlanPrices?.items, state.billingPeriod, state.currency],
 	);
+
+	// currentPrices drives the existing "Charges" table + override / commitment / coupon flows.
+	// It intentionally does NOT include opted-in additional prices — those live in their own
+	// section without override support in this iteration.
+	const currentPrices = pricePartition.primary;
 
 	const hasFixedSubscriptionChargePrice = useMemo(() => {
 		if (!selectedPlanPrices?.items?.length) return false;
@@ -194,6 +203,21 @@ const SubscriptionForm = ({
 			return { ...prev, autoInvoiceThreshold: '' };
 		});
 	}, [hasFixedSubscriptionChargePrice, setState]);
+
+	// Reconcile opted-in additional prices when the compatible set shifts (e.g. user changed
+	// billing_period / currency, or the plan swap changed prices). Keep IDs still available;
+	// drop the rest. Do NOT silently re-add a price the user deselected earlier.
+	const additionalIdsKey = pricePartition.additional.map((p) => p.id).join('|');
+	useEffect(() => {
+		const availableIds = new Set(pricePartition.additional.map((p) => p.id));
+		setState((prev) => {
+			const filtered = prev.optedInAdditionalPriceIds.filter((id) => availableIds.has(id));
+			if (filtered.length === prev.optedInAdditionalPriceIds.length) return prev;
+			return { ...prev, optedInAdditionalPriceIds: filtered };
+		});
+		// additionalIdsKey encodes the current additional-set membership; effect runs when it changes.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [additionalIdsKey, setState]);
 
 	// Price overrides functionality for subscription-level
 	const { overriddenPrices, overridePrice, resetOverride } = usePriceOverrides(currentPrices);
@@ -802,6 +826,26 @@ const SubscriptionForm = ({
 							onEditAddedCharge={handleEditAddedCharge}
 						/>
 					</div>
+
+					{pricePartition.additional.length > 0 && (
+						<div className='mt-6'>
+							<AdditionalPlanPricesSection
+								prices={pricePartition.additional}
+								optedInIds={state.optedInAdditionalPriceIds}
+								onToggle={(priceId, included) => {
+									setState((prev) => {
+										const next = new Set(prev.optedInAdditionalPriceIds);
+										if (included) next.add(priceId);
+										else next.delete(priceId);
+										return { ...prev, optedInAdditionalPriceIds: [...next] };
+									});
+								}}
+								subPeriod={state.billingPeriod}
+								subCount={1}
+								disabled={isDisabled}
+							/>
+						</div>
+					)}
 
 					{/* Subscription Level Discounts */}
 					<div className='mt-6'>
