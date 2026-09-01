@@ -134,26 +134,39 @@ export const normalizePriceDisplay = (
  * @param normalized - The normalized price display data
  * @returns Formatted price string for display
  */
+// Backend amounts can carry full floating-point precision (e.g. a per-unit rate computed as
+// amount/quantity yielding "0.066666666666667"). Display doesn't need more than this many decimal
+// places - values with fewer decimals are returned untouched, so the common 2-decimal case is
+// unaffected.
+const MAX_DISPLAY_DECIMALS = 6;
+
+const capDisplayDecimals = (amount: string, maxDecimals: number = MAX_DISPLAY_DECIMALS): string => {
+	const [, decimalPart] = amount.split('.');
+	if (!decimalPart || decimalPart.length <= maxDecimals) return amount;
+	const parsed = Number(amount);
+	return Number.isFinite(parsed) ? parsed.toFixed(maxDecimals) : amount;
+};
+
 export const formatPriceDisplay = (normalized: NormalizedPriceDisplay): string => {
 	const { amount, symbol, billingModel, transformQuantity, tiers } = normalized;
 
 	switch (billingModel) {
 		case BILLING_MODEL.FLAT_FEE:
-			return `${symbol}${formatAmount(amount)}`;
+			return `${symbol}${formatAmount(capDisplayDecimals(amount))}`;
 
 		case BILLING_MODEL.PACKAGE: {
 			const divideBy = transformQuantity?.divide_by || 1;
-			return `${symbol}${formatAmount(amount)} / ${divideBy} units`;
+			return `${symbol}${formatAmount(capDisplayDecimals(amount))} / ${divideBy} units`;
 		}
 
 		case BILLING_MODEL.TIERED:
 		case 'SLAB_TIERED': {
 			const firstTier = tiers?.[0];
-			return `starts at ${symbol}${formatAmount(firstTier?.unit_amount || '0')} per unit`;
+			return `starts at ${symbol}${formatAmount(capDisplayDecimals(firstTier?.unit_amount || '0'))} per unit`;
 		}
 
 		default:
-			return `${symbol}${formatAmount(amount)}`;
+			return `${symbol}${formatAmount(capDisplayDecimals(amount))}`;
 	}
 };
 

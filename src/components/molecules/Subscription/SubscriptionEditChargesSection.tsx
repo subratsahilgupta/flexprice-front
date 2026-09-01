@@ -5,7 +5,7 @@ import SubscriptionLineItemTable from '@/components/molecules/SubscriptionLineIt
 import { QueryBuilder } from '@/components/molecules/QueryBuilder';
 import type { LineItem, SubscriptionCommitmentInfo, SubscriptionPhase } from '@/models/Subscription';
 import formatDate from '@/utils/common/format_date';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import SubscriptionApi from '@/api/SubscriptionApi';
 import { EXPAND } from '@/models';
 import usePagination, { PAGINATION_PREFIX } from '@/hooks/usePagination';
@@ -92,6 +92,11 @@ const SubscriptionEditChargesSection: FC<SubscriptionEditChargesSectionProps> = 
 				sort: sanitizedSorts.length ? sanitizedSorts : undefined,
 			}),
 		enabled: !!subscriptionId && !!customerId && !!currentPeriodStart,
+		// Keep the previous page's data (and total) visible while the next page is in flight.
+		// Without this, `data` briefly goes undefined on every page change (queryKey changes,
+		// nothing cached yet), totalLineItems collapses to 0, and ShortPagination's self-clamp
+		// effect immediately snaps the page back to 1 before the new page's response arrives.
+		placeholderData: keepPreviousData,
 	});
 
 	const lineItems = useMemo(() => (lineItemsResponse?.items ?? []).map(subscriptionLineItemListItemToLineItem), [lineItemsResponse?.items]);
