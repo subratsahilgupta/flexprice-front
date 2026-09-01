@@ -612,7 +612,7 @@
 		"labelAddon": "Addon",
 		"placeholderSelectAddon": "Select addon",
 		"addonChargesHeading": "Addon Charges",
-		"filteredByPeriodAndCurrency": "Filtered by {{period}} and {{currency}}",
+		"filteredByPeriodAndCurrency": "Compatible with {{period}} and {{currency}}",
 		"billingPeriodFallback": "billing period",
 		"currencyFallback": "currency",
 		"noChargesForPeriod": "No charges for this billing period/currency.",

@@ -607,7 +607,7 @@
 		"labelAddon": "الإضافة",
 		"placeholderSelectAddon": "اختر إضافة",
 		"addonChargesHeading": "رسوم الإضافة",
-		"filteredByPeriodAndCurrency": "مُصفّى حسب {{period}} و {{currency}}",
+		"filteredByPeriodAndCurrency": "متوافق مع {{period}} و {{currency}}",
 		"billingPeriodFallback": "فترة الفوترة",
 		"currencyFallback": "العملة",
 		"noChargesForPeriod": "لا توجد رسوم لهذه الفترة/العملة.",
