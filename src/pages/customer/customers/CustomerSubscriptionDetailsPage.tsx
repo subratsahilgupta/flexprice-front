@@ -593,6 +593,7 @@ const CustomerSubscriptionDetailsPage: FC = () => {
 						subscriptionId={subscription_id}
 						readOnly
 						subscriptionBillingPeriod={subscriptionDetails.billing_period}
+						subscriptionBillingPeriodCount={subscriptionDetails.billing_period_count}
 						subscriptionCurrency={subscriptionDetails.currency}
 						subscriptionCurrentPeriodStart={subscriptionDetails.current_period_start}
 						subscriptionCurrentPeriodEnd={subscriptionDetails.current_period_end}

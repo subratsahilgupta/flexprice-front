@@ -9,7 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { BsThreeDots } from 'react-icons/bs';
 import SubscriptionApi from '@/api/SubscriptionApi';
 import { ADDON_ASSOCIATION_STATUS } from '@/models/AddonAssociation';
-import { AddonAssociationResponse } from '@/types/dto/Subscription';
+import { AddonAssociationResponse, SubscriptionResponse } from '@/types/dto/Subscription';
 import { ADDON_PRORATION_BEHAVIOR } from '@/types/dto/Addon';
 import { BILLING_PERIOD } from '@/constants/constants';
 import { toSentenceCase, copyToClipboard } from '@/utils/common/helper_functions';
@@ -33,6 +33,8 @@ interface SubscriptionAddonsSectionProps {
 	 * avoids an extra GET /subscriptions/:id fetch.
 	 */
 	subscriptionBillingPeriod?: BILLING_PERIOD;
+	/** Paired with subscriptionBillingPeriod for the cadence-compat filter. Defaults to 1. */
+	subscriptionBillingPeriodCount?: number;
 	subscriptionCurrency?: string;
 	subscriptionCurrentPeriodStart?: string;
 	subscriptionCurrentPeriodEnd?: string;
@@ -149,6 +151,7 @@ const SubscriptionAddonsSection: FC<SubscriptionAddonsSectionProps> = ({
 	subscriptionId,
 	readOnly = false,
 	subscriptionBillingPeriod,
+	subscriptionBillingPeriodCount,
 	subscriptionCurrency,
 	subscriptionCurrentPeriodStart,
 	subscriptionCurrentPeriodEnd,
@@ -423,6 +426,10 @@ const SubscriptionAddonsSection: FC<SubscriptionAddonsSectionProps> = ({
 					onOpenChange={setIsAddDialogOpen}
 					subscriptionId={subscriptionId}
 					billingPeriod={subscriptionDetails?.billing_period}
+					billingPeriodCount={
+						subscriptionBillingPeriodCount ??
+						(subscriptionContextResolved ? undefined : (subscriptionDetailsFetched as SubscriptionResponse | undefined)?.billing_period_count)
+					}
 					currency={subscriptionDetails?.currency}
 					currentPeriodEndIso={subscriptionDetails?.current_period_end}
 				/>
