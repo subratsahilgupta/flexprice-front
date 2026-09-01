@@ -141,7 +141,8 @@
 		"emptyDescription": "No wallet has been set up for this account",
 		"transactionHistory": "Transaction History",
 		"noTransactionsTitle": "No transactions",
-		"noTransactionsDescription": "Your transaction history will appear here"
+		"noTransactionsDescription": "Your transaction history will appear here",
+		"moreActions": "More wallet actions"
 	},
 	"usageAnalytics": {
 		"noDataTitle": "No usage data found",
@@ -189,7 +190,9 @@
 		"useSavedMethodEmptyLabel": "Use my saved card",
 		"savedMethodUnsupported": "Your payment provider does not support charging a saved card.",
 		"savedMethodNone": "No saved card yet — add one from the Payments tab.",
-		"cardSavedNotice": "Your card is securely saved for future payments."
+		"cardSavedNotice": "Your card is securely saved for future payments.",
+		"providerLabel": "Payment provider",
+		"providerHint": "Choose which provider to complete this payment with."
 	},
 	"autoTopUp": {
 		"title": "Auto top-up",
@@ -250,7 +253,11 @@
 		"providerUnavailable": "We couldn't load your saved cards right now.",
 		"retryHint": "Please refresh the page to try again.",
 		"unsupportedTitle": "Payment methods are not available",
-		"unsupportedDescription": "This account has no payment provider that supports saved cards."
+		"unsupportedDescription": "This account has no payment provider that supports saved cards.",
+		"rowActions": "Actions for {{method}}",
+		"alreadyDefault": "This is already your default card.",
+		"setDefaultUnsupported": "Your payment provider does not support a default card.",
+		"expiredCannotDefault": "An expired card cannot be made default."
 	},
 	"invoiceDetail": {
 		"title": "Invoice",
@@ -287,5 +294,14 @@
 		"completed": "Payment complete — your balance has been updated.",
 		"failed": "Payment was not completed.",
 		"expired": "That payment session expired. Please try again."
+	},
+	"paymentProviders": {
+		"chargebee": "Chargebee",
+		"razorpay": "Razorpay",
+		"stripe": "Stripe",
+		"nomod": "Nomod",
+		"moyasar": "Moyasar",
+		"paddle": "Paddle",
+		"whop": "Whop"
 	}
 }

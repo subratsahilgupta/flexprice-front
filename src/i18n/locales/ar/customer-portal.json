@@ -141,7 +141,8 @@
 		"emptyDescription": "لم يتم إعداد محفظة لهذا الحساب",
 		"transactionHistory": "سجل المعاملات",
 		"noTransactionsTitle": "لا توجد معاملات",
-		"noTransactionsDescription": "سيظهر سجل معاملاتك هنا"
+		"noTransactionsDescription": "سيظهر سجل معاملاتك هنا",
+		"moreActions": "إجراءات إضافية للمحفظة"
 	},
 	"usageAnalytics": {
 		"noDataTitle": "لا توجد بيانات استخدام",
@@ -189,7 +190,9 @@
 		"useSavedMethodEmptyLabel": "استخدام بطاقتي المحفوظة",
 		"savedMethodUnsupported": "مزوّد الدفع لديك لا يدعم الخصم من بطاقة محفوظة.",
 		"savedMethodNone": "لا توجد بطاقة محفوظة بعد — أضف واحدة من تبويب المدفوعات.",
-		"cardSavedNotice": "يتم حفظ بطاقتك بأمان للمدفوعات المستقبلية."
+		"cardSavedNotice": "يتم حفظ بطاقتك بأمان للمدفوعات المستقبلية.",
+		"providerLabel": "مزوّد الدفع",
+		"providerHint": "اختر المزوّد الذي تريد إتمام الدفع من خلاله."
 	},
 	"autoTopUp": {
 		"title": "الشحن التلقائي",
@@ -250,7 +253,11 @@
 		"providerUnavailable": "تعذّر تحميل بطاقاتك المحفوظة الآن.",
 		"retryHint": "يرجى تحديث الصفحة للمحاولة مرة أخرى.",
 		"unsupportedTitle": "طرق الدفع غير متاحة",
-		"unsupportedDescription": "لا يوجد مزوّد دفع في هذا الحساب يدعم البطاقات المحفوظة."
+		"unsupportedDescription": "لا يوجد مزوّد دفع في هذا الحساب يدعم البطاقات المحفوظة.",
+		"rowActions": "إجراءات {{method}}",
+		"alreadyDefault": "هذه بطاقتك الافتراضية بالفعل.",
+		"setDefaultUnsupported": "مزوّد الدفع لديك لا يدعم بطاقة افتراضية.",
+		"expiredCannotDefault": "لا يمكن تعيين بطاقة منتهية كافتراضية."
 	},
 	"invoiceDetail": {
 		"title": "الفاتورة",
@@ -287,5 +294,14 @@
 		"completed": "اكتمل الدفع — تم تحديث رصيدك.",
 		"failed": "لم تكتمل عملية الدفع.",
 		"expired": "انتهت صلاحية جلسة الدفع. يرجى المحاولة مرة أخرى."
+	},
+	"paymentProviders": {
+		"chargebee": "Chargebee",
+		"razorpay": "Razorpay",
+		"stripe": "Stripe",
+		"nomod": "Nomod",
+		"moyasar": "Moyasar",
+		"paddle": "Paddle",
+		"whop": "Whop"
 	}
 }
