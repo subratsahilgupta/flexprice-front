@@ -384,3 +384,33 @@ export type {
 } from './Workflow';
 
 export type { RevenueDashboardRequest, RevenueDashboardResponse, RevenueDashboardSummary, RevenueDashboardItem } from './RevenueDashboard';
+export type {
+	PaymentGatewayType,
+	IntegrationCapabilityType,
+	IntegrationCapability,
+	PaymentIntegration,
+	PortalIntegrationsResponse,
+	PaymentActionType,
+	PaymentAction,
+	CheckoutStatus,
+	PortalCheckoutSession,
+	PortalCheckoutParams,
+	PortalTopUpRequest,
+	PortalTopUpResponse,
+	PortalAutoTopupRequest,
+	PaymentMethodStatus,
+	SavedCardDetails,
+	SavedPaymentMethod,
+	ProviderError,
+	ProviderSavedPaymentMethods,
+	SavedPaymentMethodsResponse,
+	PortalListPaymentMethodsQuery,
+	SetupActionType,
+	SetupAction,
+	PortalAddPaymentMethodRequest,
+	AddPaymentMethodResponse,
+	PortalDeletePaymentMethodRequest,
+	PortalSetDefaultPaymentMethodRequest,
+	PortalPayInvoiceRequest,
+	PortalPayInvoiceResponse,
+} from './CustomerPortalBilling';

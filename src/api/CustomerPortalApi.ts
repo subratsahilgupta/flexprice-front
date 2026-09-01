@@ -14,6 +14,21 @@ import { GetUsageAnalyticsResponse } from '@/types/dto/Events';
 import { GetDetailedCostAnalyticsResponse } from '@/types/dto/Cost';
 import { generateQueryParams } from '@/utils/common/api_helper';
 import { PortalConfig, DEFAULT_PORTAL_CONFIG, deepMergePortalConfig } from '@/types/dto/PortalConfig';
+import {
+	PortalTopUpRequest,
+	PortalTopUpResponse,
+	PortalAutoTopupRequest,
+	PortalListPaymentMethodsQuery,
+	SavedPaymentMethodsResponse,
+	PortalAddPaymentMethodRequest,
+	AddPaymentMethodResponse,
+	PortalDeletePaymentMethodRequest,
+	PortalSetDefaultPaymentMethodRequest,
+	PortalPayInvoiceRequest,
+	PortalPayInvoiceResponse,
+	PortalIntegrationsResponse,
+	PortalCheckoutSession,
+} from '@/types/dto/CustomerPortalBilling';
 
 /**
  * CustomerPortalApi - Customer-facing dashboard APIs
@@ -129,6 +144,79 @@ class CustomerPortalApi {
 		const url = generateQueryParams(`${this.baseUrl}/wallets/${walletId}/transactions`, { limit, offset });
 		return await AxiosClient.get<WalletTransactionResponse>(url);
 	}
+
+	/**
+	 * Top up a wallet. Pass `checkout` to charge now; omit it to raise an invoice
+	 * the customer settles later.
+	 */
+	public static async topUpWallet(walletId: string, payload: PortalTopUpRequest): Promise<PortalTopUpResponse> {
+		return await AxiosClient.post<PortalTopUpResponse>(`${this.baseUrl}/wallets/${walletId}/top-up`, payload);
+	}
+
+	/**
+	 * Configure auto top-up. The payload is flat: invoicing is the tenant's call,
+	 * and enabling auto top-up is itself the consent to be charged unattended.
+	 */
+	public static async updateAutoTopup(walletId: string, payload: PortalAutoTopupRequest): Promise<unknown> {
+		return await AxiosClient.put<unknown>(`${this.baseUrl}/wallets/${walletId}/auto-topup`, payload);
+	}
+
+	/**
+	 * Start payment for an invoice. The amount comes from the invoice — a customer
+	 * cannot part-pay. Read `payment_action` for what to do next.
+	 */
+	public static async payInvoice(invoiceId: string, payload: PortalPayInvoiceRequest = {}): Promise<PortalPayInvoiceResponse> {
+		return await AxiosClient.post<PortalPayInvoiceResponse>(`${this.baseUrl}/invoices/${invoiceId}/pay`, payload);
+	}
+
+	/**
+	 * Saved payment methods, grouped by provider. A group may carry an `error`
+	 * instead of items — that is "we could not ask", not "none saved".
+	 */
+	public static async getPaymentMethods(query?: PortalListPaymentMethodsQuery): Promise<SavedPaymentMethodsResponse> {
+		const url = generateQueryParams(`${this.baseUrl}/payment-methods`, query || {});
+		return await AxiosClient.get<SavedPaymentMethodsResponse>(url);
+	}
+
+	/**
+	 * Begin adding a payment method. Returns an action, not a method — nothing is
+	 * vaulted yet. Follow `action.url` when `action.type` is 'redirect'.
+	 */
+	public static async addPaymentMethod(payload: PortalAddPaymentMethodRequest): Promise<AddPaymentMethodResponse> {
+		return await AxiosClient.post<AddPaymentMethodResponse>(`${this.baseUrl}/payment-methods`, payload);
+	}
+
+	/**
+	 * Remove a saved payment method. Returns the refreshed list — the backend
+	 * re-reads the affected gateway — so callers can seed the cache rather than
+	 * spend another round trip on it.
+	 */
+	public static async deletePaymentMethod(payload: PortalDeletePaymentMethodRequest): Promise<SavedPaymentMethodsResponse> {
+		return await AxiosClient.post<SavedPaymentMethodsResponse>(`${this.baseUrl}/payment-methods/delete`, payload);
+	}
+
+	/** Defaults are scoped per provider, so the provider is required. Returns the refreshed list. */
+	public static async setDefaultPaymentMethod(payload: PortalSetDefaultPaymentMethodRequest): Promise<SavedPaymentMethodsResponse> {
+		return await AxiosClient.post<SavedPaymentMethodsResponse>(`${this.baseUrl}/payment-methods/default`, payload);
+	}
+
+	/**
+	 * Which providers are connected and what each can do. Drives whether the portal
+	 * offers checkout, saved-card management or a default-method control at all.
+	 */
+	public static async getIntegrations(): Promise<PortalIntegrationsResponse> {
+		return await AxiosClient.get<PortalIntegrationsResponse>(`${this.baseUrl}/integrations`);
+	}
+
+	/** Poll a checkout session to see whether the customer completed payment. */
+	public static async getCheckoutSession(sessionId: string): Promise<PortalCheckoutSession> {
+		return await AxiosClient.get<PortalCheckoutSession>(`${this.baseUrl}/checkout-sessions/${sessionId}`);
+	}
+
+	public static async cancelCheckoutSession(sessionId: string): Promise<PortalCheckoutSession> {
+		return await AxiosClient.post<PortalCheckoutSession>(`${this.baseUrl}/checkout-sessions/${sessionId}/cancel`, {});
+	}
+
 	/**
 	 * Get the portal configuration for this tenant.
 	 * Backend merges tenant-specific config with defaults and returns the resolved PortalConfig.

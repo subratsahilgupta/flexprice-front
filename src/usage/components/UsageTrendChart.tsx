@@ -6,6 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import CustomerUsageChart from '@/components/molecules/CustomerUsageChart';
 import type { GetUsageAnalyticsResponse } from '@/types/dto';
 import { cn } from '@/lib/utils';
+import { formatCredits } from '@/utils/common/formatBalance';
 import { useUsageT } from '../i18n';
 import { normalizeUsageTrendSeries } from '../schema';
 import type { UsageTrendChartProps } from '../types';
@@ -42,6 +43,25 @@ const UsageTrendChart = ({ series: rawSeries, label, isLoading = false, classNam
 		[series],
 	);
 
+	// With a single point there is no trend to read, so the chart is captioned with the
+	// value and its date. The chart still renders — CustomerUsageChart shows a marker
+	// when the series is too short to draw a line.
+	const points = series.flatMap((s) => s.points);
+	const sparseCaption =
+		points.length === 1
+			? t('usageWidgets.singlePointLabel', {
+					// Not formatDateShort: it pins 'en-US', so this caption rendered an
+					// English date inside the Arabic portal. Passing undefined defers to
+					// the runtime locale without wiring host i18n into the package.
+					date: new Date(points[0].timestamp).toLocaleDateString(undefined, {
+						month: 'short',
+						day: 'numeric',
+						year: 'numeric',
+					}),
+					value: formatCredits(series.reduce((sum, item) => sum + (item.points[0]?.usage ?? 0), 0)),
+				})
+			: undefined;
+
 	if (!isLoading && series.length === 0) return null;
 
 	if (isLoading) {
@@ -76,7 +96,15 @@ const UsageTrendChart = ({ series: rawSeries, label, isLoading = false, classNam
 		);
 	}
 
-	return <CustomerUsageChart data={chartData} title={label || t('usageWidgets.trendTitle')} className={cn('flexprice-ui', className)} />;
+	return (
+		<CustomerUsageChart
+			data={chartData}
+			title={label || t('usageWidgets.trendTitle')}
+			description={sparseCaption}
+			className={cn('flexprice-ui', className)}
+			height={260}
+		/>
+	);
 };
 
 export default UsageTrendChart;

@@ -5,25 +5,39 @@ import toast from 'react-hot-toast';
 import CustomerPortalApi from '@/api/CustomerPortalApi';
 import { portalInvoicesQueryKey } from '@/components/customer-portal/queryKeys';
 import { Card, Chip } from '@/components/atoms';
+import { DropdownMenu } from '@/components/molecules';
 import { InvoiceDownloadFormatDialog } from '@/components/molecules';
 import { Invoice, INVOICE_STATUS } from '@/models/Invoice';
 import { PAYMENT_STATUS } from '@/constants/payment';
 import { formatDateShort, getCurrencySymbol } from '@/utils/common/helper_functions';
 import { formatAmount } from '@/components/atoms/Input/Input';
-import { Download, Loader2, Search } from 'lucide-react';
+import { CreditCard, Download, Eye, MoreHorizontal, Search } from 'lucide-react';
 import EmptyState from '../EmptyState';
-import { usePortalConfig } from '@/context/PortalConfigContext';
 import { downloadInvoiceLineItemsCsv } from '@/utils/invoices/downloadInvoiceLineItemsCsv';
+import InvoiceDetailDrawer from './InvoiceDetailDrawer';
+import CheckoutLinkDialog from './CheckoutLinkDialog';
+import usePayInvoice from './usePayInvoice';
+import { isPayable } from '../invoiceStatus';
 
 interface InvoicesTableProps {
 	invoices: Invoice[];
 	currencySymbol: string;
 	onOpenDownloadFormat: (invoice: Invoice) => void;
 	downloadPendingId: string | null;
-	hasTheme: boolean;
+	onView: (invoice: Invoice) => void;
+	onPay: (invoice: Invoice) => void;
+	payPendingId: string | null;
 }
 
-const InvoicesTable = ({ invoices, currencySymbol, onOpenDownloadFormat, downloadPendingId, hasTheme }: InvoicesTableProps) => {
+const InvoicesTable = ({
+	invoices,
+	currencySymbol,
+	onOpenDownloadFormat,
+	downloadPendingId,
+	onView,
+	onPay,
+	payPendingId,
+}: InvoicesTableProps) => {
 	const { t } = useTranslation('customer-portal');
 
 	const getStatusChip = (invoice: Invoice) => {
@@ -53,7 +67,7 @@ const InvoicesTable = ({ invoices, currencySymbol, onOpenDownloadFormat, downloa
 						<th
 							className='px-4 py-3 text-xs font-medium uppercase tracking-wider text-start'
 							style={{ color: 'var(--portal-text-secondary, #71717a)' }}>
-							{t('invoices.columnInvoiceNumber')}
+							{t('invoices.columnInvoice')}
 						</th>
 						<th
 							className='px-4 py-3 text-xs font-medium uppercase tracking-wider text-start'
@@ -66,36 +80,71 @@ const InvoicesTable = ({ invoices, currencySymbol, onOpenDownloadFormat, downloa
 							{t('invoices.columnAmount')}
 						</th>
 						<th
-							className='px-4 py-3 text-xs font-medium uppercase tracking-wider text-center'
+							className='px-4 py-3 text-xs font-medium uppercase tracking-wider text-end'
 							style={{ color: 'var(--portal-text-secondary, #71717a)' }}>
-							{t('invoices.columnDownload')}
+							{t('invoices.columnAction')}
 						</th>
 					</tr>
 				</thead>
 				<tbody className='divide-y' style={{ borderColor: 'var(--portal-border, #E9E9E9)' }}>
 					{invoices.map((invoice) => (
 						<tr key={invoice.id} className='transition-colors' style={{ backgroundColor: 'var(--portal-surface, white)' }}>
-							<td className='px-4 py-3 text-sm' style={{ color: 'var(--portal-text-secondary, #71717a)' }}>
+							<td className='px-4 py-2.5 text-sm' style={{ color: 'var(--portal-text-secondary, #71717a)' }}>
 								{invoice.finalized_at ? formatDateShort(invoice.finalized_at) : formatDateShort(invoice.created_at)}
 							</td>
-							<td className='px-4 py-3 text-sm font-medium' style={{ color: 'var(--portal-text-primary, #09090b)' }}>
-								{invoice.invoice_number || t('invoices.numberPrefix', { id: invoice.id.slice(0, 8) })}
+							<td className='px-4 py-2.5 text-sm font-medium'>
+								<button
+									type='button'
+									onClick={() => onView(invoice)}
+									className='hover:underline text-start'
+									style={{ color: 'var(--portal-text-primary, #09090b)' }}>
+									{invoice.invoice_number || t('invoices.numberPrefix', { id: invoice.id.slice(0, 8) })}
+								</button>
 							</td>
-							<td className='px-4 py-3'>{getStatusChip(invoice)}</td>
-							<td className='px-4 py-3 text-sm text-end font-medium' style={{ color: 'var(--portal-text-primary, #09090b)' }}>
+							<td className='px-4 py-2.5'>{getStatusChip(invoice)}</td>
+							<td className='px-4 py-2.5 text-sm text-end font-medium' style={{ color: 'var(--portal-text-primary, #09090b)' }}>
 								{currencySymbol}
 								{formatAmount(String(invoice.total ?? 0))}
 							</td>
-							<td className='px-4 py-3 text-center'>
-								{invoice.invoice_status === INVOICE_STATUS.FINALIZED && (
-									<button
-										onClick={() => onOpenDownloadFormat(invoice)}
-										disabled={downloadPendingId !== null}
-										className='p-2 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
-										style={hasTheme ? { backgroundColor: 'var(--portal-primary)', color: 'white' } : { color: '#71717a' }}>
-										{downloadPendingId === invoice.id ? <Loader2 className='h-4 w-4 animate-spin' /> : <Download className='h-4 w-4' />}
-									</button>
-								)}
+							<td className='px-4 py-2.5'>
+								<div className='flex items-center justify-end'>
+									<DropdownMenu
+										align='end'
+										// The shared default trigger is a bare icon with no accessible
+										// name, which leaves the only action on the row unreachable by
+										// screen reader and unnameable in tests.
+										trigger={
+											<button
+												type='button'
+												aria-label={t('invoices.rowActions', { invoice: invoice.invoice_number || invoice.id })}
+												className='p-1.5 rounded-md transition-colors'
+												style={{ color: 'var(--portal-text-secondary, #71717a)' }}>
+												<MoreHorizontal className='h-4 w-4' />
+											</button>
+										}
+										options={[
+											{
+												label: t('invoices.payNow'),
+												icon: <CreditCard className='w-4 h-4' />,
+												disabled: !isPayable(invoice) || payPendingId !== null,
+												disabledReason: isPayable(invoice) ? undefined : t('invoices.notPayable'),
+												onSelect: () => onPay(invoice),
+											},
+											{
+												label: t('invoices.viewInvoice'),
+												icon: <Eye className='w-4 h-4' />,
+												onSelect: () => onView(invoice),
+											},
+											{
+												label: t('invoices.downloadInvoice'),
+												icon: <Download className='w-4 h-4' />,
+												disabled: invoice.invoice_status !== INVOICE_STATUS.FINALIZED || downloadPendingId !== null,
+												disabledReason: invoice.invoice_status === INVOICE_STATUS.FINALIZED ? undefined : t('invoices.notDownloadable'),
+												onSelect: () => onOpenDownloadFormat(invoice),
+											},
+										]}
+									/>
+								</div>
 							</td>
 						</tr>
 					))}
@@ -116,8 +165,8 @@ const InvoicesWidget = () => {
 	const [downloadTarget, setDownloadTarget] = useState<Invoice | null>(null);
 	const [isDownloadDialogOpen, setIsDownloadDialogOpen] = useState(false);
 	const [isCsvExportPending, setIsCsvExportPending] = useState(false);
-	const { config } = usePortalConfig();
-	const hasTheme = !!config.theme;
+	const [detailInvoice, setDetailInvoice] = useState<Invoice | null>(null);
+	const { payInvoice, payingInvoiceId, checkoutUrl, clearCheckoutUrl } = usePayInvoice();
 
 	const {
 		data: invoicesData,
@@ -189,6 +238,18 @@ const InvoicesWidget = () => {
 
 	return (
 		<div className='space-y-6'>
+			<CheckoutLinkDialog url={checkoutUrl} onOpenChange={(open) => !open && clearCheckoutUrl()} />
+			<InvoiceDetailDrawer
+				invoice={detailInvoice}
+				isOpen={detailInvoice !== null}
+				onOpenChange={(open) => {
+					if (!open) setDetailInvoice(null);
+				}}
+				onDownload={openInvoiceDownload}
+				isDownloading={busyDownloadInvoiceId !== null}
+				onPay={(invoice) => payInvoice(invoice.id)}
+				payPendingId={payingInvoiceId}
+			/>
 			<InvoiceDownloadFormatDialog
 				open={isDownloadDialogOpen}
 				onOpenChange={(open) => {
@@ -248,7 +309,9 @@ const InvoicesWidget = () => {
 					currencySymbol={currencySymbol}
 					onOpenDownloadFormat={openInvoiceDownload}
 					downloadPendingId={busyDownloadInvoiceId}
-					hasTheme={hasTheme}
+					onView={setDetailInvoice}
+					onPay={(invoice) => payInvoice(invoice.id)}
+					payPendingId={payingInvoiceId}
 				/>
 			</Card>
 		</div>
