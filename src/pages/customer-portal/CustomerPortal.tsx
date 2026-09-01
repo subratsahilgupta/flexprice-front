@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useEffect, useMemo, useCallback } from 'react';
+import { useSearchParams } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
@@ -10,7 +11,9 @@ import { Loader } from '@/components/atoms';
 import { PortalHeader } from '@/components/customer-portal';
 import { PortalConfigProvider, usePortalConfig } from '@/context/PortalConfigContext';
 import SectionContent from '@/components/customer-portal/SectionContent';
+import useCheckoutReturn from '@/components/customer-portal/useCheckoutReturn';
 import { portalInvoicesQueryKey } from '@/components/customer-portal/queryKeys';
+import { isCustomerVisible } from '@/components/customer-portal/invoiceStatus';
 import { SectionConfig } from '@/types/dto/PortalConfig';
 import { cn } from '@/lib/utils';
 
@@ -27,11 +30,16 @@ interface CustomerPortalProps {
 	token: string;
 }
 
+/** Query parameter remembering which section tab is open. */
+const SECTION_PARAM = 'section';
+
 // ─── Inner component — consumes PortalConfigContext ───────────────────────────
 
 const CustomerPortalInner = () => {
 	const { t } = useTranslation('customer-portal');
 	const { config } = usePortalConfig();
+	// Resolves a checkout the customer has just been redirected back from.
+	useCheckoutReturn();
 	const hasTheme = !!config.theme;
 
 	const {
@@ -78,7 +86,9 @@ const CustomerPortalInner = () => {
 			const allInvoice = enabledTypes.length > 0 && enabledTypes.every((t) => invoiceTypes.has(t));
 
 			if (allWallet && walletsData !== undefined && walletsData.length === 0) return false;
-			if (allInvoice && invoicesData !== undefined && (invoicesData.items?.length ?? 0) === 0) return false;
+			// Counted the same way the tab lists them, or a customer with nothing but
+			// drafts gets an Invoices tab that opens onto an empty list.
+			if (allInvoice && invoicesData !== undefined && (invoicesData.items ?? []).filter(isCustomerVisible).length === 0) return false;
 
 			return true;
 		},
@@ -91,19 +101,29 @@ const CustomerPortalInner = () => {
 		[config.sections, isSectionVisible],
 	);
 
-	const [activeSectionId, setActiveSectionId] = useState<string>('');
+	// Held in the URL, not component state: a reload — which customers do after
+	// paying — dropped them back on the first section regardless of where they
+	// were. Deriving it also removes the need to reset when the chosen section
+	// stops being visible (e.g. its data comes back empty); an id that no longer
+	// matches simply falls through to the first visible one.
+	const [searchParams, setSearchParams] = useSearchParams();
+	const requestedSectionId = searchParams.get(SECTION_PARAM);
 
-	// If the active section gets hidden (e.g. invoices data empty), fall back to first visible
-	useEffect(() => {
-		if (activeSectionId && !visibleSections.find((s) => s.id === activeSectionId)) {
-			setActiveSectionId('');
-		}
-	}, [activeSectionId, visibleSections]);
+	const activeSection = useMemo(
+		() => visibleSections.find((s) => s.id === requestedSectionId) ?? visibleSections[0],
+		[requestedSectionId, visibleSections],
+	);
 
-	const activeSection = useMemo(() => {
-		if (activeSectionId) return visibleSections.find((s) => s.id === activeSectionId);
-		return visibleSections[0];
-	}, [activeSectionId, visibleSections]);
+	const selectSection = useCallback(
+		(id: string) => {
+			const next = new URLSearchParams(searchParams);
+			next.set(SECTION_PARAM, id);
+			// Replace: switching tabs should not stack up history the back button
+			// then has to walk through.
+			setSearchParams(next, { replace: true });
+		},
+		[searchParams, setSearchParams],
+	);
 
 	if (customerLoading) {
 		return (
@@ -140,7 +160,7 @@ const CustomerPortalInner = () => {
 							return (
 								<button
 									key={section.id}
-									onClick={() => setActiveSectionId(section.id)}
+									onClick={() => selectSection(section.id)}
 									className={cn(
 										'px-4 py-2 text-sm font-medium rounded-[6px] transition-colors',
 										!hasTheme && (isActive ? 'bg-zinc-100 text-zinc-900' : 'text-zinc-500 hover:text-zinc-700 hover:bg-zinc-50'),

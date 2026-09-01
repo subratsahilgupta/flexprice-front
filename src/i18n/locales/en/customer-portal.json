@@ -25,12 +25,21 @@
 		"loadTransactions": "Failed to load transactions",
 		"loadAnalytics": "Failed to load analytics",
 		"loadCostAnalytics": "Failed to load cost analytics",
-		"loadUsageBreakdown": "Failed to load usage breakdown"
+		"loadUsageBreakdown": "Failed to load usage breakdown",
+		"topUp": "Failed to start top-up",
+		"saveAutoTopUp": "Failed to save auto top-up settings",
+		"loadPaymentMethods": "Failed to load payment methods",
+		"addPaymentMethod": "Failed to start adding a payment method",
+		"payInvoice": "Failed to pay invoice",
+		"setDefaultPaymentMethod": "Failed to update default payment method",
+		"deletePaymentMethod": "Failed to remove payment method",
+		"checkoutUnavailable": "Could not open the payment page. Please try again."
 	},
 	"toast": {
 		"invoiceDownloaded": "Invoice downloaded",
 		"invoiceCsvDownloaded": "Invoice CSV downloaded",
-		"noBillableLineItems": "No billable line items to export"
+		"noBillableLineItems": "No billable line items to export",
+		"invoicePaymentStarted": "Payment submitted"
 	},
 	"datePreset": {
 		"today": "Today",
@@ -110,7 +119,17 @@
 		"emptyDescription": "No invoices have been generated yet",
 		"noMatchTitle": "No invoices found",
 		"noMatchDescription": "No invoices match your search criteria",
-		"numberPrefix": "INV-{{id}}"
+		"numberPrefix": "INV-{{id}}",
+		"pay": "Pay",
+		"columnInvoice": "Invoice",
+		"columnAction": "Action",
+		"payNow": "Pay now",
+		"view": "View",
+		"viewInvoice": "View invoice",
+		"downloadInvoice": "Download invoice",
+		"notPayable": "This invoice is not awaiting payment.",
+		"notDownloadable": "Only finalized invoices can be downloaded.",
+		"rowActions": "Actions for invoice {{invoice}}"
 	},
 	"wallet": {
 		"defaultName": "Wallet",
@@ -122,7 +141,8 @@
 		"emptyDescription": "No wallet has been set up for this account",
 		"transactionHistory": "Transaction History",
 		"noTransactionsTitle": "No transactions",
-		"noTransactionsDescription": "Your transaction history will appear here"
+		"noTransactionsDescription": "Your transaction history will appear here",
+		"moreActions": "More wallet actions"
 	},
 	"usageAnalytics": {
 		"noDataTitle": "No usage data found",
@@ -151,5 +171,145 @@
 		"margin": "Margin",
 		"marginPercent": "Margin %",
 		"cpm": "CPM"
+	},
+	"topUp": {
+		"title": "Add credits",
+		"description": "Top up your balance. You will be taken to a secure checkout page to complete the payment.",
+		"creditsLabel": "Credits",
+		"creditsPlaceholder": "Enter an amount",
+		"chargeSummary": "You'll be charged {{amount}}",
+		"action": "Continue to checkout",
+		"successPending": "Top-up requested — your balance will update once payment completes",
+		"descriptionLabel": "Description (optional)",
+		"descriptionPlaceholder": "What is this top-up for?",
+		"payNow": "Pay now",
+		"useSavedMethod": "Pay with my saved card ({{method}})",
+		"useSavedMethodTitle": "Saved card",
+		"useSavedMethodHint": "Charge the card on file instead of opening a checkout page.",
+		"checkoutUnavailable": "Online payment is not set up for this account, so an invoice will be raised instead.",
+		"useSavedMethodEmptyLabel": "Use my saved card",
+		"savedMethodUnsupported": "Your payment provider does not support charging a saved card.",
+		"savedMethodNone": "No saved card yet — add one from the Payments tab.",
+		"cardSavedNotice": "Your card is securely saved for future payments.",
+		"providerLabel": "Payment provider",
+		"providerHint": "Choose which provider to complete this payment with.",
+		"paid": "Payment complete — your credits have been added."
+	},
+	"autoTopUp": {
+		"title": "Auto top-up",
+		"description": "Automatically add credits when your balance runs low.",
+		"on": "On",
+		"off": "Off",
+		"thresholdLabel": "Top up when balance falls below",
+		"thresholdHelp": "The balance that triggers an automatic top-up",
+		"amountLabel": "Top-up amount",
+		"amountHelp": "How much to add each time",
+		"save": "Save settings",
+		"saved": "Auto top-up settings saved",
+		"summary": "Automatically add {{amount}} when your balance falls below {{threshold}}.",
+		"offSummary": "Auto top-up is off.",
+		"manage": "Manage",
+		"enable": "Enable",
+		"cancel": "Cancel",
+		"enableLabel": "Enable auto top-up",
+		"cooloffLabel": "Wait before the next auto top-up",
+		"cooloffHelp": "Wait this long after a top-up before another can run",
+		"cooloffPlaceholder": "No cooloff",
+		"cooloffUnitLabel": "Unit",
+		"cooloffUnits": {
+			"second": "Seconds",
+			"minute": "Minutes",
+			"hour": "Hours",
+			"day": "Days"
+		},
+		"noSavedCard": "No saved payment method found.",
+		"enableHint": "We top up your balance automatically so service is never interrupted.",
+		"needsCardHint": "Add a payment method to enable automatic top-ups.",
+		"enableTitle": "Auto top-up",
+		"thresholdPlaceholder": "e.g. 20",
+		"amountPlaceholder": "e.g. 100",
+		"cooloffTitle": "Cooloff",
+		"cooloffValueLabel": "Duration",
+		"cooloffOnHint": "After a top-up, we wait this long before topping up again, even if the balance is still low.",
+		"cooloffOffHint": "With cooloff off, there is no wait between automatic top-ups."
+	},
+	"paymentMethods": {
+		"title": "Payment methods",
+		"description": "Cards saved for invoices and automatic top-ups.",
+		"add": "Add card",
+		"cardLabel": "{{brand}} •••• {{last4}}",
+		"expires": "Expires {{expiry}}",
+		"default": "Default",
+		"emptyTitle": "No payment methods",
+		"emptyDescription": "Add a card to pay invoices and enable automatic top-ups",
+		"setDefault": "Set as default",
+		"defaultUpdated": "Default payment method updated",
+		"expired": "Expired",
+		"remove": "Remove",
+		"removeTitle": "Remove payment method",
+		"removeConfirm": "This card will no longer be available for payments or automatic top-ups.",
+		"cancel": "Cancel",
+		"removed": "Payment method removed",
+		"added": "Payment method added",
+		"providerUnavailable": "We couldn't load your saved cards right now.",
+		"retryHint": "Please refresh the page to try again.",
+		"unsupportedTitle": "Payment methods are not available",
+		"unsupportedDescription": "This account has no payment provider that supports saved cards.",
+		"rowActions": "Actions for {{method}}",
+		"alreadyDefault": "This is already your default card.",
+		"setDefaultUnsupported": "Your payment provider does not support a default card.",
+		"expiredCannotDefault": "An expired card cannot be made default."
+	},
+	"invoiceDetail": {
+		"title": "Invoice",
+		"amountDue": "Amount due",
+		"amountTotal": "Total",
+		"billingPeriod": "Billing period",
+		"issued": "Issued",
+		"dueDate": "Due date",
+		"lineItems": "Line items",
+		"quantity": "Qty {{quantity}}",
+		"noLineItems": "No line items on this invoice",
+		"subtotal": "Subtotal",
+		"discount": "Discount",
+		"tax": "Tax",
+		"total": "Total",
+		"amountPaid": "Amount paid",
+		"download": "Download",
+		"payUnavailableHint": "Online payment is not available yet. Please contact support to settle this invoice."
+	},
+	"accountSummary": {
+		"balance": "Balance",
+		"amountDue": "Amount due",
+		"nextBilling": "Next billing"
+	},
+	"checkoutLink": {
+		"copy": "Copy link",
+		"copied": "Link copied",
+		"copyFailed": "Could not copy the link",
+		"paymentTitle": "Complete your payment",
+		"paymentDescription": "If the payment page didn't open, use the link below.",
+		"paymentOpen": "Open payment page",
+		"setupTitle": "Add your card",
+		"setupDescription": "If the secure card form didn't open, use the link below.",
+		"setupOpen": "Open card form"
+	},
+	"checkoutReturn": {
+		"completed": "Payment complete — your balance has been updated.",
+		"failed": "Payment was not completed.",
+		"expired": "That payment session expired. Please try again."
+	},
+	"paymentProviders": {
+		"chargebee": "Chargebee",
+		"razorpay": "Razorpay",
+		"stripe": "Stripe",
+		"nomod": "Nomod",
+		"moyasar": "Moyasar",
+		"paddle": "Paddle",
+		"whop": "Whop"
+	},
+	"section": {
+		"emptyTitle": "Nothing to show here",
+		"emptyDescription": "This section has no content configured yet."
 	}
 }

@@ -1,4 +1,7 @@
+import { useEffect } from 'react';
 import { useSearchParams } from 'react-router';
+import { rememberSessionToken, recallSessionToken } from '@/components/customer-portal/portalReturnUrl';
+import useCheckoutTabHandoff from '@/components/customer-portal/useCheckoutTabHandoff';
 import { useTranslation } from 'react-i18next';
 import { RefreshCw, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -58,8 +61,24 @@ const CustomerPortalWrapper = () => {
 	// Tenant-facing: never inherit a Flexprice user's dark-mode preference.
 	useForceLightTheme();
 	const { t } = useTranslation('customer-portal');
+	// A provider redirect lands in the tab the checkout was opened in, not the one
+	// the customer left behind. That tab reports back and closes itself.
+	const isHandingOff = useCheckoutTabHandoff();
 	const [searchParams] = useSearchParams();
-	const token = searchParams.get('token');
+	// Falls back to stored state so a customer returning from a hosted checkout
+	// still authenticates: the return URL deliberately omits the token rather than
+	// handing the session to the payment provider. The provider opens in a fresh
+	// tab, so the store has to outlive this one — see portalReturnUrl.
+	const urlToken = searchParams.get('token');
+	const token = urlToken ?? recallSessionToken();
+
+	useEffect(() => {
+		if (urlToken) rememberSessionToken(urlToken);
+	}, [urlToken]);
+
+	// Nothing to show in a tab that is closing — and the invalid-link card in
+	// particular would be wrong, since this tab's job is already done.
+	if (isHandingOff) return null;
 
 	// Validate required token parameter
 	if (!token) {

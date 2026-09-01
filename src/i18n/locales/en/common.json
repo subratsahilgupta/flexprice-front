@@ -541,7 +541,7 @@
 		"quotaTitle": "Usage Quota",
 		"unknownFeature": "Unknown Feature",
 		"unlimited": "Unlimited",
-		"revenue": "Revenue",
+		"revenue": "Total spend",
 		"cost": "Cost",
 		"margin": "Margin",
 		"marginPercent": "Margin %",
@@ -556,7 +556,14 @@
 		"collapseAllAria": "Collapse all",
 		"unknownRow": "Unknown",
 		"cellEmDash": "—",
-		"cellEmpty": "--"
+		"cellEmpty": "--",
+		"singlePointLabel": "Usage for {{date}} · {{value}}",
+		"quotaEmptyTitle": "No usage quotas configured",
+		"quotaEmptyDescription": "Quotas will appear when your plan includes metered features.",
+		"trendEmptyTitle": "No usage data yet",
+		"trendEmptyDescription": "No usage has been recorded during this period.",
+		"breakdownEmptyTitle": "No usage in this period",
+		"breakdownEmptyDescription": "Try selecting a different date range."
 	},
 	"creditWidgets": {
 		"defaultName": "Wallet",
@@ -574,7 +581,8 @@
 		"transactionsUnit": "Transactions",
 		"noTransactionsTitle": "No transactions",
 		"noTransactionsDescription": "Your transaction history will appear here",
-		"fallbackWalletName": "Wallet {{id}}"
+		"fallbackWalletName": "Wallet {{id}}",
+		"overdrawnHint": "Your current usage exceeds available credits."
 	},
 	"taxAssociation": {
 		"dialogTitle": "Link Tax Rate",
@@ -612,7 +620,7 @@
 		"labelAddon": "Addon",
 		"placeholderSelectAddon": "Select addon",
 		"addonChargesHeading": "Addon Charges",
-		"filteredByPeriodAndCurrency": "Filtered by {{period}} and {{currency}}",
+		"filteredByPeriodAndCurrency": "Compatible with {{period}} and {{currency}}",
 		"billingPeriodFallback": "billing period",
 		"currencyFallback": "currency",
 		"noChargesForPeriod": "No charges for this billing period/currency.",

@@ -6,6 +6,8 @@ import Card from '@/components/atoms/Card/Card';
 import Progress from '@/components/atoms/Progress/Progress';
 import { formatAmount } from '@/components/atoms/Input/Input';
 import { cn } from '@/lib/utils';
+import { Gauge } from 'lucide-react';
+import EmptyState from '@/components/atoms/EmptyState/EmptyState';
 import { useUsageT } from '../i18n';
 import { normalizeUsageQuotaItems } from '../schema';
 import type { UsageQuotaProps } from '../types';
@@ -14,17 +16,29 @@ import type { UsageQuotaProps } from '../types';
  * Prop-only usage-quota list — no fetching, no auth, no PortalConfigContext. Renders a progress
  * bar per metered entitlement. Consumers supply already-adapted `items` (see `adaptUsageQuotaItems`).
  */
-const UsageQuota = ({ items: rawItems, label, className }: UsageQuotaProps) => {
+const UsageQuota = ({ items: rawItems, label, className, emptyAction }: UsageQuotaProps) => {
 	const items = useMemo(() => normalizeUsageQuotaItems(rawItems), [rawItems]);
 	const t = useUsageT();
 
-	if (items.length === 0) return null;
+	const heading = <h3 className='text-base font-medium text-content'>{label || t('usageWidgets.quotaTitle')}</h3>;
+
+	if (items.length === 0) {
+		return (
+			<Card noPadding className={cn('flexprice-ui', 'rounded-xl overflow-hidden bg-surface', className)}>
+				<div className='p-6 border-b border-line'>{heading}</div>
+				<EmptyState
+					icon={<Gauge />}
+					title={t('usageWidgets.quotaEmptyTitle')}
+					description={t('usageWidgets.quotaEmptyDescription')}
+					action={emptyAction}
+				/>
+			</Card>
+		);
+	}
 
 	return (
 		<Card noPadding className={cn('flexprice-ui', 'rounded-xl overflow-hidden bg-surface', className)}>
-			<div className='p-6 border-b border-line'>
-				<h3 className='text-base font-medium text-content'>{label || t('usageWidgets.quotaTitle')}</h3>
-			</div>
+			<div className='p-6 border-b border-line'>{heading}</div>
 			<div className='p-6 space-y-4'>
 				{items.map((item) => {
 					// `item.limit` truthiness would treat a real 0 limit (e.g. a zero-quota entitlement)

@@ -536,7 +536,7 @@
 		"quotaTitle": "حصة الاستخدام",
 		"unknownFeature": "ميزة غير معروفة",
 		"unlimited": "غير محدود",
-		"revenue": "الإيرادات",
+		"revenue": "إجمالي الإنفاق",
 		"cost": "التكلفة",
 		"margin": "الهامش",
 		"marginPercent": "الهامش %",
@@ -551,7 +551,14 @@
 		"collapseAllAria": "طي الكل",
 		"unknownRow": "غير معروف",
 		"cellEmDash": "—",
-		"cellEmpty": "--"
+		"cellEmpty": "--",
+		"singlePointLabel": "الاستخدام في {{date}} · {{value}}",
+		"quotaEmptyTitle": "لم يتم إعداد حصص استخدام",
+		"quotaEmptyDescription": "ستظهر الحصص عندما تتضمن خطتك ميزات مقيسة.",
+		"trendEmptyTitle": "لا يوجد استخدام بعد",
+		"trendEmptyDescription": "لم يُسجَّل أي استخدام خلال هذه الفترة.",
+		"breakdownEmptyTitle": "لا يوجد استخدام في هذه الفترة",
+		"breakdownEmptyDescription": "جرّب اختيار نطاق زمني مختلف."
 	},
 	"creditWidgets": {
 		"defaultName": "محفظة",
@@ -569,7 +576,8 @@
 		"transactionsUnit": "معاملات",
 		"noTransactionsTitle": "لا توجد معاملات",
 		"noTransactionsDescription": "سيظهر سجل معاملاتك هنا",
-		"fallbackWalletName": "محفظة {{id}}"
+		"fallbackWalletName": "محفظة {{id}}",
+		"overdrawnHint": "استخدامك الحالي يتجاوز الأرصدة المتاحة."
 	},
 	"taxAssociation": {
 		"dialogTitle": "ربط سعر ضريبي",
@@ -607,7 +615,7 @@
 		"labelAddon": "الإضافة",
 		"placeholderSelectAddon": "اختر إضافة",
 		"addonChargesHeading": "رسوم الإضافة",
-		"filteredByPeriodAndCurrency": "مُصفّى حسب {{period}} و {{currency}}",
+		"filteredByPeriodAndCurrency": "متوافق مع {{period}} و {{currency}}",
 		"billingPeriodFallback": "فترة الفوترة",
 		"currencyFallback": "العملة",
 		"noChargesForPeriod": "لا توجد رسوم لهذه الفترة/العملة.",

@@ -6,6 +6,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import CustomerUsageChart from '@/components/molecules/CustomerUsageChart';
 import type { GetUsageAnalyticsResponse } from '@/types/dto';
 import { cn } from '@/lib/utils';
+import { formatCredits } from '@/utils/common/formatBalance';
+import { LineChart } from 'lucide-react';
+import EmptyState from '@/components/atoms/EmptyState/EmptyState';
 import { useUsageT } from '../i18n';
 import { normalizeUsageTrendSeries } from '../schema';
 import type { UsageTrendChartProps } from '../types';
@@ -20,8 +23,13 @@ import type { UsageTrendChartProps } from '../types';
  * has-data paths — this wrapper must not add a second one around it, or the widget renders
  * nested card borders/padding. The Card here is only for the loading-skeleton state, which
  * `CustomerUsageChart` has no prop for.
+ *
+ * The empty case is rendered here rather than delegated to `CustomerUsageChart`: its own
+ * no-data path holds a 250px void and states the same thing twice ("No usage data available"
+ * above "No data to display"), which reads as a broken chart. This one keeps the heading and
+ * the period it covers, then a compact empty state saying what is missing, why, and where to go.
  */
-const UsageTrendChart = ({ series: rawSeries, label, isLoading = false, className }: UsageTrendChartProps) => {
+const UsageTrendChart = ({ series: rawSeries, label, isLoading = false, className, periodLabel, emptyAction }: UsageTrendChartProps) => {
 	const series = useMemo(() => normalizeUsageTrendSeries(rawSeries), [rawSeries]);
 	const t = useUsageT();
 
@@ -42,7 +50,24 @@ const UsageTrendChart = ({ series: rawSeries, label, isLoading = false, classNam
 		[series],
 	);
 
-	if (!isLoading && series.length === 0) return null;
+	// With a single point there is no trend to read, so the chart is captioned with the
+	// value and its date. The chart still renders — CustomerUsageChart shows a marker
+	// when the series is too short to draw a line.
+	const points = series.flatMap((s) => s.points);
+	const sparseCaption =
+		points.length === 1
+			? t('usageWidgets.singlePointLabel', {
+					// Not formatDateShort: it pins 'en-US', so this caption rendered an
+					// English date inside the Arabic portal. Passing undefined defers to
+					// the runtime locale without wiring host i18n into the package.
+					date: new Date(points[0].timestamp).toLocaleDateString(undefined, {
+						month: 'short',
+						day: 'numeric',
+						year: 'numeric',
+					}),
+					value: formatCredits(series.reduce((sum, item) => sum + (item.points[0]?.usage ?? 0), 0)),
+				})
+			: undefined;
 
 	if (isLoading) {
 		return (
@@ -76,7 +101,32 @@ const UsageTrendChart = ({ series: rawSeries, label, isLoading = false, classNam
 		);
 	}
 
-	return <CustomerUsageChart data={chartData} title={label || t('usageWidgets.trendTitle')} className={cn('flexprice-ui', className)} />;
+	if (series.length === 0) {
+		return (
+			<Card noPadding className={cn('flexprice-ui', 'rounded-xl overflow-hidden bg-surface', className)}>
+				<div className='p-6 border-b border-line'>
+					<h3 className='text-base font-medium text-content'>{label || t('usageWidgets.trendTitle')}</h3>
+					{periodLabel && <p className='mt-1 text-xs text-content-tertiary'>{periodLabel}</p>}
+				</div>
+				<EmptyState
+					icon={<LineChart />}
+					title={t('usageWidgets.trendEmptyTitle')}
+					description={t('usageWidgets.trendEmptyDescription')}
+					action={emptyAction}
+				/>
+			</Card>
+		);
+	}
+
+	return (
+		<CustomerUsageChart
+			data={chartData}
+			title={label || t('usageWidgets.trendTitle')}
+			description={sparseCaption || periodLabel}
+			className={cn('flexprice-ui', className)}
+			height={260}
+		/>
+	);
 };
 
 export default UsageTrendChart;

@@ -672,7 +672,10 @@ const CreateCustomerSubscriptionPage: React.FC = () => {
 			subscriptionState.addons && subscriptionState.addons.length > 0
 				? subscriptionState.addons.map((addon: AddAddonToSubscriptionRequest) => {
 						const addonDetails = addonsById.get(addon.addon_id);
-						const prices = filterAddonPricesForSubscription(addonDetails?.prices as Price[] | undefined, billingPeriod, currency);
+						// Create flow hardcodes billing_period_count to 1 at submit (see the payload
+						// below). Pass it here explicitly so the addon-price filter agrees with what
+						// will actually be sent.
+						const prices = filterAddonPricesForSubscription(addonDetails?.prices as Price[] | undefined, billingPeriod, currency, 1);
 						const line_item_commitments = sanitizeAddonLineItemCommitmentsForApi(addon.line_item_commitments, prices);
 						return {
 							...addon,

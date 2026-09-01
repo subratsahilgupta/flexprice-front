@@ -11,12 +11,13 @@ const EN_USAGE_WIDGETS = {
 	quotaTitle: 'Usage Quota',
 	unknownFeature: 'Unknown Feature',
 	unlimited: 'Unlimited',
-	revenue: 'Revenue',
+	revenue: 'Total spend',
 	cost: 'Cost',
 	margin: 'Margin',
 	marginPercent: 'Margin %',
 	cpm: 'CPM',
 	trendTitle: 'Usage Trend',
+	singlePointLabel: 'Usage for {{date}} · {{value}}',
 	breakdownTitle: 'Usage Breakdown',
 	feature: 'Feature',
 	totalUsage: 'Total Usage',
@@ -27,6 +28,12 @@ const EN_USAGE_WIDGETS = {
 	unknownRow: 'Unknown',
 	cellEmDash: '—',
 	cellEmpty: '--',
+	quotaEmptyTitle: 'No usage quotas configured',
+	quotaEmptyDescription: 'Quotas will appear when your plan includes metered features.',
+	trendEmptyTitle: 'No usage data yet',
+	trendEmptyDescription: 'No usage has been recorded during this period.',
+	breakdownEmptyTitle: 'No usage in this period',
+	breakdownEmptyDescription: 'Try selecting a different date range.',
 };
 
 export const useUsageT = createBundledT('common', { usageWidgets: EN_USAGE_WIDGETS }).useBoundT;

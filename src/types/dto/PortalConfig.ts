@@ -46,8 +46,12 @@ export type TabType =
 	| 'usage_graph' // chart only
 	| 'usage_breakdown' // table only (shares API cache with usage_graph)
 	| 'invoices'
+	| 'account_summary' // compact balance / amount due / next billing strip
 	| 'wallet_balance'
 	| 'wallet_transactions'
+	| 'wallet_topup' // top up via hosted checkout
+	| 'auto_topup' // auto top-up threshold + amount config
+	| 'payment_methods' // saved cards + add a new one
 	| 'metric_cards'; // custom + cost metrics in one grid (controlled by MetricCardsConfig)
 
 // ─── Widget-specific Config ───────────────────────────────────────────────────
@@ -55,8 +59,10 @@ export type TabType =
 /**
  * Controls which sub-groups appear inside the metric_cards widget.
  *   show_custom_metrics  → cards from revenue analytics custom_analytics[]
- *   show_revenue_metric  → Revenue card from cost analytics API
- *   show_cost_metrics    → Cost / Margin / Margin % cards from cost analytics API
+ *   show_revenue_metric  → the customer's total spend, from the cost analytics API
+ *   show_cost_metrics    → Cost / Margin / Margin % — the TENANT's cost to serve and
+ *                          their profit on this customer. Off by default: these are
+ *                          not the customer's numbers to see.
  * If the field is absent in the stored config, all default to true.
  */
 export interface MetricCardsConfig {
@@ -118,14 +124,15 @@ export const DEFAULT_PORTAL_CONFIG: PortalConfig = {
 			id: 'usage',
 			label: 'Usage',
 			enabled: true,
-			order: 1,
+			order: 2,
 			tabs: [
+				{ id: '15', type: 'account_summary', enabled: true, order: 0 },
 				{
 					id: '1',
 					type: 'metric_cards',
 					enabled: true,
 					order: 1,
-					metric_cards: { show_custom_metrics: true, show_revenue_metric: true, show_cost_metrics: true },
+					metric_cards: { show_custom_metrics: true, show_revenue_metric: true, show_cost_metrics: false },
 				},
 				{
 					id: '2',
@@ -147,7 +154,7 @@ export const DEFAULT_PORTAL_CONFIG: PortalConfig = {
 			id: 'invoices',
 			label: 'Invoices',
 			enabled: true,
-			order: 2,
+			order: 4,
 			tabs: [{ id: '5', type: 'invoices', enabled: true, order: 1 }],
 		},
 		{
@@ -157,18 +164,29 @@ export const DEFAULT_PORTAL_CONFIG: PortalConfig = {
 			order: 3,
 			tabs: [
 				{ id: '6', type: 'wallet_balance', enabled: true, order: 1 },
-				{ id: '7', type: 'wallet_transactions', enabled: true, order: 2 },
+				{ id: '12', type: 'auto_topup', enabled: true, order: 2 },
+				{ id: '7', type: 'wallet_transactions', enabled: true, order: 3 },
 			],
+		},
+		{
+			// Saved cards live on Overview, beside the balance they top up and the
+			// subscriptions they pay for. A section of its own held one widget and
+			// split managing a card from the reason to manage it.
+			id: 'payment_methods',
+			label: 'Payments',
+			enabled: false,
+			order: 5,
+			tabs: [{ id: '13', type: 'payment_methods', enabled: true, order: 1 }],
 		},
 		{
 			id: 'overview',
 			label: 'Overview',
 			enabled: true,
-			order: 4,
+			order: 1,
 			tabs: [
-				{ id: '8', type: 'wallet_balance', enabled: true, order: 1 },
-				{ id: '9', type: 'subscriptions', enabled: true, order: 2 },
-				{ id: '10', type: 'current_usage', enabled: true, order: 3 },
+				{ id: '16', type: 'wallet_balance', enabled: true, order: 1 },
+				{ id: '17', type: 'payment_methods', enabled: true, order: 2 },
+				{ id: '9', type: 'subscriptions', enabled: true, order: 3 },
 			],
 		},
 	],
@@ -187,6 +205,75 @@ function hasThemeValues(theme?: Partial<PortalTheme>): boolean {
 	return Object.values(theme).some((v) => typeof v === 'string' && v.length > 0);
 }
 
+/**
+ * Tenant content and visibility, product ordering.
+ *
+ * A tenant's stored config carries the `order` values that were current when they
+ * saved it, so a section later promoted in the defaults stays wherever it was —
+ * Overview sat last for every tenant with a saved config. Known sections
+ * therefore take the default's order, while the tenant keeps label, enabled and
+ * tabs. Sections only the tenant has keep their own order, placed after.
+ *
+ * The trade-off: a tenant who deliberately reordered a known section loses that.
+ * Ordering of the standard sections is treated as a product decision; what a
+ * tenant shows, hides and names is not.
+ */
+function mergeSections(defaults: SectionConfig[], tenant?: SectionConfig[]): SectionConfig[] {
+	if (!tenant || tenant.length === 0) return defaults;
+
+	const defaultOrder = new Map(defaults.map((section) => [section.id, section.order]));
+	const maxDefaultOrder = defaults.reduce((max, section) => Math.max(max, section.order), 0);
+
+	const reordered = tenant.map((section) => ({
+		...section,
+		order: defaultOrder.get(section.id) ?? maxDefaultOrder + section.order,
+	}));
+
+	const known = new Set(tenant.map((section) => section.id));
+	const unseen = defaults.filter((section) => !known.has(section.id));
+
+	return [...reordered, ...unseen].sort((a, b) => a.order - b.order);
+}
+
+const OVERVIEW_SECTION_ID = 'overview';
+
+/** Sections the product no longer shows, whatever a stored config says. */
+const RETIRED_SECTION_IDS = new Set(['payment_methods']);
+
+/**
+ * Overview's composition, and which sections exist at all, are product decisions
+ * — like the ordering of the standard sections above.
+ *
+ * Overview is credits, payments and subscriptions: what the customer owes, how
+ * they pay it, and what they are signed up to. Payments is therefore no longer a
+ * section of its own; it held a single widget, and splitting the card from the
+ * balance it tops up made the customer navigate between the two.
+ *
+ * Applied after the merge because a stored config replaces the default sections
+ * and tabs wholesale, so tenants saved before a change never see it. That is how
+ * analytics widgets survived in Overview: any of them also renders the section's
+ * date filter, so the summary page opened on a chart and a timeline picker
+ * duplicating Usage.
+ *
+ * Retirement is expressed as `enabled: false` rather than deletion, matching how
+ * the rest of this file treats a hidden section.
+ *
+ * The trade-off, and it is a real one: a tenant who curated their own Overview,
+ * or who wanted a standalone Payments tab, loses that. Every other section still
+ * honours the tenant's tabs, labels and visibility.
+ */
+function withPortalComposition(sections: SectionConfig[], defaults: SectionConfig[]): SectionConfig[] {
+	const defaultOverviewTabs = defaults.find((section) => section.id === OVERVIEW_SECTION_ID)?.tabs;
+
+	return sections.map((section) => {
+		if (RETIRED_SECTION_IDS.has(section.id)) return { ...section, enabled: false };
+		// Label and enabled stay the tenant's — what they call it and whether they
+		// show it at all is still theirs.
+		if (section.id === OVERVIEW_SECTION_ID && defaultOverviewTabs) return { ...section, tabs: defaultOverviewTabs };
+		return section;
+	});
+}
+
 export function deepMergePortalConfig(defaults: PortalConfig, tenant: Partial<PortalConfig>): PortalConfig {
 	const mergedTheme = { ...(defaults.theme ?? {}), ...(tenant.theme ?? {}) } as PortalTheme;
 	return {
@@ -194,7 +281,14 @@ export function deepMergePortalConfig(defaults: PortalConfig, tenant: Partial<Po
 		// Only set theme if the merged result actually has at least one value.
 		// An empty {} from the backend must NOT override the light-mode defaults.
 		theme: hasThemeValues(mergedTheme) ? mergedTheme : undefined,
-		// Sections from tenant fully replace defaults if provided (they control order + content)
-		sections: tenant.sections && tenant.sections.length > 0 ? tenant.sections : defaults.sections,
+		// Tenant sections win on order and content — that is their point — but a
+		// wholesale replace also hides any section added to the defaults later, so a
+		// tenant with a stored config never sees a newly shipped capability. New
+		// default sections are therefore appended rather than dropped.
+		//
+		// The trade-off: a tenant who deliberately removed a section would see it
+		// return. Section removal is expressed by `enabled: false`, not by deletion,
+		// so that is the narrower reading of intent.
+		sections: withPortalComposition(mergeSections(defaults.sections, tenant.sections), defaults.sections),
 	};
 }

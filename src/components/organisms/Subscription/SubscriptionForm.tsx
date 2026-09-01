@@ -1081,6 +1081,7 @@ const SubscriptionForm = ({
 						}}
 						disabled={isDisabled}
 						billingPeriod={state.billingPeriod}
+						billingPeriodCount={1}
 						currency={state.currency}
 					/>
 				</div>

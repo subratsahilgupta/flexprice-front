@@ -36,6 +36,12 @@ interface Props {
 	onOpenChange: (open: boolean) => void;
 	subscriptionId: string;
 	billingPeriod?: BILLING_PERIOD;
+	/**
+	 * Subscription's billing_period_count paired with billingPeriod for the cadence-compat filter.
+	 * Defaults to 1 when the caller has not resolved the subscription context yet; a follow-up
+	 * fetch below can supply the real value.
+	 */
+	billingPeriodCount?: number;
 	currency?: string;
 	/** When provided, skips GET subscription for defaults (subscription edit passes from core fetch). */
 	currentPeriodEndIso?: string;
@@ -45,7 +51,15 @@ interface FormErrors {
 	addon_id?: string;
 }
 
-const AddAddonDialog: React.FC<Props> = ({ isOpen, onOpenChange, subscriptionId, billingPeriod, currency, currentPeriodEndIso }) => {
+const AddAddonDialog: React.FC<Props> = ({
+	isOpen,
+	onOpenChange,
+	subscriptionId,
+	billingPeriod,
+	billingPeriodCount,
+	currency,
+	currentPeriodEndIso,
+}) => {
 	const { t } = useTranslation(['billing', 'common', 'customers']);
 	const [formData, setFormData] = useState<Partial<AddAddonRequest>>({});
 	const [errors, setErrors] = useState<FormErrors>({});
@@ -71,6 +85,10 @@ const AddAddonDialog: React.FC<Props> = ({ isOpen, onOpenChange, subscriptionId,
 	});
 
 	const resolvedPeriodEndRaw = currentPeriodEndIso ?? (subscriptionDetails as SubscriptionResponse | undefined)?.current_period_end;
+	// Prefer the count from props (caller-supplied); fall back to the fetched subscription;
+	// default to 1 when neither is available (matches backend EffectiveMonths behavior).
+	const resolvedBillingPeriodCount =
+		billingPeriodCount ?? (subscriptionDetails as SubscriptionResponse | undefined)?.billing_period_count ?? 1;
 
 	// Fetch available addons
 	const { data: addonsResponse } = useQuery({
@@ -82,8 +100,8 @@ const AddAddonDialog: React.FC<Props> = ({ isOpen, onOpenChange, subscriptionId,
 
 	// Reset form when modal opens/closes
 	const selectedAddonPrices = useMemo(
-		() => filterAddonPricesForSubscription((selectedAddonDetails?.prices as Price[]) || [], billingPeriod, currency),
-		[selectedAddonDetails, billingPeriod, currency],
+		() => filterAddonPricesForSubscription((selectedAddonDetails?.prices as Price[]) || [], billingPeriod, currency, resolvedBillingPeriodCount),
+		[selectedAddonDetails, billingPeriod, currency, resolvedBillingPeriodCount],
 	);
 
 	const { overriddenPrices, overridePrice, resetOverride, resetAllOverrides } = usePriceOverrides(selectedAddonPrices);
