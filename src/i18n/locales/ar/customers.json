@@ -538,6 +538,21 @@
 			"editAdded": "تعديل",
 			"deleteAdded": "حذف"
 		},
+		"additionalPlanPrices": {
+			"title": "متوفر أيضاً في هذه الخطة",
+			"explainer": "تُحتسب هذه الدورات بمعدل أكثر تكراراً من دورة اشتراكك. فعّل دورة لإضافة كل أسعارها إلى الرسوم.",
+			"colCadence": "الدورة",
+			"colCount": "الرسوم",
+			"colBillingImpact": "الأثر على الفواتير",
+			"chargeCount_zero": "لا توجد رسوم",
+			"chargeCount_one": "رسم واحد",
+			"chargeCount_two": "رسمان",
+			"chargeCount_few": "{{count}} رسوم",
+			"chargeCount_many": "{{count}} رسمًا",
+			"chargeCount_other": "{{count}} رسم",
+			"fanoutHint": "يُحتسب كلٌّ منها كـ {{count}} بنود لكل فاتورة اشتراك",
+			"noFanout": "بنفس دورة الاشتراك"
+		},
 		"subscriptionTable": {
 			"planModifiedAria": "تم تعديل الخطة",
 			"hierarchyColumn": "التسلسل",

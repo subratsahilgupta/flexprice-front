@@ -55,8 +55,10 @@ import { useBreadcrumbsStore } from '@/store/useBreadcrumbsStore';
 import { useEnvironment } from '@/hooks/useEnvironment';
 import { usePlanPrices } from '@/hooks/usePlanPrices';
 import {
+	cadenceKey,
 	filterPlanPricesForSubscriptionCharges,
 	isOneTimePlanPrice,
+	partitionPricesForSubscription,
 	uniqueRecurringBillingPeriodsFromPrices,
 } from '@/utils/subscription/planPricesForSubscriptionUi';
 
@@ -132,6 +134,15 @@ export type SubscriptionFormState = {
 	subscriptionTrialPeriodDays: string;
 	/** Set to send `auto_invoice_threshold` when plan has no FIXED charges; leave empty to omit. */
 	autoInvoiceThreshold: string;
+	/**
+	 * Cadence keys (`period:count`, e.g. "MONTHLY:1") the user opted in from the
+	 * "Also available on this plan" section. Each opted-in cadence pulls **all**
+	 * plan prices of that cadence into the main Charges table. Empty = user
+	 * accepted the default (exact cadence + ONETIME only).
+	 * On submit: if non-empty, we send `include_price_ids = [primary_ids +
+	 * every_price_in_opted_in_cadences]` so backend attaches exactly the user's selection.
+	 */
+	optedInAdditionalCadences: string[];
 };
 
 const usePlans = () => {
@@ -309,6 +320,7 @@ const CreateCustomerSubscriptionPage: React.FC = () => {
 		inheritanceCustomers: [],
 		subscriptionTrialPeriodDays: '',
 		autoInvoiceThreshold: '',
+		optedInAdditionalCadences: [],
 	});
 
 	const { data: plans, isLoading: plansLoading, isError: plansError } = usePlans();
@@ -575,6 +587,7 @@ const CreateCustomerSubscriptionPage: React.FC = () => {
 			inheritanceCustomers,
 			subscriptionTrialPeriodDays,
 			autoInvoiceThreshold,
+			optedInAdditionalCadences,
 		} = subscriptionState;
 
 		const hasFixedSubscriptionChargePrice = subscriptionChargesHaveFixedPrice(prices, billingPeriod, currency, isPriceActive);
@@ -586,6 +599,14 @@ const CreateCustomerSubscriptionPage: React.FC = () => {
 		let finalOverrideLineItems: OverrideLineItemRequest[] | undefined;
 		let finalLineItemCommitments: Record<string, any> | undefined;
 		let sanitizedPhases: SubscriptionPhaseCreateRequest[] | undefined;
+		/**
+		 * When user opted in additional-cadence prices, send the full authoritative list
+		 * `[primary_ids + opted_in_ids]` so backend attaches exactly those. When user made
+		 * no selection, omit — backend applies its default (exact cadence + ONETIME).
+		 * Phases path is not opted into per-price selection in this iteration; leaves
+		 * include_price_ids unset for phases (backend default per phase).
+		 */
+		let finalIncludePriceIds: string[] | undefined;
 
 		if (phases.length > 0) {
 			// Multi-phase subscription: extract data from phases
@@ -618,6 +639,16 @@ const CreateCustomerSubscriptionPage: React.FC = () => {
 			// Plan prices for selected recurring period + currency, plus all one-time plan prices in that currency
 			const activeItems = prices?.items?.filter((price) => isPriceActive(price)) || [];
 			const currentPrices = filterPlanPricesForSubscriptionCharges(activeItems, billingPeriod, currency);
+
+			// Only send include_price_ids when the user opted in at least one additional-cadence
+			// bucket. Full authoritative list = primary partition IDs + every additional price
+			// whose (period, count) cadence key matches one of the opted-in cadences.
+			if (optedInAdditionalCadences.length > 0) {
+				const optedSet = new Set(optedInAdditionalCadences);
+				const { primary, additional } = partitionPricesForSubscription(activeItems, billingPeriod, 1, currency);
+				const optedInPrices = additional.filter((p) => optedSet.has(cadenceKey(p.billing_period, p.billing_period_count)));
+				finalIncludePriceIds = [...primary.map((p) => p.id), ...optedInPrices.map((p) => p.id)];
+			}
 
 			// Convert price overrides to line item overrides
 			// Note: getLineItemOverrides automatically excludes quantity for USAGE type prices
@@ -701,6 +732,7 @@ const CreateCustomerSubscriptionPage: React.FC = () => {
 			inheritanceExternalIds,
 			trial_period_days,
 			auto_invoice_threshold,
+			finalIncludePriceIds,
 		};
 	};
 
@@ -797,6 +829,7 @@ const CreateCustomerSubscriptionPage: React.FC = () => {
 			inheritance: Object.keys(inheritancePayload).length > 0 ? inheritancePayload : undefined,
 			...(sanitized.trial_period_days !== undefined ? { trial_period_days: sanitized.trial_period_days } : {}),
 			...(sanitized.auto_invoice_threshold !== undefined ? { auto_invoice_threshold: sanitized.auto_invoice_threshold } : {}),
+			...(sanitized.finalIncludePriceIds !== undefined ? { include_price_ids: sanitized.finalIncludePriceIds } : {}),
 		};
 
 		setIsDraft(isDraftParam);

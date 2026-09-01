@@ -58,10 +58,14 @@ import { InternalCreditGrantRequest, creditGrantToInternal } from '@/types/dto/C
 import { uniqueId } from 'lodash';
 import { generateExpandQueryParams } from '@/utils/common/api_helper';
 import {
+	cadenceKey,
 	filterPlanPricesForSubscriptionCharges,
+	groupAdditionalPricesByCadence,
 	isOneTimePlanPrice,
+	partitionPricesForSubscription,
 	uniqueRecurringBillingPeriodsFromPrices,
 } from '@/utils/subscription/planPricesForSubscriptionUi';
+import AdditionalPlanPricesSection from './AdditionalPlanPricesSection';
 import { Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -171,15 +175,37 @@ const SubscriptionForm = ({
 	// Fetch plan prices via shared hook (same cache key + canonical active filter as CreateCustomerSubscriptionPage)
 	const { data: selectedPlanPrices } = usePlanPrices(state.selectedPlan);
 
-	// Current prices for subscription-level and phase management (hook already returns only active prices).
-	// Includes plan one-time (ONETIME) prices for the selected currency regardless of recurring billing period.
-	const currentPrices = useMemo(
+	// Split plan prices into what attaches by default (exact cadence + ONETIME) vs. what
+	// the user can opt into via the "Also available on this plan" section (compatible but
+	// finer cadence). Backend attaches partition.primary by default; sending
+	// include_price_ids on submit enumerates the full selection (primary + opted-in).
+	const pricePartition = useMemo(
 		() =>
 			selectedPlanPrices?.items
-				? filterPlanPricesForSubscriptionCharges(selectedPlanPrices.items, state.billingPeriod, state.currency)
-				: [],
+				? partitionPricesForSubscription(selectedPlanPrices.items, state.billingPeriod, 1, state.currency)
+				: { primary: [], additional: [] },
 		[selectedPlanPrices?.items, state.billingPeriod, state.currency],
 	);
+
+	// Additional prices are opted in per **cadence** (toggling Monthly pulls in every monthly
+	// price on the plan). Grouped for the "Also available on this plan" section.
+	const additionalCadenceGroups = useMemo(() => groupAdditionalPricesByCadence(pricePartition.additional), [pricePartition.additional]);
+
+	// Prices in the main "Charges" table = primary partition + every additional price whose
+	// cadence key was opted in. Merged rows go through the existing SubscriptionPriceTable
+	// override / commitment / coupon flows unchanged.
+	//
+	// In phase mode (phases.length > 0) opt-in cadences are ignored: the create payload's
+	// phases branch does not send include_price_ids, so any opted-in additional prices
+	// would silently drop at submit. Return only the primary partition so what the UI shows
+	// (in PhaseList and elsewhere) matches what actually gets sent.
+	const currentPrices = useMemo(() => {
+		if (phases.length > 0) return pricePartition.primary;
+		if (state.optedInAdditionalCadences.length === 0) return pricePartition.primary;
+		const optedSet = new Set(state.optedInAdditionalCadences);
+		const optedIn = pricePartition.additional.filter((p) => optedSet.has(cadenceKey(p.billing_period, p.billing_period_count)));
+		return [...pricePartition.primary, ...optedIn];
+	}, [pricePartition, state.optedInAdditionalCadences, phases.length]);
 
 	const hasFixedSubscriptionChargePrice = useMemo(() => {
 		if (!selectedPlanPrices?.items?.length) return false;
@@ -194,6 +220,20 @@ const SubscriptionForm = ({
 			return { ...prev, autoInvoiceThreshold: '' };
 		});
 	}, [hasFixedSubscriptionChargePrice, setState]);
+
+	// Reconcile opted-in additional cadences when the available cadence set shifts (e.g. user
+	// changed billing_period / currency, or the plan swap changed prices). Keep keys still
+	// available; drop the rest. Do NOT silently re-add a cadence the user deselected earlier.
+	const additionalCadenceKeysStr = additionalCadenceGroups.map((g) => g.key).join('|');
+	useEffect(() => {
+		const availableKeys = new Set(additionalCadenceGroups.map((g) => g.key));
+		setState((prev) => {
+			const filtered = prev.optedInAdditionalCadences.filter((k) => availableKeys.has(k));
+			if (filtered.length === prev.optedInAdditionalCadences.length) return prev;
+			return { ...prev, optedInAdditionalCadences: filtered };
+		});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [additionalCadenceKeysStr, setState]);
 
 	// Price overrides functionality for subscription-level
 	const { overriddenPrices, overridePrice, resetOverride } = usePriceOverrides(currentPrices);
@@ -328,6 +368,9 @@ const SubscriptionForm = ({
 			linkedCoupon: null,
 			lineItemCoupons: {},
 			inheritanceCustomers: [],
+			// Reset cadence opt-ins so the new plan's additional prices require fresh consent
+			// rather than silently attaching just because the cadence key happens to match.
+			optedInAdditionalCadences: [],
 		}));
 	};
 
@@ -786,6 +829,7 @@ const SubscriptionForm = ({
 						<SubscriptionPriceTable
 							data={currentPrices}
 							billingPeriod={state.billingPeriod}
+							billingPeriodCount={1}
 							currency={state.currency}
 							onPriceOverride={overridePrice}
 							onResetOverride={resetOverride}
@@ -802,8 +846,31 @@ const SubscriptionForm = ({
 						/>
 					</div>
 
-					{/* Subscription Level Discounts */}
-					<div className='mt-6'>
+					{/* Hidden in phase mode — the phases branch of the create payload does not
+					    send include_price_ids, so any opt-in here would silently drop at submit. */}
+					{phases.length === 0 && additionalCadenceGroups.length > 0 && (
+						<div className='mt-6'>
+							<AdditionalPlanPricesSection
+								groups={additionalCadenceGroups}
+								optedInKeys={state.optedInAdditionalCadences}
+								onToggle={(key, included) => {
+									setState((prev) => {
+										const next = new Set(prev.optedInAdditionalCadences);
+										if (included) next.add(key);
+										else next.delete(key);
+										return { ...prev, optedInAdditionalCadences: [...next] };
+									});
+								}}
+								subPeriod={state.billingPeriod}
+								subCount={1}
+								disabled={isDisabled}
+							/>
+						</div>
+					)}
+
+					{/* Subscription Level Discounts — divider above so it reads as a peer section
+					    to Charges (and separates from the Also-available sub-section under Charges). */}
+					<div className='mt-6 pt-6 border-t border-line'>
 						<SubscriptionDiscountTable
 							coupon={state.linkedCoupon}
 							onChange={(coupon) => setState((prev) => ({ ...prev, linkedCoupon: coupon }))}

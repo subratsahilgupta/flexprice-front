@@ -22,6 +22,7 @@ import { formatBillingPeriodForPrice } from '@/utils/common/helper_functions';
 import { resolveBucketSize } from '@/utils/common/commitment_helpers';
 import { formatAmount } from '@/components/atoms/Input/Input';
 import { BILLING_PERIOD, BUCKET_SIZE_NONE } from '@/constants/constants';
+import { isCadenceCompatible } from '@/utils/subscription/cadenceCompatibility';
 import { isOneTimePlanPrice } from '@/utils/subscription/planPricesForSubscriptionUi';
 import { useTranslation } from 'react-i18next';
 
@@ -222,6 +223,12 @@ export interface Props {
 	data: Price[];
 	/** Used for filtering and dialog context (e.g. commitment). */
 	billingPeriod?: BILLING_PERIOD;
+	/**
+	 * Subscription-level billing_period_count used with `billingPeriod` for the cadence-compatibility
+	 * check. Defaults to 1 because today's create/edit flows do not expose a count > 1 field; callers
+	 * that add such a control should pass the state value through.
+	 */
+	billingPeriodCount?: number;
 	/** Used for filtering and LineItemCoupon. */
 	currency?: string;
 	onPriceOverride?: (priceId: string, override: Partial<ExtendedPriceOverride>) => void;
@@ -258,6 +265,7 @@ function formatAddedLineItemPrice(item: AddedSubscriptionLineItem, fallbackCurre
 const SubscriptionPriceTable: FC<Props> = ({
 	data,
 	billingPeriod,
+	billingPeriodCount = 1,
 	currency,
 	onPriceOverride,
 	onResetOverride,
@@ -312,11 +320,10 @@ const SubscriptionPriceTable: FC<Props> = ({
 			filtered = filtered.filter((p) => p.currency.toLowerCase() === currency.toLowerCase());
 		}
 		if (billingPeriod) {
-			const periodKey = billingPeriod.toUpperCase();
-			filtered = filtered.filter((p) => isOneTimePlanPrice(p) || p.billing_period.toUpperCase() === periodKey);
+			filtered = filtered.filter((p) => isCadenceCompatible(billingPeriod, billingPeriodCount, p.billing_period, p.billing_period_count));
 		}
 		return filtered;
-	}, [data, billingPeriod, currency]);
+	}, [data, billingPeriod, billingPeriodCount, currency]);
 
 	const handleOverride = (price: Price) => {
 		if (lineItemCoupons[price.id]) {
@@ -391,6 +398,8 @@ const SubscriptionPriceTable: FC<Props> = ({
 		});
 	}, [
 		filteredPrices,
+		billingPeriod,
+		billingPeriodCount,
 		overriddenPrices,
 		lineItemCoupons,
 		quantityInputs,

@@ -36,7 +36,8 @@
 		"sync": "Sync",
 		"linking": "Linking...",
 		"unlink": "Unlink",
-		"unlinking": "Unlinking..."
+		"unlinking": "Unlinking...",
+		"rowActions": "Row actions"
 	},
 	"status": {
 		"active": "Active",
@@ -220,7 +221,9 @@
 		"dialogTitle": "Payment Link Created",
 		"successBanner": "Your payment link has been successfully created!",
 		"goToLink": "Go to Payment Link",
-		"getLink": "Get Link"
+		"getLink": "Get Link",
+		"linkLabel": "Payment link",
+		"blockedHint": "If the page didn't open automatically, copy this link and open it in a new tab."
 	},
 	"errorPage": {
 		"title": "Something went wrong",

@@ -32,12 +32,7 @@ describe('DropdownMenu', () => {
 	it('exposes a focusable nested submenu trigger that opens from pointer and keyboard', async () => {
 		const user = userEvent.setup();
 		const onSelect = vi.fn();
-		render(
-			<DropdownMenu
-				trigger={<Button>Open</Button>}
-				options={[{ label: 'More', children: [{ label: 'Nested', onSelect }] }]}
-			/>,
-		);
+		render(<DropdownMenu trigger={<Button>Open</Button>} options={[{ label: 'More', children: [{ label: 'Nested', onSelect }] }]} />);
 
 		await user.click(screen.getByRole('button', { name: 'Open' }));
 		const submenuTrigger = await screen.findByRole('button', { name: /More/ });
