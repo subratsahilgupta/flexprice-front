@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { ColumnData } from '@/components/molecules/Table/Table';
-import { AlertTriangle, Copy, Download, Eye, EyeOff, Info, Link2, Lock, Mail } from 'lucide-react';
+import { AlertTriangle, Copy, Download, Eye, EyeOff, Info, Link2, Lock, Mail, Trash2 } from 'lucide-react';
 import { RouteNames } from '@/core/routes/Routes';
 import type { HttpRejectedError } from '@/core/axios/types';
 import { formatDateShort } from '@/utils/common/helper_functions';
@@ -22,11 +22,13 @@ import { FlexpriceTable, OptionFilterPopover, type OptionFilterGroup } from '@/c
 import RolePicker from '@/components/molecules/RolePicker/RolePicker';
 import EditUserRolesDialog from '@/components/molecules/EditUserRolesDialog';
 import { useTranslation } from 'react-i18next';
+import { UserApi } from '@/api/UserApi';
 import { useTenantMembers } from './useTenantMembers';
 import { useRbacRoles } from '@/hooks/useRbacRoles';
 import { useCurrentUserPermissions } from '@/hooks/useCurrentUserPermissions';
 import useUser from '@/hooks/useUser';
 import { SUPER_ADMIN_ROLE_ID } from '@/api/RbacApi';
+import { settingsQueryKeys } from '../queryKeys';
 import {
 	filterMembers,
 	getMemberJoinedDate,
@@ -41,7 +43,7 @@ import {
 
 function UsersSection() {
 	const { t } = useTranslation(['settings', 'common']);
-	const { members, isLoading, isError, refetch, pageSize, createUser } = useTenantMembers();
+	const { members, totalMembers, isLoading, isError, refetch, pageSize, createUser } = useTenantMembers();
 
 	const [roleFilter, setRoleFilter] = useState<MemberRoleFilter>('all');
 	const [statusFilter, setStatusFilter] = useState<MemberStatusFilter>('all');
@@ -314,8 +316,9 @@ function UsersSection() {
 		},
 	];
 
-	// Only super_admins can reach PUT /users/{id}/roles at all, so the whole
-	// action column is omitted rather than shown-but-disabled for anyone else.
+	// Editing roles and removing a member are both super_admin-only server-side, and
+	// neither may target the caller, so the whole action column is omitted rather than
+	// shown-but-disabled for anyone else.
 	if (isSuperAdmin) {
 		columns.push({
 			fieldVariant: 'interactive',
@@ -324,11 +327,15 @@ function UsersSection() {
 				return (
 					<ActionButton
 						id={row.id}
-						entityName={row.email}
-						deleteMutationFn={async () => {}}
-						refetchQueryKey='team-members'
-						archive={{ enabled: false }}
+						entityName={row.email || row.id}
+						deleteMutationFn={() => UserApi.removeUserFromTenant(row.id)}
+						refetchQueryKey={settingsQueryKeys.teamMembersRoot()[0]}
 						edit={{ enabled: true, text: t('members.actions.editRoles'), onClick: () => setEditingUser(row) }}
+						archive={{
+							enabled: totalMembers > 1,
+							text: t('members.actions.remove'),
+							icon: <Trash2 className='h-4 w-4' />,
+						}}
 					/>
 				);
 			},
