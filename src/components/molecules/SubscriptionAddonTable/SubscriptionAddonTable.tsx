@@ -22,6 +22,8 @@ interface Props {
 	priceOverrides?: Record<string, ExtendedPriceOverride>;
 	coupons?: Coupon[];
 	billingPeriod?: BILLING_PERIOD;
+	/** Subscription's billing_period_count paired with billingPeriod for the cadence-compat filter. Defaults to 1. */
+	billingPeriodCount?: number;
 	currency?: string;
 }
 const formatAddonCharges = (
@@ -63,6 +65,7 @@ const SubscriptionAddonTable: React.FC<Props> = ({
 	priceOverrides = {},
 	coupons = [],
 	billingPeriod,
+	billingPeriodCount = 1,
 	currency,
 }) => {
 	const { t } = useTranslation('common');
@@ -147,7 +150,7 @@ const SubscriptionAddonTable: React.FC<Props> = ({
 				title: t('subscriptionAddon.columnCharges'),
 				render: (row) => {
 					const addonDetails = getAddonDetails(row.addon_id);
-					const prices = filterAddonPricesForSubscription(addonDetails?.prices || [], billingPeriod, currency);
+					const prices = filterAddonPricesForSubscription(addonDetails?.prices || [], billingPeriod, currency, billingPeriodCount);
 					return <span>{formatAddonCharges(prices, priceOverrides, coupons, t)}</span>;
 				},
 			},
@@ -184,7 +187,7 @@ const SubscriptionAddonTable: React.FC<Props> = ({
 				},
 			},
 		],
-		[disabled, getAddonDetails, handleDelete, handleEdit, priceOverrides, coupons, billingPeriod, currency, t],
+		[disabled, getAddonDetails, handleDelete, handleEdit, priceOverrides, coupons, billingPeriod, billingPeriodCount, currency, t],
 	);
 
 	return (
@@ -200,6 +203,7 @@ const SubscriptionAddonTable: React.FC<Props> = ({
 					setSelectedAddon(null);
 				}}
 				billingPeriod={billingPeriod}
+				billingPeriodCount={billingPeriodCount}
 				currency={currency}
 			/>
 			<div className='space-y-4'>

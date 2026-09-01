@@ -36,6 +36,8 @@ interface Props {
 	onCancel: () => void;
 	getEmptyAddon: () => Partial<AddAddonToSubscriptionRequest>;
 	billingPeriod?: BILLING_PERIOD;
+	/** Subscription's billing_period_count paired with billingPeriod for the cadence-compat filter. Defaults to 1. */
+	billingPeriodCount?: number;
 	currency?: string;
 }
 
@@ -76,6 +78,7 @@ const SubscriptionAddonModal: React.FC<Props> = ({
 	onCancel,
 	getEmptyAddon,
 	billingPeriod,
+	billingPeriodCount = 1,
 	currency,
 }) => {
 	const { t } = useTranslation(['common', 'customers']);
@@ -140,8 +143,8 @@ const SubscriptionAddonModal: React.FC<Props> = ({
 	}, [formData, t]);
 
 	const selectedAddonPrices = useMemo(
-		() => filterAddonPricesForSubscription((selectedAddonDetails?.prices as Price[]) || [], billingPeriod, currency),
-		[selectedAddonDetails, billingPeriod, currency],
+		() => filterAddonPricesForSubscription((selectedAddonDetails?.prices as Price[]) || [], billingPeriod, currency, billingPeriodCount),
+		[selectedAddonDetails, billingPeriod, currency, billingPeriodCount],
 	);
 
 	const handleSave = useCallback(() => {
