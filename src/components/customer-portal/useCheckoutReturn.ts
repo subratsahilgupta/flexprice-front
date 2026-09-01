@@ -3,8 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
 import CustomerPortalApi from '@/api/CustomerPortalApi';
-import { refetchPortalQueries } from './refetchPortalQueries';
-import { PORTAL_BALANCE_QUERY_ROOTS } from './queryKeys';
+import { refreshAfterPayment } from './refetchPortalQueries';
 import { subscribeToCheckoutReturn } from './checkoutHandoff';
 import type { CheckoutStatus } from '@/types/dto/CustomerPortalBilling';
 
@@ -22,6 +21,23 @@ const TERMINAL: CheckoutStatus[] = ['completed', 'failed', 'expired'];
  * is scoped to the tab, so two tabs cannot claim each other's checkout.
  */
 const startListeners = new Set<(sessionId: string) => void>();
+
+/** Notified once a checkout reaches a status it will not move on from. */
+const settleListeners = new Set<(status: CheckoutStatus) => void>();
+
+/**
+ * Run `onSettle` when a checkout finishes, whatever the outcome.
+ *
+ * Lets the hand-off dialog dismiss itself once the payment it points at is done,
+ * rather than leaving "Complete your payment" on screen over a balance that has
+ * already gone up. Returns an unsubscribe.
+ */
+export const subscribeToCheckoutSettled = (onSettle: (status: CheckoutStatus) => void): (() => void) => {
+	settleListeners.add(onSettle);
+	return () => {
+		settleListeners.delete(onSettle);
+	};
+};
 
 export const rememberPendingCheckout = (sessionId: string) => {
 	try {
@@ -122,7 +138,7 @@ const useCheckoutReturn = () => {
 
 		if (status === 'completed') {
 			toast.success(t('checkoutReturn.completed'));
-			void refetchPortalQueries([...PORTAL_BALANCE_QUERY_ROOTS]);
+			void refreshAfterPayment();
 		} else if (status === 'expired') {
 			toast.error(t('checkoutReturn.expired'));
 		} else {
@@ -132,6 +148,7 @@ const useCheckoutReturn = () => {
 		clearPendingCheckout();
 		setSessionId(null);
 		setIsPolling(false);
+		settleListeners.forEach((listener) => listener(status));
 	}, [session, t]);
 
 	return { pendingSession: session, isResolving: !!sessionId };

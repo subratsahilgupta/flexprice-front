@@ -15,9 +15,10 @@ interface UsageTrendChartContainerProps {
 	analyticsParams: DashboardAnalyticsRequest;
 	label?: string;
 	className?: string;
+	periodLabel?: string;
 }
 
-const UsageTrendChartContainer = ({ config, analyticsParams, label, className }: UsageTrendChartContainerProps) => {
+const UsageTrendChartContainer = ({ config, analyticsParams, label, className, periodLabel }: UsageTrendChartContainerProps) => {
 	const { t } = useTranslation('customer-portal');
 	const {
 		data: analyticsData,
@@ -34,7 +35,7 @@ const UsageTrendChartContainer = ({ config, analyticsParams, label, className }:
 
 	const series = adaptUsageTrendSeries(analyticsData?.items ?? [], config);
 
-	return <UsageTrendChart series={series} label={label} isLoading={isLoading} className={className} />;
+	return <UsageTrendChart series={series} label={label} isLoading={isLoading} className={className} periodLabel={periodLabel} />;
 };
 
 export default UsageTrendChartContainer;

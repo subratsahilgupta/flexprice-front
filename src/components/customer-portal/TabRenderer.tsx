@@ -51,7 +51,18 @@ interface TabRendererProps {
  * Maps tab.type to the correct lazily-loaded widget.
  * analyticsParams is always passed from SectionContent (which owns the date filter state).
  */
+/** "Aug 26 – Sep 1" for the window the analytics widgets are showing. */
+const formatPeriod = (start?: string, end?: string): string | undefined => {
+	if (!start || !end) return undefined;
+	// Not formatDateShort: it pins 'en-US', which would print English dates inside
+	// the Arabic portal. undefined defers to the runtime locale.
+	const short = (value: string) => new Date(value).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+	return `${short(start)} – ${short(end)}`;
+};
+
 const TabRenderer = ({ tab, subscriptions = [], usageData, analyticsParams }: TabRendererProps) => {
+	const period = formatPeriod(analyticsParams?.start_time, analyticsParams?.end_time);
+
 	return (
 		<Suspense fallback={<FallbackLoader />}>
 			{tab.type === 'subscriptions' && <SubscriptionsWidget subscriptions={subscriptions} label={tab.label} />}
@@ -61,6 +72,7 @@ const TabRenderer = ({ tab, subscriptions = [], usageData, analyticsParams }: Ta
 					config={tab.usage_graph ?? DEFAULT_USAGE_GRAPH_CONFIG}
 					analyticsParams={analyticsParams}
 					label={tab.label}
+					periodLabel={period}
 				/>
 			)}
 			{tab.type === 'usage_breakdown' && <UsageBreakdownContainer analyticsParams={analyticsParams} label={tab.label} />}

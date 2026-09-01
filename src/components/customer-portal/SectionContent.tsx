@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
-import { endOfDay, startOfDay } from 'date-fns';
+import { endOfDay, startOfDay, subDays } from 'date-fns';
 import CustomerPortalApi from '@/api/CustomerPortalApi';
 import { SectionConfig, TabConfig, DatePreset, UsageGraphConfig } from '@/types/dto/PortalConfig';
 import { DashboardAnalyticsRequest } from '@/types';
@@ -10,7 +10,10 @@ import { WindowSize } from '@/models';
 import { DateRangePicker } from '@/components/atoms';
 import { usePortalConfig } from '@/context/PortalConfigContext';
 import TabRenderer, { DEFAULT_USAGE_GRAPH_CONFIG } from './TabRenderer';
+import EmptyState from './EmptyState';
+import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { LayoutGrid } from 'lucide-react';
 
 interface SectionContentProps {
 	section: SectionConfig;
@@ -27,16 +30,15 @@ function calculateDateRange(preset: DatePreset): { start_time: string; end_time:
 			start.setHours(0, 0, 0, 0);
 			return { start_time: start.toISOString(), end_time: end };
 		}
-		case DatePreset.Last7Days: {
-			const start = new Date(now);
-			start.setDate(start.getDate() - 7);
-			return { start_time: start.toISOString(), end_time: end };
-		}
-		case DatePreset.Last30Days: {
-			const start = new Date(now);
-			start.setDate(start.getDate() - 30);
-			return { start_time: start.toISOString(), end_time: end };
-		}
+		// Calendar-aligned and inclusive of today, so "7d" covers seven dates and the
+		// range the filter prints matches the range queried. A rolling now-minus-7×24h
+		// window spanned eight dates once the time was dropped from the label, and left
+		// the oldest day-bucket partial — so an empty state could not be trusted to be
+		// about the period on screen.
+		case DatePreset.Last7Days:
+			return { start_time: startOfDay(subDays(now, 6)).toISOString(), end_time: end };
+		case DatePreset.Last30Days:
+			return { start_time: startOfDay(subDays(now, 29)).toISOString(), end_time: end };
 		case DatePreset.CurrentMonth:
 			return { start_time: new Date(now.getFullYear(), now.getMonth(), 1).toISOString(), end_time: end };
 		case DatePreset.LastMonth: {
@@ -44,9 +46,8 @@ function calculateDateRange(preset: DatePreset): { start_time: string; end_time:
 			const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
 			return { start_time: start.toISOString(), end_time: endOfLastMonth.toISOString() };
 		}
-		default: {
-			return { start_time: new Date(Date.now() - 7 * 86400000).toISOString(), end_time: end };
-		}
+		default:
+			return { start_time: startOfDay(subDays(now, 6)).toISOString(), end_time: end };
 	}
 }
 
@@ -212,7 +213,19 @@ const SectionContent = ({ section }: SectionContentProps) => {
 		if (usageError) toast.error(t('errors.loadUsage'));
 	}, [usageError, t]);
 
-	if (enabledTabs.length === 0) return null;
+	// The section keeps its place in the tab bar whatever its tabs are configured
+	// to be — CustomerPortal only hides a section whose one data source came back
+	// empty — so returning null here left the customer clicking a tab that opened
+	// onto nothing at all.
+	if (enabledTabs.length === 0) {
+		return (
+			<Card
+				className='rounded-xl p-6'
+				style={{ backgroundColor: 'var(--portal-surface, white)', border: '1px solid var(--portal-border, #E9E9E9)' }}>
+				<EmptyState icon={<LayoutGrid />} title={t('section.emptyTitle')} description={t('section.emptyDescription')} />
+			</Card>
+		);
+	}
 
 	const subscriptions = subscriptionsData?.items ?? [];
 	const usageData = usageSummaryData?.features ?? [];

@@ -11,13 +11,13 @@ import { Invoice, INVOICE_STATUS } from '@/models/Invoice';
 import { PAYMENT_STATUS } from '@/constants/payment';
 import { formatDateShort, getCurrencySymbol } from '@/utils/common/helper_functions';
 import { formatAmount } from '@/components/atoms/Input/Input';
-import { CreditCard, Download, Eye, MoreHorizontal, Search } from 'lucide-react';
+import { CreditCard, Download, Eye, MoreHorizontal, Receipt, Search, SearchX } from 'lucide-react';
 import EmptyState from '../EmptyState';
 import { downloadInvoiceLineItemsCsv } from '@/utils/invoices/downloadInvoiceLineItemsCsv';
 import InvoiceDetailDrawer from './InvoiceDetailDrawer';
 import CheckoutLinkDialog from './CheckoutLinkDialog';
 import usePayInvoice from './usePayInvoice';
-import { isPayable } from '../invoiceStatus';
+import { isPayable, isCustomerVisible } from '../invoiceStatus';
 
 interface InvoicesTableProps {
 	invoices: Invoice[];
@@ -147,7 +147,7 @@ const InvoicesTable = ({ invoices, onOpenDownloadFormat, downloadPendingId, onVi
 			</table>
 			{invoices.length === 0 && (
 				<div className='py-8'>
-					<EmptyState title={t('invoices.noMatchTitle')} description={t('invoices.noMatchDescription')} />
+					<EmptyState icon={<SearchX />} title={t('invoices.noMatchTitle')} description={t('invoices.noMatchDescription')} />
 				</div>
 			)}
 		</div>
@@ -182,7 +182,7 @@ const InvoicesWidget = () => {
 		if (isError) toast.error(t('errors.loadInvoices'));
 	}, [isError, t]);
 
-	const invoices = useMemo(() => invoicesData?.items ?? [], [invoicesData?.items]);
+	const invoices = useMemo(() => (invoicesData?.items ?? []).filter(isCustomerVisible), [invoicesData?.items]);
 	const filteredInvoices = useMemo(() => {
 		if (!searchQuery) return invoices;
 		const query = searchQuery.toLowerCase();
@@ -223,7 +223,7 @@ const InvoicesWidget = () => {
 			<Card
 				className='rounded-xl p-6'
 				style={{ backgroundColor: 'var(--portal-surface, white)', border: '1px solid var(--portal-border, #E9E9E9)' }}>
-				<EmptyState title={t('invoices.emptyTitle')} description={t('invoices.emptyDescription')} />
+				<EmptyState icon={<Receipt />} title={t('invoices.emptyTitle')} description={t('invoices.emptyDescription')} />
 			</Card>
 		);
 	}

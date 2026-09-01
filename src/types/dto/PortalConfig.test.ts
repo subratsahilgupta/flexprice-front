@@ -74,3 +74,94 @@ describe('deepMergePortalConfig', () => {
 		expect(merged.sections).toEqual(DEFAULT_PORTAL_CONFIG.sections);
 	});
 });
+
+describe('Overview composition', () => {
+	const overviewTabs = (config: PortalConfig) => config.sections.find((section) => section.id === 'overview')?.tabs ?? [];
+
+	// Credits, payments and subscriptions: what the customer owes, how they pay it,
+	// and what they are signed up to.
+	it('is the shipped composition, whatever the stored config holds', () => {
+		const merged = deepMergePortalConfig(DEFAULT_PORTAL_CONFIG, {
+			sections: [
+				{
+					id: 'overview',
+					label: 'Overview',
+					enabled: true,
+					order: 1,
+					tabs: [
+						{ id: '14', type: 'account_summary', enabled: true, order: 1 },
+						{ id: '20', type: 'usage_graph', enabled: true, order: 2 },
+						{ id: '21', type: 'metric_cards', enabled: true, order: 3 },
+					],
+				},
+			],
+		});
+
+		expect(overviewTabs(merged).map((tab) => tab.type)).toEqual(['wallet_balance', 'payment_methods', 'subscriptions']);
+	});
+
+	// Any analytics tab in Overview also renders the section's date filter, so a
+	// stored config from before the split opened the summary on a chart and a
+	// timeline picker duplicating the Usage tab.
+	it('carries no analytics, so no date filter renders on it', () => {
+		const types = overviewTabs(deepMergePortalConfig(DEFAULT_PORTAL_CONFIG, {})).map((tab) => tab.type);
+		expect(types).not.toContain('usage_graph');
+		expect(types).not.toContain('metric_cards');
+		expect(types).not.toContain('usage_breakdown');
+	});
+
+	// The rule is scoped to Overview — every other section still honours the
+	// tenant's own tabs, and Usage is where analytics belong.
+	it('leaves other sections to the tenant', () => {
+		const merged = deepMergePortalConfig(DEFAULT_PORTAL_CONFIG, {
+			sections: [
+				{ id: 'credits', label: 'Credits', enabled: true, order: 3, tabs: [{ id: '6', type: 'wallet_balance', enabled: true, order: 1 }] },
+			],
+		});
+
+		expect(merged.sections.find((section) => section.id === 'credits')?.tabs.map((tab) => tab.type)).toEqual(['wallet_balance']);
+		expect(merged.sections.find((section) => section.id === 'usage')?.tabs.map((tab) => tab.type)).toContain('usage_graph');
+	});
+
+	// What a tenant calls the section, and whether they show it at all, is still theirs.
+	it('keeps the tenant label and visibility', () => {
+		const merged = deepMergePortalConfig(DEFAULT_PORTAL_CONFIG, {
+			sections: [{ id: 'overview', label: 'Home', enabled: false, order: 1, tabs: [] }],
+		});
+
+		const overview = merged.sections.find((section) => section.id === 'overview');
+		expect(overview?.label).toBe('Home');
+		expect(overview?.enabled).toBe(false);
+	});
+});
+
+describe('retired sections', () => {
+	// Saved cards live on Overview now, beside the balance they top up. A section of
+	// its own held one widget and split the card from the reason to manage it.
+	it('hides Payments even when a stored config enables it', () => {
+		const merged = deepMergePortalConfig(DEFAULT_PORTAL_CONFIG, {
+			sections: [
+				{
+					id: 'payment_methods',
+					label: 'Payments',
+					enabled: true,
+					order: 5,
+					tabs: [{ id: '13', type: 'payment_methods', enabled: true, order: 1 }],
+				},
+			],
+		});
+
+		expect(merged.sections.find((section) => section.id === 'payment_methods')?.enabled).toBe(false);
+	});
+
+	// It is gone from the tab bar, but the widget it held is still reachable.
+	it('keeps payment methods on Overview', () => {
+		const merged = deepMergePortalConfig(DEFAULT_PORTAL_CONFIG, {});
+		const overview = merged.sections.find((section) => section.id === 'overview');
+		expect(overview?.tabs.map((tab) => tab.type)).toContain('payment_methods');
+	});
+
+	it('ships disabled by default too', () => {
+		expect(DEFAULT_PORTAL_CONFIG.sections.find((section) => section.id === 'payment_methods')?.enabled).toBe(false);
+	});
+});

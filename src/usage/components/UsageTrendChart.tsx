@@ -7,6 +7,8 @@ import CustomerUsageChart from '@/components/molecules/CustomerUsageChart';
 import type { GetUsageAnalyticsResponse } from '@/types/dto';
 import { cn } from '@/lib/utils';
 import { formatCredits } from '@/utils/common/formatBalance';
+import { LineChart } from 'lucide-react';
+import EmptyState from '@/components/atoms/EmptyState/EmptyState';
 import { useUsageT } from '../i18n';
 import { normalizeUsageTrendSeries } from '../schema';
 import type { UsageTrendChartProps } from '../types';
@@ -21,8 +23,13 @@ import type { UsageTrendChartProps } from '../types';
  * has-data paths — this wrapper must not add a second one around it, or the widget renders
  * nested card borders/padding. The Card here is only for the loading-skeleton state, which
  * `CustomerUsageChart` has no prop for.
+ *
+ * The empty case is rendered here rather than delegated to `CustomerUsageChart`: its own
+ * no-data path holds a 250px void and states the same thing twice ("No usage data available"
+ * above "No data to display"), which reads as a broken chart. This one keeps the heading and
+ * the period it covers, then a compact empty state saying what is missing, why, and where to go.
  */
-const UsageTrendChart = ({ series: rawSeries, label, isLoading = false, className }: UsageTrendChartProps) => {
+const UsageTrendChart = ({ series: rawSeries, label, isLoading = false, className, periodLabel, emptyAction }: UsageTrendChartProps) => {
 	const series = useMemo(() => normalizeUsageTrendSeries(rawSeries), [rawSeries]);
 	const t = useUsageT();
 
@@ -62,8 +69,6 @@ const UsageTrendChart = ({ series: rawSeries, label, isLoading = false, classNam
 				})
 			: undefined;
 
-	if (!isLoading && series.length === 0) return null;
-
 	if (isLoading) {
 		return (
 			<Card noPadding className={cn('flexprice-ui', 'rounded-xl overflow-hidden bg-surface', className)}>
@@ -96,11 +101,28 @@ const UsageTrendChart = ({ series: rawSeries, label, isLoading = false, classNam
 		);
 	}
 
+	if (series.length === 0) {
+		return (
+			<Card noPadding className={cn('flexprice-ui', 'rounded-xl overflow-hidden bg-surface', className)}>
+				<div className='p-6 border-b border-line'>
+					<h3 className='text-base font-medium text-content'>{label || t('usageWidgets.trendTitle')}</h3>
+					{periodLabel && <p className='mt-1 text-xs text-content-tertiary'>{periodLabel}</p>}
+				</div>
+				<EmptyState
+					icon={<LineChart />}
+					title={t('usageWidgets.trendEmptyTitle')}
+					description={t('usageWidgets.trendEmptyDescription')}
+					action={emptyAction}
+				/>
+			</Card>
+		);
+	}
+
 	return (
 		<CustomerUsageChart
 			data={chartData}
 			title={label || t('usageWidgets.trendTitle')}
-			description={sparseCaption}
+			description={sparseCaption || periodLabel}
 			className={cn('flexprice-ui', className)}
 			height={260}
 		/>
