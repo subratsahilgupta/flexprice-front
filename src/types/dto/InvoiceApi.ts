@@ -51,6 +51,64 @@ export interface InvoiceFilter {
 	skip_line_items?: boolean;
 }
 
+/**
+ * Request body for PUT /invoices/:id (update invoice). Matches backend UpdateInvoiceRequest.
+ * All fields optional — send only what changed. Allowed for DRAFT and FINALIZED invoices.
+ */
+export interface UpdateInvoicePayload {
+	// Backend rejects a due_date in the past, so omit it unless the user changed it.
+	due_date?: string;
+	invoice_pdf_url?: string;
+	// Full replace of the invoice's metadata, not a merge.
+	metadata?: Metadata;
+	// Recalculates discount from existing coupon associations. DRAFT invoices only.
+	apply_discount?: boolean;
+}
+
+export enum INVOICE_MODIFY_LINE_ITEM_ACTION {
+	ADD = 'add',
+	UPDATE = 'update',
+	REMOVE = 'remove',
+}
+
+/** A line item to add via the modify endpoint. Amount is the line total, not a unit price. */
+export interface InvoiceModifyAddLineItem {
+	display_name: string;
+	amount: string;
+	quantity: string;
+}
+
+type RequireAtLeastOne<T> = { [K in keyof T]-?: Required<Pick<T, K>> & Partial<Omit<T, K>> }[keyof T];
+
+/** Sparse update for one line item via the modify endpoint; at least one field required. */
+export type InvoiceModifyUpdateLineItem = RequireAtLeastOne<{
+	display_name: string;
+	amount: string;
+	quantity: string;
+}>;
+
+/** Per-action params for the modify endpoint; each action carries only its own required fields. */
+export type InvoiceModifyLineItemParams =
+	| { action: INVOICE_MODIFY_LINE_ITEM_ACTION.ADD; items: InvoiceModifyAddLineItem[] }
+	| { action: INVOICE_MODIFY_LINE_ITEM_ACTION.REMOVE; line_item_ids: string[] }
+	// One line item per call: the backend versions each edit individually.
+	| { action: INVOICE_MODIFY_LINE_ITEM_ACTION.UPDATE; line_item_id: string; update: InvoiceModifyUpdateLineItem };
+
+/**
+ * Request body for POST /invoices/:id/modify/execute. Matches backend
+ * ExecuteInvoiceModifyRequest. DRAFT invoices only; an edit marks the invoice
+ * as manually edited (compute is disabled afterwards), and updates are
+ * versioned so line item ids change after each edit.
+ */
+export interface ExecuteInvoiceModifyPayload {
+	type: 'line_item';
+	line_item_params: InvoiceModifyLineItemParams;
+}
+
+export interface InvoiceModifyResponse {
+	invoice: Invoice;
+}
+
 /** Request body for PUT /invoices/:id/payment (update payment status). */
 export interface UpdatePaymentStatusPayload {
 	payment_status: string;
