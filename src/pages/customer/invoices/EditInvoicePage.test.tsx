@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest';
 import '@testing-library/jest-dom';
@@ -278,7 +278,7 @@ describe('EditInvoicePage', () => {
 
 		// remove the existing row
 		await screen.findByDisplayValue('Consulting');
-		const removeButtons = screen.getAllByRole('button').filter((b) => b.querySelector('svg.lucide-trash2'));
+		const removeButtons = screen.getAllByRole('button', { name: 'Remove line item' });
 		await user.click(removeButtons[removeButtons.length - 1]);
 
 		// add a new row
@@ -300,6 +300,112 @@ describe('EditInvoicePage', () => {
 			type: 'line_item',
 			line_item_params: { action: 'add', items: [{ display_name: 'Setup fee', amount: '50', quantity: '1' }] },
 		});
+	});
+
+	it('lets finalized invoices edit line items behind a void-and-recreate confirmation', async () => {
+		mockGetInvoiceById.mockResolvedValue(
+			makeInvoice({
+				invoice_status: 'FINALIZED',
+				line_items: [{ id: 'li_1', display_name: 'Consulting', quantity: '2', amount: 300 }],
+			}),
+		);
+		mockModifyInvoice.mockResolvedValue({ invoice: makeInvoice() });
+		const user = userEvent.setup();
+		renderPage();
+
+		const nameInput = await screen.findByDisplayValue('Consulting');
+		await user.clear(nameInput);
+		await user.type(nameInput, 'Consulting hours');
+		await user.click(screen.getByRole('button', { name: 'Save Changes' }));
+
+		// No API call yet — the confirmation dialog gates the save.
+		expect(mockModifyInvoice).not.toHaveBeenCalled();
+		expect(await screen.findByText('Void invoice and create a new draft?')).toBeInTheDocument();
+
+		await user.click(screen.getByRole('button', { name: 'Void & create draft' }));
+		await waitFor(() =>
+			expect(mockModifyInvoice).toHaveBeenCalledWith('inv_1', {
+				type: 'line_item',
+				line_item_params: { action: 'update', line_item_id: 'li_1', update: { display_name: 'Consulting hours' } },
+			}),
+		);
+	});
+
+	it('chains finalized operations onto the recreated draft and navigates to it', async () => {
+		mockGetInvoiceById.mockResolvedValue(
+			makeInvoice({
+				invoice_status: 'FINALIZED',
+				line_items: [{ id: 'li_1', display_name: 'Consulting', quantity: '2', amount: 300 }],
+			}),
+		);
+		// The first operation voids the invoice and returns the new draft copy.
+		mockModifyInvoice.mockResolvedValue({ invoice: makeInvoice({ id: 'inv_draft_2', invoice_status: 'DRAFT' }) });
+		const user = userEvent.setup();
+		renderPage();
+
+		const nameInput = await screen.findByDisplayValue('Consulting');
+		await user.clear(nameInput);
+		await user.type(nameInput, 'Consulting hours');
+		await user.click(screen.getByRole('button', { name: 'Add Line Item' }));
+		const nameInputs = screen.getAllByPlaceholderText('Enter item name');
+		await user.type(nameInputs[nameInputs.length - 1], 'Setup fee');
+		const amountInputs = screen.getAllByPlaceholderText('0.00');
+		await user.clear(amountInputs[amountInputs.length - 1]);
+		await user.type(amountInputs[amountInputs.length - 1], '50');
+
+		await user.click(screen.getByRole('button', { name: 'Save Changes' }));
+		await user.click(await screen.findByRole('button', { name: 'Void & create draft' }));
+
+		await waitFor(() => expect(mockModifyInvoice).toHaveBeenCalledTimes(2));
+		// First call hits the original invoice; the follow-up targets the returned draft.
+		expect(mockModifyInvoice.mock.calls[0][0]).toBe('inv_1');
+		expect(mockModifyInvoice.mock.calls[1][0]).toBe('inv_draft_2');
+		await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/billing/invoices/inv_draft_2'));
+	});
+
+	it('keeps the edited form state when the finalized save fails', async () => {
+		mockGetInvoiceById.mockResolvedValue(
+			makeInvoice({
+				invoice_status: 'FINALIZED',
+				line_items: [{ id: 'li_1', display_name: 'Consulting', quantity: '2', amount: 300 }],
+			}),
+		);
+		mockModifyInvoice.mockRejectedValue(new Error('void failed'));
+		const user = userEvent.setup();
+		renderPage();
+
+		const nameInput = await screen.findByDisplayValue('Consulting');
+		await user.clear(nameInput);
+		await user.type(nameInput, 'Consulting hours');
+		await user.click(screen.getByRole('button', { name: 'Save Changes' }));
+		await user.click(await screen.findByRole('button', { name: 'Void & create draft' }));
+
+		await waitFor(() => expect(mockModifyInvoice).toHaveBeenCalled());
+		// Edits survive the failure so the user can fix and retry.
+		expect(screen.getByDisplayValue('Consulting hours')).toBeInTheDocument();
+		expect(screen.getByRole('button', { name: 'Save Changes' })).toBeEnabled();
+		expect(mockNavigate).not.toHaveBeenCalled();
+	});
+
+	it('cancelling the void confirmation returns to editing without saving', async () => {
+		mockGetInvoiceById.mockResolvedValue(
+			makeInvoice({
+				invoice_status: 'FINALIZED',
+				line_items: [{ id: 'li_1', display_name: 'Consulting', quantity: '2', amount: 300 }],
+			}),
+		);
+		const user = userEvent.setup();
+		renderPage();
+
+		const nameInput = await screen.findByDisplayValue('Consulting');
+		await user.clear(nameInput);
+		await user.type(nameInput, 'Consulting hours');
+		await user.click(screen.getByRole('button', { name: 'Save Changes' }));
+		const dialog = await screen.findByRole('dialog');
+		await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+
+		expect(mockModifyInvoice).not.toHaveBeenCalled();
+		expect(screen.getByDisplayValue('Consulting hours')).toBeInTheDocument();
 	});
 
 	it('blocks editing for voided invoices', async () => {
