@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import SettingsApi from '@/api/SettingsApi';
 import useEnvironment from '@/hooks/useEnvironment';
@@ -26,11 +26,17 @@ export const useCustomCurrencyConfig = (): { config: CustomCurrencyConfig; isLoa
 		staleTime: 5 * 60 * 1000,
 	});
 
+	// The registry is module state that the currency formatters read synchronously, so
+	// writing to it schedules no render of its own. Bumping this makes the subtree render
+	// once more, after the write, instead of leaving already-rendered amounts on the old
+	// symbols until something unrelated happens to re-render them.
+	const [, setRegistryVersion] = useState(0);
+
 	useEffect(() => {
-		if (!environmentId) return;
-		// Cleared on environment change so a previous tenant's symbols are never shown
-		// against another environment's amounts.
-		setCustomCurrencies(data ? toCustomCurrencyDisplay(data) : {});
+		// Cleared when the environment changes or goes away, so a previous environment's
+		// symbols are never shown against another environment's amounts.
+		setCustomCurrencies(environmentId && data ? toCustomCurrencyDisplay(data) : {});
+		setRegistryVersion((version) => version + 1);
 	}, [data, environmentId]);
 
 	return {

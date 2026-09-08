@@ -27,7 +27,7 @@ const withStarterRow = (draft: CustomCurrencyDraft): CustomCurrencyDraft =>
 
 const CustomCurrencyConfigurationSection = () => {
 	const { t } = useTranslation(['settings', 'common']);
-	const { savedConfiguration, isLoading, updateConfiguration } = useCustomCurrencyConfiguration();
+	const { savedConfiguration, isLoading, isError, updateConfiguration } = useCustomCurrencyConfiguration();
 	const { can, isSuperAdmin } = useCurrentUserPermissions();
 	// Same gate as the sibling sections: the generic settings endpoints are Super Admin only.
 	const canWriteSetting = can('setting', 'write') && isSuperAdmin;
@@ -45,9 +45,11 @@ const CustomCurrencyConfigurationSection = () => {
 		[fiatOptions, draft.fiatCurrencies],
 	);
 
-	const errorKey = getCustomCurrencyErrorKey(draft);
+	// A failed load leaves an empty draft, which would otherwise be saved over a
+	// configuration that is still there.
+	const errorKey = isError ? 'loadFailed' : getCustomCurrencyErrorKey(draft);
 	const isSaving = updateConfiguration.isPending;
-	const isDisabled = isSaving || !canWriteSetting;
+	const isDisabled = isSaving || isError || !canWriteSetting;
 
 	const settlementLabel = t('billing.customCurrencyConfiguration.fields.settlementCurrency');
 	const conversionLabel = t('billing.customCurrencyConfiguration.fields.conversionCurrencies');
@@ -278,7 +280,7 @@ const CustomCurrencyConfigurationSection = () => {
 						onReset={() => setDraft(withStarterRow(savedConfiguration))}
 						onSave={handleSave}
 						isSaving={isSaving}
-						disabled={isLoading || !canWriteSetting || !!errorKey}
+						disabled={isLoading || isError || !canWriteSetting || !!errorKey}
 						disabledReason={canWriteSetting ? undefined : t('superAdmin.writeDeniedTooltip')}
 					/>
 				</>

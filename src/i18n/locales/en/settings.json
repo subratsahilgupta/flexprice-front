@@ -244,6 +244,7 @@
 				"removeConversionCurrency": "Remove {{currency}}"
 			},
 			"errors": {
+				"loadFailed": "Could not load the current configuration. Reload before making changes.",
 				"defaultFiatRequired": "Select a settlement currency.",
 				"codeLength": "Currency codes must be 3 characters.",
 				"codeDuplicate": "Each currency code can only be used once.",

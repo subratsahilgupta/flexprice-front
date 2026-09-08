@@ -250,6 +250,7 @@
 				"removeConversionCurrency": "إزالة {{currency}}"
 			},
 			"errors": {
+				"loadFailed": "تعذر تحميل الإعدادات الحالية. أعد التحميل قبل إجراء أي تغييرات.",
 				"defaultFiatRequired": "اختر عملة التسوية.",
 				"codeLength": "يجب أن تتكون رموز العملات من 3 أحرف.",
 				"codeDuplicate": "لا يمكن استخدام رمز العملة أكثر من مرة.",

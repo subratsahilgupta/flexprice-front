@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 /**
  * Tenant-defined currencies from the `custom_currency_config` setting. Prices,
  * subscriptions and wallets can be denominated in one of these; invoices are always
@@ -14,24 +16,38 @@ export interface CustomCurrencyConfig {
 	default_fiat_currency: string;
 }
 
+// Every field falls back rather than throwing: a malformed setting must not take down
+// the pages that read it. An entry left without a symbol is dropped by the display map.
+const settingString = z.union([z.string(), z.number()]).transform(String).catch('');
+
+const customCurrencyDefinitionSchema = z.object({
+	name: settingString,
+	symbol: settingString,
+	fiat_conversion_factors: z.record(settingString).catch({}),
+});
+
+const customCurrencyConfigSchema = z.object({
+	custom_currencies: z.record(customCurrencyDefinitionSchema).catch({}),
+	default_fiat_currency: settingString,
+});
+
 /** Reads an unknown settings payload into a config, tolerating a missing or partial value. */
 export const parseCustomCurrencyConfig = (value: unknown): CustomCurrencyConfig => {
-	const raw = (value ?? {}) as Partial<CustomCurrencyConfig>;
-
-	return {
-		custom_currencies: raw.custom_currencies ?? {},
-		default_fiat_currency: raw.default_fiat_currency ?? '',
-	};
+	const parsed = customCurrencyConfigSchema.safeParse(value ?? {});
+	return parsed.success ? parsed.data : { custom_currencies: {}, default_fiat_currency: '' };
 };
 
 /** Maps lowercased currency code to the display data the formatters need. */
 export const toCustomCurrencyDisplay = (config: CustomCurrencyConfig): Record<string, { symbol: string; name: string }> => {
-	return Object.entries(config.custom_currencies ?? {}).reduce<Record<string, { symbol: string; name: string }>>((display, [code, definition]) => {
-		if (definition?.symbol) {
-			display[code.toLowerCase()] = { symbol: definition.symbol, name: definition.name || code.toUpperCase() };
-		}
-		return display;
-	}, {});
+	return Object.entries(config.custom_currencies ?? {}).reduce<Record<string, { symbol: string; name: string }>>(
+		(display, [code, definition]) => {
+			if (definition?.symbol) {
+				display[code.toLowerCase()] = { symbol: definition.symbol, name: definition.name || code.toUpperCase() };
+			}
+			return display;
+		},
+		{},
+	);
 };
 
 /**

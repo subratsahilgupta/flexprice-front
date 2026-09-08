@@ -11,6 +11,8 @@ import {
 	getCustomCurrencyErrorKey,
 	type CustomCurrencyDraft,
 } from '@/types/dto/CustomCurrency';
+import { customCurrencyConfigToOptions } from '@/types/common/PriceUnitSelector';
+import { PRICE_UNIT_TYPE } from '@/models/Price';
 
 const MAC = { symbol: 'MAC', name: 'MoEngage AI Credits' };
 
@@ -199,5 +201,51 @@ describe('an untouched starter row', () => {
 
 	it('still validates a row the user has started', () => {
 		expect(getCustomCurrencyErrorKey({ ...blank, currencies: [{ ...blank.currencies[0], code: 'cr' }] })).toBe('codeLength');
+	});
+});
+
+// The setting is free-form JSON on the server, so a malformed value must degrade to a
+// usable config rather than publish garbage to the formatters.
+describe('parsing a malformed payload', () => {
+	it('drops values that are not strings', () => {
+		const config = parseCustomCurrencyConfig({
+			custom_currencies: { crd: { name: 'Credits', symbol: {}, fiat_conversion_factors: { usd: '0.1' } } },
+			default_fiat_currency: 'usd',
+		});
+		expect(config.custom_currencies.crd.symbol).toBe('');
+		// No symbol means no display entry, so nothing renders "[object Object]".
+		expect(toCustomCurrencyDisplay(config).crd).toBeUndefined();
+	});
+
+	it('accepts numeric factors and codes', () => {
+		const config = parseCustomCurrencyConfig({
+			custom_currencies: { crd: { name: 'Credits', symbol: 'CR', fiat_conversion_factors: { usd: 0.1 } } },
+			default_fiat_currency: 'usd',
+		});
+		expect(config.custom_currencies.crd.fiat_conversion_factors.usd).toBe('0.1');
+	});
+
+	it('falls back whole when the payload is not an object', () => {
+		expect(parseCustomCurrencyConfig('nonsense')).toEqual({ custom_currencies: {}, default_fiat_currency: '' });
+		expect(parseCustomCurrencyConfig({ custom_currencies: 'nope' })).toEqual({ custom_currencies: {}, default_fiat_currency: '' });
+	});
+});
+
+// The charge and wallet selectors offer these beside the price units, but a tenant
+// currency is set on the price directly, so it must come through as a FIAT option.
+describe('offering tenant currencies in the currency selector', () => {
+	const config = parseCustomCurrencyConfig({
+		custom_currencies: { crd: { name: 'Credits', symbol: 'CR', fiat_conversion_factors: { usd: '1.25' } } },
+		default_fiat_currency: 'usd',
+	});
+
+	it('builds a FIAT option carrying the code', () => {
+		expect(customCurrencyConfigToOptions(config)).toEqual([
+			{ type: PRICE_UNIT_TYPE.FIAT, code: 'crd', symbol: 'CR', value: 'crd', label: 'CRD (CR)' },
+		]);
+	});
+
+	it('offers nothing when the tenant has configured nothing', () => {
+		expect(customCurrencyConfigToOptions(parseCustomCurrencyConfig(undefined))).toEqual([]);
 	});
 });
