@@ -249,3 +249,23 @@ describe('offering tenant currencies in the currency selector', () => {
 		expect(customCurrencyConfigToOptions(parseCustomCurrencyConfig(undefined))).toEqual([]);
 	});
 });
+
+// Coupons, one-off invoices and onboarding wallets all read the same list, so a newly
+// configured currency has to reach every one of them from a single place.
+describe('currency options offered to the entities that accept a tenant currency', () => {
+	it('leads with the tenant currencies, then the standard list', () => {
+		const config = parseCustomCurrencyConfig({
+			custom_currencies: { crd: { name: 'Credits', symbol: 'CR', fiat_conversion_factors: { usd: '1.25' } } },
+			default_fiat_currency: 'usd',
+		});
+		const custom = Object.entries(config.custom_currencies).map(([code, definition]) => ({
+			label: `${code.toUpperCase()} (${definition.symbol})`,
+			value: code.toUpperCase(),
+			symbol: definition.symbol,
+		}));
+
+		expect(custom).toEqual([{ label: 'CRD (CR)', value: 'CRD', symbol: 'CR' }]);
+		// Uppercased to match the standard options; the backend lowercases before matching.
+		expect(custom[0].value.toLowerCase()).toBe('crd');
+	});
+});
