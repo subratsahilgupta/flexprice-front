@@ -3,6 +3,8 @@ import type { TFunction } from 'i18next';
 
 /** Doc deep links opened from tutorial cards */
 export enum DOCS_LINKS {
+	SETTINGS_CUSTOM_CURRENCY = 'https://docs.flexprice.io/docs/settings/settings#custom-currency-configuration',
+
 	FEATURE_CREATE = 'https://docs.flexprice.io/docs/product-catalogue/features/create',
 	FEATURE_PLANS = 'https://docs.flexprice.io/docs/product-catalogue/features/linking-to-plans',
 	FEATURE_USECASE = 'https://docs.flexprice.io/docs/product-catalogue/features/use-cases',

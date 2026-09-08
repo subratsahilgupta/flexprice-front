@@ -216,6 +216,49 @@
 				"description2": "يُرسل webhook من نوع subscription.cancelled لمزامنة الأنظمة الأخرى",
 				"description3": "تُلغى منح الائتمان المستقبلية، وتُنشأ فاتورة نهائية للفترة الجزئية"
 			}
+		},
+		"customCurrencyConfiguration": {
+			"title": "إعدادات العملة المخصصة",
+			"saveSuccess": "تم حفظ إعدادات العملة المخصصة",
+			"saveError": "تعذر حفظ إعدادات العملة المخصصة",
+			"fields": {
+				"settlementCurrency": "عملة التسوية",
+				"settlementPlaceholder": "اختر عملة",
+				"conversionCurrencies": "عملات التحويل",
+				"defaultBadge": "افتراضي",
+				"code": "الرمز",
+				"name": "الاسم",
+				"symbol": "الرمز المعروض",
+				"rate": "السعر مقابل {{fiat}}",
+				"codePlaceholder": "crd",
+				"namePlaceholder": "Credits",
+				"symbolPlaceholder": "CR",
+				"ratePlaceholder": "0.00"
+			},
+			"hints": {
+				"settlementCurrency": "تُصدر الفواتير وتُدفع بهذه العملة. وتُحوَّل إليها المبالغ المسعَّرة بعملتك المخصصة.",
+				"conversionCurrencies": "تحتاج كل عملة مخصصة إلى سعر مقابل كل واحدة من هذه العملات. أدخل قيمة وحدة واحدة من عملتك بتلك العملة، وليس العكس.",
+				"conversionFormula": "1 CRD = 0.10 USD، أي أن السعر هو 0.10",
+				"code": "يُستخدم أينما تُحدَّد العملة على سعر أو اشتراك أو محفظة. ولا يمكن تغييره لاحقًا."
+			},
+			"actions": {
+				"addCurrency": "إضافة عملة",
+				"addConversionCurrency": "إضافة عملة",
+				"docs": "الوثائق",
+				"docsTitle": "فتح وثائق العملة المخصصة",
+				"removeCurrency": "إزالة {{currency}}",
+				"removeConversionCurrency": "إزالة {{currency}}"
+			},
+			"errors": {
+				"loadFailed": "تعذر تحميل الإعدادات الحالية. أعد التحميل قبل إجراء أي تغييرات.",
+				"defaultFiatRequired": "اختر عملة التسوية.",
+				"codeLength": "يجب أن تتكون رموز العملات من 3 أحرف.",
+				"codeDuplicate": "لا يمكن استخدام رمز العملة أكثر من مرة.",
+				"codeMatchesFiat": "لا يمكن أن يطابق رمز العملة إحدى عملات التحويل.",
+				"nameRequired": "كل عملة تحتاج إلى اسم.",
+				"symbolRequired": "كل عملة تحتاج إلى رمز معروض.",
+				"factorInvalid": "يجب أن يكون كل سعر أكبر من 0."
+			}
 		}
 	},
 	"customerPortal": {
