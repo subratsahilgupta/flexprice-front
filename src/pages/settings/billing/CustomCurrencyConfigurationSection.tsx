@@ -277,7 +277,6 @@ const CustomCurrencyConfigurationSection = () => {
 					{errorKey ? <p className='mt-4 text-sm text-destructive'>{t(`billing.customCurrencyConfiguration.errors.${errorKey}`)}</p> : null}
 
 					<SettingsFormActions
-						onReset={() => setDraft(withStarterRow(savedConfiguration))}
 						onSave={handleSave}
 						isSaving={isSaving}
 						disabled={isLoading || isError || !canWriteSetting || !!errorKey}
