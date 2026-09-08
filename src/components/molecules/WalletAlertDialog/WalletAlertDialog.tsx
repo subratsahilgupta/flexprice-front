@@ -1,22 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, Button, SegmentedControl, Toggle, InfoIcon } from '@/components/atoms';
+import { Dialog, Button } from '@/components/atoms';
+import { Switch } from '@/components/ui/switch';
 import toast from 'react-hot-toast';
-import { WalletAlertThresholdCard } from '@/components/molecules';
-import type { WalletAlertThresholdCardLabels } from '@/components/molecules/WalletAlertThresholdCard';
-import { WalletAlertSettings, WalletAlertLevel, WalletAlertThresholdType } from '@/models/Wallet';
+import { WalletAlertThresholdSection } from '@/components/molecules';
+import type { WalletAlertThresholdSectionLabels } from '@/components/molecules/WalletAlertThresholdSection';
+import { WalletAlertSettings, WalletAlertLevel } from '@/models/Wallet';
 import {
-	addWalletAlertThreshold,
-	applyWalletAlertThresholdChange,
 	fromWalletAlertDraftForSave,
-	getActiveWalletAlertLevels,
 	getWalletAlertValidationErrorKey,
-	isWalletAlertConditionDisabled,
 	setWalletAlertDraftEnabled,
-	setWalletAlertDraftThresholdType,
 	toWalletAlertDraft,
 	toWalletAlertSettingsForValidation,
-	updateWalletAlertDraftLevels,
-	updateWalletAlertThreshold,
 } from '@/utils/wallet/walletAlertUtils';
 import { useTranslation } from 'react-i18next';
 
@@ -28,8 +22,6 @@ interface WalletAlertDialogProps {
 	currency?: string;
 }
 
-const ALERT_LEVELS = [WalletAlertLevel.CRITICAL, WalletAlertLevel.WARNING, WalletAlertLevel.INFO] as const;
-
 const WalletAlertDialog: React.FC<WalletAlertDialogProps> = ({ open, alertSettings, onSave, onClose, currency }) => {
 	const { t } = useTranslation('billing');
 	const [draft, setDraft] = useState(() => toWalletAlertDraft(alertSettings));
@@ -39,34 +31,23 @@ const WalletAlertDialog: React.FC<WalletAlertDialogProps> = ({ open, alertSettin
 		setDraft(toWalletAlertDraft(alertSettings));
 	}, [alertSettings]);
 
-	const activeLevels = getActiveWalletAlertLevels(draft);
-	const unit = draft.alert_threshold_type === 'percentage' ? '%' : (currency ?? '');
-
-	const getLevelLabels = (level: WalletAlertLevel): WalletAlertThresholdCardLabels => {
-		const titleKey = {
-			[WalletAlertLevel.CRITICAL]: 'wallet.alerts.criticalTitle',
-			[WalletAlertLevel.WARNING]: 'wallet.alerts.warningTitle',
-			[WalletAlertLevel.INFO]: 'wallet.alerts.infoTitle',
-		} as const;
-		const descriptionKey = {
-			[WalletAlertLevel.CRITICAL]: 'wallet.alerts.criticalDescription',
-			[WalletAlertLevel.WARNING]: 'wallet.alerts.warningDescription',
-			[WalletAlertLevel.INFO]: 'wallet.alerts.infoDescription',
-		} as const;
-
-		return {
-			title: t(titleKey[level]),
-			description: t(descriptionKey[level]),
-			add: t('wallet.alerts.add'),
-			remove: t('wallet.alerts.remove'),
-			thresholdValue: t('wallet.alerts.thresholdValueLabel', {
-				currencySuffix: draft.alert_threshold_type === 'percentage' ? '' : currency ? ` (${currency})` : '',
-			}),
-			condition: t('wallet.alerts.conditionLabel'),
-			conditionBelow: t('wallet.alerts.conditionBelow'),
-			conditionAbove: t('wallet.alerts.conditionAbove'),
-			amountPlaceholder: t('wallet.alerts.amountPlaceholder'),
-		};
+	const thresholdLabels: WalletAlertThresholdSectionLabels = {
+		thresholdType: t('wallet.alerts.thresholdTypeLabel'),
+		thresholdTypeTooltip: (
+			<>
+				<span className='block'>{t('wallet.alerts.thresholdTypeTooltipAbsolute')}</span>
+				<span className='mt-1.5 block'>{t('wallet.alerts.thresholdTypeTooltipPercentage')}</span>
+			</>
+		),
+		thresholdTypeAbsolute: t('wallet.alerts.thresholdTypeAbsolute'),
+		thresholdTypePercentage: t('wallet.alerts.thresholdTypePercentage'),
+		rowDescription: t('wallet.alerts.rowDescription'),
+		amountPlaceholder: t('wallet.alerts.amountPlaceholder'),
+		levels: {
+			[WalletAlertLevel.CRITICAL]: t('wallet.alerts.criticalTitle'),
+			[WalletAlertLevel.WARNING]: t('wallet.alerts.warningTitle'),
+			[WalletAlertLevel.INFO]: t('wallet.alerts.infoTitle'),
+		},
 	};
 
 	const handleSave = async () => {
@@ -106,63 +87,34 @@ const WalletAlertDialog: React.FC<WalletAlertDialogProps> = ({ open, alertSettin
 			}}
 			title={t('wallet.alerts.dialogTitle')}
 			showCloseButton>
-			<div className='flex min-w-[600px] flex-col gap-6'>
-				<Toggle
-					title={t('wallet.alerts.enableTitle')}
-					label={t('wallet.alerts.enableLabel')}
-					description={t('wallet.alerts.enableDescription')}
-					checked={draft.alert_enabled}
-					onChange={(enabled) => setDraft((prev) => setWalletAlertDraftEnabled(prev, enabled))}
-					disabled={isSaving}
-				/>
-
-				<div className='space-y-2'>
-					<div className='flex items-center gap-1.5'>
-						<span className='text-sm font-medium text-content'>{t('wallet.alerts.thresholdTypeLabel')}</span>
-						<InfoIcon
-							description={t('wallet.alerts.thresholdTypeTooltip')}
-							ariaLabel={t('wallet.alerts.thresholdTypeLabel')}
-							disabled={isSaving || !draft.alert_enabled}
+			<div className='flex min-w-[600px] flex-col gap-5'>
+				{/*
+				 * A settings row rather than the Toggle atom: the switch belongs on the far right, level
+				 * with the label it controls, with the explanation underneath — not stacked under a
+				 * separate heading with the switch off to the left.
+				 */}
+				<div className='space-y-1'>
+					<div className='flex items-center justify-between gap-4'>
+						<span className='text-sm font-medium text-content'>{t('wallet.alerts.enableTitle')}</span>
+						<Switch
+							checked={draft.alert_enabled}
+							onCheckedChange={(enabled) => setDraft((prev) => setWalletAlertDraftEnabled(prev, enabled))}
+							disabled={isSaving}
+							aria-label={t('wallet.alerts.enableTitle')}
 						/>
 					</div>
-					<SegmentedControl
-						aria-label={t('wallet.alerts.thresholdTypeLabel')}
-						className='w-fit'
-						options={[
-							{ label: t('wallet.alerts.thresholdTypeAbsolute'), value: 'absolute' as WalletAlertThresholdType },
-							{ label: t('wallet.alerts.thresholdTypePercentage'), value: 'percentage' as WalletAlertThresholdType },
-						]}
-						value={draft.alert_threshold_type}
-						onChange={(type) => setDraft((prev) => setWalletAlertDraftThresholdType(prev, type))}
-						disabled={isSaving || !draft.alert_enabled}
-					/>
-					{draft.alert_threshold_type === 'percentage' && (
-						<p className='max-w-[560px] text-[13px] leading-relaxed text-content-secondary'>{t('wallet.alerts.percentageWarning')}</p>
-					)}
+					<p className='max-w-[440px] text-sm text-content-secondary'>{t('wallet.alerts.enableDescription')}</p>
 				</div>
 
-				<div className='space-y-4'>
-					{ALERT_LEVELS.map((level) => (
-						<WalletAlertThresholdCard
-							key={level}
-							threshold={activeLevels[level]}
-							labels={getLevelLabels(level)}
-							unit={unit}
-							conditionDisabled={isWalletAlertConditionDisabled(level, activeLevels)}
-							disabled={isSaving || !draft.alert_enabled}
-							onAdd={() => setDraft((prev) => updateWalletAlertDraftLevels(prev, (levels) => addWalletAlertThreshold(levels, level)))}
-							onRemove={() => setDraft((prev) => updateWalletAlertDraftLevels(prev, (levels) => updateWalletAlertThreshold(levels, level, null)))}
-							onThresholdChange={(value) =>
-								setDraft((prev) => updateWalletAlertDraftLevels(prev, (levels) => applyWalletAlertThresholdChange(levels, level, 'threshold', value)))
-							}
-							onConditionChange={(value) =>
-								setDraft((prev) => updateWalletAlertDraftLevels(prev, (levels) => applyWalletAlertThresholdChange(levels, level, 'condition', value)))
-							}
-						/>
-					))}
-				</div>
+				<WalletAlertThresholdSection
+					draft={draft}
+					labels={thresholdLabels}
+					currency={currency}
+					disabled={isSaving || !draft.alert_enabled}
+					onChange={setDraft}
+				/>
 
-				<div className='mt-6 flex justify-end gap-2'>
+				<div className='flex justify-end gap-2'>
 					<Button variant='outline' onClick={handleClose} disabled={isSaving}>
 						{t('wallet.alerts.cancel')}
 					</Button>

@@ -1,28 +1,20 @@
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, InfoIcon, Loader, SegmentedControl, Tooltip } from '@/components/atoms';
-import { SettingsCardHeader, WalletAlertThresholdCard } from '@/components/molecules';
-import type { WalletAlertThresholdCardLabels } from '@/components/molecules/WalletAlertThresholdCard';
+import { Button, Card, Loader, Tooltip } from '@/components/atoms';
+import { SettingsCardHeader, WalletAlertThresholdSection } from '@/components/molecules';
+import type { WalletAlertThresholdSectionLabels } from '@/components/molecules/WalletAlertThresholdSection';
 import { Switch } from '@/components/ui/switch';
-import { WalletAlertLevel, WalletAlertThresholdType } from '@/models/Wallet';
+import { WalletAlertLevel } from '@/models/Wallet';
 import {
-	addWalletAlertThreshold,
 	fromWalletAlertDraftForSave,
-	getActiveWalletAlertLevels,
 	getWalletAlertValidationErrorKey,
-	isWalletAlertConditionDisabled,
 	setWalletAlertDraftEnabled,
-	setWalletAlertDraftThresholdType,
 	toWalletAlertDraft,
 	toWalletAlertSettingsForValidation,
-	updateWalletAlertDraftLevels,
-	updateWalletAlertThreshold,
 } from '@/utils/wallet/walletAlertUtils';
 import { useWalletAlertSettings } from './useWalletAlertSettings';
 import { useCurrentUserPermissions } from '@/hooks/useCurrentUserPermissions';
-
-const ALERT_LEVELS = [WalletAlertLevel.CRITICAL, WalletAlertLevel.WARNING, WalletAlertLevel.INFO] as const;
 
 const WalletAlertSettingsSection = () => {
 	const { t } = useTranslation(['settings', 'common']);
@@ -37,20 +29,26 @@ const WalletAlertSettingsSection = () => {
 		setDraft(toWalletAlertDraft(settings));
 	}, [settings]);
 
-	const activeLevels = getActiveWalletAlertLevels(draft);
-	const unit = draft.alert_threshold_type === 'percentage' ? '%' : '';
-
-	const getLevelLabels = (level: WalletAlertLevel): WalletAlertThresholdCardLabels => ({
-		title: t(`alerts.walletAlerts.levels.${level}`),
-		description: t(`alerts.walletAlerts.levelDescriptions.${level}`),
-		add: t('alerts.walletAlerts.add'),
-		remove: t('alerts.walletAlerts.remove'),
-		thresholdValue: t('alerts.walletAlerts.thresholdValue'),
-		condition: t('alerts.walletAlerts.condition'),
-		conditionBelow: t('alerts.walletAlerts.conditions.below'),
-		conditionAbove: t('alerts.walletAlerts.conditions.above'),
+	// No currency symbol here: these are tenant-wide defaults that apply to wallets in any
+	// currency, so the unit selector's "Currency" label is what identifies the mode.
+	const thresholdLabels: WalletAlertThresholdSectionLabels = {
+		thresholdType: t('alerts.walletAlerts.thresholdTypeLabel'),
+		thresholdTypeTooltip: (
+			<>
+				<span className='block'>{t('alerts.walletAlerts.thresholdTypeTooltipAbsolute')}</span>
+				<span className='mt-1.5 block'>{t('alerts.walletAlerts.thresholdTypeTooltipPercentage')}</span>
+			</>
+		),
+		thresholdTypeAbsolute: t('alerts.walletAlerts.thresholdTypeAbsolute'),
+		thresholdTypePercentage: t('alerts.walletAlerts.thresholdTypePercentage'),
+		rowDescription: t('alerts.walletAlerts.rowDescription'),
 		amountPlaceholder: t('alerts.walletAlerts.amountPlaceholder'),
-	});
+		levels: {
+			[WalletAlertLevel.CRITICAL]: t('alerts.walletAlerts.levels.critical'),
+			[WalletAlertLevel.WARNING]: t('alerts.walletAlerts.levels.warning'),
+			[WalletAlertLevel.INFO]: t('alerts.walletAlerts.levels.info'),
+		},
+	};
 
 	const handleSave = () => {
 		// Validate against the raw draft so invalid values (e.g. 'abc') produce the correct
@@ -74,15 +72,17 @@ const WalletAlertSettingsSection = () => {
 	const isDisabled = !draft.alert_enabled || updateSettings.isPending;
 	const alertsTitle = t('alerts.walletAlerts.title');
 
+	// Same Card chrome as every sibling settings section (Theme, Customer Portal, SAML SSO) so the
+	// tabs match; the compact interior spacing is what keeps it from feeling like a nested card.
 	return (
 		<Card variant='default' noPadding className='rounded-xl border-line bg-surface shadow-sm'>
-			<div className='px-6 pt-6'>
+			<div className='space-y-5 p-6'>
 				<SettingsCardHeader
 					title={alertsTitle}
 					infoDescription={t('alerts.walletAlerts.description')}
 					infoAriaLabel={t('info.ariaLabel', { field: alertsTitle })}
 					titleClassName='text-lg font-medium text-content-zinc-strong'
-					className='mb-2'
+					className='mb-0'
 					cta={
 						<Switch
 							checked={draft.alert_enabled}
@@ -92,76 +92,29 @@ const WalletAlertSettingsSection = () => {
 						/>
 					}
 				/>
-			</div>
-			{isLoading ? (
-				<div className='flex min-h-[200px] items-center justify-center'>
-					<Loader />
-				</div>
-			) : (
-				<div className='space-y-6 px-6 pb-6 pt-6'>
-					<div className='space-y-2'>
-						<div className='flex items-center gap-1.5'>
-							<span className='text-sm font-medium text-content'>{t('alerts.walletAlerts.thresholdTypeLabel')}</span>
-							<InfoIcon
-								description={t('alerts.walletAlerts.thresholdTypeTooltip')}
-								ariaLabel={t('alerts.walletAlerts.thresholdTypeLabel')}
-								disabled={isDisabled}
-							/>
+				{isLoading ? (
+					<div className='flex min-h-[160px] items-center justify-center'>
+						<Loader />
+					</div>
+				) : (
+					<>
+						<WalletAlertThresholdSection draft={draft} labels={thresholdLabels} disabled={isDisabled} onChange={setDraft} />
+						<div className='flex justify-end'>
+							{canWriteAlertSettings ? (
+								<Button onClick={handleSave} isLoading={updateSettings.isPending} disabled={updateSettings.isPending}>
+									{t('alerts.walletAlerts.saveChanges')}
+								</Button>
+							) : (
+								<Tooltip content={t('superAdmin.writeDeniedTooltip')}>
+									<span tabIndex={0} className='inline-block'>
+										<Button disabled>{t('alerts.walletAlerts.saveChanges')}</Button>
+									</span>
+								</Tooltip>
+							)}
 						</div>
-						<SegmentedControl
-							aria-label={t('alerts.walletAlerts.thresholdTypeLabel')}
-							className='w-fit'
-							options={[
-								{ label: t('alerts.walletAlerts.thresholdTypeAbsolute'), value: 'absolute' as WalletAlertThresholdType },
-								{ label: t('alerts.walletAlerts.thresholdTypePercentage'), value: 'percentage' as WalletAlertThresholdType },
-							]}
-							value={draft.alert_threshold_type}
-							onChange={(type) => setDraft((prev) => setWalletAlertDraftThresholdType(prev, type))}
-							disabled={isDisabled}
-						/>
-						{draft.alert_threshold_type === 'percentage' && (
-							<p className='max-w-[560px] text-[13px] leading-relaxed text-content-secondary'>
-								{t('alerts.walletAlerts.percentageWarning')}
-							</p>
-						)}
-					</div>
-					<div className='space-y-4'>
-						{ALERT_LEVELS.map((level) => (
-							<WalletAlertThresholdCard
-								key={level}
-								threshold={activeLevels[level]}
-								labels={getLevelLabels(level)}
-								unit={unit}
-								conditionDisabled={isWalletAlertConditionDisabled(level, activeLevels)}
-								disabled={isDisabled}
-								onAdd={() => setDraft((prev) => updateWalletAlertDraftLevels(prev, (levels) => addWalletAlertThreshold(levels, level)))}
-								onRemove={() =>
-									setDraft((prev) => updateWalletAlertDraftLevels(prev, (levels) => updateWalletAlertThreshold(levels, level, null)))
-								}
-								onThresholdChange={(value) =>
-									setDraft((prev) => updateWalletAlertDraftLevels(prev, (levels) => updateWalletAlertThreshold(levels, level, { threshold: value })))
-								}
-								onConditionChange={(value) =>
-									setDraft((prev) => updateWalletAlertDraftLevels(prev, (levels) => updateWalletAlertThreshold(levels, level, { condition: value })))
-								}
-							/>
-						))}
-					</div>
-					<div className='flex justify-end'>
-						{canWriteAlertSettings ? (
-							<Button onClick={handleSave} isLoading={updateSettings.isPending} disabled={updateSettings.isPending}>
-								{t('alerts.walletAlerts.saveChanges')}
-							</Button>
-						) : (
-							<Tooltip content={t('superAdmin.writeDeniedTooltip')}>
-								<span tabIndex={0} className='inline-block'>
-									<Button disabled>{t('alerts.walletAlerts.saveChanges')}</Button>
-								</span>
-							</Tooltip>
-						)}
-					</div>
-				</div>
-			)}
+					</>
+				)}
+			</div>
 		</Card>
 	);
 };
