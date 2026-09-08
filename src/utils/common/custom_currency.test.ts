@@ -3,7 +3,14 @@ import { getCurrencySymbol as getIsoCurrencySymbol, getCurrencyName } from './he
 import { getCurrencySymbol as getIntlCurrencySymbol, formatCurrency } from '@/constants/common';
 import { getLocalizedCurrencySymbol } from '@/i18n/display/formatNumber';
 import { setCustomCurrencies, getCustomCurrencySymbol, isCustomCurrency } from './custom_currency';
-import { parseCustomCurrencyConfig, toCustomCurrencyDisplay } from '@/types/dto/CustomCurrency';
+import {
+	parseCustomCurrencyConfig,
+	toCustomCurrencyDisplay,
+	toCustomCurrencyDraft,
+	serializeCustomCurrencyConfig,
+	getCustomCurrencyErrorKey,
+	type CustomCurrencyDraft,
+} from '@/types/dto/CustomCurrency';
 
 const MAC = { symbol: 'MAC', name: 'MoEngage AI Credits' };
 
@@ -36,6 +43,17 @@ describe('custom currency symbols', () => {
 		expect(getIntlCurrencySymbol('mac')).toBe('MAC');
 		expect(getLocalizedCurrencySymbol('mac')).toBe('MAC');
 		expect(formatCurrency(1500, 'mac')).toContain('MAC');
+	});
+
+	it('formats a code Intl rejects', () => {
+		// Intl.NumberFormat throws on anything that is not three alphabetic characters.
+		setCustomCurrencies({ credits: { symbol: 'CR', name: 'Credits' } });
+		expect(formatCurrency(1500, 'credits')).toBe('CR1,500.00');
+		expect(formatCurrency('1500', 'credits')).toBe('CR1,500.00');
+	});
+
+	it('does not throw on an unconfigured code Intl rejects', () => {
+		expect(formatCurrency(1500, 'credits')).toBe('credits1500.00');
 	});
 
 	it('resolves the display name too', () => {
@@ -80,5 +98,106 @@ describe('parsing the setting payload', () => {
 			}),
 		);
 		expect(display.mac).toBeUndefined();
+	});
+});
+
+describe('the settings editor draft', () => {
+	const config = parseCustomCurrencyConfig({
+		custom_currencies: {
+			FPC: { name: 'FinePrint Credits', symbol: 'FPC', fiat_conversion_factors: { usd: '0.1', inr: '8.5' } },
+		},
+		default_fiat_currency: 'usd',
+	});
+
+	const draftOf = (rows: CustomCurrencyDraft['currencies'], fiat = ['usd'], defaultFiat = 'usd'): CustomCurrencyDraft => ({
+		defaultFiatCurrency: defaultFiat,
+		fiatCurrencies: fiat,
+		currencies: rows,
+	});
+
+	const row = (overrides: Partial<CustomCurrencyDraft['currencies'][number]> = {}) => ({
+		id: 'r1',
+		code: 'fpc',
+		name: 'FinePrint Credits',
+		symbol: 'FPC',
+		factors: { usd: '0.1' },
+		...overrides,
+	});
+
+	it('lifts the fiat currencies out of the per-currency factors', () => {
+		const draft = toCustomCurrencyDraft(config);
+		expect(draft.defaultFiatCurrency).toBe('usd');
+		// The default leads, so the settlement currency reads first in the editor.
+		expect(draft.fiatCurrencies).toEqual(['usd', 'inr']);
+		expect(draft.currencies).toHaveLength(1);
+		expect(draft.currencies[0]).toMatchObject({ code: 'fpc', symbol: 'FPC', factors: { usd: '0.1', inr: '8.5' } });
+	});
+
+	it('round-trips back to the setting payload', () => {
+		expect(serializeCustomCurrencyConfig(toCustomCurrencyDraft(config))).toEqual({
+			default_fiat_currency: 'usd',
+			custom_currencies: {
+				fpc: { name: 'FinePrint Credits', symbol: 'FPC', fiat_conversion_factors: { usd: '0.1', inr: '8.5' } },
+			},
+		});
+	});
+
+	it('clears the setting when the last currency is removed', () => {
+		expect(serializeCustomCurrencyConfig(draftOf([]))).toEqual({ custom_currencies: {}, default_fiat_currency: '' });
+	});
+
+	it('accepts a valid draft and an empty one', () => {
+		expect(getCustomCurrencyErrorKey(draftOf([row()]))).toBeNull();
+		expect(getCustomCurrencyErrorKey(draftOf([]))).toBeNull();
+	});
+
+	it('rejects what the backend rejects', () => {
+		expect(getCustomCurrencyErrorKey({ ...draftOf([row()]), defaultFiatCurrency: '' })).toBe('defaultFiatRequired');
+		expect(getCustomCurrencyErrorKey(draftOf([row({ code: 'credits' })]))).toBe('codeLength');
+		expect(getCustomCurrencyErrorKey(draftOf([row(), row({ id: 'r2' })]))).toBe('codeDuplicate');
+		expect(getCustomCurrencyErrorKey(draftOf([row({ code: 'usd' })]))).toBe('codeMatchesFiat');
+		expect(getCustomCurrencyErrorKey(draftOf([row({ name: '  ' })]))).toBe('nameRequired');
+		expect(getCustomCurrencyErrorKey(draftOf([row({ symbol: '' })]))).toBe('symbolRequired');
+		expect(getCustomCurrencyErrorKey(draftOf([row({ factors: { usd: '0' } })]))).toBe('factorInvalid');
+		expect(getCustomCurrencyErrorKey(draftOf([row({ factors: { usd: 'abc' } })]))).toBe('factorInvalid');
+		expect(getCustomCurrencyErrorKey(draftOf([row({ factors: {} })]))).toBe('factorInvalid');
+	});
+});
+
+// The settings editor and the app-wide symbol loader share one react-query key, so the
+// cached value has to stay a CustomCurrencyConfig. Caching a draft under it crashed every
+// page, because the symbol loader reads that cache on mount.
+describe('the shared query key holds one shape', () => {
+	it('the symbol loader survives whatever is cached under it', () => {
+		const config = parseCustomCurrencyConfig({
+			custom_currencies: { fpc: { name: 'FinePrint Credits', symbol: 'FPC', fiat_conversion_factors: { usd: '0.1' } } },
+			default_fiat_currency: 'usd',
+		});
+
+		expect(toCustomCurrencyDisplay(config)).toEqual({ fpc: { symbol: 'FPC', name: 'FinePrint Credits' } });
+		expect(() => toCustomCurrencyDisplay(toCustomCurrencyDraft(config) as never)).not.toThrow();
+		expect(() => toCustomCurrencyDisplay({} as never)).not.toThrow();
+	});
+});
+
+// The form always renders one currency to fill in, so an untouched row must read as
+// "nothing configured yet" rather than as a validation failure.
+describe('an untouched starter row', () => {
+	const blank = {
+		defaultFiatCurrency: 'usd',
+		fiatCurrencies: ['usd'],
+		currencies: [{ id: 'r1', code: '', name: '', symbol: '', factors: { usd: '' } }],
+	};
+
+	it('is not reported as invalid', () => {
+		expect(getCustomCurrencyErrorKey(blank)).toBeNull();
+	});
+
+	it('is dropped on save, clearing the config', () => {
+		expect(serializeCustomCurrencyConfig(blank)).toEqual({ custom_currencies: {}, default_fiat_currency: '' });
+	});
+
+	it('still validates a row the user has started', () => {
+		expect(getCustomCurrencyErrorKey({ ...blank, currencies: [{ ...blank.currencies[0], code: 'cr' }] })).toBe('codeLength');
 	});
 });

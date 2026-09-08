@@ -210,6 +210,48 @@
 				"description2": "A subscription.cancelled webhook fires so downstream systems stay in sync",
 				"description3": "Future credit grants are cancelled, a final invoice is generated for the partial period"
 			}
+		},
+		"customCurrencyConfiguration": {
+			"title": "Custom currency configuration",
+			"saveSuccess": "Custom currency configuration saved",
+			"saveError": "Failed to save custom currency configuration",
+			"fields": {
+				"settlementCurrency": "Settlement currency",
+				"settlementPlaceholder": "Select a currency",
+				"conversionCurrencies": "Conversion currencies",
+				"defaultBadge": "default",
+				"code": "Code",
+				"name": "Name",
+				"symbol": "Symbol",
+				"rate": "Rate to {{fiat}}",
+				"codePlaceholder": "crd",
+				"namePlaceholder": "Credits",
+				"symbolPlaceholder": "CR",
+				"ratePlaceholder": "0.00"
+			},
+			"hints": {
+				"settlementCurrency": "Invoices are issued and paid in this currency. Amounts priced in your custom currency are converted into it.",
+				"conversionCurrencies": "Every custom currency needs a rate for each of these. Enter what one unit of your currency is worth there, not the other way round.",
+				"conversionFormula": "1 CRD = 0.10 USD, so the rate is 0.10",
+				"code": "Used wherever a currency is set on a price, subscription or wallet. It cannot be changed later."
+			},
+			"actions": {
+				"addCurrency": "Add currency",
+				"addConversionCurrency": "Add currency",
+				"docs": "Docs",
+				"docsTitle": "Open custom currency docs",
+				"removeCurrency": "Remove {{currency}}",
+				"removeConversionCurrency": "Remove {{currency}}"
+			},
+			"errors": {
+				"defaultFiatRequired": "Select a settlement currency.",
+				"codeLength": "Currency codes must be 3 characters.",
+				"codeDuplicate": "Each currency code can only be used once.",
+				"codeMatchesFiat": "A currency code cannot match a conversion currency.",
+				"nameRequired": "Every currency needs a name.",
+				"symbolRequired": "Every currency needs a symbol.",
+				"factorInvalid": "Every rate must be greater than 0."
+			}
 		}
 	},
 	"customerPortal": {
