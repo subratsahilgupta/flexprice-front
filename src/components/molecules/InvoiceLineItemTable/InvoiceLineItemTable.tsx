@@ -168,39 +168,44 @@ const InvoiceLineItemTable: FC<Props> = ({
 							<div className='flex justify-between items-center py-1.5'>
 								<div className='flex items-center gap-1.5'>
 									<span className='text-xs text-content-muted'>{t('invoices.details.lineItemsTable.tax')}</span>
-									{tax_summary && !tax_summary.exemption && (
+									{tax_summary && (
 										<TooltipProvider delayDuration={0}>
 											<Tooltip>
 												<TooltipTrigger asChild>
-													<Info className='h-3.5 w-3.5 text-content-subtle hover:text-content-tertiary transition-colors cursor-help' />
+													<button
+														type='button'
+														aria-label={t('invoices.details.lineItemsTable.taxBreakdownAria')}
+														className='inline-flex items-center'>
+														<Info className='h-3.5 w-3.5 text-content-subtle hover:text-content-tertiary transition-colors cursor-help' />
+													</button>
 												</TooltipTrigger>
 												<TooltipContent
 													sideOffset={5}
 													className='bg-surface-inverse text-xs text-content-inverse px-2.5 py-1.5 rounded-[6px] max-w-[280px]'>
-													<div className='space-y-1'>
-														<div className='flex justify-between gap-6'>
-															<span>{t('invoices.details.lineItemsTable.taxInclusiveTotal')}</span>
-															<span>{formatAmount(Number(tax_summary.inclusive_tax), currency ?? '')}</span>
+													{tax_summary.exemption ? (
+														tax_summary.exemption.reason
+													) : (
+														<div className='space-y-1'>
+															<div className='flex justify-between gap-6'>
+																<span>{t('invoices.details.lineItemsTable.taxInclusiveTotal')}</span>
+																<span>{formatAmount(Number(tax_summary.inclusive_tax), currency ?? '')}</span>
+															</div>
+															<div className='flex justify-between gap-6'>
+																<span>{t('invoices.details.lineItemsTable.taxExclusiveTotal')}</span>
+																<span>{formatAmount(Number(tax_summary.exclusive_tax), currency ?? '')}</span>
+															</div>
+															<div className='flex justify-between gap-6 pt-1 border-t border-white/20 font-medium'>
+																<span>{t('invoices.details.lineItemsTable.taxTotal')}</span>
+																<span>{formatAmount(Number(tax_summary.total_tax), currency ?? '')}</span>
+															</div>
 														</div>
-														<div className='flex justify-between gap-6'>
-															<span>{t('invoices.details.lineItemsTable.taxExclusiveTotal')}</span>
-															<span>{formatAmount(Number(tax_summary.exclusive_tax), currency ?? '')}</span>
-														</div>
-														<div className='flex justify-between gap-6 pt-1 border-t border-white/20 font-medium'>
-															<span>{t('invoices.details.lineItemsTable.taxTotal')}</span>
-															<span>{formatAmount(Number(tax_summary.total_tax), currency ?? '')}</span>
-														</div>
-													</div>
+													)}
 												</TooltipContent>
 											</Tooltip>
 										</TooltipProvider>
 									)}
 								</div>
-								{tax_summary?.exemption ? (
-									<span className='text-sm text-content-tertiary'>{tax_summary.exemption.reason}</span>
-								) : (
-									<span className='text-sm text-content font-medium'>{formatAmount(Number(total_tax ?? 0), currency ?? '')}</span>
-								)}
+								<span className='text-sm text-content font-medium'>{formatAmount(Number(total_tax ?? 0), currency ?? '')}</span>
 							</div>
 						)}
 
@@ -211,7 +216,12 @@ const InvoiceLineItemTable: FC<Props> = ({
 								<TooltipProvider delayDuration={0}>
 									<Tooltip>
 										<TooltipTrigger asChild>
-											<Info className='h-3.5 w-3.5 text-content-subtle hover:text-content-tertiary transition-colors cursor-help' />
+											<button
+												type='button'
+												aria-label={t('invoices.details.lineItemsTable.netPayableAria')}
+												className='inline-flex items-center'>
+												<Info className='h-3.5 w-3.5 text-content-subtle hover:text-content-tertiary transition-colors cursor-help' />
+											</button>
 										</TooltipTrigger>
 										<TooltipContent
 											sideOffset={5}

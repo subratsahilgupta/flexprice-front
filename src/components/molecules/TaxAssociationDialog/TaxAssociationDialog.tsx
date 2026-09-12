@@ -1,4 +1,4 @@
-import { FC, useState, useCallback } from 'react';
+import { FC, useState, useCallback, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Button, Input, Select, SelectOption, Toggle, Dialog } from '@/components/atoms';
 import TaxApi from '@/api/TaxApi';
@@ -48,10 +48,24 @@ const TaxAssociationDialog: FC<TaxAssociationDialogProps> = ({
 		tax_rate_code: data?.tax_rate_code || '',
 		priority: data?.priority || 1,
 		currency: data?.currency || 'usd',
-		auto_apply: data?.auto_apply || true,
+		auto_apply: data?.auto_apply ?? true,
 		tax_behavior: data?.tax_behavior || TAX_BEHAVIOR.EXCLUSIVE,
 	});
 	const [errors, setErrors] = useState<FormErrors>({});
+
+	// The parents keep this dialog mounted while the selected row changes, so without this the
+	// form would still hold the previously edited override.
+	useEffect(() => {
+		if (!open) return;
+		setFormData({
+			tax_rate_code: data?.tax_rate_code || '',
+			priority: data?.priority || 1,
+			currency: data?.currency || 'usd',
+			auto_apply: data?.auto_apply ?? true,
+			tax_behavior: data?.tax_behavior || TAX_BEHAVIOR.EXCLUSIVE,
+		});
+		setErrors({});
+	}, [open, data?.tax_rate_code, data?.priority, data?.currency, data?.auto_apply, data?.tax_behavior]);
 
 	// Fetch published tax rates
 	const { data: taxRatesData, isLoading: isLoadingTaxRates } = useQuery({

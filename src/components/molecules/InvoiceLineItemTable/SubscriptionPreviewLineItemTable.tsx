@@ -151,39 +151,44 @@ const SubscriptionPreviewLineItemTable: FC<Props> = ({
 						<div className='flex flex-row justify-end items-center py-1'>
 							<div className='w-40 flex items-center justify-end gap-1.5 text-base font-medium text-content'>
 								<span>{t(`${li}.tax`)}</span>
-								{tax_summary && !tax_summary.exemption && (
+								{tax_summary && (
 									<TooltipProvider delayDuration={0}>
 										<Tooltip>
 											<TooltipTrigger asChild>
-												<Info className='h-3.5 w-3.5 text-content-subtle hover:text-content-tertiary transition-colors cursor-help' />
+												<button
+													type='button'
+													aria-label={t('invoices.details.lineItemsTable.taxBreakdownAria')}
+													className='inline-flex items-center'>
+													<Info className='h-3.5 w-3.5 text-content-subtle hover:text-content-tertiary transition-colors cursor-help' />
+												</button>
 											</TooltipTrigger>
 											<TooltipContent
 												sideOffset={5}
 												className='bg-surface-inverse text-xs text-content-inverse px-2.5 py-1.5 rounded-[6px] max-w-[280px]'>
-												<div className='space-y-1'>
-													<div className='flex justify-between gap-6'>
-														<span>{t(`${li}.taxInclusiveTotal`)}</span>
-														<span>{formatAmount(Number(tax_summary.inclusive_tax), currency ?? '')}</span>
+												{tax_summary.exemption ? (
+													tax_summary.exemption.reason
+												) : (
+													<div className='space-y-1'>
+														<div className='flex justify-between gap-6'>
+															<span>{t(`${li}.taxInclusiveTotal`)}</span>
+															<span>{formatAmount(Number(tax_summary.inclusive_tax), currency ?? '')}</span>
+														</div>
+														<div className='flex justify-between gap-6'>
+															<span>{t(`${li}.taxExclusiveTotal`)}</span>
+															<span>{formatAmount(Number(tax_summary.exclusive_tax), currency ?? '')}</span>
+														</div>
+														<div className='flex justify-between gap-6 pt-1 border-t border-white/20 font-medium'>
+															<span>{t(`${li}.taxTotal`)}</span>
+															<span>{formatAmount(Number(tax_summary.total_tax), currency ?? '')}</span>
+														</div>
 													</div>
-													<div className='flex justify-between gap-6'>
-														<span>{t(`${li}.taxExclusiveTotal`)}</span>
-														<span>{formatAmount(Number(tax_summary.exclusive_tax), currency ?? '')}</span>
-													</div>
-													<div className='flex justify-between gap-6 pt-1 border-t border-white/20 font-medium'>
-														<span>{t(`${li}.taxTotal`)}</span>
-														<span>{formatAmount(Number(tax_summary.total_tax), currency ?? '')}</span>
-													</div>
-												</div>
+												)}
 											</TooltipContent>
 										</Tooltip>
 									</TooltipProvider>
 								)}
 							</div>
-							{tax_summary?.exemption ? (
-								<div className='flex-1 text-end text-sm text-content-tertiary'>{tax_summary.exemption.reason}</div>
-							) : (
-								<div className='flex-1 text-end text-sm text-content font-medium'>{formatAmount(Number(tax ?? 0), currency ?? '')}</div>
-							)}
+							<div className='flex-1 text-end text-sm text-content font-medium'>{formatAmount(Number(tax ?? 0), currency ?? '')}</div>
 						</div>
 					)}
 

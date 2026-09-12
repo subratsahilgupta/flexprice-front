@@ -156,8 +156,11 @@ const CustomerInformationTab = () => {
 			value: customer?.email || '--',
 		},
 		{
-			label: 'Tax Treatment',
-			value: customer?.tax_treatment === TAX_TREATMENT.EXEMPT ? 'Exempt' : 'Taxable',
+			label: t('overview.labels.taxTreatment'),
+			value:
+				customer?.tax_treatment === TAX_TREATMENT.EXEMPT
+					? t('overview.labels.taxTreatmentExempt')
+					: t('overview.labels.taxTreatmentTaxable'),
 		},
 		...(customer?.timezone?.trim()
 			? [

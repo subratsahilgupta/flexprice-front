@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import FlexpriceTable, { ColumnData } from '../Table';
-import { TaxRateOverride } from '@/types/dto/tax';
+import { TaxRateOverride, CreateTaxAssociationRequest } from '@/types/dto/tax';
 import { Chip, ActionButton, AddButton, FormHeader } from '@/components/atoms';
 import TaxAssociationDialog from '../TaxAssociationDialog/TaxAssociationDialog';
 import { TAX_BEHAVIOR, TAXRATE_ENTITY_TYPE } from '@/models/Tax';
@@ -18,7 +18,7 @@ const InvoiceTaxAssociationTable: FC<Props> = ({ data, onChange, disabled, defau
 	const [isOpen, setIsOpen] = useState(false);
 	const [selectedTaxOverride, setSelectedTaxOverride] = useState<TaxRateOverride | null>(null);
 
-	const handleSave = (taxAssociationRequest: any) => {
+	const handleSave = (taxAssociationRequest: CreateTaxAssociationRequest) => {
 		const newTaxOverride: TaxRateOverride = {
 			tax_rate_code: taxAssociationRequest.tax_rate_code,
 			priority: taxAssociationRequest.priority,
