@@ -92,7 +92,11 @@
 			"addBillingDetail": "Add Billing Detail",
 			"billingSectionBadge": "Billing Details",
 			"saving": "Saving...",
-			"save": "Save"
+			"save": "Save",
+			"taxTreatmentLabel": "Tax Treatment",
+			"taxTreatmentHint": "Exempt customers are never charged tax on their invoices.",
+			"taxTreatmentTaxable": "Taxable",
+			"taxTreatmentExempt": "Exempt"
 		},
 		"billingFields": {
 			"country": "Country",

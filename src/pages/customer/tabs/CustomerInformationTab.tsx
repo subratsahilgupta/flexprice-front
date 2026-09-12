@@ -4,6 +4,7 @@ import ConnectionApi from '@/api/ConnectionApi';
 import SubscriptionApi from '@/api/SubscriptionApi';
 import { useQuery } from '@tanstack/react-query';
 import { Country } from 'country-state-city';
+import { TAX_TREATMENT } from '@/models';
 import { CreateCustomerDrawer, Detail, DetailsCard, MetadataModal, SaveCardModal } from '@/components/molecules';
 import FlexpriceTable, { ColumnData } from '@/components/molecules/Table';
 import { useParams, useOutletContext, useNavigate } from 'react-router';
@@ -153,6 +154,10 @@ const CustomerInformationTab = () => {
 		{
 			label: 'Email',
 			value: customer?.email || '--',
+		},
+		{
+			label: 'Tax Treatment',
+			value: customer?.tax_treatment === TAX_TREATMENT.EXEMPT ? 'Exempt' : 'Taxable',
 		},
 		...(customer?.timezone?.trim()
 			? [

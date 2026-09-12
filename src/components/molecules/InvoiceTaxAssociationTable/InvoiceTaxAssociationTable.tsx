@@ -3,7 +3,7 @@ import FlexpriceTable, { ColumnData } from '../Table';
 import { TaxRateOverride } from '@/types/dto/tax';
 import { Chip, ActionButton, AddButton, FormHeader } from '@/components/atoms';
 import TaxAssociationDialog from '../TaxAssociationDialog/TaxAssociationDialog';
-import { TAXRATE_ENTITY_TYPE } from '@/models/Tax';
+import { TAX_BEHAVIOR, TAXRATE_ENTITY_TYPE } from '@/models/Tax';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -24,6 +24,7 @@ const InvoiceTaxAssociationTable: FC<Props> = ({ data, onChange, disabled, defau
 			priority: taxAssociationRequest.priority,
 			currency: (taxAssociationRequest.currency || defaultCurrency || 'usd').toLowerCase(),
 			auto_apply: taxAssociationRequest.auto_apply,
+			tax_behavior: taxAssociationRequest.tax_behavior,
 		};
 
 		if (selectedTaxOverride) {
@@ -58,6 +59,11 @@ const InvoiceTaxAssociationTable: FC<Props> = ({ data, onChange, disabled, defau
 		{
 			title: 'Auto Apply',
 			render: (row) => <Chip variant={row.auto_apply ? 'success' : 'default'} label={row.auto_apply ? t('labels.yes') : t('labels.no')} />,
+		},
+		{
+			title: 'Tax Behavior',
+			render: (row) =>
+				row.tax_behavior === TAX_BEHAVIOR.INCLUSIVE ? t('taxAssociation.taxBehaviorInclusive') : t('taxAssociation.taxBehaviorExclusive'),
 		},
 		{
 			title: 'Currency',
@@ -101,6 +107,7 @@ const InvoiceTaxAssociationTable: FC<Props> = ({ data, onChange, disabled, defau
 					priority: selectedTaxOverride?.priority || 1,
 					currency: selectedTaxOverride?.currency || defaultCurrency || 'usd',
 					auto_apply: selectedTaxOverride?.auto_apply || true,
+					tax_behavior: selectedTaxOverride?.tax_behavior || TAX_BEHAVIOR.EXCLUSIVE,
 				}}
 				onCancel={() => {
 					setIsOpen(false);
