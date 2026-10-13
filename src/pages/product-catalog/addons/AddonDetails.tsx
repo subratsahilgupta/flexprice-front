@@ -376,6 +376,7 @@ const AddonDetails = () => {
 		},
 		onSuccess: () => {
 			void refetchQueries(['fetchAddon']);
+			void queryClient.invalidateQueries({ queryKey: ['addonSyncStatus', id] });
 		},
 		onError: (error: Error) => {
 			toast.error(error.message || 'Error terminating price');
@@ -401,7 +402,10 @@ const AddonDetails = () => {
 		setIsPriceDialogOpen(false);
 		setSelectedPriceForEdit(null);
 		void refetchQueries(['fetchAddon']);
-	}, []);
+		// A price change can move the addon's usage sequence, so the sync status must be
+		// refetched or "Sync Usage Charges" stays disabled while the user is on this page.
+		void queryClient.invalidateQueries({ queryKey: ['addonSyncStatus', id] });
+	}, [id, queryClient]);
 
 	const handleTerminateConfirm = useCallback(
 		async (endDate: string | undefined) => {
