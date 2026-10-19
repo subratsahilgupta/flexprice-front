@@ -66,6 +66,8 @@ interface TopupCardProps {
 const TopupCard: FC<TopupCardProps> = ({ walletId, currency, conversion_rate = 1, onSuccess, onCheckoutUrl, customerId }) => {
 	const { t } = useTranslation('billing');
 	const { minExpiryDate } = useMinCreditExpiryDate(customerId);
+	// Days after this are disabled. Today stays selectable.
+	const maxEffectiveDate = useMemo(() => new Date(), []);
 
 	const creditsTypeOptions = useMemo<RectangleRadiogroupOption[]>(
 		() => [
@@ -420,6 +422,7 @@ const TopupCard: FC<TopupCardProps> = ({ walletId, currency, conversion_rate = 1
 						<DatePicker
 							label={t('wallet.topup.effectiveDate')}
 							placeholder={t('wallet.topup.effectiveDatePlaceholder')}
+							maxDate={maxEffectiveDate}
 							date={topupPayload.effective_date ? new Date(topupPayload.effective_date) : undefined}
 							setDate={(value) =>
 								updateTopupPayload({
