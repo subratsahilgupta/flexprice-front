@@ -126,6 +126,9 @@ export type {
 	GetCustomerUsageSummaryRequest,
 	DashboardAnalyticsRequest,
 	DashboardCostAnalyticsRequest,
+	PortalPropertyKeysRequest,
+	PortalPropertyValuesRequest,
+	PropertyValuesResponse,
 } from './Dashboard';
 
 export type {
@@ -176,6 +179,8 @@ export type {
 	MeterResponse,
 	GetAllMetersResponse,
 	ListMetersResponse,
+	GetPropertyKeysRequest,
+	PropertyKeysResponse,
 } from './Meter';
 
 export type { GetAllPaymentsPayload, GetAllPaymentsResponse, RecordPaymentPayload } from './Payment';
