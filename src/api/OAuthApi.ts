@@ -19,6 +19,9 @@ export interface InitiateOAuthRequest {
 			inbound: boolean;
 			outbound: boolean;
 		};
+		invoice_sync_settings?: {
+			attach_payment_gateways?: boolean;
+		};
 	};
 }
 

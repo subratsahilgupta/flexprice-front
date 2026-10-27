@@ -998,7 +998,9 @@
 			"webhookBodyHtml": "In Zoho Books, create Invoice and Contact webhooks and set this URL on each. Use the same secret here and in Zoho so Flexprice can verify <header>X-Zoho-Webhook-Signature</header>.",
 			"credentialsHidden": "OAuth credentials are encrypted and hidden. To update credentials, delete the connection and create a new one.",
 			"selectTenantForUrl": "Select tenant and environment to generate URL",
-			"toastUpdated": "Zoho Books connection updated successfully"
+			"toastUpdated": "Zoho Books connection updated successfully",
+			"attachPaymentGateways": "Attach payment gateways to invoices",
+			"attachPaymentGatewaysDesc": "Adds pay online links to synced invoices. The gateway must also be enabled in Zoho Books."
 		},
 		"quickBooks": {
 			"descriptionEdit": "Update your QuickBooks connection settings.",

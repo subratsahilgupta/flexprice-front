@@ -2,6 +2,7 @@ import { config } from '@/config/config';
 import { FC, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { Button, Input, Sheet, Spacer } from '@/components/atoms';
+import { Switch } from '@/components/ui/switch';
 import { useMutation } from '@tanstack/react-query';
 import ConnectionApi from '@/api/ConnectionApi';
 import OAuthApi from '@/api/OAuthApi';
@@ -16,6 +17,13 @@ interface ZohoBooksConnection extends Connection {
 		organization_id?: string;
 		organization_name?: string;
 		accounts_server?: string;
+	};
+	sync_config?: {
+		invoice_sync_settings?: {
+			attach_payment_gateways?: boolean;
+			[key: string]: unknown;
+		};
+		[key: string]: unknown;
 	};
 }
 
@@ -33,6 +41,9 @@ interface ZohoBooksFormData {
 	organization_id: string;
 	accounts_server: string;
 	webhook_secret: string;
+	sync_config: {
+		attach_payment_gateways: boolean;
+	};
 }
 
 const ZOHO_SESSION_KEY = 'zoho_books_oauth_session_id';
@@ -54,6 +65,9 @@ const ZohoBooksConnectionDrawer: FC<ZohoBooksConnectionDrawerProps> = ({ isOpen,
 		organization_id: '',
 		accounts_server: 'https://accounts.zoho.in',
 		webhook_secret: '',
+		sync_config: {
+			attach_payment_gateways: false,
+		},
 	});
 	const [errors, setErrors] = useState<Record<string, string>>({});
 	const [redirectUriCopied, setRedirectUriCopied] = useState(false);
@@ -70,6 +84,9 @@ const ZohoBooksConnectionDrawer: FC<ZohoBooksConnectionDrawerProps> = ({ isOpen,
 			organization_id: (secretData.organization_id as string) || '',
 			accounts_server: (secretData.accounts_server as string) || 'https://accounts.zoho.in',
 			webhook_secret: '',
+			sync_config: {
+				attach_payment_gateways: connection?.sync_config?.invoice_sync_settings?.attach_payment_gateways || false,
+			},
 		});
 		setErrors({});
 		setWebhookUrlCopied(false);
@@ -78,6 +95,16 @@ const ZohoBooksConnectionDrawer: FC<ZohoBooksConnectionDrawerProps> = ({ isOpen,
 	const handleChange = (field: keyof ZohoBooksFormData, value: string) => {
 		setFormData((prev) => ({ ...prev, [field]: value }));
 		setErrors((prev) => ({ ...prev, [field]: '' }));
+	};
+
+	const handleSyncConfigChange = (setting: keyof ZohoBooksFormData['sync_config'], value: boolean) => {
+		setFormData((prev) => ({
+			...prev,
+			sync_config: {
+				...prev.sync_config,
+				[setting]: value,
+			},
+		}));
 	};
 
 	const validateForm = () => {
@@ -118,6 +145,9 @@ const ZohoBooksConnectionDrawer: FC<ZohoBooksConnectionDrawerProps> = ({ isOpen,
 						inbound: true,
 						outbound: false,
 					},
+					invoice_sync_settings: {
+						attach_payment_gateways: formData.sync_config.attach_payment_gateways,
+					},
 				},
 			});
 		},
@@ -142,11 +172,20 @@ const ZohoBooksConnectionDrawer: FC<ZohoBooksConnectionDrawerProps> = ({ isOpen,
 			if (!connection) return;
 			const existingConnection = await ConnectionApi.Get(connection.id);
 			const existingSecretData = (existingConnection as ZohoBooksConnection).encrypted_secret_data || {};
+			// The backend replaces sync_config wholesale, so carry every existing setting forward.
+			const existingSyncConfig = (existingConnection as ZohoBooksConnection).sync_config || {};
 			const payload: Record<string, unknown> = {
 				name: formData.name,
 				encrypted_secret_data: {
 					provider_type: CONNECTION_PROVIDER_TYPE.ZOHO_BOOKS,
 					...existingSecretData,
+				},
+				sync_config: {
+					...existingSyncConfig,
+					invoice_sync_settings: {
+						...existingSyncConfig.invoice_sync_settings,
+						attach_payment_gateways: formData.sync_config.attach_payment_gateways,
+					},
 				},
 			};
 			if (formData.webhook_secret.trim()) {
@@ -299,6 +338,26 @@ const ZohoBooksConnectionDrawer: FC<ZohoBooksConnectionDrawerProps> = ({ isOpen,
 							{redirectUriCopied ? <CheckCircle className='w-3 h-3' /> : <Copy className='w-3 h-3' />}
 							{redirectUriCopied ? tc('actions.copied') : tc('actions.copy')}
 						</Button>
+					</div>
+				</div>
+
+				{/* Sync Configuration Section */}
+				<div className='p-4 bg-surface-subtle border border-line rounded-lg'>
+					<h3 className='text-sm font-medium text-content-heading mb-3'>{t('connection.sync.title')}</h3>
+					<p className='text-xs text-content-tertiary mb-4'>{t('connection.sync.description', { partner: 'Zoho Books' })}</p>
+
+					<div className='space-y-4'>
+						{/* Payment gateways */}
+						<div className='flex items-center justify-between p-3 bg-surface border border-line rounded-lg'>
+							<div>
+								<label className='text-sm font-medium text-content-secondary'>{t('connection.zohoBooks.attachPaymentGateways')}</label>
+								<p className='text-xs text-content-muted'>{t('connection.zohoBooks.attachPaymentGatewaysDesc')}</p>
+							</div>
+							<Switch
+								checked={formData.sync_config.attach_payment_gateways}
+								onCheckedChange={(checked) => handleSyncConfigChange('attach_payment_gateways', checked)}
+							/>
+						</div>
 					</div>
 				</div>
 
