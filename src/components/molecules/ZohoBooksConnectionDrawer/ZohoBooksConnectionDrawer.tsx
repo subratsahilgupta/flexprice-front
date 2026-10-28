@@ -1,7 +1,7 @@
 import { config } from '@/config/config';
 import { FC, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { Button, Input, Sheet, Spacer } from '@/components/atoms';
+import { Button, Checkbox, Input, Select, Sheet, Spacer } from '@/components/atoms';
 import { Switch } from '@/components/ui/switch';
 import { useMutation } from '@tanstack/react-query';
 import ConnectionApi from '@/api/ConnectionApi';
@@ -20,7 +20,11 @@ interface ZohoBooksConnection extends Connection {
 	};
 	sync_config?: {
 		invoice_sync_settings?: {
-			attach_payment_gateways?: boolean;
+			payment_gateways?: {
+				enabled?: boolean;
+				gateways?: string[];
+				paypal_payment_method?: string;
+			};
 			[key: string]: unknown;
 		};
 		[key: string]: unknown;
@@ -42,9 +46,24 @@ interface ZohoBooksFormData {
 	accounts_server: string;
 	webhook_secret: string;
 	sync_config: {
-		attach_payment_gateways: boolean;
+		payment_gateways: {
+			enabled: boolean;
+			gateways: string[];
+			paypal_payment_method: string;
+		};
 	};
 }
+
+// Zoho Books gateway_name values. Labels are brand names, so they are not translated.
+const ZOHO_PAYMENT_GATEWAYS = [
+	{ value: 'paypal', label: 'PayPal' },
+	{ value: 'stripe', label: 'Stripe' },
+	{ value: 'razorpay', label: 'Razorpay' },
+	{ value: 'authorize_net', label: 'Authorize.Net' },
+	{ value: 'payflow_pro', label: 'PayPal Payflow Pro' },
+	{ value: 'braintree', label: 'Braintree' },
+	{ value: '2checkout', label: '2Checkout' },
+];
 
 const ZOHO_SESSION_KEY = 'zoho_books_oauth_session_id';
 const OAUTH_PROVIDER_KEY = 'oauth_provider';
@@ -66,7 +85,11 @@ const ZohoBooksConnectionDrawer: FC<ZohoBooksConnectionDrawerProps> = ({ isOpen,
 		accounts_server: 'https://accounts.zoho.in',
 		webhook_secret: '',
 		sync_config: {
-			attach_payment_gateways: false,
+			payment_gateways: {
+				enabled: false,
+				gateways: [],
+				paypal_payment_method: 'standard',
+			},
 		},
 	});
 	const [errors, setErrors] = useState<Record<string, string>>({});
@@ -85,7 +108,11 @@ const ZohoBooksConnectionDrawer: FC<ZohoBooksConnectionDrawerProps> = ({ isOpen,
 			accounts_server: (secretData.accounts_server as string) || 'https://accounts.zoho.in',
 			webhook_secret: '',
 			sync_config: {
-				attach_payment_gateways: connection?.sync_config?.invoice_sync_settings?.attach_payment_gateways || false,
+				payment_gateways: {
+					enabled: connection?.sync_config?.invoice_sync_settings?.payment_gateways?.enabled || false,
+					gateways: connection?.sync_config?.invoice_sync_settings?.payment_gateways?.gateways || [],
+					paypal_payment_method: connection?.sync_config?.invoice_sync_settings?.payment_gateways?.paypal_payment_method || 'standard',
+				},
 			},
 		});
 		setErrors({});
@@ -97,12 +124,42 @@ const ZohoBooksConnectionDrawer: FC<ZohoBooksConnectionDrawerProps> = ({ isOpen,
 		setErrors((prev) => ({ ...prev, [field]: '' }));
 	};
 
-	const handleSyncConfigChange = (setting: keyof ZohoBooksFormData['sync_config'], value: boolean) => {
+	const handlePaymentGatewaysEnabledChange = (value: boolean) => {
 		setFormData((prev) => ({
 			...prev,
 			sync_config: {
-				...prev.sync_config,
-				[setting]: value,
+				payment_gateways: {
+					...prev.sync_config.payment_gateways,
+					enabled: value,
+				},
+			},
+		}));
+		setErrors((prev) => ({ ...prev, payment_gateways: '' }));
+	};
+
+	const handlePaymentGatewayChange = (gateway: string, selected: boolean) => {
+		setFormData((prev) => ({
+			...prev,
+			sync_config: {
+				payment_gateways: {
+					...prev.sync_config.payment_gateways,
+					gateways: selected
+						? [...prev.sync_config.payment_gateways.gateways, gateway]
+						: prev.sync_config.payment_gateways.gateways.filter((g) => g !== gateway),
+				},
+			},
+		}));
+		setErrors((prev) => ({ ...prev, payment_gateways: '' }));
+	};
+
+	const handlePayPalPaymentMethodChange = (value: string) => {
+		setFormData((prev) => ({
+			...prev,
+			sync_config: {
+				payment_gateways: {
+					...prev.sync_config.payment_gateways,
+					paypal_payment_method: value,
+				},
 			},
 		}));
 	};
@@ -117,8 +174,19 @@ const ZohoBooksConnectionDrawer: FC<ZohoBooksConnectionDrawerProps> = ({ isOpen,
 		if (!connection && !formData.webhook_secret.trim()) {
 			newErrors.webhook_secret = t('connection.validation.webhookSecretRequired');
 		}
+		if (formData.sync_config.payment_gateways.enabled && formData.sync_config.payment_gateways.gateways.length === 0) {
+			newErrors.payment_gateways = t('connection.validation.paymentGatewayRequired');
+		}
 		setErrors(newErrors);
 		return Object.keys(newErrors).length === 0;
+	};
+
+	const isPayPalSelected = formData.sync_config.payment_gateways.gateways.includes('paypal');
+	// The PayPal payment method applies only when PayPal is selected.
+	const paymentGatewaysPayload = {
+		enabled: formData.sync_config.payment_gateways.enabled,
+		gateways: formData.sync_config.payment_gateways.gateways,
+		...(isPayPalSelected && { paypal_payment_method: formData.sync_config.payment_gateways.paypal_payment_method }),
 	};
 
 	const { mutate: initiateOAuth, isPending: isInitiatingOAuth } = useMutation({
@@ -146,7 +214,7 @@ const ZohoBooksConnectionDrawer: FC<ZohoBooksConnectionDrawerProps> = ({ isOpen,
 						outbound: false,
 					},
 					invoice_sync_settings: {
-						attach_payment_gateways: formData.sync_config.attach_payment_gateways,
+						payment_gateways: paymentGatewaysPayload,
 					},
 				},
 			});
@@ -184,7 +252,7 @@ const ZohoBooksConnectionDrawer: FC<ZohoBooksConnectionDrawerProps> = ({ isOpen,
 					...existingSyncConfig,
 					invoice_sync_settings: {
 						...existingSyncConfig.invoice_sync_settings,
-						attach_payment_gateways: formData.sync_config.attach_payment_gateways,
+						payment_gateways: paymentGatewaysPayload,
 					},
 				},
 			};
@@ -348,15 +416,47 @@ const ZohoBooksConnectionDrawer: FC<ZohoBooksConnectionDrawerProps> = ({ isOpen,
 
 					<div className='space-y-4'>
 						{/* Payment gateways */}
-						<div className='flex items-center justify-between p-3 bg-surface border border-line rounded-lg'>
-							<div>
-								<label className='text-sm font-medium text-content-secondary'>{t('connection.zohoBooks.attachPaymentGateways')}</label>
-								<p className='text-xs text-content-muted'>{t('connection.zohoBooks.attachPaymentGatewaysDesc')}</p>
+						<div className='p-3 bg-surface border border-line rounded-lg'>
+							<div className='flex items-center justify-between'>
+								<div>
+									<label className='text-sm font-medium text-content-secondary'>{t('connection.zohoBooks.attachPaymentGateways')}</label>
+									<p className='text-xs text-content-muted'>{t('connection.zohoBooks.attachPaymentGatewaysDesc')}</p>
+								</div>
+								<Switch checked={formData.sync_config.payment_gateways.enabled} onCheckedChange={handlePaymentGatewaysEnabledChange} />
 							</div>
-							<Switch
-								checked={formData.sync_config.attach_payment_gateways}
-								onCheckedChange={(checked) => handleSyncConfigChange('attach_payment_gateways', checked)}
-							/>
+
+							{formData.sync_config.payment_gateways.enabled && (
+								<div className='mt-4 pt-4 border-t border-line'>
+									<p className='text-sm font-medium text-content-secondary'>{t('connection.zohoBooks.paymentGateways')}</p>
+									<p className='text-xs text-content-muted mb-3'>{t('connection.zohoBooks.paymentGatewaysDesc')}</p>
+									<div className='grid grid-cols-2 gap-3'>
+										{ZOHO_PAYMENT_GATEWAYS.map((gateway) => (
+											<Checkbox
+												key={gateway.value}
+												id={`zoho-payment-gateway-${gateway.value}`}
+												label={gateway.label}
+												checked={formData.sync_config.payment_gateways.gateways.includes(gateway.value)}
+												onCheckedChange={(checked) => handlePaymentGatewayChange(gateway.value, checked)}
+											/>
+										))}
+									</div>
+									{isPayPalSelected && (
+										<div className='mt-4'>
+											<Select
+												label={t('connection.zohoBooks.paypalPaymentMethod')}
+												description={t('connection.zohoBooks.paypalPaymentMethodDesc')}
+												options={[
+													{ value: 'standard', label: t('connection.zohoBooks.paypalPaymentMethodStandard') },
+													{ value: 'adaptive', label: t('connection.zohoBooks.paypalPaymentMethodAdaptive') },
+												]}
+												value={formData.sync_config.payment_gateways.paypal_payment_method}
+												onChange={handlePayPalPaymentMethodChange}
+											/>
+										</div>
+									)}
+									{errors.payment_gateways && <p className='text-sm text-destructive mt-2'>{errors.payment_gateways}</p>}
+								</div>
+							)}
 						</div>
 					</div>
 				</div>

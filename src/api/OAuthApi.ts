@@ -20,7 +20,11 @@ export interface InitiateOAuthRequest {
 			outbound: boolean;
 		};
 		invoice_sync_settings?: {
-			attach_payment_gateways?: boolean;
+			payment_gateways?: {
+				enabled?: boolean;
+				gateways?: string[];
+				paypal_payment_method?: string;
+			};
 		};
 	};
 }
